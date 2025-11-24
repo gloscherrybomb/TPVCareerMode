@@ -1,0 +1,220 @@
+/* Peloton Page Styles */
+
+.peloton-intro {
+    padding: 4rem 0;
+    background: var(--dark-card);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.intro-content {
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.intro-content h2 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2.5rem;
+    font-weight: 900;
+    margin-bottom: 1.5rem;
+    background: linear-gradient(135deg, var(--gradient-start), var(--gradient-mid), var(--gradient-end));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.intro-content p {
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+    line-height: 1.8;
+}
+
+/* Riders Section */
+.riders-section {
+    padding: 6rem 0;
+}
+
+.riders-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 3rem;
+}
+
+.rider-card {
+    background: var(--dark-card);
+    border: 2px solid rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    overflow: hidden;
+    transition: all 0.4s ease;
+    animation: fadeInUp 0.6s ease-out both;
+}
+
+.rider-card:nth-child(1) { animation-delay: 0.1s; }
+.rider-card:nth-child(2) { animation-delay: 0.2s; }
+.rider-card:nth-child(3) { animation-delay: 0.3s; }
+.rider-card:nth-child(4) { animation-delay: 0.4s; }
+.rider-card:nth-child(5) { animation-delay: 0.5s; }
+.rider-card:nth-child(6) { animation-delay: 0.6s; }
+
+.rider-card:hover {
+    transform: translateY(-10px);
+    border-color: var(--accent-blue);
+    box-shadow: 0 20px 50px rgba(69, 202, 255, 0.2);
+}
+
+.rider-image {
+    position: relative;
+    height: 250px;
+    background: linear-gradient(135deg, rgba(255, 27, 107, 0.1), rgba(69, 202, 255, 0.1));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.rider-placeholder {
+    font-size: 6rem;
+}
+
+.rider-rank {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    padding: 0.5rem 1.2rem;
+    background: rgba(10, 14, 26, 0.9);
+    backdrop-filter: blur(10px);
+    border-radius: 50px;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.rider-info {
+    padding: 2rem;
+}
+
+.rider-name {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+}
+
+.rider-location {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+}
+
+.rider-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding: 1.5rem;
+    background: var(--dark-bg);
+    border-radius: 10px;
+}
+
+.stat {
+    text-align: center;
+}
+
+.stat-label {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.3rem;
+}
+
+.stat-value {
+    display: block;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent-blue);
+}
+
+.rider-bio {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    font-style: italic;
+    padding-left: 1rem;
+    border-left: 3px solid var(--accent-blue);
+}
+
+/* Join Peloton Section */
+.join-peloton {
+    padding: 6rem 0;
+    background: linear-gradient(135deg, rgba(255, 27, 107, 0.1), rgba(69, 202, 255, 0.1));
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.join-content {
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.join-content h2 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 3rem;
+    font-weight: 900;
+    margin-bottom: 1rem;
+}
+
+.join-content p {
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+    margin-bottom: 2.5rem;
+}
+
+/* Highlight top riders */
+.rider-card:has(.rider-rank:contains("#1")) {
+    border-color: var(--accent-pink);
+    background: linear-gradient(135deg, rgba(255, 27, 107, 0.05), rgba(199, 26, 229, 0.05));
+}
+
+.rider-card:has(.rider-rank:contains("#2")) {
+    border-color: rgba(192, 192, 192, 0.3);
+}
+
+.rider-card:has(.rider-rank:contains("#3")) {
+    border-color: rgba(205, 127, 50, 0.3);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .intro-content h2 {
+        font-size: 2rem;
+    }
+
+    .riders-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .rider-image {
+        height: 200px;
+    }
+
+    .rider-placeholder {
+        font-size: 4rem;
+    }
+
+    .rider-stats {
+        gap: 0.5rem;
+        padding: 1rem;
+    }
+
+    .stat-value {
+        font-size: 1.2rem;
+    }
+
+    .join-content h2 {
+        font-size: 2rem;
+    }
+}

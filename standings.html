@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Standings - TPV Career Mode</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="standings.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <span class="logo-text">TPV</span>
+                <span class="logo-subtitle">Career Mode</span>
+            </div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="events.html" class="nav-link">Events</a>
+                <a href="peloton.html" class="nav-link">Peloton</a>
+                <a href="standings.html" class="nav-link active">Standings</a>
+                <a href="#" class="nav-link nav-login" id="loginBtn">Login</a>
+            </div>
+            <button class="nav-toggle" id="navToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="page-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="breadcrumb">
+                    <a href="index.html">Home</a> / Standings
+                </div>
+                <h1 class="page-title">Leaderboards</h1>
+                <p class="page-subtitle">Where do you stand among the competition?</p>
+            </div>
+        </div>
+    </div>
+
+    <section class="standings-tabs">
+        <div class="container">
+            <div class="tabs-container">
+                <button class="tab-btn active" data-tab="season">Season Standings</button>
+                <button class="tab-btn" data-tab="global">Global Rankings</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Season Standings -->
+    <section class="standings-content active" id="seasonContent">
+        <div class="container">
+            <div class="standings-header">
+                <h2>Season 1 - Local Amateur</h2>
+                <div class="standings-filters">
+                    <select class="filter-select">
+                        <option value="all">All Riders</option>
+                        <option value="region">By Region</option>
+                        <option value="age">By Age Group</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="podium">
+                <div class="podium-spot second">
+                    <div class="podium-rank">2</div>
+                    <div class="podium-avatar">🚴</div>
+                    <div class="podium-name">Maria Rodriguez</div>
+                    <div class="podium-country">🇪🇸 Spain</div>
+                    <div class="podium-points">812 pts</div>
+                </div>
+                <div class="podium-spot first">
+                    <div class="podium-rank">1</div>
+                    <div class="podium-avatar">🚴</div>
+                    <div class="podium-name">Emma Larsson</div>
+                    <div class="podium-country">🇸🇪 Sweden</div>
+                    <div class="podium-points">1,127 pts</div>
+                </div>
+                <div class="podium-spot third">
+                    <div class="podium-rank">3</div>
+                    <div class="podium-avatar">🚴</div>
+                    <div class="podium-name">James Mitchell</div>
+                    <div class="podium-country">🇬🇧 UK</div>
+                    <div class="podium-points">1,045 pts</div>
+                </div>
+            </div>
+
+            <div class="standings-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Rider</th>
+                            <th>Country</th>
+                            <th>Events</th>
+                            <th>Points</th>
+                            <th>Trend</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="rank-highlight">
+                            <td><span class="rank-badge gold">1</span></td>
+                            <td class="rider-cell">
+                                <span class="rider-avatar">🚴</span>
+                                <span class="rider-name">Emma Larsson</span>
+                            </td>
+                            <td>🇸🇪 Sweden</td>
+                            <td>12</td>
+                            <td class="points-cell">1,127</td>
+                            <td><span class="trend trend-up">↑ 2</span></td>
+                        </tr>
+                        <tr class="rank-highlight">
+                            <td><span class="rank-badge silver">2</span></td>
+                            <td class="rider-cell">
+                                <span class="rider-avatar">🚴</span>
+                                <span class="rider-name">Maria Rodriguez</span>
+                            </td>
+                            <td>🇪🇸 Spain</td>
+                            <td>12</td>
+                            <td class="points-cell">1,045</td>
+                            <td><span class="trend trend-down">↓ 1</span></td>
+                        </tr>
+                        <tr class="rank-highlight">
+                            <td><span class="rank-badge bronze">3</span></td>
+                            <td class="rider-cell">
+                                <span class="rider-avatar">🚴</span>
+                                <span class="rider-name">James Mitchell</span>
+                            </td>
+                            <td>🇬🇧 United Kingdom</td>
+                            <td>12</td>
+                            <td class="points-cell">812</td>
+                            <td><span class="trend trend-up">↑ 1</span></td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td class="rider-cell">
+                                <span class="rider-avatar">🚴</span>
+                                <span class="rider-name">Lucas Silva</span>
+                            </td>
+                            <td>🇧🇷 Brazil</td>
+                            <td>11</td>
+                            <td class="points-cell">745</td>
+                            <td><span class="trend trend-same">-</span></td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td class="rider-cell">
+                                <span class="rider-avatar">🚴</span>
+                                <span class="rider-name">Yuki Nakamura</span>
+                            </td>
+                            <td>🇯🇵 Japan</td>
+                            <td>10</td>
+                            <td class="points-cell">720</td>
+                            <td><span class="trend trend-up">↑ 3</span></td>
+                        </tr>
+                        <tr>
+                            <td>6</td>
+                            <td class="rider-cell">
+                                <span class="rider-avatar">🚴</span>
+                                <span class="rider-name">Sarah Johnson</span>
+                            </td>
+                            <td>🇺🇸 USA</td>
+                            <td>11</td>
+                            <td class="points-cell">698</td>
+                            <td><span class="trend trend-down">↓ 2</span></td>
+                        </tr>
+                        <tr>
+                            <td>7</td>
+                            <td class="rider-cell">
+                                <span class="rider-avatar">🚴</span>
+                                <span class="rider-name">Pierre Dubois</span>
+                            </td>
+                            <td>🇫🇷 France</td>
+                            <td>10</td>
+                            <td class="points-cell">665</td>
+                            <td><span class="trend trend-same">-</span></td>
+                        </tr>
+                        <tr>
+                            <td>8</td>
+                            <td class="rider-cell">
+                                <span class="rider-avatar">🚴</span>
+                                <span class="rider-name">Kenji Tanaka</span>
+                            </td>
+                            <td>🇯🇵 Japan</td>
+                            <td>10</td>
+                            <td class="points-cell">645</td>
+                            <td><span class="trend trend-up">↑ 1</span></td>
+                        </tr>
+                        <tr>
+                            <td>9</td>
+                            <td class="rider-cell">
+                                <span class="rider-avatar">🚴</span>
+                                <span class="rider-name">Anna Kowalski</span>
+                            </td>
+                            <td>🇵🇱 Poland</td>
+                            <td>9</td>
+                            <td class="points-cell">612</td>
+                            <td><span class="trend trend-down">↓ 1</span></td>
+                        </tr>
+                        <tr>
+                            <td>10</td>
+                            <td class="rider-cell">
+                                <span class="rider-avatar">🚴</span>
+                                <span class="rider-name">Marco Bianchi</span>
+                            </td>
+                            <td>🇮🇹 Italy</td>
+                            <td>10</td>
+                            <td class="points-cell">598</td>
+                            <td><span class="trend trend-same">-</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- Global Rankings -->
+    <section class="standings-content" id="globalContent">
+        <div class="container">
+            <div class="standings-header">
+                <h2>Global Career Rankings</h2>
+                <p class="standings-subtitle">Cumulative standings across all stages</p>
+            </div>
+
+            <div class="global-stats">
+                <div class="global-stat-card">
+                    <div class="stat-icon">👥</div>
+                    <div class="stat-info">
+                        <div class="stat-value">2,547</div>
+                        <div class="stat-label">Active Riders</div>
+                    </div>
+                </div>
+                <div class="global-stat-card">
+                    <div class="stat-icon">🌍</div>
+                    <div class="stat-info">
+                        <div class="stat-value">68</div>
+                        <div class="stat-label">Countries</div>
+                    </div>
+                </div>
+                <div class="global-stat-card">
+                    <div class="stat-icon">🏁</div>
+                    <div class="stat-info">
+                        <div class="stat-value">15,234</div>
+                        <div class="stat-label">Events Completed</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="standings-table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Rider</th>
+                            <th>Country</th>
+                            <th>Stage</th>
+                            <th>Total Points</th>
+                            <th>Avg Points/Event</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="rank-highlight">
+                            <td><span class="rank-badge gold">1</span></td>
+                            <td class="rider-cell">
+                                <span class="rider-avatar">🚴</span>
+                                <span class="rider-name">Emma Larsson</span>
+                            </td>
+                            <td>🇸🇪 Sweden</td>
+                            <td><span class="stage-badge">Stage 1</span></td>
+                            <td class="points-cell">1,127</td>
+                            <td>93.9</td>
+                        </tr>
+                        <tr class="rank-highlight">
+                            <td><span class="rank-badge silver">2</span></td>
+                            <td class="rider-cell">
+                                <span class="rider-avatar">🚴</span>
+                                <span class="rider-name">James Mitchell</span>
+                            </td>
+                            <td>🇬🇧 United Kingdom</td>
+                            <td><span class="stage-badge">Stage 1</span></td>
+                            <td class="points-cell">1,045</td>
+                            <td>87.1</td>
+                        </tr>
+                        <tr class="rank-highlight">
+                            <td><span class="rank-badge bronze">3</span></td>
+                            <td class="rider-cell">
+                                <span class="rider-avatar">🚴</span>
+                                <span class="rider-name">Maria Rodriguez</span>
+                            </td>
+                            <td>🇪🇸 Spain</td>
+                            <td><span class="stage-badge">Stage 1</span></td>
+                            <td class="points-cell">812</td>
+                            <td>67.7</td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td class="rider-cell">
+                                <span class="rider-avatar">🚴</span>
+                                <span class="rider-name">Lucas Silva</span>
+                            </td>
+                            <td>🇧🇷 Brazil</td>
+                            <td><span class="stage-badge">Stage 1</span></td>
+                            <td class="points-cell">745</td>
+                            <td>67.7</td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td class="rider-cell">
+                                <span class="rider-avatar">🚴</span>
+                                <span class="rider-name">Yuki Nakamura</span>
+                            </td>
+                            <td>🇯🇵 Japan</td>
+                            <td><span class="stage-badge">Stage 1</span></td>
+                            <td class="points-cell">720</td>
+                            <td>72.0</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="footer-logo">TPV Career Mode</div>
+                    <p>Virtual cycling career progression</p>
+                </div>
+                <div class="footer-links">
+                    <a href="index.html">Home</a>
+                    <a href="events.html">Events</a>
+                    <a href="peloton.html">Meet the Peloton</a>
+                    <a href="standings.html">Standings</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 TrainingPeaks Virtual Career Mode. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Login Modal -->
+    <div class="modal" id="loginModal">
+        <div class="modal-overlay" id="modalOverlay"></div>
+        <div class="modal-content">
+            <button class="modal-close" id="modalClose">&times;</button>
+            <h2 class="modal-title">Welcome Back</h2>
+            <div class="modal-tabs">
+                <button class="modal-tab active" data-tab="login">Login</button>
+                <button class="modal-tab" data-tab="signup">Sign Up</button>
+            </div>
+            
+            <div class="tab-content active" id="loginTab">
+                <form class="auth-form" id="loginForm">
+                    <div class="form-group">
+                        <label for="loginEmail">Email</label>
+                        <input type="email" id="loginEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full">Login</button>
+                </form>
+            </div>
+
+            <div class="tab-content" id="signupTab">
+                <form class="auth-form" id="signupForm">
+                    <div class="form-group">
+                        <label for="signupName">Rider Name</label>
+                        <input type="text" id="signupName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signupEmail">Email</label>
+                        <input type="email" id="signupEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signupPassword">Password</label>
+                        <input type="password" id="signupPassword" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full">Create Account</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="app.js"></script>
+    <script src="standings.js"></script>
+</body>
+</html>

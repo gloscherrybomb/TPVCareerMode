@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Events - TPV Career Mode</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="events.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <span class="logo-text">TPV</span>
+                <span class="logo-subtitle">Career Mode</span>
+            </div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="events.html" class="nav-link active">Events</a>
+                <a href="peloton.html" class="nav-link">Peloton</a>
+                <a href="standings.html" class="nav-link">Standings</a>
+                <a href="#" class="nav-link nav-login" id="loginBtn">Login</a>
+            </div>
+            <button class="nav-toggle" id="navToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="page-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="breadcrumb">
+                    <a href="index.html">Home</a> / Events
+                </div>
+                <h1 class="page-title">Season Events</h1>
+                <p class="page-subtitle">Complete events to earn points and climb the rankings</p>
+            </div>
+        </div>
+    </div>
+
+    <section class="progress-overview">
+        <div class="container">
+            <div class="progress-grid">
+                <div class="progress-card">
+                    <div class="progress-icon">🎯</div>
+                    <div class="progress-info">
+                        <div class="progress-label">Current Stage</div>
+                        <div class="progress-value">Local Amateur</div>
+                    </div>
+                </div>
+                <div class="progress-card">
+                    <div class="progress-icon">✓</div>
+                    <div class="progress-info">
+                        <div class="progress-label">Events Completed</div>
+                        <div class="progress-value">0 / 12</div>
+                    </div>
+                </div>
+                <div class="progress-card">
+                    <div class="progress-icon">⭐</div>
+                    <div class="progress-info">
+                        <div class="progress-label">Total Points</div>
+                        <div class="progress-value">0</div>
+                    </div>
+                </div>
+                <div class="progress-card">
+                    <div class="progress-icon">📊</div>
+                    <div class="progress-info">
+                        <div class="progress-label">Current Rank</div>
+                        <div class="progress-value">-</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="events-section">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title-small">Stage 1: Local Amateur</h2>
+                <div class="stage-filters">
+                    <button class="filter-btn active" data-filter="all">All Events</button>
+                    <button class="filter-btn" data-filter="upcoming">Upcoming</button>
+                    <button class="filter-btn" data-filter="completed">Completed</button>
+                </div>
+            </div>
+
+            <div class="events-grid">
+                <!-- Event 1 -->
+                <div class="event-card" data-status="upcoming">
+                    <div class="event-header">
+                        <div class="event-number">01</div>
+                        <div class="event-status status-upcoming">Upcoming</div>
+                    </div>
+                    <div class="event-image">
+                        <div class="event-image-placeholder">
+                            <span>🚴</span>
+                        </div>
+                    </div>
+                    <div class="event-content">
+                        <h3 class="event-title">The First Pedal</h3>
+                        <p class="event-description">Your journey begins on familiar roads. A test of endurance and determination on local circuits.</p>
+                        <div class="event-details">
+                            <div class="event-detail">
+                                <span class="detail-icon">📅</span>
+                                <span>Available Now</span>
+                            </div>
+                            <div class="event-detail">
+                                <span class="detail-icon">📏</span>
+                                <span>45 km</span>
+                            </div>
+                            <div class="event-detail">
+                                <span class="detail-icon">⏱️</span>
+                                <span>~75 min</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="event-footer">
+                        <button class="btn btn-secondary btn-full" onclick="location.href='event-detail.html?id=1'">View Details</button>
+                    </div>
+                </div>
+
+                <!-- Event 2 -->
+                <div class="event-card" data-status="upcoming">
+                    <div class="event-header">
+                        <div class="event-number">02</div>
+                        <div class="event-status status-locked">Locked</div>
+                    </div>
+                    <div class="event-image">
+                        <div class="event-image-placeholder">
+                            <span>⛰️</span>
+                        </div>
+                    </div>
+                    <div class="event-content">
+                        <h3 class="event-title">Hill Climb Challenge</h3>
+                        <p class="event-description">Test your climbing legs on a brutal ascent. Only the strong-willed will make it to the top.</p>
+                        <div class="event-details">
+                            <div class="event-detail">
+                                <span class="detail-icon">📅</span>
+                                <span>Unlocks after Event 1</span>
+                            </div>
+                            <div class="event-detail">
+                                <span class="detail-icon">📏</span>
+                                <span>28 km</span>
+                            </div>
+                            <div class="event-detail">
+                                <span class="detail-icon">⏱️</span>
+                                <span>~60 min</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="event-footer">
+                        <button class="btn btn-secondary btn-full" disabled>Complete Previous Event</button>
+                    </div>
+                </div>
+
+                <!-- Event 3 -->
+                <div class="event-card" data-status="upcoming">
+                    <div class="event-header">
+                        <div class="event-number">03</div>
+                        <div class="event-status status-locked">Locked</div>
+                    </div>
+                    <div class="event-image">
+                        <div class="event-image-placeholder">
+                            <span>💨</span>
+                        </div>
+                    </div>
+                    <div class="event-content">
+                        <h3 class="event-title">Sprint Showdown</h3>
+                        <p class="event-description">Short, explosive, and intense. Can you unleash your top-end speed when it matters most?</p>
+                        <div class="event-details">
+                            <div class="event-detail">
+                                <span class="detail-icon">📅</span>
+                                <span>Unlocks after Event 2</span>
+                            </div>
+                            <div class="event-detail">
+                                <span class="detail-icon">📏</span>
+                                <span>35 km</span>
+                            </div>
+                            <div class="event-detail">
+                                <span class="detail-icon">⏱️</span>
+                                <span>~55 min</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="event-footer">
+                        <button class="btn btn-secondary btn-full" disabled>Complete Previous Event</button>
+                    </div>
+                </div>
+
+                <!-- Event 4 -->
+                <div class="event-card" data-status="upcoming">
+                    <div class="event-header">
+                        <div class="event-number">04</div>
+                        <div class="event-status status-locked">Locked</div>
+                    </div>
+                    <div class="event-image">
+                        <div class="event-image-placeholder">
+                            <span>🌄</span>
+                        </div>
+                    </div>
+                    <div class="event-content">
+                        <h3 class="event-title">Dawn Breakaway</h3>
+                        <p class="event-description">An early morning ride through scenic routes. Build your endurance and mental fortitude.</p>
+                        <div class="event-details">
+                            <div class="event-detail">
+                                <span class="detail-icon">📅</span>
+                                <span>Unlocks after Event 3</span>
+                            </div>
+                            <div class="event-detail">
+                                <span class="detail-icon">📏</span>
+                                <span>60 km</span>
+                            </div>
+                            <div class="event-detail">
+                                <span class="detail-icon">⏱️</span>
+                                <span>~90 min</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="event-footer">
+                        <button class="btn btn-secondary btn-full" disabled>Complete Previous Event</button>
+                    </div>
+                </div>
+
+                <!-- Event 5 -->
+                <div class="event-card" data-status="upcoming">
+                    <div class="event-header">
+                        <div class="event-number">05</div>
+                        <div class="event-status status-locked">Locked</div>
+                    </div>
+                    <div class="event-image">
+                        <div class="event-image-placeholder">
+                            <span>🔄</span>
+                        </div>
+                    </div>
+                    <div class="event-content">
+                        <h3 class="event-title">The Criterium Circuit</h3>
+                        <p class="event-description">Fast laps, tight corners, and constant action. A true test of bike handling and tactical racing.</p>
+                        <div class="event-details">
+                            <div class="event-detail">
+                                <span class="detail-icon">📅</span>
+                                <span>Unlocks after Event 4</span>
+                            </div>
+                            <div class="event-detail">
+                                <span class="detail-icon">📏</span>
+                                <span>40 km</span>
+                            </div>
+                            <div class="event-detail">
+                                <span class="detail-icon">⏱️</span>
+                                <span>~65 min</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="event-footer">
+                        <button class="btn btn-secondary btn-full" disabled>Complete Previous Event</button>
+                    </div>
+                </div>
+
+                <!-- Event 6 -->
+                <div class="event-card" data-status="upcoming">
+                    <div class="event-header">
+                        <div class="event-number">06</div>
+                        <div class="event-status status-locked">Locked</div>
+                    </div>
+                    <div class="event-image">
+                        <div class="event-image-placeholder">
+                            <span>🏁</span>
+                        </div>
+                    </div>
+                    <div class="event-content">
+                        <h3 class="event-title">Regional Championship</h3>
+                        <p class="event-description">The culmination of your local amateur stage. Prove you're ready for the next level.</p>
+                        <div class="event-details">
+                            <div class="event-detail">
+                                <span class="detail-icon">📅</span>
+                                <span>Unlocks after Event 5</span>
+                            </div>
+                            <div class="event-detail">
+                                <span class="detail-icon">📏</span>
+                                <span>80 km</span>
+                            </div>
+                            <div class="event-detail">
+                                <span class="detail-icon">⏱️</span>
+                                <span>~120 min</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="event-footer">
+                        <button class="btn btn-secondary btn-full" disabled>Complete Previous Event</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="login-prompt">
+        <div class="container">
+            <div class="prompt-content">
+                <h3>Track Your Progress</h3>
+                <p>Login to save your results, earn points, and compete on the leaderboards.</p>
+                <button class="btn btn-primary" id="promptLoginBtn">Login / Sign Up</button>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="footer-logo">TPV Career Mode</div>
+                    <p>Virtual cycling career progression</p>
+                </div>
+                <div class="footer-links">
+                    <a href="index.html">Home</a>
+                    <a href="events.html">Events</a>
+                    <a href="peloton.html">Meet the Peloton</a>
+                    <a href="standings.html">Standings</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 TrainingPeaks Virtual Career Mode. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Login Modal (reused from index.html) -->
+    <div class="modal" id="loginModal">
+        <div class="modal-overlay" id="modalOverlay"></div>
+        <div class="modal-content">
+            <button class="modal-close" id="modalClose">&times;</button>
+            <h2 class="modal-title">Welcome Back</h2>
+            <div class="modal-tabs">
+                <button class="modal-tab active" data-tab="login">Login</button>
+                <button class="modal-tab" data-tab="signup">Sign Up</button>
+            </div>
+            
+            <div class="tab-content active" id="loginTab">
+                <form class="auth-form" id="loginForm">
+                    <div class="form-group">
+                        <label for="loginEmail">Email</label>
+                        <input type="email" id="loginEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full">Login</button>
+                </form>
+            </div>
+
+            <div class="tab-content" id="signupTab">
+                <form class="auth-form" id="signupForm">
+                    <div class="form-group">
+                        <label for="signupName">Rider Name</label>
+                        <input type="text" id="signupName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signupEmail">Email</label>
+                        <input type="email" id="signupEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signupPassword">Password</label>
+                        <input type="password" id="signupPassword" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full">Create Account</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="app.js"></script>
+    <script src="events.js"></script>
+</body>
+</html>

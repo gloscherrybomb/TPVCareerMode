@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrainingPeaks Virtual - Career Mode</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <span class="logo-text">TPV</span>
+                <span class="logo-subtitle">Career Mode</span>
+            </div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link active">Home</a>
+                <a href="events.html" class="nav-link">Events</a>
+                <a href="peloton.html" class="nav-link">Peloton</a>
+                <a href="standings.html" class="nav-link">Standings</a>
+                <a href="#" class="nav-link nav-login" id="loginBtn">Login</a>
+            </div>
+            <button class="nav-toggle" id="navToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="hero-section">
+        <div class="hero-gradient"></div>
+        <div class="hero-content">
+            <div class="hero-badge">Season 1 - Now Live</div>
+            <h1 class="hero-title">
+                <span class="title-main">Career Mode</span>
+                <span class="title-sub">Rise Through The Ranks</span>
+            </h1>
+            <p class="hero-description">
+                From local circuits to the world stage. Build your legacy, race by race.
+                Every pedal stroke counts in your journey to cycling greatness.
+            </p>
+            <div class="hero-cta">
+                <button class="btn btn-primary" id="getStartedBtn">Get Started</button>
+                <button class="btn btn-secondary" onclick="location.href='events.html'">View Events</button>
+            </div>
+        </div>
+        <div class="hero-image">
+            <img src="TPV_career_v2.jpg" alt="Career Mode Progression" class="career-graphic">
+        </div>
+    </div>
+
+    <section class="stages-section">
+        <div class="container">
+            <h2 class="section-title">Your Journey Awaits</h2>
+            <p class="section-subtitle">Five stages. One ultimate goal. How high will you climb?</p>
+            
+            <div class="stages-grid">
+                <div class="stage-card stage-active" data-stage="1">
+                    <div class="stage-number">01</div>
+                    <div class="stage-icon">🚴</div>
+                    <h3 class="stage-name">Local Amateur</h3>
+                    <p class="stage-desc">Begin your journey in regional circuits. Learn the fundamentals and prove your worth.</p>
+                    <div class="stage-status">
+                        <span class="status-badge status-live">LIVE NOW</span>
+                    </div>
+                </div>
+
+                <div class="stage-card stage-locked" data-stage="2">
+                    <div class="stage-number">02</div>
+                    <div class="stage-icon">🏁</div>
+                    <h3 class="stage-name">Continental Pro</h3>
+                    <p class="stage-desc">Step up to continental racing. Face tougher competition and longer events.</p>
+                    <div class="stage-status">
+                        <span class="status-badge status-locked">Coming Soon</span>
+                        <span class="status-date">Spring 2026</span>
+                    </div>
+                </div>
+
+                <div class="stage-card stage-locked" data-stage="3">
+                    <div class="stage-number">03</div>
+                    <div class="stage-icon">⚡</div>
+                    <h3 class="stage-name">Pro Continental</h3>
+                    <p class="stage-desc">Join the professional ranks. Compete in prestigious races across the continent.</p>
+                    <div class="stage-status">
+                        <span class="status-badge status-locked">Coming Soon</span>
+                        <span class="status-date">Summer 2026</span>
+                    </div>
+                </div>
+
+                <div class="stage-card stage-locked" data-stage="4">
+                    <div class="stage-number">04</div>
+                    <div class="stage-icon">🌟</div>
+                    <h3 class="stage-name">World Tour</h3>
+                    <p class="stage-desc">The pinnacle of cycling. Race against the world's elite in legendary events.</p>
+                    <div class="stage-status">
+                        <span class="status-badge status-locked">Coming Soon</span>
+                        <span class="status-date">Fall 2026</span>
+                    </div>
+                </div>
+
+                <div class="stage-card stage-locked" data-stage="5">
+                    <div class="stage-number">05</div>
+                    <div class="stage-icon">👑</div>
+                    <h3 class="stage-name">Legends</h3>
+                    <p class="stage-desc">Enter cycling immortality. Only the greatest ever reach this stage.</p>
+                    <div class="stage-status">
+                        <span class="status-badge status-locked">Coming Soon</span>
+                        <span class="status-date">Winter 2026</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="features-section">
+        <div class="container">
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>Track Progress</h3>
+                    <p>Monitor your performance across all events and see your ranking climb as you earn points.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🏆</div>
+                    <h3>Earn Recognition</h3>
+                    <p>Unlock achievements and build your reputation as you complete stages and conquer challenges.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🌍</div>
+                    <h3>Global Competition</h3>
+                    <p>Compete against riders worldwide. Compare your results on global and season standings.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📖</div>
+                    <h3>Story-Driven</h3>
+                    <p>Each event comes with its own narrative, immersing you in the world of professional cycling.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-section">
+        <div class="cta-content">
+            <h2>Ready to Start Your Career?</h2>
+            <p>Create an account and begin your journey from local amateur to world tour champion.</p>
+            <button class="btn btn-primary btn-large" id="ctaSignupBtn">Sign Up Now</button>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="footer-logo">TPV Career Mode</div>
+                    <p>Virtual cycling career progression</p>
+                </div>
+                <div class="footer-links">
+                    <a href="index.html">Home</a>
+                    <a href="events.html">Events</a>
+                    <a href="peloton.html">Meet the Peloton</a>
+                    <a href="standings.html">Standings</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 TrainingPeaks Virtual Career Mode. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Login Modal -->
+    <div class="modal" id="loginModal">
+        <div class="modal-overlay" id="modalOverlay"></div>
+        <div class="modal-content">
+            <button class="modal-close" id="modalClose">&times;</button>
+            <h2 class="modal-title">Welcome Back</h2>
+            <div class="modal-tabs">
+                <button class="modal-tab active" data-tab="login">Login</button>
+                <button class="modal-tab" data-tab="signup">Sign Up</button>
+            </div>
+            
+            <div class="tab-content active" id="loginTab">
+                <form class="auth-form" id="loginForm">
+                    <div class="form-group">
+                        <label for="loginEmail">Email</label>
+                        <input type="email" id="loginEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full">Login</button>
+                </form>
+            </div>
+
+            <div class="tab-content" id="signupTab">
+                <form class="auth-form" id="signupForm">
+                    <div class="form-group">
+                        <label for="signupName">Rider Name</label>
+                        <input type="text" id="signupName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signupEmail">Email</label>
+                        <input type="email" id="signupEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signupPassword">Password</label>
+                        <input type="password" id="signupPassword" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full">Create Account</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>
