@@ -239,6 +239,151 @@
         </div>
     </div>
 
+    <script src="event-data.js"></script>
     <script type="module" src="app.js"></script>
+    <script>
+        // Get event ID from URL parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const eventId = urlParams.get('id') || '1';
+        const event = getEvent(parseInt(eventId));
+
+        if (!event) {
+            window.location.href = 'events.html';
+        }
+
+        // Update page content
+        document.addEventListener('DOMContentLoaded', () => {
+            // Update title
+            document.title = `${event.name} - TPV Career Mode`;
+
+            // Update breadcrumb
+            document.querySelector('.breadcrumb').innerHTML = `
+                <a href="index.html">Home</a> / <a href="events.html">Events</a> / Event ${event.number}
+            `;
+
+            // Update hero section
+            document.querySelector('.event-badge').textContent = `Event ${event.number} • ${event.level}`;
+            document.querySelector('.event-hero-title').textContent = event.name;
+            document.querySelector('.event-hero-subtitle').textContent = event.subtitle;
+
+            // Update overview cards
+            const overviewGrid = document.querySelector('.overview-grid');
+            overviewGrid.innerHTML = `
+                <div class="overview-card">
+                    <div class="overview-icon">📏</div>
+                    <div class="overview-label">Distance</div>
+                    <div class="overview-value">${event.distance}</div>
+                </div>
+                <div class="overview-card">
+                    <div class="overview-icon">⛰️</div>
+                    <div class="overview-label">Climbing</div>
+                    <div class="overview-value">${event.climbing}</div>
+                </div>
+                <div class="overview-card">
+                    <div class="overview-icon">🏷️</div>
+                    <div class="overview-label">Type</div>
+                    <div class="overview-value">${event.type}</div>
+                </div>
+                <div class="overview-card">
+                    <div class="overview-icon">⭐</div>
+                    <div class="overview-label">Max Points</div>
+                    <div class="overview-value">${event.maxPoints}</div>
+                </div>
+                <div class="overview-card">
+                    <div class="overview-icon">${event.mandatory ? '🔴' : '🟢'}</div>
+                    <div class="overview-label">Status</div>
+                    <div class="overview-value">${event.mandatory ? 'Mandatory' : 'Optional'}</div>
+                </div>
+                <div class="overview-card">
+                    <div class="overview-icon">🔄</div>
+                    <div class="overview-label">Format</div>
+                    <div class="overview-value">${event.format}</div>
+                </div>
+            `;
+
+            // Update story section
+            const storyText = document.querySelector('.story-text');
+            const descriptionParagraphs = event.description.split('\n\n').map(p => `<p>${p.trim()}</p>`).join('');
+            
+            let storyHTML = descriptionParagraphs;
+            
+            if (event.strategy) {
+                storyHTML += `
+                    <div class="story-callout">
+                        <div class="callout-icon">💡</div>
+                        <div class="callout-text">
+                            <strong>Race Strategy:</strong> ${event.strategy}
+                        </div>
+                    </div>
+                `;
+            }
+
+            // Add stage breakdown for stage races
+            if (event.isStageRace && event.stages) {
+                storyHTML += `
+                    <div class="stage-race-breakdown">
+                        <h3>Stage Breakdown</h3>
+                        ${event.stages.map((stage, i) => `
+                            <div class="stage-detail-card">
+                                <div class="stage-detail-header">
+                                    <span class="stage-detail-number">Stage ${i + 1}</span>
+                                    <span class="stage-detail-points">${stage.points} pts</span>
+                                </div>
+                                <h4>${stage.name}</h4>
+                                <div class="stage-detail-stats">
+                                    <span>📏 ${stage.distance}</span>
+                                    <span>⛰️ ${stage.climbing}</span>
+                                </div>
+                                <p>${stage.description}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            storyText.innerHTML = storyHTML;
+
+            // Update route details
+            const routeDetailsGrid = document.querySelector('.route-details-grid');
+            if (event.isStageRace) {
+                routeDetailsGrid.innerHTML = `
+                    <div class="route-detail">
+                        <strong>Stage 1:</strong> ${event.routeDetails.stage1}
+                    </div>
+                    <div class="route-detail">
+                        <strong>Stage 2:</strong> ${event.routeDetails.stage2}
+                    </div>
+                    <div class="route-detail">
+                        <strong>Stage 3:</strong> ${event.routeDetails.stage3}
+                    </div>
+                    <div class="route-detail">
+                        <strong>Difficulty:</strong> ${event.routeDetails.difficulty}
+                    </div>
+                `;
+            } else {
+                const routeKeys = Object.keys(event.routeDetails);
+                routeDetailsGrid.innerHTML = routeKeys.map(key => `
+                    <div class="route-detail">
+                        <strong>${key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}:</strong>
+                        ${event.routeDetails[key]}
+                    </div>
+                `).join('');
+            }
+
+            // Update scoring section
+            const scoringGrid = document.querySelector('.scoring-grid');
+            const points = calculatePoints(event.maxPoints);
+            scoringGrid.innerHTML = points.map(p => `
+                <div class="scoring-card">
+                    <div class="scoring-rank">${p.rank}</div>
+                    <div class="scoring-points">${p.points} pts</div>
+                </div>
+            `).join('');
+
+            // Update course name in breadcrumb callout
+            document.querySelector('.scoring-note').textContent = 
+                `Points are awarded based on your finishing position. Course: ${event.course}`;
+        });
+    </script>
 </body>
 </html>
