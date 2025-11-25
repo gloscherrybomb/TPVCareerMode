@@ -328,6 +328,43 @@ if (googleLoginBtn) {
     });
 }
 
+// Google Sign-Up (same logic as login)
+const googleSignupBtn = document.getElementById('googleSignupBtn');
+if (googleSignupBtn) {
+    googleSignupBtn.addEventListener('click', async () => {
+        try {
+            const result = await signInWithPopup(auth, googleProvider);
+            const user = result.user;
+            
+            // Check if user document exists and has UID
+            const userDoc = await getDoc(doc(db, 'users', user.uid));
+            
+            if (!userDoc.exists() || !userDoc.data().uid) {
+                // New Google user or existing user without UID - show UID modal
+                openUidModal();
+            } else {
+                // User has UID, proceed normally
+                console.log('Google user signed up:', user.uid);
+                closeModal();
+                window.location.href = 'events.html';
+            }
+        } catch (error) {
+            console.error('Google sign-up error:', error);
+            
+            let errorMessage = 'Google sign-up failed. ';
+            if (error.code === 'auth/popup-closed-by-user') {
+                errorMessage += 'Sign-up popup was closed.';
+            } else if (error.code === 'auth/cancelled-popup-request') {
+                errorMessage += 'Another sign-up popup is already open.';
+            } else {
+                errorMessage += error.message;
+            }
+            
+            alert(errorMessage);
+        }
+    });
+}
+
 // UID Form for Google users
 const uidForm = document.getElementById('uidForm');
 if (uidForm) {
