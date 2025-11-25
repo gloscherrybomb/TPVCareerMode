@@ -44,6 +44,124 @@
     color: var(--text-secondary);
 }
 
+/* Season Selection */
+.season-selection {
+    padding: 2rem 0 0;
+    background: var(--dark-bg);
+}
+
+.season-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 1rem;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.season-card {
+    background: var(--dark-card);
+    border: 2px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 1rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.season-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--gradient-start), var(--gradient-mid), var(--gradient-end));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.season-card.active {
+    border-color: rgba(255, 27, 107, 0.3);
+    background: linear-gradient(135deg, rgba(255, 27, 107, 0.05), rgba(69, 202, 255, 0.05));
+    cursor: default;
+}
+
+.season-card.active::before {
+    opacity: 1;
+}
+
+.season-card.locked {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.season-card:not(.locked):not(.active):hover {
+    border-color: rgba(69, 202, 255, 0.3);
+    transform: translateY(-2px);
+}
+
+.season-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.season-number {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.season-badge {
+    font-size: 0.7rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.active-badge {
+    background: linear-gradient(135deg, var(--accent-pink), var(--accent-blue));
+    color: var(--text-primary);
+}
+
+.coming-soon-badge {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-secondary);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.season-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.season-stats {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .season-cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .season-cards-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 /* Progress Overview */
 .progress-overview {
     padding: 3rem 0;

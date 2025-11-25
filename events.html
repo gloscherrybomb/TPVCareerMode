@@ -50,6 +50,68 @@
         </div>
     </div>
 
+    <!-- Season Selection -->
+    <section class="season-selection">
+        <div class="container">
+            <div class="season-cards-grid">
+                <div class="season-card active" data-season="1" onclick="selectSeason(1)">
+                    <div class="season-card-header">
+                        <div class="season-number">Season 1</div>
+                        <div class="season-badge active-badge">Active</div>
+                    </div>
+                    <div class="season-title">Local Amateur</div>
+                    <div class="season-stats">
+                        <span>9 Stages</span>
+                    </div>
+                </div>
+
+                <div class="season-card locked" data-season="2">
+                    <div class="season-card-header">
+                        <div class="season-number">Season 2</div>
+                        <div class="season-badge coming-soon-badge">Coming Soon</div>
+                    </div>
+                    <div class="season-title">Continental Pro</div>
+                    <div class="season-stats">
+                        <span>🔒 Locked</span>
+                    </div>
+                </div>
+
+                <div class="season-card locked" data-season="3">
+                    <div class="season-card-header">
+                        <div class="season-number">Season 3</div>
+                        <div class="season-badge coming-soon-badge">Coming Soon</div>
+                    </div>
+                    <div class="season-title">Pro Continental</div>
+                    <div class="season-stats">
+                        <span>🔒 Locked</span>
+                    </div>
+                </div>
+
+                <div class="season-card locked" data-season="4">
+                    <div class="season-card-header">
+                        <div class="season-number">Season 4</div>
+                        <div class="season-badge coming-soon-badge">Coming Soon</div>
+                    </div>
+                    <div class="season-title">World Tour</div>
+                    <div class="season-stats">
+                        <span>🔒 Locked</span>
+                    </div>
+                </div>
+
+                <div class="season-card locked" data-season="5">
+                    <div class="season-card-header">
+                        <div class="season-number">Season 5</div>
+                        <div class="season-badge coming-soon-badge">Coming Soon</div>
+                    </div>
+                    <div class="season-title">Legends</div>
+                    <div class="season-stats">
+                        <span>🔒 Locked</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <section class="progress-overview">
         <div class="container">
             <!-- Season Timeline -->
@@ -599,6 +661,19 @@
         // Make functions global for onclick handlers
         window.openChoiceModal = openChoiceModal;
         window.selectChoiceEvent = selectChoiceEvent;
+        
+        // Season selection handler
+        window.selectSeason = function(seasonNumber) {
+            // Currently only Season 1 is available
+            if (seasonNumber !== 1) {
+                // Future seasons are locked
+                return;
+            }
+            
+            // Season 1 is already active, no action needed
+            // In the future, this will load different season data
+            console.log(`Season ${seasonNumber} selected (already active)`);
+        };
     </script>
 </body>
 </html>
