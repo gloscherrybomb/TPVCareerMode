@@ -140,6 +140,47 @@
     }
 }
 
+/* Season Story/Report Section */
+.season-story-box {
+    background: linear-gradient(135deg, rgba(255, 27, 107, 0.03), rgba(69, 202, 255, 0.03));
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 2rem;
+    margin: 2rem 0 3rem 0;
+}
+
+.season-story-content {
+    font-size: 1rem;
+    line-height: 1.8;
+    color: var(--text-secondary);
+    text-align: justify;
+}
+
+.season-story-content.report {
+    font-style: italic;
+}
+
+.season-story-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .season-story-box {
+        padding: 1.5rem;
+        margin: 1.5rem 0 2rem 0;
+    }
+    
+    .season-story-content {
+        font-size: 0.95rem;
+        text-align: left;
+    }
+}
+
 /* Progress Overview */
 .progress-overview {
     padding: 3rem 0;

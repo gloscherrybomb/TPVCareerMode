@@ -88,6 +88,7 @@
                         </button>
                     </div>
                 </div>
+                
                 <div class="timeline-track">
                     <div class="timeline-line"></div>
                     <div class="timeline-stages" id="timelineStages">
@@ -155,8 +156,12 @@
         <div class="container">
             <div class="section-header">
                 <h2 class="section-title-small">Season 1: Local Amateur</h2>
-                <div class="stage-info">
-                    <p>Complete stages in sequence to progress through your career</p>
+            </div>
+
+            <!-- Season Story/Report -->
+            <div class="season-story-box" id="seasonStoryBox">
+                <div class="season-story-content" id="seasonStoryContent">
+                    <!-- Content will be dynamically loaded -->
                 </div>
             </div>
 
@@ -468,6 +473,9 @@
             
             // Fetch and display season rank
             await updateSeasonRank();
+            
+            // Update season story/report
+            await updateSeasonStory();
         }
         
         // Fetch and display user's season rank
@@ -514,6 +522,92 @@
             } catch (error) {
                 console.error('Error fetching season rank:', error);
                 rankText.textContent = '-';
+            }
+        }
+        
+        // Update season story or end-of-season report
+        async function updateSeasonStory() {
+            const storyContent = document.getElementById('seasonStoryContent');
+            
+            // Check if season is complete (all 9 stages completed)
+            const totalStages = eventSequence.length;
+            const completedStages = progressManager.progress.completedStages.length;
+            const isSeasonComplete = completedStages === totalStages;
+            
+            if (!isSeasonComplete) {
+                // Show introduction text
+                storyContent.innerHTML = `
+                    <p>This is the true beginning of your career—the moment where you stop imagining what it would feel like to "be a rider" and actually step into it. The races may be small, the crowds may be local, but every start line feels electric because you're finally part of it. This is your chance to experience that classic pro cycling manager journey, only now it's you doing the riding, you making the decisions, and you earning every result with your own legs. At this level, every race is an opportunity: the crits sharpen your instincts, the climbs test your composure, and the time trials reveal what you're really capable of when it's just you against the clock. Nothing is handed to you, but that's the appeal—each place you gain, each expectation you beat, feels like your first steps toward something bigger. You're not chasing fame yet; you're chasing proof that you belong here. It's the start of a long road, but a meaningful one. And if you can master these early races—these local, gritty, character-building tests—you'll lay the foundation for everything that comes next. This isn't just a season. It's the pro cyclist origin story you've always imagined, and you're finally writing the first chapter.</p>
+                `;
+                storyContent.classList.remove('report');
+            } else {
+                // Season is complete - show appropriate end-of-season report
+                await showEndOfSeasonReport(storyContent);
+            }
+        }
+        
+        // Show end-of-season report based on final ranking
+        async function showEndOfSeasonReport(storyContent) {
+            try {
+                // Get user's final rank
+                const { getFirestore, doc, getDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+                const db = getFirestore();
+                
+                if (!progressManager.currentUser) {
+                    storyContent.innerHTML = '<p>Complete the season to see your final report!</p>';
+                    return;
+                }
+                
+                // Fetch user data
+                const userDoc = await getDoc(doc(db, 'users', progressManager.currentUser.uid));
+                const userData = userDoc.data();
+                
+                // Get standings
+                let standings = userData?.season1Standings;
+                
+                if (!standings || standings.length === 0) {
+                    storyContent.innerHTML = '<p>Complete the season to see your final report!</p>';
+                    return;
+                }
+                
+                // Find user's final position
+                const userPosition = standings.findIndex(racer => racer.isCurrentUser === true);
+                
+                if (userPosition === -1) {
+                    storyContent.innerHTML = '<p>Complete the season to see your final report!</p>';
+                    return;
+                }
+                
+                const rank = userPosition + 1;
+                const totalRiders = standings.length;
+                const midPoint = Math.ceil(totalRiders / 2);
+                
+                let reportText = '';
+                let reportTitle = '';
+                
+                if (rank === 1) {
+                    reportTitle = 'Post-Season Report: 1st Place';
+                    reportText = 'You couldn't have asked for a stronger first season. Race after race, you showed up ready, handled whatever the course threw at you, and kept placing well above what anyone expected at this level. You looked confident in the fast races, sharp in the climbs, and steady in the tougher moments, rewarded with a 1st place finish. Riders who finish a season like this don't stay in the local ranks for long. You've clearly outgrown this tier—now it's time to see what you can do against bigger fields.';
+                } else if (rank <= 3) {
+                    reportTitle = 'Post-Season Report: Podium Finish';
+                    reportText = 'This season showed you're right on the edge of breaking through. You were in the mix almost every weekend—close to the front, picking up strong finishes, and proving you know how to handle different types of races. There's a bit of polishing left to do, but the foundation is there. You've built momentum, gained respect in the local bunch, and put yourself in a position where moving up a tier feels like a matter of when, not if. You were rightly rewarded with a podium finish.';
+                } else if (rank <= midPoint) {
+                    reportTitle = 'Post-Season Report: Upper Half Finish';
+                    reportText = 'You ended the year in the middle of the standings, but the story isn't about the ranking—it's about the steps you took. You held your own in tougher fields, figured out your strengths, and learned how to manage the chaos of real racing. There were moments where everything clicked, and others where you were simply hanging on, but that's what these early seasons are for. With a bit more experience and focus, you'll be fighting for bigger results before long.';
+                } else {
+                    reportTitle = 'Post-Season Report: Season Complete';
+                    reportText = 'It was a tough season, and the results show it—but that doesn't mean it was wasted. Every rider has a year like this early on, where the learning curve is steep and every race feels like a new lesson. You stuck it out, finished your events, and started to understand what this level demands. The important part is that you're still here and now have a clearer picture of where you need to improve. Take what you've learned, regroup, and come back stronger next season.';
+                }
+                
+                storyContent.innerHTML = `
+                    <div class="season-story-title">${reportTitle}</div>
+                    <p>${reportText}</p>
+                `;
+                storyContent.classList.add('report');
+                
+            } catch (error) {
+                console.error('Error showing end-of-season report:', error);
+                storyContent.innerHTML = '<p>Complete the season to see your final report!</p>';
             }
         }
         
