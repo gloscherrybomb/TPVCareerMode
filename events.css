@@ -667,8 +667,9 @@
         font-size: 2.5rem;
     }
 
+    /* Hide timeline on mobile devices */
     .season-timeline {
-        padding: 1.5rem;
+        display: none;
     }
 
     .timeline-header {
@@ -747,8 +748,9 @@
         font-size: 2rem;
     }
 
+    /* Keep timeline hidden on small mobile */
     .season-timeline {
-        padding: 1rem;
+        display: none;
     }
 
     .timeline-header h3 {
