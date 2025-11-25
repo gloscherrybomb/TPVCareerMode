@@ -146,13 +146,16 @@ async function renderSeasonStandings() {
         const rowClass = racer.isCurrentUser ? 'current-user-row' : '';
         const teamDisplay = racer.team || '<span class="no-team">—</span>';
         
+        // Podium class for top 3
+        let rankClass = '';
+        if (rank === 1) rankClass = 'rank-gold';
+        else if (rank === 2) rankClass = 'rank-silver';
+        else if (rank === 3) rankClass = 'rank-bronze';
+        
         tableHTML += `
             <tr class="${rowClass}">
                 <td class="rank-cell">
-                    <span class="rank-number ${rank <= 3 ? 'rank-podium' : ''}">${rank}</span>
-                    ${rank === 1 ? '<span class="rank-badge">🥇</span>' : ''}
-                    ${rank === 2 ? '<span class="rank-badge">🥈</span>' : ''}
-                    ${rank === 3 ? '<span class="rank-badge">🥉</span>' : ''}
+                    <span class="rank-number ${rankClass}">${rank}</span>
                 </td>
                 <td class="name-cell">
                     <span class="rider-name">${racer.name}</span>
@@ -234,13 +237,16 @@ async function renderGlobalRankings() {
                 const rank = index + 1;
                 const rowClass = racer.isCurrentUser ? 'current-user-row' : '';
                 
+                // Podium class for top 3
+                let rankClass = '';
+                if (rank === 1) rankClass = 'rank-gold';
+                else if (rank === 2) rankClass = 'rank-silver';
+                else if (rank === 3) rankClass = 'rank-bronze';
+                
                 tableHTML += `
                     <tr class="${rowClass}">
                         <td class="rank-cell">
-                            <span class="rank-number ${rank <= 3 ? 'rank-podium' : ''}">${rank}</span>
-                            ${rank === 1 ? '<span class="rank-badge">🥇</span>' : ''}
-                            ${rank === 2 ? '<span class="rank-badge">🥈</span>' : ''}
-                            ${rank === 3 ? '<span class="rank-badge">🥉</span>' : ''}
+                            <span class="rank-number ${rankClass}">${rank}</span>
                         </td>
                         <td class="name-cell">
                             <span class="rider-name">${racer.name}</span>

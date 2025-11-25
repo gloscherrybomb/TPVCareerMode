@@ -152,6 +152,51 @@ body {
     transition: all 0.3s ease;
 }
 
+/* Page Header (for pages with breadcrumbs) */
+.page-header {
+    padding: 8rem 0 4rem;
+    background: linear-gradient(135deg, rgba(255, 27, 107, 0.1), rgba(69, 202, 255, 0.1));
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.header-content {
+    text-align: center;
+}
+
+.breadcrumb {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.breadcrumb a {
+    color: var(--accent-blue);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.breadcrumb a:hover {
+    color: var(--accent-pink);
+}
+
+.page-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 4rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--gradient-start), var(--gradient-mid), var(--gradient-end));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1rem;
+}
+
+.page-subtitle {
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+}
+
 /* Hero Section */
 .hero-section {
     padding: 8rem 2rem 6rem;
@@ -861,6 +906,18 @@ body {
 
 /* Responsive Design */
 @media (max-width: 1024px) {
+    .page-header {
+        padding: 7rem 0 3.5rem;
+    }
+
+    .page-title {
+        font-size: 3rem;
+    }
+
+    .page-subtitle {
+        font-size: 1.1rem;
+    }
+
     .hero-section {
         grid-template-columns: 1fr;
         text-align: center;
@@ -891,6 +948,18 @@ body {
 }
 
 @media (max-width: 768px) {
+    .page-header {
+        padding: 6rem 0 3rem;
+    }
+
+    .page-title {
+        font-size: 2.5rem;
+    }
+
+    .page-subtitle {
+        font-size: 1rem;
+    }
+
     .nav-links {
         position: fixed;
         top: 80px;

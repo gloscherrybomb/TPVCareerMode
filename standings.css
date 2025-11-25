@@ -1,5 +1,51 @@
 /* Standings Page Styles */
 
+/* Page Header */
+.page-header {
+    padding: 8rem 0 4rem;
+    background: linear-gradient(135deg, rgba(255, 27, 107, 0.1), rgba(69, 202, 255, 0.1));
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.header-content {
+    text-align: center;
+}
+
+.breadcrumb {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.breadcrumb a {
+    color: var(--accent-blue);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.breadcrumb a:hover {
+    color: var(--accent-pink);
+}
+
+.page-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 4rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--gradient-start), var(--gradient-mid), var(--gradient-end));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1rem;
+}
+
+.page-subtitle {
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+}
+
+/* Standings Tabs */
 .standings-tabs {
     background: var(--dark-card);
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -189,17 +235,34 @@
 
 .rank-number {
     display: inline-block;
-    min-width: 30px;
+    min-width: 40px;
+    padding: 0.4rem 0.6rem;
     text-align: center;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    transition: all 0.3s ease;
 }
 
-.rank-number.rank-podium {
-    font-size: 1.2rem;
+/* Podium rank styling */
+.rank-gold {
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    color: #1a1a1a;
+    font-weight: 900;
+    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
 }
 
-.rank-badge {
-    font-size: 1.2rem;
-    margin-left: 0.5rem;
+.rank-silver {
+    background: linear-gradient(135deg, #C0C0C0, #A8A8A8);
+    color: #1a1a1a;
+    font-weight: 900;
+    box-shadow: 0 4px 15px rgba(192, 192, 192, 0.3);
+}
+
+.rank-bronze {
+    background: linear-gradient(135deg, #CD7F32, #A0522D);
+    color: #ffffff;
+    font-weight: 900;
+    box-shadow: 0 4px 15px rgba(205, 127, 50, 0.3);
 }
 
 /* Name Cell */
@@ -300,6 +363,18 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
+    .page-header {
+        padding: 6rem 0 3rem;
+    }
+
+    .page-title {
+        font-size: 2.5rem;
+    }
+
+    .page-subtitle {
+        font-size: 1rem;
+    }
+
     .tab-btn {
         padding: 1rem;
         font-size: 1rem;
@@ -340,6 +415,18 @@
 }
 
 @media (max-width: 480px) {
+    .page-header {
+        padding: 5rem 0 2.5rem;
+    }
+
+    .page-title {
+        font-size: 2rem;
+    }
+
+    .page-subtitle {
+        font-size: 0.9rem;
+    }
+
     .tab-btn {
         padding: 0.75rem;
         font-size: 0.9rem;
@@ -358,7 +445,4 @@
         display: none;
     }
 
-    .rank-badge {
-        font-size: 1rem;
-    }
 }
