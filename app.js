@@ -1,21 +1,23 @@
 // Firebase configuration (replace with your actual config)
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_AUTH_DOMAIN",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_STORAGE_BUCKET",
-    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-    appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyDo-g0UhDCB8QWRXQ0iapVHQEgA4X7jt4o",
+  authDomain: "careermodelogin.firebaseapp.com",
+  projectId: "careermodelogin",
+  storageBucket: "careermodelogin.firebasestorage.app",
+  messagingSenderId: "599516805754",
+  appId: "1:599516805754:web:7f5c6bbebb8b454a81d9c3",
+  measurementId: "G-Y8BQ4F6H4V"
 };
 
-// Initialize Firebase (will be uncommented when config is added)
-// import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-// import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-// import { getFirestore, doc, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+ Initialize Firebase (will be uncommented when config is added)
+ import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+ import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+ import { getFirestore, doc, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
-// const app = initializeApp(firebaseConfig);
-// const auth = getAuth(app);
-// const db = getFirestore(app);
+ const app = initializeApp(firebaseConfig);
+ const auth = getAuth(app);
+ const db = getFirestore(app);
 
 // Modal functionality
 const loginModal = document.getElementById('loginModal');
