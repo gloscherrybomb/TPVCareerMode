@@ -340,32 +340,52 @@
     <script>
         // Render the timeline
         function renderTimeline() {
+            console.log('=== renderTimeline START ===');
             const timelineStages = document.getElementById('timelineStages');
             const cyclistMarker = document.getElementById('cyclistMarker');
+            
+            console.log('Elements found:', { timelineStages, cyclistMarker });
             
             // Use window objects explicitly
             const eventSequence = window.eventSequence;
             const progressManager = window.progressManager;
             const getStageStatus = window.getStageStatus;
             
+            console.log('Objects loaded:', { 
+                eventSequence: !!eventSequence, 
+                progressManager: !!progressManager, 
+                getStageStatus: !!getStageStatus 
+            });
+            
             if (!eventSequence || !progressManager || !getStageStatus) {
                 console.error('Required objects not loaded yet');
                 return;
             }
             
-            timelineStages.innerHTML = eventSequence.map((stage, index) => {
-                const status = getStageStatus(stage.stage);
-                const isChoice = stage.type === 'choice';
-                
-                return `
-                    <div class="timeline-stage ${status} ${isChoice ? 'choice-stage' : ''}" data-stage="${stage.stage}">
-                        <div class="stage-dot"></div>
-                        <div class="stage-label">
-                            <div class="stage-number">Stage ${stage.stage}</div>
+            console.log('Mapping eventSequence with', eventSequence.length, 'stages');
+            
+            try {
+                timelineStages.innerHTML = eventSequence.map((stage, index) => {
+                    const status = getStageStatus(stage.stage);
+                    const isChoice = stage.type === 'choice';
+                    
+                    console.log(`Stage ${stage.stage}: status=${status}, isChoice=${isChoice}`);
+                    
+                    return `
+                        <div class="timeline-stage ${status} ${isChoice ? 'choice-stage' : ''}" data-stage="${stage.stage}">
+                            <div class="stage-dot"></div>
+                            <div class="stage-label">
+                                <div class="stage-number">Stage ${stage.stage}</div>
+                            </div>
                         </div>
-                    </div>
-                `;
-            }).join('');
+                    `;
+                }).join('');
+                
+                console.log('Timeline HTML generated, length:', timelineStages.innerHTML.length);
+            } catch (error) {
+                console.error('Error generating timeline HTML:', error);
+                return;
+            }
 
             // Position team car marker
             const currentStage = progressManager.getCurrentStage();
@@ -380,11 +400,16 @@
                     console.log(`Team car positioned at stage ${currentStage} (${position}%)`);
                 }
             }
+            
+            console.log('=== renderTimeline COMPLETE ===');
         }
 
         // Render event sequence
         function renderEventSequence() {
+            console.log('=== renderEventSequence START ===');
             const eventsSequence = document.getElementById('eventsSequence');
+            
+            console.log('eventsSequence element found:', !!eventsSequence);
             
             // Use window objects explicitly
             const eventSequence = window.eventSequence;
@@ -392,21 +417,33 @@
             const getStageStatus = window.getStageStatus;
             const getEvent = window.getEvent;
             
+            console.log('Objects loaded:', {
+                eventSequence: !!eventSequence,
+                progressManager: !!progressManager,
+                getStageStatus: !!getStageStatus,
+                getEvent: !!getEvent
+            });
+            
             if (!eventSequence || !progressManager || !getStageStatus || !getEvent) {
-                console.error('Required objects not loaded yet');
+                console.error('Required objects not loaded yet for renderEventSequence');
                 return;
             }
             
-            eventsSequence.innerHTML = eventSequence.map((stage, index) => {
-                const status = getStageStatus(stage.stage);
-                const isChoice = stage.type === 'choice';
-                const isLocked = status === 'locked';
-                const isCompleted = status === 'completed';
-                
-                if (isChoice) {
-                    // Choice stage
-                    const selectedEventId = progressManager.getChoiceSelection(stage.stage);
-                    const availableCount = progressManager.getAvailableOptionalEvents(stage.stage).length;
+            console.log('Mapping eventSequence with', eventSequence.length, 'stages');
+            
+            try {
+                eventsSequence.innerHTML = eventSequence.map((stage, index) => {
+                    const status = getStageStatus(stage.stage);
+                    const isChoice = stage.type === 'choice';
+                    const isLocked = status === 'locked';
+                    const isCompleted = status === 'completed';
+                    
+                    console.log(`Rendering stage ${stage.stage}: status=${status}, isChoice=${isChoice}`);
+                    
+                    if (isChoice) {
+                        // Choice stage
+                        const selectedEventId = progressManager.getChoiceSelection(stage.stage);
+                        const availableCount = progressManager.getAvailableOptionalEvents(stage.stage).length;
                     
                     return `
                         <div class="sequence-stage ${status}" data-stage="${stage.stage}">
@@ -479,7 +516,13 @@
                     `;
                 }
             }).join('');
+            
+            console.log('EventSequence HTML generated, length:', eventsSequence.innerHTML.length);
+            console.log('=== renderEventSequence COMPLETE ===');
+        } catch (error) {
+            console.error('Error in renderEventSequence:', error);
         }
+    }
 
         // Update progress stats
         async function updateProgressStats() {
@@ -725,36 +768,61 @@
 
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', () => {
+            console.log('DOMContentLoaded fired');
+            
             // Setup modal close handlers
             document.getElementById('choiceModalClose').addEventListener('click', closeChoiceModal);
             document.getElementById('choiceModalOverlay').addEventListener('click', closeChoiceModal);
             
             // Wait for event-sequence.js module to load and attach to window
             const initializeUI = () => {
+                console.log('Checking for required objects...', {
+                    eventSequence: typeof window.eventSequence,
+                    progressManager: typeof window.progressManager,
+                    getStageStatus: typeof window.getStageStatus,
+                    getEvent: typeof window.getEvent
+                });
+                
                 if (typeof window.eventSequence === 'undefined' || typeof window.progressManager === 'undefined') {
                     // Module not loaded yet, wait a bit
+                    console.log('Waiting for modules to load...');
                     setTimeout(initializeUI, 50);
                     return;
                 }
                 
-                // Show admin toggle for testing (remove in production or check real auth)
-                document.getElementById('adminToggle').style.display = 'inline-block';
+                console.log('All required objects loaded!');
+                console.log('Event sequence length:', window.eventSequence.length);
+                console.log('Progress Manager:', window.progressManager);
                 
-                // Setup admin toggle (temporary - will be replaced with real auth)
-                document.getElementById('adminToggle').addEventListener('click', () => {
-                    const progressManager = window.progressManager;
-                    if (!progressManager) return;
+                try {
+                    // Show admin toggle for testing (remove in production or check real auth)
+                    document.getElementById('adminToggle').style.display = 'inline-block';
                     
-                    progressManager.setAdminMode(!progressManager.isAdmin);
-                    document.getElementById('adminStatus').textContent = 
-                        progressManager.isAdmin ? 'Admin Mode: ON' : 'Admin Mode: OFF';
-                    renderEventSequence();
+                    // Setup admin toggle (temporary - will be replaced with real auth)
+                    document.getElementById('adminToggle').addEventListener('click', () => {
+                        const progressManager = window.progressManager;
+                        if (!progressManager) return;
+                        
+                        progressManager.setAdminMode(!progressManager.isAdmin);
+                        document.getElementById('adminStatus').textContent = 
+                            progressManager.isAdmin ? 'Admin Mode: ON' : 'Admin Mode: OFF';
+                        renderEventSequence();
+                        renderTimeline();
+                    });
+                    
+                    console.log('Calling renderTimeline...');
                     renderTimeline();
-                });
-                
-                renderTimeline();
-                renderEventSequence();
-                updateProgressStats();
+                    
+                    console.log('Calling renderEventSequence...');
+                    renderEventSequence();
+                    
+                    console.log('Calling updateProgressStats...');
+                    updateProgressStats();
+                    
+                    console.log('UI initialization complete!');
+                } catch (error) {
+                    console.error('Error during UI initialization:', error);
+                }
             };
             
             initializeUI();
