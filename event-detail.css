@@ -483,3 +483,214 @@
         grid-template-columns: 1fr;
     }
 }
+
+/* Event Results Section */
+.event-results {
+    padding: 4rem 0;
+    background: var(--dark-card);
+}
+
+.results-table-container {
+    background: var(--card-bg);
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    margin-top: 2rem;
+}
+
+.results-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.results-table thead {
+    background: linear-gradient(135deg, rgba(255, 27, 107, 0.1), rgba(69, 202, 255, 0.1));
+    border-bottom: 2px solid rgba(69, 202, 255, 0.3);
+}
+
+.results-table th {
+    padding: 1.5rem 1rem;
+    text-align: left;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--accent-blue);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.results-table tbody tr {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.3s ease;
+}
+
+.results-table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.results-table td {
+    padding: 1.25rem 1rem;
+    color: var(--text-primary);
+}
+
+/* Current User Row */
+.current-user-row {
+    background: rgba(69, 202, 255, 0.1) !important;
+    box-shadow: inset 4px 0 0 0 var(--accent-blue), 
+                inset 0 2px 0 0 var(--accent-blue), 
+                inset -2px 0 0 0 var(--accent-blue), 
+                inset 0 -2px 0 0 var(--accent-blue) !important;
+}
+
+/* Rank Cell */
+.rank-cell {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    width: 60px;
+}
+
+.rank-number {
+    display: inline-block;
+    min-width: 40px;
+    padding: 0.4rem 0.6rem;
+    text-align: center;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.rank-gold {
+    background: linear-gradient(135deg, #FFD700, #FFA500);
+    color: #1a1a1a;
+    font-weight: 900;
+    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+}
+
+.rank-silver {
+    background: linear-gradient(135deg, #C0C0C0, #A8A8A8);
+    color: #1a1a1a;
+    font-weight: 900;
+    box-shadow: 0 4px 15px rgba(192, 192, 192, 0.3);
+}
+
+.rank-bronze {
+    background: linear-gradient(135deg, #CD7F32, #A0522D);
+    color: #ffffff;
+    font-weight: 900;
+    box-shadow: 0 4px 15px rgba(205, 127, 50, 0.3);
+}
+
+/* Name Cell */
+.name-cell {
+    font-weight: 600;
+}
+
+.rider-name {
+    font-size: 1.05rem;
+}
+
+.you-badge {
+    display: inline-block;
+    margin-left: 0.75rem;
+    padding: 0.25rem 0.75rem;
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-pink));
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 700;
+    border-radius: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Team Cell */
+.team-cell {
+    color: var(--text-secondary);
+}
+
+.no-team {
+    opacity: 0.4;
+}
+
+/* Time Cell */
+.time-cell {
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+    color: var(--accent-blue);
+}
+
+/* Gap Cell */
+.gap-cell {
+    font-family: 'Courier New', monospace;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+/* ARR Cell */
+.arr-cell {
+    font-family: 'Courier New', monospace;
+}
+
+.arr-value {
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: var(--accent-blue);
+}
+
+.arr-band {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    margin-top: 0.25rem;
+}
+
+/* Points Cell */
+.points-cell {
+    text-align: right;
+    font-weight: 700;
+}
+
+.points-value {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.1rem;
+    color: var(--gradient-mid);
+}
+
+/* Event Points Cell (for points races) */
+.event-points-cell {
+    text-align: center;
+    font-weight: 600;
+    color: var(--accent-pink);
+}
+
+/* Results Note */
+.results-note {
+    padding: 1.5rem;
+    background: rgba(69, 202, 255, 0.05);
+    border-left: 4px solid var(--accent-blue);
+    margin-top: 1.5rem;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .results-table {
+        font-size: 0.85rem;
+    }
+
+    .results-table th,
+    .results-table td {
+        padding: 0.75rem 0.5rem;
+    }
+
+    /* Hide team and gap on mobile */
+    .team-cell,
+    .gap-cell,
+    .results-table th:nth-child(3),
+    .results-table th:nth-child(5) {
+        display: none;
+    }
+
+    .arr-band {
+        display: none;
+    }
+}
