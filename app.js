@@ -10,7 +10,7 @@ const firebaseConfig = {
   measurementId: "G-Y8BQ4F6H4V"
 };
 
- Initialize Firebase (will be uncommented when config is added)
+// Initialize Firebase (will be uncommented when config is added)
  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
  import { getFirestore, doc, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
