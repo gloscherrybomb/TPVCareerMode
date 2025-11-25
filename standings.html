@@ -64,164 +64,15 @@
         <div class="container">
             <div class="standings-header">
                 <h2>Season 1 - Local Amateur</h2>
-                <div class="standings-filters">
-                    <select class="filter-select">
-                        <option value="all">All Riders</option>
-                        <option value="region">By Region</option>
-                        <option value="age">By Age Group</option>
-                    </select>
-                </div>
+                <p class="standings-description">Your personal season rankings including all racers from your events</p>
             </div>
 
-            <div class="podium">
-                <div class="podium-spot second">
-                    <div class="podium-rank">2</div>
-                    <div class="podium-avatar">🚴</div>
-                    <div class="podium-name">Maria Rodriguez</div>
-                    <div class="podium-country">🇪🇸 Spain</div>
-                    <div class="podium-points">812 pts</div>
+            <!-- JavaScript will populate this -->
+            <div id="seasonStandings">
+                <div class="loading-state">
+                    <div class="loading-spinner"></div>
+                    <p>Loading standings...</p>
                 </div>
-                <div class="podium-spot first">
-                    <div class="podium-rank">1</div>
-                    <div class="podium-avatar">🚴</div>
-                    <div class="podium-name">Emma Larsson</div>
-                    <div class="podium-country">🇸🇪 Sweden</div>
-                    <div class="podium-points">1,127 pts</div>
-                </div>
-                <div class="podium-spot third">
-                    <div class="podium-rank">3</div>
-                    <div class="podium-avatar">🚴</div>
-                    <div class="podium-name">James Mitchell</div>
-                    <div class="podium-country">🇬🇧 UK</div>
-                    <div class="podium-points">1,045 pts</div>
-                </div>
-            </div>
-
-            <div class="standings-table">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Rank</th>
-                            <th>Rider</th>
-                            <th>Country</th>
-                            <th>Events</th>
-                            <th>Points</th>
-                            <th>Trend</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr class="rank-highlight">
-                            <td><span class="rank-badge gold">1</span></td>
-                            <td class="rider-cell">
-                                <span class="rider-avatar">🚴</span>
-                                <span class="rider-name">Emma Larsson</span>
-                            </td>
-                            <td>🇸🇪 Sweden</td>
-                            <td>12</td>
-                            <td class="points-cell">1,127</td>
-                            <td><span class="trend trend-up">↑ 2</span></td>
-                        </tr>
-                        <tr class="rank-highlight">
-                            <td><span class="rank-badge silver">2</span></td>
-                            <td class="rider-cell">
-                                <span class="rider-avatar">🚴</span>
-                                <span class="rider-name">Maria Rodriguez</span>
-                            </td>
-                            <td>🇪🇸 Spain</td>
-                            <td>12</td>
-                            <td class="points-cell">1,045</td>
-                            <td><span class="trend trend-down">↓ 1</span></td>
-                        </tr>
-                        <tr class="rank-highlight">
-                            <td><span class="rank-badge bronze">3</span></td>
-                            <td class="rider-cell">
-                                <span class="rider-avatar">🚴</span>
-                                <span class="rider-name">James Mitchell</span>
-                            </td>
-                            <td>🇬🇧 United Kingdom</td>
-                            <td>12</td>
-                            <td class="points-cell">812</td>
-                            <td><span class="trend trend-up">↑ 1</span></td>
-                        </tr>
-                        <tr>
-                            <td>4</td>
-                            <td class="rider-cell">
-                                <span class="rider-avatar">🚴</span>
-                                <span class="rider-name">Lucas Silva</span>
-                            </td>
-                            <td>🇧🇷 Brazil</td>
-                            <td>11</td>
-                            <td class="points-cell">745</td>
-                            <td><span class="trend trend-same">-</span></td>
-                        </tr>
-                        <tr>
-                            <td>5</td>
-                            <td class="rider-cell">
-                                <span class="rider-avatar">🚴</span>
-                                <span class="rider-name">Yuki Nakamura</span>
-                            </td>
-                            <td>🇯🇵 Japan</td>
-                            <td>10</td>
-                            <td class="points-cell">720</td>
-                            <td><span class="trend trend-up">↑ 3</span></td>
-                        </tr>
-                        <tr>
-                            <td>6</td>
-                            <td class="rider-cell">
-                                <span class="rider-avatar">🚴</span>
-                                <span class="rider-name">Sarah Johnson</span>
-                            </td>
-                            <td>🇺🇸 USA</td>
-                            <td>11</td>
-                            <td class="points-cell">698</td>
-                            <td><span class="trend trend-down">↓ 2</span></td>
-                        </tr>
-                        <tr>
-                            <td>7</td>
-                            <td class="rider-cell">
-                                <span class="rider-avatar">🚴</span>
-                                <span class="rider-name">Pierre Dubois</span>
-                            </td>
-                            <td>🇫🇷 France</td>
-                            <td>10</td>
-                            <td class="points-cell">665</td>
-                            <td><span class="trend trend-same">-</span></td>
-                        </tr>
-                        <tr>
-                            <td>8</td>
-                            <td class="rider-cell">
-                                <span class="rider-avatar">🚴</span>
-                                <span class="rider-name">Kenji Tanaka</span>
-                            </td>
-                            <td>🇯🇵 Japan</td>
-                            <td>10</td>
-                            <td class="points-cell">645</td>
-                            <td><span class="trend trend-up">↑ 1</span></td>
-                        </tr>
-                        <tr>
-                            <td>9</td>
-                            <td class="rider-cell">
-                                <span class="rider-avatar">🚴</span>
-                                <span class="rider-name">Anna Kowalski</span>
-                            </td>
-                            <td>🇵🇱 Poland</td>
-                            <td>9</td>
-                            <td class="points-cell">612</td>
-                            <td><span class="trend trend-down">↓ 1</span></td>
-                        </tr>
-                        <tr>
-                            <td>10</td>
-                            <td class="rider-cell">
-                                <span class="rider-avatar">🚴</span>
-                                <span class="rider-name">Marco Bianchi</span>
-                            </td>
-                            <td>🇮🇹 Italy</td>
-                            <td>10</td>
-                            <td class="points-cell">598</td>
-                            <td><span class="trend trend-same">-</span></td>
-                        </tr>
-                    </tbody>
-                </table>
             </div>
         </div>
     </section>
@@ -230,107 +81,20 @@
     <section class="standings-content" id="globalContent">
         <div class="container">
             <div class="standings-header">
-                <h2>Global Career Rankings</h2>
-                <p class="standings-subtitle">Cumulative standings across all stages</p>
+                <h2>Global Rankings</h2>
+                <p class="standings-description">Worldwide leaderboard of all human racers</p>
             </div>
 
-            <div class="global-stats">
-                <div class="global-stat-card">
-                    <div class="stat-icon">👥</div>
-                    <div class="stat-info">
-                        <div class="stat-value">2,547</div>
-                        <div class="stat-label">Active Riders</div>
-                    </div>
+            <!-- JavaScript will populate this -->
+            <div id="globalRankings">
+                <div class="loading-state">
+                    <div class="loading-spinner"></div>
+                    <p>Loading rankings...</p>
                 </div>
-                <div class="global-stat-card">
-                    <div class="stat-icon">🌍</div>
-                    <div class="stat-info">
-                        <div class="stat-value">68</div>
-                        <div class="stat-label">Countries</div>
-                    </div>
-                </div>
-                <div class="global-stat-card">
-                    <div class="stat-icon">🏁</div>
-                    <div class="stat-info">
-                        <div class="stat-value">15,234</div>
-                        <div class="stat-label">Events Completed</div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="standings-table">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Rank</th>
-                            <th>Rider</th>
-                            <th>Country</th>
-                            <th>Stage</th>
-                            <th>Total Points</th>
-                            <th>Avg Points/Event</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr class="rank-highlight">
-                            <td><span class="rank-badge gold">1</span></td>
-                            <td class="rider-cell">
-                                <span class="rider-avatar">🚴</span>
-                                <span class="rider-name">Emma Larsson</span>
-                            </td>
-                            <td>🇸🇪 Sweden</td>
-                            <td><span class="stage-badge">Stage 1</span></td>
-                            <td class="points-cell">1,127</td>
-                            <td>93.9</td>
-                        </tr>
-                        <tr class="rank-highlight">
-                            <td><span class="rank-badge silver">2</span></td>
-                            <td class="rider-cell">
-                                <span class="rider-avatar">🚴</span>
-                                <span class="rider-name">James Mitchell</span>
-                            </td>
-                            <td>🇬🇧 United Kingdom</td>
-                            <td><span class="stage-badge">Stage 1</span></td>
-                            <td class="points-cell">1,045</td>
-                            <td>87.1</td>
-                        </tr>
-                        <tr class="rank-highlight">
-                            <td><span class="rank-badge bronze">3</span></td>
-                            <td class="rider-cell">
-                                <span class="rider-avatar">🚴</span>
-                                <span class="rider-name">Maria Rodriguez</span>
-                            </td>
-                            <td>🇪🇸 Spain</td>
-                            <td><span class="stage-badge">Stage 1</span></td>
-                            <td class="points-cell">812</td>
-                            <td>67.7</td>
-                        </tr>
-                        <tr>
-                            <td>4</td>
-                            <td class="rider-cell">
-                                <span class="rider-avatar">🚴</span>
-                                <span class="rider-name">Lucas Silva</span>
-                            </td>
-                            <td>🇧🇷 Brazil</td>
-                            <td><span class="stage-badge">Stage 1</span></td>
-                            <td class="points-cell">745</td>
-                            <td>67.7</td>
-                        </tr>
-                        <tr>
-                            <td>5</td>
-                            <td class="rider-cell">
-                                <span class="rider-avatar">🚴</span>
-                                <span class="rider-name">Yuki Nakamura</span>
-                            </td>
-                            <td>🇯🇵 Japan</td>
-                            <td><span class="stage-badge">Stage 1</span></td>
-                            <td class="points-cell">720</td>
-                            <td>72.0</td>
-                        </tr>
-                    </tbody>
-                </table>
             </div>
         </div>
     </section>
+
 
     <footer class="footer">
         <div class="container">
@@ -474,6 +238,6 @@
     </div>
 
     <script type="module" src="app.js"></script>
-    <script src="standings.js"></script>
+    <script type="module" src="standings.js"></script>
 </body>
 </html>
