@@ -155,15 +155,15 @@ if (loginForm) {
         
         try {
             // Uncomment when Firebase is configured
-            // const userCredential = await signInWithEmailAndPassword(auth, email, password);
-            // console.log('User logged in:', userCredential.user);
+             const userCredential = await signInWithEmailAndPassword(auth, email, password);
+             console.log('User logged in:', userCredential.user);
             
             // For now, just show a success message
-            alert('Login functionality will be enabled once Firebase is configured.');
-            closeModal();
+          //  alert('Login functionality will be enabled once Firebase is configured.');
+          //  closeModal();
             
             // After login, redirect to events page
-            // window.location.href = 'events.html';
+             window.location.href = 'events.html';
         } catch (error) {
             console.error('Login error:', error);
             alert('Login error: ' + error.message);
@@ -180,26 +180,26 @@ if (signupForm) {
         const password = document.getElementById('signupPassword').value;
         
         try {
-            // Uncomment when Firebase is configured
-            // const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            // const user = userCredential.user;
+             Uncomment when Firebase is configured
+             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+             const user = userCredential.user;
             
-            // Create user profile in Firestore
-            // await setDoc(doc(db, 'users', user.uid), {
-            //     name: name,
-            //     email: email,
-            //     currentStage: 1,
-            //     points: 0,
-            //     eventsCompleted: [],
-            //     createdAt: new Date()
-            // });
+             Create user profile in Firestore
+             await setDoc(doc(db, 'users', user.uid), {
+                 name: name,
+                 email: email,
+                 currentStage: 1,
+                 points: 0,
+                 eventsCompleted: [],
+                 createdAt: new Date()
+             });
             
             // For now, just show a success message
-            alert('Sign up functionality will be enabled once Firebase is configured.');
-            closeModal();
+          //  alert('Sign up functionality will be enabled once Firebase is configured.');
+          //  closeModal();
             
             // After signup, redirect to events page
-            // window.location.href = 'events.html';
+             window.location.href = 'events.html';
         } catch (error) {
             console.error('Signup error:', error);
             alert('Signup error: ' + error.message);
@@ -208,8 +208,8 @@ if (signupForm) {
 }
 
 // Auth state observer
-// Uncomment when Firebase is configured
-/*
+ Uncomment when Firebase is configured
+
 onAuthStateChanged(auth, (user) => {
     const loginBtn = document.getElementById('loginBtn');
     
@@ -229,7 +229,7 @@ onAuthStateChanged(auth, (user) => {
         };
     }
 });
-*/
+
 
 // Add animation on scroll
 const observerOptions = {
