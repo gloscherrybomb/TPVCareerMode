@@ -99,7 +99,18 @@ function isBot(uid, gender) {
  */
 function parseCSV(csvContent) {
   return new Promise((resolve, reject) => {
-    Papa.parse(csvContent, {
+    // Remove the first 2 lines if they contain "OVERALL INDIVIDUAL RESULTS:"
+    // TPVirtual CSVs have a title line and blank line before the actual headers
+    let processedContent = csvContent;
+    const lines = csvContent.split('\n');
+    
+    if (lines[0].includes('OVERALL INDIVIDUAL RESULTS')) {
+      // Skip first 2 lines (title + blank)
+      processedContent = lines.slice(2).join('\n');
+      console.log('   Detected TPVirtual CSV format, skipping title lines');
+    }
+    
+    Papa.parse(processedContent, {
       header: true,
       skipEmptyLines: true,
       complete: (results) => {
@@ -329,6 +340,12 @@ async function processResults(csvFiles) {
         .filter((uid, index, self) => uid && self.indexOf(uid) === index); // Unique UIDs only
       
       console.log(`   Found ${humanUids.length} human racer(s): ${humanUids.join(', ')}`);
+      
+      // Debug: Show sample of what we found
+      if (results.length > 0) {
+        const sample = results[0];
+        console.log(`   Sample data - Name: ${sample.Name}, Gender: ${sample.Gender}, UID: ${sample.UID}`);
+      }
       
       // Process each human's result
       for (const uid of humanUids) {
