@@ -328,6 +328,7 @@
 
             // Position team car marker
             const currentStage = progressManager.getCurrentStage();
+            console.log('Rendering timeline with currentStage:', currentStage);
             const stageElements = timelineStages.querySelectorAll('.timeline-stage');
             if (stageElements.length > 0) {
                 const currentIndex = Math.min(currentStage - 1, stageElements.length - 1);
@@ -335,6 +336,7 @@
                 if (stageElement) {
                     const position = (currentIndex / (stageElements.length - 1)) * 100;
                     cyclistMarker.style.left = `${position}%`;
+                    console.log(`Team car positioned at stage ${currentStage} (${position}%)`);
                 }
             }
         }

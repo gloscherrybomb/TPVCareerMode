@@ -146,6 +146,12 @@ class ProgressManager {
                     totalPoints: userData.totalPoints || 0
                 };
                 console.log('Progress loaded from Firestore:', this.progress);
+                
+                // Force UI update after Firebase load
+                if (typeof window.updateProgressUI === 'function') {
+                    console.log('Triggering UI update with currentStage:', this.progress.currentStage);
+                    window.updateProgressUI();
+                }
             } else {
                 console.log('No user document found, using defaults');
                 this.progress = {
