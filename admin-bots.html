@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bot Profile Admin - TPV Career Mode</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="tpv-team-car.png">
+    <link rel="apple-touch-icon" href="tpv-team-car.png">
+    
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="admin-bots.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <span class="logo-text">TPV</span>
+                <span class="logo-subtitle">Admin</span>
+            </div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="events.html" class="nav-link">Events</a>
+                <a href="peloton.html" class="nav-link">Peloton</a>
+                <a href="admin-bots.html" class="nav-link active">Bot Admin</a>
+                <a href="#" class="nav-link nav-logout" id="logoutBtn">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Auth Check Notice -->
+    <div id="authCheck" class="auth-check">
+        <div class="spinner"></div>
+        <p>Checking authentication...</p>
+    </div>
+
+    <!-- Unauthorized Message -->
+    <div id="unauthorized" class="unauthorized" style="display: none;">
+        <div class="container">
+            <div class="unauthorized-content">
+                <div class="unauthorized-icon">🔒</div>
+                <h2>Access Denied</h2>
+                <p>You must be logged in as an administrator to access this page.</p>
+                <button class="btn btn-primary" onclick="window.location.href='index.html'">Go Home</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Content -->
+    <div id="adminContent" style="display: none;">
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="container">
+                <div class="header-content">
+                    <h1 class="page-title">Bot Profile Administration</h1>
+                    <p class="page-subtitle">Create and manage bot rider profiles</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Sections -->
+        <section class="admin-section">
+            <div class="container">
+                <div class="admin-layout">
+                    <!-- Left Side: Form -->
+                    <div class="admin-form-container">
+                        <div class="section-header">
+                            <h2 id="formTitle">Add New Bot Profile</h2>
+                            <button id="resetForm" class="btn btn-secondary btn-small" style="display: none;">Create New</button>
+                        </div>
+
+                        <form id="botProfileForm" class="bot-form">
+                            <!-- UID -->
+                            <div class="form-group">
+                                <label for="botUid">Bot UID *</label>
+                                <input 
+                                    type="text" 
+                                    id="botUid" 
+                                    placeholder="e.g., Bot123ABC456DEF78"
+                                    required
+                                    maxlength="20">
+                                <small class="field-help">Unique identifier (will be document ID in Firestore)</small>
+                            </div>
+
+                            <!-- Name -->
+                            <div class="form-group">
+                                <label for="botName">Name *</label>
+                                <input 
+                                    type="text" 
+                                    id="botName" 
+                                    placeholder="e.g., Marco DiCicco"
+                                    required>
+                            </div>
+
+                            <!-- Team -->
+                            <div class="form-group">
+                                <label for="botTeam">Team *</label>
+                                <input 
+                                    type="text" 
+                                    id="botTeam" 
+                                    placeholder="e.g., Formix"
+                                    required>
+                            </div>
+
+                            <!-- ARR -->
+                            <div class="form-group">
+                                <label for="botArr">ARR *</label>
+                                <input 
+                                    type="number" 
+                                    id="botArr" 
+                                    placeholder="e.g., 1250"
+                                    min="800"
+                                    max="2000"
+                                    required>
+                                <small class="field-help">Bronze: <1196 | Silver: 1196-1320 | Gold: 1321-1450 | Platinum: 1451+</small>
+                            </div>
+
+                            <!-- Gender -->
+                            <div class="form-group">
+                                <label for="botGender">Gender *</label>
+                                <select id="botGender" required>
+                                    <option value="">Select gender</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Non-binary">Non-binary</option>
+                                </select>
+                            </div>
+
+                            <!-- Nationality -->
+                            <div class="form-group">
+                                <label for="botNationality">Nationality *</label>
+                                <select id="botNationality" required>
+                                    <option value="">Select nationality</option>
+                                    <option value="GB">🇬🇧 Great Britain</option>
+                                    <option value="US">🇺🇸 United States</option>
+                                    <option value="FR">🇫🇷 France</option>
+                                    <option value="ES">🇪🇸 Spain</option>
+                                    <option value="IT">🇮🇹 Italy</option>
+                                    <option value="DE">🇩🇪 Germany</option>
+                                    <option value="NL">🇳🇱 Netherlands</option>
+                                    <option value="BE">🇧🇪 Belgium</option>
+                                    <option value="AU">🇦🇺 Australia</option>
+                                    <option value="CA">🇨🇦 Canada</option>
+                                    <option value="JP">🇯🇵 Japan</option>
+                                    <option value="CN">🇨🇳 China</option>
+                                    <option value="BR">🇧🇷 Brazil</option>
+                                    <option value="MX">🇲🇽 Mexico</option>
+                                    <option value="AR">🇦🇷 Argentina</option>
+                                    <option value="CL">🇨🇱 Chile</option>
+                                    <option value="CO">🇨🇴 Colombia</option>
+                                    <option value="DK">🇩🇰 Denmark</option>
+                                    <option value="SE">🇸🇪 Sweden</option>
+                                    <option value="NO">🇳🇴 Norway</option>
+                                    <option value="FI">🇫🇮 Finland</option>
+                                    <option value="PL">🇵🇱 Poland</option>
+                                    <option value="CZ">🇨🇿 Czech Republic</option>
+                                    <option value="AT">🇦🇹 Austria</option>
+                                    <option value="CH">🇨🇭 Switzerland</option>
+                                    <option value="PT">🇵🇹 Portugal</option>
+                                    <option value="IE">🇮🇪 Ireland</option>
+                                    <option value="NZ">🇳🇿 New Zealand</option>
+                                    <option value="SG">🇸🇬 Singapore</option>
+                                    <option value="KR">🇰🇷 South Korea</option>
+                                </select>
+                            </div>
+
+                            <!-- Age (Optional) -->
+                            <div class="form-group">
+                                <label for="botAge">Age</label>
+                                <input 
+                                    type="number" 
+                                    id="botAge" 
+                                    placeholder="e.g., 28"
+                                    min="18"
+                                    max="80">
+                                <small class="field-help">Optional</small>
+                            </div>
+
+                            <!-- Riding Style (Optional) -->
+                            <div class="form-group">
+                                <label for="botRidingStyle">Riding Style</label>
+                                <select id="botRidingStyle">
+                                    <option value="">Select riding style</option>
+                                    <option value="Climber">Climber</option>
+                                    <option value="Sprinter">Sprinter</option>
+                                    <option value="All-Rounder">All-Rounder</option>
+                                    <option value="Time Trialist">Time Trialist</option>
+                                    <option value="Rouleur">Rouleur</option>
+                                    <option value="Puncheur">Puncheur</option>
+                                </select>
+                                <small class="field-help">Optional</small>
+                            </div>
+
+                            <!-- Profile Image Upload -->
+                            <div class="form-group">
+                                <label for="botImage">Profile Image *</label>
+                                <div class="image-upload-wrapper">
+                                    <input 
+                                        type="file" 
+                                        id="botImage" 
+                                        accept="image/jpeg,image/png,image/webp"
+                                        style="display: none;">
+                                    <button type="button" class="btn btn-secondary" onclick="document.getElementById('botImage').click()">
+                                        Choose Image
+                                    </button>
+                                    <span id="imageFileName" class="file-name">No file chosen</span>
+                                </div>
+                                <small class="field-help">JPG, PNG, or WebP. Max 2MB. Recommended: 800x800px square</small>
+                                <div id="imagePreview" class="image-preview" style="display: none;">
+                                    <img id="previewImg" src="" alt="Preview">
+                                    <button type="button" class="btn btn-small btn-secondary" onclick="clearImage()">Remove</button>
+                                </div>
+                                <div id="existingImage" class="existing-image" style="display: none;">
+                                    <p>Current image:</p>
+                                    <img id="existingImg" src="" alt="Current">
+                                    <small>Upload a new image to replace</small>
+                                </div>
+                            </div>
+
+                            <!-- Backstory -->
+                            <div class="form-group">
+                                <label for="botBackstory">Backstory *</label>
+                                <textarea 
+                                    id="botBackstory" 
+                                    rows="8" 
+                                    placeholder="Write 2 paragraphs with a comedy edge. Real cyclist backstory but funny. Separate paragraphs with double line break."
+                                    required></textarea>
+                                <small class="field-help">Max 2 paragraphs. Tone: real cyclist backstory with comedy edge</small>
+                                <div class="character-count">
+                                    <span id="charCount">0</span> characters
+                                </div>
+                            </div>
+
+                            <!-- Submit Buttons -->
+                            <div class="form-actions">
+                                <button type="button" id="previewBtn" class="btn btn-secondary">Preview</button>
+                                <button type="submit" id="submitBtn" class="btn btn-primary">
+                                    <span id="submitText">Save Profile</span>
+                                    <span id="submitSpinner" class="button-spinner" style="display: none;"></span>
+                                </button>
+                            </div>
+
+                            <div id="formMessage" class="form-message" style="display: none;"></div>
+                        </form>
+                    </div>
+
+                    <!-- Right Side: Profile List -->
+                    <div class="admin-list-container">
+                        <div class="section-header">
+                            <h2>Existing Profiles</h2>
+                            <span id="profileCount" class="profile-count">0</span>
+                        </div>
+
+                        <div class="search-box">
+                            <input type="text" id="searchProfiles" placeholder="Search profiles...">
+                        </div>
+
+                        <div id="profilesList" class="profiles-list">
+                            <div class="loading-spinner">
+                                <div class="spinner"></div>
+                                <p>Loading profiles...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Preview Modal -->
+    <div class="modal" id="previewModal">
+        <div class="modal-overlay" id="previewModalOverlay"></div>
+        <div class="modal-content profile-modal-content">
+            <button class="modal-close" id="previewModalClose">&times;</button>
+            <div id="previewModalBody" class="profile-modal-body">
+                <!-- Preview will be inserted here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal" id="deleteModal">
+        <div class="modal-overlay" id="deleteModalOverlay"></div>
+        <div class="modal-content" style="max-width: 500px;">
+            <button class="modal-close" id="deleteModalClose">&times;</button>
+            <h2 class="modal-title">Delete Profile?</h2>
+            <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+                Are you sure you want to delete this bot profile? This action cannot be undone.
+            </p>
+            <div id="deleteProfileInfo" style="background: var(--dark-card); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                <!-- Profile info will be inserted here -->
+            </div>
+            <div style="display: flex; gap: 1rem;">
+                <button id="confirmDelete" class="btn btn-primary" style="background: #dc3545;">Delete Profile</button>
+                <button id="cancelDelete" class="btn btn-secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="app.js"></script>
+    <script type="module" src="admin-bots.js"></script>
+</body>
+</html>
