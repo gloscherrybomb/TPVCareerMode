@@ -4,6 +4,12 @@ on:
   push:
     paths:
       - 'race_results/**/*.csv'
+  workflow_dispatch:  # Allows manual trigger from GitHub UI
+    inputs:
+      csv_path:
+        description: 'Path to CSV file (e.g., race_results/season_1/event_1/results.csv)'
+        required: false
+        default: ''
 
 jobs:
   process-results:
@@ -28,7 +34,13 @@ jobs:
       - name: Get changed CSV files
         id: changed-files
         run: |
-          echo "files=$(git diff --name-only --diff-filter=A HEAD~1 HEAD | grep '\.csv$' | jq -R -s -c 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            # Manual trigger - find all CSV files in race_results
+            echo "files=$(find race_results -name '*.csv' -type f 2>/dev/null | jq -R -s -c 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
+          else
+            # Auto trigger - process ADDED or MODIFIED CSV files (AM = Added or Modified)
+            echo "files=$(git diff --name-only --diff-filter=AM HEAD~1 HEAD | grep '\.csv$' | jq -R -s -c 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
+          fi
       
       - name: Process race results
         env:
