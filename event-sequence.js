@@ -1,4 +1,9 @@
 // Event Sequence Manager for TPV Career Mode Season 1
+// Now with Firebase Firestore integration
+
+// Firebase imports
+import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+import { getFirestore, doc, getDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
 // Define the event sequence
 const eventSequence = [
@@ -67,16 +72,82 @@ const eventSequence = [
     }
 ];
 
-// User progress state (in real implementation, this comes from backend/database)
-// For now, we'll use localStorage to simulate progress
+// User progress state with Firebase integration
 class ProgressManager {
     constructor() {
         this.storageKey = 'tpv_career_progress';
-        this.isAdmin = false; // Will be set based on login status
-        this.loadProgress();
+        this.isAdmin = false;
+        this.currentUser = null;
+        this.progress = {
+            currentStage: 1,
+            completedStages: [],
+            completedOptionalEvents: [],
+            choiceSelections: {},
+            totalPoints: 0
+        };
+        
+        // Initialize Firebase
+        this.auth = getAuth();
+        this.db = getFirestore();
+        
+        // Listen for auth state changes
+        this.initAuthListener();
     }
 
-    loadProgress() {
+    initAuthListener() {
+        onAuthStateChanged(this.auth, async (user) => {
+            this.currentUser = user;
+            if (user) {
+                console.log('User logged in, loading progress from Firestore');
+                await this.loadProgress();
+            } else {
+                console.log('User logged out, using default progress');
+                this.loadLocalProgress();
+            }
+            
+            // Trigger UI update if needed
+            if (typeof window.updateProgressUI === 'function') {
+                window.updateProgressUI();
+            }
+        });
+    }
+
+    async loadProgress() {
+        if (!this.currentUser) {
+            this.loadLocalProgress();
+            return;
+        }
+
+        try {
+            const userDoc = await getDoc(doc(this.db, 'users', this.currentUser.uid));
+            
+            if (userDoc.exists()) {
+                const userData = userDoc.data();
+                this.progress = {
+                    currentStage: userData.currentStage || 1,
+                    completedStages: userData.completedStages || [],
+                    completedOptionalEvents: userData.completedOptionalEvents || [],
+                    choiceSelections: userData.choiceSelections || {},
+                    totalPoints: userData.totalPoints || 0
+                };
+                console.log('Progress loaded from Firestore:', this.progress);
+            } else {
+                console.log('No user document found, using defaults');
+                this.progress = {
+                    currentStage: 1,
+                    completedStages: [],
+                    completedOptionalEvents: [],
+                    choiceSelections: {},
+                    totalPoints: 0
+                };
+            }
+        } catch (error) {
+            console.error('Error loading progress from Firestore:', error);
+            this.loadLocalProgress();
+        }
+    }
+
+    loadLocalProgress() {
         const saved = localStorage.getItem(this.storageKey);
         if (saved) {
             this.progress = JSON.parse(saved);
@@ -85,18 +156,47 @@ class ProgressManager {
                 currentStage: 1,
                 completedStages: [],
                 completedOptionalEvents: [],
-                choiceSelections: {} // Maps choice stage to selected event ID
+                choiceSelections: {},
+                totalPoints: 0
             };
-            this.saveProgress();
         }
+        console.log('Progress loaded from localStorage:', this.progress);
     }
 
-    saveProgress() {
+    async saveProgress() {
+        // Always save to localStorage as backup
         localStorage.setItem(this.storageKey, JSON.stringify(this.progress));
+
+        // If user is logged in, save to Firestore
+        if (this.currentUser) {
+            try {
+                await updateDoc(doc(this.db, 'users', this.currentUser.uid), {
+                    currentStage: this.progress.currentStage,
+                    completedStages: this.progress.completedStages,
+                    completedOptionalEvents: this.progress.completedOptionalEvents,
+                    choiceSelections: this.progress.choiceSelections,
+                    totalPoints: this.progress.totalPoints
+                });
+                console.log('Progress saved to Firestore');
+            } catch (error) {
+                console.error('Error saving progress to Firestore:', error);
+                alert('Warning: Progress saved locally but could not sync to cloud. Please try again later.');
+            }
+        } else {
+            console.log('Progress saved to localStorage only (user not logged in)');
+        }
     }
 
     getCurrentStage() {
         return this.progress.currentStage;
+    }
+
+    getTotalPoints() {
+        return this.progress.totalPoints;
+    }
+
+    addPoints(points) {
+        this.progress.totalPoints += points;
     }
 
     isStageCompleted(stage) {
@@ -119,9 +219,14 @@ class ProgressManager {
         return !this.progress.completedOptionalEvents.includes(eventId);
     }
 
-    completeStage(stage, optionalEventId = null) {
+    async completeStage(stage, optionalEventId = null, points = 0) {
         if (!this.progress.completedStages.includes(stage)) {
             this.progress.completedStages.push(stage);
+        }
+        
+        // Add points if provided
+        if (points > 0) {
+            this.progress.totalPoints += points;
         }
         
         // If this was a choice stage, record which event was selected
@@ -134,10 +239,10 @@ class ProgressManager {
         
         // Move to next stage if current
         if (stage === this.progress.currentStage) {
-            this.progress.currentStage = stage + 1;
+            this.progress.currentStage = Math.min(stage + 1, 10); // Cap at stage 10
         }
         
-        this.saveProgress();
+        await this.saveProgress();
     }
 
     getAvailableOptionalEvents(choiceStage) {
@@ -152,16 +257,36 @@ class ProgressManager {
 
     setAdminMode(isAdmin) {
         this.isAdmin = isAdmin;
+        console.log('Admin mode:', isAdmin ? 'ON' : 'OFF');
     }
 
-    resetProgress() {
+    async resetProgress() {
+        this.progress = {
+            currentStage: 1,
+            completedStages: [],
+            completedOptionalEvents: [],
+            choiceSelections: {},
+            totalPoints: 0
+        };
+        
         localStorage.removeItem(this.storageKey);
-        this.loadProgress();
+        await this.saveProgress();
+        console.log('Progress reset');
     }
 
     // Get the event ID for a choice stage (either selected or null)
     getChoiceSelection(stage) {
         return this.progress.choiceSelections[stage] || null;
+    }
+
+    // Get completed stages count
+    getCompletedStagesCount() {
+        return this.progress.completedStages.length;
+    }
+
+    // Get progress percentage
+    getProgressPercentage() {
+        return Math.round((this.progress.completedStages.length / 9) * 100);
     }
 }
 
