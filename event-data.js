@@ -378,26 +378,80 @@ function getEvent(id) {
 
 // Function to calculate points distribution
 function calculatePoints(maxPoints) {
-    const positions = [
-        { rank: "1st", percentage: 100 },
-        { rank: "2nd", percentage: 96.5 },
-        { rank: "3rd", percentage: 94 },
-        { rank: "4th", percentage: 91 },
-        { rank: "5th", percentage: 89.5 },
-        { rank: "6th", percentage: 88.5 },
-        { rank: "7th", percentage: 87 },
-        { rank: "8th", percentage: 86 },
-        { rank: "9th", percentage: 85 },
-        { rank: "10th", percentage: 84 }
-    ];
+    // Match the actual point calculation formula from process-results.js
+    // Formula: points = (maxPoints/2) + (40 - position) * ((maxPoints - 10)/78) + podiumBonus
+    // Podium bonuses: 1st = +5, 2nd = +3, 3rd = +2
+    // Only positions 1-40 score points
+    
+    const positions = [];
+    
+    for (let position = 1; position <= 10; position++) {
+        if (position <= 40) {
+            // Calculate base points
+            const basePoints = (maxPoints / 2) + (40 - position) * ((maxPoints - 10) / 78);
+            
+            // Calculate podium bonus
+            let podiumBonus = 0;
+            if (position === 1) podiumBonus = 5;
+            else if (position === 2) podiumBonus = 3;
+            else if (position === 3) podiumBonus = 2;
+            
+            // Total points (rounded to nearest integer)
+            const points = Math.round(basePoints + podiumBonus);
+            
+            // Format rank
+            const suffix = position === 1 ? 'st' : position === 2 ? 'nd' : position === 3 ? 'rd' : 'th';
+            
+            positions.push({
+                rank: `${position}${suffix}`,
+                points: points
+            });
+        } else {
+            positions.push({
+                rank: `${position}th`,
+                points: 0
+            });
+        }
+    }
+    
+    // Add ranges for other positions
+    positions.push({
+        rank: '11th-20th',
+        points: `${calculateSinglePosition(20, maxPoints)}-${calculateSinglePosition(11, maxPoints)}`
+    });
+    
+    positions.push({
+        rank: '21st-30th',
+        points: `${calculateSinglePosition(30, maxPoints)}-${calculateSinglePosition(21, maxPoints)}`
+    });
+    
+    positions.push({
+        rank: '31st-40th',
+        points: `${calculateSinglePosition(40, maxPoints)}-${calculateSinglePosition(31, maxPoints)}`
+    });
+    
+    positions.push({
+        rank: '41st+',
+        points: 0
+    });
+    
+    return positions;
+}
 
-    return positions.map(pos => ({
-        rank: pos.rank,
-        points: Math.round(maxPoints * (pos.percentage / 100))
-    }));
+// Helper function to calculate points for a single position
+function calculateSinglePosition(position, maxPoints) {
+    if (position > 40) return 0;
+    
+    const basePoints = (maxPoints / 2) + (40 - position) * ((maxPoints - 10) / 78);
+    let podiumBonus = 0;
+    if (position === 1) podiumBonus = 5;
+    else if (position === 2) podiumBonus = 3;
+    else if (position === 3) podiumBonus = 2;
+    
+    return Math.round(basePoints + podiumBonus);
 }
 
 // Export for use in HTML
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { eventData, getEvent, calculatePoints };
+    module.exports = { eventData, getEvent, calculatePoints, calculateSinglePosition };
 }
