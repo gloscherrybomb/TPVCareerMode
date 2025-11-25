@@ -27,7 +27,7 @@ let eventNumber = null;
  */
 function getEventNumber() {
     const params = new URLSearchParams(window.location.search);
-    return parseInt(params.get('event')) || 1;
+    return parseInt(params.get('id')) || 1;
 }
 
 /**
@@ -64,11 +64,31 @@ function getARRBand(arr) {
 }
 
 /**
+ * Show pre-race sections (story, route, scoring, cta)
+ */
+function showPreRaceSections() {
+    const sectionsToShow = [
+        '.event-story',
+        '.event-route',
+        '.event-scoring',
+        '.event-cta'
+    ];
+    
+    sectionsToShow.forEach(selector => {
+        const section = document.querySelector(selector);
+        if (section) {
+            section.style.display = 'block';
+        }
+    });
+}
+
+/**
  * Load and display event results
  */
 async function loadEventResults() {
     if (!currentUser) {
-        // Not logged in - can't see results
+        // Not logged in - show pre-race sections
+        showPreRaceSections();
         return;
     }
 
@@ -81,8 +101,9 @@ async function loadEventResults() {
         const resultsDoc = await getDoc(resultsRef);
 
         if (!resultsDoc.exists()) {
-            // No results available yet
+            // No results available yet - show pre-race sections
             eventResultsSection.style.display = 'none';
+            showPreRaceSections();
             return;
         }
 
@@ -91,11 +112,27 @@ async function loadEventResults() {
 
         if (results.length === 0) {
             eventResultsSection.style.display = 'none';
+            showPreRaceSections();
             return;
         }
 
         // Show results section
         eventResultsSection.style.display = 'block';
+
+        // Hide pre-race sections when results are available
+        const sectionsToHide = [
+            '.event-story',
+            '.event-route',
+            '.event-scoring',
+            '.event-cta'
+        ];
+        
+        sectionsToHide.forEach(selector => {
+            const section = document.querySelector(selector);
+            if (section) {
+                section.style.display = 'none';
+            }
+        });
 
         // Get current user's UID
         const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
@@ -176,6 +213,7 @@ async function loadEventResults() {
     } catch (error) {
         console.error('Error loading event results:', error);
         eventResultsSection.style.display = 'none';
+        showPreRaceSections();
     }
 }
 
