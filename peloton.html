@@ -38,6 +38,7 @@
         </div>
     </nav>
 
+    <!-- Hero Section -->
     <div class="page-header">
         <div class="container">
             <div class="header-content">
@@ -45,210 +46,66 @@
                     <a href="index.html">Home</a> / Meet the Peloton
                 </div>
                 <h1 class="page-title">The Peloton</h1>
-                <p class="page-subtitle">Racing alongside riders from around the world</p>
+                <p class="page-subtitle">Get to know the riders competing in the peloton</p>
             </div>
         </div>
     </div>
 
-    <section class="peloton-intro">
+    <!-- Search and Shuffle Section -->
+    <section class="search-section">
         <div class="container">
-            <div class="intro-content">
-                <h2>Who Are You Racing Against?</h2>
-                <p>Career Mode brings together riders from every corner of the globe. From weekend warriors to seasoned veterans, the peloton is filled with stories of determination, passion, and the pursuit of greatness. Here are some of the riders you'll meet on your journey.</p>
+            <div class="search-wrapper">
+                <div class="search-input-wrapper">
+                    <svg class="search-icon" width="20" height="20" viewBox="0 0 20 20" fill="none">
+                        <path d="M9 17A8 8 0 1 0 9 1a8 8 0 0 0 0 16zM19 19l-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    <input type="text" id="searchInput" class="search-input" placeholder="Search by name, team, or nationality...">
+                    <button id="clearSearch" class="clear-search" style="display: none;">
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <path d="M12 4L4 12M4 4l8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                        </svg>
+                    </button>
+                </div>
+                <button id="shuffleBtn" class="btn btn-secondary shuffle-btn">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+                        <path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    Shuffle
+                </button>
             </div>
         </div>
     </section>
 
-    <section class="riders-section">
+    <!-- Profiles Grid -->
+    <section class="profiles-section">
         <div class="container">
-            <div class="riders-grid">
-                <!-- Rider Profile 1 -->
-                <div class="rider-card">
-                    <div class="rider-image">
-                        <div class="rider-placeholder">
-                            <span>🚴</span>
-                        </div>
-                        <div class="rider-rank">Rank #42</div>
-                    </div>
-                    <div class="rider-info">
-                        <h3 class="rider-name">Alex Chen</h3>
-                        <div class="rider-location">🌍 Singapore</div>
-                        <div class="rider-stats">
-                            <div class="stat">
-                                <span class="stat-label">Events</span>
-                                <span class="stat-value">8</span>
-                            </div>
-                            <div class="stat">
-                                <span class="stat-label">Points</span>
-                                <span class="stat-value">487</span>
-                            </div>
-                            <div class="stat">
-                                <span class="stat-label">Stage</span>
-                                <span class="stat-value">1</span>
-                            </div>
-                        </div>
-                        <p class="rider-bio">"Started cycling during lockdown and never looked back. Virtual racing has opened up a whole new world for me."</p>
-                    </div>
-                </div>
-
-                <!-- Rider Profile 2 -->
-                <div class="rider-card">
-                    <div class="rider-image">
-                        <div class="rider-placeholder">
-                            <span>🚴</span>
-                        </div>
-                        <div class="rider-rank">Rank #15</div>
-                    </div>
-                    <div class="rider-info">
-                        <h3 class="rider-name">Maria Rodriguez</h3>
-                        <div class="rider-location">🌍 Spain</div>
-                        <div class="rider-stats">
-                            <div class="stat">
-                                <span class="stat-label">Events</span>
-                                <span class="stat-value">12</span>
-                            </div>
-                            <div class="stat">
-                                <span class="stat-label">Points</span>
-                                <span class="stat-value">812</span>
-                            </div>
-                            <div class="stat">
-                                <span class="stat-label">Stage</span>
-                                <span class="stat-value">1</span>
-                            </div>
-                        </div>
-                        <p class="rider-bio">"Climbing is my passion. Every hill is a new challenge, every summit a victory."</p>
-                    </div>
-                </div>
-
-                <!-- Rider Profile 3 -->
-                <div class="rider-card">
-                    <div class="rider-image">
-                        <div class="rider-placeholder">
-                            <span>🚴</span>
-                        </div>
-                        <div class="rider-rank">Rank #3</div>
-                    </div>
-                    <div class="rider-info">
-                        <h3 class="rider-name">James Mitchell</h3>
-                        <div class="rider-location">🌍 United Kingdom</div>
-                        <div class="rider-stats">
-                            <div class="stat">
-                                <span class="stat-label">Events</span>
-                                <span class="stat-value">12</span>
-                            </div>
-                            <div class="stat">
-                                <span class="stat-label">Points</span>
-                                <span class="stat-value">1,045</span>
-                            </div>
-                            <div class="stat">
-                                <span class="stat-label">Stage</span>
-                                <span class="stat-value">1</span>
-                            </div>
-                        </div>
-                        <p class="rider-bio">"Consistency is key. Show up, do the work, and results will follow."</p>
-                    </div>
-                </div>
-
-                <!-- Rider Profile 4 -->
-                <div class="rider-card">
-                    <div class="rider-image">
-                        <div class="rider-placeholder">
-                            <span>🚴</span>
-                        </div>
-                        <div class="rider-rank">Rank #88</div>
-                    </div>
-                    <div class="rider-info">
-                        <h3 class="rider-name">Sophie Laurent</h3>
-                        <div class="rider-location">🌍 France</div>
-                        <div class="rider-stats">
-                            <div class="stat">
-                                <span class="stat-label">Events</span>
-                                <span class="stat-value">5</span>
-                            </div>
-                            <div class="stat">
-                                <span class="stat-label">Points</span>
-                                <span class="stat-value">312</span>
-                            </div>
-                            <div class="stat">
-                                <span class="stat-label">Stage</span>
-                                <span class="stat-value">1</span>
-                            </div>
-                        </div>
-                        <p class="rider-bio">"New to racing but loving every minute. The community here is incredible!"</p>
-                    </div>
-                </div>
-
-                <!-- Rider Profile 5 -->
-                <div class="rider-card">
-                    <div class="rider-image">
-                        <div class="rider-placeholder">
-                            <span>🚴</span>
-                        </div>
-                        <div class="rider-rank">Rank #27</div>
-                    </div>
-                    <div class="rider-info">
-                        <h3 class="rider-name">Kenji Tanaka</h3>
-                        <div class="rider-location">🌍 Japan</div>
-                        <div class="rider-stats">
-                            <div class="stat">
-                                <span class="stat-label">Events</span>
-                                <span class="stat-value">10</span>
-                            </div>
-                            <div class="stat">
-                                <span class="stat-label">Points</span>
-                                <span class="stat-value">645</span>
-                            </div>
-                            <div class="stat">
-                                <span class="stat-label">Stage</span>
-                                <span class="stat-value">1</span>
-                            </div>
-                        </div>
-                        <p class="rider-bio">"Discipline and dedication. That's the way of the cyclist."</p>
-                    </div>
-                </div>
-
-                <!-- Rider Profile 6 -->
-                <div class="rider-card">
-                    <div class="rider-image">
-                        <div class="rider-placeholder">
-                            <span>🚴</span>
-                        </div>
-                        <div class="rider-rank">Rank #1</div>
-                    </div>
-                    <div class="rider-info">
-                        <h3 class="rider-name">Emma Larsson</h3>
-                        <div class="rider-location">🌍 Sweden</div>
-                        <div class="rider-stats">
-                            <div class="stat">
-                                <span class="stat-label">Events</span>
-                                <span class="stat-value">12</span>
-                            </div>
-                            <div class="stat">
-                                <span class="stat-label">Points</span>
-                                <span class="stat-value">1,127</span>
-                            </div>
-                            <div class="stat">
-                                <span class="stat-label">Stage</span>
-                                <span class="stat-value">1</span>
-                            </div>
-                        </div>
-                        <p class="rider-bio">"Every race is an opportunity to push limits and discover what you're truly capable of."</p>
-                    </div>
-                </div>
+            <div id="profilesGrid" class="profiles-grid">
+                <!-- Profile cards will be inserted here by JavaScript -->
+            </div>
+            <div id="noResults" class="no-results" style="display: none;">
+                <div class="no-results-icon">🔍</div>
+                <h3>No riders found</h3>
+                <p>Try adjusting your search or browse all riders</p>
+            </div>
+            <div id="loadingSpinner" class="loading-spinner">
+                <div class="spinner"></div>
+                <p>Loading peloton...</p>
             </div>
         </div>
     </section>
 
-    <section class="join-peloton">
-        <div class="container">
-            <div class="join-content">
-                <h2>Join the Peloton</h2>
-                <p>Create your profile and become part of a global community of passionate cyclists.</p>
-                <button class="btn btn-primary btn-large" id="joinBtn">Create Your Profile</button>
+    <!-- Profile Modal -->
+    <div class="modal" id="profileModal">
+        <div class="modal-overlay" id="profileModalOverlay"></div>
+        <div class="modal-content profile-modal-content">
+            <button class="modal-close" id="profileModalClose">&times;</button>
+            <div id="profileModalBody" class="profile-modal-body">
+                <!-- Profile details will be inserted here -->
             </div>
         </div>
-    </section>
+    </div>
 
+    <!-- Footer -->
     <footer class="footer">
         <div class="container">
             <div class="footer-content">
@@ -342,6 +199,7 @@
                         <label for="signupPassword">Password</label>
                         <input type="password" id="signupPassword" required>
                     </div>
+                    <button type="submit" class="btn btn-primary btn-full">Sign Up</button>
                 </form>
                 <div class="auth-divider">
                     <span>or</span>
@@ -359,7 +217,6 @@
             </div>
         </div>
     </div>
-
 
     <!-- UID Modal for Google Sign-In Users -->
     <div class="modal" id="uidModal">
@@ -391,6 +248,6 @@
     </div>
 
     <script type="module" src="app.js"></script>
-    <script src="peloton.js"></script>
+    <script type="module" src="peloton.js"></script>
 </body>
 </html>

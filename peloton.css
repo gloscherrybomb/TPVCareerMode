@@ -1,220 +1,398 @@
-/* Peloton Page Styles */
-
-.peloton-intro {
-    padding: 4rem 0;
+/* Search Section */
+.search-section {
+    padding: 2rem 0;
     background: var(--dark-card);
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.intro-content {
-    max-width: 900px;
+.search-wrapper {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    max-width: 800px;
     margin: 0 auto;
-    text-align: center;
 }
 
-.intro-content h2 {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 2.5rem;
-    font-weight: 900;
-    margin-bottom: 1.5rem;
-    background: linear-gradient(135deg, var(--gradient-start), var(--gradient-mid), var(--gradient-end));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+.search-input-wrapper {
+    flex: 1;
+    position: relative;
+    display: flex;
+    align-items: center;
 }
 
-.intro-content p {
-    font-size: 1.2rem;
+.search-icon {
+    position: absolute;
+    left: 1rem;
     color: var(--text-secondary);
-    line-height: 1.8;
+    pointer-events: none;
 }
 
-/* Riders Section */
-.riders-section {
-    padding: 6rem 0;
+.search-input {
+    width: 100%;
+    padding: 0.875rem 1rem 0.875rem 3rem;
+    background: var(--dark-bg);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    color: var(--text-primary);
+    font-size: 1rem;
+    transition: all 0.3s ease;
 }
 
-.riders-grid {
+.search-input:focus {
+    outline: none;
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 3px rgba(69, 202, 255, 0.1);
+}
+
+.search-input::placeholder {
+    color: var(--text-secondary);
+}
+
+.clear-search {
+    position: absolute;
+    right: 1rem;
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.3s ease;
+}
+
+.clear-search:hover {
+    color: var(--text-primary);
+}
+
+.shuffle-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    white-space: nowrap;
+}
+
+.shuffle-btn svg {
+    transition: transform 0.3s ease;
+}
+
+.shuffle-btn:hover svg {
+    transform: rotate(180deg);
+}
+
+/* Profiles Section */
+.profiles-section {
+    padding: 3rem 0;
+    min-height: 500px;
+}
+
+.profiles-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-    gap: 3rem;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 2rem;
+    margin-bottom: 2rem;
 }
 
-.rider-card {
+/* Profile Card */
+.profile-card {
     background: var(--dark-card);
-    border: 2px solid rgba(255, 255, 255, 0.05);
-    border-radius: 20px;
+    border-radius: 16px;
     overflow: hidden;
-    transition: all 0.4s ease;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+    cursor: pointer;
     animation: fadeInUp 0.6s ease-out both;
 }
 
-.rider-card:nth-child(1) { animation-delay: 0.1s; }
-.rider-card:nth-child(2) { animation-delay: 0.2s; }
-.rider-card:nth-child(3) { animation-delay: 0.3s; }
-.rider-card:nth-child(4) { animation-delay: 0.4s; }
-.rider-card:nth-child(5) { animation-delay: 0.5s; }
-.rider-card:nth-child(6) { animation-delay: 0.6s; }
-
-.rider-card:hover {
-    transform: translateY(-10px);
+.profile-card:hover {
+    transform: translateY(-8px);
     border-color: var(--accent-blue);
-    box-shadow: 0 20px 50px rgba(69, 202, 255, 0.2);
+    box-shadow: 0 12px 40px rgba(69, 202, 255, 0.2);
 }
 
-.rider-image {
+.profile-image {
     position: relative;
-    height: 250px;
+    width: 100%;
+    aspect-ratio: 1;
     background: linear-gradient(135deg, rgba(255, 27, 107, 0.1), rgba(69, 202, 255, 0.1));
     display: flex;
     align-items: center;
     justify-content: center;
+    overflow: hidden;
 }
 
-.rider-placeholder {
-    font-size: 6rem;
+.profile-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
-.rider-rank {
+.profile-image-placeholder {
+    font-size: 4rem;
+}
+
+.profile-arr-badge {
     position: absolute;
-    top: 1rem;
-    right: 1rem;
-    padding: 0.5rem 1.2rem;
-    background: rgba(10, 14, 26, 0.9);
+    top: 0.75rem;
+    right: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    border-radius: 8px;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    font-size: 0.875rem;
     backdrop-filter: blur(10px);
-    border-radius: 50px;
-    font-family: 'Orbitron', sans-serif;
-    font-weight: 700;
-    font-size: 0.9rem;
-    border: 2px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-.rider-info {
-    padding: 2rem;
+.arr-badge-bronze {
+    background: rgba(205, 127, 50, 0.9);
+    color: #ffffff;
 }
 
-.rider-name {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 1.8rem;
-    font-weight: 700;
-    margin-bottom: 0.5rem;
-    color: var(--text-primary);
+.arr-badge-silver {
+    background: rgba(192, 192, 192, 0.9);
+    color: #000000;
 }
 
-.rider-location {
-    font-size: 1rem;
-    color: var(--text-secondary);
-    margin-bottom: 1.5rem;
+.arr-badge-gold {
+    background: rgba(255, 215, 0, 0.9);
+    color: #000000;
 }
 
-.rider-stats {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
-    margin-bottom: 1.5rem;
+.arr-badge-platinum {
+    background: linear-gradient(135deg, rgba(229, 228, 226, 0.9), rgba(200, 200, 200, 0.9));
+    color: #000000;
+}
+
+.profile-info {
     padding: 1.5rem;
-    background: var(--dark-bg);
-    border-radius: 10px;
 }
 
-.stat {
-    text-align: center;
-}
-
-.stat-label {
-    display: block;
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 0.3rem;
-}
-
-.stat-value {
-    display: block;
+.profile-name {
     font-family: 'Orbitron', sans-serif;
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     font-weight: 700;
-    color: var(--accent-blue);
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
 }
 
-.rider-bio {
-    font-size: 1rem;
+.profile-meta {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
     color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+.profile-team {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.profile-nationality {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 1.25rem;
+}
+
+.profile-bio-preview {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
     line-height: 1.6;
-    font-style: italic;
-    padding-left: 1rem;
-    border-left: 3px solid var(--accent-blue);
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
-/* Join Peloton Section */
-.join-peloton {
-    padding: 6rem 0;
-    background: linear-gradient(135deg, rgba(255, 27, 107, 0.1), rgba(69, 202, 255, 0.1));
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+/* Loading & No Results */
+.loading-spinner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 0;
+    gap: 1rem;
 }
 
-.join-content {
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid rgba(255, 255, 255, 0.1);
+    border-top-color: var(--accent-blue);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.loading-spinner p {
+    color: var(--text-secondary);
+}
+
+.no-results {
     text-align: center;
-    max-width: 700px;
-    margin: 0 auto;
+    padding: 4rem 0;
 }
 
-.join-content h2 {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 3rem;
-    font-weight: 900;
+.no-results-icon {
+    font-size: 4rem;
     margin-bottom: 1rem;
 }
 
-.join-content p {
-    font-size: 1.2rem;
+.no-results h3 {
+    font-family: 'Orbitron', sans-serif;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.no-results p {
     color: var(--text-secondary);
-    margin-bottom: 2.5rem;
 }
 
-/* Highlight top riders */
-.rider-card:has(.rider-rank:contains("#1")) {
-    border-color: var(--accent-pink);
-    background: linear-gradient(135deg, rgba(255, 27, 107, 0.05), rgba(199, 26, 229, 0.05));
+/* Profile Modal */
+.profile-modal-content {
+    max-width: 700px;
+    max-height: 90vh;
+    overflow-y: auto;
 }
 
-.rider-card:has(.rider-rank:contains("#2")) {
-    border-color: rgba(192, 192, 192, 0.3);
+.profile-modal-body {
+    padding: 0;
 }
 
-.rider-card:has(.rider-rank:contains("#3")) {
-    border-color: rgba(205, 127, 50, 0.3);
+.modal-profile-header {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    background: linear-gradient(135deg, rgba(255, 27, 107, 0.1), rgba(69, 202, 255, 0.1));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
 }
 
-/* Responsive Design */
+.modal-profile-header img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.modal-profile-header-placeholder {
+    font-size: 6rem;
+}
+
+.modal-profile-details {
+    padding: 2rem;
+}
+
+.modal-profile-name {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+}
+
+.modal-profile-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.modal-meta-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+.modal-meta-value {
+    font-size: 1.125rem;
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.modal-meta-value.arr-value {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+}
+
+.modal-profile-backstory {
+    margin-bottom: 1.5rem;
+}
+
+.modal-backstory-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+}
+
+.modal-backstory-text {
+    color: var(--text-secondary);
+    line-height: 1.8;
+    font-size: 1rem;
+}
+
+.modal-backstory-text p {
+    margin-bottom: 1rem;
+}
+
+.modal-backstory-text p:last-child {
+    margin-bottom: 0;
+}
+
+/* Responsive */
 @media (max-width: 768px) {
-    .intro-content h2 {
-        font-size: 2rem;
+    .search-wrapper {
+        flex-direction: column;
     }
-
-    .riders-grid {
+    
+    .shuffle-btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .profiles-grid {
         grid-template-columns: 1fr;
+        gap: 1.5rem;
     }
-
-    .rider-image {
-        height: 200px;
+    
+    .modal-profile-name {
+        font-size: 1.5rem;
     }
-
-    .rider-placeholder {
-        font-size: 4rem;
+    
+    .modal-profile-meta {
+        gap: 1rem;
     }
+}
 
-    .rider-stats {
-        gap: 0.5rem;
-        padding: 1rem;
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
     }
-
-    .stat-value {
-        font-size: 1.2rem;
-    }
-
-    .join-content h2 {
-        font-size: 2rem;
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
