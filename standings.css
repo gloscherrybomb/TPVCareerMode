@@ -212,18 +212,10 @@
 /* Current User Row */
 .current-user-row {
     background: rgba(69, 202, 255, 0.1) !important;
-    box-shadow: inset 0 0 0 2px var(--accent-blue) !important;
-    position: relative;
-}
-
-.current-user-row::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 4px;
-    background: var(--accent-blue);
+    box-shadow: inset 4px 0 0 0 var(--accent-blue), 
+                inset 0 2px 0 0 var(--accent-blue), 
+                inset -2px 0 0 0 var(--accent-blue), 
+                inset 0 -2px 0 0 var(--accent-blue) !important;
 }
 
 /* Rank Cell */
