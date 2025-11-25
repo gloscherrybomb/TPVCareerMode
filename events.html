@@ -292,7 +292,7 @@
     </div>
 
     <script src="event-data.js"></script>
-    <script src="event-sequence.js"></script>
+    <script type="module" src="event-sequence.js"></script>
     <script type="module" src="app.js"></script>
     <script src="events.js"></script>
     <script>
@@ -489,12 +489,23 @@
 
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', () => {
-            // Show admin toggle for testing (remove in production or check real auth)
-            document.getElementById('adminToggle').style.display = 'inline-block';
+            // Wait for event-sequence.js module to load and attach to window
+            const initializeUI = () => {
+                if (typeof window.eventSequence === 'undefined' || typeof window.progressManager === 'undefined') {
+                    // Module not loaded yet, wait a bit
+                    setTimeout(initializeUI, 50);
+                    return;
+                }
+                
+                // Show admin toggle for testing (remove in production or check real auth)
+                document.getElementById('adminToggle').style.display = 'inline-block';
+                
+                renderTimeline();
+                renderEventSequence();
+                updateProgressStats();
+            };
             
-            renderTimeline();
-            renderEventSequence();
-            updateProgressStats();
+            initializeUI();
         });
 
         // Global function to update UI when progress changes (called by Firebase)
