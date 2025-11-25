@@ -129,16 +129,24 @@ function parseCSV(csvContent) {
 async function processUserResult(uid, eventInfo, results) {
   const { season, event: eventNumber } = eventInfo;
   
-  // Get user document
-  const userRef = db.collection('users').doc(uid);
-  const userDoc = await userRef.get();
+  // Query for user by uid field (not document ID)
+  const usersQuery = await db.collection('users')
+    .where('uid', '==', uid)
+    .limit(1)
+    .get();
   
-  if (!userDoc.exists) {
-    console.log(`User ${uid} not found in database, skipping`);
+  if (usersQuery.empty) {
+    console.log(`❌ User with uid ${uid} not found in database`);
+    console.log(`   Make sure the user has signed up on the website and their uid field is set`);
     return;
   }
   
+  // Get the user document
+  const userDoc = usersQuery.docs[0];
+  const userRef = userDoc.ref;
   const userData = userDoc.data();
+  
+  console.log(`   Found user: ${userData.name || uid} (Document ID: ${userDoc.id})`);
   
   // Check if this is the user's next event
   const currentStage = userData.currentStage || 1;
