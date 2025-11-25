@@ -11,12 +11,13 @@ const firebaseConfig = {
 
 // Initialize Firebase
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-import { getFirestore, doc, setDoc, getDoc, query, collection, where, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+import { getFirestore, doc, setDoc, getDoc, query, collection, where, getDocs, updateDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+const googleProvider = new GoogleAuthProvider();
 
 // Modal functionality
 const loginModal = document.getElementById('loginModal');
@@ -86,6 +87,47 @@ if (modalOverlay) {
 
 if (modalClose) {
     modalClose.addEventListener('click', closeModal);
+}
+
+// Logout button
+const logoutBtn = document.getElementById('logoutBtn');
+if (logoutBtn) {
+    logoutBtn.addEventListener('click', async (e) => {
+        e.preventDefault();
+        try {
+            await signOut(auth);
+            alert('You have been logged out successfully.');
+            window.location.href = 'index.html';
+        } catch (error) {
+            console.error('Logout error:', error);
+            alert('Error logging out: ' + error.message);
+        }
+    });
+}
+
+// UID Modal functionality
+const uidModal = document.getElementById('uidModal');
+const uidModalOverlay = document.getElementById('uidModalOverlay');
+
+function openUidModal() {
+    if (uidModal) {
+        uidModal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+function closeUidModal() {
+    if (uidModal) {
+        uidModal.classList.remove('active');
+        document.body.style.overflow = 'auto';
+    }
+}
+
+if (uidModalOverlay) {
+    uidModalOverlay.addEventListener('click', (e) => {
+        // Prevent closing on overlay click for UID modal (required field)
+        e.stopPropagation();
+    });
 }
 
 // Tab switching
@@ -249,27 +291,130 @@ if (signupForm) {
     });
 }
 
+// Google Sign-In
+const googleLoginBtn = document.getElementById('googleLoginBtn');
+if (googleLoginBtn) {
+    googleLoginBtn.addEventListener('click', async () => {
+        try {
+            const result = await signInWithPopup(auth, googleProvider);
+            const user = result.user;
+            
+            // Check if user document exists and has UID
+            const userDoc = await getDoc(doc(db, 'users', user.uid));
+            
+            if (!userDoc.exists() || !userDoc.data().uid) {
+                // New Google user or existing user without UID - show UID modal
+                openUidModal();
+            } else {
+                // User has UID, proceed normally
+                console.log('Google user logged in:', user.uid);
+                closeModal();
+                window.location.href = 'events.html';
+            }
+        } catch (error) {
+            console.error('Google sign-in error:', error);
+            
+            let errorMessage = 'Google sign-in failed. ';
+            if (error.code === 'auth/popup-closed-by-user') {
+                errorMessage += 'Sign-in popup was closed.';
+            } else if (error.code === 'auth/cancelled-popup-request') {
+                errorMessage += 'Another sign-in popup is already open.';
+            } else {
+                errorMessage += error.message;
+            }
+            
+            alert(errorMessage);
+        }
+    });
+}
+
+// UID Form for Google users
+const uidForm = document.getElementById('uidForm');
+if (uidForm) {
+    uidForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const uid = document.getElementById('googleUID').value.toUpperCase();
+        
+        // Validate UID format
+        if (!/^[0-9A-F]{16}$/.test(uid)) {
+            alert('Invalid UID format. Must be exactly 16 hexadecimal characters (0-9, A-F).');
+            return;
+        }
+        
+        try {
+            // Check if UID is already claimed
+            const usersRef = collection(db, 'users');
+            const q = query(usersRef, where('uid', '==', uid));
+            const querySnapshot = await getDocs(q);
+            
+            if (!querySnapshot.empty) {
+                alert('This UID is already claimed by another user. Each UID can only be registered once.');
+                return;
+            }
+            
+            const user = auth.currentUser;
+            if (!user) {
+                alert('Error: No user is currently logged in.');
+                return;
+            }
+            
+            // Check if user document exists
+            const userDoc = await getDoc(doc(db, 'users', user.uid));
+            
+            if (userDoc.exists()) {
+                // Update existing document
+                await updateDoc(doc(db, 'users', user.uid), {
+                    uid: uid
+                });
+            } else {
+                // Create new user document
+                await setDoc(doc(db, 'users', user.uid), {
+                    name: user.displayName || 'Google User',
+                    uid: uid,
+                    email: user.email,
+                    currentStage: 1,
+                    completedStages: [],
+                    completedOptionalEvents: [],
+                    choiceSelections: {},
+                    totalPoints: 0,
+                    createdAt: new Date()
+                });
+            }
+            
+            console.log('UID saved for Google user:', user.uid);
+            alert('UID saved successfully! Welcome to TPV Career Mode.');
+            closeUidModal();
+            closeModal();
+            window.location.href = 'events.html';
+        } catch (error) {
+            console.error('Error saving UID:', error);
+            alert('Error saving UID: ' + error.message);
+        }
+    });
+}
+
 // Auth state observer
 onAuthStateChanged(auth, (user) => {
     const loginBtn = document.getElementById('loginBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
     
     if (user) {
         // User is signed in
         if (loginBtn) {
-            loginBtn.textContent = 'Profile';
-            loginBtn.onclick = (e) => {
-                e.preventDefault();
-                window.location.href = 'events.html';
-            };
+            loginBtn.style.display = 'none';
+        }
+        if (logoutBtn) {
+            logoutBtn.style.display = 'inline-block';
         }
     } else {
         // User is signed out
         if (loginBtn) {
+            loginBtn.style.display = 'inline-block';
             loginBtn.textContent = 'Login';
-            loginBtn.onclick = (e) => {
-                e.preventDefault();
-                openModal('login');
-            };
+        }
+        if (logoutBtn) {
+            logoutBtn.style.display = 'none';
         }
     }
 });
