@@ -44,125 +44,99 @@
     color: var(--text-secondary);
 }
 
-/* Season Selection */
-.season-selection {
-    padding: 2rem 0 0;
+/* Season Selector Dropdown */
+.season-selector-section {
+    padding: 1.5rem 0;
     background: var(--dark-bg);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.season-cards-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 1rem;
-    max-width: 1000px;
-    margin: 0 auto;
-}
-
-.season-card {
-    background: var(--dark-card);
-    border: 2px solid rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
-    padding: 1rem;
-    transition: all 0.3s ease;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-}
-
-.season-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, var(--gradient-start), var(--gradient-mid), var(--gradient-end));
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.season-card.active {
-    border-color: rgba(255, 27, 107, 0.3);
-    background: linear-gradient(135deg, rgba(255, 27, 107, 0.05), rgba(69, 202, 255, 0.05));
-    cursor: default;
-}
-
-.season-card.active::before {
-    opacity: 1;
-}
-
-.season-card.locked {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-.season-card:not(.locked):not(.active):hover {
-    border-color: rgba(69, 202, 255, 0.3);
-    transform: translateY(-2px);
-}
-
-.season-card-header {
+.season-selector-wrapper {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    margin-bottom: 0.75rem;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.season-selector-label {
+    display: flex;
+    align-items: center;
     gap: 0.5rem;
-}
-
-.season-number {
     font-family: 'Orbitron', sans-serif;
-    font-size: 0.8rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    flex-shrink: 0;
-}
-
-.season-badge {
-    font-size: 0.65rem;
-    padding: 0.2rem 0.4rem;
-    border-radius: 4px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-    white-space: nowrap;
-    flex-shrink: 0;
-}
-
-.active-badge {
-    background: linear-gradient(135deg, var(--accent-pink), var(--accent-blue));
-    color: var(--text-primary);
-}
-
-.coming-soon-badge {
-    background: rgba(255, 255, 255, 0.05);
-    color: var(--text-secondary);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.season-title {
     font-size: 0.95rem;
     font-weight: 600;
     color: var(--text-primary);
-    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
-.season-stats {
-    font-size: 0.8rem;
+.season-icon {
+    font-size: 1.2rem;
+}
+
+.season-select-container {
+    position: relative;
+    min-width: 320px;
+}
+
+.season-select {
+    width: 100%;
+    padding: 0.75rem 2.5rem 0.75rem 1rem;
+    background: var(--dark-card);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    appearance: none;
+    transition: all 0.3s ease;
+    background-image: linear-gradient(135deg, rgba(255, 27, 107, 0.03), rgba(69, 202, 255, 0.03));
+}
+
+.season-select:hover {
+    border-color: rgba(69, 202, 255, 0.4);
+}
+
+.season-select:focus {
+    outline: none;
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 3px rgba(69, 202, 255, 0.1);
+}
+
+.season-select option {
+    background: var(--dark-card);
+    color: var(--text-primary);
+    padding: 0.5rem;
+}
+
+.season-select option:disabled {
     color: var(--text-secondary);
+    opacity: 0.6;
 }
 
-/* Responsive adjustments */
+.select-arrow {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: var(--accent-blue);
+    display: flex;
+    align-items: center;
+}
+
+/* Responsive */
 @media (max-width: 768px) {
-    .season-cards-grid {
-        grid-template-columns: repeat(2, 1fr);
+    .season-selector-wrapper {
+        flex-direction: column;
+        gap: 0.75rem;
     }
-}
-
-@media (max-width: 480px) {
-    .season-cards-grid {
-        grid-template-columns: 1fr;
+    
+    .season-select-container {
+        width: 100%;
+        min-width: auto;
+        max-width: 400px;
     }
 }
 
