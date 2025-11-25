@@ -11,7 +11,7 @@ const firebaseConfig = {
 
 // Initialize Firebase
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut, GoogleAuthProvider, signInWithPopup, setPersistence, browserLocalPersistence, browserSessionPersistence } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 import { getFirestore, doc, setDoc, getDoc, query, collection, where, getDocs, updateDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
 const app = initializeApp(firebaseConfig);
@@ -193,10 +193,16 @@ if (loginForm) {
         
         const email = document.getElementById('loginEmail').value;
         const password = document.getElementById('loginPassword').value;
+        const rememberMe = document.getElementById('rememberMe').checked;
         
         try {
+            // Set persistence based on Remember Me checkbox
+            const persistence = rememberMe ? browserLocalPersistence : browserSessionPersistence;
+            await setPersistence(auth, persistence);
+            
             const userCredential = await signInWithEmailAndPassword(auth, email, password);
             console.log('User logged in:', userCredential.user);
+            console.log('Remember me:', rememberMe ? 'ON (stays logged in)' : 'OFF (session only)');
             
             closeModal();
             
@@ -296,8 +302,18 @@ const googleLoginBtn = document.getElementById('googleLoginBtn');
 if (googleLoginBtn) {
     googleLoginBtn.addEventListener('click', async () => {
         try {
+            // Check Remember Me checkbox (default to true if not found)
+            const rememberMeCheckbox = document.getElementById('rememberMe');
+            const rememberMe = rememberMeCheckbox ? rememberMeCheckbox.checked : true;
+            
+            // Set persistence based on Remember Me checkbox
+            const persistence = rememberMe ? browserLocalPersistence : browserSessionPersistence;
+            await setPersistence(auth, persistence);
+            
             const result = await signInWithPopup(auth, googleProvider);
             const user = result.user;
+            
+            console.log('Remember me:', rememberMe ? 'ON (stays logged in)' : 'OFF (session only)');
             
             // Check if user document exists and has UID
             const userDoc = await getDoc(doc(db, 'users', user.uid));
@@ -333,6 +349,9 @@ const googleSignupBtn = document.getElementById('googleSignupBtn');
 if (googleSignupBtn) {
     googleSignupBtn.addEventListener('click', async () => {
         try {
+            // Always use local persistence for signup (user choosing to create account)
+            await setPersistence(auth, browserLocalPersistence);
+            
             const result = await signInWithPopup(auth, googleProvider);
             const user = result.user;
             

@@ -828,6 +828,37 @@ body {
     margin-top: 0.25rem;
 }
 
+/* Remember Me Checkbox */
+.form-group-checkbox {
+    display: flex;
+    align-items: center;
+    margin: 0.5rem 0;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin-right: 0.5rem;
+    cursor: pointer;
+    accent-color: var(--accent-blue);
+}
+
+.checkbox-text {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.checkbox-label:hover .checkbox-text {
+    color: var(--text-primary);
+}
+
 /* Responsive Design */
 @media (max-width: 1024px) {
     .hero-section {
