@@ -1,5 +1,4 @@
-// Firebase configuration (replace with your actual config)
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+// Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyDo-g0UhDCB8QWRXQ0iapVHQEgA4X7jt4o",
   authDomain: "careermodelogin.firebaseapp.com",
@@ -10,14 +9,14 @@ const firebaseConfig = {
   measurementId: "G-Y8BQ4F6H4V"
 };
 
-// Initialize Firebase (will be uncommented when config is added)
- import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
- import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
- import { getFirestore, doc, setDoc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+// Initialize Firebase
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+import { getFirestore, doc, setDoc, getDoc, query, collection, where, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
- const app = initializeApp(firebaseConfig);
- const auth = getAuth(app);
- const db = getFirestore(app);
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
 // Modal functionality
 const loginModal = document.getElementById('loginModal');
@@ -142,7 +141,7 @@ document.querySelectorAll('.nav-link').forEach(link => {
     });
 });
 
-// Authentication functions (template for Firebase integration)
+// Authentication functions
 const loginForm = document.getElementById('loginForm');
 const signupForm = document.getElementById('signupForm');
 
@@ -154,19 +153,30 @@ if (loginForm) {
         const password = document.getElementById('loginPassword').value;
         
         try {
-            // Uncomment when Firebase is configured
-             const userCredential = await signInWithEmailAndPassword(auth, email, password);
-             console.log('User logged in:', userCredential.user);
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+            console.log('User logged in:', userCredential.user);
             
-            // For now, just show a success message
-          //  alert('Login functionality will be enabled once Firebase is configured.');
-          //  closeModal();
+            closeModal();
             
-            // After login, redirect to events page
-             window.location.href = 'events.html';
+            // Redirect to events page
+            window.location.href = 'events.html';
         } catch (error) {
             console.error('Login error:', error);
-            alert('Login error: ' + error.message);
+            
+            let errorMessage = 'Login failed. ';
+            if (error.code === 'auth/user-not-found') {
+                errorMessage += 'No account found with this email.';
+            } else if (error.code === 'auth/wrong-password') {
+                errorMessage += 'Incorrect password.';
+            } else if (error.code === 'auth/invalid-email') {
+                errorMessage += 'Invalid email address.';
+            } else if (error.code === 'auth/invalid-credential') {
+                errorMessage += 'Invalid email or password.';
+            } else {
+                errorMessage += error.message;
+            }
+            
+            alert(errorMessage);
         }
     });
 }
@@ -176,60 +186,93 @@ if (signupForm) {
         e.preventDefault();
         
         const name = document.getElementById('signupName').value;
+        const uid = document.getElementById('signupUID').value.toUpperCase();
         const email = document.getElementById('signupEmail').value;
         const password = document.getElementById('signupPassword').value;
         
+        // Validate UID format (16 hexadecimal characters)
+        if (!/^[0-9A-F]{16}$/.test(uid)) {
+            alert('Invalid UID format. Must be exactly 16 hexadecimal characters (0-9, A-F).');
+            return;
+        }
+        
         try {
-             Uncomment when Firebase is configured
-             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-             const user = userCredential.user;
+            // Check if UID is already claimed by another user
+            const usersRef = collection(db, 'users');
+            const q = query(usersRef, where('uid', '==', uid));
+            const querySnapshot = await getDocs(q);
             
-             Create user profile in Firestore
-             await setDoc(doc(db, 'users', user.uid), {
-                 name: name,
-                 email: email,
-                 currentStage: 1,
-                 points: 0,
-                 eventsCompleted: [],
-                 createdAt: new Date()
-             });
+            if (!querySnapshot.empty) {
+                alert('This UID is already claimed by another user. Each UID can only be registered once.');
+                return;
+            }
             
-            // For now, just show a success message
-          //  alert('Sign up functionality will be enabled once Firebase is configured.');
-          //  closeModal();
+            // Create Firebase Auth user
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
             
-            // After signup, redirect to events page
-             window.location.href = 'events.html';
+            // Create user profile in Firestore with UID
+            await setDoc(doc(db, 'users', user.uid), {
+                name: name,
+                uid: uid,
+                email: email,
+                currentStage: 1,
+                completedStages: [],
+                completedOptionalEvents: [],
+                choiceSelections: {},
+                totalPoints: 0,
+                createdAt: new Date()
+            });
+            
+            console.log('User created:', user.uid);
+            alert('Account created successfully! Welcome to TPV Career Mode.');
+            closeModal();
+            
+            // Redirect to events page
+            window.location.href = 'events.html';
         } catch (error) {
             console.error('Signup error:', error);
-            alert('Signup error: ' + error.message);
+            
+            let errorMessage = 'Sign up failed. ';
+            if (error.code === 'auth/email-already-in-use') {
+                errorMessage += 'This email is already registered.';
+            } else if (error.code === 'auth/invalid-email') {
+                errorMessage += 'Invalid email address.';
+            } else if (error.code === 'auth/weak-password') {
+                errorMessage += 'Password should be at least 6 characters.';
+            } else {
+                errorMessage += error.message;
+            }
+            
+            alert(errorMessage);
         }
     });
 }
 
 // Auth state observer
- Uncomment when Firebase is configured
-
 onAuthStateChanged(auth, (user) => {
     const loginBtn = document.getElementById('loginBtn');
     
     if (user) {
         // User is signed in
-        loginBtn.textContent = 'Profile';
-        loginBtn.onclick = (e) => {
-            e.preventDefault();
-            window.location.href = 'events.html';
-        };
+        if (loginBtn) {
+            loginBtn.textContent = 'Profile';
+            loginBtn.onclick = (e) => {
+                e.preventDefault();
+                window.location.href = 'events.html';
+            };
+        }
     } else {
         // User is signed out
-        loginBtn.textContent = 'Login';
-        loginBtn.onclick = (e) => {
-            e.preventDefault();
-            openModal('login');
-        };
+        if (loginBtn) {
+            loginBtn.textContent = 'Login';
+            loginBtn.onclick = (e) => {
+                e.preventDefault();
+                openModal('login');
+            };
+        }
     }
 });
-
 
 // Add animation on scroll
 const observerOptions = {
