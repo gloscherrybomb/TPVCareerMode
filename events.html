@@ -161,7 +161,7 @@
             <!-- Season Story/Report -->
             <div class="season-story-box" id="seasonStoryBox">
                 <div class="season-story-content" id="seasonStoryContent">
-                    <!-- Content will be dynamically loaded -->
+                    <p>This is the true beginning of your career—the moment where you stop imagining what it would feel like to "be a rider" and actually step into it. The races may be small, the crowds may be local, but every start line feels electric because you're finally part of it. This is your chance to experience that classic pro cycling manager journey, only now it's you doing the riding, you making the decisions, and you earning every result with your own legs. At this level, every race is an opportunity: the crits sharpen your instincts, the climbs test your composure, and the time trials reveal what you're really capable of when it's just you against the clock. Nothing is handed to you, but that's the appeal—each place you gain, each expectation you beat, feels like your first steps toward something bigger. You're not chasing fame yet; you're chasing proof that you belong here. It's the start of a long road, but a meaningful one. And if you can master these early races—these local, gritty, character-building tests—you'll lay the foundation for everything that comes next. This isn't just a season. It's the pro cyclist origin story you've always imagined, and you're finally writing the first chapter.</p>
                 </div>
             </div>
 
@@ -343,6 +343,16 @@
             const timelineStages = document.getElementById('timelineStages');
             const cyclistMarker = document.getElementById('cyclistMarker');
             
+            // Use window objects explicitly
+            const eventSequence = window.eventSequence;
+            const progressManager = window.progressManager;
+            const getStageStatus = window.getStageStatus;
+            
+            if (!eventSequence || !progressManager || !getStageStatus) {
+                console.error('Required objects not loaded yet');
+                return;
+            }
+            
             timelineStages.innerHTML = eventSequence.map((stage, index) => {
                 const status = getStageStatus(stage.stage);
                 const isChoice = stage.type === 'choice';
@@ -375,6 +385,17 @@
         // Render event sequence
         function renderEventSequence() {
             const eventsSequence = document.getElementById('eventsSequence');
+            
+            // Use window objects explicitly
+            const eventSequence = window.eventSequence;
+            const progressManager = window.progressManager;
+            const getStageStatus = window.getStageStatus;
+            const getEvent = window.getEvent;
+            
+            if (!eventSequence || !progressManager || !getStageStatus || !getEvent) {
+                console.error('Required objects not loaded yet');
+                return;
+            }
             
             eventsSequence.innerHTML = eventSequence.map((stage, index) => {
                 const status = getStageStatus(stage.stage);
@@ -462,6 +483,14 @@
 
         // Update progress stats
         async function updateProgressStats() {
+            const progressManager = window.progressManager;
+            const eventSequence = window.eventSequence;
+            
+            if (!progressManager || !eventSequence) {
+                console.error('Required objects not loaded yet in updateProgressStats');
+                return;
+            }
+            
             const current = progressManager.getCurrentStage();
             const completed = progressManager.progress.completedStages.length;
             const total = eventSequence.length;
@@ -529,10 +558,30 @@
         async function updateSeasonStory() {
             const storyContent = document.getElementById('seasonStoryContent');
             
+            // Check if element exists
+            if (!storyContent) {
+                console.error('seasonStoryContent element not found');
+                return;
+            }
+            
+            // Check if required objects are available
+            if (typeof window.eventSequence === 'undefined' || typeof window.progressManager === 'undefined') {
+                console.log('Waiting for eventSequence and progressManager to load...');
+                // Set a default message while loading
+                storyContent.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">Loading...</p>';
+                return;
+            }
+            
+            // Use window.eventSequence and window.progressManager to be explicit
+            const eventSequence = window.eventSequence;
+            const progressManager = window.progressManager;
+            
             // Check if season is complete (all 9 stages completed)
             const totalStages = eventSequence.length;
             const completedStages = progressManager.progress.completedStages.length;
             const isSeasonComplete = completedStages === totalStages;
+            
+            console.log(`Season status: ${completedStages}/${totalStages} stages completed`);
             
             if (!isSeasonComplete) {
                 // Show introduction text
@@ -540,6 +589,7 @@
                     <p>This is the true beginning of your career—the moment where you stop imagining what it would feel like to "be a rider" and actually step into it. The races may be small, the crowds may be local, but every start line feels electric because you're finally part of it. This is your chance to experience that classic pro cycling manager journey, only now it's you doing the riding, you making the decisions, and you earning every result with your own legs. At this level, every race is an opportunity: the crits sharpen your instincts, the climbs test your composure, and the time trials reveal what you're really capable of when it's just you against the clock. Nothing is handed to you, but that's the appeal—each place you gain, each expectation you beat, feels like your first steps toward something bigger. You're not chasing fame yet; you're chasing proof that you belong here. It's the start of a long road, but a meaningful one. And if you can master these early races—these local, gritty, character-building tests—you'll lay the foundation for everything that comes next. This isn't just a season. It's the pro cyclist origin story you've always imagined, and you're finally writing the first chapter.</p>
                 `;
                 storyContent.classList.remove('report');
+                console.log('Season introduction text loaded');
             } else {
                 // Season is complete - show appropriate end-of-season report
                 await showEndOfSeasonReport(storyContent);
@@ -623,6 +673,14 @@
 
         // Open choice modal
         function openChoiceModal(stage) {
+            const progressManager = window.progressManager;
+            const getEvent = window.getEvent;
+            
+            if (!progressManager || !getEvent) {
+                console.error('Required objects not loaded yet');
+                return;
+            }
+            
             const modal = document.getElementById('choiceModal');
             const grid = document.getElementById('choiceEventsGrid');
             const availableEvents = progressManager.getAvailableOptionalEvents(stage);
@@ -665,21 +723,12 @@
             document.body.style.overflow = 'auto';
         }
 
-        // Admin toggle (temporary - will be replaced with real auth)
-        document.getElementById('adminToggle').addEventListener('click', () => {
-            progressManager.setAdminMode(!progressManager.isAdmin);
-            document.getElementById('adminStatus').textContent = 
-                progressManager.isAdmin ? 'Admin Mode: ON' : 'Admin Mode: OFF';
-            renderEventSequence();
-            renderTimeline();
-        });
-
-        // Modal close handlers
-        document.getElementById('choiceModalClose').addEventListener('click', closeChoiceModal);
-        document.getElementById('choiceModalOverlay').addEventListener('click', closeChoiceModal);
-
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', () => {
+            // Setup modal close handlers
+            document.getElementById('choiceModalClose').addEventListener('click', closeChoiceModal);
+            document.getElementById('choiceModalOverlay').addEventListener('click', closeChoiceModal);
+            
             // Wait for event-sequence.js module to load and attach to window
             const initializeUI = () => {
                 if (typeof window.eventSequence === 'undefined' || typeof window.progressManager === 'undefined') {
@@ -690,6 +739,18 @@
                 
                 // Show admin toggle for testing (remove in production or check real auth)
                 document.getElementById('adminToggle').style.display = 'inline-block';
+                
+                // Setup admin toggle (temporary - will be replaced with real auth)
+                document.getElementById('adminToggle').addEventListener('click', () => {
+                    const progressManager = window.progressManager;
+                    if (!progressManager) return;
+                    
+                    progressManager.setAdminMode(!progressManager.isAdmin);
+                    document.getElementById('adminStatus').textContent = 
+                        progressManager.isAdmin ? 'Admin Mode: ON' : 'Admin Mode: OFF';
+                    renderEventSequence();
+                    renderTimeline();
+                });
                 
                 renderTimeline();
                 renderEventSequence();
