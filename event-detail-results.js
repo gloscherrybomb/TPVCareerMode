@@ -149,7 +149,6 @@ async function loadEventResults() {
                             <th>Rider</th>
                             <th>Team</th>
                             <th>Time</th>
-                            <th>Gap</th>
                             <th>ARR</th>
                             <th>Points</th>
                             ${results[0].eventPoints !== null ? '<th>PR Pts</th>' : ''}
@@ -180,7 +179,6 @@ async function loadEventResults() {
                     </td>
                     <td class="team-cell">${teamDisplay}</td>
                     <td class="time-cell">${formatTime(result.time)}</td>
-                    <td class="gap-cell">${formatDeltaTime(result.deltaTime || 0)}</td>
                     <td class="arr-cell">
                         <span class="arr-value">${result.arr}</span>
                         <span class="arr-band">${result.arrBand || getARRBand(result.arr)}</span>
