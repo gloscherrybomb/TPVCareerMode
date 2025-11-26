@@ -20,6 +20,14 @@
     align-items: center;
 }
 
+.profile-nationality .flag-icon {
+    width: 20px;
+    height: 14px;
+    object-fit: cover;
+    vertical-align: middle;
+}
+
+
 .search-icon {
     position: absolute;
     left: 1rem;
