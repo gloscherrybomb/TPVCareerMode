@@ -19,7 +19,8 @@ import {
     getDownloadURL 
 } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-import { eventData } from './event-data.js';
+
+// Access eventData from global scope (loaded via script tag in HTML)
 
 // Firebase configuration
 const firebaseConfig = {
@@ -176,7 +177,7 @@ async function calculateUserStats(userUID) {
                     // Add to recent results
                     stats.recentResults.push({
                         eventNum: eventNum,
-                        eventName: eventData[eventNum]?.name || `Event ${eventNum}`,
+                        eventName: window.eventData?.[eventNum]?.name || `Event ${eventNum}`,
                         position: position,
                         time: userResult.time || 'N/A',
                         points: userResult.points || 0,

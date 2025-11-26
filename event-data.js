@@ -451,9 +451,6 @@ function calculateSinglePosition(position, maxPoints) {
     return Math.round(basePoints + podiumBonus);
 }
 
-// Export for ES6 modules
-export { eventData, getEvent, calculatePoints, calculateSinglePosition };
-
 // Export for use in HTML (CommonJS)
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = { eventData, getEvent, calculatePoints, calculateSinglePosition };
