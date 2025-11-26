@@ -195,7 +195,7 @@ async function calculateUserStats(userUID) {
     // Calculate average finish
     if (stats.positions.length > 0) {
         const sum = stats.positions.reduce((a, b) => a + b, 0);
-        stats.avgFinish = (sum / stats.positions.length).toFixed(1);
+        stats.avgFinish = Math.round(sum / stats.positions.length);
     }
     
     // Calculate rates
