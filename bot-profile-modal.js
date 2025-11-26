@@ -38,14 +38,189 @@ function initializeBotModal() {
         styles.id = 'bot-modal-styles';
         styles.textContent = `
             .bot-name-link {
-                color: var(--accent-blue);
-                cursor: pointer;
+                color: var(--accent-blue) !important;
+                cursor: pointer !important;
                 text-decoration: none;
                 transition: color 0.3s ease;
+                display: inline;
             }
             .bot-name-link:hover {
-                color: var(--text-primary);
+                color: var(--text-primary) !important;
                 text-decoration: underline;
+            }
+            .rider-name .bot-name-link {
+                color: var(--accent-blue) !important;
+            }
+            
+            /* Modal Profile Styles */
+            .profile-modal-content {
+                max-width: 700px;
+                max-height: 90vh;
+                overflow-y: auto;
+            }
+            
+            .profile-modal-body {
+                padding: 0;
+            }
+            
+            .modal-profile-header {
+                position: relative;
+                width: 100%;
+                height: 400px;
+                max-height: 50vh;
+                background: linear-gradient(135deg, rgba(255, 27, 107, 0.1), rgba(69, 202, 255, 0.1));
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                overflow: hidden;
+            }
+            
+            .modal-profile-header img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+            
+            .modal-profile-header-placeholder {
+                font-size: 6rem;
+            }
+            
+            .modal-profile-details {
+                padding: 2rem;
+            }
+            
+            .modal-profile-name {
+                font-family: 'Orbitron', sans-serif;
+                font-size: 2rem;
+                font-weight: 700;
+                color: var(--text-primary);
+                margin-bottom: 1rem;
+            }
+            
+            .modal-profile-meta {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 1.5rem;
+                margin-bottom: 2rem;
+                padding-bottom: 1.5rem;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+            
+            .modal-meta-item {
+                display: flex;
+                flex-direction: column;
+                gap: 0.25rem;
+            }
+            
+            .modal-meta-label {
+                font-size: 0.75rem;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                color: var(--text-secondary);
+                font-weight: 600;
+            }
+            
+            .modal-meta-value {
+                font-size: 1.125rem;
+                color: var(--text-primary);
+                font-weight: 600;
+            }
+            
+            .modal-meta-value.arr-value {
+                font-family: 'Orbitron', sans-serif;
+                font-weight: 700;
+            }
+            
+            .modal-profile-backstory {
+                margin-bottom: 1.5rem;
+            }
+            
+            .modal-backstory-title {
+                font-family: 'Orbitron', sans-serif;
+                font-size: 1.25rem;
+                font-weight: 700;
+                color: var(--text-primary);
+                margin-bottom: 1rem;
+            }
+            
+            .modal-backstory-text {
+                color: var(--text-secondary);
+                line-height: 1.8;
+                font-size: 1rem;
+            }
+            
+            .modal-backstory-text p {
+                margin-bottom: 1rem;
+            }
+            
+            .modal-backstory-text p:last-child {
+                margin-bottom: 0;
+            }
+            
+            /* ARR Badge Colors */
+            .arr-badge-bronze {
+                color: #cd7f32;
+            }
+            
+            .arr-badge-silver {
+                color: #c0c0c0;
+            }
+            
+            .arr-badge-gold {
+                color: #ffd700;
+            }
+            
+            .arr-badge-platinum {
+                background: linear-gradient(135deg, #e5e4e2, #c8c8c8);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+            }
+            
+            /* Loading Spinner */
+            .loading-spinner {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                padding: 4rem 0;
+                gap: 1rem;
+            }
+            
+            .spinner {
+                width: 50px;
+                height: 50px;
+                border: 4px solid rgba(255, 255, 255, 0.1);
+                border-top-color: var(--accent-blue);
+                border-radius: 50%;
+                animation: spin 1s linear infinite;
+            }
+            
+            @keyframes spin {
+                to { transform: rotate(360deg); }
+            }
+            
+            .loading-spinner p {
+                color: var(--text-secondary);
+            }
+            
+            /* Mobile Responsive */
+            @media (max-width: 768px) {
+                .modal-profile-header {
+                    height: 300px;
+                }
+                
+                .modal-profile-name {
+                    font-size: 1.5rem;
+                }
+                
+                .modal-profile-details {
+                    padding: 1.5rem;
+                }
+                
+                .modal-profile-meta {
+                    gap: 1rem;
+                }
             }
         `;
         document.head.appendChild(styles);
@@ -191,11 +366,16 @@ function closeBotModal() {
 
 // Check if rider is a bot (UID starts with "Bot")
 function isBot(uid) {
-    return uid && uid.startsWith('Bot');
+    return uid && typeof uid === 'string' && uid.startsWith('Bot');
 }
 
 // Make rider name clickable if it's a bot
 function makeNameClickable(name, uid) {
+    // Debug logging (can be removed after testing)
+    if (uid && uid.startsWith('Bot')) {
+        console.log('Making bot name clickable:', name, uid);
+    }
+    
     if (isBot(uid)) {
         return `<span class="bot-name-link" onclick="window.openBotProfile('${uid}')">${name}</span>`;
     }

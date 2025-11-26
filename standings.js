@@ -127,6 +127,10 @@ async function renderSeasonStandings() {
         // await updateDoc(doc(db, 'users', currentUser.uid), { season1Standings: standings });
     }
 
+    // Debug logging
+    console.log('Season Standings - First 3 racers:', standings.slice(0, 3));
+    console.log('Season Standings - Sample bot:', standings.find(r => r.uid && r.uid.startsWith('Bot')));
+
     // Build table HTML
     let tableHTML = `
         <div class="standings-table-container">
