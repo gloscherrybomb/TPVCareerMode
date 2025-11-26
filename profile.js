@@ -70,6 +70,22 @@ function getInitials(name) {
     return name[0].toUpperCase();
 }
 
+// Format time in seconds to hh:mm:ss
+function formatTime(seconds) {
+    if (!seconds || seconds === 'N/A') return 'N/A';
+    
+    const totalSeconds = Math.floor(seconds);
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    const secs = totalSeconds % 60;
+    
+    if (hours > 0) {
+        return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    } else {
+        return `${minutes}:${secs.toString().padStart(2, '0')}`;
+    }
+}
+
 // Get ARR band from rating
 function getARRBand(arr) {
     if (!arr || arr < 300) return 'Unranked';
@@ -429,7 +445,7 @@ function displayRecentResults(results) {
                     <div class="result-event">${result.eventName}</div>
                     <div class="result-date">${formattedDate}</div>
                 </div>
-                <div class="result-time">${result.time}</div>
+                <div class="result-time">${formatTime(result.time)}</div>
                 <div class="result-points">+${result.points}</div>
             </div>
         `;
