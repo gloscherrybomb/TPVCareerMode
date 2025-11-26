@@ -22,7 +22,11 @@ const db = getFirestore(app);
 
 let currentUser = null;
 
-// Dummy season standings data (will be replaced with real data from CSV processing)
+// NOTE: Dummy data function below is no longer used - real standings calculated from results
+// Keeping for reference but can be deleted
+
+/*
+// Dummy season standings data (DEPRECATED - now using real results)
 function generateDummySeasonStandings(userName, userArr) {
     const botRacers = [
         { uid: "Bot001", name: "Stephen Burgess", arr: 1280, team: "Formix" },
@@ -92,6 +96,74 @@ function generateDummySeasonStandings(userName, userArr) {
 
     return standings;
 }
+*/
+
+// Calculate real season standings from results
+async function calculateRealSeasonStandings(season = 1) {
+    console.log('Calculating real season standings from results...');
+    
+    // Object to accumulate points for each rider
+    const riderStats = {};
+    
+    // Fetch results for all events in the season
+    // Assuming events 1-9 for now (can be made dynamic)
+    const eventCount = 9;
+    
+    for (let eventNum = 1; eventNum <= eventCount; eventNum++) {
+        const resultDocId = `season${season}_event${eventNum}`;
+        
+        try {
+            const resultDoc = await getDoc(doc(db, 'results', resultDocId));
+            
+            if (resultDoc.exists()) {
+                const resultData = resultDoc.data();
+                const results = resultData.results || [];
+                
+                console.log(`Event ${eventNum}: Found ${results.length} results`);
+                
+                // Process each result
+                results.forEach(result => {
+                    const uid = result.uid;
+                    const points = result.points || 0;
+                    
+                    if (!riderStats[uid]) {
+                        riderStats[uid] = {
+                            uid: uid,
+                            name: result.name,
+                            team: result.team || '',
+                            arr: result.arr || 0,
+                            events: 0,
+                            points: 0,
+                            isCurrentUser: false
+                        };
+                    }
+                    
+                    riderStats[uid].events += 1;
+                    riderStats[uid].points += points;
+                });
+            }
+        } catch (error) {
+            console.log(`No results for event ${eventNum}`);
+        }
+    }
+    
+    // Convert to array and sort by points
+    const standings = Object.values(riderStats);
+    standings.sort((a, b) => b.points - a.points);
+    
+    console.log(`Calculated standings for ${standings.length} riders`);
+    
+    // Mark current user
+    if (currentUser) {
+        standings.forEach(rider => {
+            if (rider.uid === currentUser.uid) {
+                rider.isCurrentUser = true;
+            }
+        });
+    }
+    
+    return standings;
+}
 
 // Render Season Standings
 async function renderSeasonStandings() {
@@ -116,19 +188,26 @@ async function renderSeasonStandings() {
     const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
     const userData = userDoc.data();
     
-    // Check if we have saved season standings, otherwise generate dummy data
-    let standings = userData?.season1Standings;
+    // Show loading state
+    seasonContent.innerHTML = `
+        <div style="text-align: center; padding: 3rem;">
+            <div class="spinner" style="margin: 0 auto 1rem;"></div>
+            <p style="color: var(--text-secondary);">Loading season standings...</p>
+        </div>
+    `;
     
-    // Check if standings exist AND have UIDs (regenerate if UIDs missing)
-    const hasUIDs = standings && standings.length > 0 && standings[0].uid;
+    // Calculate real standings from results
+    const standings = await calculateRealSeasonStandings(1);
     
-    if (!standings || !hasUIDs) {
-        // Generate dummy standings (with UIDs)
-        console.log('Regenerating season standings with UIDs...');
-        standings = generateDummySeasonStandings(userData?.name, userData?.arr || 1196);
-        
-        // TODO: Save to Firestore (for now just use in memory)
-        // await updateDoc(doc(db, 'users', currentUser.uid), { season1Standings: standings });
+    if (standings.length === 0) {
+        seasonContent.innerHTML = `
+            <div style="text-align: center; padding: 3rem;">
+                <div style="font-size: 4rem; margin-bottom: 1rem;">📊</div>
+                <h3 style="color: var(--text-primary); margin-bottom: 0.5rem;">No Results Yet</h3>
+                <p style="color: var(--text-secondary);">Season standings will appear once events are completed</p>
+            </div>
+        `;
+        return;
     }
 
     // Debug logging
