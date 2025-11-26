@@ -181,7 +181,8 @@ async function processUserResult(uid, eventInfo, results) {
         points: 0,
         distance: parseFloat(userResult.Distance) || 0,
         processedAt: admin.firestore.FieldValue.serverTimestamp()
-      }
+      },
+      team: userResult.Team || '' // Update team even on DNF
     });
     return;
   }
@@ -211,7 +212,8 @@ async function processUserResult(uid, eventInfo, results) {
     currentStage: eventNumber + 1, // Unlock next event
     totalPoints: (userData.totalPoints || 0) + points,
     totalEvents: (userData.totalEvents || 0) + 1,
-    [`season${season}Standings`]: seasonStandings
+    [`season${season}Standings`]: seasonStandings,
+    team: userResult.Team || '' // Update team from latest race result
   };
   
   // Add to completedStages if not already there
