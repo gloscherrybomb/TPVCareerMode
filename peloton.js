@@ -60,7 +60,7 @@ function showRandomProfiles() {
     
     // Get 5 random profiles
     const shuffled = [...allProfiles].sort(() => 0.5 - Math.random());
-    displayedProfiles = shuffled.slice(0, Math.min(5, shuffled.length));
+    displayedProfiles = shuffled.slice(0, Math.min(8, shuffled.length));
     
     renderProfiles(displayedProfiles);
 }
