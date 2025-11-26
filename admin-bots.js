@@ -18,56 +18,11 @@ const countryDisplayNames = new Intl.DisplayNames(['en'], { type: 'region' });
 
 // Custom pseudo-countries for UK nations (not ISO-3166)
 const customCountries = [
-    { code: "ENG", name: "England", flag: "england" },
-    { code: "SCO", name: "Scotland", flag: "scotland" },
-    { code: "WLS", name: "Wales", flag: "wales" },
-    { code: "NIR", name: "Northern Ireland", flag: "northern-ireland" }
+    { code: "ENG", name: "England" },
+    { code: "SCO", name: "Scotland" },
+    { code: "WLS", name: "Wales" },
+    { code: "NIR", name: "Northern Ireland" }
 ];
-
-/**
- * Map nationality codes to SVG filenames.
- * Put corresponding SVGs in e.g. /assets/flags/<file>.svg or adjust paths below.
- * Example: GB -> /assets/flags/gb.svg
- */
-const flagSvgMap = {
-    // Standard ISO codes (add more if you have SVGs for them)
-    'GB': 'gb',
-    'US': 'us',
-    'FR': 'fr',
-    'ES': 'es',
-    'IT': 'it',
-    'DE': 'de',
-    'NL': 'nl',
-    'BE': 'be',
-    'AU': 'au',
-    'CA': 'ca',
-    'JP': 'jp',
-    'CN': 'cn',
-    'BR': 'br',
-    'MX': 'mx',
-    'AR': 'ar',
-    'CL': 'cl',
-    'CO': 'co',
-    'DK': 'dk',
-    'SE': 'se',
-    'NO': 'no',
-    'FI': 'fi',
-    'PL': 'pl',
-    'CZ': 'cz',
-    'AT': 'at',
-    'CH': 'ch',
-    'PT': 'pt',
-    'IE': 'ie',
-    'NZ': 'nz',
-    'SG': 'sg',
-    'KR': 'kr',
-
-    // UK home nations (custom)
-    'ENG': 'england',
-    'SCO': 'scotland',
-    'WLS': 'wales',
-    'NIR': 'northern-ireland'
-};
 
 /**
  * Returns a human-readable country name for a given code.
@@ -94,23 +49,35 @@ function getEmojiFlag(countryCode) {
 }
 
 /**
- * Returns HTML string for a flag icon using SVG, falling back to emoji if SVG not found.
- * This is used in the profile list and preview modal, not inside <select> options.
+ * Returns HTML string for a flag icon using SVG, falling back to emoji.
+ * - For 2-letter ISO codes: uses SVG from TPVCareerMode/assets/flags/{lowercase}.svg
+ * - For custom codes (ENG, SCO, WLS, NIR): uses emoji only (no SVG assets exist)
  */
 function getCountryFlag(code) {
     if (!code) return '🌍';
 
-    const fileKey = flagSvgMap[code];
-    if (fileKey) {
-        const name = getCountryName(code);
-        // Adjust the path if your SVGs live somewhere else
-        const src = `assets/flags/${fileKey}.svg`;
+    const upper = code.toUpperCase();
+
+    // Custom UK nations → emoji only (no SVGs available)
+    if (customCountries.some(c => c.code === upper)) {
+        // There are separate emojis for England/Scotland/Wales; NI has no dedicated flag
+        if (upper === 'ENG') return '🏴';
+        if (upper === 'SCO') return '🏴';
+        if (upper === 'WLS') return '🏴';
+        if (upper === 'NIR') return '🚩';
+        return '🌍';
+    }
+
+    // 2-letter ISO code → use SVG if possible
+    if (upper.length === 2) {
+        const name = getCountryName(upper);
+        const src = `TPVCareerMode/assets/flags/${upper.toLowerCase()}.svg`;
         return `<img class="flag-icon" src="${src}" alt="${name} flag" loading="lazy">`;
     }
 
-    // Fallback to emoji for any code without an SVG mapping
+    // Fallback to emoji for anything else
     try {
-        return getEmojiFlag(code);
+        return getEmojiFlag(upper);
     } catch {
         return '🌍';
     }
@@ -153,10 +120,17 @@ function loadAllCountries() {
 
     // --- Custom UK nations ---
     customCountries.forEach(c => {
+        // Optional: give them emoji labels as well
+        let emoji = '';
+        if (c.code === 'ENG') emoji = '🏴 ';
+        else if (c.code === 'SCO') emoji = '🏴 ';
+        else if (c.code === 'WLS') emoji = '🏴 ';
+        else if (c.code === 'NIR') emoji = '🚩 ';
+
         entries.push({
             code: c.code,
             name: c.name,
-            label: `${c.name}` // You could prepend an emoji if you like
+            label: `${emoji}${c.name}`
         });
     });
 
