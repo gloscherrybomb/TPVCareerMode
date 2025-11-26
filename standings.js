@@ -119,8 +119,12 @@ async function renderSeasonStandings() {
     // Check if we have saved season standings, otherwise generate dummy data
     let standings = userData?.season1Standings;
     
-    if (!standings) {
-        // Generate dummy standings
+    // Check if standings exist AND have UIDs (regenerate if UIDs missing)
+    const hasUIDs = standings && standings.length > 0 && standings[0].uid;
+    
+    if (!standings || !hasUIDs) {
+        // Generate dummy standings (with UIDs)
+        console.log('Regenerating season standings with UIDs...');
         standings = generateDummySeasonStandings(userData?.name, userData?.arr || 1196);
         
         // TODO: Save to Firestore (for now just use in memory)
