@@ -204,6 +204,16 @@ function initializeBotModal() {
                 color: var(--text-secondary);
             }
             
+            /* Flag Icons */
+            .flag-icon {
+                width: 20px;
+                height: 14px;
+                object-fit: cover;
+                vertical-align: middle;
+                margin-right: 4px;
+                display: inline-block;
+            }
+            
             /* Mobile Responsive */
             @media (max-width: 768px) {
                 .modal-profile-header {
@@ -390,19 +400,119 @@ function getARRBadge(arr) {
     return { class: 'arr-badge-bronze', label: 'Bronze' };
 }
 
-function getCountryFlag(countryCode) {
-    if (!countryCode) return '';
+// Country / Flag helpers (matching admin-bots.js)
+const countryDisplayNames = new Intl.DisplayNames(['en'], { type: 'region' });
+
+const customCountries = [
+    { code: "ENG", name: "England" },
+    { code: "SCO", name: "Scotland" },
+    { code: "WLS", name: "Wales" },
+    { code: "NIR", name: "Northern Ireland" }
+];
+
+// Map 3-letter codes to 2-letter ISO codes (for flag-icons library)
+const iso3ToIso2 = {
+    'BER': 'BM',  // Bermuda
+    'FRA': 'FR',  // France
+    'CZE': 'CZ',  // Czech Republic
+    'ISR': 'IL',  // Israel
+    'ALG': 'DZ',  // Algeria
+    'AND': 'AD',  // Andorra
+    'UKR': 'UA',  // Ukraine
+    'MAS': 'MY',  // Malaysia
+    'AUT': 'AT',  // Austria
+    'ISV': 'VG',  // Virgin Islands (British)
+    'BRA': 'BR',  // Brazil
+    'CHN': 'CN',  // China
+    'FIN': 'FI',  // Finland
+    'ITA': 'IT',  // Italy
+    'ESP': 'ES',  // Spain
+    'IRL': 'IE',  // Ireland
+    'KOR': 'KR',  // South Korea
+    'NZL': 'NZ',  // New Zealand
+    'GER': 'DE',  // Germany
+    'USA': 'US',  // United States
+    'GBR': 'GB',  // Great Britain
+    'NED': 'NL',  // Netherlands
+    'SUI': 'CH',  // Switzerland
+    'BEL': 'BE',  // Belgium
+    'DEN': 'DK',  // Denmark
+    'SWE': 'SE',  // Sweden
+    'NOR': 'NO',  // Norway
+    'POL': 'PL',  // Poland
+    'POR': 'PT',  // Portugal
+    'AUS': 'AU',  // Australia
+    'CAN': 'CA',  // Canada
+    'JPN': 'JP',  // Japan
+    'MEX': 'MX',  // Mexico
+    'ARG': 'AR',  // Argentina
+    'RSA': 'ZA',  // South Africa
+    'COL': 'CO',  // Colombia
+    'VEN': 'VE',  // Venezuela
+    'CHI': 'CL',  // Chile
+    'ECU': 'EC',  // Ecuador
+    'PER': 'PE',  // Peru
+    'URU': 'UY',  // Uruguay
+};
+
+function getCountryName(code) {
+    if (!code) return '';
+    const upper = code.toUpperCase();
     
-    const flags = {
-        'GB': '🇬🇧', 'US': '🇺🇸', 'FR': '🇫🇷', 'ES': '🇪🇸', 'IT': '🇮🇹',
-        'DE': '🇩🇪', 'NL': '🇳🇱', 'BE': '🇧🇪', 'AU': '🇦🇺', 'CA': '🇨🇦',
-        'JP': '🇯🇵', 'CN': '🇨🇳', 'BR': '🇧🇷', 'MX': '🇲🇽', 'AR': '🇦🇷',
-        'CL': '🇨🇱', 'CO': '🇨🇴', 'DK': '🇩🇰', 'SE': '🇸🇪', 'NO': '🇳🇴',
-        'FI': '🇫🇮', 'PL': '🇵🇱', 'CZ': '🇨🇿', 'AT': '🇦🇹', 'CH': '🇨🇭',
-        'PT': '🇵🇹', 'IE': '🇮🇪', 'NZ': '🇳🇿', 'SG': '🇸🇬', 'KR': '🇰🇷'
-    };
+    const custom = customCountries.find(c => c.code === upper);
+    if (custom) return custom.name;
     
-    return flags[countryCode.toUpperCase()] || '🌍';
+    try {
+        // Try 3-letter code first, then 2-letter
+        let isoCode = iso3ToIso2[upper] || upper;
+        const name = countryDisplayNames.of(isoCode);
+        return name && name !== isoCode ? name : upper;
+    } catch {
+        return upper;
+    }
+}
+
+function getEmojiFlag(countryCode) {
+    return countryCode
+        .toUpperCase()
+        .replace(/./g, c => String.fromCodePoint(127397 + c.charCodeAt()));
+}
+
+function getCountryFlag(code) {
+    if (!code) return '🌍';
+    
+    const upper = code.toUpperCase();
+    
+    // Custom UK nations → custom SVGs (except NIR which stays emoji)
+    if (upper === 'ENG') {
+        return `<img class="flag-icon" src="assets/flags/england.svg" alt="England flag" loading="lazy">`;
+    }
+    if (upper === 'SCO') {
+        return `<img class="flag-icon" src="assets/flags/scotland.svg" alt="Scotland flag" loading="lazy">`;
+    }
+    if (upper === 'WLS') {
+        return `<img class="flag-icon" src="assets/flags/wales.svg" alt="Wales flag" loading="lazy">`;
+    }
+    if (upper === 'NIR') {
+        return '🚩';
+    }
+    
+    // Convert 3-letter code to 2-letter ISO code if needed
+    const isoCode = iso3ToIso2[upper] || upper;
+    
+    // Use SVG from flag-icons library (expects 2-letter lowercase codes)
+    if (isoCode.length === 2) {
+        const name = getCountryName(upper);
+        const src = `assets/flags/${isoCode.toLowerCase()}.svg`;
+        return `<img class="flag-icon" src="${src}" alt="${name} flag" loading="lazy">`;
+    }
+    
+    // Fallback to emoji for unrecognized codes
+    try {
+        return getEmojiFlag(isoCode);
+    } catch {
+        return '🌍';
+    }
 }
 
 // Expose functions globally
