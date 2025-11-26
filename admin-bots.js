@@ -53,20 +53,27 @@ function getEmojiFlag(countryCode) {
 /**
  * Returns HTML string for a flag icon using SVG, falling back to emoji.
  * - For 2-letter ISO codes: uses SVG from assets/flags/{lowercase}.svg
- * - For custom codes (ENG, SCO, WLS, NIR): uses emoji only (no SVG assets exist)
+ * - For ENG/SCO/WLS: uses england.svg / scotland.svg / wales.svg
+ * - For NIR: uses emoji
  */
 function getCountryFlag(code) {
     if (!code) return '🌍';
 
     const upper = code.toUpperCase();
 
-    // Custom UK nations → emoji only (no SVGs available)
-    if (customCountries.some(c => c.code === upper)) {
-        if (upper === 'ENG') return '🏴';
-        if (upper === 'SCO') return '🏴';
-        if (upper === 'WLS') return '🏴';
-        if (upper === 'NIR') return '🚩';
-        return '🌍';
+    // Custom UK nations → custom SVGs (except NIR which stays emoji)
+    if (upper === 'ENG') {
+        return `<img class="flag-icon" src="assets/flags/england.svg" alt="England flag" loading="lazy">`;
+    }
+    if (upper === 'SCO') {
+        return `<img class="flag-icon" src="assets/flags/scotland.svg" alt="Scotland flag" loading="lazy">`;
+    }
+    if (upper === 'WLS') {
+        return `<img class="flag-icon" src="assets/flags/wales.svg" alt="Wales flag" loading="lazy">`;
+    }
+    if (upper === 'NIR') {
+        // If you later add northern-ireland.svg, you can swap this to an <img> too.
+        return '🚩';
     }
 
     // 2-letter ISO code → use SVG if possible
