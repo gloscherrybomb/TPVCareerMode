@@ -11,6 +11,167 @@ let allProfiles = [];
 let editingProfile = null;
 let selectedImage = null;
 
+// ------- Country / Flag helpers -------
+
+// Display names for ISO region codes
+const countryDisplayNames = new Intl.DisplayNames(['en'], { type: 'region' });
+
+// Custom pseudo-countries for UK nations (not ISO-3166)
+const customCountries = [
+    { code: "ENG", name: "England", flag: "england" },
+    { code: "SCO", name: "Scotland", flag: "scotland" },
+    { code: "WLS", name: "Wales", flag: "wales" },
+    { code: "NIR", name: "Northern Ireland", flag: "northern-ireland" }
+];
+
+/**
+ * Map nationality codes to SVG filenames.
+ * Put corresponding SVGs in e.g. /assets/flags/<file>.svg or adjust paths below.
+ * Example: GB -> /assets/flags/gb.svg
+ */
+const flagSvgMap = {
+    // Standard ISO codes (add more if you have SVGs for them)
+    'GB': 'gb',
+    'US': 'us',
+    'FR': 'fr',
+    'ES': 'es',
+    'IT': 'it',
+    'DE': 'de',
+    'NL': 'nl',
+    'BE': 'be',
+    'AU': 'au',
+    'CA': 'ca',
+    'JP': 'jp',
+    'CN': 'cn',
+    'BR': 'br',
+    'MX': 'mx',
+    'AR': 'ar',
+    'CL': 'cl',
+    'CO': 'co',
+    'DK': 'dk',
+    'SE': 'se',
+    'NO': 'no',
+    'FI': 'fi',
+    'PL': 'pl',
+    'CZ': 'cz',
+    'AT': 'at',
+    'CH': 'ch',
+    'PT': 'pt',
+    'IE': 'ie',
+    'NZ': 'nz',
+    'SG': 'sg',
+    'KR': 'kr',
+
+    // UK home nations (custom)
+    'ENG': 'england',
+    'SCO': 'scotland',
+    'WLS': 'wales',
+    'NIR': 'northern-ireland'
+};
+
+/**
+ * Returns a human-readable country name for a given code.
+ * Falls back to the code itself if no name is found.
+ */
+function getCountryName(code) {
+    if (!code) return '';
+    // Check custom UK nations
+    const custom = customCountries.find(c => c.code === code);
+    if (custom) return custom.name;
+
+    const name = countryDisplayNames.of(code);
+    return name && name !== code ? name : code;
+}
+
+/**
+ * Emoji flag generator for ISO codes (used as a fallback where SVGs aren’t available,
+ * and in the <select> where images are not supported).
+ */
+function getEmojiFlag(countryCode) {
+    return countryCode
+        .toUpperCase()
+        .replace(/./g, c => String.fromCodePoint(127397 + c.charCodeAt()));
+}
+
+/**
+ * Returns HTML string for a flag icon using SVG, falling back to emoji if SVG not found.
+ * This is used in the profile list and preview modal, not inside <select> options.
+ */
+function getCountryFlag(code) {
+    if (!code) return '🌍';
+
+    const fileKey = flagSvgMap[code];
+    if (fileKey) {
+        const name = getCountryName(code);
+        // Adjust the path if your SVGs live somewhere else
+        const src = `assets/flags/${fileKey}.svg`;
+        return `<img class="flag-icon" src="${src}" alt="${name} flag" loading="lazy">`;
+    }
+
+    // Fallback to emoji for any code without an SVG mapping
+    try {
+        return getEmojiFlag(code);
+    } catch {
+        return '🌍';
+    }
+}
+
+/**
+ * Populates the nationality <select> with:
+ *  - All valid ISO countries (using Intl.DisplayNames)
+ *  - Custom UK nations (ENG, SCO, WLS, NIR)
+ * The <select> shows emoji + name (since images are not supported in <option>),
+ * but we still store the 2–3 letter code in value.
+ */
+function loadAllCountries() {
+    const select = document.getElementById('botNationality');
+    if (!select) return;
+
+    select.innerHTML = '<option value="">Select nationality</option>';
+
+    const entries = [];
+
+    // --- ISO countries ---
+    const isoCodes = Array.from({ length: 26 * 26 }, (_, i) => {
+        const first = 65 + Math.floor(i / 26);
+        const second = 65 + (i % 26);
+        return String.fromCharCode(first) + String.fromCharCode(second);
+    }).filter(code => {
+        const name = countryDisplayNames.of(code);
+        return !!name && name !== code;
+    });
+
+    isoCodes.forEach(code => {
+        const name = countryDisplayNames.of(code);
+        const emoji = getEmojiFlag(code);
+        entries.push({
+            code,
+            name,
+            label: `${emoji} ${name}`
+        });
+    });
+
+    // --- Custom UK nations ---
+    customCountries.forEach(c => {
+        entries.push({
+            code: c.code,
+            name: c.name,
+            label: `${c.name}` // You could prepend an emoji if you like
+        });
+    });
+
+    // Sort by country name
+    entries.sort((a, b) => a.name.localeCompare(b.name));
+
+    // Add to <select>
+    for (const entry of entries) {
+        const option = document.createElement('option');
+        option.value = entry.code;
+        option.textContent = entry.label;
+        select.appendChild(option);
+    }
+}
+
 // Initialize Firebase services
 async function initializeFirebase() {
     try {
@@ -98,10 +259,10 @@ async function loadProfiles() {
         const snapshot = await getDocs(profilesRef);
         
         allProfiles = [];
-        snapshot.forEach((doc) => {
+        snapshot.forEach((docSnap) => {
             allProfiles.push({
-                id: doc.id,
-                ...doc.data()
+                id: docSnap.id,
+                ...docSnap.data()
             });
         });
         
@@ -136,7 +297,7 @@ function renderProfilesList(profiles) {
     
     listContainer.innerHTML = profiles.map(profile => {
         const arrBadge = getARRBadge(profile.arr);
-        const flag = getCountryFlag(profile.nationality);
+        const flagHtml = getCountryFlag(profile.nationality);
         
         return `
             <div class="profile-item" data-profile-id="${profile.id}">
@@ -151,7 +312,7 @@ function renderProfilesList(profiles) {
                     <div class="profile-item-meta">
                         <span>${profile.team}</span>
                         <span class="${arrBadge.class}">${profile.arr}</span>
-                        <span>${flag}</span>
+                        <span class="profile-flag">${flagHtml}</span>
                     </div>
                 </div>
                 <div class="profile-item-actions">
@@ -376,8 +537,8 @@ document.getElementById('botImage').addEventListener('change', (e) => {
     
     // Show preview
     const reader = new FileReader();
-    reader.onload = (e) => {
-        document.getElementById('previewImg').src = e.target.result;
+    reader.onload = (ev) => {
+        document.getElementById('previewImg').src = ev.target.result;
         document.getElementById('imagePreview').style.display = 'block';
     };
     reader.readAsDataURL(file);
@@ -415,7 +576,8 @@ document.getElementById('previewBtn').addEventListener('click', () => {
     }
     
     const arrBadge = getARRBadge(arr);
-    const flag = getCountryFlag(nationality);
+    const flagHtml = getCountryFlag(nationality);
+    const nationalityName = getCountryName(nationality);
     const backstoryParagraphs = backstory.split('\n\n').map(p => `<p>${p}</p>`).join('');
     
     const previewImageSrc = selectedImage 
@@ -443,7 +605,10 @@ document.getElementById('previewBtn').addEventListener('click', () => {
                 </div>
                 <div class="modal-meta-item">
                     <div class="modal-meta-label">Nationality</div>
-                    <div class="modal-meta-value">${flag} ${nationality}</div>
+                    <div class="modal-meta-value">
+                        <span class="profile-flag">${flagHtml}</span>
+                        <span>${nationalityName}</span>
+                    </div>
                 </div>
                 ${age ? `
                 <div class="modal-meta-item">
@@ -484,7 +649,7 @@ document.getElementById('searchProfiles').addEventListener('input', (e) => {
         return (
             profile.name.toLowerCase().includes(term) ||
             profile.team.toLowerCase().includes(term) ||
-            profile.nationality.toLowerCase().includes(term) ||
+            (profile.nationality && profile.nationality.toLowerCase().includes(term)) ||
             profile.uid.toLowerCase().includes(term)
         );
     });
@@ -526,20 +691,35 @@ function getARRBadge(arr) {
     return { class: 'arr-badge-bronze', label: 'Bronze' };
 }
 
-function getCountryFlag(countryCode) {
-    const flags = {
-        'GB': '🇬🇧', 'US': '🇺🇸', 'FR': '🇫🇷', 'ES': '🇪🇸', 'IT': '🇮🇹',
-        'DE': '🇩🇪', 'NL': '🇳🇱', 'BE': '🇧🇪', 'AU': '🇦🇺', 'CA': '🇨🇦',
-        'JP': '🇯🇵', 'CN': '🇨🇳', 'BR': '🇧🇷', 'MX': '🇲🇽', 'AR': '🇦🇷',
-        'CL': '🇨🇱', 'CO': '🇨🇴', 'DK': '🇩🇰', 'SE': '🇸🇪', 'NO': '🇳🇴',
-        'FI': '🇫🇮', 'PL': '🇵🇱', 'CZ': '🇨🇿', 'AT': '🇦🇹', 'CH': '🇨🇭',
-        'PT': '🇵🇹', 'IE': '🇮🇪', 'NZ': '🇳🇿', 'SG': '🇸🇬', 'KR': '🇰🇷'
-    };
-    return flags[countryCode] || '🌍';
-}
-
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
+    // Populate nationality select with all countries + UK nations
+    loadAllCountries();
+
+    // Search/filter inside nationality dropdown
+    const searchInput = document.getElementById('botNationalitySearch');
+    const select = document.getElementById('botNationality');
+
+    if (searchInput && select) {
+        searchInput.addEventListener('input', () => {
+            const term = searchInput.value.toLowerCase();
+
+            for (let i = 0; i < select.options.length; i++) {
+                const option = select.options[i];
+
+                // Always show the placeholder
+                if (i === 0) {
+                    option.hidden = false;
+                    continue;
+                }
+
+                const text = option.textContent.toLowerCase();
+                option.hidden = term && !text.includes(term);
+            }
+        });
+    }
+
+    // Firebase & CSV handlers
     initializeFirebase();
     
     // CSV upload handler
@@ -551,39 +731,6 @@ document.addEventListener('DOMContentLoaded', () => {
         downloadCSVTemplate();
     });
 });
-
-const countryList = new Intl.DisplayNames(['en'], { type: 'region' });
-
-function loadAllCountries() {
-    const select = document.getElementById('botNationality');
-    select.innerHTML = '<option value="">Select nationality</option>';
-
-    // ISO-3166 country codes (official full list)
-    const countryCodes = Array.from({length: 26 * 26}, (_, i) => {
-        const first = 65 + Math.floor(i / 26);
-        const second = 65 + (i % 26);
-        return String.fromCharCode(first) + String.fromCharCode(second);
-    }).filter(code => countryList.of(code) !== code);
-
-    countryCodes.forEach(code => {
-        const name = countryList.of(code);
-        const flag = getEmojiFlag(code);
-        const option = document.createElement('option');
-        option.value = code;
-        option.textContent = `${flag} ${name}`;
-        select.appendChild(option);
-    });
-}
-
-// Convert ISO country code → emoji flag
-function getEmojiFlag(countryCode) {
-    return countryCode
-        .toUpperCase()
-        .replace(/./g, c => String.fromCodePoint(127397 + c.charCodeAt()));
-}
-
-document.addEventListener('DOMContentLoaded', loadAllCountries);
-
 
 // CSV Template Download
 function downloadCSVTemplate() {
@@ -763,4 +910,3 @@ async function batchUploadProfiles(profiles) {
     document.getElementById('csvFile').value = '';
     document.getElementById('csvFileName').textContent = 'No file chosen';
 }
-
