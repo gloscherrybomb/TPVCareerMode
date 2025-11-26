@@ -19,6 +19,7 @@ import {
     getDownloadURL 
 } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { eventData } from './event-data.js';
 
 // Firebase configuration
 const firebaseConfig = {
@@ -159,10 +160,11 @@ async function calculateUserStats(userUID) {
                     // Add to recent results
                     stats.recentResults.push({
                         eventNum: eventNum,
+                        eventName: eventData[eventNum]?.name || `Event ${eventNum}`,
                         position: position,
                         time: userResult.time || 'N/A',
                         points: userResult.points || 0,
-                        date: resultData.processedAt || new Date()
+                        date: resultData.processedAt
                     });
                 }
             }
@@ -399,12 +401,33 @@ function displayRecentResults(results) {
         const isPodium = result.position <= 3;
         const positionClass = isPodium ? 'podium' : '';
         
+        // Format date properly - handle Firestore Timestamp
+        let formattedDate = 'Unknown date';
+        if (result.date) {
+            try {
+                // Check if it's a Firestore Timestamp object with seconds property
+                if (result.date.seconds) {
+                    const date = new Date(result.date.seconds * 1000);
+                    formattedDate = date.toLocaleDateString();
+                } else if (result.date.toDate) {
+                    // If it has a toDate method (Firestore Timestamp)
+                    formattedDate = result.date.toDate().toLocaleDateString();
+                } else {
+                    // Try to parse as regular date
+                    formattedDate = new Date(result.date).toLocaleDateString();
+                }
+            } catch (e) {
+                console.error('Error formatting date:', e);
+                formattedDate = 'Unknown date';
+            }
+        }
+        
         html += `
             <div class="result-card">
                 <div class="result-position ${positionClass}">${result.position}</div>
                 <div class="result-info">
-                    <div class="result-event">Event ${result.eventNum}</div>
-                    <div class="result-date">${new Date(result.date).toLocaleDateString()}</div>
+                    <div class="result-event">${result.eventName}</div>
+                    <div class="result-date">${formattedDate}</div>
                 </div>
                 <div class="result-time">${result.time}</div>
                 <div class="result-points">+${result.points}</div>
