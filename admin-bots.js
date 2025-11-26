@@ -30,12 +30,14 @@ const customCountries = [
  */
 function getCountryName(code) {
     if (!code) return '';
+    const upper = code.toUpperCase();
+
     // Check custom UK nations
-    const custom = customCountries.find(c => c.code === code);
+    const custom = customCountries.find(c => c.code === upper);
     if (custom) return custom.name;
 
-    const name = countryDisplayNames.of(code);
-    return name && name !== code ? name : code;
+    const name = countryDisplayNames.of(upper);
+    return name && name !== upper ? name : upper;
 }
 
 /**
@@ -50,7 +52,7 @@ function getEmojiFlag(countryCode) {
 
 /**
  * Returns HTML string for a flag icon using SVG, falling back to emoji.
- * - For 2-letter ISO codes: uses SVG from TPVCareerMode/assets/flags/{lowercase}.svg
+ * - For 2-letter ISO codes: uses SVG from assets/flags/{lowercase}.svg
  * - For custom codes (ENG, SCO, WLS, NIR): uses emoji only (no SVG assets exist)
  */
 function getCountryFlag(code) {
@@ -60,7 +62,6 @@ function getCountryFlag(code) {
 
     // Custom UK nations → emoji only (no SVGs available)
     if (customCountries.some(c => c.code === upper)) {
-        // There are separate emojis for England/Scotland/Wales; NI has no dedicated flag
         if (upper === 'ENG') return '🏴';
         if (upper === 'SCO') return '🏴';
         if (upper === 'WLS') return '🏴';
@@ -71,7 +72,8 @@ function getCountryFlag(code) {
     // 2-letter ISO code → use SVG if possible
     if (upper.length === 2) {
         const name = getCountryName(upper);
-        const src = `TPVCareerMode/assets/flags/${upper.toLowerCase()}.svg`;
+        // IMPORTANT: path relative to admin-bots.html
+        const src = `assets/flags/${upper.toLowerCase()}.svg`;
         return `<img class="flag-icon" src="${src}" alt="${name} flag" loading="lazy">`;
     }
 
@@ -120,7 +122,6 @@ function loadAllCountries() {
 
     // --- Custom UK nations ---
     customCountries.forEach(c => {
-        // Optional: give them emoji labels as well
         let emoji = '';
         if (c.code === 'ENG') emoji = '🏴 ';
         else if (c.code === 'SCO') emoji = '🏴 ';
@@ -144,6 +145,59 @@ function loadAllCountries() {
         option.textContent = entry.label;
         select.appendChild(option);
     }
+}
+
+/**
+ * Normalize nationality from CSV or other free-form input into:
+ *  - 2-letter ISO code (e.g. GB, FR)
+ *  - or one of ENG, SCO, WLS, NIR
+ * Returns '' if it can't resolve to a valid code.
+ */
+function normalizeNationality(raw) {
+    if (!raw) return '';
+    let v = String(raw).trim();
+    if (!v) return '';
+
+    const lower = v.toLowerCase();
+
+    // 2-letter ISO code (any case)
+    if (/^[a-z]{2}$/i.test(v)) {
+        return v.toUpperCase();
+    }
+
+    // Common names / synonyms → custom codes or GB
+    const directMap = {
+        'england': 'ENG',
+        'scotland': 'SCO',
+        'wales': 'WLS',
+        'northern ireland': 'NIR',
+        'great britain': 'GB',
+        'united kingdom': 'GB',
+        'uk': 'GB',
+        'britain': 'GB'
+    };
+    if (directMap[lower]) {
+        return directMap[lower];
+    }
+
+    // Try to match against ISO country names via Intl.DisplayNames
+    // (slow-ish but fine for CSV import scale)
+    const isoCodes = Array.from({ length: 26 * 26 }, (_, i) => {
+        const first = 65 + Math.floor(i / 26);
+        const second = 65 + (i % 26);
+        return String.fromCharCode(first) + String.fromCharCode(second);
+    });
+
+    for (const code of isoCodes) {
+        const name = countryDisplayNames.of(code);
+        if (name && name.toLowerCase() === lower) {
+            return code;
+        }
+    }
+
+    // No match found
+    console.warn('Unrecognized nationality value:', raw);
+    return '';
 }
 
 // Initialize Firebase services
@@ -791,6 +845,10 @@ function parseCSV(text) {
             if (header === 'backstory') {
                 value = value.replace(/\\n\\n/g, '\n\n');
             }
+            // Normalize nationality
+            if (header === 'nationality') {
+                value = normalizeNationality(value);
+            }
             // Convert numeric fields
             if (header === 'arr' || header === 'age') {
                 value = value ? parseInt(value) : null;
@@ -803,7 +861,7 @@ function parseCSV(text) {
             profile.gender && profile.nationality && profile.backstory) {
             profiles.push(profile);
         } else {
-            console.warn('Skipping invalid profile:', profile);
+            console.warn('Skipping invalid profile row (required field missing or nationality invalid):', profile);
         }
     }
     
@@ -826,6 +884,12 @@ async function batchUploadProfiles(profiles) {
     
     for (const profile of profiles) {
         try {
+            // Ensure nationality is normalized (in case this function is used with other sources)
+            const nationality = normalizeNationality(profile.nationality);
+            if (!nationality) {
+                throw new Error('Invalid nationality code in CSV (could not resolve to ISO or ENG/SCO/WLS/NIR)');
+            }
+
             // Create profile object
             const profileData = {
                 uid: profile.uid,
@@ -833,7 +897,7 @@ async function batchUploadProfiles(profiles) {
                 team: profile.team,
                 arr: profile.arr,
                 gender: profile.gender,
-                nationality: profile.nationality,
+                nationality,
                 backstory: profile.backstory,
                 imageUrl: profile.imageUrl || '',
                 updatedAt: new Date().toISOString()
