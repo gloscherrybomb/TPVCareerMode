@@ -181,12 +181,22 @@
                             </div>
 
                             <!-- Nationality -->
-                            <div class="form-group">
-                                <label for="botNationality">Nationality *</label>
-                             <select id="botNationality" required>
-    <option value="">Loading countries…</option>
-</select>
-                            </div>
+                         <div class="form-group">
+    <label for="botNationality">Nationality *</label>
+
+    <!-- New: search box for filtering nationalities -->
+    <input 
+        type="text" 
+        id="botNationalitySearch" 
+        placeholder="Type to search countries..."
+        style="margin-bottom: 0.5rem;"
+    >
+
+    <select id="botNationality" required>
+        <option value="">Select nationality</option>
+        <!-- Options will be populated by JS -->
+    </select>
+</div>
 
                             <!-- Age (Optional) -->
                             <div class="form-group">
