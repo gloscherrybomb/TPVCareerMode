@@ -1,9 +1,81 @@
 // Peloton Page - Bot Profiles
-import { getFirestore, collection, getDocs, doc, getDoc, query, limit, orderBy, where } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { getFirestore, collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
 let db;
 let allProfiles = [];
 let displayedProfiles = [];
+
+// ------- Country / Flag helpers -------
+
+// Display names for ISO region codes
+const countryDisplayNames = new Intl.DisplayNames(['en'], { type: 'region' });
+
+// Custom pseudo-countries for UK nations (not ISO-3166)
+const customCountries = [
+    { code: 'ENG', name: 'England' },
+    { code: 'SCO', name: 'Scotland' },
+    { code: 'WLS', name: 'Wales' },
+    { code: 'NIR', name: 'Northern Ireland' }
+];
+
+/**
+ * Returns a human-readable country name for a given code.
+ * Falls back to the code itself if no name is found.
+ */
+function getCountryName(code) {
+    if (!code) return '';
+    const upper = code.toUpperCase();
+
+    // Custom UK nations
+    const custom = customCountries.find(c => c.code === upper);
+    if (custom) return custom.name;
+
+    const name = countryDisplayNames.of(upper);
+    return name && name !== upper ? name : upper;
+}
+
+/**
+ * Emoji flag generator for ISO codes (used as a fallback).
+ */
+function getEmojiFlag(countryCode) {
+    return countryCode
+        .toUpperCase()
+        .replace(/./g, c => String.fromCodePoint(127397 + c.charCodeAt()));
+}
+
+/**
+ * Returns HTML string for a flag icon using SVG, falling back to emoji.
+ * - For 2-letter ISO codes: uses SVG from assets/flags/{lowercase}.svg
+ * - For custom codes (ENG, SCO, WLS, NIR): uses emoji only
+ */
+function getCountryFlag(code) {
+    if (!code) return '';
+
+    const upper = code.toUpperCase();
+
+    // Custom UK nations → emoji only (no SVGs available)
+    if (customCountries.some(c => c.code === upper)) {
+        if (upper === 'ENG') return '🏴';
+        if (upper === 'SCO') return '🏴';
+        if (upper === 'WLS') return '🏴';
+        if (upper === 'NIR') return '🚩';
+        return '🌍';
+    }
+
+    // 2-letter ISO code → SVG
+    if (upper.length === 2) {
+        const name = getCountryName(upper);
+        const src = `assets/flags/${upper.toLowerCase()}.svg`;
+        return `<img class="flag-icon" src="${src}" alt="${name} flag" loading="lazy">`;
+    }
+
+    // Fallback to emoji for anything else
+    try {
+        return getEmojiFlag(upper);
+    } catch {
+        return '🌍';
+    }
+}
 
 // Initialize Firestore
 async function initializeFirestore() {
@@ -51,14 +123,13 @@ async function loadAllProfiles() {
     }
 }
 
-// Show 5 random profiles
+// Show random profiles (up to 8)
 function showRandomProfiles() {
     if (allProfiles.length === 0) {
         showNoResults('No bot profiles available yet. Check back soon!');
         return;
     }
     
-    // Get 5 random profiles
     const shuffled = [...allProfiles].sort(() => 0.5 - Math.random());
     displayedProfiles = shuffled.slice(0, Math.min(8, shuffled.length));
     
@@ -81,8 +152,10 @@ function renderProfiles(profiles) {
     
     grid.innerHTML = profiles.map((profile, index) => {
         const arrBadge = getARRBadge(profile.arr);
-        const flag = getCountryFlag(profile.nationality);
-        const bioPreview = profile.backstory ? profile.backstory.substring(0, 150) + '...' : 'No backstory available.';
+        const flagHtml = profile.nationality ? getCountryFlag(profile.nationality) : '';
+        const bioPreview = profile.backstory 
+            ? profile.backstory.substring(0, 150) + '...' 
+            : 'No backstory available.';
         
         return `
             <div class="profile-card" data-profile-id="${profile.id}" onclick="openProfileModal('${profile.id}')" style="animation-delay: ${index * 0.1}s">
@@ -102,7 +175,10 @@ function renderProfiles(profiles) {
                             <span>🚴</span>
                             <span>${profile.team || 'No Team'}</span>
                         </div>
-                        ${flag ? `<div class="profile-nationality">${flag}</div>` : ''}
+                        ${flagHtml ? `
+                        <div class="profile-nationality">
+                            ${flagHtml}
+                        </div>` : ''}
                     </div>
                     <p class="profile-bio-preview">${bioPreview}</p>
                 </div>
@@ -151,7 +227,8 @@ window.openProfileModal = async function(profileId) {
     const modalBody = document.getElementById('profileModalBody');
     
     const arrBadge = getARRBadge(profile.arr);
-    const flag = getCountryFlag(profile.nationality);
+    const flagHtml = profile.nationality ? getCountryFlag(profile.nationality) : '';
+    const nationalityName = profile.nationality ? getCountryName(profile.nationality) : '';
     const backstoryParagraphs = profile.backstory 
         ? profile.backstory.split('\n\n').map(p => `<p>${p}</p>`).join('') 
         : '<p>No backstory available.</p>';
@@ -177,7 +254,10 @@ window.openProfileModal = async function(profileId) {
                 ${profile.nationality ? `
                 <div class="modal-meta-item">
                     <div class="modal-meta-label">Nationality</div>
-                    <div class="modal-meta-value">${flag} ${profile.nationality}</div>
+                    <div class="modal-meta-value">
+                        ${flagHtml ? `<span class="profile-nationality">${flagHtml}</span>` : ''}
+                        <span>${nationalityName}</span>
+                    </div>
                 </div>
                 ` : ''}
                 ${profile.age ? `
@@ -224,10 +304,12 @@ function searchProfiles(searchTerm) {
     
     const term = searchTerm.toLowerCase();
     const filtered = allProfiles.filter(profile => {
+        const nationalityName = profile.nationality ? getCountryName(profile.nationality).toLowerCase() : '';
         return (
             profile.name.toLowerCase().includes(term) ||
             (profile.team && profile.team.toLowerCase().includes(term)) ||
-            (profile.nationality && profile.nationality.toLowerCase().includes(term))
+            (profile.nationality && profile.nationality.toLowerCase().includes(term)) ||
+            nationalityName.includes(term)
         );
     });
     
@@ -245,22 +327,6 @@ function getARRBadge(arr) {
     if (arr >= 1321) return { class: 'arr-badge-gold', label: 'Gold' };
     if (arr >= 1196) return { class: 'arr-badge-silver', label: 'Silver' };
     return { class: 'arr-badge-bronze', label: 'Bronze' };
-}
-
-// Get country flag emoji
-function getCountryFlag(countryCode) {
-    if (!countryCode) return '';
-    
-    const flags = {
-        'GB': '🇬🇧', 'US': '🇺🇸', 'FR': '🇫🇷', 'ES': '🇪🇸', 'IT': '🇮🇹',
-        'DE': '🇩🇪', 'NL': '🇳🇱', 'BE': '🇧🇪', 'AU': '🇦🇺', 'CA': '🇨🇦',
-        'JP': '🇯🇵', 'CN': '🇨🇳', 'BR': '🇧🇷', 'MX': '🇲🇽', 'AR': '🇦🇷',
-        'CL': '🇨🇱', 'CO': '🇨🇴', 'DK': '🇩🇰', 'SE': '🇸🇪', 'NO': '🇳🇴',
-        'FI': '🇫🇮', 'PL': '🇵🇱', 'CZ': '🇨🇿', 'AT': '🇦🇹', 'CH': '🇨🇭',
-        'PT': '🇵🇹', 'IE': '🇮🇪', 'NZ': '🇳🇿', 'SG': '🇸🇬', 'KR': '🇰🇷'
-    };
-    
-    return flags[countryCode.toUpperCase()] || '🌍';
 }
 
 // Event Listeners
