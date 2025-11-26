@@ -3,6 +3,7 @@
 import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 import { getFirestore, doc, getDoc, collection, getDocs, query, orderBy, limit } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { makeNameClickable } from './bot-profile-modal.js';
 
 // Firebase configuration
 const firebaseConfig = {
@@ -24,31 +25,31 @@ let currentUser = null;
 // Dummy season standings data (will be replaced with real data from CSV processing)
 function generateDummySeasonStandings(userName, userArr) {
     const botRacers = [
-        { name: "Stephen Burgess", arr: 1280, team: "Formix" },
-        { name: "Adam Stuart", arr: 1256, team: "" },
-        { name: "Damien Fournier", arr: 1119, team: "Fujikai" },
-        { name: "Enchen Vong", arr: 1113, team: "Monova" },
-        { name: "Jean Francois", arr: 1013, team: "" },
-        { name: "Lucca Cardoso", arr: 1112, team: "Patriot" },
-        { name: "Roy Jackson", arr: 1121, team: "" },
-        { name: "Katerina Dodig", arr: 1031, team: "Formix" },
-        { name: "Benjamin Rosenberg", arr: 1047, team: "" },
-        { name: "Odell Hartman", arr: 1001, team: "Fable" },
-        { name: "Eliel Niskanen", arr: 1087, team: "Optech" },
-        { name: "Bradley Xiong", arr: 1065, team: "" },
-        { name: "Alonzo Fontana", arr: 1005, team: "Windsail" },
-        { name: "Juan Miguel", arr: 1022, team: "Zonkify" },
-        { name: "Ethan Flynn", arr: 1236, team: "Hinal" },
-        { name: "Ki Ham", arr: 1000, team: "" },
-        { name: "Omar Sahraoui", arr: 1026, team: "" },
-        { name: "Antonio Martins", arr: 1141, team: "Nuvio" },
-        { name: "Danylo Semenyuk", arr: 1004, team: "Delta" },
-        { name: "Anaïs Michel", arr: 1118, team: "Base" },
-        { name: "Paul Zimmermann", arr: 1091, team: "Ampex" },
-        { name: "Hannu Lehtinen", arr: 1128, team: "" },
-        { name: "Miriam Locatelli", arr: 1034, team: "Eckleson" },
-        { name: "Archie Macleod", arr: 1060, team: "Windsail" },
-        { name: "Raymond Benoit", arr: 1127, team: "" }
+        { uid: "Bot001", name: "Stephen Burgess", arr: 1280, team: "Formix" },
+        { uid: "Bot002", name: "Adam Stuart", arr: 1256, team: "" },
+        { uid: "Bot003", name: "Damien Fournier", arr: 1119, team: "Fujikai" },
+        { uid: "Bot004", name: "Enchen Vong", arr: 1113, team: "Monova" },
+        { uid: "Bot005", name: "Jean Francois", arr: 1013, team: "" },
+        { uid: "Bot006", name: "Lucca Cardoso", arr: 1112, team: "Patriot" },
+        { uid: "Bot007", name: "Roy Jackson", arr: 1121, team: "" },
+        { uid: "Bot008", name: "Katerina Dodig", arr: 1031, team: "Formix" },
+        { uid: "Bot009", name: "Benjamin Rosenberg", arr: 1047, team: "" },
+        { uid: "Bot010", name: "Odell Hartman", arr: 1001, team: "Fable" },
+        { uid: "Bot011", name: "Eliel Niskanen", arr: 1087, team: "Optech" },
+        { uid: "Bot012", name: "Bradley Xiong", arr: 1065, team: "" },
+        { uid: "Bot013", name: "Alonzo Fontana", arr: 1005, team: "Windsail" },
+        { uid: "Bot014", name: "Juan Miguel", arr: 1022, team: "Zonkify" },
+        { uid: "Bot015", name: "Ethan Flynn", arr: 1236, team: "Hinal" },
+        { uid: "Bot016", name: "Ki Ham", arr: 1000, team: "" },
+        { uid: "Bot017", name: "Omar Sahraoui", arr: 1026, team: "" },
+        { uid: "Bot018", name: "Antonio Martins", arr: 1141, team: "Nuvio" },
+        { uid: "Bot019", name: "Danylo Semenyuk", arr: 1004, team: "Delta" },
+        { uid: "Bot020", name: "Anaïs Michel", arr: 1118, team: "Base" },
+        { uid: "Bot021", name: "Paul Zimmermann", arr: 1091, team: "Ampex" },
+        { uid: "Bot022", name: "Hannu Lehtinen", arr: 1128, team: "" },
+        { uid: "Bot023", name: "Miriam Locatelli", arr: 1034, team: "Eckleson" },
+        { uid: "Bot024", name: "Archie Macleod", arr: 1060, team: "Windsail" },
+        { uid: "Bot025", name: "Raymond Benoit", arr: 1127, team: "" }
     ];
 
     // Generate standings with realistic point distributions
@@ -61,6 +62,7 @@ function generateDummySeasonStandings(userName, userArr) {
         const points = avgPointsPerEvent * eventsCompleted;
         
         return {
+            uid: racer.uid,
             name: racer.name,
             arr: racer.arr,
             team: racer.team,
@@ -75,6 +77,7 @@ function generateDummySeasonStandings(userName, userArr) {
     const userEvents = 2; // User has completed 2 events
     const userPoints = 130; // From their progress
     standings.splice(8, 0, {
+        uid: currentUser?.uid || "user",
         name: userName || "You",
         arr: userArr || 1196,
         team: "Chaos",
@@ -158,7 +161,7 @@ async function renderSeasonStandings() {
                     <span class="rank-number ${rankClass}">${rank}</span>
                 </td>
                 <td class="name-cell">
-                    <span class="rider-name">${racer.name}</span>
+                    <span class="rider-name">${makeNameClickable(racer.name, racer.uid)}</span>
                     ${racer.isCurrentUser ? '<span class="you-badge">YOU</span>' : ''}
                 </td>
                 <td class="team-cell">${teamDisplay}</td>
@@ -196,6 +199,7 @@ async function renderGlobalRankings() {
         usersSnapshot.forEach((doc) => {
             const data = doc.data();
             rankings.push({
+                uid: doc.id,  // Add UID from document ID
                 name: data.name || 'Unknown',
                 season: data.currentSeason || 1,
                 events: data.totalEvents || (data.completedStages?.length || 0),
@@ -249,7 +253,7 @@ async function renderGlobalRankings() {
                             <span class="rank-number ${rankClass}">${rank}</span>
                         </td>
                         <td class="name-cell">
-                            <span class="rider-name">${racer.name}</span>
+                            <span class="rider-name">${makeNameClickable(racer.name, racer.uid)}</span>
                             ${racer.isCurrentUser ? '<span class="you-badge">YOU</span>' : ''}
                         </td>
                         <td class="season-cell">Season ${racer.season}</td>

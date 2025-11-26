@@ -73,6 +73,56 @@
                             <button id="resetForm" class="btn btn-secondary btn-small" style="display: none;">Create New</button>
                         </div>
 
+                        <!-- CSV Batch Upload Section -->
+                        <div class="csv-upload-section">
+                            <h3 class="csv-title">Batch Upload from CSV</h3>
+                            <p class="csv-description">Upload multiple bot profiles at once using a CSV file</p>
+                            
+                            <div class="csv-upload-wrapper">
+                                <input 
+                                    type="file" 
+                                    id="csvFile" 
+                                    accept=".csv"
+                                    style="display: none;">
+                                <button type="button" class="btn btn-secondary" onclick="document.getElementById('csvFile').click()">
+                                    Choose CSV File
+                                </button>
+                                <span id="csvFileName" class="file-name">No file chosen</span>
+                            </div>
+                            
+                            <div class="csv-help">
+                                <details>
+                                    <summary>CSV Format Guide</summary>
+                                    <div class="csv-format-info">
+                                        <p><strong>Required columns:</strong> uid, name, team, arr, gender, nationality, backstory, imageUrl</p>
+                                        <p><strong>Optional columns:</strong> age, ridingStyle</p>
+                                        <p><strong>Example row:</strong></p>
+                                        <code>Bot123ABC,Marco DiCicco,Formix,1250,Male,IT,"Paragraph 1...\n\nParagraph 2...",https://example.com/image.jpg,28,Climber</code>
+                                        <p><strong>Notes:</strong></p>
+                                        <ul>
+                                            <li>Separate paragraphs in backstory with \n\n</li>
+                                            <li>Use quotes around backstory text</li>
+                                            <li>Image URLs must be publicly accessible or already in Firebase Storage</li>
+                                        </ul>
+                                        <a href="#" id="downloadTemplate" class="csv-template-link">Download Template CSV</a>
+                                    </div>
+                                </details>
+                            </div>
+                            
+                            <div id="csvProgress" class="csv-progress" style="display: none;">
+                                <div class="progress-bar">
+                                    <div id="csvProgressBar" class="progress-fill"></div>
+                                </div>
+                                <p id="csvProgressText">Processing: 0/0</p>
+                            </div>
+                            
+                            <div id="csvResults" class="csv-results" style="display: none;"></div>
+                        </div>
+
+                        <div class="form-divider"></div>
+
+                        <h3 class="form-section-title">Manual Entry</h3>
+
                         <form id="botProfileForm" class="bot-form">
                             <!-- UID -->
                             <div class="form-group">
@@ -130,263 +180,43 @@
                                 </select>
                             </div>
 
-                          <!-- Nationality -->
-<div class="form-group">
-    <label for="botNationality">Nationality *</label>
-    <select id="botNationality" required>
-        <option value="">Select nationality</option>
-
-        <!-- A -->
-        <option value="AFG">Afghanistan (AFG)</option>
-        <option value="ALB">Albania (ALB)</option>
-        <option value="ALG">Algeria (ALG)</option>
-        <option value="AND">Andorra (AND)</option>
-        <option value="ANG">Angola (ANG)</option>
-        <option value="ANT">Antigua and Barbuda (ANT)</option>
-        <option value="ARG">Argentina (ARG)</option>
-        <option value="ARM">Armenia (ARM)</option>
-        <option value="ARU">Aruba (ARU)</option>
-        <option value="ASA">American Samoa (ASA)</option>
-        <option value="AUS">Australia (AUS)</option>
-        <option value="AUT">Austria (AUT)</option>
-        <option value="AZE">Azerbaijan (AZE)</option>
-
-        <!-- B -->
-        <option value="BAH">Bahamas (BAH)</option>
-        <option value="BAN">Bangladesh (BAN)</option>
-        <option value="BAR">Barbados (BAR)</option>
-        <option value="BDI">Burundi (BDI)</option>
-        <option value="BEL">Belgium (BEL)</option>
-        <option value="BEN">Benin (BEN)</option>
-        <option value="BER">Bermuda (BER)</option>
-        <option value="BHU">Bhutan (BHU)</option>
-        <option value="BIH">Bosnia and Herzegovina (BIH)</option>
-        <option value="BIZ">Belize (BIZ)</option>
-        <option value="BLR">Belarus (BLR)</option>
-        <option value="BOL">Bolivia (BOL)</option>
-        <option value="BOT">Botswana (BOT)</option>
-        <option value="BRA">Brazil (BRA)</option>
-        <option value="BRN">Bahrain (BRN)</option>
-        <option value="BRU">Brunei Darussalam (BRU)</option>
-        <option value="BUL">Bulgaria (BUL)</option>
-        <option value="BUR">Burkina Faso (BUR)</option>
-
-        <!-- C -->
-        <option value="CAF">Central African Republic (CAF)</option>
-        <option value="CAM">Cambodia (CAM)</option>
-        <option value="CAN">Canada (CAN)</option>
-        <option value="CAY">Cayman Islands (CAY)</option>
-        <option value="CGO">Congo (CGO)</option>
-        <option value="CHA">Chad (CHA)</option>
-        <option value="CHI">Chile (CHI)</option>
-        <option value="CHN">China (CHN)</option>
-        <option value="CIV">Côte d'Ivoire (CIV)</option>
-        <option value="CMR">Cameroon (CMR)</option>
-        <option value="COD">Democratic Republic of the Congo (COD)</option>
-        <option value="COK">Cook Islands (COK)</option>
-        <option value="COL">Colombia (COL)</option>
-        <option value="COM">Comoros (COM)</option>
-        <option value="CPV">Cabo Verde (CPV)</option>
-        <option value="CRC">Costa Rica (CRC)</option>
-        <option value="CRO">Croatia (CRO)</option>
-        <option value="CUB">Cuba (CUB)</option>
-        <option value="CYP">Cyprus (CYP)</option>
-        <option value="CZE">Czech Republic (CZE)</option>
-
-        <!-- D -->
-        <option value="DEN">Denmark (DEN)</option>
-        <option value="DJI">Djibouti (DJI)</option>
-        <option value="DMA">Dominica (DMA)</option>
-        <option value="DOM">Dominican Republic (DOM)</option>
-
-        <!-- E -->
-        <option value="ECU">Ecuador (ECU)</option>
-        <option value="EGY">Egypt (EGY)</option>
-        <option value="ERI">Eritrea (ERI)</option>
-        <option value="ESA">El Salvador (ESA)</option>
-        <option value="ESP">Spain (ESP)</option>
-        <option value="EST">Estonia (EST)</option>
-        <option value="ETH">Ethiopia (ETH)</option>
-
-        <!-- F -->
-        <option value="FIJ">Fiji (FIJ)</option>
-        <option value="FIN">Finland (FIN)</option>
-        <option value="FRA">France (FRA)</option>
-
-        <!-- G -->
-        <option value="GAB">Gabon (GAB)</option>
-        <option value="GAM">Gambia (GAM)</option>
-        <option value="GBR">Great Britain (GBR)</option>
-        <option value="GBS">Guinea-Bissau (GBS)</option>
-        <option value="GEO">Georgia (GEO)</option>
-        <option value="GEQ">Equatorial Guinea (GEQ)</option>
-        <option value="GER">Germany (GER)</option>
-        <option value="GHA">Ghana (GHA)</option>
-        <option value="GRE">Greece (GRE)</option>
-        <option value="GRN">Grenada (GRN)</option>
-        <option value="GUA">Guatemala (GUA)</option>
-        <option value="GUI">Guinea (GUI)</option>
-        <option value="GUM">Guam (GUM)</option>
-        <option value="GUY">Guyana (GUY)</option>
-
-        <!-- H -->
-        <option value="HAI">Haiti (HAI)</option>
-        <option value="HKG">Hong Kong, China (HKG)</option>
-        <option value="HON">Honduras (HON)</option>
-        <option value="HUN">Hungary (HUN)</option>
-
-        <!-- I -->
-        <option value="INA">Indonesia (INA)</option>
-        <option value="IND">India (IND)</option>
-        <option value="IRI">Islamic Republic of Iran (IRI)</option>
-        <option value="IRL">Ireland (IRL)</option>
-        <option value="IRQ">Iraq (IRQ)</option>
-        <option value="ISL">Iceland (ISL)</option>
-        <option value="ISR">Israel (ISR)</option>
-        <option value="ITA">Italy (ITA)</option>
-
-        <!-- J -->
-        <option value="JAM">Jamaica (JAM)</option>
-        <option value="JOR">Jordan (JOR)</option>
-        <option value="JPN">Japan (JPN)</option>
-
-        <!-- K -->
-        <option value="KAZ">Kazakhstan (KAZ)</option>
-        <option value="KEN">Kenya (KEN)</option>
-        <option value="KGZ">Kyrgyzstan (KGZ)</option>
-        <option value="KIR">Kiribati (KIR)</option>
-        <option value="KOR">Republic of Korea (KOR)</option>
-        <option value="KOS">Kosovo (KOS)</option>
-        <option value="KSA">Saudi Arabia (KSA)</option>
-        <option value="KUW">Kuwait (KUW)</option>
-
-        <!-- L -->
-        <option value="LAO">Lao People's Democratic Republic (LAO)</option>
-        <option value="LAT">Latvia (LAT)</option>
-        <option value="LBA">Libya (LBA)</option>
-        <option value="LBN">Lebanon (LBN)</option>
-        <option value="LBR">Liberia (LBR)</option>
-        <option value="LCA">Saint Lucia (LCA)</option>
-        <option value="LES">Lesotho (LES)</option>
-        <option value="LIE">Liechtenstein (LIE)</option>
-        <option value="LTU">Lithuania (LTU)</option>
-        <option value="LUX">Luxembourg (LUX)</option>
-
-        <!-- M -->
-        <option value="MAD">Madagascar (MAD)</option>
-        <option value="MAR">Morocco (MAR)</option>
-        <option value="MAS">Malaysia (MAS)</option>
-        <option value="MAW">Malawi (MAW)</option>
-        <option value="MDA">Republic of Moldova (MDA)</option>
-        <option value="MDV">Maldives (MDV)</option>
-        <option value="MEX">Mexico (MEX)</option>
-        <option value="MGL">Mongolia (MGL)</option>
-        <option value="MHL">Marshall Islands (MHL)</option>
-        <option value="MKD">North Macedonia (MKD)</option>
-        <option value="MLI">Mali (MLI)</option>
-        <option value="MLT">Malta (MLT)</option>
-        <option value="MNE">Montenegro (MNE)</option>
-        <option value="MON">Monaco (MON)</option>
-        <option value="MOZ">Mozambique (MOZ)</option>
-        <option value="MRI">Mauritius (MRI)</option>
-        <option value="MTN">Mauritania (MTN)</option>
-        <option value="MYA">Myanmar (MYA)</option>
-
-        <!-- N -->
-        <option value="NAM">Namibia (NAM)</option>
-        <option value="NCA">Nicaragua (NCA)</option>
-        <option value="NED">Netherlands (NED)</option>
-        <option value="NEP">Nepal (NEP)</option>
-        <option value="NGR">Nigeria (NGR)</option>
-        <option value="NIG">Niger (NIG)</option>
-        <option value="NOR">Norway (NOR)</option>
-        <option value="NRU">Nauru (NRU)</option>
-        <option value="NZL">New Zealand (NZL)</option>
-
-        <!-- O -->
-        <option value="OMA">Oman (OMA)</option>
-
-        <!-- P -->
-        <option value="PAK">Pakistan (PAK)</option>
-        <option value="PAN">Panama (PAN)</option>
-        <option value="PAR">Paraguay (PAR)</option>
-        <option value="PER">Peru (PER)</option>
-        <option value="PHI">Philippines (PHI)</option>
-        <option value="PLE">Palestine (PLE)</option>
-        <option value="PLW">Palau (PLW)</option>
-        <option value="PNG">Papua New Guinea (PNG)</option>
-        <option value="POL">Poland (POL)</option>
-        <option value="POR">Portugal (POR)</option>
-        <option value="PRK">Democratic People's Republic of Korea (PRK)</option>
-        <option value="PUR">Puerto Rico (PUR)</option>
-
-        <!-- Q -->
-        <option value="QAT">Qatar (QAT)</option>
-
-        <!-- R -->
-        <option value="ROU">Romania (ROU)</option>
-        <option value="RSA">South Africa (RSA)</option>
-        <option value="RWA">Rwanda (RWA)</option>
-
-        <!-- S -->
-        <option value="SAM">Samoa (SAM)</option>
-        <option value="SEN">Senegal (SEN)</option>
-        <option value="SEY">Seychelles (SEY)</option>
-        <option value="SIN">Singapore (SIN)</option>
-        <option value="SKN">Saint Kitts and Nevis (SKN)</option>
-        <option value="SLE">Sierra Leone (SLE)</option>
-        <option value="SLO">Slovenia (SLO)</option>
-        <option value="SMR">San Marino (SMR)</option>
-        <option value="SOL">Solomon Islands (SOL)</option>
-        <option value="SOM">Somalia (SOM)</option>
-        <option value="SRB">Serbia (SRB)</option>
-        <option value="SRI">Sri Lanka (SRI)</option>
-        <option value="SSD">South Sudan (SSD)</option>
-        <option value="STP">São Tomé and Príncipe (STP)</option>
-        <option value="SUD">Sudan (SUD)</option>
-        <option value="SUI">Switzerland (SUI)</option>
-        <option value="SUR">Suriname (SUR)</option>
-        <option value="SVK">Slovakia (SVK)</option>
-        <option value="SWE">Sweden (SWE)</option>
-        <option value="SWZ">Eswatini (SWZ)</option>
-        <option value="SYR">Syrian Arab Republic (SYR)</option>
-
-        <!-- T -->
-        <option value="TAN">United Republic of Tanzania (TAN)</option>
-        <option value="TGA">Tonga (TGA)</option>
-        <option value="THA">Thailand (THA)</option>
-        <option value="TJK">Tajikistan (TJK)</option>
-        <option value="TKM">Turkmenistan (TKM)</option>
-        <option value="TLS">Timor-Leste (TLS)</option>
-        <option value="TOG">Togo (TOG)</option>
-        <option value="TPE">Chinese Taipei (TPE)</option>
-        <option value="TRI">Trinidad and Tobago (TRI)</option>
-        <option value="TUN">Tunisia (TUN)</option>
-        <option value="TUR">Türkiye (TUR)</option>
-        <option value="TUV">Tuvalu (TUV)</option>
-
-        <!-- U -->
-        <option value="UAE">United Arab Emirates (UAE)</option>
-        <option value="UGA">Uganda (UGA)</option>
-        <option value="UKR">Ukraine (UKR)</option>
-        <option value="URU">Uruguay (URU)</option>
-        <option value="USA">United States (USA)</option>
-        <option value="UZB">Uzbekistan (UZB)</option>
-
-        <!-- V -->
-        <option value="VAN">Vanuatu (VAN)</option>
-        <option value="VEN">Venezuela (VEN)</option>
-        <option value="VIE">Viet Nam (VIE)</option>
-
-        <!-- Y -->
-        <option value="YEM">Yemen (YEM)</option>
-
-        <!-- Z -->
-        <option value="ZAM">Zambia (ZAM)</option>
-        <option value="ZIM">Zimbabwe (ZIM)</option>
-    </select>
-</div>
-
+                            <!-- Nationality -->
+                            <div class="form-group">
+                                <label for="botNationality">Nationality *</label>
+                                <select id="botNationality" required>
+                                    <option value="">Select nationality</option>
+                                    <option value="GB">🇬🇧 Great Britain</option>
+                                    <option value="US">🇺🇸 United States</option>
+                                    <option value="FR">🇫🇷 France</option>
+                                    <option value="ES">🇪🇸 Spain</option>
+                                    <option value="IT">🇮🇹 Italy</option>
+                                    <option value="DE">🇩🇪 Germany</option>
+                                    <option value="NL">🇳🇱 Netherlands</option>
+                                    <option value="BE">🇧🇪 Belgium</option>
+                                    <option value="AU">🇦🇺 Australia</option>
+                                    <option value="CA">🇨🇦 Canada</option>
+                                    <option value="JP">🇯🇵 Japan</option>
+                                    <option value="CN">🇨🇳 China</option>
+                                    <option value="BR">🇧🇷 Brazil</option>
+                                    <option value="MX">🇲🇽 Mexico</option>
+                                    <option value="AR">🇦🇷 Argentina</option>
+                                    <option value="CL">🇨🇱 Chile</option>
+                                    <option value="CO">🇨🇴 Colombia</option>
+                                    <option value="DK">🇩🇰 Denmark</option>
+                                    <option value="SE">🇸🇪 Sweden</option>
+                                    <option value="NO">🇳🇴 Norway</option>
+                                    <option value="FI">🇫🇮 Finland</option>
+                                    <option value="PL">🇵🇱 Poland</option>
+                                    <option value="CZ">🇨🇿 Czech Republic</option>
+                                    <option value="AT">🇦🇹 Austria</option>
+                                    <option value="CH">🇨🇭 Switzerland</option>
+                                    <option value="PT">🇵🇹 Portugal</option>
+                                    <option value="IE">🇮🇪 Ireland</option>
+                                    <option value="NZ">🇳🇿 New Zealand</option>
+                                    <option value="SG">🇸🇬 Singapore</option>
+                                    <option value="KR">🇰🇷 South Korea</option>
+                                </select>
+                            </div>
 
                             <!-- Age (Optional) -->
                             <div class="form-group">

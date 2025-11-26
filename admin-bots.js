@@ -541,4 +541,193 @@ function getCountryFlag(countryCode) {
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
     initializeFirebase();
+    
+    // CSV upload handler
+    document.getElementById('csvFile').addEventListener('change', handleCSVUpload);
+    
+    // Download template
+    document.getElementById('downloadTemplate').addEventListener('click', (e) => {
+        e.preventDefault();
+        downloadCSVTemplate();
+    });
 });
+
+// CSV Template Download
+function downloadCSVTemplate() {
+    const template = `uid,name,team,arr,gender,nationality,backstory,imageUrl,age,ridingStyle
+Bot123ABC,Marco DiCicco,Formix,1250,Male,IT,"Born in Tuscany where he hauled cheese wheels uphill daily. Now he climbs mountains instead.
+
+His teammates call him The Wheel for his consistency though some suspect it's because he smells like Parmesan.",https://example.com/marco.jpg,28,Climber
+Bot456DEF,Sarah Thompson,Swift Racing,1380,Female,GB,"Started cycling to escape her job as a competitive tea taster in Yorkshire. Discovered she had extraordinary endurance.
+
+She once rode 200km to prove British weather builds character. Her Instagram posts about finding your inner brew have gone viral.",https://example.com/sarah.jpg,32,All-Rounder`;
+
+    const blob = new Blob([template], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'bot-profiles-template.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+}
+
+// Handle CSV Upload
+async function handleCSVUpload(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    document.getElementById('csvFileName').textContent = file.name;
+    
+    try {
+        const text = await file.text();
+        const profiles = parseCSV(text);
+        
+        if (profiles.length === 0) {
+            alert('No valid profiles found in CSV');
+            return;
+        }
+        
+        await batchUploadProfiles(profiles);
+        
+    } catch (error) {
+        console.error('Error reading CSV:', error);
+        alert('Error reading CSV file: ' + error.message);
+    }
+}
+
+// Parse CSV
+function parseCSV(text) {
+    const lines = text.split('\n');
+    const headers = lines[0].split(',').map(h => h.trim());
+    
+    const profiles = [];
+    
+    for (let i = 1; i < lines.length; i++) {
+        const line = lines[i].trim();
+        if (!line) continue;
+        
+        // Handle quoted fields with commas
+        const values = [];
+        let currentValue = '';
+        let insideQuotes = false;
+        
+        for (let char of line) {
+            if (char === '"') {
+                insideQuotes = !insideQuotes;
+            } else if (char === ',' && !insideQuotes) {
+                values.push(currentValue.trim());
+                currentValue = '';
+            } else {
+                currentValue += char;
+            }
+        }
+        values.push(currentValue.trim());
+        
+        // Create profile object
+        const profile = {};
+        headers.forEach((header, index) => {
+            let value = values[index] || '';
+            // Remove quotes if present
+            if (value.startsWith('"') && value.endsWith('"')) {
+                value = value.slice(1, -1);
+            }
+            // Replace \n\n with actual line breaks
+            if (header === 'backstory') {
+                value = value.replace(/\\n\\n/g, '\n\n');
+            }
+            // Convert numeric fields
+            if (header === 'arr' || header === 'age') {
+                value = value ? parseInt(value) : null;
+            }
+            profile[header] = value;
+        });
+        
+        // Validate required fields
+        if (profile.uid && profile.name && profile.team && profile.arr && 
+            profile.gender && profile.nationality && profile.backstory) {
+            profiles.push(profile);
+        } else {
+            console.warn('Skipping invalid profile:', profile);
+        }
+    }
+    
+    return profiles;
+}
+
+// Batch Upload Profiles
+async function batchUploadProfiles(profiles) {
+    const progressSection = document.getElementById('csvProgress');
+    const progressBar = document.getElementById('csvProgressBar');
+    const progressText = document.getElementById('csvProgressText');
+    const resultsSection = document.getElementById('csvResults');
+    
+    progressSection.style.display = 'block';
+    resultsSection.style.display = 'block';
+    resultsSection.innerHTML = '';
+    
+    let completed = 0;
+    const results = [];
+    
+    for (const profile of profiles) {
+        try {
+            // Create profile object
+            const profileData = {
+                uid: profile.uid,
+                name: profile.name,
+                team: profile.team,
+                arr: profile.arr,
+                gender: profile.gender,
+                nationality: profile.nationality,
+                backstory: profile.backstory,
+                imageUrl: profile.imageUrl || '',
+                updatedAt: new Date().toISOString()
+            };
+            
+            // Add optional fields
+            if (profile.age) profileData.age = profile.age;
+            if (profile.ridingStyle) profileData.ridingStyle = profile.ridingStyle;
+            
+            // Save to Firestore
+            await setDoc(doc(db, 'botProfiles', profile.uid), profileData);
+            
+            results.push({
+                success: true,
+                name: profile.name,
+                message: 'Successfully created'
+            });
+            
+        } catch (error) {
+            console.error('Error creating profile:', profile.name, error);
+            results.push({
+                success: false,
+                name: profile.name,
+                message: error.message
+            });
+        }
+        
+        completed++;
+        const progress = (completed / profiles.length) * 100;
+        progressBar.style.width = progress + '%';
+        progressText.textContent = `Processing: ${completed}/${profiles.length}`;
+        
+        // Small delay to prevent rate limiting
+        await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    
+    // Display results
+    resultsSection.innerHTML = results.map(result => `
+        <div class="csv-result-item ${result.success ? 'success' : 'error'}">
+            <strong>${result.name}:</strong> ${result.message}
+        </div>
+    `).join('');
+    
+    // Reload profiles list
+    await loadProfiles();
+    
+    // Reset file input
+    document.getElementById('csvFile').value = '';
+    document.getElementById('csvFileName').textContent = 'No file chosen';
+}
+

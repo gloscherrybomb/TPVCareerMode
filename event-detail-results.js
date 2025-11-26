@@ -3,6 +3,7 @@
 import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { makeNameClickable } from './bot-profile-modal.js';
 
 // Firebase configuration
 const firebaseConfig = {
@@ -174,7 +175,7 @@ async function loadEventResults() {
                         <span class="rank-number ${rankClass}">${result.position}</span>
                     </td>
                     <td class="name-cell">
-                        <span class="rider-name">${result.name}</span>
+                        <span class="rider-name">${makeNameClickable(result.name, result.uid)}</span>
                         ${isCurrentUser ? '<span class="you-badge">YOU</span>' : ''}
                     </td>
                     <td class="team-cell">${teamDisplay}</td>
