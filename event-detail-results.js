@@ -248,6 +248,26 @@ document.addEventListener('DOMContentLoaded', () => {
     // Listen for auth changes
     onAuthStateChanged(auth, async (user) => {
         currentUser = user;
+        
+        // Update schedule button based on login state
+        const scheduleButton = document.getElementById('scheduleButton');
+        if (scheduleButton) {
+            if (user) {
+                scheduleButton.textContent = 'Schedule Event';
+                scheduleButton.onclick = null; // Will be handled by event scheduling logic
+            } else {
+                scheduleButton.textContent = 'Login to Schedule';
+                scheduleButton.onclick = (e) => {
+                    e.preventDefault();
+                    // Trigger the login modal
+                    const loginBtn = document.getElementById('loginBtn');
+                    if (loginBtn) {
+                        loginBtn.click();
+                    }
+                };
+            }
+        }
+        
         if (user) {
             await loadEventResults();
         }
