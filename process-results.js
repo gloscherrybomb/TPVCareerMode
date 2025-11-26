@@ -289,6 +289,64 @@ function buildSeasonStandings(results, userData, eventNumber, currentUid) {
 }
 
 /**
+ * Update bot profile ARRs from race results
+ */
+async function updateBotARRs(season, event, results) {
+  console.log('   Updating bot ARRs...');
+  
+  let botsFound = 0;
+  let botsUpdated = 0;
+  let botsNotFound = 0;
+  
+  // Process each bot in results
+  for (const result of results) {
+    const uid = result.UID;
+    const arr = parseInt(result.ARR);
+    
+    // Check if this is a bot
+    if (!isBot(uid, result.Gender)) {
+      continue;
+    }
+    
+    // Validate ARR
+    if (!arr || isNaN(arr) || arr < 0) {
+      console.log(`   ⚠️  Invalid ARR for bot ${uid}: ${result.ARR}`);
+      continue;
+    }
+    
+    botsFound++;
+    
+    try {
+      const botProfileRef = db.collection('botProfiles').doc(uid);
+      const botProfileDoc = await botProfileRef.get();
+      
+      if (!botProfileDoc.exists()) {
+        console.log(`   ℹ️  Bot profile not found for ${uid}, skipping`);
+        botsNotFound++;
+        continue;
+      }
+      
+      // Update bot profile with latest ARR
+      await botProfileRef.update({
+        arr: arr,
+        lastARRUpdate: admin.firestore.FieldValue.serverTimestamp(),
+        lastEventId: `season${season}_event${event}`
+      });
+      
+      console.log(`   ✓ Updated ${uid} ARR: ${arr}`);
+      botsUpdated++;
+      
+    } catch (error) {
+      console.error(`   ✗ Error updating bot ${uid}:`, error.message);
+    }
+  }
+  
+  if (botsFound > 0) {
+    console.log(`   Bot ARR updates: ${botsUpdated} updated, ${botsNotFound} profiles not found`);
+  }
+}
+
+/**
  * Update results summary collection (for quick access to full results)
  */
 async function updateResultsSummary(season, event, results) {
@@ -319,6 +377,9 @@ async function updateResultsSummary(season, event, results) {
   });
   
   console.log(`✅ Updated results summary for season ${season} event ${event}`);
+  
+  // Update bot ARRs from these results
+  await updateBotARRs(season, event, results);
 }
 
 /**
