@@ -329,24 +329,74 @@
     gap: 1.5rem;
 }
 
+.trophy-cabinet {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1.5rem;
+}
+
 .award-card {
     padding: 2rem 1.5rem;
     background: var(--dark-card);
     border-radius: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.1);
     text-align: center;
     transition: all 0.3s ease;
+    position: relative;
 }
 
 .award-card:hover {
     transform: translateY(-4px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.award-card.gold {
+    border-color: rgba(255, 215, 0, 0.3);
+}
+
+.award-card.gold:hover {
     border-color: gold;
-    box-shadow: 0 10px 30px rgba(255, 215, 0, 0.2);
+    box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3);
+}
+
+.award-card.silver {
+    border-color: rgba(192, 192, 192, 0.3);
+}
+
+.award-card.silver:hover {
+    border-color: silver;
+    box-shadow: 0 10px 30px rgba(192, 192, 192, 0.3);
+}
+
+.award-card.bronze {
+    border-color: rgba(205, 127, 50, 0.3);
+}
+
+.award-card.bronze:hover {
+    border-color: rgb(205, 127, 50);
+    box-shadow: 0 10px 30px rgba(205, 127, 50, 0.3);
+}
+
+.award-card.lantern {
+    border-color: rgba(255, 100, 100, 0.3);
+}
+
+.award-card.lantern:hover {
+    border-color: rgb(255, 100, 100);
+    box-shadow: 0 10px 30px rgba(255, 100, 100, 0.3);
 }
 
 .award-icon {
-    font-size: 3rem;
-    margin-bottom: 1rem;
+    font-size: 3.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.award-count {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    font-size: 1.5rem;
+    color: var(--accent-pink);
+    margin-bottom: 0.75rem;
 }
 
 .award-title {

@@ -133,7 +133,13 @@ async function calculateUserStats(userUID) {
         positions: [],
         recentResults: [],
         bestFinish: null,
-        arr: null
+        arr: null,
+        awards: {
+            goldMedals: 0,
+            silverMedals: 0,
+            bronzeMedals: 0,
+            lanternRouge: 0
+        }
     };
     
     // Fetch all results for this user from all events
@@ -158,10 +164,24 @@ async function calculateUserStats(userUID) {
                     stats.totalPoints += userResult.points || 0;
                     
                     const position = userResult.position || 0;
+                    const totalRiders = results.length;
+                    
                     if (position > 0) {
                         stats.positions.push(position);
                         
-                        if (position === 1) stats.totalWins++;
+                        if (position === 1) {
+                            stats.totalWins++;
+                            stats.awards.goldMedals++;
+                        }
+                        if (position === 2) {
+                            stats.awards.silverMedals++;
+                        }
+                        if (position === 3) {
+                            stats.awards.bronzeMedals++;
+                        }
+                        if (position === totalRiders && totalRiders > 1) {
+                            stats.awards.lanternRouge++;
+                        }
                         if (position <= 3) stats.totalPodiums++;
                         
                         if (!stats.bestFinish || position < stats.bestFinish) {
@@ -392,8 +412,8 @@ function displayProfileInfo(user, userData, stats, seasonRanking, globalRanking)
     const progressPercent = (completedEvents / totalEvents) * 100;
     document.getElementById('progressFill').style.width = `${progressPercent}%`;
     
-    // Awards (placeholder for future)
-    displayAwards([]);
+    // Awards
+    displayAwards(stats.awards);
 }
 
 // Display recent results
@@ -461,28 +481,71 @@ function displayRecentResults(results) {
 function displayAwards(awards) {
     const container = document.getElementById('awardsContainer');
     
-    if (awards.length === 0) {
+    // Check if user has any awards
+    const totalAwards = awards.goldMedals + awards.silverMedals + awards.bronzeMedals + awards.lanternRouge;
+    
+    if (totalAwards === 0) {
         container.innerHTML = `
             <div class="awards-empty">
-                <div class="awards-empty-icon">🏅</div>
+                <div class="awards-empty-icon">🏆</div>
                 <p>No awards yet. Keep racing to earn achievements!</p>
             </div>
         `;
         return;
     }
     
-    // Future: render award cards here
-    let html = '';
-    awards.forEach(award => {
+    // Display trophy cabinet
+    let html = '<div class="trophy-cabinet">';
+    
+    // Gold medals (1st place)
+    if (awards.goldMedals > 0) {
         html += `
-            <div class="award-card">
-                <div class="award-icon">${award.icon}</div>
-                <div class="award-title">${award.title}</div>
-                <div class="award-description">${award.description}</div>
+            <div class="award-card gold">
+                <div class="award-icon">🥇</div>
+                <div class="award-count">${awards.goldMedals}x</div>
+                <div class="award-title">Gold Medal</div>
+                <div class="award-description">1st Place Finish</div>
             </div>
         `;
-    });
+    }
     
+    // Silver medals (2nd place)
+    if (awards.silverMedals > 0) {
+        html += `
+            <div class="award-card silver">
+                <div class="award-icon">🥈</div>
+                <div class="award-count">${awards.silverMedals}x</div>
+                <div class="award-title">Silver Medal</div>
+                <div class="award-description">2nd Place Finish</div>
+            </div>
+        `;
+    }
+    
+    // Bronze medals (3rd place)
+    if (awards.bronzeMedals > 0) {
+        html += `
+            <div class="award-card bronze">
+                <div class="award-icon">🥉</div>
+                <div class="award-count">${awards.bronzeMedals}x</div>
+                <div class="award-title">Bronze Medal</div>
+                <div class="award-description">3rd Place Finish</div>
+            </div>
+        `;
+    }
+    
+    // Lantern rouge (last place)
+    if (awards.lanternRouge > 0) {
+        html += `
+            <div class="award-card lantern">
+                <div class="award-icon">🏮</div>
+                <div class="award-count">${awards.lanternRouge}x</div>
+                <div class="award-title">Lantern Rouge</div>
+                <div class="award-description">Last Place Finish</div>
+            </div>
+        `;
+    }
+    
+    html += '</div>';
     container.innerHTML = html;
 }
 
