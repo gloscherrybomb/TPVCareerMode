@@ -165,6 +165,16 @@
     color: #000000;
 }
 
+.arr-badge-diamond {
+    background: linear-gradient(135deg, rgba(185, 242, 255, 0.9), rgba(120, 200, 255, 0.9));
+    color: #000000;
+}
+
+.arr-badge-unranked {
+    background: rgba(100, 100, 100, 0.9);
+    color: #ffffff;
+}
+
 .profile-info {
     padding: 1.5rem;
 }

@@ -241,10 +241,36 @@ function searchProfiles(searchTerm) {
 
 // Get ARR badge styling
 function getARRBadge(arr) {
-    if (arr >= 1451) return { class: 'arr-badge-platinum', label: 'Platinum' };
-    if (arr >= 1321) return { class: 'arr-badge-gold', label: 'Gold' };
-    if (arr >= 1196) return { class: 'arr-badge-silver', label: 'Silver' };
-    return { class: 'arr-badge-bronze', label: 'Bronze' };
+    if (!arr || arr < 300) return { class: 'arr-badge-unranked', label: 'Unranked' };
+    
+    // Diamond: 1500-2000
+    if (arr >= 1900) return { class: 'arr-badge-diamond', label: 'Diamond 5' };
+    if (arr >= 1800) return { class: 'arr-badge-diamond', label: 'Diamond 4' };
+    if (arr >= 1700) return { class: 'arr-badge-diamond', label: 'Diamond 3' };
+    if (arr >= 1600) return { class: 'arr-badge-diamond', label: 'Diamond 2' };
+    if (arr >= 1500) return { class: 'arr-badge-diamond', label: 'Diamond 1' };
+    
+    // Platinum: 1200-1499
+    if (arr >= 1400) return { class: 'arr-badge-platinum', label: 'Platinum 3' };
+    if (arr >= 1300) return { class: 'arr-badge-platinum', label: 'Platinum 2' };
+    if (arr >= 1200) return { class: 'arr-badge-platinum', label: 'Platinum 1' };
+    
+    // Gold: 900-1199
+    if (arr >= 1100) return { class: 'arr-badge-gold', label: 'Gold 3' };
+    if (arr >= 1000) return { class: 'arr-badge-gold', label: 'Gold 2' };
+    if (arr >= 900) return { class: 'arr-badge-gold', label: 'Gold 1' };
+    
+    // Silver: 600-899
+    if (arr >= 800) return { class: 'arr-badge-silver', label: 'Silver 3' };
+    if (arr >= 700) return { class: 'arr-badge-silver', label: 'Silver 2' };
+    if (arr >= 600) return { class: 'arr-badge-silver', label: 'Silver 1' };
+    
+    // Bronze: 300-599
+    if (arr >= 500) return { class: 'arr-badge-bronze', label: 'Bronze 3' };
+    if (arr >= 400) return { class: 'arr-badge-bronze', label: 'Bronze 2' };
+    if (arr >= 300) return { class: 'arr-badge-bronze', label: 'Bronze 1' };
+    
+    return { class: 'arr-badge-unranked', label: 'Unranked' };
 }
 
 // Country / Flag helpers (matching admin-bots.js)

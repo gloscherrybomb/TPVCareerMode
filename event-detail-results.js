@@ -55,13 +55,36 @@ function formatDeltaTime(seconds) {
  * Get ARR band label
  */
 function getARRBand(arr) {
-    if (arr >= 1200) return 'Gold 3';
-    if (arr >= 1100) return 'Gold 2';
-    if (arr >= 1000) return 'Gold 1';
-    if (arr >= 900) return 'Silver 3';
-    if (arr >= 800) return 'Silver 2';
-    if (arr >= 700) return 'Silver 1';
-    return 'Bronze';
+    if (!arr || arr < 300) return 'Unranked';
+    
+    // Diamond: 1500-2000
+    if (arr >= 1900) return 'Diamond 5';
+    if (arr >= 1800) return 'Diamond 4';
+    if (arr >= 1700) return 'Diamond 3';
+    if (arr >= 1600) return 'Diamond 2';
+    if (arr >= 1500) return 'Diamond 1';
+    
+    // Platinum: 1200-1499
+    if (arr >= 1400) return 'Platinum 3';
+    if (arr >= 1300) return 'Platinum 2';
+    if (arr >= 1200) return 'Platinum 1';
+    
+    // Gold: 900-1199
+    if (arr >= 1100) return 'Gold 3';
+    if (arr >= 1000) return 'Gold 2';
+    if (arr >= 900) return 'Gold 1';
+    
+    // Silver: 600-899
+    if (arr >= 800) return 'Silver 3';
+    if (arr >= 700) return 'Silver 2';
+    if (arr >= 600) return 'Silver 1';
+    
+    // Bronze: 300-599
+    if (arr >= 500) return 'Bronze 3';
+    if (arr >= 400) return 'Bronze 2';
+    if (arr >= 300) return 'Bronze 1';
+    
+    return 'Unranked';
 }
 
 /**
