@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Batch Image Upload - Firebase Storage</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: #0f1419;
+            color: #e7e9ea;
+            padding: 2rem;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        h1 {
+            margin-bottom: 1rem;
+            color: #45caff;
+        }
+        
+        .upload-section {
+            background: #16181c;
+            border: 1px solid #2f3336;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .instructions {
+            background: rgba(69, 202, 255, 0.1);
+            border: 1px solid rgba(69, 202, 255, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .instructions h3 {
+            color: #45caff;
+            margin-bottom: 0.5rem;
+        }
+        
+        .instructions ul {
+            margin-left: 1.5rem;
+            color: #8b98a5;
+        }
+        
+        .instructions li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .file-input-wrapper {
+            margin-bottom: 2rem;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .file-button {
+            background: #45caff;
+            color: #0f1419;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        
+        .file-button:hover {
+            background: #5dd4ff;
+        }
+        
+        .file-info {
+            margin-top: 1rem;
+            color: #8b98a5;
+        }
+        
+        .upload-button {
+            background: #00ba7c;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 1rem;
+            width: 100%;
+        }
+        
+        .upload-button:hover {
+            background: #00d68f;
+        }
+        
+        .upload-button:disabled {
+            background: #2f3336;
+            color: #8b98a5;
+            cursor: not-allowed;
+        }
+        
+        .progress-section {
+            margin-top: 2rem;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #2f3336;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ff1b6b, #45caff);
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+        
+        .progress-text {
+            text-align: center;
+            color: #8b98a5;
+            margin-bottom: 2rem;
+        }
+        
+        .results {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #2f3336;
+            border-radius: 8px;
+            padding: 1rem;
+        }
+        
+        .result-item {
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .result-item.success {
+            background: rgba(0, 186, 124, 0.1);
+            border-left: 3px solid #00ba7c;
+        }
+        
+        .result-item.error {
+            background: rgba(239, 68, 68, 0.1);
+            border-left: 3px solid #ef4444;
+        }
+        
+        .csv-output {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: #16181c;
+            border: 1px solid #2f3336;
+            border-radius: 8px;
+        }
+        
+        .csv-output h3 {
+            color: #45caff;
+            margin-bottom: 1rem;
+        }
+        
+        .csv-content {
+            background: #0f1419;
+            padding: 1rem;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+            color: #8b98a5;
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .copy-button {
+            margin-top: 1rem;
+            background: #8b98a5;
+            color: #0f1419;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .copy-button:hover {
+            background: #a0aec0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🖼️ Batch Image Upload to Firebase Storage</h1>
+        
+        <div class="instructions">
+            <h3>Instructions:</h3>
+            <ul>
+                <li><strong>Name your images by UID:</strong> Bot001.jpg, Bot002.jpg, etc.</li>
+                <li><strong>Supported formats:</strong> JPG, PNG, WebP</li>
+                <li><strong>Recommended size:</strong> 800x800px square</li>
+                <li><strong>Max file size:</strong> 2MB per image</li>
+                <li>After upload, copy the generated CSV with URLs</li>
+            </ul>
+        </div>
+        
+        <div class="upload-section">
+            <h2>Select Images</h2>
+            <div class="file-input-wrapper">
+                <input 
+                    type="file" 
+                    id="imageFiles" 
+                    class="file-input"
+                    multiple 
+                    accept="image/jpeg,image/png,image/webp">
+                <button class="file-button" onclick="document.getElementById('imageFiles').click()">
+                    Choose Images
+                </button>
+                <div class="file-info" id="fileInfo">No files selected</div>
+            </div>
+            
+            <button class="upload-button" id="uploadButton" disabled>
+                Upload to Firebase Storage
+            </button>
+        </div>
+        
+        <div class="progress-section" id="progressSection" style="display: none;">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">Uploading: 0/0</div>
+            <div class="results" id="results"></div>
+        </div>
+        
+        <div class="csv-output" id="csvOutput" style="display: none;">
+            <h3>📋 Generated CSV URLs</h3>
+            <p style="color: #8b98a5; margin-bottom: 1rem;">
+                Copy this and add it to your bot profiles CSV:
+            </p>
+            <div class="csv-content" id="csvContent"></div>
+            <button class="copy-button" onclick="copyCSV()">Copy to Clipboard</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getStorage, ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDo-g0UhDCB8QWRXQ0iapVHQEgA4X7jt4o",
+            authDomain: "careermodelogin.firebaseapp.com",
+            projectId: "careermodelogin",
+            storageBucket: "careermodelogin.firebasestorage.app",
+            messagingSenderId: "599516805754",
+            appId: "1:599516805754:web:7f5c6bbebb8b454a81d9c3",
+            measurementId: "G-Y8BQ4F6H4V"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const storage = getStorage(app);
+
+        let selectedFiles = [];
+        const uploadResults = [];
+
+        // File selection
+        document.getElementById('imageFiles').addEventListener('change', (e) => {
+            selectedFiles = Array.from(e.target.files);
+            const fileInfo = document.getElementById('fileInfo');
+            const uploadButton = document.getElementById('uploadButton');
+            
+            if (selectedFiles.length > 0) {
+                fileInfo.textContent = `${selectedFiles.length} files selected`;
+                uploadButton.disabled = false;
+            } else {
+                fileInfo.textContent = 'No files selected';
+                uploadButton.disabled = true;
+            }
+        });
+
+        // Upload button
+        document.getElementById('uploadButton').addEventListener('click', async () => {
+            if (selectedFiles.length === 0) return;
+            
+            const progressSection = document.getElementById('progressSection');
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+            const results = document.getElementById('results');
+            const uploadButton = document.getElementById('uploadButton');
+            
+            progressSection.style.display = 'block';
+            results.innerHTML = '';
+            uploadResults.length = 0;
+            uploadButton.disabled = true;
+            
+            let completed = 0;
+            
+            for (const file of selectedFiles) {
+                try {
+                    // Extract UID from filename (e.g., "Bot001.jpg" -> "Bot001")
+                    const uid = file.name.split('.')[0];
+                    
+                    // Validate file size
+                    if (file.size > 2 * 1024 * 1024) {
+                        throw new Error('File too large (max 2MB)');
+                    }
+                    
+                    // Upload to Firebase Storage
+                    const storageRef = ref(storage, `bot-profiles/${uid}.jpg`);
+                    await uploadBytes(storageRef, file);
+                    const downloadURL = await getDownloadURL(storageRef);
+                    
+                    // Success
+                    uploadResults.push({
+                        success: true,
+                        uid: uid,
+                        filename: file.name,
+                        url: downloadURL
+                    });
+                    
+                    results.innerHTML += `
+                        <div class="result-item success">
+                            ✓ ${file.name} → ${uid}
+                        </div>
+                    `;
+                    
+                } catch (error) {
+                    // Error
+                    const uid = file.name.split('.')[0];
+                    uploadResults.push({
+                        success: false,
+                        uid: uid,
+                        filename: file.name,
+                        error: error.message
+                    });
+                    
+                    results.innerHTML += `
+                        <div class="result-item error">
+                            ✗ ${file.name} → Error: ${error.message}
+                        </div>
+                    `;
+                }
+                
+                completed++;
+                const progress = (completed / selectedFiles.length) * 100;
+                progressFill.style.width = progress + '%';
+                progressText.textContent = `Uploading: ${completed}/${selectedFiles.length}`;
+                
+                // Small delay to prevent rate limiting
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+            
+            // Generate CSV output
+            generateCSVOutput();
+            uploadButton.disabled = false;
+        });
+
+        function generateCSVOutput() {
+            const csvOutput = document.getElementById('csvOutput');
+            const csvContent = document.getElementById('csvContent');
+            
+            // Generate CSV lines (uid,url format)
+            const csvLines = uploadResults
+                .filter(r => r.success)
+                .map(r => `${r.uid},${r.url}`)
+                .join('\n');
+            
+            if (csvLines) {
+                csvContent.textContent = 'uid,imageUrl\n' + csvLines;
+                csvOutput.style.display = 'block';
+                window.generatedCSV = 'uid,imageUrl\n' + csvLines;
+            }
+        }
+
+        window.copyCSV = function() {
+            const csvText = window.generatedCSV;
+            navigator.clipboard.writeText(csvText).then(() => {
+                const copyButton = document.querySelector('.copy-button');
+                copyButton.textContent = 'Copied!';
+                setTimeout(() => {
+                    copyButton.textContent = 'Copy to Clipboard';
+                }, 2000);
+            });
+        };
+    </script>
+</body>
+</html>
