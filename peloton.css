@@ -20,14 +20,6 @@
     align-items: center;
 }
 
-.profile-nationality .flag-icon {
-    width: 20px;
-    height: 14px;
-    object-fit: cover;
-    vertical-align: middle;
-}
-
-
 .search-icon {
     position: absolute;
     left: 1rem;
@@ -403,4 +395,22 @@
         opacity: 1;
         transform: translateY(0);
     }
+}
+
+/* Flag Icons */
+.flag-icon {
+    width: 20px !important;
+    height: 14px !important;
+    object-fit: cover;
+    vertical-align: middle;
+    margin-right: 4px;
+    display: inline-block;
+}
+
+.modal-meta-value .flag-icon,
+.profile-nationality .flag-icon {
+    width: 20px !important;
+    height: 14px !important;
+    max-width: 20px;
+    max-height: 14px;
 }
