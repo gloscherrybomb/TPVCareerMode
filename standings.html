@@ -82,14 +82,28 @@
         <div class="container">
             <div class="standings-header">
                 <h2>Global Rankings</h2>
-                <p class="standings-description">Worldwide leaderboard of all human racers</p>
+                <p class="standings-description">Worldwide leaderboards of all human racers</p>
             </div>
 
-            <!-- JavaScript will populate this -->
-            <div id="globalRankings">
+            <!-- Sub-tabs for Individual vs Team -->
+            <div class="sub-tabs-container">
+                <button class="sub-tab-btn active" data-subtab="individual">Individual Rankings</button>
+                <button class="sub-tab-btn" data-subtab="team">Team Rankings</button>
+            </div>
+
+            <!-- Individual Rankings -->
+            <div class="sub-tab-content active" id="individualRankings">
                 <div class="loading-state">
                     <div class="loading-spinner"></div>
-                    <p>Loading rankings...</p>
+                    <p>Loading individual rankings...</p>
+                </div>
+            </div>
+
+            <!-- Team Rankings -->
+            <div class="sub-tab-content" id="teamRankings">
+                <div class="loading-state">
+                    <div class="loading-spinner"></div>
+                    <p>Loading team rankings...</p>
                 </div>
             </div>
         </div>

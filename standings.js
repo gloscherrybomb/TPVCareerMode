@@ -275,7 +275,7 @@ async function renderSeasonStandings() {
 
 // Render Global Rankings
 async function renderGlobalRankings() {
-    const globalContent = document.getElementById('globalRankings');
+    const globalContent = document.getElementById('individualRankings');
     
     try {
         // Fetch all users from Firestore
@@ -288,6 +288,7 @@ async function renderGlobalRankings() {
             rankings.push({
                 uid: doc.id,  // Add UID from document ID
                 name: data.name || 'Unknown',
+                team: data.team || '',
                 season: data.currentSeason || 1,
                 events: data.totalEvents || (data.completedStages?.length || 0),
                 points: data.totalPoints || 0,
@@ -360,6 +361,7 @@ async function renderGlobalRankings() {
         `;
 
         globalContent.innerHTML = tableHTML;
+        return rankings; // Return rankings for team calculations
     } catch (error) {
         console.error('Error loading global rankings:', error);
         globalContent.innerHTML = `
@@ -367,7 +369,180 @@ async function renderGlobalRankings() {
                 <p>Error loading rankings. Please try again later.</p>
             </div>
         `;
+        return [];
     }
+}
+
+// Render team rankings (top 5 riders per team)
+async function renderTeamRankings() {
+    const teamContent = document.getElementById('teamRankings');
+    
+    try {
+        // Fetch all users from Firestore
+        const usersQuery = query(collection(db, 'users'));
+        const usersSnapshot = await getDocs(usersQuery);
+        
+        const riders = [];
+        usersSnapshot.forEach((doc) => {
+            const data = doc.data();
+            const team = data.team ? data.team.trim() : '';
+            
+            // Skip riders without teams or on "Independent"
+            if (!team || team.toLowerCase() === 'independent' || team.toLowerCase() === 'no team') {
+                return;
+            }
+            
+            riders.push({
+                uid: doc.id,
+                name: data.name || 'Unknown',
+                team: team,
+                points: data.totalPoints || 0,
+                isCurrentUser: currentUser && doc.id === currentUser.uid
+            });
+        });
+        
+        // Group riders by team
+        const teamMap = new Map();
+        riders.forEach(rider => {
+            if (!teamMap.has(rider.team)) {
+                teamMap.set(rider.team, []);
+            }
+            teamMap.get(rider.team).push(rider);
+        });
+        
+        // Calculate team rankings
+        const teamRankings = [];
+        const currentUserTeam = currentUser ? riders.find(r => r.isCurrentUser)?.team : null;
+        
+        teamMap.forEach((members, teamName) => {
+            // Sort members by points descending
+            members.sort((a, b) => b.points - a.points);
+            
+            // Get top 5 riders
+            const top5 = members.slice(0, 5);
+            
+            // Sum top 5 points
+            const totalPoints = top5.reduce((sum, rider) => sum + rider.points, 0);
+            
+            teamRankings.push({
+                team: teamName,
+                totalPoints: totalPoints,
+                totalMembers: members.length,
+                top5Riders: top5,
+                isCurrentUserTeam: teamName === currentUserTeam
+            });
+        });
+        
+        // Sort teams by total points
+        teamRankings.sort((a, b) => b.totalPoints - a.totalPoints);
+        
+        // Build table HTML
+        let tableHTML = `
+            <div class="standings-table-container">
+                <table class="standings-table">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Team</th>
+                            <th>Members</th>
+                            <th>Points</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+        
+        if (teamRankings.length === 0) {
+            tableHTML += `
+                <tr>
+                    <td colspan="4" class="empty-state">
+                        <div class="empty-icon">🏆</div>
+                        <p>No teams yet. Join a team to compete!</p>
+                    </td>
+                </tr>
+            `;
+        } else {
+            teamRankings.forEach((team, index) => {
+                const rank = index + 1;
+                const rowClass = team.isCurrentUserTeam ? 'current-user-team-row' : '';
+                
+                // Podium class for top 3
+                let rankClass = '';
+                if (rank === 1) rankClass = 'rank-gold';
+                else if (rank === 2) rankClass = 'rank-silver';
+                else if (rank === 3) rankClass = 'rank-bronze';
+                
+                // Build top 5 riders list
+                const top5HTML = team.top5Riders.map(rider => 
+                    `<span class="team-rank-member">
+                        <span class="team-rank-member-name">${rider.name}</span>
+                        (<span class="team-rank-member-points">${rider.points}</span>)
+                    </span>`
+                ).join(', ');
+                
+                tableHTML += `
+                    <tr class="${rowClass}">
+                        <td class="rank-cell">
+                            <span class="rank-number ${rankClass}">${rank}</span>
+                        </td>
+                        <td class="name-cell">
+                            <div class="team-rank-name">
+                                ${team.team}
+                                ${team.isCurrentUserTeam ? '<span class="your-team-badge">YOUR TEAM</span>' : ''}
+                            </div>
+                            <div class="team-rank-top5">
+                                Top 5: ${top5HTML}
+                            </div>
+                        </td>
+                        <td class="team-rank-members">${team.totalMembers} rider${team.totalMembers !== 1 ? 's' : ''}</td>
+                        <td class="points-cell">
+                            <span class="points-value">${team.totalPoints}</span>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+        
+        tableHTML += `
+                    </tbody>
+                </table>
+            </div>
+        `;
+        
+        teamContent.innerHTML = tableHTML;
+    } catch (error) {
+        console.error('Error loading team rankings:', error);
+        teamContent.innerHTML = `
+            <div class="error-state">
+                <p>Error loading team rankings. Please try again later.</p>
+            </div>
+        `;
+    }
+}
+
+// Sub-tab switching (for Individual vs Team rankings)
+function initSubTabs() {
+    const subTabButtons = document.querySelectorAll('.sub-tab-btn');
+    const individualContent = document.getElementById('individualRankings');
+    const teamContent = document.getElementById('teamRankings');
+    
+    subTabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const subtab = button.dataset.subtab;
+            
+            // Update active button
+            subTabButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+            
+            // Show/hide content
+            if (subtab === 'individual') {
+                individualContent.classList.add('active');
+                teamContent.classList.remove('active');
+            } else if (subtab === 'team') {
+                individualContent.classList.remove('active');
+                teamContent.classList.add('active');
+            }
+        });
+    });
 }
 
 // Get ARR band label
@@ -411,18 +586,22 @@ function initTabs() {
 onAuthStateChanged(auth, async (user) => {
     currentUser = user;
     
-    // Render both tabs
+    // Render all content
     await renderSeasonStandings();
     await renderGlobalRankings();
+    await renderTeamRankings();
 });
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
     initTabs();
+    initSubTabs();
     renderSeasonStandings();
     renderGlobalRankings();
+    renderTeamRankings();
 });
 
 // Make functions available globally
 window.renderSeasonStandings = renderSeasonStandings;
 window.renderGlobalRankings = renderGlobalRankings;
+window.renderTeamRankings = renderTeamRankings;
