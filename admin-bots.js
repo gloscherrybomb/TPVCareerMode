@@ -548,14 +548,241 @@ window.resetForm = function() {
 
 document.getElementById('resetForm').addEventListener('click', resetForm);
 
+// ===== AI IMAGE PROMPT GENERATOR =====
+
+// Nationality to ethnicity mapping for prompt generation
+const nationalityToEthnicity = {
+    'BER': 'African-Bermudan, dark brown skin',
+    'BM': 'African-Bermudan, dark brown skin',
+    'SCO': 'Scottish, fair skin',
+    'FRA': 'French, light olive skin',
+    'FR': 'French, light olive skin',
+    'CHN': 'Chinese, East Asian features',
+    'CN': 'Chinese, East Asian features',
+    'BRA': 'Brazilian, tan skin, South American features',
+    'BR': 'Brazilian, tan skin, South American features',
+    'ISV': 'Caribbean, dark brown skin',
+    'VG': 'Caribbean, dark brown skin',
+    'CZE': 'Czech, fair skin, Eastern European features',
+    'CZ': 'Czech, fair skin, Eastern European features',
+    'ISR': 'Israeli, olive skin, Middle Eastern features',
+    'IL': 'Israeli, olive skin, Middle Eastern features',
+    'ENG': 'English, fair to medium skin',
+    'FIN': 'Finnish, fair skin, Nordic features',
+    'FI': 'Finnish, fair skin, Nordic features',
+    'NZL': 'New Zealand, mixed ethnicity, tan skin',
+    'NZ': 'New Zealand, mixed ethnicity, tan skin',
+    'ITA': 'Italian, olive skin, Mediterranean features',
+    'IT': 'Italian, olive skin, Mediterranean features',
+    'ESP': 'Spanish, olive skin, Mediterranean features',
+    'ES': 'Spanish, olive skin, Mediterranean features',
+    'IRL': 'Irish, fair skin with freckles',
+    'IE': 'Irish, fair skin with freckles',
+    'KOR': 'Korean, East Asian features',
+    'KR': 'Korean, East Asian features',
+    'ALG': 'Algerian, olive to tan skin, North African features',
+    'DZ': 'Algerian, olive to tan skin, North African features',
+    'AND': 'Andorran, olive skin, Mediterranean features',
+    'AD': 'Andorran, olive skin, Mediterranean features',
+    'UKR': 'Ukrainian, fair skin, Eastern European features',
+    'UA': 'Ukrainian, fair skin, Eastern European features',
+    'GER': 'German, fair to medium skin',
+    'DE': 'German, fair to medium skin',
+    'MAS': 'Malaysian, Southeast Asian features, tan skin',
+    'MY': 'Malaysian, Southeast Asian features, tan skin',
+    'AUT': 'Austrian, fair to medium skin',
+    'AT': 'Austrian, fair to medium skin',
+    'USA': 'American, diverse features',
+    'US': 'American, diverse features',
+    'GBR': 'British, fair to medium skin',
+    'GB': 'British, fair to medium skin',
+    'NED': 'Dutch, fair to medium skin',
+    'NL': 'Dutch, fair to medium skin',
+    'SUI': 'Swiss, fair to medium skin',
+    'CH': 'Swiss, fair to medium skin',
+    'BEL': 'Belgian, fair to medium skin',
+    'BE': 'Belgian, fair to medium skin',
+    'DEN': 'Danish, fair skin, Nordic features',
+    'DK': 'Danish, fair skin, Nordic features',
+    'SWE': 'Swedish, fair skin, Nordic features',
+    'SE': 'Swedish, fair skin, Nordic features',
+    'NOR': 'Norwegian, fair skin, Nordic features',
+    'NO': 'Norwegian, fair skin, Nordic features',
+    'POL': 'Polish, fair to medium skin, Eastern European features',
+    'PL': 'Polish, fair to medium skin, Eastern European features',
+    'POR': 'Portuguese, olive skin, Mediterranean features',
+    'PT': 'Portuguese, olive skin, Mediterranean features',
+    'AUS': 'Australian, diverse features',
+    'AU': 'Australian, diverse features',
+    'CAN': 'Canadian, diverse features',
+    'CA': 'Canadian, diverse features',
+    'JPN': 'Japanese, East Asian features',
+    'JP': 'Japanese, East Asian features',
+    'MEX': 'Mexican, tan skin, Latin American features',
+    'MX': 'Mexican, tan skin, Latin American features',
+    'ARG': 'Argentinian, diverse features, South American',
+    'AR': 'Argentinian, diverse features, South American',
+    'RSA': 'South African, diverse features',
+    'ZA': 'South African, diverse features',
+};
+
+// Generate AI image prompt based on bot details
+window.generateImagePrompt = function() {
+    // Get form values
+    const name = document.getElementById('botName').value.trim();
+    const nationality = document.getElementById('botNationality').value.toUpperCase();
+    const gender = document.getElementById('botGender').value;
+    const team = document.getElementById('botTeam').value.trim() || 'Independent';
+    const arr = parseInt(document.getElementById('botArr').value);
+    
+    // Validate required fields
+    if (!name || !nationality || !gender) {
+        alert('Please fill in Name, Nationality, and Gender first');
+        return;
+    }
+    
+    // Get ethnicity description
+    const ethnicityDesc = nationalityToEthnicity[nationality] || 'diverse features';
+    
+    // Determine age range based on ARR (rough estimate)
+    let ageRange = 'late 20s to early 30s';
+    if (arr < 1000) {
+        ageRange = 'early to mid 20s';
+    } else if (arr > 1200) {
+        ageRange = 'late 30s to early 40s';
+    }
+    
+    // Hair style based on gender
+    const hairStyle = gender === 'Female' ? 'ponytail' : 'short athletic haircut';
+    const genderDesc = gender === 'Female' ? 'female cyclist' : 'male cyclist';
+    
+    // Build prompt
+    const prompt = `Professional cycling portrait, cartoon illustration style, ${ethnicityDesc}, ${genderDesc} in ${ageRange}, ${hairStyle}, athletic build, wearing ${team} team cycling jersey, confident expression, studio lighting, head and shoulders portrait, digital art, vibrant colors, clean gradient background, professional sports photography style, 4K quality`;
+    
+    // Display prompt
+    document.getElementById('generatedPrompt').textContent = prompt;
+    document.getElementById('imagePromptResult').style.display = 'block';
+    
+    console.log('Generated prompt:', prompt);
+};
+
+// Copy prompt to clipboard
+window.copyPromptToClipboard = function() {
+    const prompt = document.getElementById('generatedPrompt').textContent;
+    
+    navigator.clipboard.writeText(prompt).then(() => {
+        const btn = event.target;
+        const originalText = btn.textContent;
+        btn.textContent = '✓ Copied!';
+        btn.style.background = '#00ba7c';
+        
+        setTimeout(() => {
+            btn.textContent = originalText;
+            btn.style.background = '';
+        }, 2000);
+    }).catch(err => {
+        console.error('Failed to copy:', err);
+        alert('Failed to copy to clipboard');
+    });
+};
+
+// ===== IMAGE RESIZING =====
+
+// Resize image if larger than 800x800
+async function resizeImageIfNeeded(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        
+        reader.onload = (e) => {
+            const img = new Image();
+            
+            img.onload = () => {
+                const width = img.width;
+                const height = img.height;
+                
+                console.log(`Original image size: ${width}x${height}`);
+                
+                // If image is 800x800 or smaller, return original
+                if (width <= 800 && height <= 800) {
+                    console.log('Image is already 800x800 or smaller, no resize needed');
+                    resolve(file);
+                    return;
+                }
+                
+                // Create canvas for resizing
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                
+                // Target dimensions (800x800)
+                const targetWidth = 800;
+                const targetHeight = 800;
+                
+                canvas.width = targetWidth;
+                canvas.height = targetHeight;
+                
+                // Calculate aspect ratios
+                const imgAspect = width / height;
+                const canvasAspect = targetWidth / targetHeight;
+                
+                let drawWidth, drawHeight, offsetX = 0, offsetY = 0;
+                
+                // Cover-fit: fill canvas, crop excess
+                if (imgAspect > canvasAspect) {
+                    // Image is wider - fit height, crop sides
+                    drawHeight = targetHeight;
+                    drawWidth = width * (targetHeight / height);
+                    offsetX = (targetWidth - drawWidth) / 2;
+                } else {
+                    // Image is taller - fit width, crop top/bottom
+                    drawWidth = targetWidth;
+                    drawHeight = height * (targetWidth / width);
+                    offsetY = (targetHeight - drawHeight) / 2;
+                }
+                
+                // Draw resized image
+                ctx.drawImage(img, offsetX, offsetY, drawWidth, drawHeight);
+                
+                // Convert canvas to blob
+                canvas.toBlob((blob) => {
+                    if (!blob) {
+                        reject(new Error('Failed to create image blob'));
+                        return;
+                    }
+                    
+                    // Create new File object with original name
+                    const resizedFile = new File([blob], file.name, {
+                        type: 'image/jpeg',
+                        lastModified: Date.now()
+                    });
+                    
+                    console.log(`Resized to 800x800, size: ${(resizedFile.size / 1024).toFixed(2)}KB (was ${(file.size / 1024).toFixed(2)}KB)`);
+                    resolve(resizedFile);
+                }, 'image/jpeg', 0.85); // 85% quality
+            };
+            
+            img.onerror = () => {
+                reject(new Error('Failed to load image'));
+            };
+            
+            img.src = e.target.result;
+        };
+        
+        reader.onerror = () => {
+            reject(new Error('Failed to read file'));
+        };
+        
+        reader.readAsDataURL(file);
+    });
+}
+
 // Image selection
-document.getElementById('botImage').addEventListener('change', (e) => {
+document.getElementById('botImage').addEventListener('change', async (e) => {
     const file = e.target.files[0];
     if (!file) return;
     
-    // Validate file size (max 2MB)
-    if (file.size > 2 * 1024 * 1024) {
-        alert('Image must be less than 2MB');
+    // Validate file size (max 5MB before resizing)
+    if (file.size > 5 * 1024 * 1024) {
+        alert('Image must be less than 5MB');
         e.target.value = '';
         return;
     }
@@ -567,16 +794,26 @@ document.getElementById('botImage').addEventListener('change', (e) => {
         return;
     }
     
-    selectedImage = file;
-    document.getElementById('imageFileName').textContent = file.name;
-    
-    // Show preview
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-        document.getElementById('previewImg').src = ev.target.result;
-        document.getElementById('imagePreview').style.display = 'block';
-    };
-    reader.readAsDataURL(file);
+    try {
+        // Resize image if needed
+        const processedFile = await resizeImageIfNeeded(file);
+        
+        selectedImage = processedFile;
+        document.getElementById('imageFileName').textContent = file.name + 
+            (processedFile !== file ? ' (resized to 800x800)' : '');
+        
+        // Show preview
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            document.getElementById('previewImg').src = ev.target.result;
+            document.getElementById('imagePreview').style.display = 'block';
+        };
+        reader.readAsDataURL(processedFile);
+    } catch (error) {
+        console.error('Error processing image:', error);
+        alert('Failed to process image: ' + error.message);
+        e.target.value = '';
+    }
 });
 
 // Clear image

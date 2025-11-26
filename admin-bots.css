@@ -598,3 +598,37 @@
         justify-content: flex-end;
     }
 }
+
+/* AI Image Prompt Generator */
+.image-prompt-result {
+    margin-top: 1rem;
+    padding: 1.5rem;
+    background: var(--dark-bg);
+    border: 1px solid rgba(69, 202, 255, 0.3);
+    border-radius: 8px;
+}
+
+.prompt-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+}
+
+.generated-prompt {
+    padding: 1rem;
+    background: var(--dark-card);
+    border-radius: 4px;
+    color: var(--text-primary);
+    font-family: 'Courier New', monospace;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.btn-small {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+}
