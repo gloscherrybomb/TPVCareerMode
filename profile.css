@@ -388,6 +388,12 @@
     gap: 1rem;
 }
 
+.result-card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
 .result-card {
     display: grid;
     grid-template-columns: auto 1fr auto auto;
@@ -398,9 +404,10 @@
     border-radius: 16px;
     border: 1px solid rgba(255, 255, 255, 0.1);
     transition: all 0.3s ease;
+    cursor: pointer;
 }
 
-.result-card:hover {
+.result-card-link:hover .result-card {
     transform: translateX(4px);
     border-color: var(--accent-pink);
 }

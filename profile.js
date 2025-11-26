@@ -439,15 +439,17 @@ function displayRecentResults(results) {
         }
         
         html += `
-            <div class="result-card">
-                <div class="result-position ${positionClass}">${result.position}</div>
-                <div class="result-info">
-                    <div class="result-event">${result.eventName}</div>
-                    <div class="result-date">${formattedDate}</div>
+            <a href="event-detail.html?id=${result.eventNum}" class="result-card-link">
+                <div class="result-card">
+                    <div class="result-position ${positionClass}">${result.position}</div>
+                    <div class="result-info">
+                        <div class="result-event">${result.eventName}</div>
+                        <div class="result-date">${formattedDate}</div>
+                    </div>
+                    <div class="result-time">${formatTime(result.time)}</div>
+                    <div class="result-points">+${result.points}</div>
                 </div>
-                <div class="result-time">${formatTime(result.time)}</div>
-                <div class="result-points">+${result.points}</div>
-            </div>
+            </a>
         `;
     });
     
