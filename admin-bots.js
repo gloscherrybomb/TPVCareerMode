@@ -552,6 +552,39 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+const countryList = new Intl.DisplayNames(['en'], { type: 'region' });
+
+function loadAllCountries() {
+    const select = document.getElementById('botNationality');
+    select.innerHTML = '<option value="">Select nationality</option>';
+
+    // ISO-3166 country codes (official full list)
+    const countryCodes = Array.from({length: 26 * 26}, (_, i) => {
+        const first = 65 + Math.floor(i / 26);
+        const second = 65 + (i % 26);
+        return String.fromCharCode(first) + String.fromCharCode(second);
+    }).filter(code => countryList.of(code) !== code);
+
+    countryCodes.forEach(code => {
+        const name = countryList.of(code);
+        const flag = getEmojiFlag(code);
+        const option = document.createElement('option');
+        option.value = code;
+        option.textContent = `${flag} ${name}`;
+        select.appendChild(option);
+    });
+}
+
+// Convert ISO country code → emoji flag
+function getEmojiFlag(countryCode) {
+    return countryCode
+        .toUpperCase()
+        .replace(/./g, c => String.fromCodePoint(127397 + c.charCodeAt()));
+}
+
+document.addEventListener('DOMContentLoaded', loadAllCountries);
+
+
 // CSV Template Download
 function downloadCSVTemplate() {
     const template = `uid,name,team,arr,gender,nationality,backstory,imageUrl,age,ridingStyle
