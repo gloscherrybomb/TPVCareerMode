@@ -1,18 +1,22 @@
 #!/usr/bin/env node
 
 /**
- * reprocess-results.js - Reprocess existing race results to add new fields
+ * reprocess-results.js - Reprocess existing race results or reset all data
  * 
- * This script fetches results from Firestore and reprocesses them through
- * the same logic as process-results.js, but specifically for updating existing
- * results with new features like bonus points, predictions, and medals.
+ * This script can either:
+ * 1. Reprocess results through the same logic as process-results.js to add new features
+ * 2. Reset all results data and user progress to start fresh
  * 
  * Usage:
- *   node reprocess-results.js                    # Reprocess all results
- *   node reprocess-results.js --event 1          # Reprocess specific event
- *   node reprocess-results.js --season 1         # Reprocess entire season
- *   node reprocess-results.js --user UID         # Reprocess specific user
- *   node reprocess-results.js --event 1 --dry-run # Preview changes
+ *   node reprocess-results.js                      # Reprocess all results
+ *   node reprocess-results.js --event 1            # Reprocess specific event
+ *   node reprocess-results.js --season 1           # Reprocess entire season
+ *   node reprocess-results.js --user UID           # Reprocess specific user
+ *   node reprocess-results.js --event 1 --dry-run  # Preview changes
+ * 
+ *   node reprocess-results.js --reset              # Reset all users and results
+ *   node reprocess-results.js --reset --dry-run    # Preview reset
+ *   node reprocess-results.js --reset --user UID   # Reset specific user
  */
 
 const admin = require('firebase-admin');
@@ -33,7 +37,8 @@ const options = {
   event: null,
   season: 1,
   user: null,
-  dryRun: false
+  dryRun: false,
+  reset: false
 };
 
 for (let i = 0; i < args.length; i++) {
@@ -48,6 +53,8 @@ for (let i = 0; i < args.length; i++) {
     i++;
   } else if (args[i] === '--dry-run') {
     options.dryRun = true;
+  } else if (args[i] === '--reset') {
+    options.reset = true;
   }
 }
 
@@ -309,6 +316,155 @@ async function reprocessEvent(season, eventNumber) {
 /**
  * Main reprocessing function
  */
+/**
+ * Reset all results data from Firebase
+ */
+async function resetAllResults(season) {
+  console.log(`\n🗑️  Resetting all results for season ${season}...\n`);
+  
+  let usersReset = 0;
+  let resultsCleared = 0;
+  let errors = 0;
+  
+  try {
+    // Get all users
+    const usersSnapshot = await db.collection('users').get();
+    
+    console.log(`   Found ${usersSnapshot.size} users to reset`);
+    
+    // Reset each user
+    for (const userDoc of usersSnapshot.docs) {
+      try {
+        const userData = userDoc.data();
+        const updates = {};
+        
+        // Find and remove all event results for this season
+        let eventsCleared = 0;
+        for (const key in userData) {
+          if (key.startsWith(`event`) && key.endsWith('Results')) {
+            // Extract event number to check if it's in this season
+            const eventMatch = key.match(/^event(\d+)Results$/);
+            if (eventMatch) {
+              const eventNum = parseInt(eventMatch[1]);
+              // For now, assume events 1-9 are season 1
+              if (season === 1 && eventNum >= 1 && eventNum <= 9) {
+                updates[key] = admin.firestore.FieldValue.delete();
+                eventsCleared++;
+              }
+            }
+          }
+        }
+        
+        // Reset progress fields
+        updates.currentStage = 1; // First event available but not completed
+        updates.totalPoints = 0;
+        updates.totalEvents = 0;
+        updates[`season${season}Standings`] = admin.firestore.FieldValue.delete();
+        
+        // Apply updates
+        if (!options.dryRun) {
+          await userDoc.ref.update(updates);
+        }
+        
+        console.log(`   ✅ ${userData.name || userDoc.id}: Reset ${eventsCleared} events, currentStage → 1`);
+        usersReset++;
+        
+      } catch (error) {
+        console.error(`   ❌ Error resetting user ${userDoc.id}:`, error.message);
+        errors++;
+      }
+    }
+    
+    // Clear results collection
+    console.log(`\n   Clearing results collection...`);
+    
+    for (let eventNum = 1; eventNum <= 9; eventNum++) {
+      try {
+        const resultDocId = `season${season}_event${eventNum}`;
+        const resultDoc = await db.collection('results').doc(resultDocId).get();
+        
+        if (resultDoc.exists) {
+          if (!options.dryRun) {
+            await resultDoc.ref.delete();
+          }
+          console.log(`   ✅ Deleted ${resultDocId}`);
+          resultsCleared++;
+        }
+      } catch (error) {
+        console.error(`   ❌ Error clearing event ${eventNum}:`, error.message);
+        errors++;
+      }
+    }
+    
+    return { usersReset, resultsCleared, errors };
+    
+  } catch (error) {
+    console.error('   ❌ Fatal error during reset:', error);
+    throw error;
+  }
+}
+
+/**
+ * Reset a specific user's results
+ */
+async function resetUserResults(userUid, season) {
+  console.log(`\n🗑️  Resetting results for user ${userUid}...\n`);
+  
+  try {
+    // Find user by UID
+    const usersQuery = await db.collection('users')
+      .where('uid', '==', userUid)
+      .limit(1)
+      .get();
+    
+    if (usersQuery.empty) {
+      console.log(`   ⚠️  User ${userUid} not found`);
+      return { usersReset: 0, resultsCleared: 0, errors: 0 };
+    }
+    
+    const userDoc = usersQuery.docs[0];
+    const userData = userDoc.data();
+    const updates = {};
+    
+    // Find and remove all event results for this season
+    let eventsCleared = 0;
+    for (const key in userData) {
+      if (key.startsWith(`event`) && key.endsWith('Results')) {
+        const eventMatch = key.match(/^event(\d+)Results$/);
+        if (eventMatch) {
+          const eventNum = parseInt(eventMatch[1]);
+          if (season === 1 && eventNum >= 1 && eventNum <= 9) {
+            updates[key] = admin.firestore.FieldValue.delete();
+            eventsCleared++;
+          }
+        }
+      }
+    }
+    
+    // Reset progress fields
+    updates.currentStage = 1;
+    updates.totalPoints = 0;
+    updates.totalEvents = 0;
+    updates[`season${season}Standings`] = admin.firestore.FieldValue.delete();
+    
+    // Apply updates
+    if (!options.dryRun) {
+      await userDoc.ref.update(updates);
+    }
+    
+    console.log(`   ✅ ${userData.name || userDoc.id}: Reset ${eventsCleared} events, currentStage → 1`);
+    
+    return { usersReset: 1, resultsCleared: eventsCleared, errors: 0 };
+    
+  } catch (error) {
+    console.error(`   ❌ Error resetting user:`, error);
+    return { usersReset: 0, resultsCleared: 0, errors: 1 };
+  }
+}
+
+/**
+ * Main execution
+ */
 async function main() {
   console.log('🔄 TPV Career Mode - Results Reprocessor\n');
   
@@ -318,6 +474,46 @@ async function main() {
   
   console.log('Options:', options);
   
+  // Handle reset mode
+  if (options.reset) {
+    console.log('\n⚠️  WARNING: RESET MODE');
+    console.log('This will DELETE all results data and reset users to stage 1\n');
+    
+    if (!options.dryRun) {
+      console.log('❗ This is NOT a dry run. Changes will be permanent!');
+      console.log('Press Ctrl+C now to cancel...\n');
+      
+      // Wait 5 seconds for user to cancel
+      await new Promise(resolve => setTimeout(resolve, 5000));
+    }
+    
+    let stats;
+    if (options.user) {
+      // Reset specific user
+      stats = await resetUserResults(options.user, options.season);
+    } else {
+      // Reset all users
+      stats = await resetAllResults(options.season);
+    }
+    
+    // Summary
+    console.log('\n' + '='.repeat(60));
+    console.log('🗑️  Reset Complete\n');
+    console.log(`   Users reset: ${stats.usersReset}`);
+    console.log(`   Results cleared: ${stats.resultsCleared}`);
+    console.log(`   Errors: ${stats.errors}`);
+    
+    if (options.dryRun) {
+      console.log('\n   ℹ️  This was a dry run. Run without --dry-run to apply changes.');
+    } else {
+      console.log('\n   ✅ All users reset to stage 1 with 0 points');
+    }
+    
+    console.log('='.repeat(60) + '\n');
+    return;
+  }
+  
+  // Regular reprocessing mode
   let totalProcessed = 0;
   let totalUpdated = 0;
   let totalErrors = 0;
