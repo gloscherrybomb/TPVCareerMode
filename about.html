@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - TPV Career Mode</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="tpv-team-car.png">
+    <link rel="apple-touch-icon" href="tpv-team-car.png">
+    
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <span class="logo-text">TPV</span>
+                <span class="logo-subtitle">Career Mode</span>
+            </div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="events.html" class="nav-link">Season</a>
+                <a href="standings.html" class="nav-link">Standings</a>
+                <a href="peloton.html" class="nav-link">Peloton</a>
+                <a href="profile.html" class="nav-link">Profile</a>
+                <a href="#" class="nav-link nav-login" id="loginBtn">Login</a>
+                <a href="#" class="nav-link nav-logout" id="logoutBtn" style="display: none;">Logout</a>
+            </div>
+            <button class="nav-toggle" id="navToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="page-header">
+        <div class="container">
+            <h1 class="page-title">About TPV Career Mode</h1>
+            <p class="page-subtitle">Your journey from local amateur to world tour champion</p>
+        </div>
+    </div>
+
+    <div class="container" style="padding: 3rem 1rem;">
+        <div class="content-section">
+            <h2>What is TPV Career Mode?</h2>
+            <p>TPV Career Mode is a community-driven progression system for TrainingPeaks Virtual (TPV) racing. We transform individual race results into an immersive career experience where every pedal stroke counts toward your journey through the ranks of virtual cycling.</p>
+            
+            <p>Think of it as your virtual cycling career simulator - complete with progressive challenges, competitive standings, awards, and a vibrant peloton of AI-powered competitors who keep the racing exciting from Event 1 through to the season finale.</p>
+        </div>
+
+        <div class="content-section">
+            <h2>How It Works</h2>
+            
+            <h3>🏁 Sequential Racing</h3>
+            <p>Your career progresses one race at a time. Complete Event 1 to unlock Event 2. Master Event 2 to tackle Event 3. Each event builds on your performance, creating a genuine sense of progression and achievement.</p>
+            
+            <h3>📊 Performance-Based Rewards</h3>
+            <p>Points aren't just handed out - they're earned through smart racing:</p>
+            <ul>
+                <li><strong>Base Points:</strong> Position-based rewards with bonuses for podium finishes</li>
+                <li><strong>Bonus Points:</strong> Beat your predicted position to earn 1-5 extra points</li>
+                <li><strong>Punching Up Medal (🥊):</strong> Finish 10+ places better than predicted</li>
+                <li><strong>Giant Killer Medal (⚔️):</strong> Beat the highest-rated rider in the race</li>
+            </ul>
+
+            <h3>🎯 Smart Competition</h3>
+            <p>Race against a diverse field of AI competitors powered by real TrainingPeaks Virtual data. These aren't just static names - they're riders with unique strengths, weaknesses, and racing styles. High-rated climbers dominate hilly courses, while sprinters excel in flat criteriums.</p>
+            
+            <p>Our intelligent backfilling system ensures every bot competes in every event (through simulation when needed), so the season-long standings reflect true performance, not just who showed up most often.</p>
+
+            <h3>🏆 Comprehensive Career Tracking</h3>
+            <p>Your profile page tells the complete story of your racing career:</p>
+            <ul>
+                <li>Total points and events completed</li>
+                <li>Recent results with predictions and bonuses</li>
+                <li>Trophy cabinet with all medals and awards</li>
+                <li>Career progression and milestones</li>
+            </ul>
+        </div>
+
+        <div class="content-section">
+            <h2>Season Structure</h2>
+            
+            <h3>Event Variety</h3>
+            <p>Season 1 features 9 carefully selected events spanning the full spectrum of virtual cycling:</p>
+            <ul>
+                <li><strong>Flat Criteriums:</strong> High-speed technical racing</li>
+                <li><strong>Rolling Courses:</strong> Punchy hills test your versatility</li>
+                <li><strong>Mountain Stages:</strong> Long climbs separate contenders from pretenders</li>
+                <li><strong>Time Trials:</strong> Pure power against the clock</li>
+            </ul>
+            
+            <h3>Progressive Difficulty</h3>
+            <p>Events are carefully ordered to introduce challenges gradually. Early events establish your baseline, mid-season races test your development, and late-season events crown the champion.</p>
+        </div>
+
+        <div class="content-section">
+            <h2>Meet the Peloton</h2>
+            <p>Over 200 AI-powered competitors populate the field, each with:</p>
+            <ul>
+                <li><strong>Unique Profiles:</strong> AI-generated backstories and images</li>
+                <li><strong>Performance Ratings:</strong> ARR-based skill levels from 700 to 1500+</li>
+                <li><strong>Consistent Racing:</strong> Deterministic simulation ensures fair, repeatable results</li>
+                <li><strong>Realistic Variation:</strong> Even top riders have off days</li>
+            </ul>
+            
+            <p>Whether you're racing against "The Mountain Crusher" Sarah Chen (1450 ARR) or the developing talent of newcomer Mike Johnson (850 ARR), every competitor adds depth to your racing experience.</p>
+        </div>
+
+        <div class="content-section">
+            <h2>Standings & Competition</h2>
+            
+            <h3>Season-Long Battle</h3>
+            <p>The standings page shows how you stack up against the entire peloton. Thanks to our bot backfilling system, every competitor shows the same number of completed events, making the leaderboard a true measure of performance excellence.</p>
+            
+            <h3>Fair Play</h3>
+            <p>Your position is earned through consistent strong performances. Beat high-rated riders, exceed predictions, and accumulate points through skill - not just participation.</p>
+        </div>
+
+        <div class="content-section">
+            <h2>Technical Features</h2>
+            
+            <h3>Automatic Results Processing</h3>
+            <p>Race results are automatically processed through our GitHub Actions workflow. Upload a CSV from TrainingPeaks Virtual, and within minutes your profile updates with new points, unlocked events, and earned medals.</p>
+            
+            <h3>Real-Time Predictions</h3>
+            <p>Our prediction algorithm analyzes the field's Event Ratings to forecast finishing positions. Beat your prediction significantly, and you'll earn valuable bonus points.</p>
+            
+            <h3>Secure Authentication</h3>
+            <p>Google authentication provides secure, seamless access to your career. Your TrainingPeaks Virtual UID links your TPV results to your Career Mode profile without requiring your TPV credentials.</p>
+        </div>
+
+        <div class="content-section">
+            <h2>Community & Independence</h2>
+            
+            <h3>Community Effort</h3>
+            <p>TPV Career Mode is a passion project built by virtual cycling enthusiasts for virtual cycling enthusiasts. We're constantly improving the experience based on community feedback and racing data.</p>
+            
+            <h3>Independent Operation</h3>
+            <p>TPV Career Mode is completely independent from TrainingPeaks and TrainingPeaks Virtual. We use publicly available race results to create an enhanced racing experience, but we are not affiliated with, endorsed by, or officially connected to TrainingPeaks or TrainingPeaks Virtual in any way.</p>
+        </div>
+
+        <div class="content-section">
+            <h2>Getting Started</h2>
+            
+            <h3>Simple Setup</h3>
+            <ol>
+                <li><strong>Create Account:</strong> Sign up with Google (recommended) or email</li>
+                <li><strong>Enter TPV UID:</strong> Link your TrainingPeaks Virtual results</li>
+                <li><strong>Complete Event 1:</strong> Race on TrainingPeaks Virtual</li>
+                <li><strong>Results Process:</strong> Wait for automatic processing</li>
+                <li><strong>Track Progress:</strong> Watch your career unfold</li>
+            </ol>
+            
+            <p>That's it! Your racing career awaits.</p>
+        </div>
+
+        <div class="content-section">
+            <h2>The Technology</h2>
+            
+            <h3>Built with Modern Tools</h3>
+            <ul>
+                <li><strong>Frontend:</strong> Responsive web design with vanilla JavaScript</li>
+                <li><strong>Backend:</strong> Firebase for authentication and database</li>
+                <li><strong>Automation:</strong> GitHub Actions for results processing</li>
+                <li><strong>AI Integration:</strong> OpenAI for bot profile generation</li>
+            </ul>
+            
+            <h3>Open Development</h3>
+            <p>While not fully open source, we're transparent about how the system works. Check out our comprehensive documentation for technical details on predictions, bonus points, and bot simulation.</p>
+        </div>
+
+        <div class="content-section">
+            <h2>Future Plans</h2>
+            <p>We're constantly evolving TPV Career Mode. Upcoming features include:</p>
+            <ul>
+                <li>Season 2 and beyond</li>
+                <li>Team competitions</li>
+                <li>Monthly challenges</li>
+                <li>Enhanced statistics and analytics</li>
+                <li>Mobile app</li>
+                <li>Social features and rider interactions</li>
+            </ul>
+        </div>
+
+        <div class="content-section">
+            <h2>Questions?</h2>
+            <p>Have questions about how Career Mode works? Want to report a bug or suggest a feature? We'd love to hear from you!</p>
+            
+            <p>While we're a small community effort without formal support channels, you can reach out through the feedback mechanisms on the site. We read every piece of feedback and constantly work to improve the experience.</p>
+        </div>
+
+        <div class="content-section" style="text-align: center; padding: 3rem 0; border-top: 1px solid rgba(255, 255, 255, 0.1); margin-top: 3rem;">
+            <h2>Ready to Start Your Career?</h2>
+            <p style="font-size: 1.1rem; margin-bottom: 2rem;">From local amateur to world tour champion - your journey starts now.</p>
+            <a href="index.html" class="btn btn-primary btn-large">Get Started</a>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="footer-logo">TPV Career Mode</div>
+                    <p>Virtual cycling career progression</p>
+                </div>
+                <div class="footer-links">
+                    <a href="index.html">Home</a>
+                    <a href="events.html">Season</a>
+                    <a href="standings.html">Standings</a>
+                    <a href="peloton.html">Peloton</a>
+                    <a href="about.html">About</a>
+                    <a href="privacy.html">Privacy</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 TPV Career Mode. TPV Career Mode is a community effort completely independent from TrainingPeaks and TrainingPeaks Virtual.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>

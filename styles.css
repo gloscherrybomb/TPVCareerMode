@@ -983,6 +983,73 @@ body {
     }
 }
 
+/* Content Section - For About and Privacy pages */
+.content-section {
+    margin-bottom: 3rem;
+}
+
+.content-section h2 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.content-section h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--accent-blue);
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.content-section h4 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.content-section p {
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+    line-height: 1.8;
+}
+
+.content-section ul,
+.content-section ol {
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+    margin-left: 2rem;
+}
+
+.content-section li {
+    margin-bottom: 0.5rem;
+    line-height: 1.8;
+}
+
+.content-section li strong {
+    color: var(--text-primary);
+}
+
+.content-section ul ul {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.content-section a {
+    color: var(--accent-blue);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.content-section a:hover {
+    color: var(--accent-pink);
+}
+
 @media (max-width: 768px) {
     .page-header {
         padding: 6rem 0 3rem;
