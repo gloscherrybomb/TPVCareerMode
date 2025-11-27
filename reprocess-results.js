@@ -162,35 +162,21 @@ async function reprocessEvent(season, eventNumber) {
     let updated = 0;
     let errors = 0;
     
+    // Track updated results for the results collection
+    const updatedResults = [];
+    
     // Process each result
     for (const result of results) {
-      if (!result.uid || result.uid.startsWith('Bot')) {
-        continue; // Skip bots
-      }
-      
       try {
-        // Find user document
-        const usersQuery = await db.collection('users')
-          .where('uid', '==', result.uid)
-          .limit(1)
-          .get();
-        
-        if (usersQuery.empty) {
-          console.log(`   ⚠️  User ${result.uid} not found in database`);
-          continue;
-        }
-        
-        const userDoc = usersQuery.docs[0];
-        const userData = userDoc.data();
-        
-        // Calculate new fields
         const position = typeof result.position === 'number' ? 
           result.position : parseInt(result.position);
         
         if (isNaN(position) || result.position === 'DNF') {
+          updatedResults.push(result); // Keep DNF as-is
           continue;
         }
         
+        // Calculate new fields for this result
         const predictedPosition = calculatePredictedPosition(results, result.uid);
         const pointsResult = calculatePoints(position, eventNumber, predictedPosition);
         const { points, bonusPoints } = pointsResult;
@@ -203,7 +189,41 @@ async function reprocessEvent(season, eventNumber) {
         
         const earnedGiantKillerMedal = checkGiantKiller(results, result.uid);
         
-        // Build updated event results
+        // Build updated result for results collection
+        const updatedResult = {
+          ...result,
+          eventRating: result.eventRating || null,
+          predictedPosition: predictedPosition,
+          points: points,
+          bonusPoints: bonusPoints,
+          earnedPunchingMedal: earnedPunchingMedal,
+          earnedGiantKillerMedal: earnedGiantKillerMedal
+        };
+        
+        updatedResults.push(updatedResult);
+        
+        // Update user document if not a bot
+        if (!result.uid || result.uid.startsWith('Bot')) {
+          processed++;
+          continue; // Skip bots for user document updates
+        }
+        
+        // Find user document
+        const usersQuery = await db.collection('users')
+          .where('uid', '==', result.uid)
+          .limit(1)
+          .get();
+        
+        if (usersQuery.empty) {
+          console.log(`   ⚠️  User ${result.uid} not found in database`);
+          processed++;
+          continue;
+        }
+        
+        const userDoc = usersQuery.docs[0];
+        const userData = userDoc.data();
+        
+        // Build updated event results for user document
         const updatedEventResults = {
           position: position,
           time: result.time || 0,
@@ -263,9 +283,19 @@ async function reprocessEvent(season, eventNumber) {
         processed++;
         
       } catch (error) {
-        console.error(`   ❌ Error processing ${result.uid}:`, error.message);
+        console.error(`   ❌ Error processing ${result.uid || result.name}:`, error.message);
+        updatedResults.push(result); // Keep original on error
         errors++;
       }
+    }
+    
+    // Update the results collection with all updated results
+    if (!options.dryRun && updatedResults.length > 0) {
+      await db.collection('results').doc(resultDocId).update({
+        results: updatedResults,
+        processedAt: admin.firestore.FieldValue.serverTimestamp()
+      });
+      console.log(`   ✅ Updated results collection`);
     }
     
     return { processed, updated, errors };
