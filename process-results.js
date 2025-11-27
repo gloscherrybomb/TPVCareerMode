@@ -473,15 +473,19 @@ async function buildSeasonStandings(results, userData, eventNumber, currentUid) 
   console.log('   Backfilling bot results...');
   const allEventResults = await getAllPreviousEventResults(season, eventNumber);
   
+  // IMPORTANT: Also include current event's results (not yet in Firestore)
+  // The 'results' parameter contains the current event being processed
+  allEventResults[eventNumber] = results;
+  
   // Build a map of all unique bots and track which events they participated in
   const allBots = new Map(); // botName -> { arr, actualEvents: Set<eventNum> }
   
   for (const [eventNum, eventResults] of Object.entries(allEventResults)) {
     eventResults.forEach(result => {
-      const isBotRacer = isBot(result.uid, result.Gender);
-      if (isBotRacer && result.position !== 'DNF') {
-        const botName = result.name;
-        const arr = parseInt(result.arr) || 900;
+      const isBotRacer = isBot(result.UID || result.uid, result.Gender);
+      if (isBotRacer && result.Position !== 'DNF' && result.position !== 'DNF') {
+        const botName = result.Name || result.name;
+        const arr = parseInt(result.ARR || result.arr) || 900;
         
         if (!allBots.has(botName)) {
           allBots.set(botName, {
