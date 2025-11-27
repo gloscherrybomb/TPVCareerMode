@@ -395,6 +395,15 @@
     box-shadow: 0 10px 30px rgba(255, 140, 0, 0.3);
 }
 
+.award-card.giant-killer {
+    border-color: rgba(138, 43, 226, 0.3);
+}
+
+.award-card.giant-killer:hover {
+    border-color: rgb(138, 43, 226);
+    box-shadow: 0 10px 30px rgba(138, 43, 226, 0.3);
+}
+
 .award-icon {
     font-size: 3.5rem;
     margin-bottom: 0.5rem;

@@ -136,6 +136,48 @@ function calculatePredictedPosition(results, userUid) {
 }
 
 /**
+ * Check if user earned Giant Killer medal by beating the highest-rated rider
+ */
+function checkGiantKiller(results, userUid) {
+  // Find user's result
+  const userResult = results.find(r => r.UID === userUid);
+  if (!userResult || userResult.Position === 'DNF' || !userResult.EventRating) {
+    return false;
+  }
+  
+  const userPosition = parseInt(userResult.Position);
+  if (isNaN(userPosition)) {
+    return false;
+  }
+  
+  // Find the rider with the highest EventRating (excluding DNFs)
+  const finishers = results.filter(r => 
+    r.Position !== 'DNF' && 
+    r.EventRating && 
+    !isNaN(parseInt(r.EventRating))
+  );
+  
+  if (finishers.length === 0) {
+    return false;
+  }
+  
+  // Sort by EventRating descending
+  finishers.sort((a, b) => parseInt(b.EventRating) - parseInt(a.EventRating));
+  
+  // Get the "giant" (highest-rated rider)
+  const giant = finishers[0];
+  const giantPosition = parseInt(giant.Position);
+  
+  // Check if user beat the giant (finished ahead)
+  // User must not BE the giant themselves
+  if (giant.UID === userUid) {
+    return false; // Can't be a giant killer if you're the giant!
+  }
+  
+  return userPosition < giantPosition;
+}
+
+/**
  * Check if UID is a bot
  */
 function isBot(uid, gender) {
@@ -249,6 +291,9 @@ async function processUserResult(uid, eventInfo, results) {
     earnedPunchingMedal = placesBeaten >= 10;
   }
   
+  // Check if earned Giant Killer medal (beat highest-rated rider)
+  const earnedGiantKillerMedal = checkGiantKiller(results, uid);
+  
   // Prepare event results
   const eventResults = {
     position: position,
@@ -260,6 +305,7 @@ async function processUserResult(uid, eventInfo, results) {
     points: points,
     bonusPoints: bonusPoints,
     earnedPunchingMedal: earnedPunchingMedal,
+    earnedGiantKillerMedal: earnedGiantKillerMedal,
     distance: parseFloat(userResult.Distance) || 0,
     deltaTime: parseFloat(userResult.DeltaTime) || 0,
     eventPoints: parseInt(userResult.Points) || null, // Points race points (for display only)
@@ -290,7 +336,8 @@ async function processUserResult(uid, eventInfo, results) {
   const bonusLog = bonusPoints > 0 ? ` (including +${bonusPoints} bonus)` : '';
   const predictionLog = predictedPosition ? ` | Predicted: ${predictedPosition}` : '';
   const punchingLog = earnedPunchingMedal ? ' 🥊 PUNCHING MEDAL!' : '';
-  console.log(`✅ Processed event ${eventNumber} for user ${uid}: Position ${position}${predictionLog}, Points ${points}${bonusLog}${punchingLog}`);
+  const giantKillerLog = earnedGiantKillerMedal ? ' ⚔️ GIANT KILLER!' : '';
+  console.log(`✅ Processed event ${eventNumber} for user ${uid}: Position ${position}${predictionLog}, Points ${points}${bonusLog}${punchingLog}${giantKillerLog}`);
   
   // Update results summary collection
   await updateResultsSummary(season, eventNumber, results);

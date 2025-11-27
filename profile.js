@@ -139,7 +139,8 @@ async function calculateUserStats(userUID) {
             silverMedals: 0,
             bronzeMedals: 0,
             lanternRouge: 0,
-            punchingMedals: 0
+            punchingMedals: 0,
+            giantKillerMedals: 0
         }
     };
     
@@ -165,11 +166,19 @@ async function calculateUserStats(userUID) {
                     stats.totalPoints += userResult.points || 0;
                     
                     const position = userResult.position || 0;
-                    const totalRiders = results.length;
+                    
+                    // Count only finishers (non-DNF riders) for Lantern Rouge
+                    const finishers = results.filter(r => r.position && r.position !== 'DNF' && !isNaN(parseInt(r.position)));
+                    const totalFinishers = finishers.length;
                     
                     // Track punching medal if earned
                     if (userResult.earnedPunchingMedal) {
                         stats.awards.punchingMedals++;
+                    }
+                    
+                    // Track Giant Killer medal if earned
+                    if (userResult.earnedGiantKillerMedal) {
+                        stats.awards.giantKillerMedals++;
                     }
                     
                     if (position > 0) {
@@ -185,7 +194,8 @@ async function calculateUserStats(userUID) {
                         if (position === 3) {
                             stats.awards.bronzeMedals++;
                         }
-                        if (position === totalRiders && totalRiders > 1) {
+                        // Lantern Rouge: last place among finishers (ignore DNFs)
+                        if (position === totalFinishers && totalFinishers > 1) {
                             stats.awards.lanternRouge++;
                         }
                         if (position <= 3) stats.totalPodiums++;
@@ -559,6 +569,18 @@ function displayAwards(awards) {
                 <div class="award-count">${awards.punchingMedals}x</div>
                 <div class="award-title">Punching Up</div>
                 <div class="award-description">Beat Prediction by 10+ Places</div>
+            </div>
+        `;
+    }
+    
+    // Giant Killer medal (beat highest-rated rider)
+    if (awards.giantKillerMedals > 0) {
+        html += `
+            <div class="award-card giant-killer">
+                <div class="award-icon">⚔️</div>
+                <div class="award-count">${awards.giantKillerMedals}x</div>
+                <div class="award-title">Giant Killer</div>
+                <div class="award-description">Beat Highest-Rated Rider</div>
             </div>
         `;
     }
