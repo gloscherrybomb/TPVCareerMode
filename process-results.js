@@ -313,7 +313,7 @@ async function processUserResult(uid, eventInfo, results) {
   };
   
   // Build season standings with all racers from CSV
-  const seasonStandings = buildSeasonStandings(results, userData, eventNumber, uid);
+  const seasonStandings = await buildSeasonStandings(results, userData, eventNumber, uid);
   
   // Update user document
   const updates = {
@@ -344,10 +344,82 @@ async function processUserResult(uid, eventInfo, results) {
 }
 
 /**
- * Build season standings including all racers from CSV
+ * Deterministic random number generator using bot UID and event as seed
  */
-function buildSeasonStandings(results, userData, eventNumber, currentUid) {
-  const existingStandings = userData[`season${1}Standings`] || [];
+function getSeededRandom(botName, eventNumber) {
+  // Create a simple hash from bot name and event
+  let hash = 0;
+  const seed = `${botName}-${eventNumber}`;
+  for (let i = 0; i < seed.length; i++) {
+    const char = seed.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32-bit integer
+  }
+  
+  // Return a number between 0 and 1
+  const x = Math.sin(Math.abs(hash)) * 10000;
+  return x - Math.floor(x);
+}
+
+/**
+ * Simulate a race position for a bot based on their ARR/rating
+ */
+function simulatePosition(botName, arr, eventNumber, fieldSize = 50) {
+  // Determine expected position range based on ARR
+  // Higher ARR = better expected position
+  let expectedPosition;
+  
+  if (arr >= 1400) {
+    expectedPosition = 5;  // Top riders
+  } else if (arr >= 1200) {
+    expectedPosition = 12; // Strong riders
+  } else if (arr >= 1000) {
+    expectedPosition = 20; // Mid-pack
+  } else if (arr >= 800) {
+    expectedPosition = 30; // Back of pack
+  } else {
+    expectedPosition = 40; // Tail end
+  }
+  
+  // Add randomness: ±10 positions
+  const randomOffset = Math.floor(getSeededRandom(botName, eventNumber) * 20) - 10;
+  let simulatedPosition = expectedPosition + randomOffset;
+  
+  // Clamp to valid range
+  simulatedPosition = Math.max(1, Math.min(fieldSize, simulatedPosition));
+  
+  return simulatedPosition;
+}
+
+/**
+ * Fetch all results from events 1 through currentEvent
+ */
+async function getAllPreviousEventResults(season, currentEvent) {
+  const allEventResults = {};
+  
+  for (let eventNum = 1; eventNum <= currentEvent; eventNum++) {
+    const resultDocId = `season${season}_event${eventNum}`;
+    try {
+      const resultDoc = await db.collection('results').doc(resultDocId).get();
+      if (resultDoc.exists()) {
+        const data = resultDoc.data();
+        allEventResults[eventNum] = data.results || [];
+      }
+    } catch (error) {
+      console.log(`   Warning: Could not fetch ${resultDocId}:`, error.message);
+    }
+  }
+  
+  return allEventResults;
+}
+
+/**
+ * Build season standings including all racers from CSV
+ * Now includes simulated results for bots to keep standings competitive
+ */
+async function buildSeasonStandings(results, userData, eventNumber, currentUid) {
+  const season = 1;
+  const existingStandings = userData[`season${season}Standings`] || [];
   
   // Create a map of existing racers
   const standingsMap = new Map();
@@ -355,7 +427,7 @@ function buildSeasonStandings(results, userData, eventNumber, currentUid) {
     standingsMap.set(racer.uid || racer.name, racer);
   });
   
-  // Process all racers from CSV
+  // Process all racers from CURRENT event CSV
   results.forEach(result => {
     const uid = result.UID;
     const name = result.Name;
@@ -395,6 +467,80 @@ function buildSeasonStandings(results, userData, eventNumber, currentUid) {
       });
     }
   });
+  
+  // Now backfill bots with simulated results
+  // Get all results from events 1 through current
+  console.log('   Backfilling bot results...');
+  const allEventResults = await getAllPreviousEventResults(season, eventNumber);
+  
+  // Build a map of all unique bots and track which events they participated in
+  const allBots = new Map(); // botName -> { arr, actualEvents: Set<eventNum> }
+  
+  for (const [eventNum, eventResults] of Object.entries(allEventResults)) {
+    eventResults.forEach(result => {
+      const isBotRacer = isBot(result.uid, result.Gender);
+      if (isBotRacer && result.position !== 'DNF') {
+        const botName = result.name;
+        const arr = parseInt(result.arr) || 900;
+        
+        if (!allBots.has(botName)) {
+          allBots.set(botName, {
+            name: botName,
+            arr: arr,
+            actualEvents: new Set()
+          });
+        }
+        
+        // Track which event this bot actually participated in
+        allBots.get(botName).actualEvents.add(parseInt(eventNum));
+        
+        // Update ARR to most recent
+        allBots.get(botName).arr = arr;
+      }
+    });
+  }
+  
+  console.log(`   Found ${allBots.size} unique bots across all events`);
+  
+  // For each bot, simulate missing events and update standings
+  for (const [botName, botInfo] of allBots.entries()) {
+    if (!standingsMap.has(botName)) {
+      // Bot not in standings yet, add them
+      standingsMap.set(botName, {
+        name: botName,
+        uid: null,
+        arr: botInfo.arr,
+        team: '',
+        events: 0,
+        points: 0,
+        isBot: true,
+        isCurrentUser: false
+      });
+    }
+    
+    const botStanding = standingsMap.get(botName);
+    
+    // Calculate simulated points for missing events
+    let simulatedPoints = 0;
+    let simulatedEvents = 0;
+    
+    for (let eventNum = 1; eventNum <= eventNumber; eventNum++) {
+      if (!botInfo.actualEvents.has(eventNum)) {
+        // Bot didn't participate in this event, simulate it
+        const simulatedPosition = simulatePosition(botName, botInfo.arr, eventNum);
+        const points = calculatePoints(simulatedPosition, eventNum).points; // Base points only, no bonus
+        simulatedPoints += points;
+        simulatedEvents++;
+      }
+    }
+    
+    // Update bot standing with simulated results
+    botStanding.points += simulatedPoints;
+    botStanding.events = eventNumber; // All bots now show as having completed all events
+    botStanding.simulatedEvents = simulatedEvents; // Track how many were simulated
+  }
+  
+  console.log(`   Simulated results for ${allBots.size} bots`);
   
   // Convert back to array and sort by points
   const standings = Array.from(standingsMap.values());
