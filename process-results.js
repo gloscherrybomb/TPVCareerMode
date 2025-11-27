@@ -467,21 +467,77 @@ async function updateBotARRs(season, event, results) {
 async function updateResultsSummary(season, event, results) {
   const summaryRef = db.collection('results').doc(`season${season}_event${event}`);
   
+  // First calculate predictions for all results
+  const calculatePredictedPositionForResult = (uid) => {
+    const finishers = results.filter(r => 
+      r.Position !== 'DNF' && 
+      r.EventRating && 
+      !isNaN(parseInt(r.EventRating))
+    );
+    finishers.sort((a, b) => parseInt(b.EventRating) - parseInt(a.EventRating));
+    const predictedIndex = finishers.findIndex(r => r.UID === uid);
+    return predictedIndex === -1 ? null : predictedIndex + 1;
+  };
+  
+  // Check Giant Killer for each result
+  const checkGiantKillerForResult = (uid, position) => {
+    const result = results.find(r => r.UID === uid);
+    if (!result || result.Position === 'DNF' || !result.EventRating) {
+      return false;
+    }
+    
+    const finishers = results.filter(r => 
+      r.Position !== 'DNF' && 
+      r.EventRating && 
+      !isNaN(parseInt(r.EventRating))
+    );
+    
+    if (finishers.length === 0) return false;
+    
+    finishers.sort((a, b) => parseInt(b.EventRating) - parseInt(a.EventRating));
+    const giant = finishers[0];
+    
+    if (giant.UID === uid) return false;
+    
+    const giantPosition = parseInt(giant.Position);
+    return position < giantPosition;
+  };
+  
   // Filter valid results (no DNFs for summary)
   const validResults = results
     .filter(r => r.Position !== 'DNF' && !isNaN(parseInt(r.Position)))
-    .map(r => ({
-      position: parseInt(r.Position),
-      name: r.Name,
-      uid: r.UID,
-      team: r.Team || '',
-      arr: parseInt(r.ARR) || 0,
-      arrBand: r.ARRBand || '',
-      time: parseFloat(r.Time) || 0,
-      points: calculatePoints(parseInt(r.Position), event),
-      eventPoints: parseInt(r.Points) || null, // Points race points
-      isBot: isBot(r.UID, r.Gender)
-    }));
+    .map(r => {
+      const position = parseInt(r.Position);
+      const predictedPosition = calculatePredictedPositionForResult(r.UID);
+      const pointsResult = calculatePoints(position, event, predictedPosition);
+      const { points, bonusPoints } = pointsResult;
+      
+      let earnedPunchingMedal = false;
+      if (predictedPosition) {
+        const placesBeaten = predictedPosition - position;
+        earnedPunchingMedal = placesBeaten >= 10;
+      }
+      
+      const earnedGiantKillerMedal = checkGiantKillerForResult(r.UID, position);
+      
+      return {
+        position: position,
+        name: r.Name,
+        uid: r.UID,
+        team: r.Team || '',
+        arr: parseInt(r.ARR) || 0,
+        arrBand: r.ARRBand || '',
+        eventRating: parseInt(r.EventRating) || null,
+        predictedPosition: predictedPosition,
+        time: parseFloat(r.Time) || 0,
+        points: points,
+        bonusPoints: bonusPoints,
+        earnedPunchingMedal: earnedPunchingMedal,
+        earnedGiantKillerMedal: earnedGiantKillerMedal,
+        eventPoints: parseInt(r.Points) || null,
+        isBot: isBot(r.UID, r.Gender)
+      };
+    });
   
   await summaryRef.set({
     season: season,
