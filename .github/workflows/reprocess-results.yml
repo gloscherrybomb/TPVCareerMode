@@ -1,0 +1,75 @@
+name: Reprocess Results
+
+# Manual trigger only - run when you need to reprocess
+on:
+  workflow_dispatch:
+    inputs:
+      event:
+        description: 'Event number to reprocess (leave empty for all)'
+        required: false
+        type: string
+      season:
+        description: 'Season number'
+        required: false
+        default: '1'
+        type: string
+      dry_run:
+        description: 'Dry run (preview changes without applying)'
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  reprocess:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+      
+      - name: Install dependencies
+        run: |
+          npm install firebase-admin
+      
+      - name: Reprocess Results
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          echo "🔄 Starting reprocessing..."
+          
+          # Build command with options
+          CMD="node reprocess-results.js"
+          
+          if [ -n "${{ inputs.event }}" ]; then
+            CMD="$CMD --event ${{ inputs.event }}"
+          fi
+          
+          if [ -n "${{ inputs.season }}" ]; then
+            CMD="$CMD --season ${{ inputs.season }}"
+          fi
+          
+          if [ "${{ inputs.dry_run }}" == "true" ]; then
+            CMD="$CMD --dry-run"
+          fi
+          
+          echo "Running: $CMD"
+          eval $CMD
+      
+      - name: Summary
+        if: always()
+        run: |
+          echo "### Reprocessing Complete! 🎉" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Options:**" >> $GITHUB_STEP_SUMMARY
+          if [ -n "${{ inputs.event }}" ]; then
+            echo "- Event: ${{ inputs.event }}" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- Events: All" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "- Season: ${{ inputs.season }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Dry Run: ${{ inputs.dry_run }}" >> $GITHUB_STEP_SUMMARY
