@@ -748,7 +748,28 @@ body {
     padding: 3rem;
     max-width: 500px;
     width: 90%;
+    max-height: 90vh; /* Limit height to 90% of viewport */
+    overflow-y: auto; /* Enable vertical scrolling */
     animation: modalSlideIn 0.3s ease-out;
+}
+
+/* Custom scrollbar for modal */
+.modal-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
 }
 
 @keyframes modalSlideIn {
@@ -1033,5 +1054,16 @@ body {
 
     .footer-links {
         flex-direction: column;
+    }
+
+    /* Modal adjustments for mobile */
+    .modal-content {
+        padding: 2rem 1.5rem;
+        max-height: 95vh;
+        width: 95%;
+    }
+
+    .auth-form {
+        gap: 1rem;
     }
 }

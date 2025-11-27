@@ -484,6 +484,7 @@ if (uidForm) {
 onAuthStateChanged(auth, (user) => {
   const loginBtn = document.getElementById('loginBtn');
   const logoutBtn = document.getElementById('logoutBtn');
+  const ctaSection = document.getElementById('ctaSection');
 
   if (user) {
     // User is signed in
@@ -493,6 +494,9 @@ onAuthStateChanged(auth, (user) => {
     if (logoutBtn) {
       logoutBtn.style.display = 'inline-block';
     }
+    if (ctaSection) {
+      ctaSection.style.display = 'none'; // Hide signup CTA when logged in
+    }
   } else {
     // User is signed out
     if (loginBtn) {
@@ -501,6 +505,9 @@ onAuthStateChanged(auth, (user) => {
     }
     if (logoutBtn) {
       logoutBtn.style.display = 'none';
+    }
+    if (ctaSection) {
+      ctaSection.style.display = 'block'; // Show signup CTA when logged out
     }
   }
 });
