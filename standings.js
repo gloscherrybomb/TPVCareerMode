@@ -199,6 +199,15 @@ async function renderSeasonStandings() {
     // Use stored season standings (includes backfilled bot results)
     let standings = userData.season1Standings || [];
     
+    // Debug: Check if user's points in standings matches their totalPoints
+    const userInStandings = standings.find(s => s.uid === currentUser.uid);
+    if (userInStandings) {
+        console.log('User points comparison:');
+        console.log('  - In season1Standings:', userInStandings.points);
+        console.log('  - totalPoints field:', userData.totalPoints);
+        console.log('  - Match:', userInStandings.points === userData.totalPoints ? '✅' : '❌');
+    }
+    
     // Clean up any malformed points data
     standings = standings.map(racer => {
         // Clean up any malformed points (convert "[object Object]41" to number)

@@ -315,11 +315,25 @@ async function processUserResult(uid, eventInfo, results) {
   // Build season standings with all racers from CSV
   const seasonStandings = await buildSeasonStandings(results, userData, eventNumber, uid);
   
+  // Calculate the user's new total points (includes bonus points)
+  const newTotalPoints = (userData.totalPoints || 0) + points;
+  
+  // IMPORTANT: Update the user's entry in standings to use their actual total points
+  // buildSeasonStandings() only adds base points, but we need total with bonuses
+  const userStandingIndex = seasonStandings.findIndex(s => s.uid === uid);
+  if (userStandingIndex !== -1) {
+    seasonStandings[userStandingIndex].points = newTotalPoints;
+    console.log(`   Updated user standing with correct total points: ${newTotalPoints} (includes all bonuses)`);
+  }
+  
+  // Re-sort standings after updating user's points
+  seasonStandings.sort((a, b) => b.points - a.points);
+  
   // Update user document
   const updates = {
     [`event${eventNumber}Results`]: eventResults,
     currentStage: eventNumber + 1, // Unlock next event
-    totalPoints: (userData.totalPoints || 0) + points,
+    totalPoints: newTotalPoints,
     totalEvents: (userData.totalEvents || 0) + 1,
     [`season${season}Standings`]: seasonStandings,
     team: userResult.Team || '' // Update team from latest race result
