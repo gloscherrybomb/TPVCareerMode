@@ -169,6 +169,31 @@
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
 }
 
+/* Horizontal scroll wrapper for mobile */
+.standings-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+}
+
+/* Custom scrollbar for table */
+.standings-table-wrapper::-webkit-scrollbar {
+    height: 8px;
+}
+
+.standings-table-wrapper::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+
+.standings-table-wrapper::-webkit-scrollbar-thumb {
+    background: rgba(69, 202, 255, 0.3);
+    border-radius: 10px;
+}
+
+.standings-table-wrapper::-webkit-scrollbar-thumb:hover {
+    background: rgba(69, 202, 255, 0.5);
+}
+
 /* Table Styles */
 .standings-table {
     width: 100%;
@@ -486,11 +511,18 @@
         padding: 1rem 0.5rem;
     }
 
-    /* Hide team column on mobile */
-    .team-cell,
-    .standings-table th:nth-child(3) {
-        display: none;
+    /* Enable horizontal scrolling on mobile */
+    .standings-table-wrapper {
+        overflow-x: auto;
     }
+    
+    /* Keep table at natural width - don't shrink */
+    .standings-table {
+        min-width: 600px; /* Ensure table doesn't get too narrow */
+    }
+
+    /* Don't hide columns - let them scroll */
+    /* Removed: .team-cell, .standings-table th:nth-child(3) { display: none; } */
 
     .rank-cell {
         width: 50px;
@@ -500,6 +532,18 @@
         display: block;
         margin: 0.5rem 0 0 0;
         width: fit-content;
+    }
+    
+    /* Scroll indicator hint */
+    .standings-table-container::after {
+        content: '← Scroll for more →';
+        display: block;
+        text-align: center;
+        padding: 0.75rem;
+        background: rgba(69, 202, 255, 0.1);
+        color: var(--accent-blue);
+        font-size: 0.85rem;
+        border-top: 1px solid rgba(69, 202, 255, 0.2);
     }
 }
 

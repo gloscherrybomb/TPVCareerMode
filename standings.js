@@ -217,18 +217,19 @@ async function renderSeasonStandings() {
     // Build table HTML
     let tableHTML = `
         <div class="standings-table-container">
-            <table class="standings-table">
-                <thead>
-                    <tr>
-                        <th>Rank</th>
-                        <th>Rider</th>
-                        <th>Team</th>
-                        <th>ARR</th>
-                        <th>Events</th>
-                        <th>Points</th>
-                    </tr>
-                </thead>
-                <tbody>
+            <div class="standings-table-wrapper">
+                <table class="standings-table">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>Rider</th>
+                            <th>Team</th>
+                            <th>ARR</th>
+                            <th>Events</th>
+                            <th>Points</th>
+                        </tr>
+                    </thead>
+                    <tbody>
     `;
 
     standings.forEach((racer, index) => {
@@ -267,6 +268,7 @@ async function renderSeasonStandings() {
     tableHTML += `
                 </tbody>
             </table>
+            </div>
         </div>
     `;
 
@@ -302,17 +304,18 @@ async function renderGlobalRankings() {
         // Build table HTML
         let tableHTML = `
             <div class="standings-table-container">
-                <table class="standings-table">
-                    <thead>
-                        <tr>
-                            <th>Rank</th>
-                            <th>Rider</th>
-                            <th>Season</th>
-                            <th>Events</th>
-                            <th>Points</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+                <div class="standings-table-wrapper">
+                    <table class="standings-table">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Rider</th>
+                                <th>Season</th>
+                                <th>Events</th>
+                                <th>Points</th>
+                            </tr>
+                        </thead>
+                        <tbody>
         `;
 
         if (rankings.length === 0) {
@@ -357,6 +360,7 @@ async function renderGlobalRankings() {
         tableHTML += `
                     </tbody>
                 </table>
+                </div>
             </div>
         `;
 
@@ -439,16 +443,17 @@ async function renderTeamRankings() {
         // Build table HTML
         let tableHTML = `
             <div class="standings-table-container">
-                <table class="standings-table">
-                    <thead>
-                        <tr>
-                            <th>Rank</th>
-                            <th>Team</th>
-                            <th>Members</th>
-                            <th>Points</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+                <div class="standings-table-wrapper">
+                    <table class="standings-table">
+                        <thead>
+                            <tr>
+                                <th>Rank</th>
+                                <th>Team</th>
+                                <th>Members</th>
+                                <th>Points</th>
+                            </tr>
+                        </thead>
+                        <tbody>
         `;
         
         if (teamRankings.length === 0) {
@@ -505,6 +510,7 @@ async function renderTeamRankings() {
         tableHTML += `
                     </tbody>
                 </table>
+                </div>
             </div>
         `;
         
