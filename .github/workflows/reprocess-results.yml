@@ -1,6 +1,6 @@
 name: Reprocess Results
 
-# Manual trigger only - run when you need to reprocess
+# Manual trigger only - run when you need to reprocess or reset
 on:
   workflow_dispatch:
     inputs:
@@ -15,6 +15,11 @@ on:
         type: string
       dry_run:
         description: 'Dry run (preview changes without applying)'
+        required: false
+        default: false
+        type: boolean
+      reset:
+        description: '⚠️ RESET MODE - Delete all results and reset users to stage 1'
         required: false
         default: false
         type: boolean
@@ -44,6 +49,11 @@ jobs:
           
           # Build command with options
           CMD="node reprocess-results.js"
+          
+          if [ "${{ inputs.reset }}" == "true" ]; then
+            CMD="$CMD --reset"
+            echo "⚠️  RESET MODE ENABLED"
+          fi
           
           if [ -n "${{ inputs.event }}" ]; then
             CMD="$CMD --event ${{ inputs.event }}"
