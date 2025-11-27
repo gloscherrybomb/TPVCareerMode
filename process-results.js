@@ -540,7 +540,19 @@ async function buildSeasonStandings(results, userData, eventNumber, currentUid) 
     botStanding.simulatedEvents = simulatedEvents; // Track how many were simulated
   }
   
+  // IMPORTANT: Ensure ALL bots in standings (not just those in allBots) have correct events count
+  // This handles any edge cases where bots might be in standings but not in allBots
+  let botsUpdatedCount = 0;
+  for (const [key, racer] of standingsMap.entries()) {
+    if (racer.isBot) {
+      // Make sure all bots show the current event number
+      racer.events = eventNumber;
+      botsUpdatedCount++;
+    }
+  }
+  
   console.log(`   Simulated results for ${allBots.size} bots`);
+  console.log(`   Updated events count for ${botsUpdatedCount} total bots in standings`);
   
   // Convert back to array and sort by points
   const standings = Array.from(standingsMap.values());
