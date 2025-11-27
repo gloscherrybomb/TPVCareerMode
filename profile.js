@@ -217,6 +217,10 @@ async function calculateUserStats(userUID) {
                         position: position,
                         time: userResult.time || 'N/A',
                         points: userResult.points || 0,
+                        bonusPoints: userResult.bonusPoints || 0,
+                        predictedPosition: userResult.predictedPosition || null,
+                        earnedPunchingMedal: userResult.earnedPunchingMedal || false,
+                        earnedGiantKillerMedal: userResult.earnedGiantKillerMedal || false,
                         date: resultData.processedAt
                     });
                 }
@@ -454,6 +458,27 @@ function displayRecentResults(results) {
         const isPodium = result.position <= 3;
         const positionClass = isPodium ? 'podium' : '';
         
+        // Build bonus/medal indicators
+        let bonusHTML = '';
+        if (result.bonusPoints > 0) {
+            bonusHTML += `<span class="bonus-indicator" title="Bonus points for beating prediction">+${result.bonusPoints} bonus</span>`;
+        }
+        if (result.earnedPunchingMedal) {
+            bonusHTML += `<span class="medal-indicator punching" title="Beat prediction by 10+ places">🥊</span>`;
+        }
+        if (result.earnedGiantKillerMedal) {
+            bonusHTML += `<span class="medal-indicator giant-killer" title="Beat highest-rated rider">⚔️</span>`;
+        }
+        
+        // Format predicted position if available
+        let predictionHTML = '';
+        if (result.predictedPosition) {
+            const placesBeaten = result.predictedPosition - result.position;
+            if (placesBeaten > 0) {
+                predictionHTML = `<div class="result-prediction">Predicted ${result.predictedPosition}th (+${placesBeaten})</div>`;
+            }
+        }
+        
         // Format date properly - handle Firestore Timestamp
         let formattedDate = 'Unknown date';
         if (result.date) {
@@ -481,10 +506,14 @@ function displayRecentResults(results) {
                     <div class="result-position ${positionClass}">${result.position}</div>
                     <div class="result-info">
                         <div class="result-event">${result.eventName}</div>
+                        ${predictionHTML}
                         <div class="result-date">${formattedDate}</div>
                     </div>
-                    <div class="result-time">${formatTime(result.time)}</div>
-                    <div class="result-points">+${result.points}</div>
+                    <div class="result-stats">
+                        <div class="result-time">${formatTime(result.time)}</div>
+                        <div class="result-points">+${result.points}</div>
+                        ${bonusHTML ? `<div class="result-bonuses">${bonusHTML}</div>` : ''}
+                    </div>
                 </div>
             </a>
         `;

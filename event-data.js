@@ -455,3 +455,11 @@ function calculateSinglePosition(position, maxPoints) {
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = { eventData, getEvent, calculatePoints, calculateSinglePosition };
 }
+
+// Also make available in browser via window object
+if (typeof window !== 'undefined') {
+    window.eventData = eventData;
+    window.getEvent = getEvent;
+    window.calculatePoints = calculatePoints;
+    window.calculateSinglePosition = calculateSinglePosition;
+}

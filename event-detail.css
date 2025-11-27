@@ -661,6 +661,47 @@
     color: var(--accent-pink);
 }
 
+/* Bonus Cell */
+.bonus-cell {
+    text-align: center;
+}
+
+.bonus-points {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    background: rgba(255, 140, 0, 0.15);
+    border: 1px solid rgba(255, 140, 0, 0.3);
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: rgb(255, 200, 100);
+    margin-right: 0.25rem;
+}
+
+.medal-icon {
+    display: inline-block;
+    font-size: 1.1rem;
+    padding: 0.15rem 0.3rem;
+    margin: 0 0.15rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+}
+
+.medal-icon.punching {
+    background: rgba(255, 140, 0, 0.15);
+    border: 1px solid rgba(255, 140, 0, 0.2);
+}
+
+.medal-icon.giant-killer {
+    background: rgba(138, 43, 226, 0.15);
+    border: 1px solid rgba(138, 43, 226, 0.2);
+}
+
+.no-bonus {
+    color: var(--text-secondary);
+    opacity: 0.5;
+}
+
 /* Results Note */
 .results-note {
     padding: 1.5rem;

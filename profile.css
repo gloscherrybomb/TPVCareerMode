@@ -464,7 +464,7 @@
 
 .result-card {
     display: grid;
-    grid-template-columns: auto 1fr auto auto;
+    grid-template-columns: auto 1fr auto;
     gap: 1.5rem;
     align-items: center;
     padding: 1.5rem;
@@ -504,9 +504,22 @@
     margin-bottom: 0.3rem;
 }
 
+.result-prediction {
+    font-size: 0.8rem;
+    color: var(--accent-blue);
+    margin-bottom: 0.2rem;
+}
+
 .result-date {
     font-size: 0.85rem;
     color: var(--text-secondary);
+}
+
+.result-stats {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.5rem;
 }
 
 .result-time {
@@ -521,6 +534,42 @@
     font-size: 1.3rem;
     font-weight: 900;
     color: var(--accent-pink);
+}
+
+.result-bonuses {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    margin-top: 0.25rem;
+}
+
+.bonus-indicator {
+    font-size: 0.75rem;
+    padding: 0.2rem 0.5rem;
+    background: rgba(255, 140, 0, 0.2);
+    border: 1px solid rgba(255, 140, 0, 0.4);
+    border-radius: 8px;
+    color: rgb(255, 200, 100);
+    font-weight: 600;
+}
+
+.medal-indicator {
+    font-size: 1.2rem;
+    padding: 0.2rem 0.4rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    display: inline-block;
+    line-height: 1;
+}
+
+.medal-indicator.punching {
+    background: rgba(255, 140, 0, 0.2);
+    border: 1px solid rgba(255, 140, 0, 0.3);
+}
+
+.medal-indicator.giant-killer {
+    background: rgba(138, 43, 226, 0.2);
+    border: 1px solid rgba(138, 43, 226, 0.3);
 }
 
 .results-empty {

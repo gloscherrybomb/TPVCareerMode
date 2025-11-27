@@ -176,6 +176,7 @@ async function loadEventResults() {
                             <th>ARR</th>
                             <th>Points</th>
                             ${results[0].eventPoints !== null ? '<th>PR Pts</th>' : ''}
+                            <th>Bonuses</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -191,6 +192,21 @@ async function loadEventResults() {
             if (result.position === 1) rankClass = 'rank-gold';
             else if (result.position === 2) rankClass = 'rank-silver';
             else if (result.position === 3) rankClass = 'rank-bronze';
+            
+            // Build bonus cell content
+            let bonusHTML = '';
+            if (result.bonusPoints && result.bonusPoints > 0) {
+                bonusHTML += `<span class="bonus-points" title="Bonus for beating prediction">+${result.bonusPoints}</span>`;
+            }
+            if (result.earnedPunchingMedal) {
+                bonusHTML += `<span class="medal-icon punching" title="Beat prediction by 10+ places">🥊</span>`;
+            }
+            if (result.earnedGiantKillerMedal) {
+                bonusHTML += `<span class="medal-icon giant-killer" title="Beat highest-rated rider">⚔️</span>`;
+            }
+            if (!bonusHTML) {
+                bonusHTML = '<span class="no-bonus">—</span>';
+            }
 
             tableHTML += `
                 <tr class="${rowClass}">
@@ -211,6 +227,7 @@ async function loadEventResults() {
                         <span class="points-value">${result.points}</span>
                     </td>
                     ${result.eventPoints !== null ? `<td class="event-points-cell">${result.eventPoints}</td>` : ''}
+                    <td class="bonus-cell">${bonusHTML}</td>
                 </tr>
             `;
         });
