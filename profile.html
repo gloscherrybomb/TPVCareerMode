@@ -251,7 +251,7 @@
                                 TrainingPeaks Virtual UID
                                 <span class="form-help">16-character hex code from TPV</span>
                             </label>
-                            <input type="text" id="signupUID" maxlength="16" pattern="[0-9A-Fa-f]{16}" required style="text-transform: uppercase;">
+                            <input type="text" id="signupUID" maxlength="16" pattern="[0-9A-Fa-f]{15,16}" required style="text-transform: uppercase;">
                         </div>
                         <div class="form-group">
                             <label for="signupEmail">Email</label>
@@ -295,7 +295,7 @@
                             TrainingPeaks Virtual UID
                             <span class="form-help">16-character hex code from TPV (e.g., A1B2C3D4E5F67890)</span>
                         </label>
-                        <input type="text" id="googleUID" maxlength="16" pattern="[0-9A-Fa-f]{16}" required style="text-transform: uppercase;" placeholder="Enter your UID">
+                        <input type="text" id="googleUID" maxlength="16" pattern="[0-9A-Fa-f]{15,16}" required style="text-transform: uppercase;" placeholder="Enter your UID">
                     </div>
                     <button type="submit" class="btn btn-primary btn-full">Save UID</button>
                 </form>
