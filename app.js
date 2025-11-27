@@ -422,11 +422,12 @@ if (uidForm) {
 
     const uid = document.getElementById('googleUID').value.toUpperCase();
 
-    // Validate UID format
-    if (!/^[0-9A-F]{16}$/.test(uid)) {
-      alert('Invalid UID format. Must be exactly 16 hexadecimal characters (0-9, A-F).');
-      return;
-    }
+  // Validate UID format
+if (!/^[0-9A-F]{15,16}$/.test(uid)) {
+  alert('Invalid UID format. Must be 15 or 16 hexadecimal characters (0-9, A-F).');
+  return;
+}
+
 
     try {
       // Check if UID is already claimed
