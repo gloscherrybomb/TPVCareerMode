@@ -138,7 +138,8 @@ async function calculateUserStats(userUID) {
             goldMedals: 0,
             silverMedals: 0,
             bronzeMedals: 0,
-            lanternRouge: 0
+            lanternRouge: 0,
+            punchingMedals: 0
         }
     };
     
@@ -165,6 +166,11 @@ async function calculateUserStats(userUID) {
                     
                     const position = userResult.position || 0;
                     const totalRiders = results.length;
+                    
+                    // Track punching medal if earned
+                    if (userResult.earnedPunchingMedal) {
+                        stats.awards.punchingMedals++;
+                    }
                     
                     if (position > 0) {
                         stats.positions.push(position);
@@ -541,6 +547,18 @@ function displayAwards(awards) {
                 <div class="award-count">${awards.lanternRouge}x</div>
                 <div class="award-title">Lantern Rouge</div>
                 <div class="award-description">Last Place Finish</div>
+            </div>
+        `;
+    }
+    
+    // Punching medal (beat prediction by 10+ places)
+    if (awards.punchingMedals > 0) {
+        html += `
+            <div class="award-card punching">
+                <div class="award-icon">🥊</div>
+                <div class="award-count">${awards.punchingMedals}x</div>
+                <div class="award-title">Punching Up</div>
+                <div class="award-description">Beat Prediction by 10+ Places</div>
             </div>
         `;
     }

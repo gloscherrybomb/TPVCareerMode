@@ -50,7 +50,7 @@ const EVENT_MAX_POINTS = {
 /**
  * Calculate points based on finishing position using Career Mode formula
  * 
- * Formula: points = (maxPoints/2) + (40 - position) * ((maxPoints - 10)/78) + podiumBonus
+ * Formula: points = (maxPoints/2) + (40 - position) * ((maxPoints - 10)/78) + podiumBonus + bonusPoints
  * 
  * Podium bonuses:
  * - 1st place: +5
@@ -58,20 +58,27 @@ const EVENT_MAX_POINTS = {
  * - 3rd place: +2
  * - Other: +0
  * 
+ * Bonus points for beating EventRating prediction:
+ * - Beat by 1-2 places: +1 point
+ * - Beat by 3-4 places: +2 points
+ * - Beat by 5-6 places: +3 points
+ * - Beat by 7-8 places: +4 points
+ * - Beat by 9+ places: +5 points
+ * 
  * Only positions 1-40 score points. Position > 40 or DNF = 0 points.
  */
-function calculatePoints(position, eventNumber) {
+function calculatePoints(position, eventNumber, predictedPosition) {
   // Get max points for this event
   const maxPoints = EVENT_MAX_POINTS[eventNumber];
   
   if (!maxPoints) {
     console.warn(`No max points defined for event ${eventNumber}, using 100`);
-    return Math.max(0, 100 - (position - 1) * 2); // Fallback
+    return { points: Math.max(0, 100 - (position - 1) * 2), bonusPoints: 0 }; // Fallback
   }
   
   // Only positions 1-40 score points
   if (position > 40) {
-    return 0;
+    return { points: 0, bonusPoints: 0 };
   }
   
   // Calculate base points
@@ -83,8 +90,49 @@ function calculatePoints(position, eventNumber) {
   else if (position === 2) podiumBonus = 3;
   else if (position === 3) podiumBonus = 2;
   
+  // Calculate bonus points for beating prediction
+  let bonusPoints = 0;
+  if (predictedPosition) {
+    const placesBeaten = predictedPosition - position; // Positive if finished better than predicted
+    
+    if (placesBeaten >= 9) {
+      bonusPoints = 5;
+    } else if (placesBeaten >= 7) {
+      bonusPoints = 4;
+    } else if (placesBeaten >= 5) {
+      bonusPoints = 3;
+    } else if (placesBeaten >= 3) {
+      bonusPoints = 2;
+    } else if (placesBeaten >= 1) {
+      bonusPoints = 1;
+    }
+  }
+  
   // Total points (rounded to nearest integer)
-  return Math.round(basePoints + podiumBonus);
+  const totalPoints = Math.round(basePoints + podiumBonus + bonusPoints);
+  
+  return { points: totalPoints, bonusPoints };
+}
+
+/**
+ * Calculate predicted position based on EventRating
+ * Higher EventRating = better predicted position
+ */
+function calculatePredictedPosition(results, userUid) {
+  // Filter out DNF results and sort by EventRating (descending)
+  const finishers = results.filter(r => r.Position !== 'DNF' && r.EventRating && !isNaN(parseInt(r.EventRating)));
+  
+  // Sort by EventRating descending (highest rating = predicted 1st)
+  finishers.sort((a, b) => parseInt(b.EventRating) - parseInt(a.EventRating));
+  
+  // Find user's predicted position (1-indexed)
+  const predictedIndex = finishers.findIndex(r => r.UID === userUid);
+  
+  if (predictedIndex === -1) {
+    return null; // User not found or no EventRating
+  }
+  
+  return predictedIndex + 1; // Return 1-indexed position
 }
 
 /**
@@ -187,8 +235,19 @@ async function processUserResult(uid, eventInfo, results) {
     return;
   }
   
-  // Calculate points
-  const points = calculatePoints(position, eventNumber);
+  // Calculate predicted position based on EventRating
+  const predictedPosition = calculatePredictedPosition(results, uid);
+  
+  // Calculate points (including bonus points)
+  const pointsResult = calculatePoints(position, eventNumber, predictedPosition);
+  const { points, bonusPoints } = pointsResult;
+  
+  // Check if earned punching medal (beat prediction by 10+ places)
+  let earnedPunchingMedal = false;
+  if (predictedPosition) {
+    const placesBeaten = predictedPosition - position;
+    earnedPunchingMedal = placesBeaten >= 10;
+  }
   
   // Prepare event results
   const eventResults = {
@@ -196,7 +255,11 @@ async function processUserResult(uid, eventInfo, results) {
     time: parseFloat(userResult.Time) || 0,
     arr: parseInt(userResult.ARR) || 0,
     arrBand: userResult.ARRBand || '',
+    eventRating: parseInt(userResult.EventRating) || null,
+    predictedPosition: predictedPosition,
     points: points,
+    bonusPoints: bonusPoints,
+    earnedPunchingMedal: earnedPunchingMedal,
     distance: parseFloat(userResult.Distance) || 0,
     deltaTime: parseFloat(userResult.DeltaTime) || 0,
     eventPoints: parseInt(userResult.Points) || null, // Points race points (for display only)
@@ -224,7 +287,10 @@ async function processUserResult(uid, eventInfo, results) {
   
   await userRef.update(updates);
   
-  console.log(`✅ Processed event ${eventNumber} for user ${uid}: Position ${position}, Points ${points}`);
+  const bonusLog = bonusPoints > 0 ? ` (including +${bonusPoints} bonus)` : '';
+  const predictionLog = predictedPosition ? ` | Predicted: ${predictedPosition}` : '';
+  const punchingLog = earnedPunchingMedal ? ' 🥊 PUNCHING MEDAL!' : '';
+  console.log(`✅ Processed event ${eventNumber} for user ${uid}: Position ${position}${predictionLog}, Points ${points}${bonusLog}${punchingLog}`);
   
   // Update results summary collection
   await updateResultsSummary(season, eventNumber, results);
