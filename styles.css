@@ -819,6 +819,21 @@ body {
     display: block;
 }
 
+.auth-notice {
+    padding: 1rem;
+    background: rgba(255, 140, 0, 0.1);
+    border: 1px solid rgba(255, 140, 0, 0.3);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+}
+
+.auth-notice strong {
+    color: rgb(255, 140, 0);
+}
+
 .auth-form {
     display: flex;
     flex-direction: column;
