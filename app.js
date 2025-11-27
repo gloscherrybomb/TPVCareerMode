@@ -95,7 +95,12 @@ if (loginBtn) {
 
 if (getStartedBtn) {
   getStartedBtn.addEventListener('click', () => {
-    openModal('signup');
+    // If user is already logged in, go to events page instead of opening modal
+    if (auth.currentUser) {
+      window.location.href = 'events.html';
+    } else {
+      openModal('signup');
+    }
   });
 }
 
