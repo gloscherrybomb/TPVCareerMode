@@ -794,7 +794,7 @@
             document.getElementById('choiceModalOverlay').addEventListener('click', closeChoiceModal);
             
             // Wait for event-sequence.js module to load and attach to window
-            const initializeUI = () => {
+            const initializeUI = async () => {
                 console.log('Checking for required objects...', {
                     eventSequence: typeof window.eventSequence,
                     progressManager: typeof window.progressManager,
