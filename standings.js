@@ -196,8 +196,44 @@ async function renderSeasonStandings() {
         </div>
     `;
     
-    // Calculate real standings from results
-    const standings = await calculateRealSeasonStandings(1);
+    // Use stored season standings (includes backfilled bot results)
+    let standings = userData.season1Standings || [];
+    
+    // Clean up any malformed points data
+    standings = standings.map(racer => {
+        // Clean up any malformed points (convert "[object Object]41" to number)
+        if (typeof racer.points === 'string' && racer.points.includes('[object Object]')) {
+            // Extract any numeric portion
+            const numericPart = racer.points.replace(/\[object Object\]/g, '');
+            racer.points = parseInt(numericPart) || 0;
+        } else if (typeof racer.points === 'object' && racer.points !== null) {
+            // If points is an object, extract the points property
+            racer.points = racer.points.points || 0;
+        }
+        // Ensure points is a number
+        racer.points = Number(racer.points) || 0;
+        return racer;
+    });
+    
+    // Sort by points (descending)
+    standings.sort((a, b) => b.points - a.points);
+    
+    // Fallback: Calculate from results if no stored standings
+    if (standings.length === 0) {
+        console.log('No stored standings found, calculating from results...');
+        standings = await calculateRealSeasonStandings(1);
+    } else {
+        console.log('Using stored season standings with backfilled data');
+    }
+    
+    // Mark current user
+    if (currentUser) {
+        standings.forEach(rider => {
+            if (rider.uid === currentUser.uid) {
+                rider.isCurrentUser = true;
+            }
+        });
+    }
     
     if (standings.length === 0) {
         seasonContent.innerHTML = `
@@ -212,7 +248,7 @@ async function renderSeasonStandings() {
 
     // Debug logging
     console.log('Season Standings - First 3 racers:', standings.slice(0, 3));
-    console.log('Season Standings - Sample bot:', standings.find(r => r.uid && r.uid.startsWith('Bot')));
+    console.log('Season Standings - Sample bot:', standings.find(r => r.isBot));
 
     // Build table HTML
     let tableHTML = `

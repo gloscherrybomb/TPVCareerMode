@@ -424,6 +424,18 @@ async function buildSeasonStandings(results, userData, eventNumber, currentUid) 
   // Create a map of existing racers
   const standingsMap = new Map();
   existingStandings.forEach(racer => {
+    // Clean up any malformed points (convert "[object Object]41" to number)
+    if (typeof racer.points === 'string' && racer.points.includes('[object Object]')) {
+      // Extract any numeric portion
+      const numericPart = racer.points.replace(/\[object Object\]/g, '');
+      racer.points = parseInt(numericPart) || 0;
+    } else if (typeof racer.points === 'object') {
+      // If points is an object, extract the points property
+      racer.points = racer.points.points || 0;
+    }
+    // Ensure points is a number
+    racer.points = Number(racer.points) || 0;
+    
     standingsMap.set(racer.uid || racer.name, racer);
   });
   
@@ -438,7 +450,8 @@ async function buildSeasonStandings(results, userData, eventNumber, currentUid) 
       return;
     }
     
-    const points = calculatePoints(position, eventNumber);
+    const pointsResult = calculatePoints(position, eventNumber);
+    const points = pointsResult.points; // Extract numeric value
     const arr = parseInt(result.ARR) || 0;
     const team = result.Team || '';
     const isBotRacer = isBot(uid, result.Gender);
