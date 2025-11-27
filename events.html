@@ -598,6 +598,26 @@
             }
         }
         
+        // Check if user is an admin
+        async function checkAdminStatus() {
+            if (!progressManager.currentUser) {
+                return false;
+            }
+            
+            try {
+                const { getFirestore, doc, getDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+                const db = getFirestore();
+                
+                const userDoc = await getDoc(doc(db, 'users', progressManager.currentUser.uid));
+                const userData = userDoc.data();
+                
+                return userData?.isAdmin === true;
+            } catch (error) {
+                console.error('Error checking admin status:', error);
+                return false;
+            }
+        }
+        
         // Update season story or end-of-season report
         async function updateSeasonStory() {
             const storyContent = document.getElementById('seasonStoryContent');
@@ -794,20 +814,24 @@
                 console.log('Progress Manager:', window.progressManager);
                 
                 try {
-                    // Show admin toggle for testing (remove in production or check real auth)
-                    document.getElementById('adminToggle').style.display = 'inline-block';
+                    // Check if user is admin and show toggle accordingly
+                    const isAdmin = await checkAdminStatus();
                     
-                    // Setup admin toggle (temporary - will be replaced with real auth)
-                    document.getElementById('adminToggle').addEventListener('click', () => {
-                        const progressManager = window.progressManager;
-                        if (!progressManager) return;
+                    if (isAdmin) {
+                        document.getElementById('adminToggle').style.display = 'inline-block';
                         
-                        progressManager.setAdminMode(!progressManager.isAdmin);
-                        document.getElementById('adminStatus').textContent = 
-                            progressManager.isAdmin ? 'Admin Mode: ON' : 'Admin Mode: OFF';
-                        renderEventSequence();
-                        renderTimeline();
-                    });
+                        // Setup admin toggle
+                        document.getElementById('adminToggle').addEventListener('click', () => {
+                            const progressManager = window.progressManager;
+                            if (!progressManager) return;
+                            
+                            progressManager.setAdminMode(!progressManager.isAdmin);
+                            document.getElementById('adminStatus').textContent = 
+                                progressManager.isAdmin ? 'Admin Mode: ON' : 'Admin Mode: OFF';
+                            renderEventSequence();
+                            renderTimeline();
+                        });
+                    }
                     
                     console.log('Calling renderTimeline...');
                     renderTimeline();
