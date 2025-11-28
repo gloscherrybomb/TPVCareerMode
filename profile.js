@@ -916,11 +916,12 @@ async function drawSeasonTemplate(ctx, width, height) {
     drawStatBox(ctx, width / 2 + statsSpacing * 0.5, statsY, data.totalPodiums, 'PODIUMS');
     drawStatBox(ctx, width / 2 + statsSpacing * 1.5, statsY, data.totalPoints, 'POINTS');
     
-    // Secondary stats
+    // Secondary stats (wider spacing for 3 items)
     const stats2Y = 1150;
-    drawStatBox(ctx, width / 2 - statsSpacing, stats2Y, data.winRate, 'WIN RATE');
+    const stats2Spacing = 280;
+    drawStatBox(ctx, width / 2 - stats2Spacing, stats2Y, data.winRate, 'WIN RATE');
     drawStatBox(ctx, width / 2, stats2Y, data.arrRating, 'ARR');
-    drawStatBox(ctx, width / 2 + statsSpacing, stats2Y, data.podiumRate, 'PODIUM RATE');
+    drawStatBox(ctx, width / 2 + stats2Spacing, stats2Y, data.podiumRate, 'PODIUM RATE');
     
     // Awards preview (if any)
     if (data.awards.length > 0) {
@@ -1088,11 +1089,11 @@ async function drawChampionTemplate(ctx, width, height) {
     ctx.font = '600 40px "Exo 2", sans-serif';
     ctx.fillText('VICTORIES', width / 2, 1020);
     
-    // Other stats in row
+    // Other stats in row (wider spacing)
     const statsY = 1180;
-    drawStatBox(ctx, width / 3, statsY, data.totalPodiums, 'PODIUMS', '#ffd700');
+    drawStatBox(ctx, width / 4, statsY, data.totalPodiums, 'PODIUMS', '#ffd700');
     drawStatBox(ctx, width / 2, statsY, data.totalPoints, 'POINTS', '#ffd700');
-    drawStatBox(ctx, width * 2/3, statsY, data.seasonRank, 'RANK', '#ffd700');
+    drawStatBox(ctx, width * 3/4, statsY, data.seasonRank, 'RANK', '#ffd700');
     
     // Awards
     if (data.awards.length > 0) {
