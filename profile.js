@@ -776,6 +776,11 @@ function initShareStats() {
 }
 
 function collectShareData() {
+    // Check if profile photo actually exists (has 'active' class when photo is loaded)
+    const profilePhotoEl = document.getElementById('profilePhoto');
+    const hasProfilePhoto = profilePhotoEl?.classList.contains('active');
+    const profilePhotoUrl = hasProfilePhoto ? profilePhotoEl.src : null;
+    
     return {
         name: document.getElementById('profileName')?.textContent || 'Rider',
         team: document.getElementById('profileTeam')?.textContent || '',
@@ -787,7 +792,7 @@ function collectShareData() {
         arrRating: document.getElementById('arrRating')?.textContent || '-',
         winRate: document.getElementById('winRate')?.textContent || '0%',
         podiumRate: document.getElementById('podiumRate')?.textContent || '0%',
-        profilePhotoUrl: document.getElementById('profilePhoto')?.src || null,
+        profilePhotoUrl: profilePhotoUrl,
         awards: collectAwardsData()
     };
 }
@@ -1113,7 +1118,7 @@ function drawStatBox(ctx, x, y, value, label, accentColor = '#ff0080') {
 async function drawProfilePhoto(ctx, x, y, radius) {
     const data = shareStatsData;
     
-    // Draw circle background
+    // Draw circle background/border
     ctx.save();
     ctx.beginPath();
     ctx.arc(x, y, radius + 4, 0, Math.PI * 2);
@@ -1124,25 +1129,39 @@ async function drawProfilePhoto(ctx, x, y, radius) {
     ctx.arc(x, y, radius, 0, Math.PI * 2);
     ctx.clip();
     
-    // Try to draw profile photo
-    if (data.profilePhotoUrl && !data.profilePhotoUrl.includes('undefined')) {
+    // Try to use the already-loaded profile photo from the page
+    const existingImg = document.getElementById('profilePhoto');
+    if (existingImg && existingImg.classList.contains('active') && existingImg.complete && existingImg.naturalWidth > 0) {
+        try {
+            ctx.drawImage(existingImg, x - radius, y - radius, radius * 2, radius * 2);
+            ctx.restore();
+            return;
+        } catch (e) {
+            console.log('Could not draw existing profile image:', e);
+        }
+    }
+    
+    // Fallback: try loading from URL
+    if (data.profilePhotoUrl) {
         try {
             const img = new Image();
             img.crossOrigin = 'anonymous';
             await new Promise((resolve, reject) => {
                 img.onload = resolve;
                 img.onerror = reject;
+                setTimeout(() => reject(new Error('Timeout')), 3000);
                 img.src = data.profilePhotoUrl;
             });
             ctx.drawImage(img, x - radius, y - radius, radius * 2, radius * 2);
+            ctx.restore();
+            return;
         } catch (e) {
-            // Draw placeholder
-            drawProfilePlaceholder(ctx, x, y, radius);
+            console.log('Could not load profile photo from URL:', e);
         }
-    } else {
-        drawProfilePlaceholder(ctx, x, y, radius);
     }
     
+    // Draw placeholder if all else fails
+    drawProfilePlaceholder(ctx, x, y, radius);
     ctx.restore();
 }
 
