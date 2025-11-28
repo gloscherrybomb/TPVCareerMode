@@ -4,10 +4,6 @@ name: Reprocess Results
 on:
   workflow_dispatch:
     inputs:
-      event:
-        description: 'Event number to reprocess (leave empty for all)'
-        required: false
-        type: string
       season:
         description: 'Season number'
         required: false
@@ -18,11 +14,15 @@ on:
         required: false
         default: false
         type: boolean
-      reset:
-        description: '⚠️ RESET MODE - Delete all results and reset users to stage 1'
+      reset_only:
+        description: 'Only reset data, do not reprocess CSVs'
         required: false
         default: false
         type: boolean
+      user:
+        description: 'Specific user UID to reprocess (leave empty for all)'
+        required: false
+        type: string
 
 jobs:
   reprocess:
@@ -39,7 +39,7 @@ jobs:
       
       - name: Install dependencies
         run: |
-          npm install firebase-admin
+          npm install firebase-admin papaparse
       
       - name: Reprocess Results
         env:
@@ -50,21 +50,20 @@ jobs:
           # Build command with options
           CMD="node reprocess-results.js"
           
-          if [ "${{ inputs.reset }}" == "true" ]; then
-            CMD="$CMD --reset"
-            echo "⚠️  RESET MODE ENABLED"
-          fi
-          
-          if [ -n "${{ inputs.event }}" ]; then
-            CMD="$CMD --event ${{ inputs.event }}"
-          fi
-          
           if [ -n "${{ inputs.season }}" ]; then
             CMD="$CMD --season ${{ inputs.season }}"
           fi
           
           if [ "${{ inputs.dry_run }}" == "true" ]; then
             CMD="$CMD --dry-run"
+          fi
+          
+          if [ "${{ inputs.reset_only }}" == "true" ]; then
+            CMD="$CMD --reset-only"
+          fi
+          
+          if [ -n "${{ inputs.user }}" ]; then
+            CMD="$CMD --user ${{ inputs.user }}"
           fi
           
           echo "Running: $CMD"
@@ -76,10 +75,9 @@ jobs:
           echo "### Reprocessing Complete! 🎉" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Options:**" >> $GITHUB_STEP_SUMMARY
-          if [ -n "${{ inputs.event }}" ]; then
-            echo "- Event: ${{ inputs.event }}" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "- Events: All" >> $GITHUB_STEP_SUMMARY
-          fi
           echo "- Season: ${{ inputs.season }}" >> $GITHUB_STEP_SUMMARY
           echo "- Dry Run: ${{ inputs.dry_run }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Reset Only: ${{ inputs.reset_only }}" >> $GITHUB_STEP_SUMMARY
+          if [ -n "${{ inputs.user }}" ]; then
+            echo "- User: ${{ inputs.user }}" >> $GITHUB_STEP_SUMMARY
+          fi
