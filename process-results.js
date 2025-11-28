@@ -595,10 +595,26 @@ async function getAllPreviousEventResults(season, currentEvent) {
 /**
  * Build season standings including all racers from CSV
  * Now includes simulated results for bots to keep standings competitive
+ * Only simulates events that the user has actually completed (not all events up to current number)
  */
 async function buildSeasonStandings(results, userData, eventNumber, currentUid) {
   const season = 1;
   const existingStandings = userData[`season${season}Standings`] || [];
+  
+  // Get list of events the user has actually completed (from all eventXResults fields)
+  const completedEventNumbers = [];
+  for (let i = 1; i <= 15; i++) {
+    if (userData[`event${i}Results`]) {
+      completedEventNumbers.push(i);
+    }
+  }
+  // Add current event being processed
+  if (!completedEventNumbers.includes(eventNumber)) {
+    completedEventNumbers.push(eventNumber);
+  }
+  completedEventNumbers.sort((a, b) => a - b);
+  
+  console.log(`   User has completed events: [${completedEventNumbers.join(', ')}]`);
   
   // Create a map of existing racers
   const standingsMap = new Map();
@@ -719,10 +735,11 @@ async function buildSeasonStandings(results, userData, eventNumber, currentUid) 
     const botStanding = standingsMap.get(botName);
     
     // Calculate simulated points for missing events
+    // ONLY simulate for events the user has actually completed
     let simulatedPoints = 0;
     let simulatedEvents = 0;
     
-    for (let eventNum = 1; eventNum <= eventNumber; eventNum++) {
+    for (const eventNum of completedEventNumbers) {
       if (!botInfo.actualEvents.has(eventNum)) {
         // Bot didn't participate in this event, simulate it
         const simulatedPosition = simulatePosition(botName, botInfo.arr, eventNum);
@@ -734,7 +751,7 @@ async function buildSeasonStandings(results, userData, eventNumber, currentUid) 
     
     // Update bot standing with simulated results
     botStanding.points += simulatedPoints;
-    botStanding.events = eventNumber; // All bots now show as having completed all events
+    botStanding.events = completedEventNumbers.length; // Count of events user has completed
     botStanding.simulatedEvents = simulatedEvents; // Track how many were simulated
   }
   
@@ -743,8 +760,8 @@ async function buildSeasonStandings(results, userData, eventNumber, currentUid) 
   let botsUpdatedCount = 0;
   for (const [key, racer] of standingsMap.entries()) {
     if (racer.isBot) {
-      // Make sure all bots show the current event number
-      racer.events = eventNumber;
+      // Make sure all bots show the same event count as user's completed events
+      racer.events = completedEventNumbers.length;
       botsUpdatedCount++;
     }
   }
