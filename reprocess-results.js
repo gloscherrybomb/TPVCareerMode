@@ -750,12 +750,44 @@ async function updateResultsSummary(season, eventNumber, results) {
     return predictedIndex === -1 ? null : predictedIndex + 1;
   };
   
+  // Check Giant Killer for a specific result
+  const checkGiantKillerForResult = (uid, position) => {
+    const result = results.find(r => r.UID === uid);
+    if (!result || result.Position === 'DNF' || !result.EventRating) {
+      return false;
+    }
+    
+    const finishers = results.filter(r => 
+      r.Position !== 'DNF' && 
+      r.EventRating && 
+      !isNaN(parseInt(r.EventRating))
+    );
+    
+    if (finishers.length === 0) return false;
+    
+    finishers.sort((a, b) => parseInt(b.EventRating) - parseInt(a.EventRating));
+    const giant = finishers[0];
+    
+    if (giant.UID === uid) return false;
+    
+    const giantPosition = parseInt(giant.Position);
+    return position < giantPosition;
+  };
+  
   const validResults = results
     .filter(r => r.Position !== 'DNF' && !isNaN(parseInt(r.Position)))
     .map(r => {
       const position = parseInt(r.Position);
       const predictedPosition = calculatePredictedPositionForResult(r.UID);
       const pointsResult = calculatePoints(position, eventNumber, predictedPosition);
+      
+      // Check for medals
+      let earnedPunchingMedal = false;
+      if (predictedPosition) {
+        const placesBeaten = predictedPosition - position;
+        earnedPunchingMedal = placesBeaten >= 10;
+      }
+      const earnedGiantKillerMedal = checkGiantKillerForResult(r.UID, position);
       
       return {
         position: position,
@@ -769,6 +801,8 @@ async function updateResultsSummary(season, eventNumber, results) {
         time: parseFloat(r.Time) || 0,
         points: pointsResult.points,
         bonusPoints: pointsResult.bonusPoints,
+        earnedPunchingMedal: earnedPunchingMedal,
+        earnedGiantKillerMedal: earnedGiantKillerMedal,
         isBot: isBot(r.UID, r.Gender)
       };
     });
