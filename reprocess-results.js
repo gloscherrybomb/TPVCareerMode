@@ -19,6 +19,7 @@ const admin = require('firebase-admin');
 const fs = require('fs');
 const path = require('path');
 const Papa = require('papaparse');
+const awardsCalc = require('./awards-calculation');
 
 // Initialize Firebase Admin
 const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
@@ -640,6 +641,36 @@ async function processResultsForUser(userDoc, csvFiles, season) {
     }
     const earnedHotStreakMedal = beatPredictionStreak >= 3;
     
+    // NEW AWARDS CALCULATIONS
+    // Get times for margin-based awards
+    const times = awardsCalc.getTimesFromResults(
+      results.map(r => ({
+        position: parseInt(r.Position),
+        time: parseFloat(r.Time)
+      })).filter(r => !isNaN(r.position)),
+      position
+    );
+    
+    // Check margin-based awards
+    const earnedDomination = awardsCalc.checkDomination(position, times.winnerTime, times.secondPlaceTime);
+    const earnedCloseCall = awardsCalc.checkCloseCall(position, times.winnerTime, times.secondPlaceTime);
+    const earnedPhotoFinish = awardsCalc.checkPhotoFinish(position, times.userTime, times.winnerTime, times.secondPlaceTime);
+    const earnedDarkHorse = awardsCalc.checkDarkHorse(position, predictedPosition);
+    
+    // Zero to Hero requires previous event data
+    let earnedZeroToHero = false;
+    if (eventNumber > 1 && completedStages.length > 0) {
+      const prevEventNum = completedStages[completedStages.length - 1];
+      const prevEventResults = updates[`event${prevEventNum}Results`];
+      if (prevEventResults && prevEventResults.position && prevEventResults.position !== 'DNF') {
+        const currentFinishers = results.filter(r => r.Position !== 'DNF' && !isNaN(parseInt(r.Position))).length;
+        earnedZeroToHero = awardsCalc.checkZeroToHero(
+          { position: prevEventResults.position, totalFinishers: 50 }, // Approximate
+          { position: position, totalFinishers: currentFinishers }
+        );
+      }
+    }
+    
     // Handle optional events
     if (OPTIONAL_EVENTS.includes(eventNumber)) {
       usedOptionalEvents.push(eventNumber);
@@ -700,6 +731,11 @@ async function processResultsForUser(userDoc, csvFiles, season) {
       earnedGiantKillerMedal: earnedGiantKillerMedal,
       earnedBullseyeMedal: earnedBullseyeMedal,
       earnedHotStreakMedal: earnedHotStreakMedal,
+      earnedDomination: earnedDomination,
+      earnedCloseCall: earnedCloseCall,
+      earnedPhotoFinish: earnedPhotoFinish,
+      earnedDarkHorse: earnedDarkHorse,
+      earnedZeroToHero: earnedZeroToHero,
       consecutiveDaysFailed: consecutiveDaysFailed,
       distance: parseFloat(userResult.Distance) || 0,
       deltaTime: parseFloat(userResult.DeltaTime) || 0,
@@ -808,6 +844,20 @@ async function updateResultsSummary(season, eventNumber, results) {
       // Bullseye: finish exactly at predicted position
       const earnedBullseyeMedal = predictedPosition && position === predictedPosition;
       
+      // NEW AWARDS
+      const times = awardsCalc.getTimesFromResults(
+        results.map(r => ({
+          position: parseInt(r.Position),
+          time: parseFloat(r.Time)
+        })).filter(r => !isNaN(r.position)),
+        position
+      );
+      
+      const earnedDomination = awardsCalc.checkDomination(position, times.winnerTime, times.secondPlaceTime);
+      const earnedCloseCall = awardsCalc.checkCloseCall(position, times.winnerTime, times.secondPlaceTime);
+      const earnedPhotoFinish = awardsCalc.checkPhotoFinish(position, times.userTime, times.winnerTime, times.secondPlaceTime);
+      const earnedDarkHorse = awardsCalc.checkDarkHorse(position, predictedPosition);
+      
       return {
         position: position,
         name: r.Name,
@@ -823,6 +873,10 @@ async function updateResultsSummary(season, eventNumber, results) {
         earnedPunchingMedal: earnedPunchingMedal,
         earnedGiantKillerMedal: earnedGiantKillerMedal,
         earnedBullseyeMedal: earnedBullseyeMedal,
+        earnedDomination: earnedDomination,
+        earnedCloseCall: earnedCloseCall,
+        earnedPhotoFinish: earnedPhotoFinish,
+        earnedDarkHorse: earnedDarkHorse,
         isBot: isBot(r.UID, r.Gender)
       };
     });

@@ -142,7 +142,18 @@ async function calculateUserStats(userUID) {
             punchingMedals: 0,
             giantKillerMedals: 0,
             bullseyeMedals: 0,
-            hotStreakMedals: 0
+            hotStreakMedals: 0,
+            // New awards
+            domination: 0,
+            closeCall: 0,
+            photoFinish: 0,
+            overrated: 0,
+            darkHorse: 0,
+            backToBack: 0,
+            weekendWarrior: 0,
+            zeroToHero: 0,
+            trophyCollector: 0,
+            technicalIssues: 0
         }
     };
     
@@ -191,6 +202,23 @@ async function calculateUserStats(userUID) {
                     // Track Hot Streak medal if earned
                     if (userResult.earnedHotStreakMedal) {
                         stats.awards.hotStreakMedals++;
+                    }
+                    
+                    // Track new awards
+                    if (userResult.earnedDomination) {
+                        stats.awards.domination++;
+                    }
+                    if (userResult.earnedCloseCall) {
+                        stats.awards.closeCall++;
+                    }
+                    if (userResult.earnedPhotoFinish) {
+                        stats.awards.photoFinish++;
+                    }
+                    if (userResult.earnedDarkHorse) {
+                        stats.awards.darkHorse++;
+                    }
+                    if (userResult.earnedZeroToHero) {
+                        stats.awards.zeroToHero++;
                     }
                     
                     if (position > 0) {
@@ -260,6 +288,27 @@ async function calculateUserStats(userUID) {
     } else {
         stats.winRate = 0;
         stats.podiumRate = 0;
+    }
+    
+    // Calculate career-based awards
+    if (window.awardsCalculation && stats.recentResults.length > 0) {
+        const careerAwards = window.awardsCalculation.calculateCareerAwards(
+            stats.recentResults.map(r => ({
+                eventNum: r.eventNum,
+                position: r.position,
+                predictedPosition: r.predictedPosition,
+                processedAt: r.date,
+                totalFinishers: null // Will be calculated inside the function if needed
+            }))
+        );
+        
+        // Merge career awards into stats.awards
+        stats.awards.overrated = careerAwards.overrated || 0;
+        stats.awards.backToBack = careerAwards.backToBack || 0;
+        stats.awards.weekendWarrior = careerAwards.weekendWarrior || 0;
+        stats.awards.trophyCollector = careerAwards.trophyCollector || 0;
+        stats.awards.technicalIssues = careerAwards.technicalIssues || 0;
+        // zeroToHero is already tracked per-event
     }
     
     console.log('Stats calculated:', stats);
@@ -529,7 +578,11 @@ function displayAwards(awards) {
     // Check if user has any awards (include all award types)
     const totalAwards = awards.goldMedals + awards.silverMedals + awards.bronzeMedals + 
                         awards.lanternRouge + awards.punchingMedals + awards.giantKillerMedals +
-                        awards.bullseyeMedals + awards.hotStreakMedals;
+                        awards.bullseyeMedals + awards.hotStreakMedals +
+                        (awards.domination || 0) + (awards.closeCall || 0) + (awards.photoFinish || 0) +
+                        (awards.overrated || 0) + (awards.darkHorse || 0) + (awards.backToBack || 0) +
+                        (awards.weekendWarrior || 0) + (awards.zeroToHero || 0) + 
+                        (awards.trophyCollector || 0) + (awards.technicalIssues || 0);
     
     if (totalAwards === 0) {
         container.innerHTML = `
@@ -636,6 +689,128 @@ function displayAwards(awards) {
                 <div class="award-count">${awards.hotStreakMedals}x</div>
                 <div class="award-title">Hot Streak</div>
                 <div class="award-description">Beat Prediction 3x in a Row</div>
+            </div>
+        `;
+    }
+    
+    // NEW AWARDS
+    
+    // Domination (win by more than a minute)
+    if (awards.domination > 0) {
+        html += `
+            <div class="award-card domination">
+                <div class="award-icon">💪</div>
+                <div class="award-count">${awards.domination}x</div>
+                <div class="award-title">Domination</div>
+                <div class="award-description">Won by 60+ Seconds</div>
+            </div>
+        `;
+    }
+    
+    // Close Call (win by less than 0.5s)
+    if (awards.closeCall > 0) {
+        html += `
+            <div class="award-card close-call">
+                <div class="award-icon">😅</div>
+                <div class="award-count">${awards.closeCall}x</div>
+                <div class="award-title">Close Call</div>
+                <div class="award-description">Won by Less Than 0.5s</div>
+            </div>
+        `;
+    }
+    
+    // Photo Finish (within 0.1s of winner)
+    if (awards.photoFinish > 0) {
+        html += `
+            <div class="award-card photo-finish">
+                <div class="award-icon">📸</div>
+                <div class="award-count">${awards.photoFinish}x</div>
+                <div class="award-title">Photo Finish</div>
+                <div class="award-description">Within 0.1s of Winner</div>
+            </div>
+        `;
+    }
+    
+    // Dark Horse (win when predicted 15th or worse)
+    if (awards.darkHorse > 0) {
+        html += `
+            <div class="award-card dark-horse">
+                <div class="award-icon">🐴</div>
+                <div class="award-count">${awards.darkHorse}x</div>
+                <div class="award-title">Dark Horse</div>
+                <div class="award-description">Won When Predicted 15th+</div>
+            </div>
+        `;
+    }
+    
+    // Zero to Hero (bottom 20% to top 20%)
+    if (awards.zeroToHero > 0) {
+        html += `
+            <div class="award-card zero-to-hero">
+                <div class="award-icon">🚀</div>
+                <div class="award-count">${awards.zeroToHero}x</div>
+                <div class="award-title">Zero to Hero</div>
+                <div class="award-description">Bottom 20% to Top 20%</div>
+            </div>
+        `;
+    }
+    
+    // Back to Back (2 wins in a row)
+    if (awards.backToBack > 0) {
+        html += `
+            <div class="award-card back-to-back">
+                <div class="award-icon">🔁</div>
+                <div class="award-count">${awards.backToBack}x</div>
+                <div class="award-title">Back to Back</div>
+                <div class="award-description">Won 2 Races in a Row</div>
+            </div>
+        `;
+    }
+    
+    // Trophy Collector (5+ podiums)
+    if (awards.trophyCollector > 0) {
+        html += `
+            <div class="award-card trophy-collector">
+                <div class="award-icon">🏆</div>
+                <div class="award-count">${awards.trophyCollector}x</div>
+                <div class="award-title">Trophy Collector</div>
+                <div class="award-description">5+ Podium Finishes</div>
+            </div>
+        `;
+    }
+    
+    // Weekend Warrior (5+ weekend events)
+    if (awards.weekendWarrior > 0) {
+        html += `
+            <div class="award-card weekend-warrior">
+                <div class="award-icon">🏁</div>
+                <div class="award-count">${awards.weekendWarrior}x</div>
+                <div class="award-title">Weekend Warrior</div>
+                <div class="award-description">Completed 5+ Weekend Events</div>
+            </div>
+        `;
+    }
+    
+    // Overrated (worse than predicted 5+ times)
+    if (awards.overrated > 0) {
+        html += `
+            <div class="award-card overrated">
+                <div class="award-icon">📉</div>
+                <div class="award-count">${awards.overrated}x</div>
+                <div class="award-title">Overrated</div>
+                <div class="award-description">Worse Than Predicted 5+ Times</div>
+            </div>
+        `;
+    }
+    
+    // Technical Issues (3+ DNFs)
+    if (awards.technicalIssues > 0) {
+        html += `
+            <div class="award-card technical-issues">
+                <div class="award-icon">🔧</div>
+                <div class="award-count">${awards.technicalIssues}x</div>
+                <div class="award-title">Technical Issues</div>
+                <div class="award-description">3+ DNFs</div>
             </div>
         `;
     }

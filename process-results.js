@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const Papa = require('papaparse');
 const admin = require('firebase-admin');
+const awardsCalc = require('./awards-calculation');
 
 // Initialize Firebase Admin
 const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
@@ -294,6 +295,37 @@ async function processUserResult(uid, eventInfo, results) {
   // Check if earned Giant Killer medal (beat highest-rated rider)
   const earnedGiantKillerMedal = checkGiantKiller(results, uid);
   
+  // NEW AWARDS CALCULATIONS
+  // Get times for margin-based awards
+  const times = awardsCalc.getTimesFromResults(
+    results.map(r => ({
+      position: parseInt(r.Position),
+      time: parseFloat(r.Time)
+    })).filter(r => !isNaN(r.position)),
+    position
+  );
+  
+  // Check margin-based awards
+  const earnedDomination = awardsCalc.checkDomination(position, times.winnerTime, times.secondPlaceTime);
+  const earnedCloseCall = awardsCalc.checkCloseCall(position, times.winnerTime, times.secondPlaceTime);
+  const earnedPhotoFinish = awardsCalc.checkPhotoFinish(position, times.userTime, times.winnerTime, times.secondPlaceTime);
+  const earnedDarkHorse = awardsCalc.checkDarkHorse(position, predictedPosition);
+  
+  // Zero to Hero requires previous event data
+  let earnedZeroToHero = false;
+  if (eventNumber > 1) {
+    const prevEventResults = userData[`event${eventNumber - 1}Results`];
+    if (prevEventResults && prevEventResults.position && prevEventResults.position !== 'DNF') {
+      // Get total finishers for both events from results
+      const currentFinishers = results.filter(r => r.Position !== 'DNF' && !isNaN(parseInt(r.Position))).length;
+      // We need previous event's total finishers - we'll approximate from standings or use null
+      earnedZeroToHero = awardsCalc.checkZeroToHero(
+        { position: prevEventResults.position, totalFinishers: 50 }, // Approximate
+        { position: position, totalFinishers: currentFinishers }
+      );
+    }
+  }
+  
   // Prepare event results
   const eventResults = {
     position: position,
@@ -306,6 +338,11 @@ async function processUserResult(uid, eventInfo, results) {
     bonusPoints: bonusPoints,
     earnedPunchingMedal: earnedPunchingMedal,
     earnedGiantKillerMedal: earnedGiantKillerMedal,
+    earnedDomination: earnedDomination,
+    earnedCloseCall: earnedCloseCall,
+    earnedPhotoFinish: earnedPhotoFinish,
+    earnedDarkHorse: earnedDarkHorse,
+    earnedZeroToHero: earnedZeroToHero,
     distance: parseFloat(userResult.Distance) || 0,
     deltaTime: parseFloat(userResult.DeltaTime) || 0,
     eventPoints: parseInt(userResult.Points) || null, // Points race points (for display only)
@@ -697,6 +734,20 @@ async function updateResultsSummary(season, event, results) {
       
       const earnedGiantKillerMedal = checkGiantKillerForResult(r.UID, position);
       
+      // Calculate new awards
+      const times = awardsCalc.getTimesFromResults(
+        results.map(r => ({
+          position: parseInt(r.Position),
+          time: parseFloat(r.Time)
+        })).filter(r => !isNaN(r.position)),
+        position
+      );
+      
+      const earnedDomination = awardsCalc.checkDomination(position, times.winnerTime, times.secondPlaceTime);
+      const earnedCloseCall = awardsCalc.checkCloseCall(position, times.winnerTime, times.secondPlaceTime);
+      const earnedPhotoFinish = awardsCalc.checkPhotoFinish(position, times.userTime, times.winnerTime, times.secondPlaceTime);
+      const earnedDarkHorse = awardsCalc.checkDarkHorse(position, predictedPosition);
+      
       return {
         position: position,
         name: r.Name,
@@ -711,6 +762,10 @@ async function updateResultsSummary(season, event, results) {
         bonusPoints: bonusPoints,
         earnedPunchingMedal: earnedPunchingMedal,
         earnedGiantKillerMedal: earnedGiantKillerMedal,
+        earnedDomination: earnedDomination,
+        earnedCloseCall: earnedCloseCall,
+        earnedPhotoFinish: earnedPhotoFinish,
+        earnedDarkHorse: earnedDarkHorse,
         eventPoints: parseInt(r.Points) || null,
         isBot: isBot(r.UID, r.Gender)
       };
