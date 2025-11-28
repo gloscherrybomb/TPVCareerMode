@@ -139,25 +139,24 @@ class ProgressManager {
             if (userDoc.exists()) {
                 const userData = userDoc.data();
                 
-                // completedStages from Firebase contains EVENT IDs, not stage numbers
-                // usedOptionalEvents contains which optional events (6-12) were used
-                const completedEventIds = userData.completedStages || [];
+                // Build choiceSelections from usedOptionalEvents if not already present
+                // usedOptionalEvents array maps to choice stages: index 0 -> stage 3, index 1 -> stage 6, index 2 -> stage 8
+                let choiceSelections = userData.choiceSelections || {};
                 const usedOptionalEvents = userData.usedOptionalEvents || [];
                 
-                // Build choiceSelections from usedOptionalEvents
-                // Map which optional event was used for which choice stage
-                const choiceSelections = {};
-                usedOptionalEvents.forEach((eventId, index) => {
-                    // Choice stages are 3, 6, 8 (index 0, 1, 2)
+                // If choiceSelections is empty but usedOptionalEvents has data, build it
+                if (Object.keys(choiceSelections).length === 0 && usedOptionalEvents.length > 0) {
                     const choiceStages = [3, 6, 8];
-                    if (index < choiceStages.length) {
-                        choiceSelections[choiceStages[index]] = eventId;
-                    }
-                });
+                    usedOptionalEvents.forEach((eventId, index) => {
+                        if (index < choiceStages.length) {
+                            choiceSelections[choiceStages[index]] = eventId;
+                        }
+                    });
+                }
                 
                 this.progress = {
                     currentStage: userData.currentStage || 1,
-                    completedEventIds: completedEventIds, // Store the raw event IDs
+                    completedStages: userData.completedStages || [],
                     completedOptionalEvents: usedOptionalEvents,
                     choiceSelections: choiceSelections,
                     totalPoints: userData.totalPoints || 0
@@ -173,7 +172,7 @@ class ProgressManager {
                 console.log('No user document found, using defaults');
                 this.progress = {
                     currentStage: 1,
-                    completedEventIds: [],
+                    completedStages: [],
                     completedOptionalEvents: [],
                     choiceSelections: {},
                     totalPoints: 0
@@ -189,14 +188,10 @@ class ProgressManager {
         const saved = localStorage.getItem(this.storageKey);
         if (saved) {
             this.progress = JSON.parse(saved);
-            // Ensure completedEventIds exists for backward compatibility
-            if (!this.progress.completedEventIds) {
-                this.progress.completedEventIds = this.progress.completedStages || [];
-            }
         } else {
             this.progress = {
                 currentStage: 1,
-                completedEventIds: [],
+                completedStages: [],
                 completedOptionalEvents: [],
                 choiceSelections: {},
                 totalPoints: 0
@@ -242,8 +237,7 @@ class ProgressManager {
     }
 
     isStageCompleted(stage) {
-        // A stage is completed if we're past it (currentStage > stage)
-        return this.progress.currentStage > stage;
+        return this.progress.completedStages.includes(stage);
     }
 
     isStageUnlocked(stage) {
@@ -322,9 +316,9 @@ class ProgressManager {
         return this.progress.choiceSelections[stage] || null;
     }
 
-    // Get completed stages count (stages 1 through currentStage - 1)
+    // Get completed stages count
     getCompletedStagesCount() {
-        return Math.max(0, this.progress.currentStage - 1);
+        return this.progress.completedStages.length;
     }
 
     // Get progress percentage

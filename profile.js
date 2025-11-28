@@ -423,7 +423,7 @@ function displayRecentResults(results) {
     if (results.length === 0) {
         container.innerHTML = `
             <div class="results-empty">
-                <div class="results-empty-icon">ðŸš´</div>
+                <div class="results-empty-icon">🚴</div>
                 <p>No race results yet. Complete your first event!</p>
             </div>
         `;
@@ -444,7 +444,7 @@ function displayRecentResults(results) {
             bonusHTML += `<span class="bonus-indicator" title="Bonus points for beating prediction">+${result.bonusPoints} bonus</span>`;
         }
         if (result.earnedPunchingMedal) {
-            bonusHTML += `<span class="medal-indicator punching" title="Beat prediction by 10+ places">ðŸ¥Š</span>`;
+            bonusHTML += `<span class="medal-indicator punching" title="Beat prediction by 10+ places">🥊</span>`;
         }
         if (result.earnedGiantKillerMedal) {
             bonusHTML += `<span class="medal-indicator giant-killer" title="Beat highest-rated rider">âš”ï¸</span>`;
@@ -512,7 +512,7 @@ function displayAwards(awards) {
     if (totalAwards === 0) {
         container.innerHTML = `
             <div class="awards-empty">
-                <div class="awards-empty-icon">ðŸ†</div>
+                <div class="awards-empty-icon">🏆</div>
                 <p>No awards yet. Keep racing to earn achievements!</p>
             </div>
         `;

@@ -1028,7 +1028,7 @@ async function processResults(csvFiles) {
   
   for (const filePath of csvFiles) {
     try {
-      console.log(`\nðŸ“„ Processing: ${filePath}`);
+      console.log(`\n🔄 Processing: ${filePath}`);
       
       // Parse event info from path
       const eventInfo = parseEventPath(filePath);

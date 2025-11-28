@@ -457,15 +457,13 @@
                                     <span class="stage-number-badge">Stage ${stage.stage}</span>
                                     <span class="stage-type-badge choice">Optional Choice</span>
                                 </div>
-                                ${selectedEvent ? `
                                 <div class="event-image">
                                     <div class="event-image-placeholder">
-                                        <span>${selectedEvent.icon}</span>
+                                        <span>${selectedEvent ? selectedEvent.icon : stage.icon}</span>
                                     </div>
+                                    ${isLocked ? '<div class="locked-overlay"><span>🔒</span><p>Complete previous stage to unlock</p></div>' : ''}
                                 </div>
-                                ` : ''}
                                 <div class="stage-card-content">
-                                    ${!selectedEvent ? `<div class="stage-icon-large">${stage.icon}</div>` : ''}
                                     <h3 class="stage-title">${selectedEvent ? selectedEvent.name : stage.name}</h3>
                                     <p class="stage-description">
                                         ${selectedEventId ? 
@@ -489,7 +487,6 @@
                                         </div>
                                     </div>
                                     ` : ''}
-                                    ${isLocked ? '<div class="locked-overlay"><span>🔒</span><p>Complete previous stage to unlock</p></div>' : ''}
                                 </div>
                                 <div class="stage-card-footer">
                                     ${!isLocked && !isCompleted ? `<button class="btn btn-primary btn-full" onclick="openChoiceModal(${stage.stage})">Choose Event</button>` : ''}
