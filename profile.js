@@ -263,6 +263,11 @@ async function calculateUserStats(userUID) {
                         earnedGiantKillerMedal: userResult.earnedGiantKillerMedal || false,
                         earnedBullseyeMedal: userResult.earnedBullseyeMedal || false,
                         earnedHotStreakMedal: userResult.earnedHotStreakMedal || false,
+                        earnedDomination: userResult.earnedDomination || false,
+                        earnedCloseCall: userResult.earnedCloseCall || false,
+                        earnedPhotoFinish: userResult.earnedPhotoFinish || false,
+                        earnedDarkHorse: userResult.earnedDarkHorse || false,
+                        earnedZeroToHero: userResult.earnedZeroToHero || false,
                         date: resultData.processedAt
                     });
                 }
@@ -517,6 +522,21 @@ function displayRecentResults(results) {
         }
         if (result.earnedHotStreakMedal) {
             bonusHTML += `<span class="medal-indicator hot-streak" title="Beat prediction 3 events in a row">🔥</span>`;
+        }
+        if (result.earnedDomination) {
+            bonusHTML += `<span class="medal-indicator domination" title="Won by 60+ seconds">💪</span>`;
+        }
+        if (result.earnedCloseCall) {
+            bonusHTML += `<span class="medal-indicator close-call" title="Won by less than 0.5s">😅</span>`;
+        }
+        if (result.earnedPhotoFinish) {
+            bonusHTML += `<span class="medal-indicator photo-finish" title="Within 0.1s of winner">📸</span>`;
+        }
+        if (result.earnedDarkHorse) {
+            bonusHTML += `<span class="medal-indicator dark-horse" title="Won when predicted 15th+">🐴</span>`;
+        }
+        if (result.earnedZeroToHero) {
+            bonusHTML += `<span class="medal-indicator zero-to-hero" title="Bottom 20% to top 20%">🚀</span>`;
         }
         
         // Format predicted position if available

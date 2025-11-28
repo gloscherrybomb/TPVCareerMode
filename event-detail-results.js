@@ -204,6 +204,24 @@ async function loadEventResults() {
             if (result.earnedGiantKillerMedal) {
                 bonusHTML += `<span class="medal-icon giant-killer" title="Beat highest-rated rider">⚔️</span>`;
             }
+            if (result.earnedBullseyeMedal) {
+                bonusHTML += `<span class="medal-icon bullseye" title="Finished exactly as predicted">🎯</span>`;
+            }
+            if (result.earnedDomination) {
+                bonusHTML += `<span class="medal-icon domination" title="Won by 60+ seconds">💪</span>`;
+            }
+            if (result.earnedCloseCall) {
+                bonusHTML += `<span class="medal-icon close-call" title="Won by less than 0.5s">😅</span>`;
+            }
+            if (result.earnedPhotoFinish) {
+                bonusHTML += `<span class="medal-icon photo-finish" title="Within 0.1s of winner">📸</span>`;
+            }
+            if (result.earnedDarkHorse) {
+                bonusHTML += `<span class="medal-icon dark-horse" title="Won when predicted 15th+">🐴</span>`;
+            }
+            if (result.earnedZeroToHero) {
+                bonusHTML += `<span class="medal-icon zero-to-hero" title="Bottom 20% to top 20%">🚀</span>`;
+            }
             if (!bonusHTML) {
                 bonusHTML = '<span class="no-bonus">—</span>';
             }
