@@ -237,7 +237,8 @@ class ProgressManager {
     }
 
     isStageCompleted(stage) {
-        return this.progress.completedStages.includes(stage);
+        // A stage is completed if we're past it (currentStage > stage)
+        return this.progress.currentStage > stage;
     }
 
     isStageUnlocked(stage) {
@@ -318,12 +319,12 @@ class ProgressManager {
 
     // Get completed stages count
     getCompletedStagesCount() {
-        return this.progress.completedStages.length;
+        return Math.max(0, this.progress.currentStage - 1);
     }
 
     // Get progress percentage
     getProgressPercentage() {
-        return Math.round((this.progress.completedStages.length / 9) * 100);
+        return Math.round((this.getCompletedStagesCount() / 9) * 100);
     }
 }
 

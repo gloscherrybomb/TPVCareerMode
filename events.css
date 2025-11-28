@@ -646,6 +646,16 @@
     line-height: 1;
 }
 
+.event-card-sequential .stage-card-content,
+.choice-card .stage-card-content {
+    text-align: center;
+}
+
+.event-card-sequential .event-stats,
+.choice-card .event-stats {
+    justify-content: center;
+}
+
 .stage-title {
     font-family: 'Orbitron', sans-serif;
     font-size: 1.8rem;
