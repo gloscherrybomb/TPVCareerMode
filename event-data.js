@@ -17,8 +17,8 @@ const eventData = {
 
 The course rewards efficient pack movement and quick accelerations, especially in the final laps when the pace traditionally lifts with the ocean breeze at riders' backs. 
 
-It's a straightforward but energetic eventâ€”an ideal early-season chance to test sprint form, refine positioning, and get a feel for local criterium racing.`,
-        strategy: "Stay alert through the waterfront turns and conserve energy in the draft. The final two laps are where the race is wonâ€”position yourself well before the last kilometer and be ready for a sharp sprint to the line.",
+It's a straightforward but energetic event—an ideal early-season chance to test sprint form, refine positioning, and get a feel for local criterium racing.`,
+        strategy: "Stay alert through the waterfront turns and conserve energy in the draft. The final two laps are where the race is won—position yourself well before the last kilometer and be ready for a sharp sprint to the line.",
         routeDetails: {
             start: "Georgetown Waterfront",
             keyPoint: "Coastal Bend (technical section)",
@@ -39,7 +39,7 @@ It's a straightforward but energetic eventâ€”an ideal early-season chance t
         format: "1 lap",
         maxPoints: 95,
         icon: "🚴",
-        description: `A local classic that has earned its reputation as a proving ground for aspiring riders. This medium length race is where many careers have taken their first meaningful step forwardâ€”consistent performances here catch the attention of scouts and bigger teams.
+        description: `A local classic that has earned its reputation as a proving ground for aspiring riders. This medium length race is where many careers have taken their first meaningful step forward—consistent performances here catch the attention of scouts and bigger teams.
 
 The course's deceptive nature is part of its legend: riders who underestimate it rarely finish well, while those who respect the accumulated difficulty often surprise themselves with strong results.
 
@@ -69,8 +69,8 @@ It's the kind of race where experience counts, but raw talent can still shine th
 
 The atmosphere is always lively, but the focus stays on sharp positioning and repeated high-intensity efforts. It's a compact, tactical event where smart wheel choice and timing matter just as much as raw speed.
 
-This makes it a key early test for any rider entering the local racing sceneâ€”you need to be aware, aggressive, and efficient all at once.`,
-        strategy: "Never drift to the back. Every lap is critical. Pick your position early, stay near the front third of the group, and be ready to surge when the bell rings. Watch for riders trying to squeeze you outâ€”protect your line and stay smooth.",
+This makes it a key early test for any rider entering the local racing scene—you need to be aware, aggressive, and efficient all at once.`,
+        strategy: "Never drift to the back. Every lap is critical. Pick your position early, stay near the front third of the group, and be ready to surge when the bell rings. Watch for riders trying to squeeze you out—protect your line and stay smooth.",
         routeDetails: {
             start: "Forest Velodrome Track",
             keyPoint: "Elimination every lap",
@@ -91,12 +91,12 @@ This makes it a key early test for any rider entering the local racing sceneâ�
         format: "20 minutes",
         maxPoints: 50,
         icon: "⏱️",
-        description: `The ultimate test of pure power and pacing discipline. Every local rider knows the Coastal Loopâ€”it's where reputations are built on numbers alone. Twenty minutes, perfectly flat, nowhere to hide. This is your FTP laid bare for scouts, coaches, and rival riders to see.
+        description: `The ultimate test of pure power and pacing discipline. Every local rider knows the Coastal Loop—it's where reputations are built on numbers alone. Twenty minutes, perfectly flat, nowhere to hide. This is your FTP laid bare for scouts, coaches, and rival riders to see.
 
 The challenge is deceptively simple: hold your threshold for the full duration and see how far you get. Go out too hard and you'll crack spectacularly in the final five minutes. Too conservative and you'll leave watts on the table.
 
-Nail the pacing and you'll set a personal best that becomes your calling card. Teams pay attention to Coastal Loop resultsâ€”a strong showing here proves you have the engine to compete at higher levels. It's not glamorous, but in the early stages of a career, a solid twenty-minute number opens doors.`,
-        strategy: "Start controlled. Your first 5 minutes should feel almost easy. Build into your rhythm by minute 8, then settle into threshold. The mental game matters hereâ€”stay focused on your breathing and power. Push hard in the final 2 minutes when you know you can hold nothing back.",
+Nail the pacing and you'll set a personal best that becomes your calling card. Teams pay attention to Coastal Loop results—a strong showing here proves you have the engine to compete at higher levels. It's not glamorous, but in the early stages of a career, a solid twenty-minute number opens doors.`,
+        strategy: "Start controlled. Your first 5 minutes should feel almost easy. Build into your rhythm by minute 8, then settle into threshold. The mental game matters here—stay focused on your breathing and power. Push hard in the final 2 minutes when you know you can hold nothing back.",
         routeDetails: {
             start: "Coastal Loop Entry",
             keyPoint: "Flat, exposed terrain",
@@ -117,12 +117,12 @@ Nail the pacing and you'll set a personal best that becomes your calling card. T
         format: "4 laps",
         maxPoints: 80,
         icon: "🎯",
-        description: `A local specialty that has riders grimacing before they even clip in. The North Lake Loop Reverse is relentlessly rollingâ€”there's no such thing as cruising here, it's always either up or down.
+        description: `A local specialty that has riders grimacing before they even clip in. The North Lake Loop Reverse is relentlessly rolling—there's no such thing as cruising here, it's always either up or down.
 
 What makes it brutal is the points banner placement: they're positioned at the worst possible moments, forcing you to dig deep when your legs are already screaming. Sprint for points on a climb, recover on a descent, then immediately sprint again. Repeat until someone cracks.
 
-This race rewards riders who can produce power repeatedly under fatigueâ€”exactly the kind of ability that separates good legs from great careers. It's a favorite among scouts looking for riders with mental toughness and the capacity to suffer well. Finish on the podium here and you've proven you can handle whatever a race throws at you. It's as much a test of character as it is fitness.`,
-        strategy: "Pick your battles wiselyâ€”you can't contest every sprint. Target 2-3 points opportunities where you're strongest. Stay near the front on climbs so you're not chasing back. Mental toughness is key: when it hurts, everyone else is suffering too.",
+This race rewards riders who can produce power repeatedly under fatigue—exactly the kind of ability that separates good legs from great careers. It's a favorite among scouts looking for riders with mental toughness and the capacity to suffer well. Finish on the podium here and you've proven you can handle whatever a race throws at you. It's as much a test of character as it is fitness.`,
+        strategy: "Pick your battles wisely—you can't contest every sprint. Target 2-3 points opportunities where you're strongest. Stay near the front on climbs so you're not chasing back. Mental toughness is key: when it hurts, everyone else is suffering too.",
         routeDetails: {
             start: "North Lake Reverse",
             keyPoint: "Rolling climbs with points banners",
@@ -143,12 +143,12 @@ This race rewards riders who can produce power repeatedly under fatigueâ€”e
         format: "Time Trial",
         maxPoints: 50,
         icon: "⛰️",
-        description: `The Easy Hill Climb TT is a straightforward test of pacing on a two-part course: a fast, flat opening section followed by a steady 3â€“4% climb to the line.
+        description: `The Easy Hill Climb TT is a straightforward test of pacing on a two-part course: a fast, flat opening section followed by a steady 3—4% climb to the line.
 
 With no technical features and no sharp gradients, the challenge is entirely in how evenly you can meter your effort. Riders who go too hard early pay for it the moment the road tilts upward, while those who hold back too much lose free speed on the flats.
 
-It's a clean, controlled time trial that rewards discipline over explosivenessâ€”an ideal early-season benchmark for riders learning to balance tempo and threshold on mixed terrain.`,
-        strategy: "Ride the flat section at a controlled tempoâ€”resist the urge to go too hard. As you hit the climb, settle into a sustainable rhythm you can hold to the top. Focus on smooth pedaling and steady breathing. The climb isn't steep enough to stand, so stay seated and grind it out.",
+It's a clean, controlled time trial that rewards discipline over explosiveness—an ideal early-season benchmark for riders learning to balance tempo and threshold on mixed terrain.`,
+        strategy: "Ride the flat section at a controlled tempo—resist the urge to go too hard. As you hit the climb, settle into a sustainable rhythm you can hold to the top. Focus on smooth pedaling and steady breathing. The climb isn't steep enough to stand, so stay seated and grind it out.",
         routeDetails: {
             start: "Flat approach road",
             keyPoint: "Transition to 3-4% climb",
@@ -173,8 +173,8 @@ It's a clean, controlled time trial that rewards discipline over explosivenessâ
 
 With frequent accelerations and tight pack dynamics, it rewards quick reactions, confident cornering, and the ability to hold position when the pace lifts.
 
-It's a straightforward but energetic critâ€”an ideal proving ground for riders looking to sharpen their race instincts early in the season.`,
-        strategy: "Stay relaxed and trust your bike handling. The pace will yo-yo constantlyâ€”don't panic when gaps open briefly. Move up on the outside of corners and drift back through the straights. Watch for late-race attacks and be ready to respond quickly.",
+It's a straightforward but energetic crit—an ideal proving ground for riders looking to sharpen their race instincts early in the season.`,
+        strategy: "Stay relaxed and trust your bike handling. The pace will yo-yo constantly—don't panic when gaps open briefly. Move up on the outside of corners and drift back through the straights. Watch for late-race attacks and be ready to respond quickly.",
         routeDetails: {
             start: "Figure-eight circuit",
             keyPoint: "Multiple corners per lap",
@@ -199,8 +199,8 @@ It's a straightforward but energetic critâ€”an ideal proving ground for rid
 
 The route strings together a series of steady climbs, rolling stretches, and exposed coastal roads, turning the event into a true endurance test rather than a single-effort effort. Riders can expect long periods of sustained work punctuated by decisive rises that gradually wear down the field.
 
-It's the kind of event where pacing matters just as much as strength, and finishing well is often a sign that a rider is ready to move beyond pure local competition. A big adventure and a serious benchmarkâ€”this is where developing riders discover what they're really capable of.`,
-        strategy: "This is an endurance test, not a sprint. Start conservatively and build into the effort. Fuel and hydrate early and often. On the climbs, find your rhythm and don't get drawn into battles you can't sustain. Save your best effort for the final 10kmâ€”that's where the race is decided.",
+It's the kind of event where pacing matters just as much as strength, and finishing well is often a sign that a rider is ready to move beyond pure local competition. A big adventure and a serious benchmark—this is where developing riders discover what they're really capable of.`,
+        strategy: "This is an endurance test, not a sprint. Start conservatively and build into the effort. Fuel and hydrate early and often. On the climbs, find your rhythm and don't get drawn into battles you can't sustain. Save your best effort for the final 10km—that's where the race is decided.",
         routeDetails: {
             start: "Gilbert Island Circuit",
             keyPoint: "Multiple sustained climbs",
@@ -223,10 +223,10 @@ It's the kind of event where pacing matters just as much as strength, and finish
         icon: "🏕️",
         description: `The Base Camp Classic is a pure climbing-focused road race designed to challenge developing riders with a steady procession of uphill efforts.
 
-The course gradually grinds the field down and rewards those who can stay composed as the gradients accumulate. There's little shelter and few opportunities to hideâ€”every rise forces a decision, every false flat tests pacing, and every summit invites someone to attack.
+The course gradually grinds the field down and rewards those who can stay composed as the gradients accumulate. There's little shelter and few opportunities to hide—every rise forces a decision, every false flat tests pacing, and every summit invites someone to attack.
 
 For riders looking to prove their climbing potential early in their career, the Base Camp Classic is the definitive test.`,
-        strategy: "Manage your energy over both laps. The first lap should feel controlledâ€”use it to gauge your competition. On lap two, be ready for attacks on every climb. Stay near the front so you can respond without burning matches. If you're a climber, this is your race to win.",
+        strategy: "Manage your energy over both laps. The first lap should feel controlled—use it to gauge your competition. On lap two, be ready for attacks on every climb. Stay near the front so you can respond without burning matches. If you're a climber, this is your race to win.",
         routeDetails: {
             start: "Base Camp Loop",
             keyPoint: "Continuous climbing efforts",
@@ -251,7 +251,7 @@ For riders looking to prove their climbing potential early in their career, the 
 
 The route follows flat shoreline roads bordered by open water on one side and dense pine stretches on the other, creating a mix of calm sheltered sections and breezier exposed straights.
 
-With no climbs or technical turns to hide behind, it's a pure test of sustained power and focusâ€”an ideal event for riders who want to benchmark their endurance and consistency against the clock.`,
+With no climbs or technical turns to hide behind, it's a pure test of sustained power and focus—an ideal event for riders who want to benchmark their endurance and consistency against the clock.`,
         strategy: "Start at a pace you can hold for the entire distance. Don't let the initial flat sections tempt you into going too hard. Stay aero as much as possible, especially in the exposed sections. Keep your cadence steady and your mind focused on smooth, efficient power delivery.",
         routeDetails: {
             start: "Coastal entry point",
@@ -273,12 +273,12 @@ With no climbs or technical turns to hide behind, it's a pure test of sustained 
         format: "8 laps",
         maxPoints: 60,
         icon: "🎯",
-        description: `The South Lake Points Race is one of the most recognizable fixtures on the local calendarâ€”a multi-lap event built around a classic loop that every rider in the region knows by heart.
+        description: `The South Lake Points Race is one of the most recognizable fixtures on the local calendar—a multi-lap event built around a classic loop that every rider in the region knows by heart.
 
 Each lap features the course's signature elements: a short, punchy rise that tempts repeated attacks and a notoriously tight corner that demands full attention as the bunch funnels through.
 
 With points awarded at regular sprint laps, the pace surges constantly, making the race a blend of timing, race sense, and controlled aggression. For newcomers and veterans alike, the South Lake Points Race remains a benchmark of local circuit racing.`,
-        strategy: "Know when points are awarded and position yourself accordingly. Don't waste energy on non-points laps unless you need to establish position. The tight corner is criticalâ€”enter it in the top 10 or you'll lose contact. Target consistent placings rather than gambling everything on one big effort.",
+        strategy: "Know when points are awarded and position yourself accordingly. Don't waste energy on non-points laps unless you need to establish position. The tight corner is critical—enter it in the top 10 or you'll lose contact. Target consistent placings rather than gambling everything on one big effort.",
         routeDetails: {
             start: "South Lake Loop",
             keyPoint: "Punchy climbs and tight corner",
@@ -299,12 +299,12 @@ With points awarded at regular sprint laps, the pace surges constantly, making t
         format: "Fondo-style",
         maxPoints: 145,
         icon: "🚵",
-        description: `Unbound â€“ Little Egypt sends riders into one of the most rugged and respected sections of the larger Unbound course, a hilly and technical stretch that demands sharp handling, constant focus, and a willingness to grind through whatever the terrain throws at you.
+        description: `Unbound — Little Egypt sends riders into one of the most rugged and respected sections of the larger Unbound course, a hilly and technical stretch that demands sharp handling, constant focus, and a willingness to grind through whatever the terrain throws at you.
 
-For this special Fondo-style edition, riders take on the Little Egypt segment as a standalone challengeâ€”open to developing athletes who want to taste the atmosphere of a major event while still racing for position and pride.
+For this special Fondo-style edition, riders take on the Little Egypt segment as a standalone challenge—open to developing athletes who want to taste the atmosphere of a major event while still racing for position and pride.
 
 For many newcomers, this race carries personal meaning. In your case, your family pooled together to cover the entry fee and travel, hoping to help you chase the cycling dream you've talked about for years. It turns the day into more than just a test of fitness: every rise you crest and every tricky corner you navigate is a reminder of the support behind you. Little Egypt doesn't give anything away easily, but for those who dig in and finish strong, it becomes an unforgettable milestone.`,
-        strategy: "Gravel racing is about managing variablesâ€”rough surfaces, loose corners, and changing gradients. Stay loose on the bike, keep your weight balanced, and don't fight the terrain. Pace yourself on the climbs and ride within your limits on technical descents. This is about finishing strong, not starting fast.",
+        strategy: "Gravel racing is about managing variables—rough surfaces, loose corners, and changing gradients. Stay loose on the bike, keep your weight balanced, and don't fight the terrain. Pace yourself on the climbs and ride within your limits on technical descents. This is about finishing strong, not starting fast.",
         routeDetails: {
             start: "Little Egypt section",
             keyPoint: "Technical gravel climbs",
@@ -336,8 +336,8 @@ Shorter and punchier. Expect aggressive racing and opportunities for time bonuse
 **Stage 3: A Bit of Everything** (28.1km, 471m climbing, 135 points)
 The queen stage. Significant climbing tests tired legs. The GC battle is often decided here, with attackers looking to overturn gaps from earlier stages.
 
-This is where you learn what it takes to race over multiple daysâ€”managing fatigue, maintaining focus, and adapting to different race situations. It's the crown jewel of the local calendar.`,
-        strategy: "Stage racing is about consistency. Don't lose time unnecessarily on Stage 1. Stay near the front and avoid crashes. Stage 2 is where attacks happenâ€”cover moves and don't give away time. Stage 3 is the decider: if you're in contention, be ready to dig deep on the climbs. If not, focus on a strong stage result.",
+This is where you learn what it takes to race over multiple days—managing fatigue, maintaining focus, and adapting to different race situations. It's the crown jewel of the local calendar.`,
+        strategy: "Stage racing is about consistency. Don't lose time unnecessarily on Stage 1. Stay near the front and avoid crashes. Stage 2 is where attacks happen—cover moves and don't give away time. Stage 3 is the decider: if you're in contention, be ready to dig deep on the climbs. If not, focus on a strong stage result.",
         routeDetails: {
             stage1: "Figure of Eight - 35.2km, 174m",
             stage2: "Loop the Loop - 27.3km, 169m",
