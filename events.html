@@ -136,7 +136,7 @@
                     </div>
                 </div>
                 <div class="progress-card">
-                    <div class="progress-icon">⭐</div>
+                    <div class="progress-icon">⭐</div>
                     <div class="progress-info">
                         <div class="progress-label">Points Earned</div>
                         <div class="progress-value" id="pointsEarnedText">0</div>
@@ -447,6 +447,7 @@
                         // Choice stage
                         const selectedEventId = progressManager.getChoiceSelection(stage.stage);
                         const availableCount = progressManager.getAvailableOptionalEvents(stage.stage).length;
+                        const selectedEvent = selectedEventId ? getEvent(selectedEventId) : null;
                     
                     return `
                         <div class="sequence-stage ${status}" data-stage="${stage.stage}">
@@ -456,19 +457,43 @@
                                     <span class="stage-number-badge">Stage ${stage.stage}</span>
                                     <span class="stage-type-badge choice">Optional Choice</span>
                                 </div>
+                                ${selectedEvent ? `
+                                <div class="event-image">
+                                    <div class="event-image-placeholder">
+                                        <span>${selectedEvent.icon}</span>
+                                    </div>
+                                </div>
+                                ` : ''}
                                 <div class="stage-card-content">
-                                    <div class="stage-icon-large">${stage.icon}</div>
-                                    <h3 class="stage-title">${stage.name}</h3>
+                                    ${!selectedEvent ? `<div class="stage-icon-large">${stage.icon}</div>` : ''}
+                                    <h3 class="stage-title">${selectedEvent ? selectedEvent.name : stage.name}</h3>
                                     <p class="stage-description">
                                         ${selectedEventId ? 
-                                            `Selected: ${getEvent(selectedEventId).name}` :
+                                            `${selectedEvent.subtitle}` :
                                             `${availableCount} optional events available`
                                         }
                                     </p>
+                                    ${selectedEvent ? `
+                                    <div class="event-stats">
+                                        <div class="stat-item">
+                                            <span class="stat-icon">📍</span>
+                                            <span>${selectedEvent.distance}</span>
+                                        </div>
+                                        <div class="stat-item">
+                                            <span class="stat-icon">⛰️</span>
+                                            <span>${selectedEvent.climbing}</span>
+                                        </div>
+                                        <div class="stat-item">
+                                            <span class="stat-icon">⭐</span>
+                                            <span>${selectedEvent.maxPoints} pts</span>
+                                        </div>
+                                    </div>
+                                    ` : ''}
                                     ${isLocked ? '<div class="locked-overlay"><span>🔒</span><p>Complete previous stage to unlock</p></div>' : ''}
                                 </div>
                                 <div class="stage-card-footer">
                                     ${!isLocked && !isCompleted ? `<button class="btn btn-primary btn-full" onclick="openChoiceModal(${stage.stage})">Choose Event</button>` : ''}
+                                    ${isCompleted && selectedEventId ? `<button class="btn btn-secondary btn-full" onclick="location.href='event-detail.html?id=${selectedEventId}'">View Details</button>` : ''}
                                     ${isCompleted ? '<span class="completed-badge">✓ Completed</span>' : ''}
                                 </div>
                             </div>
@@ -505,7 +530,7 @@
                                             <span>${event.climbing}</span>
                                         </div>
                                         <div class="stat-item">
-                                            <span class="stat-icon">⭐</span>
+                                            <span class="stat-icon">⭐</span>
                                             <span>${event.maxPoints} pts</span>
                                         </div>
                                     </div>
@@ -759,7 +784,7 @@
                         <div class="choice-event-stats">
                             <span>📍 ${event.distance}</span>
                             <span>⛰️ ${event.climbing}</span>
-                            <span>⭐ ${event.maxPoints} pts</span>
+                            <span>⭐ ${event.maxPoints} pts</span>
                         </div>
                         <button class="btn btn-primary btn-small">Select</button>
                     </div>
