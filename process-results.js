@@ -446,9 +446,14 @@ async function processUserResult(uid, eventInfo, results) {
     processedAt: admin.firestore.FieldValue.serverTimestamp()
   };
   
+  // Build list of completed events (previous + current)
+  const previouslyCompletedEvents = userData.completedStages || [];
+  const allCompletedEvents = previouslyCompletedEvents.includes(eventNumber) 
+    ? previouslyCompletedEvents 
+    : [...previouslyCompletedEvents, eventNumber];
   
   // Build season standings with all racers from CSV
-  const seasonStandings = await buildSeasonStandings(results, userData, eventNumber, uid);
+  const seasonStandings = await buildSeasonStandings(results, userData, eventNumber, uid, allCompletedEvents);
   
   // Determine stage progression and handle special cases
   let newTourProgress = { ...tourProgress };
@@ -599,12 +604,12 @@ function simulatePosition(botName, arr, eventNumber, fieldSize = 50) {
 }
 
 /**
- * Fetch all results from events 1 through currentEvent
+ * Fetch results for specific events only (not a range)
  */
-async function getAllPreviousEventResults(season, currentEvent) {
+async function getEventResults(season, eventNumbers) {
   const allEventResults = {};
   
-  for (let eventNum = 1; eventNum <= currentEvent; eventNum++) {
+  for (const eventNum of eventNumbers) {
     const resultDocId = `season${season}_event${eventNum}`;
     try {
       const resultDoc = await db.collection('results').doc(resultDocId).get();
@@ -623,10 +628,23 @@ async function getAllPreviousEventResults(season, currentEvent) {
 /**
  * Build season standings including all racers from CSV
  * Now includes simulated results for bots to keep standings competitive
+ * @param {Array} results - Current event results
+ * @param {Object} userData - User's data from Firestore
+ * @param {number} eventNumber - Current event number being processed
+ * @param {string} currentUid - Current user's UID
+ * @param {Array} completedEvents - Array of event numbers the user has completed (including current)
  */
-async function buildSeasonStandings(results, userData, eventNumber, currentUid) {
+async function buildSeasonStandings(results, userData, eventNumber, currentUid, completedEvents = []) {
   const season = 1;
   const existingStandings = userData[`season${season}Standings`] || [];
+  
+  // Ensure current event is in completedEvents
+  if (!completedEvents.includes(eventNumber)) {
+    completedEvents = [...completedEvents, eventNumber];
+  }
+  
+  const numCompletedEvents = completedEvents.length;
+  console.log(`   Building standings for ${numCompletedEvents} completed events: [${completedEvents.join(', ')}]`);
   
   // Create a map of existing racers
   const standingsMap = new Map();
@@ -689,9 +707,9 @@ async function buildSeasonStandings(results, userData, eventNumber, currentUid) 
   });
   
   // Now backfill bots with simulated results
-  // Get all results from events 1 through current
+  // Get results for completed events only (not a range)
   console.log('   Backfilling bot results...');
-  const allEventResults = await getAllPreviousEventResults(season, eventNumber);
+  const allEventResults = await getEventResults(season, completedEvents);
   
   // IMPORTANT: Also include current event's results (not yet in Firestore)
   // The 'results' parameter contains the current event being processed
@@ -744,11 +762,11 @@ async function buildSeasonStandings(results, userData, eventNumber, currentUid) 
     
     const botStanding = standingsMap.get(botName);
     
-    // Calculate simulated points for missing events
+    // Calculate simulated points for missing events (only for completed events, not all 1-N)
     let simulatedPoints = 0;
     let simulatedEvents = 0;
     
-    for (let eventNum = 1; eventNum <= eventNumber; eventNum++) {
+    for (const eventNum of completedEvents) {
       if (!botInfo.actualEvents.has(eventNum)) {
         // Bot didn't participate in this event, simulate it
         const simulatedPosition = simulatePosition(botName, botInfo.arr, eventNum);
@@ -760,7 +778,7 @@ async function buildSeasonStandings(results, userData, eventNumber, currentUid) 
     
     // Update bot standing with simulated results
     botStanding.points += simulatedPoints;
-    botStanding.events = eventNumber; // All bots now show as having completed all events
+    botStanding.events = numCompletedEvents; // Bots show same number of events as human
     botStanding.simulatedEvents = simulatedEvents; // Track how many were simulated
   }
   
@@ -769,8 +787,8 @@ async function buildSeasonStandings(results, userData, eventNumber, currentUid) 
   let botsUpdatedCount = 0;
   for (const [key, racer] of standingsMap.entries()) {
     if (racer.isBot) {
-      // Make sure all bots show the current event number
-      racer.events = eventNumber;
+      // Make sure all bots show the correct number of completed events
+      racer.events = numCompletedEvents;
       botsUpdatedCount++;
     }
   }
