@@ -489,13 +489,13 @@
                                         </div>
                                     </div>
                                     ` : ''}
-                                    ${isLocked ? '<div class="locked-overlay"><span>🔒</span><p>Complete previous stage to unlock</p></div>' : ''}
                                 </div>
                                 <div class="stage-card-footer">
                                     ${!isLocked && !isCompleted ? `<button class="btn btn-primary btn-full" onclick="openChoiceModal(${stage.stage})">Choose Event</button>` : ''}
                                     ${isCompleted && selectedEventId ? `<button class="btn btn-secondary btn-full" onclick="location.href='event-detail.html?id=${selectedEventId}'">View Details</button>` : ''}
                                     ${isCompleted ? '<span class="completed-badge">✓ Completed</span>' : ''}
                                 </div>
+                                ${isLocked ? '<div class="locked-overlay"><span>🔒</span><p>Complete previous stage to unlock</p></div>' : ''}
                             </div>
                         </div>
                     `;
@@ -515,7 +515,6 @@
                                     <div class="event-image-placeholder">
                                         <span>${event.icon}</span>
                                     </div>
-                                    ${isLocked ? '<div class="locked-overlay"><span>🔒</span><p>Complete previous stage</p></div>' : ''}
                                 </div>
                                 <div class="stage-card-content">
                                     <h3 class="stage-title">${event.name}</h3>
@@ -539,6 +538,7 @@
                                     ${!isLocked ? `<button class="btn btn-secondary btn-full" onclick="location.href='event-detail.html?id=${event.number}'">View Details</button>` : ''}
                                     ${isCompleted ? '<span class="completed-badge">✓ Completed</span>' : ''}
                                 </div>
+                                ${isLocked ? '<div class="locked-overlay"><span>🔒</span><p>Complete previous stage to unlock</p></div>' : ''}
                             </div>
                         </div>
                     `;
