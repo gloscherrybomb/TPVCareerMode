@@ -452,9 +452,6 @@ async function processUserResult(uid, eventInfo, results) {
     ? previouslyCompletedEvents 
     : [...previouslyCompletedEvents, eventNumber];
   
-  // Build season standings with all racers from CSV
-  const seasonStandings = await buildSeasonStandings(results, userData, eventNumber, uid, allCompletedEvents);
-  
   // Determine stage progression and handle special cases
   let newTourProgress = { ...tourProgress };
   let newUsedOptionalEvents = [...usedOptionalEvents];
@@ -513,6 +510,17 @@ async function processUserResult(uid, eventInfo, results) {
     }
   }
   
+  // Calculate the user's new authoritative totals (AFTER finalPoints is determined)
+  const newTotalPoints = (userData.totalPoints || 0) + finalPoints;
+  const newTotalEvents = (userData.totalEvents || 0) + 1;
+  
+  // Build season standings with all racers from CSV, using authoritative user totals
+  const currentUserTotals = {
+    totalPoints: newTotalPoints,
+    totalEvents: newTotalEvents
+  };
+  const seasonStandings = await buildSeasonStandings(results, userData, eventNumber, uid, allCompletedEvents, currentUserTotals);
+  
   // Calculate next stage
   const nextStage = calculateNextStage(currentStage, newTourProgress);
   
@@ -520,8 +528,8 @@ async function processUserResult(uid, eventInfo, results) {
   const updates = {
     [`event${eventNumber}Results`]: eventResults,
     currentStage: nextStage,
-    totalPoints: (userData.totalPoints || 0) + finalPoints,
-    totalEvents: (userData.totalEvents || 0) + 1,
+    totalPoints: newTotalPoints,
+    totalEvents: newTotalEvents,
     [`season${season}Standings`]: seasonStandings,
     team: userResult.Team || '' // Update team from latest race result
   };
@@ -633,8 +641,9 @@ async function getEventResults(season, eventNumbers) {
  * @param {number} eventNumber - Current event number being processed
  * @param {string} currentUid - Current user's UID
  * @param {Array} completedEvents - Array of event numbers the user has completed (including current)
+ * @param {Object} currentUserTotals - The current user's authoritative totals { totalPoints, totalEvents }
  */
-async function buildSeasonStandings(results, userData, eventNumber, currentUid, completedEvents = []) {
+async function buildSeasonStandings(results, userData, eventNumber, currentUid, completedEvents = [], currentUserTotals = {}) {
   const season = 1;
   const existingStandings = userData[`season${season}Standings`] || [];
   
@@ -684,8 +693,23 @@ async function buildSeasonStandings(results, userData, eventNumber, currentUid, 
     // Use UID for humans, name for bots (bots may not have persistent UIDs)
     const key = isBotRacer ? name : uid;
     
-    if (standingsMap.has(key)) {
-      // Update existing racer
+    // For the current user, use authoritative data from Firebase
+    const isCurrentUser = uid === currentUid;
+    
+    if (isCurrentUser && currentUserTotals.totalPoints !== undefined) {
+      // Use authoritative totals for current user
+      standingsMap.set(key, {
+        name: name,
+        uid: uid,
+        arr: arr,
+        team: team,
+        events: currentUserTotals.totalEvents,
+        points: currentUserTotals.totalPoints,
+        isBot: false,
+        isCurrentUser: true
+      });
+    } else if (standingsMap.has(key)) {
+      // Update existing racer (for bots and other humans)
       const racer = standingsMap.get(key);
       racer.points = (racer.points || 0) + points;
       racer.events = (racer.events || 0) + 1;
@@ -701,7 +725,7 @@ async function buildSeasonStandings(results, userData, eventNumber, currentUid, 
         events: 1,
         points: points,
         isBot: isBotRacer,
-        isCurrentUser: uid === currentUid
+        isCurrentUser: isCurrentUser
       });
     }
   });
