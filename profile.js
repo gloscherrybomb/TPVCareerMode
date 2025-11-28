@@ -729,7 +729,7 @@ document.addEventListener('DOMContentLoaded', () => {
 let shareStatsData = null;
 let teamCarImage = null;
 let selectedTemplate = 'season';
-let canvasIsTainted = false;
+let skipProfilePhoto = false;
 
 function initShareStats() {
     const shareBtn = document.getElementById('shareStatsBtn');
@@ -1132,32 +1132,28 @@ async function drawProfilePhoto(ctx, x, y, radius) {
     ctx.arc(x, y, radius, 0, Math.PI * 2);
     ctx.clip();
     
-    // Try to use the already-loaded profile photo from the page
-    // Only if it's same-origin or has proper CORS headers
+    // Try to load profile photo with CORS
     const existingImg = document.getElementById('profilePhoto');
-    if (existingImg && existingImg.classList.contains('active') && existingImg.complete && existingImg.naturalWidth > 0) {
-        // Check if image is same origin
-        const isSameOrigin = existingImg.src.startsWith(window.location.origin) || 
-                            existingImg.src.startsWith('data:') ||
-                            existingImg.src.startsWith('blob:');
-        
-        if (isSameOrigin) {
-            try {
-                ctx.drawImage(existingImg, x - radius, y - radius, radius * 2, radius * 2);
-                ctx.restore();
-                return;
-            } catch (e) {
-                console.log('Could not draw profile image:', e);
-            }
-        } else {
-            // Cross-origin image - drawing it would taint the canvas
-            // Use placeholder instead to keep canvas exportable
-            console.log('Skipping cross-origin profile photo to keep canvas exportable');
-            canvasIsTainted = false; // We're intentionally not drawing it
+    if (existingImg && existingImg.classList.contains('active') && existingImg.src) {
+        try {
+            // Create new image with crossOrigin to avoid tainting canvas
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            await new Promise((resolve, reject) => {
+                img.onload = resolve;
+                img.onerror = reject;
+                setTimeout(() => reject(new Error('Timeout')), 5000);
+                img.src = existingImg.src;
+            });
+            ctx.drawImage(img, x - radius, y - radius, radius * 2, radius * 2);
+            ctx.restore();
+            return;
+        } catch (e) {
+            console.log('Could not load profile photo:', e);
         }
     }
     
-    // Draw placeholder
+    // Draw placeholder if photo couldn't be loaded
     drawProfilePlaceholder(ctx, x, y, radius);
     ctx.restore();
 }
@@ -1205,7 +1201,25 @@ function downloadShareImage() {
         link.click();
         document.body.removeChild(link);
     } catch (e) {
-        console.error('Error downloading image:', e);
-        alert('Could not download image. Please try taking a screenshot instead.');
+        console.error('Canvas tainted, regenerating without profile photo:', e);
+        // Canvas is tainted by cross-origin image - regenerate without profile photo
+        skipProfilePhoto = true;
+        generateShareImage().then(() => {
+            try {
+                const dataUrl = canvas.toDataURL('image/png');
+                const link = document.createElement('a');
+                link.download = `tpv-stats-${selectedTemplate}-${Date.now()}.png`;
+                link.href = dataUrl;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } catch (e2) {
+                console.error('Still failed:', e2);
+                alert('Could not download image. Please try taking a screenshot instead.');
+            }
+            skipProfilePhoto = false;
+            // Regenerate with profile photo for preview
+            generateShareImage();
+        });
     }
 }
