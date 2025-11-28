@@ -14,6 +14,111 @@ admin.initializeApp({
 
 const db = admin.firestore();
 
+// Stage requirements for Career Mode progression
+const STAGE_REQUIREMENTS = {
+  1: { type: 'fixed', eventId: 1 },
+  2: { type: 'fixed', eventId: 2 },
+  3: { type: 'choice', eventIds: [6, 7, 8, 9, 10, 11, 12] },
+  4: { type: 'fixed', eventId: 3 },
+  5: { type: 'fixed', eventId: 4 },
+  6: { type: 'choice', eventIds: [6, 7, 8, 9, 10, 11, 12] },
+  7: { type: 'fixed', eventId: 5 },
+  8: { type: 'choice', eventIds: [6, 7, 8, 9, 10, 11, 12] },
+  9: { type: 'tour', eventIds: [13, 14, 15] }
+};
+
+const OPTIONAL_EVENTS = [6, 7, 8, 9, 10, 11, 12];
+
+/**
+ * Check if an event is valid for a given stage
+ */
+function isEventValidForStage(eventNumber, currentStage, usedOptionalEvents = [], tourProgress = {}) {
+  const stageReq = STAGE_REQUIREMENTS[currentStage];
+  
+  if (!stageReq) {
+    return { valid: false, reason: `Invalid stage: ${currentStage}` };
+  }
+  
+  if (stageReq.type === 'fixed') {
+    if (eventNumber === stageReq.eventId) {
+      return { valid: true };
+    }
+    return { valid: false, reason: `Stage ${currentStage} requires event ${stageReq.eventId}, not event ${eventNumber}` };
+  }
+  
+  if (stageReq.type === 'choice') {
+    if (!stageReq.eventIds.includes(eventNumber)) {
+      return { valid: false, reason: `Event ${eventNumber} is not a valid choice for stage ${currentStage}` };
+    }
+    if (usedOptionalEvents.includes(eventNumber)) {
+      return { valid: false, reason: `Event ${eventNumber} has already been used in a previous stage` };
+    }
+    return { valid: true };
+  }
+  
+  if (stageReq.type === 'tour') {
+    if (!stageReq.eventIds.includes(eventNumber)) {
+      return { valid: false, reason: `Event ${eventNumber} is not part of the Local Tour` };
+    }
+    
+    const nextExpected = getNextTourEvent(tourProgress);
+    if (nextExpected === null) {
+      return { valid: false, reason: 'Local Tour already completed' };
+    }
+    if (eventNumber !== nextExpected) {
+      return { valid: false, reason: `Local Tour must be completed in order. Expected event ${nextExpected}` };
+    }
+    
+    return { valid: true, isTour: true };
+  }
+  
+  return { valid: false, reason: 'Unknown stage type' };
+}
+
+/**
+ * Get next tour event to complete
+ */
+function getNextTourEvent(tourProgress = {}) {
+  if (!tourProgress.event13Completed) return 13;
+  if (!tourProgress.event14Completed) return 14;
+  if (!tourProgress.event15Completed) return 15;
+  return null;
+}
+
+/**
+ * Check if two dates are consecutive days
+ */
+function areConsecutiveDays(date1, date2) {
+  const d1 = new Date(date1);
+  const d2 = new Date(date2);
+  
+  const d1Start = new Date(Date.UTC(d1.getUTCFullYear(), d1.getUTCMonth(), d1.getUTCDate()));
+  const d2Start = new Date(Date.UTC(d2.getUTCFullYear(), d2.getUTCMonth(), d2.getUTCDate()));
+  
+  const diffTime = d2Start.getTime() - d1Start.getTime();
+  const diffDays = diffTime / (1000 * 60 * 60 * 24);
+  
+  return diffDays === 1;
+}
+
+/**
+ * Calculate next stage after completing current stage
+ */
+function calculateNextStage(currentStage, tourProgress = {}) {
+  if (currentStage < 9) {
+    return currentStage + 1;
+  }
+  
+  // Stage 9 is the tour - advance only when all 3 events complete
+  if (currentStage === 9) {
+    if (tourProgress.event13Completed && tourProgress.event14Completed && tourProgress.event15Completed) {
+      return 10; // Beyond the tour
+    }
+  }
+  
+  return currentStage + 1;
+}
+
 /**
  * Parse folder path to extract season and event number
  * Example: race_results/season_1/event_1/results.csv -> { season: 1, event: 1 }
@@ -239,12 +344,22 @@ async function processUserResult(uid, eventInfo, results) {
   
   console.log(`   Found user: ${userData.name || uid} (Document ID: ${userDoc.id})`);
   
-  // Check if this is the user's next event
+  // Get user's current stage and used optional events
   const currentStage = userData.currentStage || 1;
-  if (currentStage !== eventNumber) {
-    console.log(`Event ${eventNumber} is not next for user ${uid} (currently on stage ${currentStage}), skipping`);
+  const usedOptionalEvents = userData.usedOptionalEvents || [];
+  const tourProgress = userData.tourProgress || {};
+  
+  // Validate if this event is valid for the user's current stage
+  const validation = isEventValidForStage(eventNumber, currentStage, usedOptionalEvents, tourProgress);
+  
+  if (!validation.valid) {
+    console.log(`❌ Event ${eventNumber} is not valid for user ${uid} at stage ${currentStage}`);
+    console.log(`   Reason: ${validation.reason}`);
+    console.log(`   This result will NOT be processed or stored.`);
     return;
   }
+  
+  console.log(`✅ Event ${eventNumber} is valid for stage ${currentStage}`);
   
   // Find user's result in CSV (first occurrence only)
   const userResult = results.find(r => r.UID === uid);
@@ -352,29 +467,56 @@ async function processUserResult(uid, eventInfo, results) {
   // Build season standings with all racers from CSV
   const seasonStandings = await buildSeasonStandings(results, userData, eventNumber, uid);
   
+  // Track if this is an optional event
+  const newUsedOptionalEvents = [...usedOptionalEvents];
+  if (OPTIONAL_EVENTS.includes(eventNumber) && !usedOptionalEvents.includes(eventNumber)) {
+    newUsedOptionalEvents.push(eventNumber);
+  }
+  
+  // Update tour progress if this is a tour event
+  const newTourProgress = { ...tourProgress };
+  if (validation.isTour) {
+    if (eventNumber === 13) {
+      newTourProgress.event13Completed = true;
+      newTourProgress.event13Date = new Date().toISOString();
+    } else if (eventNumber === 14) {
+      newTourProgress.event14Completed = true;
+      newTourProgress.event14Date = new Date().toISOString();
+    } else if (eventNumber === 15) {
+      newTourProgress.event15Completed = true;
+      newTourProgress.event15Date = new Date().toISOString();
+    }
+  }
+  
+  // Calculate next stage
+  const nextStage = calculateNextStage(currentStage, newTourProgress);
+  
   // Update user document
   const updates = {
     [`event${eventNumber}Results`]: eventResults,
-    currentStage: eventNumber + 1, // Unlock next event
+    currentStage: nextStage,
     totalPoints: (userData.totalPoints || 0) + points,
     totalEvents: (userData.totalEvents || 0) + 1,
     [`season${season}Standings`]: seasonStandings,
-    team: userResult.Team || '' // Update team from latest race result
+    team: userResult.Team || '',
+    usedOptionalEvents: newUsedOptionalEvents,
+    tourProgress: newTourProgress
   };
   
-  // Add to completedStages if not already there
+  // Add to completedStages (store the STAGE number, not event number)
   const completedStages = userData.completedStages || [];
-  if (!completedStages.includes(eventNumber)) {
-    updates.completedStages = admin.firestore.FieldValue.arrayUnion(eventNumber);
+  if (!completedStages.includes(currentStage)) {
+    updates.completedStages = admin.firestore.FieldValue.arrayUnion(currentStage);
   }
   
   await userRef.update(updates);
   
   const bonusLog = bonusPoints > 0 ? ` (including +${bonusPoints} bonus)` : '';
   const predictionLog = predictedPosition ? ` | Predicted: ${predictedPosition}` : '';
-  const punchingLog = earnedPunchingMedal ? ' 🥊 PUNCHING MEDAL!' : '';
-  const giantKillerLog = earnedGiantKillerMedal ? ' âš”ï¸ GIANT KILLER!' : '';
-  console.log(`âœ… Processed event ${eventNumber} for user ${uid}: Position ${position}${predictionLog}, Points ${points}${bonusLog}${punchingLog}${giantKillerLog}`);
+  const punchingLog = earnedPunchingMedal ? ' PUNCHING MEDAL!' : '';
+  const giantKillerLog = earnedGiantKillerMedal ? ' GIANT KILLER!' : '';
+  console.log(`Processed event ${eventNumber} for user ${uid}: Position ${position}${predictionLog}, Points ${points}${bonusLog}${punchingLog}${giantKillerLog}`);
+  console.log(`   Stage ${currentStage} complete -> Stage ${nextStage}`);
   
   // Update results summary collection
   await updateResultsSummary(season, eventNumber, results);

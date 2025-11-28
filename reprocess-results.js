@@ -574,7 +574,8 @@ async function processResultsForUser(userDoc, csvFiles, season) {
   let currentStage = 1;
   let totalPoints = 0;
   let totalEvents = 0;
-  let completedStages = [];
+  let completedStages = []; // Stores stage numbers (1, 2, 3, 4, ...)
+  let processedEvents = []; // Stores event numbers (1, 2, 8, 3, ...) for reference
   let usedOptionalEvents = [];
   let tourProgress = {};
   let beatPredictionStreak = 0; // For Hot Streak award
@@ -660,8 +661,8 @@ async function processResultsForUser(userDoc, csvFiles, season) {
     
     // Zero to Hero requires previous event data
     let earnedZeroToHero = false;
-    if (eventNumber > 1 && completedStages.length > 0) {
-      const prevEventNum = completedStages[completedStages.length - 1];
+    if (eventNumber > 1 && processedEvents.length > 0) {
+      const prevEventNum = processedEvents[processedEvents.length - 1];
       const prevEventResults = updates[`event${prevEventNum}Results`];
       if (prevEventResults && prevEventResults.position && prevEventResults.position !== 'DNF') {
         const currentFinishers = results.filter(r => r.Position !== 'DNF' && !isNaN(parseInt(r.Position))).length;
@@ -716,7 +717,8 @@ async function processResultsForUser(userDoc, csvFiles, season) {
     // Update totals
     totalPoints += points;
     totalEvents += 1;
-    completedStages.push(eventNumber);
+    completedStages.push(currentStage); // Store STAGE number
+    processedEvents.push(eventNumber);  // Store EVENT number for reference
     
     // Store event results
     updates[`event${eventNumber}Results`] = {
@@ -751,8 +753,8 @@ async function processResultsForUser(userDoc, csvFiles, season) {
   }
   
   // Build final standings
-  if (completedStages.length > 0) {
-    const lastEventNum = completedStages[completedStages.length - 1];
+  if (processedEvents.length > 0) {
+    const lastEventNum = processedEvents[processedEvents.length - 1];
     const lastCsvFile = csvFiles.find(f => f.event === lastEventNum);
     
     if (lastCsvFile) {
@@ -762,7 +764,7 @@ async function processResultsForUser(userDoc, csvFiles, season) {
       const seasonStandings = await buildSeasonStandings(
         results, 
         lastEventNum, 
-        completedStages,
+        processedEvents, // Pass processed events, not completed stages
         { totalPoints, totalEvents },
         userUid
       );
