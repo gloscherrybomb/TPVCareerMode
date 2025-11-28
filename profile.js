@@ -719,4 +719,469 @@ onAuthStateChanged(auth, async (user) => {
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
     initPhotoUpload();
+    initShareStats();
 });
+
+// ============================================================================
+// SHARE STATS FUNCTIONALITY
+// ============================================================================
+
+let shareStatsData = null;
+let teamCarImage = null;
+let selectedTemplate = 'season';
+
+function initShareStats() {
+    const shareBtn = document.getElementById('shareStatsBtn');
+    const modal = document.getElementById('shareStatsModal');
+    const modalClose = document.getElementById('shareStatsModalClose');
+    const modalOverlay = document.getElementById('shareStatsModalOverlay');
+    const downloadBtn = document.getElementById('downloadStatsBtn');
+    const templateOptions = document.querySelectorAll('.template-option');
+    
+    if (!shareBtn || !modal) return;
+    
+    // Preload team car image
+    teamCarImage = new Image();
+    teamCarImage.crossOrigin = 'anonymous';
+    teamCarImage.src = 'tpvteamcar.png';
+    
+    // Open modal
+    shareBtn.addEventListener('click', () => {
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+        generateShareImage();
+    });
+    
+    // Close modal
+    const closeModal = () => {
+        modal.classList.remove('active');
+        document.body.style.overflow = '';
+    };
+    
+    modalClose?.addEventListener('click', closeModal);
+    modalOverlay?.addEventListener('click', closeModal);
+    
+    // Template selection
+    templateOptions.forEach(option => {
+        option.addEventListener('click', () => {
+            templateOptions.forEach(o => o.classList.remove('selected'));
+            option.classList.add('selected');
+            selectedTemplate = option.dataset.template;
+            generateShareImage();
+        });
+    });
+    
+    // Download button
+    downloadBtn?.addEventListener('click', downloadShareImage);
+}
+
+function collectShareData() {
+    return {
+        name: document.getElementById('profileName')?.textContent || 'Rider',
+        team: document.getElementById('profileTeam')?.textContent || '',
+        totalRaces: document.getElementById('totalRaces')?.textContent || '0',
+        totalWins: document.getElementById('totalWins')?.textContent || '0',
+        totalPodiums: document.getElementById('totalPodiums')?.textContent || '0',
+        totalPoints: document.getElementById('totalPoints')?.textContent || '0',
+        seasonRank: document.getElementById('seasonRank')?.textContent || '-',
+        arrRating: document.getElementById('arrRating')?.textContent || '-',
+        winRate: document.getElementById('winRate')?.textContent || '0%',
+        podiumRate: document.getElementById('podiumRate')?.textContent || '0%',
+        profilePhotoUrl: document.getElementById('profilePhoto')?.src || null,
+        awards: collectAwardsData()
+    };
+}
+
+function collectAwardsData() {
+    const awards = [];
+    const awardCards = document.querySelectorAll('.award-card');
+    
+    awardCards.forEach(card => {
+        const icon = card.querySelector('.award-icon')?.textContent || '';
+        const count = card.querySelector('.award-count')?.textContent || '';
+        const title = card.querySelector('.award-title')?.textContent || '';
+        if (icon && count) {
+            awards.push({ icon, count, title });
+        }
+    });
+    
+    return awards;
+}
+
+async function generateShareImage() {
+    const canvas = document.getElementById('shareCanvas');
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    const width = 1080;
+    const height = 1920;
+    
+    // Collect current stats
+    shareStatsData = collectShareData();
+    
+    // Clear canvas
+    ctx.clearRect(0, 0, width, height);
+    
+    // Draw based on selected template
+    switch (selectedTemplate) {
+        case 'season':
+            await drawSeasonTemplate(ctx, width, height);
+            break;
+        case 'trophy':
+            await drawTrophyTemplate(ctx, width, height);
+            break;
+        case 'champion':
+            await drawChampionTemplate(ctx, width, height);
+            break;
+    }
+}
+
+async function drawSeasonTemplate(ctx, width, height) {
+    const data = shareStatsData;
+    
+    // Background gradient
+    const bgGradient = ctx.createLinearGradient(0, 0, 0, height);
+    bgGradient.addColorStop(0, '#0a0e1a');
+    bgGradient.addColorStop(0.3, '#1a1a2e');
+    bgGradient.addColorStop(0.7, '#1a1a2e');
+    bgGradient.addColorStop(1, '#0a0e1a');
+    ctx.fillStyle = bgGradient;
+    ctx.fillRect(0, 0, width, height);
+    
+    // Decorative lines
+    ctx.strokeStyle = 'rgba(255, 0, 128, 0.1)';
+    ctx.lineWidth = 2;
+    for (let i = 0; i < 5; i++) {
+        ctx.beginPath();
+        ctx.moveTo(0, 300 + i * 300);
+        ctx.lineTo(width, 350 + i * 300);
+        ctx.stroke();
+    }
+    
+    // TPV Logo text
+    ctx.fillStyle = '#ff0080';
+    ctx.font = 'bold 72px Orbitron, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('TPV', width / 2, 120);
+    
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+    ctx.font = '600 28px "Exo 2", sans-serif';
+    ctx.letterSpacing = '8px';
+    ctx.fillText('CAREER MODE', width / 2, 165);
+    
+    // Profile photo (small, circular)
+    await drawProfilePhoto(ctx, width / 2, 320, 100);
+    
+    // Player name
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 52px "Exo 2", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(data.name.toUpperCase(), width / 2, 480);
+    
+    // Team
+    if (data.team) {
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+        ctx.font = '32px "Exo 2", sans-serif';
+        ctx.fillText(data.team, width / 2, 530);
+    }
+    
+    // Season rank highlight
+    ctx.fillStyle = '#ff0080';
+    ctx.font = 'bold 140px Orbitron, sans-serif';
+    ctx.fillText(data.seasonRank, width / 2, 720);
+    
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+    ctx.font = '600 32px "Exo 2", sans-serif';
+    ctx.fillText('SEASON RANK', width / 2, 780);
+    
+    // Stats grid
+    const statsY = 920;
+    const statsSpacing = 180;
+    
+    drawStatBox(ctx, width / 2 - statsSpacing * 1.5, statsY, data.totalRaces, 'RACES');
+    drawStatBox(ctx, width / 2 - statsSpacing * 0.5, statsY, data.totalWins, 'WINS');
+    drawStatBox(ctx, width / 2 + statsSpacing * 0.5, statsY, data.totalPodiums, 'PODIUMS');
+    drawStatBox(ctx, width / 2 + statsSpacing * 1.5, statsY, data.totalPoints, 'POINTS');
+    
+    // Secondary stats
+    const stats2Y = 1150;
+    drawStatBox(ctx, width / 2 - statsSpacing, stats2Y, data.winRate, 'WIN RATE');
+    drawStatBox(ctx, width / 2, stats2Y, data.arrRating, 'ARR');
+    drawStatBox(ctx, width / 2 + statsSpacing, stats2Y, data.podiumRate, 'PODIUM RATE');
+    
+    // Awards preview (if any)
+    if (data.awards.length > 0) {
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+        ctx.font = '600 28px "Exo 2", sans-serif';
+        ctx.fillText('AWARDS', width / 2, 1380);
+        
+        const awardStartX = width / 2 - (data.awards.length - 1) * 60;
+        data.awards.slice(0, 6).forEach((award, i) => {
+            ctx.font = '64px sans-serif';
+            ctx.fillText(award.icon, awardStartX + i * 120, 1460);
+        });
+    }
+    
+    // Team car
+    await drawTeamCar(ctx, width / 2, 1620, 0.5);
+    
+    // Website
+    drawWebsite(ctx, width, height);
+}
+
+async function drawTrophyTemplate(ctx, width, height) {
+    const data = shareStatsData;
+    
+    // Background gradient (purple theme)
+    const bgGradient = ctx.createLinearGradient(0, 0, 0, height);
+    bgGradient.addColorStop(0, '#0a0e1a');
+    bgGradient.addColorStop(0.3, '#2d1f3d');
+    bgGradient.addColorStop(0.7, '#2d1f3d');
+    bgGradient.addColorStop(1, '#0a0e1a');
+    ctx.fillStyle = bgGradient;
+    ctx.fillRect(0, 0, width, height);
+    
+    // Decorative circles
+    ctx.strokeStyle = 'rgba(138, 43, 226, 0.1)';
+    ctx.lineWidth = 3;
+    for (let i = 0; i < 3; i++) {
+        ctx.beginPath();
+        ctx.arc(width / 2, height / 2, 300 + i * 150, 0, Math.PI * 2);
+        ctx.stroke();
+    }
+    
+    // TPV Logo
+    ctx.fillStyle = '#8a2be2';
+    ctx.font = 'bold 72px Orbitron, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('TPV', width / 2, 120);
+    
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+    ctx.font = '600 28px "Exo 2", sans-serif';
+    ctx.fillText('CAREER MODE', width / 2, 165);
+    
+    // Trophy icon
+    ctx.font = '120px sans-serif';
+    ctx.fillText('🏆', width / 2, 320);
+    
+    // Title
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 48px "Exo 2", sans-serif';
+    ctx.fillText('TROPHY CABINET', width / 2, 420);
+    
+    // Player name
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+    ctx.font = '600 36px "Exo 2", sans-serif';
+    ctx.fillText(data.name.toUpperCase(), width / 2, 490);
+    
+    // Awards grid
+    if (data.awards.length > 0) {
+        const startY = 620;
+        const rowHeight = 200;
+        const cols = 3;
+        const colWidth = width / (cols + 1);
+        
+        data.awards.forEach((award, i) => {
+            const col = i % cols;
+            const row = Math.floor(i / cols);
+            const x = colWidth + col * colWidth;
+            const y = startY + row * rowHeight;
+            
+            // Award icon
+            ctx.font = '80px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(award.icon, x, y);
+            
+            // Count
+            ctx.fillStyle = '#8a2be2';
+            ctx.font = 'bold 36px Orbitron, sans-serif';
+            ctx.fillText(award.count, x, y + 60);
+            
+            // Title
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+            ctx.font = '600 22px "Exo 2", sans-serif';
+            ctx.fillText(award.title.toUpperCase(), x, y + 100);
+        });
+    } else {
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+        ctx.font = '32px "Exo 2", sans-serif';
+        ctx.fillText('Start racing to earn awards!', width / 2, 700);
+    }
+    
+    // Team car
+    await drawTeamCar(ctx, width / 2, 1620, 0.5);
+    
+    // Website
+    drawWebsite(ctx, width, height);
+}
+
+async function drawChampionTemplate(ctx, width, height) {
+    const data = shareStatsData;
+    
+    // Background gradient (gold theme)
+    const bgGradient = ctx.createLinearGradient(0, 0, 0, height);
+    bgGradient.addColorStop(0, '#0a0e1a');
+    bgGradient.addColorStop(0.2, '#1a2a1a');
+    bgGradient.addColorStop(0.5, '#2a3a1a');
+    bgGradient.addColorStop(0.8, '#1a2a1a');
+    bgGradient.addColorStop(1, '#0a0e1a');
+    ctx.fillStyle = bgGradient;
+    ctx.fillRect(0, 0, width, height);
+    
+    // Gold rays
+    ctx.save();
+    ctx.translate(width / 2, 600);
+    for (let i = 0; i < 12; i++) {
+        ctx.rotate(Math.PI / 6);
+        ctx.fillStyle = 'rgba(255, 215, 0, 0.05)';
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(-100, -1000);
+        ctx.lineTo(100, -1000);
+        ctx.closePath();
+        ctx.fill();
+    }
+    ctx.restore();
+    
+    // TPV Logo
+    ctx.fillStyle = '#ffd700';
+    ctx.font = 'bold 72px Orbitron, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('TPV', width / 2, 120);
+    
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+    ctx.font = '600 28px "Exo 2", sans-serif';
+    ctx.fillText('CAREER MODE', width / 2, 165);
+    
+    // Profile photo (larger for champion)
+    await drawProfilePhoto(ctx, width / 2, 380, 140);
+    
+    // Player name
+    ctx.fillStyle = '#ffd700';
+    ctx.font = 'bold 56px "Exo 2", sans-serif';
+    ctx.fillText(data.name.toUpperCase(), width / 2, 590);
+    
+    // Champion text
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 72px Orbitron, sans-serif';
+    ctx.fillText('CHAMPION', width / 2, 700);
+    
+    // Big stats
+    ctx.font = 'bold 200px Orbitron, sans-serif';
+    ctx.fillStyle = '#ffd700';
+    ctx.fillText(data.totalWins, width / 2, 950);
+    
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+    ctx.font = '600 40px "Exo 2", sans-serif';
+    ctx.fillText('VICTORIES', width / 2, 1020);
+    
+    // Other stats in row
+    const statsY = 1180;
+    drawStatBox(ctx, width / 3, statsY, data.totalPodiums, 'PODIUMS', '#ffd700');
+    drawStatBox(ctx, width / 2, statsY, data.totalPoints, 'POINTS', '#ffd700');
+    drawStatBox(ctx, width * 2/3, statsY, data.seasonRank, 'RANK', '#ffd700');
+    
+    // Awards
+    if (data.awards.length > 0) {
+        const awardStartX = width / 2 - (Math.min(data.awards.length, 5) - 1) * 70;
+        ctx.font = '72px sans-serif';
+        data.awards.slice(0, 5).forEach((award, i) => {
+            ctx.fillText(award.icon, awardStartX + i * 140, 1420);
+        });
+    }
+    
+    // Team car
+    await drawTeamCar(ctx, width / 2, 1620, 0.55);
+    
+    // Website
+    drawWebsite(ctx, width, height);
+}
+
+function drawStatBox(ctx, x, y, value, label, accentColor = '#ff0080') {
+    // Value
+    ctx.fillStyle = accentColor;
+    ctx.font = 'bold 56px Orbitron, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(value, x, y);
+    
+    // Label
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+    ctx.font = '600 22px "Exo 2", sans-serif';
+    ctx.fillText(label, x, y + 40);
+}
+
+async function drawProfilePhoto(ctx, x, y, radius) {
+    const data = shareStatsData;
+    
+    // Draw circle background
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(x, y, radius + 4, 0, Math.PI * 2);
+    ctx.fillStyle = 'rgba(255, 0, 128, 0.5)';
+    ctx.fill();
+    
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, Math.PI * 2);
+    ctx.clip();
+    
+    // Try to draw profile photo
+    if (data.profilePhotoUrl && !data.profilePhotoUrl.includes('undefined')) {
+        try {
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            await new Promise((resolve, reject) => {
+                img.onload = resolve;
+                img.onerror = reject;
+                img.src = data.profilePhotoUrl;
+            });
+            ctx.drawImage(img, x - radius, y - radius, radius * 2, radius * 2);
+        } catch (e) {
+            // Draw placeholder
+            drawProfilePlaceholder(ctx, x, y, radius);
+        }
+    } else {
+        drawProfilePlaceholder(ctx, x, y, radius);
+    }
+    
+    ctx.restore();
+}
+
+function drawProfilePlaceholder(ctx, x, y, radius) {
+    ctx.fillStyle = '#1a1a2e';
+    ctx.fillRect(x - radius, y - radius, radius * 2, radius * 2);
+    
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+    ctx.font = `bold ${radius}px "Exo 2", sans-serif`;
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    
+    const initials = shareStatsData.name.split(' ').map(n => n[0]).join('').substring(0, 2);
+    ctx.fillText(initials, x, y);
+    ctx.textBaseline = 'alphabetic';
+}
+
+async function drawTeamCar(ctx, x, y, scale) {
+    if (teamCarImage && teamCarImage.complete && teamCarImage.naturalWidth > 0) {
+        const carWidth = teamCarImage.naturalWidth * scale;
+        const carHeight = teamCarImage.naturalHeight * scale;
+        ctx.drawImage(teamCarImage, x - carWidth / 2, y - carHeight / 2, carWidth, carHeight);
+    }
+}
+
+function drawWebsite(ctx, width, height) {
+    // Website URL at bottom
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+    ctx.font = '600 32px "Exo 2", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('tpvcareermode.com', width / 2, height - 80);
+}
+
+function downloadShareImage() {
+    const canvas = document.getElementById('shareCanvas');
+    if (!canvas) return;
+    
+    const link = document.createElement('a');
+    link.download = `tpv-stats-${selectedTemplate}-${Date.now()}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+}

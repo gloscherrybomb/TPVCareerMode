@@ -83,6 +83,14 @@
                             <span class="profile-team" id="profileTeam"></span>
                         </div>
                         <div class="profile-category" id="profileCategory"></div>
+                        <button class="btn btn-share-stats" id="shareStatsBtn">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+                                <polyline points="16 6 12 2 8 6"></polyline>
+                                <line x1="12" y1="2" x2="12" y2="15"></line>
+                            </svg>
+                            Share Stats
+                        </button>
                     </div>
 
                     <div class="profile-quick-stats">
@@ -117,7 +125,7 @@
                             </div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-icon">🌍</div>
+                            <div class="stat-icon">🌐</div>
                             <div class="stat-content">
                                 <div class="stat-label">Global Ranking</div>
                                 <div class="stat-value" id="globalRank">-</div>
@@ -299,6 +307,55 @@
                     </div>
                     <button type="submit" class="btn btn-primary btn-full">Save UID</button>
                 </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Share Stats Modal -->
+    <div class="modal" id="shareStatsModal">
+        <div class="modal-overlay" id="shareStatsModalOverlay"></div>
+        <div class="modal-content modal-large">
+            <button class="modal-close" id="shareStatsModalClose">&times;</button>
+            <div class="modal-header">
+                <h2>Share Your Stats</h2>
+                <p class="modal-subtitle">Choose a template and share your TPV Career Mode stats</p>
+            </div>
+            <div class="modal-body">
+                <div class="template-selector">
+                    <div class="template-option selected" data-template="season">
+                        <div class="template-preview template-preview-season">
+                            <div class="template-preview-label">Season Summary</div>
+                        </div>
+                        <span class="template-name">Season Summary</span>
+                    </div>
+                    <div class="template-option" data-template="trophy">
+                        <div class="template-preview template-preview-trophy">
+                            <div class="template-preview-label">Trophy Cabinet</div>
+                        </div>
+                        <span class="template-name">Trophy Cabinet</span>
+                    </div>
+                    <div class="template-option" data-template="champion">
+                        <div class="template-preview template-preview-champion">
+                            <div class="template-preview-label">Champion</div>
+                        </div>
+                        <span class="template-name">Champion</span>
+                    </div>
+                </div>
+                
+                <div class="share-preview-container">
+                    <canvas id="shareCanvas" width="1080" height="1920"></canvas>
+                </div>
+                
+                <div class="share-actions">
+                    <button class="btn btn-secondary" id="downloadStatsBtn">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        Download Image
+                    </button>
+                </div>
             </div>
         </div>
     </div>
