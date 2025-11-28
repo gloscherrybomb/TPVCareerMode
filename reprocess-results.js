@@ -484,6 +484,23 @@ async function buildSeasonStandings(results, eventNumber, completedEvents, curre
   });
   
   // Simulate bot results for missing events
+  // Stage to event mapping for mandatory stages
+  const STAGE_TO_EVENT = {
+    1: 1,   // Coast and Roast Crit
+    2: 2,   // Island Classic
+    // 3: choice from 6-12
+    4: 3,   // Forest Velodrome Elimination
+    5: 4,   // Coastal Loop Time Challenge
+    // 6: choice from 6-12
+    7: 5,   // North Lake Points Race
+    // 8: choice from 6-12
+    9: 13   // Local Tour (simplified)
+  };
+  
+  const CHOICE_STAGES = [3, 6, 8];
+  const OPTIONAL_EVENT_IDS = [6, 7, 8, 9, 10, 11, 12];
+  const numStagesCompleted = numCompletedEvents;
+  
   for (const [botName, botInfo] of allBots.entries()) {
     if (!standingsMap.has(botName)) {
       standingsMap.set(botName, {
@@ -499,12 +516,29 @@ async function buildSeasonStandings(results, eventNumber, completedEvents, curre
     }
     
     const botStanding = standingsMap.get(botName);
+    const botUsedOptionals = new Set();
     let simulatedPoints = 0;
     
-    for (const evtNum of completedEvents) {
-      if (!botInfo.actualEvents.has(evtNum)) {
-        const simulatedPosition = simulatePosition(botName, botInfo.arr, evtNum);
-        const points = calculatePoints(simulatedPosition, evtNum).points;
+    for (let stage = 1; stage <= numStagesCompleted; stage++) {
+      let eventNumForStage;
+      
+      if (CHOICE_STAGES.includes(stage)) {
+        // For choice stages, pick a random event from available optionals
+        const availableOptionals = OPTIONAL_EVENT_IDS.filter(id => !botUsedOptionals.has(id));
+        if (availableOptionals.length > 0) {
+          const randomIndex = Math.floor(getSeededRandom(botName, stage) * availableOptionals.length);
+          eventNumForStage = availableOptionals[randomIndex];
+          botUsedOptionals.add(eventNumForStage);
+        } else {
+          eventNumForStage = 6;
+        }
+      } else {
+        eventNumForStage = STAGE_TO_EVENT[stage];
+      }
+      
+      if (eventNumForStage && !botInfo.actualEvents.has(eventNumForStage)) {
+        const simulatedPosition = simulatePosition(botName, botInfo.arr, eventNumForStage);
+        const points = calculatePoints(simulatedPosition, eventNumForStage).points;
         simulatedPoints += points;
       }
     }

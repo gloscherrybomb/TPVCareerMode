@@ -768,7 +768,27 @@ async function buildSeasonStandings(results, userData, eventNumber, currentUid, 
   
   console.log(`   Found ${allBots.size} unique bots across all events`);
   
-  // For each bot, simulate missing events and update standings
+  // Stage to event mapping for mandatory stages
+  const STAGE_TO_EVENT = {
+    1: 1,   // Coast and Roast Crit
+    2: 2,   // Island Classic
+    // 3: choice from 6-12
+    4: 3,   // Forest Velodrome Elimination
+    5: 4,   // Coastal Loop Time Challenge
+    // 6: choice from 6-12
+    7: 5,   // North Lake Points Race
+    // 8: choice from 6-12
+    9: 13   // Local Tour (simplified - just event 13 for now)
+  };
+  
+  const CHOICE_STAGES = [3, 6, 8];
+  const OPTIONAL_EVENT_IDS = [6, 7, 8, 9, 10, 11, 12];
+  
+  // Determine number of stages completed based on currentStage
+  // completedEvents length = number of stages completed
+  const numStagesCompleted = numCompletedEvents;
+  
+  // For each bot, simulate results for all completed stages
   for (const [botName, botInfo] of allBots.entries()) {
     if (!standingsMap.has(botName)) {
       // Bot not in standings yet, add them
@@ -786,15 +806,38 @@ async function buildSeasonStandings(results, userData, eventNumber, currentUid, 
     
     const botStanding = standingsMap.get(botName);
     
-    // Calculate simulated points for missing events (only for completed events, not all 1-N)
+    // Track which optional events this bot has "used"
+    const botUsedOptionals = new Set();
+    
+    // Calculate simulated points for each stage
     let simulatedPoints = 0;
     let simulatedEvents = 0;
     
-    for (const eventNum of completedEvents) {
-      if (!botInfo.actualEvents.has(eventNum)) {
+    for (let stage = 1; stage <= numStagesCompleted; stage++) {
+      let eventNumForStage;
+      
+      if (CHOICE_STAGES.includes(stage)) {
+        // For choice stages, pick a random event from available optionals
+        // Use seeded random so same bot picks same event consistently
+        const availableOptionals = OPTIONAL_EVENT_IDS.filter(id => !botUsedOptionals.has(id));
+        if (availableOptionals.length > 0) {
+          const randomIndex = Math.floor(getSeededRandom(botName, stage) * availableOptionals.length);
+          eventNumForStage = availableOptionals[randomIndex];
+          botUsedOptionals.add(eventNumForStage);
+        } else {
+          // Fallback - shouldn't happen with only 3 choice stages and 7 options
+          eventNumForStage = 6;
+        }
+      } else {
+        // Fixed stage - use the mapped event
+        eventNumForStage = STAGE_TO_EVENT[stage];
+      }
+      
+      // Check if bot actually participated in this event
+      if (eventNumForStage && !botInfo.actualEvents.has(eventNumForStage)) {
         // Bot didn't participate in this event, simulate it
-        const simulatedPosition = simulatePosition(botName, botInfo.arr, eventNum);
-        const points = calculatePoints(simulatedPosition, eventNum).points; // Base points only, no bonus
+        const simulatedPosition = simulatePosition(botName, botInfo.arr, eventNumForStage);
+        const points = calculatePoints(simulatedPosition, eventNumForStage).points;
         simulatedPoints += points;
         simulatedEvents++;
       }

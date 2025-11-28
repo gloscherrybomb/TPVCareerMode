@@ -27,20 +27,20 @@ const eventSequence = [
         type: 'mandatory',
         eventId: 1,
         name: 'Coast and Roast Crit',
-        icon: '🔄'
+        icon: 'ðŸ”„'
     },
     {
         stage: 2,
         type: 'mandatory',
         eventId: 2,
         name: 'Island Classic',
-        icon: '🚴'
+        icon: 'ðŸš´'
     },
     {
         stage: 3,
         type: 'choice',
         name: 'Optional Event Choice #1',
-        icon: '🎯',
+        icon: 'ðŸŽ¯',
         availableEvents: [6, 7, 8, 9, 10, 11, 12] // IDs of optional events
     },
     {
@@ -48,20 +48,20 @@ const eventSequence = [
         type: 'mandatory',
         eventId: 3,
         name: 'The Forest Velodrome Elimination',
-        icon: '🏟️'
+        icon: 'ðŸŸï¸'
     },
     {
         stage: 5,
         type: 'mandatory',
         eventId: 4,
         name: 'Coastal Loop Time Challenge',
-        icon: '⏱️'
+        icon: 'â±ï¸'
     },
     {
         stage: 6,
         type: 'choice',
         name: 'Optional Event Choice #2',
-        icon: '🎯',
+        icon: 'ðŸŽ¯',
         availableEvents: [6, 7, 8, 9, 10, 11, 12]
     },
     {
@@ -69,13 +69,13 @@ const eventSequence = [
         type: 'mandatory',
         eventId: 5,
         name: 'North Lake Points Race',
-        icon: '🎯'
+        icon: 'ðŸŽ¯'
     },
     {
         stage: 8,
         type: 'choice',
         name: 'Optional Event Choice #3',
-        icon: '🎯',
+        icon: 'ðŸŽ¯',
         availableEvents: [6, 7, 8, 9, 10, 11, 12]
     },
     {
@@ -83,7 +83,7 @@ const eventSequence = [
         type: 'mandatory',
         eventId: 13,
         name: 'Local Tour',
-        icon: '🏆'
+        icon: 'ðŸ†'
     }
 ];
 
@@ -138,11 +138,28 @@ class ProgressManager {
             
             if (userDoc.exists()) {
                 const userData = userDoc.data();
+                
+                // completedStages from Firebase contains EVENT IDs, not stage numbers
+                // usedOptionalEvents contains which optional events (6-12) were used
+                const completedEventIds = userData.completedStages || [];
+                const usedOptionalEvents = userData.usedOptionalEvents || [];
+                
+                // Build choiceSelections from usedOptionalEvents
+                // Map which optional event was used for which choice stage
+                const choiceSelections = {};
+                usedOptionalEvents.forEach((eventId, index) => {
+                    // Choice stages are 3, 6, 8 (index 0, 1, 2)
+                    const choiceStages = [3, 6, 8];
+                    if (index < choiceStages.length) {
+                        choiceSelections[choiceStages[index]] = eventId;
+                    }
+                });
+                
                 this.progress = {
                     currentStage: userData.currentStage || 1,
-                    completedStages: userData.completedStages || [],
-                    completedOptionalEvents: userData.completedOptionalEvents || [],
-                    choiceSelections: userData.choiceSelections || {},
+                    completedEventIds: completedEventIds, // Store the raw event IDs
+                    completedOptionalEvents: usedOptionalEvents,
+                    choiceSelections: choiceSelections,
                     totalPoints: userData.totalPoints || 0
                 };
                 console.log('Progress loaded from Firestore:', this.progress);
@@ -156,7 +173,7 @@ class ProgressManager {
                 console.log('No user document found, using defaults');
                 this.progress = {
                     currentStage: 1,
-                    completedStages: [],
+                    completedEventIds: [],
                     completedOptionalEvents: [],
                     choiceSelections: {},
                     totalPoints: 0
@@ -172,10 +189,14 @@ class ProgressManager {
         const saved = localStorage.getItem(this.storageKey);
         if (saved) {
             this.progress = JSON.parse(saved);
+            // Ensure completedEventIds exists for backward compatibility
+            if (!this.progress.completedEventIds) {
+                this.progress.completedEventIds = this.progress.completedStages || [];
+            }
         } else {
             this.progress = {
                 currentStage: 1,
-                completedStages: [],
+                completedEventIds: [],
                 completedOptionalEvents: [],
                 choiceSelections: {},
                 totalPoints: 0
@@ -221,7 +242,8 @@ class ProgressManager {
     }
 
     isStageCompleted(stage) {
-        return this.progress.completedStages.includes(stage);
+        // A stage is completed if we're past it (currentStage > stage)
+        return this.progress.currentStage > stage;
     }
 
     isStageUnlocked(stage) {
@@ -300,9 +322,9 @@ class ProgressManager {
         return this.progress.choiceSelections[stage] || null;
     }
 
-    // Get completed stages count
+    // Get completed stages count (stages 1 through currentStage - 1)
     getCompletedStagesCount() {
-        return this.progress.completedStages.length;
+        return Math.max(0, this.progress.currentStage - 1);
     }
 
     // Get progress percentage

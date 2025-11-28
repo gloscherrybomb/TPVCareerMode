@@ -252,51 +252,31 @@ async function calculateUserStats(userUID) {
     return stats;
 }
 
-// Calculate season ranking
-async function calculateSeasonRanking(userUID) {
+// Calculate season ranking from standings data
+async function calculateSeasonRanking(userUID, userData) {
     console.log('Calculating season ranking for user:', userUID);
     
-    // Get all riders' points from results
-    const riderPoints = {};
-    const eventCount = 9;
-    const season = 1;
+    // Use season1Standings from user document - this is the authoritative source
+    // that includes simulated bot results
+    const standings = userData.season1Standings || [];
     
-    for (let eventNum = 1; eventNum <= eventCount; eventNum++) {
-        const resultDocId = `season${season}_event${eventNum}`;
-        
-        try {
-            const resultDoc = await getDoc(doc(db, 'results', resultDocId));
-            
-            if (resultDoc.exists()) {
-                const resultData = resultDoc.data();
-                const results = resultData.results || [];
-                
-                results.forEach(result => {
-                    const uid = result.uid;
-                    const points = result.points || 0;
-                    
-                    if (!riderPoints[uid]) {
-                        riderPoints[uid] = 0;
-                    }
-                    riderPoints[uid] += points;
-                });
-            }
-        } catch (error) {
-            console.log(`No results for event ${eventNum}`);
-        }
+    if (standings.length === 0) {
+        console.log('No standings data found');
+        return { rank: null, total: 0 };
     }
     
-    // Sort riders by points
-    const sortedRiders = Object.entries(riderPoints)
-        .sort((a, b) => b[1] - a[1]);
+    // Standings are already sorted by points (descending)
+    // Find user's position
+    const userIndex = standings.findIndex(r => r.isCurrentUser || r.uid === userUID);
     
-    // Find user's rank
-    const userRank = sortedRiders.findIndex(([uid]) => uid === userUID) + 1;
-    const totalRiders = sortedRiders.length;
+    if (userIndex === -1) {
+        console.log('User not found in standings');
+        return { rank: null, total: standings.length };
+    }
     
     return {
-        rank: userRank > 0 ? userRank : null,
-        total: totalRiders
+        rank: userIndex + 1,
+        total: standings.length
     };
 }
 
@@ -353,7 +333,7 @@ async function loadProfile(user) {
         userStats = await calculateUserStats(userData.uid);
         
         // Calculate rankings
-        const seasonRanking = await calculateSeasonRanking(userData.uid);
+        const seasonRanking = await calculateSeasonRanking(userData.uid, userData);
         const globalRanking = await calculateGlobalRanking(user.uid);
         
         // Display profile information
@@ -443,7 +423,7 @@ function displayRecentResults(results) {
     if (results.length === 0) {
         container.innerHTML = `
             <div class="results-empty">
-                <div class="results-empty-icon">🚴</div>
+                <div class="results-empty-icon">ðŸš´</div>
                 <p>No race results yet. Complete your first event!</p>
             </div>
         `;
@@ -464,10 +444,10 @@ function displayRecentResults(results) {
             bonusHTML += `<span class="bonus-indicator" title="Bonus points for beating prediction">+${result.bonusPoints} bonus</span>`;
         }
         if (result.earnedPunchingMedal) {
-            bonusHTML += `<span class="medal-indicator punching" title="Beat prediction by 10+ places">🥊</span>`;
+            bonusHTML += `<span class="medal-indicator punching" title="Beat prediction by 10+ places">ðŸ¥Š</span>`;
         }
         if (result.earnedGiantKillerMedal) {
-            bonusHTML += `<span class="medal-indicator giant-killer" title="Beat highest-rated rider">⚔️</span>`;
+            bonusHTML += `<span class="medal-indicator giant-killer" title="Beat highest-rated rider">âš”ï¸</span>`;
         }
         
         // Format predicted position if available
@@ -532,7 +512,7 @@ function displayAwards(awards) {
     if (totalAwards === 0) {
         container.innerHTML = `
             <div class="awards-empty">
-                <div class="awards-empty-icon">🏆</div>
+                <div class="awards-empty-icon">ðŸ†</div>
                 <p>No awards yet. Keep racing to earn achievements!</p>
             </div>
         `;
@@ -546,7 +526,7 @@ function displayAwards(awards) {
     if (awards.goldMedals > 0) {
         html += `
             <div class="award-card gold">
-                <div class="award-icon">🥇</div>
+                <div class="award-icon">ðŸ¥‡</div>
                 <div class="award-count">${awards.goldMedals}x</div>
                 <div class="award-title">Gold Medal</div>
                 <div class="award-description">1st Place Finish</div>
@@ -558,7 +538,7 @@ function displayAwards(awards) {
     if (awards.silverMedals > 0) {
         html += `
             <div class="award-card silver">
-                <div class="award-icon">🥈</div>
+                <div class="award-icon">ðŸ¥ˆ</div>
                 <div class="award-count">${awards.silverMedals}x</div>
                 <div class="award-title">Silver Medal</div>
                 <div class="award-description">2nd Place Finish</div>
@@ -570,7 +550,7 @@ function displayAwards(awards) {
     if (awards.bronzeMedals > 0) {
         html += `
             <div class="award-card bronze">
-                <div class="award-icon">🥉</div>
+                <div class="award-icon">ðŸ¥‰</div>
                 <div class="award-count">${awards.bronzeMedals}x</div>
                 <div class="award-title">Bronze Medal</div>
                 <div class="award-description">3rd Place Finish</div>
@@ -582,7 +562,7 @@ function displayAwards(awards) {
     if (awards.lanternRouge > 0) {
         html += `
             <div class="award-card lantern">
-                <div class="award-icon">🏮</div>
+                <div class="award-icon">ðŸ®</div>
                 <div class="award-count">${awards.lanternRouge}x</div>
                 <div class="award-title">Lantern Rouge</div>
                 <div class="award-description">Last Place Finish</div>
@@ -594,7 +574,7 @@ function displayAwards(awards) {
     if (awards.punchingMedals > 0) {
         html += `
             <div class="award-card punching">
-                <div class="award-icon">🥊</div>
+                <div class="award-icon">ðŸ¥Š</div>
                 <div class="award-count">${awards.punchingMedals}x</div>
                 <div class="award-title">Punching Up</div>
                 <div class="award-description">Beat Prediction by 10+ Places</div>
@@ -606,7 +586,7 @@ function displayAwards(awards) {
     if (awards.giantKillerMedals > 0) {
         html += `
             <div class="award-card giant-killer">
-                <div class="award-icon">⚔️</div>
+                <div class="award-icon">âš”ï¸</div>
                 <div class="award-count">${awards.giantKillerMedals}x</div>
                 <div class="award-title">Giant Killer</div>
                 <div class="award-description">Beat Highest-Rated Rider</div>
