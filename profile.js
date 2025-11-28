@@ -729,6 +729,7 @@ document.addEventListener('DOMContentLoaded', () => {
 let shareStatsData = null;
 let teamCarImage = null;
 let selectedTemplate = 'season';
+let canvasIsTainted = false;
 
 function initShareStats() {
     const shareBtn = document.getElementById('shareStatsBtn');
@@ -740,9 +741,8 @@ function initShareStats() {
     
     if (!shareBtn || !modal) return;
     
-    // Preload team car image
+    // Preload team car image (same origin, should be fine)
     teamCarImage = new Image();
-    teamCarImage.crossOrigin = 'anonymous';
     teamCarImage.src = 'tpvteamcar.png';
     
     // Open modal
@@ -820,6 +820,9 @@ async function generateShareImage() {
     const ctx = canvas.getContext('2d');
     const width = 1080;
     const height = 1920;
+    
+    // Reset taint tracking
+    canvasIsTainted = false;
     
     // Collect current stats
     shareStatsData = collectShareData();
@@ -1130,37 +1133,31 @@ async function drawProfilePhoto(ctx, x, y, radius) {
     ctx.clip();
     
     // Try to use the already-loaded profile photo from the page
+    // Only if it's same-origin or has proper CORS headers
     const existingImg = document.getElementById('profilePhoto');
     if (existingImg && existingImg.classList.contains('active') && existingImg.complete && existingImg.naturalWidth > 0) {
-        try {
-            ctx.drawImage(existingImg, x - radius, y - radius, radius * 2, radius * 2);
-            ctx.restore();
-            return;
-        } catch (e) {
-            console.log('Could not draw existing profile image:', e);
+        // Check if image is same origin
+        const isSameOrigin = existingImg.src.startsWith(window.location.origin) || 
+                            existingImg.src.startsWith('data:') ||
+                            existingImg.src.startsWith('blob:');
+        
+        if (isSameOrigin) {
+            try {
+                ctx.drawImage(existingImg, x - radius, y - radius, radius * 2, radius * 2);
+                ctx.restore();
+                return;
+            } catch (e) {
+                console.log('Could not draw profile image:', e);
+            }
+        } else {
+            // Cross-origin image - drawing it would taint the canvas
+            // Use placeholder instead to keep canvas exportable
+            console.log('Skipping cross-origin profile photo to keep canvas exportable');
+            canvasIsTainted = false; // We're intentionally not drawing it
         }
     }
     
-    // Fallback: try loading from URL
-    if (data.profilePhotoUrl) {
-        try {
-            const img = new Image();
-            img.crossOrigin = 'anonymous';
-            await new Promise((resolve, reject) => {
-                img.onload = resolve;
-                img.onerror = reject;
-                setTimeout(() => reject(new Error('Timeout')), 3000);
-                img.src = data.profilePhotoUrl;
-            });
-            ctx.drawImage(img, x - radius, y - radius, radius * 2, radius * 2);
-            ctx.restore();
-            return;
-        } catch (e) {
-            console.log('Could not load profile photo from URL:', e);
-        }
-    }
-    
-    // Draw placeholder if all else fails
+    // Draw placeholder
     drawProfilePlaceholder(ctx, x, y, radius);
     ctx.restore();
 }
@@ -1199,8 +1196,16 @@ function downloadShareImage() {
     const canvas = document.getElementById('shareCanvas');
     if (!canvas) return;
     
-    const link = document.createElement('a');
-    link.download = `tpv-stats-${selectedTemplate}-${Date.now()}.png`;
-    link.href = canvas.toDataURL('image/png');
-    link.click();
+    try {
+        const dataUrl = canvas.toDataURL('image/png');
+        const link = document.createElement('a');
+        link.download = `tpv-stats-${selectedTemplate}-${Date.now()}.png`;
+        link.href = dataUrl;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    } catch (e) {
+        console.error('Error downloading image:', e);
+        alert('Could not download image. Please try taking a screenshot instead.');
+    }
 }
