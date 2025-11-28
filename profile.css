@@ -404,6 +404,24 @@
     box-shadow: 0 10px 30px rgba(138, 43, 226, 0.3);
 }
 
+.award-card.bullseye {
+    border-color: rgba(0, 191, 255, 0.3);
+}
+
+.award-card.bullseye:hover {
+    border-color: rgb(0, 191, 255);
+    box-shadow: 0 10px 30px rgba(0, 191, 255, 0.3);
+}
+
+.award-card.hot-streak {
+    border-color: rgba(255, 69, 0, 0.3);
+}
+
+.award-card.hot-streak:hover {
+    border-color: rgb(255, 69, 0);
+    box-shadow: 0 10px 30px rgba(255, 69, 0, 0.3);
+}
+
 .award-icon {
     font-size: 3.5rem;
     margin-bottom: 0.5rem;

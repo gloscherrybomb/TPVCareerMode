@@ -428,6 +428,33 @@ async function processUserResult(uid, eventInfo, results) {
   // Check if earned Giant Killer medal (beat highest-rated rider)
   const earnedGiantKillerMedal = checkGiantKiller(results, uid);
   
+  // Check if earned Bullseye medal (finish exactly at predicted position)
+  const earnedBullseyeMedal = predictedPosition && position === predictedPosition;
+  
+  // Check if earned Hot Streak medal (beat prediction 3 events in a row)
+  let earnedHotStreakMedal = false;
+  if (predictedPosition && position < predictedPosition) {
+    // Current event beats prediction, check previous 2 events
+    let consecutiveBeatPrediction = 1; // Current event counts as 1
+    
+    // Get previous event results from userData
+    const completedEvents = userData.completedStages || [];
+    const sortedEvents = [...completedEvents].sort((a, b) => b - a); // Most recent first
+    
+    for (const prevEventNum of sortedEvents) {
+      if (consecutiveBeatPrediction >= 3) break;
+      
+      const prevResults = userData[`event${prevEventNum}Results`];
+      if (prevResults && prevResults.predictedPosition && prevResults.position < prevResults.predictedPosition) {
+        consecutiveBeatPrediction++;
+      } else {
+        break; // Streak broken
+      }
+    }
+    
+    earnedHotStreakMedal = consecutiveBeatPrediction >= 3;
+  }
+  
   // Prepare event results
   const eventResults = {
     position: position,
@@ -440,6 +467,8 @@ async function processUserResult(uid, eventInfo, results) {
     bonusPoints: bonusPoints,
     earnedPunchingMedal: earnedPunchingMedal,
     earnedGiantKillerMedal: earnedGiantKillerMedal,
+    earnedBullseyeMedal: earnedBullseyeMedal,
+    earnedHotStreakMedal: earnedHotStreakMedal,
     distance: parseFloat(userResult.Distance) || 0,
     deltaTime: parseFloat(userResult.DeltaTime) || 0,
     eventPoints: parseInt(userResult.Points) || null, // Points race points (for display only)
@@ -987,6 +1016,11 @@ async function updateResultsSummary(season, event, results) {
       
       const earnedGiantKillerMedal = checkGiantKillerForResult(r.UID, position);
       
+      // Bullseye: finish exactly at predicted position
+      const earnedBullseyeMedal = predictedPosition && position === predictedPosition;
+      
+      // Note: Hot Streak is calculated per-user based on their event history, not in summary
+      
       return {
         position: position,
         name: r.Name,
@@ -1001,6 +1035,7 @@ async function updateResultsSummary(season, event, results) {
         bonusPoints: bonusPoints,
         earnedPunchingMedal: earnedPunchingMedal,
         earnedGiantKillerMedal: earnedGiantKillerMedal,
+        earnedBullseyeMedal: earnedBullseyeMedal,
         eventPoints: parseInt(r.Points) || null,
         isBot: isBot(r.UID, r.Gender)
       };

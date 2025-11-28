@@ -575,6 +575,7 @@ async function processResultsForUser(userDoc, csvFiles, season) {
   let completedStages = [];
   let usedOptionalEvents = [];
   let tourProgress = {};
+  let beatPredictionStreak = 0; // For Hot Streak award
   
   const updates = {};
   
@@ -625,6 +626,19 @@ async function processResultsForUser(userDoc, csvFiles, season) {
       earnedPunchingMedal = placesBeaten >= 10;
     }
     const earnedGiantKillerMedal = checkGiantKiller(results, userUid);
+    
+    // Bullseye: finish exactly at predicted position
+    const earnedBullseyeMedal = predictedPosition && position === predictedPosition;
+    
+    // Hot Streak: beat prediction 3 events in a row
+    // Track if current event beats prediction
+    const beatPrediction = predictedPosition && position < predictedPosition;
+    if (beatPrediction) {
+      beatPredictionStreak++;
+    } else {
+      beatPredictionStreak = 0;
+    }
+    const earnedHotStreakMedal = beatPredictionStreak >= 3;
     
     // Handle optional events
     if (OPTIONAL_EVENTS.includes(eventNumber)) {
@@ -684,6 +698,8 @@ async function processResultsForUser(userDoc, csvFiles, season) {
       bonusPoints: bonusPoints,
       earnedPunchingMedal: earnedPunchingMedal,
       earnedGiantKillerMedal: earnedGiantKillerMedal,
+      earnedBullseyeMedal: earnedBullseyeMedal,
+      earnedHotStreakMedal: earnedHotStreakMedal,
       consecutiveDaysFailed: consecutiveDaysFailed,
       distance: parseFloat(userResult.Distance) || 0,
       deltaTime: parseFloat(userResult.DeltaTime) || 0,
@@ -789,6 +805,9 @@ async function updateResultsSummary(season, eventNumber, results) {
       }
       const earnedGiantKillerMedal = checkGiantKillerForResult(r.UID, position);
       
+      // Bullseye: finish exactly at predicted position
+      const earnedBullseyeMedal = predictedPosition && position === predictedPosition;
+      
       return {
         position: position,
         name: r.Name,
@@ -803,6 +822,7 @@ async function updateResultsSummary(season, eventNumber, results) {
         bonusPoints: pointsResult.bonusPoints,
         earnedPunchingMedal: earnedPunchingMedal,
         earnedGiantKillerMedal: earnedGiantKillerMedal,
+        earnedBullseyeMedal: earnedBullseyeMedal,
         isBot: isBot(r.UID, r.Gender)
       };
     });

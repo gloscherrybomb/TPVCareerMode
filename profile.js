@@ -140,7 +140,9 @@ async function calculateUserStats(userUID) {
             bronzeMedals: 0,
             lanternRouge: 0,
             punchingMedals: 0,
-            giantKillerMedals: 0
+            giantKillerMedals: 0,
+            bullseyeMedals: 0,
+            hotStreakMedals: 0
         }
     };
     
@@ -179,6 +181,16 @@ async function calculateUserStats(userUID) {
                     // Track Giant Killer medal if earned
                     if (userResult.earnedGiantKillerMedal) {
                         stats.awards.giantKillerMedals++;
+                    }
+                    
+                    // Track Bullseye medal if earned
+                    if (userResult.earnedBullseyeMedal) {
+                        stats.awards.bullseyeMedals++;
+                    }
+                    
+                    // Track Hot Streak medal if earned
+                    if (userResult.earnedHotStreakMedal) {
+                        stats.awards.hotStreakMedals++;
                     }
                     
                     if (position > 0) {
@@ -221,6 +233,8 @@ async function calculateUserStats(userUID) {
                         predictedPosition: userResult.predictedPosition || null,
                         earnedPunchingMedal: userResult.earnedPunchingMedal || false,
                         earnedGiantKillerMedal: userResult.earnedGiantKillerMedal || false,
+                        earnedBullseyeMedal: userResult.earnedBullseyeMedal || false,
+                        earnedHotStreakMedal: userResult.earnedHotStreakMedal || false,
                         date: resultData.processedAt
                     });
                 }
@@ -449,6 +463,12 @@ function displayRecentResults(results) {
         if (result.earnedGiantKillerMedal) {
             bonusHTML += `<span class="medal-indicator giant-killer" title="Beat highest-rated rider">⚔️</span>`;
         }
+        if (result.earnedBullseyeMedal) {
+            bonusHTML += `<span class="medal-indicator bullseye" title="Finished exactly as predicted">🎯</span>`;
+        }
+        if (result.earnedHotStreakMedal) {
+            bonusHTML += `<span class="medal-indicator hot-streak" title="Beat prediction 3 events in a row">🔥</span>`;
+        }
         
         // Format predicted position if available
         let predictionHTML = '';
@@ -508,7 +528,8 @@ function displayAwards(awards) {
     
     // Check if user has any awards (include all award types)
     const totalAwards = awards.goldMedals + awards.silverMedals + awards.bronzeMedals + 
-                        awards.lanternRouge + awards.punchingMedals + awards.giantKillerMedals;
+                        awards.lanternRouge + awards.punchingMedals + awards.giantKillerMedals +
+                        awards.bullseyeMedals + awards.hotStreakMedals;
     
     if (totalAwards === 0) {
         container.innerHTML = `
@@ -591,6 +612,30 @@ function displayAwards(awards) {
                 <div class="award-count">${awards.giantKillerMedals}x</div>
                 <div class="award-title">Giant Killer</div>
                 <div class="award-description">Beat Highest-Rated Rider</div>
+            </div>
+        `;
+    }
+    
+    // Bullseye medal (finish exactly at predicted position)
+    if (awards.bullseyeMedals > 0) {
+        html += `
+            <div class="award-card bullseye">
+                <div class="award-icon">🎯</div>
+                <div class="award-count">${awards.bullseyeMedals}x</div>
+                <div class="award-title">Bullseye</div>
+                <div class="award-description">Finished Exactly as Predicted</div>
+            </div>
+        `;
+    }
+    
+    // Hot Streak medal (beat prediction 3 events in a row)
+    if (awards.hotStreakMedals > 0) {
+        html += `
+            <div class="award-card hot-streak">
+                <div class="award-icon">🔥</div>
+                <div class="award-count">${awards.hotStreakMedals}x</div>
+                <div class="award-title">Hot Streak</div>
+                <div class="award-description">Beat Prediction 3x in a Row</div>
             </div>
         `;
     }
