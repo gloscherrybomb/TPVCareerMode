@@ -27,20 +27,20 @@ const eventSequence = [
         type: 'mandatory',
         eventId: 1,
         name: 'Coast and Roast Crit',
-        icon: 'ðŸ”„'
+        icon: '🔄'
     },
     {
         stage: 2,
         type: 'mandatory',
         eventId: 2,
         name: 'Island Classic',
-        icon: 'ðŸš´'
+        icon: '🚴'
     },
     {
         stage: 3,
         type: 'choice',
         name: 'Optional Event Choice #1',
-        icon: 'ðŸŽ¯',
+        icon: '🎯',
         availableEvents: [6, 7, 8, 9, 10, 11, 12] // IDs of optional events
     },
     {
@@ -48,20 +48,20 @@ const eventSequence = [
         type: 'mandatory',
         eventId: 3,
         name: 'The Forest Velodrome Elimination',
-        icon: 'ðŸŸï¸'
+        icon: '🏟️'
     },
     {
         stage: 5,
         type: 'mandatory',
         eventId: 4,
         name: 'Coastal Loop Time Challenge',
-        icon: 'â±ï¸'
+        icon: '⏱️'
     },
     {
         stage: 6,
         type: 'choice',
         name: 'Optional Event Choice #2',
-        icon: 'ðŸŽ¯',
+        icon: '🎯',
         availableEvents: [6, 7, 8, 9, 10, 11, 12]
     },
     {
@@ -69,13 +69,13 @@ const eventSequence = [
         type: 'mandatory',
         eventId: 5,
         name: 'North Lake Points Race',
-        icon: 'ðŸŽ¯'
+        icon: '🎯'
     },
     {
         stage: 8,
         type: 'choice',
         name: 'Optional Event Choice #3',
-        icon: 'ðŸŽ¯',
+        icon: '🎯',
         availableEvents: [6, 7, 8, 9, 10, 11, 12]
     },
     {
@@ -83,9 +83,11 @@ const eventSequence = [
         type: 'mandatory',
         eventId: 13,
         name: 'Local Tour',
-        icon: 'ðŸ†'
+        icon: '🏆'
     }
 ];
+
+// User progress state
 
 // User progress state with Firebase integration
 class ProgressManager {
