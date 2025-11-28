@@ -1,27 +1,24 @@
 #!/usr/bin/env node
 
 /**
- * reprocess-results.js - Reprocess existing race results or reset all data
+ * reprocess-results.js - Reset and reprocess all race results
  * 
- * This script can either:
- * 1. Reprocess results through the same logic as process-results.js to add new features
- * 2. Reset all results data and user progress to start fresh
+ * This script:
+ * 1. Clears all event-related data from user documents
+ * 2. Clears the results collection (optional)
+ * 3. Reprocesses all CSV files in event order
  * 
  * Usage:
- *   node reprocess-results.js                      # Reprocess all results
- *   node reprocess-results.js --event 1            # Reprocess specific event
- *   node reprocess-results.js --season 1           # Reprocess entire season
- *   node reprocess-results.js --user UID           # Reprocess specific user
- *   node reprocess-results.js --event 1 --dry-run  # Preview changes
- * 
- *   node reprocess-results.js --reset              # Reset all users and results
- *   node reprocess-results.js --reset --dry-run    # Preview reset
- *   node reprocess-results.js --reset --user UID   # Reset specific user
+ *   node reprocess-results.js                    # Reprocess all results
+ *   node reprocess-results.js --dry-run          # Preview changes
+ *   node reprocess-results.js --reset-only       # Only reset, don't reprocess
+ *   node reprocess-results.js --user UID         # Reprocess specific user only
  */
 
 const admin = require('firebase-admin');
 const fs = require('fs');
 const path = require('path');
+const Papa = require('papaparse');
 
 // Initialize Firebase Admin
 const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
@@ -34,18 +31,14 @@ const db = admin.firestore();
 // Parse command line arguments
 const args = process.argv.slice(2);
 const options = {
-  event: null,
   season: 1,
   user: null,
   dryRun: false,
-  reset: false
+  resetOnly: false
 };
 
 for (let i = 0; i < args.length; i++) {
-  if (args[i] === '--event' && args[i + 1]) {
-    options.event = parseInt(args[i + 1]);
-    i++;
-  } else if (args[i] === '--season' && args[i + 1]) {
+  if (args[i] === '--season' && args[i + 1]) {
     options.season = parseInt(args[i + 1]);
     i++;
   } else if (args[i] === '--user' && args[i + 1]) {
@@ -53,20 +46,116 @@ for (let i = 0; i < args.length; i++) {
     i++;
   } else if (args[i] === '--dry-run') {
     options.dryRun = true;
-  } else if (args[i] === '--reset') {
-    options.reset = true;
+  } else if (args[i] === '--reset-only') {
+    options.resetOnly = true;
   }
 }
 
-// Event maximum points lookup
+// ============================================================================
+// STAGE PROGRESSION CONFIGURATION (must match process-results.js)
+// ============================================================================
+
 const EVENT_MAX_POINTS = {
   1: 65, 2: 95, 3: 50, 4: 50, 5: 80, 6: 50, 7: 70, 8: 185, 9: 85,
   10: 70, 11: 60, 12: 145, 13: 120, 14: 95, 15: 135
 };
 
-/**
- * Calculate points with bonus
- */
+const STAGE_REQUIREMENTS = {
+  1: { type: 'fixed', eventId: 1 },
+  2: { type: 'fixed', eventId: 2 },
+  3: { type: 'choice', eventIds: [6, 7, 8, 9, 10, 11, 12] },
+  4: { type: 'fixed', eventId: 3 },
+  5: { type: 'fixed', eventId: 4 },
+  6: { type: 'choice', eventIds: [6, 7, 8, 9, 10, 11, 12] },
+  7: { type: 'fixed', eventId: 5 },
+  8: { type: 'choice', eventIds: [6, 7, 8, 9, 10, 11, 12] },
+  9: { type: 'tour', eventIds: [13, 14, 15] }
+};
+
+const OPTIONAL_EVENTS = [6, 7, 8, 9, 10, 11, 12];
+
+// ============================================================================
+// HELPER FUNCTIONS (must match process-results.js)
+// ============================================================================
+
+function isEventValidForStage(eventNumber, currentStage, usedOptionalEvents = [], tourProgress = {}) {
+  const stageReq = STAGE_REQUIREMENTS[currentStage];
+  
+  if (!stageReq) {
+    return { valid: false, reason: `Invalid stage: ${currentStage}` };
+  }
+  
+  if (stageReq.type === 'fixed') {
+    if (eventNumber === stageReq.eventId) {
+      return { valid: true };
+    }
+    return { valid: false, reason: `Stage ${currentStage} requires event ${stageReq.eventId}, not event ${eventNumber}` };
+  }
+  
+  if (stageReq.type === 'choice') {
+    if (!stageReq.eventIds.includes(eventNumber)) {
+      return { valid: false, reason: `Event ${eventNumber} is not a valid choice for stage ${currentStage}` };
+    }
+    if (usedOptionalEvents.includes(eventNumber)) {
+      return { valid: false, reason: `Event ${eventNumber} has already been used in a previous stage` };
+    }
+    return { valid: true };
+  }
+  
+  if (stageReq.type === 'tour') {
+    if (!stageReq.eventIds.includes(eventNumber)) {
+      return { valid: false, reason: `Event ${eventNumber} is not part of the Local Tour` };
+    }
+    
+    const nextExpected = getNextTourEvent(tourProgress);
+    if (nextExpected === null) {
+      return { valid: false, reason: 'Local Tour already completed' };
+    }
+    if (eventNumber !== nextExpected) {
+      return { valid: false, reason: `Local Tour must be completed in order. Expected event ${nextExpected}` };
+    }
+    
+    return { valid: true, isTour: true };
+  }
+  
+  return { valid: false, reason: 'Unknown stage type' };
+}
+
+function getNextTourEvent(tourProgress = {}) {
+  if (!tourProgress.event13Completed) return 13;
+  if (!tourProgress.event14Completed) return 14;
+  if (!tourProgress.event15Completed) return 15;
+  return null;
+}
+
+function areConsecutiveDays(date1, date2) {
+  const d1 = new Date(date1);
+  const d2 = new Date(date2);
+  
+  const d1Start = new Date(Date.UTC(d1.getUTCFullYear(), d1.getUTCMonth(), d1.getUTCDate()));
+  const d2Start = new Date(Date.UTC(d2.getUTCFullYear(), d2.getUTCMonth(), d2.getUTCDate()));
+  
+  const diffTime = d2Start.getTime() - d1Start.getTime();
+  const diffDays = diffTime / (1000 * 60 * 60 * 24);
+  
+  return diffDays === 1;
+}
+
+function calculateNextStage(currentStage, tourProgress = {}) {
+  if (currentStage < 9) {
+    return currentStage + 1;
+  }
+  
+  if (currentStage === 9) {
+    if (tourProgress.event13Completed && tourProgress.event14Completed && tourProgress.event15Completed) {
+      return 10;
+    }
+    return 9;
+  }
+  
+  return currentStage + 1;
+}
+
 function calculatePoints(position, eventNumber, predictedPosition) {
   const maxPoints = EVENT_MAX_POINTS[eventNumber] || 100;
   
@@ -95,464 +184,667 @@ function calculatePoints(position, eventNumber, predictedPosition) {
   return { points: totalPoints, bonusPoints };
 }
 
-/**
- * Calculate predicted position from EventRating
- */
 function calculatePredictedPosition(results, userUid) {
   const finishers = results.filter(r => 
-    r.position !== 'DNF' && 
-    r.eventRating && 
-    !isNaN(parseInt(r.eventRating))
+    r.Position !== 'DNF' && 
+    r.EventRating && 
+    !isNaN(parseInt(r.EventRating))
   );
   
-  finishers.sort((a, b) => parseInt(b.eventRating) - parseInt(a.eventRating));
+  finishers.sort((a, b) => parseInt(b.EventRating) - parseInt(a.EventRating));
   
-  const predictedIndex = finishers.findIndex(r => r.uid === userUid);
+  const predictedIndex = finishers.findIndex(r => r.UID === userUid);
   return predictedIndex === -1 ? null : predictedIndex + 1;
 }
 
-/**
- * Check if user earned Giant Killer medal
- */
 function checkGiantKiller(results, userUid) {
-  const userResult = results.find(r => r.uid === userUid);
-  if (!userResult || userResult.position === 'DNF' || !userResult.eventRating) {
+  const userResult = results.find(r => r.UID === userUid);
+  if (!userResult || userResult.Position === 'DNF' || !userResult.EventRating) {
     return false;
   }
   
-  const userPosition = typeof userResult.position === 'number' ? 
-    userResult.position : parseInt(userResult.position);
-  
+  const userPosition = parseInt(userResult.Position);
   if (isNaN(userPosition)) return false;
   
   const finishers = results.filter(r => 
-    r.position !== 'DNF' && 
-    r.eventRating && 
-    !isNaN(parseInt(r.eventRating))
+    r.Position !== 'DNF' && 
+    r.EventRating && 
+    !isNaN(parseInt(r.EventRating))
   );
   
   if (finishers.length === 0) return false;
   
-  finishers.sort((a, b) => parseInt(b.eventRating) - parseInt(a.eventRating));
+  finishers.sort((a, b) => parseInt(b.EventRating) - parseInt(a.EventRating));
   
   const giant = finishers[0];
-  const giantPosition = typeof giant.position === 'number' ? 
-    giant.position : parseInt(giant.position);
+  const giantPosition = parseInt(giant.Position);
   
-  if (giant.uid === userUid) return false;
+  if (giant.UID === userUid) return false;
   
   return userPosition < giantPosition;
 }
 
-/**
- * Reprocess a single event's results
- */
-async function reprocessEvent(season, eventNumber) {
-  const resultDocId = `season${season}_event${eventNumber}`;
-  
-  console.log(`\n📊 Reprocessing ${resultDocId}...`);
-  
-  try {
-    const resultDoc = await db.collection('results').doc(resultDocId).get();
-    
-    if (!resultDoc.exists()) {
-      console.log(`   ⚠️  No results found for ${resultDocId}`);
-      return { processed: 0, updated: 0, errors: 0 };
-    }
-    
-    const resultData = resultDoc.data();
-    const results = resultData.results || [];
-    
-    console.log(`   Found ${results.length} results`);
-    
-    let processed = 0;
-    let updated = 0;
-    let errors = 0;
-    
-    // Track updated results for the results collection
-    const updatedResults = [];
-    
-    // Process each result
-    for (const result of results) {
-      try {
-        const position = typeof result.position === 'number' ? 
-          result.position : parseInt(result.position);
-        
-        if (isNaN(position) || result.position === 'DNF') {
-          updatedResults.push(result); // Keep DNF as-is
-          continue;
-        }
-        
-        // Calculate new fields for this result
-        const predictedPosition = calculatePredictedPosition(results, result.uid);
-        const pointsResult = calculatePoints(position, eventNumber, predictedPosition);
-        const { points, bonusPoints } = pointsResult;
-        
-        let earnedPunchingMedal = false;
-        if (predictedPosition) {
-          const placesBeaten = predictedPosition - position;
-          earnedPunchingMedal = placesBeaten >= 10;
-        }
-        
-        const earnedGiantKillerMedal = checkGiantKiller(results, result.uid);
-        
-        // Build updated result for results collection
-        const updatedResult = {
-          ...result,
-          eventRating: result.eventRating || null,
-          predictedPosition: predictedPosition,
-          points: points,
-          bonusPoints: bonusPoints,
-          earnedPunchingMedal: earnedPunchingMedal,
-          earnedGiantKillerMedal: earnedGiantKillerMedal
-        };
-        
-        updatedResults.push(updatedResult);
-        
-        // Update user document if not a bot
-        if (!result.uid || result.uid.startsWith('Bot')) {
-          processed++;
-          continue; // Skip bots for user document updates
-        }
-        
-        // Find user document
-        const usersQuery = await db.collection('users')
-          .where('uid', '==', result.uid)
-          .limit(1)
-          .get();
-        
-        if (usersQuery.empty) {
-          console.log(`   ⚠️  User ${result.uid} not found in database`);
-          processed++;
-          continue;
-        }
-        
-        const userDoc = usersQuery.docs[0];
-        const userData = userDoc.data();
-        
-        // Build updated event results for user document
-        const updatedEventResults = {
-          position: position,
-          time: result.time || 0,
-          arr: result.arr || 0,
-          arrBand: result.arrBand || '',
-          eventRating: result.eventRating || null,
-          predictedPosition: predictedPosition,
-          points: points,
-          bonusPoints: bonusPoints,
-          earnedPunchingMedal: earnedPunchingMedal,
-          earnedGiantKillerMedal: earnedGiantKillerMedal,
-          distance: result.distance || 0,
-          deltaTime: result.deltaTime || 0,
-          eventPoints: result.eventPoints || null,
-          processedAt: admin.firestore.FieldValue.serverTimestamp()
-        };
-        
-        const existingEventResults = userData[`event${eventNumber}Results`];
-        
-        // Check if anything changed
-        const hasChanges = !existingEventResults || 
-          existingEventResults.bonusPoints !== bonusPoints ||
-          existingEventResults.predictedPosition !== predictedPosition ||
-          existingEventResults.earnedPunchingMedal !== earnedPunchingMedal ||
-          existingEventResults.earnedGiantKillerMedal !== earnedGiantKillerMedal;
-        
-        if (!hasChanges) {
-          processed++;
-          continue; // No changes needed
-        }
-        
-        // Log what will change
-        const changes = [];
-        if (!existingEventResults?.bonusPoints && bonusPoints > 0) {
-          changes.push(`+${bonusPoints} bonus`);
-        }
-        if (!existingEventResults?.predictedPosition && predictedPosition) {
-          changes.push(`predicted: ${predictedPosition}`);
-        }
-        if (earnedPunchingMedal && !existingEventResults?.earnedPunchingMedal) {
-          changes.push('🥊');
-        }
-        if (earnedGiantKillerMedal && !existingEventResults?.earnedGiantKillerMedal) {
-          changes.push('⚔️');
-        }
-        
-        console.log(`   ✨ ${userData.name || result.uid}: Pos ${position} → ${changes.join(', ')}`);
-        
-        if (!options.dryRun) {
-          // Update user document
-          await userDoc.ref.update({
-            [`event${eventNumber}Results`]: updatedEventResults
-          });
-          updated++;
-        }
-        
-        processed++;
-        
-      } catch (error) {
-        console.error(`   ❌ Error processing ${result.uid || result.name}:`, error.message);
-        updatedResults.push(result); // Keep original on error
-        errors++;
-      }
-    }
-    
-    // Update the results collection with all updated results
-    if (!options.dryRun && updatedResults.length > 0) {
-      await db.collection('results').doc(resultDocId).update({
-        results: updatedResults,
-        processedAt: admin.firestore.FieldValue.serverTimestamp()
-      });
-      console.log(`   ✅ Updated results collection`);
-    }
-    
-    return { processed, updated, errors };
-    
-  } catch (error) {
-    console.error(`   ❌ Error reprocessing ${resultDocId}:`, error);
-    return { processed: 0, updated: 0, errors: 1 };
-  }
+function isBot(uid, gender) {
+  return gender === 'Bot' || (uid && uid.startsWith('Bot'));
 }
 
-/**
- * Main reprocessing function
- */
-/**
- * Reset all results data from Firebase
- */
-async function resetAllResults(season) {
-  console.log(`\n🗑️  Resetting all results for season ${season}...\n`);
+function parseCSV(csvContent) {
+  return new Promise((resolve, reject) => {
+    let processedContent = csvContent;
+    const lines = csvContent.split('\n');
+    
+    if (lines[0].includes('OVERALL INDIVIDUAL RESULTS')) {
+      processedContent = lines.slice(2).join('\n');
+    }
+    
+    Papa.parse(processedContent, {
+      header: true,
+      skipEmptyLines: true,
+      complete: (results) => resolve(results.data),
+      error: (error) => reject(error)
+    });
+  });
+}
+
+function getSeededRandom(botName, eventNumber) {
+  let hash = 0;
+  const seed = `${botName}-${eventNumber}`;
+  for (let i = 0; i < seed.length; i++) {
+    const char = seed.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  const x = Math.sin(Math.abs(hash)) * 10000;
+  return x - Math.floor(x);
+}
+
+function simulatePosition(botName, arr, eventNumber, fieldSize = 50) {
+  let expectedPosition;
   
+  if (arr >= 1400) expectedPosition = 5;
+  else if (arr >= 1200) expectedPosition = 12;
+  else if (arr >= 1000) expectedPosition = 20;
+  else if (arr >= 800) expectedPosition = 30;
+  else expectedPosition = 40;
+  
+  const randomOffset = Math.floor(getSeededRandom(botName, eventNumber) * 20) - 10;
+  let simulatedPosition = expectedPosition + randomOffset;
+  
+  return Math.max(1, Math.min(fieldSize, simulatedPosition));
+}
+
+// ============================================================================
+// RESET FUNCTIONS
+// ============================================================================
+
+async function resetUserData(userRef, userData, season) {
+  const updates = {};
+  
+  // Remove all event results (events 1-15)
+  for (let i = 1; i <= 15; i++) {
+    const key = `event${i}Results`;
+    if (userData[key]) {
+      updates[key] = admin.firestore.FieldValue.delete();
+    }
+  }
+  
+  // Reset progress fields
+  updates.currentStage = 1;
+  updates.totalPoints = 0;
+  updates.totalEvents = 0;
+  updates.completedStages = [];
+  updates.usedOptionalEvents = [];
+  updates.tourProgress = {};
+  updates[`season${season}Standings`] = admin.firestore.FieldValue.delete();
+  
+  if (!options.dryRun) {
+    await userRef.update(updates);
+  }
+  
+  return Object.keys(updates).length;
+}
+
+async function resetAllUsers(season) {
+  console.log(`\n🗑️  Resetting all users for season ${season}...\n`);
+  
+  const usersSnapshot = await db.collection('users').get();
   let usersReset = 0;
-  let resultsCleared = 0;
-  let errors = 0;
   
-  try {
-    // Get all users
-    const usersSnapshot = await db.collection('users').get();
-    
-    console.log(`   Found ${usersSnapshot.size} users to reset`);
-    
-    // Reset each user
-    for (const userDoc of usersSnapshot.docs) {
-      try {
-        const userData = userDoc.data();
-        const updates = {};
-        
-        // Find and remove all event results for this season
-        let eventsCleared = 0;
-        for (const key in userData) {
-          if (key.startsWith(`event`) && key.endsWith('Results')) {
-            // Extract event number to check if it's in this season
-            const eventMatch = key.match(/^event(\d+)Results$/);
-            if (eventMatch) {
-              const eventNum = parseInt(eventMatch[1]);
-              // For now, assume events 1-9 are season 1
-              if (season === 1 && eventNum >= 1 && eventNum <= 9) {
-                updates[key] = admin.firestore.FieldValue.delete();
-                eventsCleared++;
-              }
-            }
-          }
-        }
-        
-        // Reset progress fields
-        updates.currentStage = 1; // First event available but not completed
-        updates.totalPoints = 0;
-        updates.totalEvents = 0;
-        updates[`season${season}Standings`] = admin.firestore.FieldValue.delete();
-        
-        // Apply updates
-        if (!options.dryRun) {
-          await userDoc.ref.update(updates);
-        }
-        
-        console.log(`   ✅ ${userData.name || userDoc.id}: Reset ${eventsCleared} events, currentStage → 1`);
-        usersReset++;
-        
-      } catch (error) {
-        console.error(`   ❌ Error resetting user ${userDoc.id}:`, error.message);
-        errors++;
-      }
-    }
-    
-    // Clear results collection
-    console.log(`\n   Clearing results collection...`);
-    
-    for (let eventNum = 1; eventNum <= 9; eventNum++) {
-      try {
-        const resultDocId = `season${season}_event${eventNum}`;
-        const resultDoc = await db.collection('results').doc(resultDocId).get();
-        
-        if (resultDoc.exists) {
-          if (!options.dryRun) {
-            await resultDoc.ref.delete();
-          }
-          console.log(`   ✅ Deleted ${resultDocId}`);
-          resultsCleared++;
-        }
-      } catch (error) {
-        console.error(`   ❌ Error clearing event ${eventNum}:`, error.message);
-        errors++;
-      }
-    }
-    
-    return { usersReset, resultsCleared, errors };
-    
-  } catch (error) {
-    console.error('   ❌ Fatal error during reset:', error);
-    throw error;
-  }
-}
-
-/**
- * Reset a specific user's results
- */
-async function resetUserResults(userUid, season) {
-  console.log(`\n🗑️  Resetting results for user ${userUid}...\n`);
-  
-  try {
-    // Find user by UID
-    const usersQuery = await db.collection('users')
-      .where('uid', '==', userUid)
-      .limit(1)
-      .get();
-    
-    if (usersQuery.empty) {
-      console.log(`   ⚠️  User ${userUid} not found`);
-      return { usersReset: 0, resultsCleared: 0, errors: 0 };
-    }
-    
-    const userDoc = usersQuery.docs[0];
+  for (const userDoc of usersSnapshot.docs) {
     const userData = userDoc.data();
-    const updates = {};
-    
-    // Find and remove all event results for this season
-    let eventsCleared = 0;
-    for (const key in userData) {
-      if (key.startsWith(`event`) && key.endsWith('Results')) {
-        const eventMatch = key.match(/^event(\d+)Results$/);
-        if (eventMatch) {
-          const eventNum = parseInt(eventMatch[1]);
-          if (season === 1 && eventNum >= 1 && eventNum <= 9) {
-            updates[key] = admin.firestore.FieldValue.delete();
-            eventsCleared++;
-          }
+    const fieldsCleared = await resetUserData(userDoc.ref, userData, season);
+    console.log(`   ✅ ${userData.name || userDoc.id}: Reset ${fieldsCleared} fields`);
+    usersReset++;
+  }
+  
+  return usersReset;
+}
+
+async function clearResultsCollection(season) {
+  console.log(`\n🗑️  Clearing results collection for season ${season}...\n`);
+  
+  let cleared = 0;
+  
+  // Clear events 1-15
+  for (let eventNum = 1; eventNum <= 15; eventNum++) {
+    const resultDocId = `season${season}_event${eventNum}`;
+    try {
+      const resultDoc = await db.collection('results').doc(resultDocId).get();
+      
+      if (resultDoc.exists) {
+        if (!options.dryRun) {
+          await resultDoc.ref.delete();
         }
+        console.log(`   ✅ Deleted ${resultDocId}`);
+        cleared++;
+      }
+    } catch (error) {
+      console.error(`   ❌ Error clearing ${resultDocId}:`, error.message);
+    }
+  }
+  
+  return cleared;
+}
+
+// ============================================================================
+// REPROCESSING FUNCTIONS
+// ============================================================================
+
+async function findAllCSVFiles(season) {
+  const baseDir = `race_results/season_${season}`;
+  const csvFiles = [];
+  
+  if (!fs.existsSync(baseDir)) {
+    console.log(`   ⚠️  Directory ${baseDir} not found`);
+    return csvFiles;
+  }
+  
+  // Find all event directories
+  const eventDirs = fs.readdirSync(baseDir)
+    .filter(d => d.startsWith('event_'))
+    .sort((a, b) => {
+      const numA = parseInt(a.replace('event_', ''));
+      const numB = parseInt(b.replace('event_', ''));
+      return numA - numB;
+    });
+  
+  for (const eventDir of eventDirs) {
+    const eventPath = path.join(baseDir, eventDir);
+    const eventNum = parseInt(eventDir.replace('event_', ''));
+    
+    // Find CSV files in this event directory
+    const files = fs.readdirSync(eventPath)
+      .filter(f => f.endsWith('.csv'));
+    
+    for (const file of files) {
+      csvFiles.push({
+        path: path.join(eventPath, file),
+        season: season,
+        event: eventNum
+      });
+    }
+  }
+  
+  return csvFiles;
+}
+
+async function buildSeasonStandings(results, eventNumber, completedEvents, currentUserTotals, currentUid) {
+  const numCompletedEvents = completedEvents.length;
+  const standingsMap = new Map();
+  
+  // Process all racers from current event
+  results.forEach(result => {
+    const uid = result.UID;
+    const name = result.Name;
+    const position = parseInt(result.Position);
+    
+    if (result.Position === 'DNF' || isNaN(position)) return;
+    
+    const pointsResult = calculatePoints(position, eventNumber);
+    const points = pointsResult.points;
+    const arr = parseInt(result.ARR) || 0;
+    const team = result.Team || '';
+    const isBotRacer = isBot(uid, result.Gender);
+    const key = isBotRacer ? name : uid;
+    const isCurrentUser = uid === currentUid;
+    
+    // For current user, use authoritative totals
+    if (isCurrentUser && currentUserTotals.totalPoints !== undefined) {
+      standingsMap.set(key, {
+        name: name,
+        uid: uid,
+        arr: arr,
+        team: team,
+        events: currentUserTotals.totalEvents,
+        points: currentUserTotals.totalPoints,
+        isBot: false,
+        isCurrentUser: true
+      });
+    } else if (standingsMap.has(key)) {
+      const racer = standingsMap.get(key);
+      racer.points = (racer.points || 0) + points;
+      racer.events = (racer.events || 0) + 1;
+      racer.arr = arr;
+      racer.team = team || racer.team;
+    } else {
+      standingsMap.set(key, {
+        name: name,
+        uid: isBotRacer ? null : uid,
+        arr: arr,
+        team: team,
+        events: 1,
+        points: points,
+        isBot: isBotRacer,
+        isCurrentUser: isCurrentUser
+      });
+    }
+  });
+  
+  // Build bot tracking from all completed events
+  const allBots = new Map();
+  
+  for (const evtNum of completedEvents) {
+    const resultDocId = `season1_event${evtNum}`;
+    try {
+      const resultDoc = await db.collection('results').doc(resultDocId).get();
+      if (resultDoc.exists) {
+        const eventResults = resultDoc.data().results || [];
+        eventResults.forEach(result => {
+          const isBotRacer = isBot(result.uid, result.isBot ? 'Bot' : '');
+          if (isBotRacer && result.position !== 'DNF') {
+            const botName = result.name;
+            const arr = result.arr || 900;
+            
+            if (!allBots.has(botName)) {
+              allBots.set(botName, { name: botName, arr: arr, actualEvents: new Set() });
+            }
+            allBots.get(botName).actualEvents.add(evtNum);
+            allBots.get(botName).arr = arr;
+          }
+        });
+      }
+    } catch (error) {
+      // Ignore errors - results may not exist yet
+    }
+  }
+  
+  // Also add bots from current results
+  results.forEach(result => {
+    const isBotRacer = isBot(result.UID, result.Gender);
+    if (isBotRacer && result.Position !== 'DNF') {
+      const botName = result.Name;
+      const arr = parseInt(result.ARR) || 900;
+      
+      if (!allBots.has(botName)) {
+        allBots.set(botName, { name: botName, arr: arr, actualEvents: new Set() });
+      }
+      allBots.get(botName).actualEvents.add(eventNumber);
+      allBots.get(botName).arr = arr;
+    }
+  });
+  
+  // Simulate bot results for missing events
+  for (const [botName, botInfo] of allBots.entries()) {
+    if (!standingsMap.has(botName)) {
+      standingsMap.set(botName, {
+        name: botName,
+        uid: null,
+        arr: botInfo.arr,
+        team: '',
+        events: 0,
+        points: 0,
+        isBot: true,
+        isCurrentUser: false
+      });
+    }
+    
+    const botStanding = standingsMap.get(botName);
+    let simulatedPoints = 0;
+    
+    for (const evtNum of completedEvents) {
+      if (!botInfo.actualEvents.has(evtNum)) {
+        const simulatedPosition = simulatePosition(botName, botInfo.arr, evtNum);
+        const points = calculatePoints(simulatedPosition, evtNum).points;
+        simulatedPoints += points;
       }
     }
     
-    // Reset progress fields
-    updates.currentStage = 1;
-    updates.totalPoints = 0;
-    updates.totalEvents = 0;
-    updates[`season${season}Standings`] = admin.firestore.FieldValue.delete();
-    
-    // Apply updates
-    if (!options.dryRun) {
-      await userDoc.ref.update(updates);
-    }
-    
-    console.log(`   ✅ ${userData.name || userDoc.id}: Reset ${eventsCleared} events, currentStage → 1`);
-    
-    return { usersReset: 1, resultsCleared: eventsCleared, errors: 0 };
-    
-  } catch (error) {
-    console.error(`   ❌ Error resetting user:`, error);
-    return { usersReset: 0, resultsCleared: 0, errors: 1 };
+    botStanding.points += simulatedPoints;
+    botStanding.events = numCompletedEvents;
   }
+  
+  // Ensure all bots have correct event count
+  for (const [key, racer] of standingsMap.entries()) {
+    if (racer.isBot) {
+      racer.events = numCompletedEvents;
+    }
+  }
+  
+  // Sort by points
+  const standings = Array.from(standingsMap.values());
+  standings.sort((a, b) => b.points - a.points);
+  
+  return standings;
 }
 
-/**
- * Main execution
- */
+async function processResultsForUser(userDoc, csvFiles, season) {
+  const userData = userDoc.data();
+  const userUid = userData.uid;
+  const userName = userData.name || userUid;
+  
+  console.log(`\n   📊 Processing results for ${userName}...`);
+  
+  // Track user's progress as we process
+  let currentStage = 1;
+  let totalPoints = 0;
+  let totalEvents = 0;
+  let completedStages = [];
+  let usedOptionalEvents = [];
+  let tourProgress = {};
+  
+  const updates = {};
+  
+  // Process each CSV in order
+  for (const csvFile of csvFiles) {
+    const eventNumber = csvFile.event;
+    
+    // Read and parse CSV
+    let csvContent;
+    try {
+      csvContent = fs.readFileSync(csvFile.path, 'utf8');
+    } catch (error) {
+      console.log(`      ⚠️  Could not read ${csvFile.path}`);
+      continue;
+    }
+    
+    const results = await parseCSV(csvContent);
+    
+    // Find user in results
+    const userResult = results.find(r => r.UID === userUid);
+    if (!userResult) {
+      continue; // User not in this event
+    }
+    
+    // Check if this event is valid for current stage
+    const validation = isEventValidForStage(eventNumber, currentStage, usedOptionalEvents, tourProgress);
+    
+    if (!validation.valid) {
+      console.log(`      ⚠️  Event ${eventNumber} skipped: ${validation.reason}`);
+      continue;
+    }
+    
+    const position = parseInt(userResult.Position);
+    if (isNaN(position) || userResult.Position === 'DNF') {
+      console.log(`      ⚠️  Event ${eventNumber}: DNF`);
+      continue;
+    }
+    
+    // Calculate points
+    const predictedPosition = calculatePredictedPosition(results, userUid);
+    const pointsResult = calculatePoints(position, eventNumber, predictedPosition);
+    let { points, bonusPoints } = pointsResult;
+    
+    // Check medals
+    let earnedPunchingMedal = false;
+    if (predictedPosition) {
+      const placesBeaten = predictedPosition - position;
+      earnedPunchingMedal = placesBeaten >= 10;
+    }
+    const earnedGiantKillerMedal = checkGiantKiller(results, userUid);
+    
+    // Handle optional events
+    if (OPTIONAL_EVENTS.includes(eventNumber)) {
+      usedOptionalEvents.push(eventNumber);
+    }
+    
+    // Handle tour events
+    let consecutiveDaysFailed = false;
+    if (validation.isTour) {
+      // For reprocessing, we use the stored processedAt timestamp from results collection
+      // or current time if not available
+      const resultDoc = await db.collection('results').doc(`season${season}_event${eventNumber}`).get();
+      const eventProcessedAt = resultDoc.exists ? resultDoc.data().processedAt?.toDate() : new Date();
+      
+      if (eventNumber === 13) {
+        tourProgress.event13Completed = true;
+        tourProgress.event13Date = eventProcessedAt.toISOString();
+      } else if (eventNumber === 14) {
+        if (tourProgress.event13Date) {
+          const isConsecutive = areConsecutiveDays(tourProgress.event13Date, eventProcessedAt);
+          if (!isConsecutive) {
+            points = 0;
+            consecutiveDaysFailed = true;
+          }
+        }
+        tourProgress.event14Completed = true;
+        tourProgress.event14Date = eventProcessedAt.toISOString();
+        tourProgress.event14ConsecutiveFailed = consecutiveDaysFailed;
+      } else if (eventNumber === 15) {
+        if (tourProgress.event14Date) {
+          const isConsecutive = areConsecutiveDays(tourProgress.event14Date, eventProcessedAt);
+          if (!isConsecutive) {
+            points = 0;
+            consecutiveDaysFailed = true;
+          }
+        }
+        tourProgress.event15Completed = true;
+        tourProgress.event15Date = eventProcessedAt.toISOString();
+        tourProgress.event15ConsecutiveFailed = consecutiveDaysFailed;
+      }
+    }
+    
+    // Update totals
+    totalPoints += points;
+    totalEvents += 1;
+    completedStages.push(eventNumber);
+    
+    // Store event results
+    updates[`event${eventNumber}Results`] = {
+      position: position,
+      time: parseFloat(userResult.Time) || 0,
+      arr: parseInt(userResult.ARR) || 0,
+      arrBand: userResult.ARRBand || '',
+      eventRating: parseInt(userResult.EventRating) || null,
+      predictedPosition: predictedPosition,
+      points: points,
+      bonusPoints: bonusPoints,
+      earnedPunchingMedal: earnedPunchingMedal,
+      earnedGiantKillerMedal: earnedGiantKillerMedal,
+      consecutiveDaysFailed: consecutiveDaysFailed,
+      distance: parseFloat(userResult.Distance) || 0,
+      deltaTime: parseFloat(userResult.DeltaTime) || 0,
+      eventPoints: parseInt(userResult.Points) || null,
+      processedAt: admin.firestore.FieldValue.serverTimestamp()
+    };
+    
+    // Calculate next stage
+    currentStage = calculateNextStage(currentStage, tourProgress);
+    
+    console.log(`      ✅ Event ${eventNumber}: P${position}, +${points}pts (Stage → ${currentStage})`);
+  }
+  
+  // Build final standings
+  if (completedStages.length > 0) {
+    const lastEventNum = completedStages[completedStages.length - 1];
+    const lastCsvFile = csvFiles.find(f => f.event === lastEventNum);
+    
+    if (lastCsvFile) {
+      const csvContent = fs.readFileSync(lastCsvFile.path, 'utf8');
+      const results = await parseCSV(csvContent);
+      
+      const seasonStandings = await buildSeasonStandings(
+        results, 
+        lastEventNum, 
+        completedStages,
+        { totalPoints, totalEvents },
+        userUid
+      );
+      
+      updates[`season${season}Standings`] = seasonStandings;
+    }
+  }
+  
+  // Set final user state
+  updates.currentStage = currentStage;
+  updates.totalPoints = totalPoints;
+  updates.totalEvents = totalEvents;
+  updates.completedStages = completedStages;
+  updates.usedOptionalEvents = usedOptionalEvents;
+  updates.tourProgress = tourProgress;
+  
+  // Apply updates
+  if (!options.dryRun) {
+    await userDoc.ref.update(updates);
+  }
+  
+  console.log(`      📈 Final: ${totalEvents} events, ${totalPoints} points, stage ${currentStage}`);
+  
+  return { totalEvents, totalPoints };
+}
+
+async function updateResultsSummary(season, eventNumber, results) {
+  const summaryRef = db.collection('results').doc(`season${season}_event${eventNumber}`);
+  
+  const calculatePredictedPositionForResult = (uid) => {
+    const finishers = results.filter(r => 
+      r.Position !== 'DNF' && 
+      r.EventRating && 
+      !isNaN(parseInt(r.EventRating))
+    );
+    finishers.sort((a, b) => parseInt(b.EventRating) - parseInt(a.EventRating));
+    const predictedIndex = finishers.findIndex(r => r.UID === uid);
+    return predictedIndex === -1 ? null : predictedIndex + 1;
+  };
+  
+  const validResults = results
+    .filter(r => r.Position !== 'DNF' && !isNaN(parseInt(r.Position)))
+    .map(r => {
+      const position = parseInt(r.Position);
+      const predictedPosition = calculatePredictedPositionForResult(r.UID);
+      const pointsResult = calculatePoints(position, eventNumber, predictedPosition);
+      
+      return {
+        position: position,
+        name: r.Name,
+        uid: r.UID,
+        team: r.Team || '',
+        arr: parseInt(r.ARR) || 0,
+        arrBand: r.ARRBand || '',
+        eventRating: parseInt(r.EventRating) || null,
+        predictedPosition: predictedPosition,
+        time: parseFloat(r.Time) || 0,
+        points: pointsResult.points,
+        bonusPoints: pointsResult.bonusPoints,
+        isBot: isBot(r.UID, r.Gender)
+      };
+    });
+  
+  if (!options.dryRun) {
+    await summaryRef.set({
+      season: season,
+      event: eventNumber,
+      totalParticipants: validResults.length,
+      processedAt: admin.firestore.FieldValue.serverTimestamp(),
+      results: validResults
+    });
+  }
+  
+  console.log(`   ✅ Updated results summary for event ${eventNumber}`);
+}
+
+// ============================================================================
+// MAIN EXECUTION
+// ============================================================================
+
 async function main() {
   console.log('🔄 TPV Career Mode - Results Reprocessor\n');
+  console.log('=' .repeat(60));
   
   if (options.dryRun) {
-    console.log('🔍 DRY RUN MODE - No changes will be made\n');
+    console.log('📝 DRY RUN MODE - No changes will be made\n');
   }
   
   console.log('Options:', options);
+  console.log('');
   
-  // Handle reset mode
-  if (options.reset) {
-    console.log('\n⚠️  WARNING: RESET MODE');
-    console.log('This will DELETE all results data and reset users to stage 1\n');
-    
-    if (!options.dryRun) {
-      console.log('❗ This is NOT a dry run. Changes will be permanent!');
-      console.log('Press Ctrl+C now to cancel...\n');
-      
-      // Wait 5 seconds for user to cancel
-      await new Promise(resolve => setTimeout(resolve, 5000));
-    }
-    
-    let stats;
-    if (options.user) {
-      // Reset specific user
-      stats = await resetUserResults(options.user, options.season);
-    } else {
-      // Reset all users
-      stats = await resetAllResults(options.season);
-    }
-    
-    // Summary
-    console.log('\n' + '='.repeat(60));
-    console.log('🗑️  Reset Complete\n');
-    console.log(`   Users reset: ${stats.usersReset}`);
-    console.log(`   Results cleared: ${stats.resultsCleared}`);
-    console.log(`   Errors: ${stats.errors}`);
-    
-    if (options.dryRun) {
-      console.log('\n   ℹ️  This was a dry run. Run without --dry-run to apply changes.');
-    } else {
-      console.log('\n   ✅ All users reset to stage 1 with 0 points');
-    }
-    
-    console.log('='.repeat(60) + '\n');
+  const season = options.season;
+  
+  // Step 1: Reset all user data
+  console.log('STEP 1: Resetting user data...');
+  const usersReset = await resetAllUsers(season);
+  console.log(`   Reset ${usersReset} users\n`);
+  
+  // Step 2: Clear results collection
+  console.log('STEP 2: Clearing results collection...');
+  const resultsCleared = await clearResultsCollection(season);
+  console.log(`   Cleared ${resultsCleared} result documents\n`);
+  
+  if (options.resetOnly) {
+    console.log('✅ Reset complete (--reset-only flag set, skipping reprocessing)\n');
     return;
   }
   
-  // Regular reprocessing mode
-  let totalProcessed = 0;
-  let totalUpdated = 0;
-  let totalErrors = 0;
+  // Step 3: Find all CSV files
+  console.log('STEP 3: Finding CSV files...');
+  const csvFiles = await findAllCSVFiles(season);
+  console.log(`   Found ${csvFiles.length} CSV files\n`);
   
-  // Determine which events to reprocess
-  const eventsToProcess = [];
-  
-  if (options.event) {
-    eventsToProcess.push({ season: options.season, event: options.event });
-  } else {
-    // Reprocess all events in the season (1-9 for now)
-    for (let i = 1; i <= 9; i++) {
-      eventsToProcess.push({ season: options.season, event: i });
-    }
+  if (csvFiles.length === 0) {
+    console.log('⚠️  No CSV files found. Nothing to reprocess.\n');
+    return;
   }
   
-  // Process each event
-  for (const { season, event } of eventsToProcess) {
-    const stats = await reprocessEvent(season, event);
-    totalProcessed += stats.processed;
-    totalUpdated += stats.updated;
-    totalErrors += stats.errors;
+  // List files
+  for (const file of csvFiles) {
+    console.log(`   - Event ${file.event}: ${file.path}`);
+  }
+  console.log('');
+  
+  // Step 4: Update results summaries first
+  console.log('STEP 4: Updating results summaries...');
+  for (const csvFile of csvFiles) {
+    try {
+      const csvContent = fs.readFileSync(csvFile.path, 'utf8');
+      const results = await parseCSV(csvContent);
+      await updateResultsSummary(season, csvFile.event, results);
+    } catch (error) {
+      console.log(`   ❌ Error processing event ${csvFile.event}:`, error.message);
+    }
+  }
+  console.log('');
+  
+  // Step 5: Process each user
+  console.log('STEP 5: Processing user results...');
+  
+  let query = db.collection('users');
+  if (options.user) {
+    query = query.where('uid', '==', options.user);
+  }
+  
+  const usersSnapshot = await query.get();
+  let usersProcessed = 0;
+  
+  for (const userDoc of usersSnapshot.docs) {
+    await processResultsForUser(userDoc, csvFiles, season);
+    usersProcessed++;
   }
   
   // Summary
   console.log('\n' + '='.repeat(60));
   console.log('📈 Reprocessing Complete\n');
-  console.log(`   Results checked: ${totalProcessed}`);
-  console.log(`   Results updated: ${totalUpdated}`);
-  console.log(`   Errors: ${totalErrors}`);
+  console.log(`   Users reset: ${usersReset}`);
+  console.log(`   Results cleared: ${resultsCleared}`);
+  console.log(`   CSV files processed: ${csvFiles.length}`);
+  console.log(`   Users reprocessed: ${usersProcessed}`);
   
   if (options.dryRun) {
     console.log('\n   ℹ️  This was a dry run. Run without --dry-run to apply changes.');
   }
   
-  console.log('='.repeat(60) + '\n');
+  console.log('=' .repeat(60) + '\n');
 }
 
-// Run the script
+// Run
 main().then(() => {
   console.log('✅ Done!');
   process.exit(0);
