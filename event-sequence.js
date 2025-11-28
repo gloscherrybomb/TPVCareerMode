@@ -87,8 +87,6 @@ const eventSequence = [
     }
 ];
 
-// User progress state
-
 // User progress state with Firebase integration
 class ProgressManager {
     constructor() {

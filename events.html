@@ -457,8 +457,15 @@
                                     <span class="stage-number-badge">Stage ${stage.stage}</span>
                                     <span class="stage-type-badge choice">Optional Choice</span>
                                 </div>
+                                ${selectedEvent ? `
+                                <div class="event-image">
+                                    <div class="event-image-placeholder">
+                                        <span>${selectedEvent.icon}</span>
+                                    </div>
+                                </div>
+                                ` : ''}
                                 <div class="stage-card-content">
-                                    <div class="stage-icon-large">${selectedEvent ? selectedEvent.icon : '\u{1F3AF}'}</div>
+                                    ${!selectedEvent ? `<div class="stage-icon-large">🎯</div>` : ''}
                                     <h3 class="stage-title">${selectedEvent ? selectedEvent.name : stage.name}</h3>
                                     <p class="stage-description">
                                         ${selectedEventId ? 
@@ -469,25 +476,25 @@
                                     ${selectedEvent ? `
                                     <div class="event-stats">
                                         <div class="stat-item">
-                                            <span class="stat-icon">\u{1F4CD}</span>
+                                            <span class="stat-icon">📍</span>
                                             <span>${selectedEvent.distance}</span>
                                         </div>
                                         <div class="stat-item">
-                                            <span class="stat-icon">\u26F0\uFE0F</span>
+                                            <span class="stat-icon">⛰️</span>
                                             <span>${selectedEvent.climbing}</span>
                                         </div>
                                         <div class="stat-item">
-                                            <span class="stat-icon">\u2B50</span>
+                                            <span class="stat-icon">⭐</span>
                                             <span>${selectedEvent.maxPoints} pts</span>
                                         </div>
                                     </div>
                                     ` : ''}
-                                    ${isLocked ? '<div class="locked-overlay"><span>\u{1F512}</span><p>Complete previous stage to unlock</p></div>' : ''}
+                                    ${isLocked ? '<div class="locked-overlay"><span>🔒</span><p>Complete previous stage to unlock</p></div>' : ''}
                                 </div>
                                 <div class="stage-card-footer">
                                     ${!isLocked && !isCompleted ? `<button class="btn btn-primary btn-full" onclick="openChoiceModal(${stage.stage})">Choose Event</button>` : ''}
                                     ${isCompleted && selectedEventId ? `<button class="btn btn-secondary btn-full" onclick="location.href='event-detail.html?id=${selectedEventId}'">View Details</button>` : ''}
-                                    ${isCompleted ? '<span class="completed-badge">\u2713 Completed</span>' : ''}
+                                    ${isCompleted ? '<span class="completed-badge">â Completed</span>' : ''}
                                 </div>
                             </div>
                         </div>
@@ -508,29 +515,29 @@
                                     <div class="event-image-placeholder">
                                         <span>${event.icon}</span>
                                     </div>
-                                    ${isLocked ? '<div class="locked-overlay"><span>\u{1F512}</span><p>Complete previous stage</p></div>' : ''}
+                                    ${isLocked ? '<div class="locked-overlay"><span>🔒</span><p>Complete previous stage</p></div>' : ''}
                                 </div>
                                 <div class="stage-card-content">
                                     <h3 class="stage-title">${event.name}</h3>
                                     <p class="stage-description">${event.subtitle}</p>
                                     <div class="event-stats">
                                         <div class="stat-item">
-                                            <span class="stat-icon">\u{1F4CD}</span>
+                                            <span class="stat-icon">📍</span>
                                             <span>${event.distance}</span>
                                         </div>
                                         <div class="stat-item">
-                                            <span class="stat-icon">\u26F0\uFE0F</span>
+                                            <span class="stat-icon">⛰️</span>
                                             <span>${event.climbing}</span>
                                         </div>
                                         <div class="stat-item">
-                                            <span class="stat-icon">\u2B50</span>
+                                            <span class="stat-icon">⭐</span>
                                             <span>${event.maxPoints} pts</span>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="stage-card-footer">
                                     ${!isLocked ? `<button class="btn btn-secondary btn-full" onclick="location.href='event-detail.html?id=${event.number}'">View Details</button>` : ''}
-                                    ${isCompleted ? '<span class="completed-badge">\u2713 Completed</span>' : ''}
+                                    ${isCompleted ? '<span class="completed-badge">â Completed</span>' : ''}
                                 </div>
                             </div>
                         </div>
@@ -544,7 +551,6 @@
             console.error('Error in renderEventSequence:', error);
         }
     }
-
 
         // Update progress stats
         async function updateProgressStats() {

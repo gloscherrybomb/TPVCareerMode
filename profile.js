@@ -526,7 +526,7 @@ function displayAwards(awards) {
     if (awards.goldMedals > 0) {
         html += `
             <div class="award-card gold">
-                <div class="award-icon">ðŸ¥‡</div>
+                <div class="award-icon">🥇</div>
                 <div class="award-count">${awards.goldMedals}x</div>
                 <div class="award-title">Gold Medal</div>
                 <div class="award-description">1st Place Finish</div>
@@ -538,7 +538,7 @@ function displayAwards(awards) {
     if (awards.silverMedals > 0) {
         html += `
             <div class="award-card silver">
-                <div class="award-icon">ðŸ¥ˆ</div>
+                <div class="award-icon">🥈</div>
                 <div class="award-count">${awards.silverMedals}x</div>
                 <div class="award-title">Silver Medal</div>
                 <div class="award-description">2nd Place Finish</div>
@@ -550,7 +550,7 @@ function displayAwards(awards) {
     if (awards.bronzeMedals > 0) {
         html += `
             <div class="award-card bronze">
-                <div class="award-icon">ðŸ¥‰</div>
+                <div class="award-icon">🥉</div>
                 <div class="award-count">${awards.bronzeMedals}x</div>
                 <div class="award-title">Bronze Medal</div>
                 <div class="award-description">3rd Place Finish</div>
@@ -562,7 +562,7 @@ function displayAwards(awards) {
     if (awards.lanternRouge > 0) {
         html += `
             <div class="award-card lantern">
-                <div class="award-icon">ðŸ®</div>
+                <div class="award-icon">🏮</div>
                 <div class="award-count">${awards.lanternRouge}x</div>
                 <div class="award-title">Lantern Rouge</div>
                 <div class="award-description">Last Place Finish</div>
@@ -574,7 +574,7 @@ function displayAwards(awards) {
     if (awards.punchingMedals > 0) {
         html += `
             <div class="award-card punching">
-                <div class="award-icon">ðŸ¥Š</div>
+                <div class="award-icon">🥊</div>
                 <div class="award-count">${awards.punchingMedals}x</div>
                 <div class="award-title">Punching Up</div>
                 <div class="award-description">Beat Prediction by 10+ Places</div>
@@ -586,7 +586,7 @@ function displayAwards(awards) {
     if (awards.giantKillerMedals > 0) {
         html += `
             <div class="award-card giant-killer">
-                <div class="award-icon">âš”ï¸</div>
+                <div class="award-icon">⚔️</div>
                 <div class="award-count">${awards.giantKillerMedals}x</div>
                 <div class="award-title">Giant Killer</div>
                 <div class="award-description">Beat Highest-Rated Rider</div>
