@@ -136,7 +136,7 @@
                     </div>
                 </div>
                 <div class="progress-card">
-                    <div class="progress-icon">⭐</div>
+                    <div class="progress-icon">⭐</div>
                     <div class="progress-info">
                         <div class="progress-label">Points Earned</div>
                         <div class="progress-value" id="pointsEarnedText">0</div>
@@ -447,7 +447,6 @@
                         // Choice stage
                         const selectedEventId = progressManager.getChoiceSelection(stage.stage);
                         const availableCount = progressManager.getAvailableOptionalEvents(stage.stage).length;
-                        const selectedEvent = selectedEventId ? getEvent(selectedEventId) : null;
                     
                     return `
                         <div class="sequence-stage ${status}" data-stage="${stage.stage}">
@@ -457,42 +456,21 @@
                                     <span class="stage-number-badge">Stage ${stage.stage}</span>
                                     <span class="stage-type-badge choice">Optional Choice</span>
                                 </div>
-                                <div class="event-image">
-                                    <div class="event-image-placeholder">
-                                        <span>${selectedEvent ? selectedEvent.icon : stage.icon}</span>
-                                    </div>
-                                </div>
                                 <div class="stage-card-content">
-                                    <h3 class="stage-title">${selectedEvent ? selectedEvent.name : stage.name}</h3>
+                                    <div class="stage-icon-large">${stage.icon}</div>
+                                    <h3 class="stage-title">${stage.name}</h3>
                                     <p class="stage-description">
                                         ${selectedEventId ? 
-                                            selectedEvent.subtitle :
-                                            availableCount + ' optional events available'
+                                            `Selected: ${getEvent(selectedEventId).name}` :
+                                            `${availableCount} optional events available`
                                         }
                                     </p>
-                                    ${selectedEvent ? `
-                                    <div class="event-stats">
-                                        <div class="stat-item">
-                                            <span class="stat-icon">📍</span>
-                                            <span>${selectedEvent.distance}</span>
-                                        </div>
-                                        <div class="stat-item">
-                                            <span class="stat-icon">⛰️</span>
-                                            <span>${selectedEvent.climbing}</span>
-                                        </div>
-                                        <div class="stat-item">
-                                            <span class="stat-icon">⭐</span>
-                                            <span>${selectedEvent.maxPoints} pts</span>
-                                        </div>
-                                    </div>
-                                    ` : ''}
+                                    ${isLocked ? '<div class="locked-overlay"><span>🔒</span><p>Complete previous stage to unlock</p></div>' : ''}
                                 </div>
                                 <div class="stage-card-footer">
                                     ${!isLocked && !isCompleted ? `<button class="btn btn-primary btn-full" onclick="openChoiceModal(${stage.stage})">Choose Event</button>` : ''}
-                                    ${isCompleted && selectedEventId ? `<button class="btn btn-secondary btn-full" onclick="location.href='event-detail.html?id=${selectedEventId}'">View Details</button>` : ''}
                                     ${isCompleted ? '<span class="completed-badge">✓ Completed</span>' : ''}
                                 </div>
-                                ${isLocked ? '<div class="locked-overlay"><span>🔒</span><p>Complete previous stage to unlock</p></div>' : ''}
                             </div>
                         </div>
                     `;
@@ -512,21 +490,22 @@
                                     <div class="event-image-placeholder">
                                         <span>${event.icon}</span>
                                     </div>
+                                    ${isLocked ? '<div class="locked-overlay"><span>🔒</span><p>Complete previous stage</p></div>' : ''}
                                 </div>
                                 <div class="stage-card-content">
                                     <h3 class="stage-title">${event.name}</h3>
                                     <p class="stage-description">${event.subtitle}</p>
                                     <div class="event-stats">
                                         <div class="stat-item">
-                                            <span class="stat-icon">📍</span>
+                                            <span class="stat-icon">�</span>
                                             <span>${event.distance}</span>
                                         </div>
                                         <div class="stat-item">
-                                            <span class="stat-icon">⛰️</span>
+                                            <span class="stat-icon">â›°ï¸</span>
                                             <span>${event.climbing}</span>
                                         </div>
                                         <div class="stat-item">
-                                            <span class="stat-icon">⭐</span>
+                                            <span class="stat-icon">⭐</span>
                                             <span>${event.maxPoints} pts</span>
                                         </div>
                                     </div>
@@ -535,7 +514,6 @@
                                     ${!isLocked ? `<button class="btn btn-secondary btn-full" onclick="location.href='event-detail.html?id=${event.number}'">View Details</button>` : ''}
                                     ${isCompleted ? '<span class="completed-badge">✓ Completed</span>' : ''}
                                 </div>
-                                ${isLocked ? '<div class="locked-overlay"><span>🔒</span><p>Complete previous stage to unlock</p></div>' : ''}
                             </div>
                         </div>
                     `;
@@ -779,9 +757,9 @@
                         <h4>${event.name}</h4>
                         <p>${event.subtitle}</p>
                         <div class="choice-event-stats">
-                            <span>📍 ${event.distance}</span>
-                            <span>⛰️ ${event.climbing}</span>
-                            <span>⭐ ${event.maxPoints} pts</span>
+                            <span>� ${event.distance}</span>
+                            <span>â›°ï¸ ${event.climbing}</span>
+                            <span>⭐ ${event.maxPoints} pts</span>
                         </div>
                         <button class="btn btn-primary btn-small">Select</button>
                     </div>
@@ -838,24 +816,7 @@
                 console.log('Progress Manager:', window.progressManager);
                 
                 try {
-                    // Check if user is admin and show toggle accordingly
-                    const isAdmin = await checkAdminStatus();
-                    
-                    if (isAdmin) {
-                        document.getElementById('adminToggle').style.display = 'inline-block';
-                        
-                        // Setup admin toggle
-                        document.getElementById('adminToggle').addEventListener('click', () => {
-                            const progressManager = window.progressManager;
-                            if (!progressManager) return;
-                            
-                            progressManager.setAdminMode(!progressManager.isAdmin);
-                            document.getElementById('adminStatus').textContent = 
-                                progressManager.isAdmin ? 'Admin Mode: ON' : 'Admin Mode: OFF';
-                            renderEventSequence();
-                            renderTimeline();
-                        });
-                    }
+                    // Admin toggle will be shown by updateProgressUI when auth is ready
                     
                     console.log('Calling renderTimeline...');
                     renderTimeline();
@@ -876,12 +837,41 @@
         });
 
         // Global function to update UI when progress changes (called by Firebase)
-        window.updateProgressUI = function() {
+        window.updateProgressUI = async function() {
             console.log('Updating UI after Firebase progress load');
+            
+            // Check admin status now that user is authenticated
+            await checkAndShowAdminToggle();
+            
             renderTimeline();
             renderEventSequence();
             updateProgressStats();
         };
+        
+        // Admin toggle setup - called when auth is ready
+        async function checkAndShowAdminToggle() {
+            const isAdmin = await checkAdminStatus();
+            const adminToggle = document.getElementById('adminToggle');
+            
+            if (isAdmin && adminToggle) {
+                adminToggle.style.display = 'inline-block';
+                
+                // Only add listener once
+                if (!adminToggle.hasAttribute('data-listener-added')) {
+                    adminToggle.setAttribute('data-listener-added', 'true');
+                    adminToggle.addEventListener('click', () => {
+                        const progressManager = window.progressManager;
+                        if (!progressManager) return;
+                        
+                        progressManager.setAdminMode(!progressManager.isAdmin);
+                        document.getElementById('adminStatus').textContent = 
+                            progressManager.isAdmin ? 'Admin Mode: ON' : 'Admin Mode: OFF';
+                        renderEventSequence();
+                        renderTimeline();
+                    });
+                }
+            }
+        }
 
         // Make functions global for onclick handlers
         window.openChoiceModal = openChoiceModal;
