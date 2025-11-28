@@ -459,16 +459,19 @@
                                 </div>
                                 <div class="event-image">
                                     <div class="event-image-placeholder">
-                                        <span>${selectedEvent ? selectedEvent.icon : stage.icon}</span>
+                                        <span>${isLocked ? '🔒' : (selectedEvent ? selectedEvent.icon : stage.icon)}</span>
                                     </div>
-                                    ${isLocked ? '<div class="locked-overlay"><span>🔒</span><p>Complete previous stage to unlock</p></div>' : ''}
                                 </div>
                                 <div class="stage-card-content">
+                                    ${isLocked ? `
+                                    <h3 class="stage-title">Locked</h3>
+                                    <p class="stage-description">Complete previous stage to unlock</p>
+                                    ` : `
                                     <h3 class="stage-title">${selectedEvent ? selectedEvent.name : stage.name}</h3>
                                     <p class="stage-description">
                                         ${selectedEventId ? 
-                                            `${selectedEvent.subtitle}` :
-                                            `${availableCount} optional events available`
+                                            selectedEvent.subtitle :
+                                            availableCount + ' optional events available'
                                         }
                                     </p>
                                     ${selectedEvent ? `
@@ -487,6 +490,7 @@
                                         </div>
                                     </div>
                                     ` : ''}
+                                    `}
                                 </div>
                                 <div class="stage-card-footer">
                                     ${!isLocked && !isCompleted ? `<button class="btn btn-primary btn-full" onclick="openChoiceModal(${stage.stage})">Choose Event</button>` : ''}
@@ -510,11 +514,14 @@
                                 </div>
                                 <div class="event-image">
                                     <div class="event-image-placeholder">
-                                        <span>${event.icon}</span>
+                                        <span>${isLocked ? '🔒' : event.icon}</span>
                                     </div>
-                                    ${isLocked ? '<div class="locked-overlay"><span>🔒</span><p>Complete previous stage</p></div>' : ''}
                                 </div>
                                 <div class="stage-card-content">
+                                    ${isLocked ? `
+                                    <h3 class="stage-title">Locked</h3>
+                                    <p class="stage-description">Complete previous stage to unlock</p>
+                                    ` : `
                                     <h3 class="stage-title">${event.name}</h3>
                                     <p class="stage-description">${event.subtitle}</p>
                                     <div class="event-stats">
@@ -531,6 +538,7 @@
                                             <span>${event.maxPoints} pts</span>
                                         </div>
                                     </div>
+                                    `}
                                 </div>
                                 <div class="stage-card-footer">
                                     ${!isLocked ? `<button class="btn btn-secondary btn-full" onclick="location.href='event-detail.html?id=${event.number}'">View Details</button>` : ''}
