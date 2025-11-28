@@ -730,6 +730,7 @@ let shareStatsData = null;
 let teamCarImage = null;
 let selectedTemplate = 'season';
 let skipProfilePhoto = false;
+let canvasIsTainted = false;
 
 function initShareStats() {
     const shareBtn = document.getElementById('shareStatsBtn');
@@ -830,17 +831,21 @@ async function generateShareImage() {
     // Clear canvas
     ctx.clearRect(0, 0, width, height);
     
-    // Draw based on selected template
-    switch (selectedTemplate) {
-        case 'season':
-            await drawSeasonTemplate(ctx, width, height);
-            break;
-        case 'trophy':
-            await drawTrophyTemplate(ctx, width, height);
-            break;
-        case 'champion':
-            await drawChampionTemplate(ctx, width, height);
-            break;
+    try {
+        // Draw based on selected template
+        switch (selectedTemplate) {
+            case 'season':
+                await drawSeasonTemplate(ctx, width, height);
+                break;
+            case 'trophy':
+                await drawTrophyTemplate(ctx, width, height);
+                break;
+            case 'champion':
+                await drawChampionTemplate(ctx, width, height);
+                break;
+        }
+    } catch (e) {
+        console.error('Error generating share image:', e);
     }
 }
 
@@ -1119,8 +1124,6 @@ function drawStatBox(ctx, x, y, value, label, accentColor = '#ff0080') {
 }
 
 async function drawProfilePhoto(ctx, x, y, radius) {
-    const data = shareStatsData;
-    
     // Draw circle background/border
     ctx.save();
     ctx.beginPath();
@@ -1139,15 +1142,19 @@ async function drawProfilePhoto(ctx, x, y, radius) {
             // Create new image with crossOrigin to avoid tainting canvas
             const img = new Image();
             img.crossOrigin = 'anonymous';
-            await new Promise((resolve, reject) => {
-                img.onload = resolve;
-                img.onerror = reject;
-                setTimeout(() => reject(new Error('Timeout')), 5000);
+            
+            const loaded = await new Promise((resolve) => {
+                img.onload = () => resolve(true);
+                img.onerror = () => resolve(false);
+                setTimeout(() => resolve(false), 5000);
                 img.src = existingImg.src;
             });
-            ctx.drawImage(img, x - radius, y - radius, radius * 2, radius * 2);
-            ctx.restore();
-            return;
+            
+            if (loaded && img.complete && img.naturalWidth > 0) {
+                ctx.drawImage(img, x - radius, y - radius, radius * 2, radius * 2);
+                ctx.restore();
+                return;
+            }
         } catch (e) {
             console.log('Could not load profile photo:', e);
         }
