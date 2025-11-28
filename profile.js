@@ -447,7 +447,7 @@ function displayRecentResults(results) {
             bonusHTML += `<span class="medal-indicator punching" title="Beat prediction by 10+ places">🥊</span>`;
         }
         if (result.earnedGiantKillerMedal) {
-            bonusHTML += `<span class="medal-indicator giant-killer" title="Beat highest-rated rider">âš”ï¸</span>`;
+            bonusHTML += `<span class="medal-indicator giant-killer" title="Beat highest-rated rider">⚔️</span>`;
         }
         
         // Format predicted position if available
@@ -506,8 +506,9 @@ function displayRecentResults(results) {
 function displayAwards(awards) {
     const container = document.getElementById('awardsContainer');
     
-    // Check if user has any awards
-    const totalAwards = awards.goldMedals + awards.silverMedals + awards.bronzeMedals + awards.lanternRouge;
+    // Check if user has any awards (include all award types)
+    const totalAwards = awards.goldMedals + awards.silverMedals + awards.bronzeMedals + 
+                        awards.lanternRouge + awards.punchingMedals + awards.giantKillerMedals;
     
     if (totalAwards === 0) {
         container.innerHTML = `
