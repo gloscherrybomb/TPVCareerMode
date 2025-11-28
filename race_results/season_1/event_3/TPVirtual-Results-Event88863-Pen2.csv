@@ -2,7 +2,7 @@
 ,,,,,,,,,,,,,,,,,,,,
 EventKey,Pen,Position,Name,Team,Country,Time,DeltaTime,Distance,DeltaDistance,Points,Gender,UID,ARR,ARRBand,EventRating,EventRatingBand,AgeBand,NGB,NGB ID,UCI ID
 88863,2,1,James Eastwood,Chaos,GBR,1800,0,19800,0,0,Male,212354980F57BA1B,1023,Gold 2,1257,Gold 2,40-44,British Cycling,1652049,10116817585
-88863,2,2,Evelyn Davis,Douvan,ITA,1802.863,2.863,19800,0,0,Bot,Bot4294,972,Gold 1,972,Gold 1,,,,
+88863,2,2,Evelyn Davis,Douvan,ITA,1800.04,0.04,19800,0,0,Bot,Bot4294,972,Gold 1,972,Gold 1,,,,
 88863,2,3,Evelyn Lewis,Ampex,CAN,1804.248,4.248,19800,0,0,Bot,Bot6452,1117,Gold 3,1117,Gold 3,,,,
 88863,2,4,Matthew Rodriguez,Chaos,NZL,1805.913,5.913,19800,0,0,Bot,Bot3343,1228,Platinum 1,1228,Platinum 1,,,,
 88863,2,5,Sam Lopez,,GBR,1811.696,11.696,19800,0,0,Bot,Bot4234,1221,Platinum 1,1221,Platinum 1,,,,
@@ -51,3 +51,4 @@ EventKey,Pen,Position,Name,Team,Country,Time,DeltaTime,Distance,DeltaDistance,Po
 88863,2,48,Alex Garcia,,BRA,1945.283,145.283,19800,0,0,Bot,Bot7122,583,Bronze 3,583,Bronze 3,,,,
 88863,2,49,Michael Clark,,JPN,1904.738,104.738,19800,0,0,Bot,Bot6835,880,Silver 3,880,Silver 3,,,,
 88863,2,50,Riley Young,Windsail,IRL,1956.916,156.916,19800,0,0,Bot,Bot5832,571,Bronze 3,571,Bronze 3,,,,
+
