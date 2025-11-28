@@ -56,7 +56,7 @@
         <div class="container">
             <div class="season-selector-wrapper">
                 <label for="seasonSelect" class="season-selector-label">
-                    <span class="season-icon">ðŸ†</span>
+                    <span class="season-icon">🏆</span>
                     <span>Season:</span>
                 </label>
                 <div class="season-select-container">
@@ -122,28 +122,28 @@
             <!-- Progress Stats -->
             <div class="progress-grid">
                 <div class="progress-card">
-                    <div class="progress-icon">ðŸŽ¯</div>
+                    <div class="progress-icon">🎯</div>
                     <div class="progress-info">
                         <div class="progress-label">Current Stage</div>
                         <div class="progress-value" id="currentStageText">Stage 1</div>
                     </div>
                 </div>
                 <div class="progress-card">
-                    <div class="progress-icon">âœ“</div>
+                    <div class="progress-icon">✓</div>
                     <div class="progress-info">
                         <div class="progress-label">Stages Completed</div>
                         <div class="progress-value" id="completedStagesText">0 / 9</div>
                     </div>
                 </div>
                 <div class="progress-card">
-                    <div class="progress-icon">â­</div>
+                    <div class="progress-icon">⭐</div>
                     <div class="progress-info">
                         <div class="progress-label">Points Earned</div>
                         <div class="progress-value" id="pointsEarnedText">0</div>
                     </div>
                 </div>
                 <div class="progress-card">
-                    <div class="progress-icon">ðŸ†</div>
+                    <div class="progress-icon">🏆</div>
                     <div class="progress-info">
                         <div class="progress-label">Season Rank</div>
                         <div class="progress-value" id="seasonRankText">-</div>
@@ -465,7 +465,7 @@
                                 </div>
                                 ` : ''}
                                 <div class="stage-card-content">
-                                    ${!selectedEvent ? `<div class="stage-icon-large">🎯</div>` : ''}
+                                    ${!selectedEvent ? `<div class="stage-icon-large">${stage.icon}</div>` : ''}
                                     <h3 class="stage-title">${selectedEvent ? selectedEvent.name : stage.name}</h3>
                                     <p class="stage-description">
                                         ${selectedEventId ? 
@@ -494,7 +494,7 @@
                                 <div class="stage-card-footer">
                                     ${!isLocked && !isCompleted ? `<button class="btn btn-primary btn-full" onclick="openChoiceModal(${stage.stage})">Choose Event</button>` : ''}
                                     ${isCompleted && selectedEventId ? `<button class="btn btn-secondary btn-full" onclick="location.href='event-detail.html?id=${selectedEventId}'">View Details</button>` : ''}
-                                    ${isCompleted ? '<span class="completed-badge">â Completed</span>' : ''}
+                                    ${isCompleted ? '<span class="completed-badge">✓ Completed</span>' : ''}
                                 </div>
                             </div>
                         </div>
@@ -537,7 +537,7 @@
                                 </div>
                                 <div class="stage-card-footer">
                                     ${!isLocked ? `<button class="btn btn-secondary btn-full" onclick="location.href='event-detail.html?id=${event.number}'">View Details</button>` : ''}
-                                    ${isCompleted ? '<span class="completed-badge">â Completed</span>' : ''}
+                                    ${isCompleted ? '<span class="completed-badge">✓ Completed</span>' : ''}
                                 </div>
                             </div>
                         </div>
@@ -782,9 +782,9 @@
                         <h4>${event.name}</h4>
                         <p>${event.subtitle}</p>
                         <div class="choice-event-stats">
-                            <span>ðŸ“ ${event.distance}</span>
-                            <span>â›°ï¸ ${event.climbing}</span>
-                            <span>â­ ${event.maxPoints} pts</span>
+                            <span>📍 ${event.distance}</span>
+                            <span>⛰️ ${event.climbing}</span>
+                            <span>⭐ ${event.maxPoints} pts</span>
                         </div>
                         <button class="btn btn-primary btn-small">Select</button>
                     </div>
