@@ -308,7 +308,7 @@ async function processUserResult(uid, eventInfo, results) {
   // Check margin-based awards
   const earnedDomination = awardsCalc.checkDomination(position, times.winnerTime, times.secondPlaceTime);
   const earnedCloseCall = awardsCalc.checkCloseCall(position, times.winnerTime, times.secondPlaceTime);
-  const earnedPhotoFinish = awardsCalc.checkPhotoFinish(position, times.userTime, times.winnerTime, times.secondPlaceTime);
+  const earnedPhotoFinish = awardsCalc.checkPhotoFinish(position, times.userTime, times.winnerTime);
   const earnedDarkHorse = awardsCalc.checkDarkHorse(position, predictedPosition);
   
   // Zero to Hero requires previous event data
@@ -745,7 +745,7 @@ async function updateResultsSummary(season, event, results) {
       
       const earnedDomination = awardsCalc.checkDomination(position, times.winnerTime, times.secondPlaceTime);
       const earnedCloseCall = awardsCalc.checkCloseCall(position, times.winnerTime, times.secondPlaceTime);
-      const earnedPhotoFinish = awardsCalc.checkPhotoFinish(position, times.userTime, times.winnerTime, times.secondPlaceTime);
+      const earnedPhotoFinish = awardsCalc.checkPhotoFinish(position, times.userTime, times.winnerTime);
       const earnedDarkHorse = awardsCalc.checkDarkHorse(position, predictedPosition);
       
       return {
@@ -791,7 +791,36 @@ async function updateResultsSummary(season, event, results) {
 async function processResults(csvFiles) {
   console.log(`Processing ${csvFiles.length} CSV file(s)...`);
   
-  for (const filePath of csvFiles) {
+  // Sort files by modification time (chronological order) to process in the correct sequence
+  // This is important when multiple files are uploaded at once
+  const filesWithStats = csvFiles.map(filePath => {
+    try {
+      const stats = fs.statSync(filePath);
+      return {
+        path: filePath,
+        modifiedTime: stats.mtime.getTime()
+      };
+    } catch (error) {
+      console.error(`⚠️  Could not stat file ${filePath}:`, error.message);
+      return {
+        path: filePath,
+        modifiedTime: 0 // If stat fails, process first
+      };
+    }
+  });
+  
+  // Sort by modification time (oldest first)
+  filesWithStats.sort((a, b) => a.modifiedTime - b.modifiedTime);
+  
+  console.log('Processing order (by file timestamp):');
+  filesWithStats.forEach((file, index) => {
+    const date = new Date(file.modifiedTime);
+    console.log(`  ${index + 1}. ${file.path} (${date.toISOString()})`);
+  });
+  console.log('');
+  
+  for (const fileInfo of filesWithStats) {
+    const filePath = fileInfo.path;
     try {
       console.log(`\n📄 Processing: ${filePath}`);
       

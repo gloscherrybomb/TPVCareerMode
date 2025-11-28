@@ -360,14 +360,9 @@ async function findAllCSVFiles(season) {
     return csvFiles;
   }
   
-  // Find all event directories
+  // Find all event directories (don't sort yet)
   const eventDirs = fs.readdirSync(baseDir)
-    .filter(d => d.startsWith('event_'))
-    .sort((a, b) => {
-      const numA = parseInt(a.replace('event_', ''));
-      const numB = parseInt(b.replace('event_', ''));
-      return numA - numB;
-    });
+    .filter(d => d.startsWith('event_'));
   
   for (const eventDir of eventDirs) {
     const eventPath = path.join(baseDir, eventDir);
@@ -378,13 +373,19 @@ async function findAllCSVFiles(season) {
       .filter(f => f.endsWith('.csv'));
     
     for (const file of files) {
+      const fullPath = path.join(eventPath, file);
+      const stats = fs.statSync(fullPath);
       csvFiles.push({
-        path: path.join(eventPath, file),
+        path: fullPath,
         season: season,
-        event: eventNum
+        event: eventNum,
+        modifiedTime: stats.mtime.getTime() // Add modification timestamp
       });
     }
   }
+  
+  // Sort by modification time (chronological order)
+  csvFiles.sort((a, b) => a.modifiedTime - b.modifiedTime);
   
   return csvFiles;
 }
@@ -654,7 +655,7 @@ async function processResultsForUser(userDoc, csvFiles, season) {
     // Check margin-based awards
     const earnedDomination = awardsCalc.checkDomination(position, times.winnerTime, times.secondPlaceTime);
     const earnedCloseCall = awardsCalc.checkCloseCall(position, times.winnerTime, times.secondPlaceTime);
-    const earnedPhotoFinish = awardsCalc.checkPhotoFinish(position, times.userTime, times.winnerTime, times.secondPlaceTime);
+    const earnedPhotoFinish = awardsCalc.checkPhotoFinish(position, times.userTime, times.winnerTime);
     const earnedDarkHorse = awardsCalc.checkDarkHorse(position, predictedPosition);
     
     // Zero to Hero requires previous event data
@@ -855,7 +856,7 @@ async function updateResultsSummary(season, eventNumber, results) {
       
       const earnedDomination = awardsCalc.checkDomination(position, times.winnerTime, times.secondPlaceTime);
       const earnedCloseCall = awardsCalc.checkCloseCall(position, times.winnerTime, times.secondPlaceTime);
-      const earnedPhotoFinish = awardsCalc.checkPhotoFinish(position, times.userTime, times.winnerTime, times.secondPlaceTime);
+      const earnedPhotoFinish = awardsCalc.checkPhotoFinish(position, times.userTime, times.winnerTime);
       const earnedDarkHorse = awardsCalc.checkDarkHorse(position, predictedPosition);
       
       return {
