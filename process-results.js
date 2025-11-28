@@ -48,132 +48,6 @@ const EVENT_MAX_POINTS = {
 };
 
 /**
- * Stage progression rules:
- * Stage 1: event_1 (Coast and Roast Crit)
- * Stage 2: event_2 (Island Classic)
- * Stage 3: any of events 6-12 (first use)
- * Stage 4: event_3 (The Forest Velodrome Elimination)
- * Stage 5: event_4 (Coastal Loop Time Challenge)
- * Stage 6: any of events 6-12 (second use, different from stage 3)
- * Stage 7: event_5 (North Lake Points Race)
- * Stage 8: any of events 6-12 (third use, different from stages 3 & 6)
- * Stage 9: events 13, 14, 15 in order on consecutive calendar days
- */
-const STAGE_REQUIREMENTS = {
-  1: { type: 'fixed', eventId: 1 },
-  2: { type: 'fixed', eventId: 2 },
-  3: { type: 'choice', eventIds: [6, 7, 8, 9, 10, 11, 12] },
-  4: { type: 'fixed', eventId: 3 },
-  5: { type: 'fixed', eventId: 4 },
-  6: { type: 'choice', eventIds: [6, 7, 8, 9, 10, 11, 12] },
-  7: { type: 'fixed', eventId: 5 },
-  8: { type: 'choice', eventIds: [6, 7, 8, 9, 10, 11, 12] },
-  9: { type: 'tour', eventIds: [13, 14, 15] }
-};
-
-const OPTIONAL_EVENTS = [6, 7, 8, 9, 10, 11, 12];
-
-/**
- * Check if an event is valid for the user's current stage
- * @returns {object} { valid: boolean, reason?: string, isTour?: boolean }
- */
-function isEventValidForStage(eventNumber, currentStage, usedOptionalEvents = [], tourProgress = {}) {
-  const stageReq = STAGE_REQUIREMENTS[currentStage];
-  
-  if (!stageReq) {
-    return { valid: false, reason: `Invalid stage: ${currentStage}` };
-  }
-  
-  if (stageReq.type === 'fixed') {
-    if (eventNumber === stageReq.eventId) {
-      return { valid: true };
-    }
-    return { valid: false, reason: `Stage ${currentStage} requires event ${stageReq.eventId}, not event ${eventNumber}` };
-  }
-  
-  if (stageReq.type === 'choice') {
-    if (!stageReq.eventIds.includes(eventNumber)) {
-      return { valid: false, reason: `Event ${eventNumber} is not a valid choice for stage ${currentStage}. Valid events: ${stageReq.eventIds.join(', ')}` };
-    }
-    if (usedOptionalEvents.includes(eventNumber)) {
-      return { valid: false, reason: `Event ${eventNumber} has already been used in a previous stage` };
-    }
-    return { valid: true };
-  }
-  
-  if (stageReq.type === 'tour') {
-    if (!stageReq.eventIds.includes(eventNumber)) {
-      return { valid: false, reason: `Event ${eventNumber} is not part of the Local Tour (stage 9). Required events: 13, 14, 15` };
-    }
-    
-    // Check if this is the next expected tour event
-    const nextExpected = getNextTourEvent(tourProgress);
-    if (nextExpected === null) {
-      return { valid: false, reason: 'Local Tour already completed' };
-    }
-    if (eventNumber !== nextExpected) {
-      return { valid: false, reason: `Local Tour must be completed in order. Expected event ${nextExpected}, got event ${eventNumber}` };
-    }
-    
-    return { valid: true, isTour: true };
-  }
-  
-  return { valid: false, reason: 'Unknown stage type' };
-}
-
-/**
- * Get the next expected tour event for stage 9
- * @returns {number|null} Next event ID (13, 14, or 15) or null if tour completed
- */
-function getNextTourEvent(tourProgress = {}) {
-  if (!tourProgress.event13Completed) return 13;
-  if (!tourProgress.event14Completed) return 14;
-  if (!tourProgress.event15Completed) return 15;
-  return null; // Tour completed
-}
-
-/**
- * Check if two dates are consecutive calendar days
- * @param {Date|string|number} date1 - First date (earlier)
- * @param {Date|string|number} date2 - Second date (later)
- * @returns {boolean} True if date2 is exactly one calendar day after date1
- */
-function areConsecutiveDays(date1, date2) {
-  const d1 = new Date(date1);
-  const d2 = new Date(date2);
-  
-  // Reset to start of day (UTC) for both
-  const d1Start = new Date(Date.UTC(d1.getUTCFullYear(), d1.getUTCMonth(), d1.getUTCDate()));
-  const d2Start = new Date(Date.UTC(d2.getUTCFullYear(), d2.getUTCMonth(), d2.getUTCDate()));
-  
-  // Calculate difference in days
-  const diffTime = d2Start.getTime() - d1Start.getTime();
-  const diffDays = diffTime / (1000 * 60 * 60 * 24);
-  
-  return diffDays === 1;
-}
-
-/**
- * Determine the next stage after completing an event
- * @returns {number} The next stage number
- */
-function calculateNextStage(currentStage, tourProgress = {}) {
-  if (currentStage < 9) {
-    return currentStage + 1;
-  }
-  
-  // Stage 9 (tour) - check if all events completed
-  if (currentStage === 9) {
-    if (tourProgress.event13Completed && tourProgress.event14Completed && tourProgress.event15Completed) {
-      return 10; // Tour completed, move to stage 10 (or season complete)
-    }
-    return 9; // Stay on stage 9 until tour is complete
-  }
-  
-  return currentStage + 1;
-}
-
-/**
  * Calculate points based on finishing position using Career Mode formula
  * 
  * Formula: points = (maxPoints/2) + (40 - position) * ((maxPoints - 10)/78) + podiumBonus + bonusPoints
@@ -364,18 +238,10 @@ async function processUserResult(uid, eventInfo, results) {
   
   console.log(`   Found user: ${userData.name || uid} (Document ID: ${userDoc.id})`);
   
-  // Get user's current progression state
+  // Check if this is the user's next event
   const currentStage = userData.currentStage || 1;
-  const usedOptionalEvents = userData.usedOptionalEvents || [];
-  const tourProgress = userData.tourProgress || {};
-  
-  console.log(`   Current stage: ${currentStage}, Used optional events: [${usedOptionalEvents.join(', ')}]`);
-  
-  // Validate if this event is valid for the user's current stage
-  const validation = isEventValidForStage(eventNumber, currentStage, usedOptionalEvents, tourProgress);
-  
-  if (!validation.valid) {
-    console.log(`   ⚠️ Event ${eventNumber} is not valid for user ${uid}: ${validation.reason}`);
+  if (currentStage !== eventNumber) {
+    console.log(`Event ${eventNumber} is not next for user ${uid} (currently on stage ${currentStage}), skipping`);
     return;
   }
   
@@ -428,33 +294,6 @@ async function processUserResult(uid, eventInfo, results) {
   // Check if earned Giant Killer medal (beat highest-rated rider)
   const earnedGiantKillerMedal = checkGiantKiller(results, uid);
   
-  // Check if earned Bullseye medal (finish exactly at predicted position)
-  const earnedBullseyeMedal = predictedPosition && position === predictedPosition;
-  
-  // Check if earned Hot Streak medal (beat prediction 3 events in a row)
-  let earnedHotStreakMedal = false;
-  if (predictedPosition && position < predictedPosition) {
-    // Current event beats prediction, check previous 2 events
-    let consecutiveBeatPrediction = 1; // Current event counts as 1
-    
-    // Get previous event results from userData
-    const completedEvents = userData.completedStages || [];
-    const sortedEvents = [...completedEvents].sort((a, b) => b - a); // Most recent first
-    
-    for (const prevEventNum of sortedEvents) {
-      if (consecutiveBeatPrediction >= 3) break;
-      
-      const prevResults = userData[`event${prevEventNum}Results`];
-      if (prevResults && prevResults.predictedPosition && prevResults.position < prevResults.predictedPosition) {
-        consecutiveBeatPrediction++;
-      } else {
-        break; // Streak broken
-      }
-    }
-    
-    earnedHotStreakMedal = consecutiveBeatPrediction >= 3;
-  }
-  
   // Prepare event results
   const eventResults = {
     position: position,
@@ -467,111 +306,24 @@ async function processUserResult(uid, eventInfo, results) {
     bonusPoints: bonusPoints,
     earnedPunchingMedal: earnedPunchingMedal,
     earnedGiantKillerMedal: earnedGiantKillerMedal,
-    earnedBullseyeMedal: earnedBullseyeMedal,
-    earnedHotStreakMedal: earnedHotStreakMedal,
     distance: parseFloat(userResult.Distance) || 0,
     deltaTime: parseFloat(userResult.DeltaTime) || 0,
     eventPoints: parseInt(userResult.Points) || null, // Points race points (for display only)
     processedAt: admin.firestore.FieldValue.serverTimestamp()
   };
   
-  // Build list of completed events (previous + current)
-  const previouslyCompletedEvents = userData.completedStages || [];
-  const allCompletedEvents = previouslyCompletedEvents.includes(eventNumber) 
-    ? previouslyCompletedEvents 
-    : [...previouslyCompletedEvents, eventNumber];
-  
-  // Determine stage progression and handle special cases
-  let newTourProgress = { ...tourProgress };
-  let newUsedOptionalEvents = [...usedOptionalEvents];
-  let finalPoints = points;
-  let consecutiveDaysFailed = false;
-  
-  // Handle optional events (stages 3, 6, 8)
-  if (OPTIONAL_EVENTS.includes(eventNumber)) {
-    newUsedOptionalEvents.push(eventNumber);
-    console.log(`   Added event ${eventNumber} to used optional events: [${newUsedOptionalEvents.join(', ')}]`);
-  }
-  
-  // Handle tour events (stage 9)
-  if (validation.isTour) {
-    const now = new Date();
-    
-    if (eventNumber === 13) {
-      // First tour event - just record the date
-      newTourProgress.event13Completed = true;
-      newTourProgress.event13Date = now.toISOString();
-      console.log(`   Tour Stage 1 completed on ${now.toISOString()}`);
-    } else if (eventNumber === 14) {
-      // Second tour event - check consecutive day from event 13
-      if (tourProgress.event13Date) {
-        const isConsecutive = areConsecutiveDays(tourProgress.event13Date, now);
-        if (!isConsecutive) {
-          console.log(`   Warning: Tour Stage 2 NOT on consecutive day from Stage 1. Points: 0`);
-          finalPoints = 0;
-          consecutiveDaysFailed = true;
-          eventResults.points = 0;
-          eventResults.consecutiveDaysFailed = true;
-        } else {
-          console.log(`   Tour Stage 2 is on consecutive day from Stage 1`);
-        }
-      }
-      newTourProgress.event14Completed = true;
-      newTourProgress.event14Date = now.toISOString();
-      newTourProgress.event14ConsecutiveFailed = consecutiveDaysFailed;
-    } else if (eventNumber === 15) {
-      // Third tour event - check consecutive day from event 14
-      if (tourProgress.event14Date) {
-        const isConsecutive = areConsecutiveDays(tourProgress.event14Date, now);
-        if (!isConsecutive) {
-          console.log(`   Warning: Tour Stage 3 NOT on consecutive day from Stage 2. Points: 0`);
-          finalPoints = 0;
-          consecutiveDaysFailed = true;
-          eventResults.points = 0;
-          eventResults.consecutiveDaysFailed = true;
-        } else {
-          console.log(`   Tour Stage 3 is on consecutive day from Stage 2`);
-        }
-      }
-      newTourProgress.event15Completed = true;
-      newTourProgress.event15Date = now.toISOString();
-      newTourProgress.event15ConsecutiveFailed = consecutiveDaysFailed;
-    }
-  }
-  
-  // Calculate the user's new authoritative totals (AFTER finalPoints is determined)
-  const newTotalPoints = (userData.totalPoints || 0) + finalPoints;
-  const newTotalEvents = (userData.totalEvents || 0) + 1;
-  
-  // Build season standings with all racers from CSV, using authoritative user totals
-  const currentUserTotals = {
-    totalPoints: newTotalPoints,
-    totalEvents: newTotalEvents
-  };
-  const seasonStandings = await buildSeasonStandings(results, userData, eventNumber, uid, allCompletedEvents, currentUserTotals);
-  
-  // Calculate next stage
-  const nextStage = calculateNextStage(currentStage, newTourProgress);
+  // Build season standings with all racers from CSV
+  const seasonStandings = await buildSeasonStandings(results, userData, eventNumber, uid);
   
   // Update user document
   const updates = {
     [`event${eventNumber}Results`]: eventResults,
-    currentStage: nextStage,
-    totalPoints: newTotalPoints,
-    totalEvents: newTotalEvents,
+    currentStage: eventNumber + 1, // Unlock next event
+    totalPoints: (userData.totalPoints || 0) + points,
+    totalEvents: (userData.totalEvents || 0) + 1,
     [`season${season}Standings`]: seasonStandings,
     team: userResult.Team || '' // Update team from latest race result
   };
-  
-  // Update optional events tracking if changed
-  if (newUsedOptionalEvents.length !== usedOptionalEvents.length) {
-    updates.usedOptionalEvents = newUsedOptionalEvents;
-  }
-  
-  // Update tour progress if on stage 9
-  if (validation.isTour) {
-    updates.tourProgress = newTourProgress;
-  }
   
   // Add to completedStages if not already there
   const completedStages = userData.completedStages || [];
@@ -583,15 +335,14 @@ async function processUserResult(uid, eventInfo, results) {
   
   const bonusLog = bonusPoints > 0 ? ` (including +${bonusPoints} bonus)` : '';
   const predictionLog = predictedPosition ? ` | Predicted: ${predictedPosition}` : '';
-  const punchingLog = earnedPunchingMedal ? ' PUNCHING MEDAL!' : '';
-  const giantKillerLog = earnedGiantKillerMedal ? ' GIANT KILLER!' : '';
-  const consecutiveLog = consecutiveDaysFailed ? ' CONSECUTIVE DAYS FAILED' : '';
-  const stageLog = ` | Stage: ${currentStage} -> ${nextStage}`;
-  console.log(`Processed event ${eventNumber} for user ${uid}: Position ${position}${predictionLog}, Points ${finalPoints}${bonusLog}${punchingLog}${giantKillerLog}${consecutiveLog}${stageLog}`);
+  const punchingLog = earnedPunchingMedal ? ' 🥊 PUNCHING MEDAL!' : '';
+  const giantKillerLog = earnedGiantKillerMedal ? ' âš”ï¸ GIANT KILLER!' : '';
+  console.log(`âœ… Processed event ${eventNumber} for user ${uid}: Position ${position}${predictionLog}, Points ${points}${bonusLog}${punchingLog}${giantKillerLog}`);
   
   // Update results summary collection
   await updateResultsSummary(season, eventNumber, results);
 }
+
 /**
  * Deterministic random number generator using bot UID and event as seed
  */
@@ -641,12 +392,12 @@ function simulatePosition(botName, arr, eventNumber, fieldSize = 50) {
 }
 
 /**
- * Fetch results for specific events only (not a range)
+ * Fetch all results from events 1 through currentEvent
  */
-async function getEventResults(season, eventNumbers) {
+async function getAllPreviousEventResults(season, currentEvent) {
   const allEventResults = {};
   
-  for (const eventNum of eventNumbers) {
+  for (let eventNum = 1; eventNum <= currentEvent; eventNum++) {
     const resultDocId = `season${season}_event${eventNum}`;
     try {
       const resultDoc = await db.collection('results').doc(resultDocId).get();
@@ -665,24 +416,10 @@ async function getEventResults(season, eventNumbers) {
 /**
  * Build season standings including all racers from CSV
  * Now includes simulated results for bots to keep standings competitive
- * @param {Array} results - Current event results
- * @param {Object} userData - User's data from Firestore
- * @param {number} eventNumber - Current event number being processed
- * @param {string} currentUid - Current user's UID
- * @param {Array} completedEvents - Array of event numbers the user has completed (including current)
- * @param {Object} currentUserTotals - The current user's authoritative totals { totalPoints, totalEvents }
  */
-async function buildSeasonStandings(results, userData, eventNumber, currentUid, completedEvents = [], currentUserTotals = {}) {
+async function buildSeasonStandings(results, userData, eventNumber, currentUid) {
   const season = 1;
   const existingStandings = userData[`season${season}Standings`] || [];
-  
-  // Ensure current event is in completedEvents
-  if (!completedEvents.includes(eventNumber)) {
-    completedEvents = [...completedEvents, eventNumber];
-  }
-  
-  const numCompletedEvents = completedEvents.length;
-  console.log(`   Building standings for ${numCompletedEvents} completed events: [${completedEvents.join(', ')}]`);
   
   // Create a map of existing racers
   const standingsMap = new Map();
@@ -722,23 +459,8 @@ async function buildSeasonStandings(results, userData, eventNumber, currentUid, 
     // Use UID for humans, name for bots (bots may not have persistent UIDs)
     const key = isBotRacer ? name : uid;
     
-    // For the current user, use authoritative data from Firebase
-    const isCurrentUser = uid === currentUid;
-    
-    if (isCurrentUser && currentUserTotals.totalPoints !== undefined) {
-      // Use authoritative totals for current user
-      standingsMap.set(key, {
-        name: name,
-        uid: uid,
-        arr: arr,
-        team: team,
-        events: currentUserTotals.totalEvents,
-        points: currentUserTotals.totalPoints,
-        isBot: false,
-        isCurrentUser: true
-      });
-    } else if (standingsMap.has(key)) {
-      // Update existing racer (for bots and other humans)
+    if (standingsMap.has(key)) {
+      // Update existing racer
       const racer = standingsMap.get(key);
       racer.points = (racer.points || 0) + points;
       racer.events = (racer.events || 0) + 1;
@@ -746,23 +468,25 @@ async function buildSeasonStandings(results, userData, eventNumber, currentUid, 
       racer.team = team || racer.team; // Keep team if exists
     } else {
       // Add new racer
+      // For bots, create a name-based identifier that can be used for profile lookup
+      const botUid = isBotRacer ? `Bot_${name.replace(/[^a-zA-Z0-9]/g, '_')}` : uid;
       standingsMap.set(key, {
         name: name,
-        uid: isBotRacer ? null : uid,
+        uid: botUid,
         arr: arr,
         team: team,
         events: 1,
         points: points,
         isBot: isBotRacer,
-        isCurrentUser: isCurrentUser
+        isCurrentUser: uid === currentUid
       });
     }
   });
   
   // Now backfill bots with simulated results
-  // Get results for completed events only (not a range)
+  // Get all results from events 1 through current
   console.log('   Backfilling bot results...');
-  const allEventResults = await getEventResults(season, completedEvents);
+  const allEventResults = await getAllPreviousEventResults(season, eventNumber);
   
   // IMPORTANT: Also include current event's results (not yet in Firestore)
   // The 'results' parameter contains the current event being processed
@@ -797,27 +521,7 @@ async function buildSeasonStandings(results, userData, eventNumber, currentUid, 
   
   console.log(`   Found ${allBots.size} unique bots across all events`);
   
-  // Stage to event mapping for mandatory stages
-  const STAGE_TO_EVENT = {
-    1: 1,   // Coast and Roast Crit
-    2: 2,   // Island Classic
-    // 3: choice from 6-12
-    4: 3,   // Forest Velodrome Elimination
-    5: 4,   // Coastal Loop Time Challenge
-    // 6: choice from 6-12
-    7: 5,   // North Lake Points Race
-    // 8: choice from 6-12
-    9: 13   // Local Tour (simplified - just event 13 for now)
-  };
-  
-  const CHOICE_STAGES = [3, 6, 8];
-  const OPTIONAL_EVENT_IDS = [6, 7, 8, 9, 10, 11, 12];
-  
-  // Determine number of stages completed based on currentStage
-  // completedEvents length = number of stages completed
-  const numStagesCompleted = numCompletedEvents;
-  
-  // For each bot, simulate results for all completed stages
+  // For each bot, simulate missing events and update standings
   for (const [botName, botInfo] of allBots.entries()) {
     if (!standingsMap.has(botName)) {
       // Bot not in standings yet, add them
@@ -835,38 +539,15 @@ async function buildSeasonStandings(results, userData, eventNumber, currentUid, 
     
     const botStanding = standingsMap.get(botName);
     
-    // Track which optional events this bot has "used"
-    const botUsedOptionals = new Set();
-    
-    // Calculate simulated points for each stage
+    // Calculate simulated points for missing events
     let simulatedPoints = 0;
     let simulatedEvents = 0;
     
-    for (let stage = 1; stage <= numStagesCompleted; stage++) {
-      let eventNumForStage;
-      
-      if (CHOICE_STAGES.includes(stage)) {
-        // For choice stages, pick a random event from available optionals
-        // Use seeded random so same bot picks same event consistently
-        const availableOptionals = OPTIONAL_EVENT_IDS.filter(id => !botUsedOptionals.has(id));
-        if (availableOptionals.length > 0) {
-          const randomIndex = Math.floor(getSeededRandom(botName, stage) * availableOptionals.length);
-          eventNumForStage = availableOptionals[randomIndex];
-          botUsedOptionals.add(eventNumForStage);
-        } else {
-          // Fallback - shouldn't happen with only 3 choice stages and 7 options
-          eventNumForStage = 6;
-        }
-      } else {
-        // Fixed stage - use the mapped event
-        eventNumForStage = STAGE_TO_EVENT[stage];
-      }
-      
-      // Check if bot actually participated in this event
-      if (eventNumForStage && !botInfo.actualEvents.has(eventNumForStage)) {
+    for (let eventNum = 1; eventNum <= eventNumber; eventNum++) {
+      if (!botInfo.actualEvents.has(eventNum)) {
         // Bot didn't participate in this event, simulate it
-        const simulatedPosition = simulatePosition(botName, botInfo.arr, eventNumForStage);
-        const points = calculatePoints(simulatedPosition, eventNumForStage).points;
+        const simulatedPosition = simulatePosition(botName, botInfo.arr, eventNum);
+        const points = calculatePoints(simulatedPosition, eventNum).points; // Base points only, no bonus
         simulatedPoints += points;
         simulatedEvents++;
       }
@@ -874,7 +555,7 @@ async function buildSeasonStandings(results, userData, eventNumber, currentUid, 
     
     // Update bot standing with simulated results
     botStanding.points += simulatedPoints;
-    botStanding.events = numCompletedEvents; // Bots show same number of events as human
+    botStanding.events = eventNumber; // All bots now show as having completed all events
     botStanding.simulatedEvents = simulatedEvents; // Track how many were simulated
   }
   
@@ -883,8 +564,8 @@ async function buildSeasonStandings(results, userData, eventNumber, currentUid, 
   let botsUpdatedCount = 0;
   for (const [key, racer] of standingsMap.entries()) {
     if (racer.isBot) {
-      // Make sure all bots show the correct number of completed events
-      racer.events = numCompletedEvents;
+      // Make sure all bots show the current event number
+      racer.events = eventNumber;
       botsUpdatedCount++;
     }
   }
@@ -1016,11 +697,6 @@ async function updateResultsSummary(season, event, results) {
       
       const earnedGiantKillerMedal = checkGiantKillerForResult(r.UID, position);
       
-      // Bullseye: finish exactly at predicted position
-      const earnedBullseyeMedal = predictedPosition && position === predictedPosition;
-      
-      // Note: Hot Streak is calculated per-user based on their event history, not in summary
-      
       return {
         position: position,
         name: r.Name,
@@ -1035,7 +711,6 @@ async function updateResultsSummary(season, event, results) {
         bonusPoints: bonusPoints,
         earnedPunchingMedal: earnedPunchingMedal,
         earnedGiantKillerMedal: earnedGiantKillerMedal,
-        earnedBullseyeMedal: earnedBullseyeMedal,
         eventPoints: parseInt(r.Points) || null,
         isBot: isBot(r.UID, r.Gender)
       };
@@ -1063,7 +738,7 @@ async function processResults(csvFiles) {
   
   for (const filePath of csvFiles) {
     try {
-      console.log(`\n🔄 Processing: ${filePath}`);
+      console.log(`\n📄 Processing: ${filePath}`);
       
       // Parse event info from path
       const eventInfo = parseEventPath(filePath);

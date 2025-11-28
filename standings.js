@@ -134,7 +134,8 @@ async function calculateRealSeasonStandings(season = 1) {
                             arr: result.arr || 0,
                             events: 0,
                             points: 0,
-                            isCurrentUser: false
+                            isCurrentUser: false,
+                            isBot: result.isBot || false
                         };
                     }
                     
@@ -294,7 +295,7 @@ async function renderSeasonStandings() {
                     <span class="rank-number ${rankClass}">${rank}</span>
                 </td>
                 <td class="name-cell">
-                    <span class="rider-name">${makeNameClickable(racer.name, racer.uid)}</span>
+                    <span class="rider-name">${makeNameClickable(racer.name, racer.uid, racer.isBot)}</span>
                     ${racer.isCurrentUser ? '<span class="you-badge">YOU</span>' : ''}
                 </td>
                 <td class="team-cell">${teamDisplay}</td>

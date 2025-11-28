@@ -1,6 +1,6 @@
 // Reusable Bot Profile Modal
 // Import this module on any page to enable bot profile viewing
-import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { getFirestore, doc, getDoc, collection, query, where, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
 let db;
 let modalInitialized = false;
@@ -281,10 +281,32 @@ async function openBotProfile(botUid) {
     `;
     
     try {
-        // Fetch profile from Firestore
+        let profile = null;
+        
+        // First try direct lookup by uid
         const profileDoc = await getDoc(doc(db, 'botProfiles', botUid));
         
-        if (!profileDoc.exists()) {
+        if (profileDoc.exists()) {
+            profile = profileDoc.data();
+        } else if (botUid && botUid.startsWith('Bot_')) {
+            // UID is in Bot_Name format, try to find by name
+            // Convert Bot_Some_Name back to "Some Name"
+            const extractedName = botUid.substring(4).replace(/_/g, ' ');
+            console.log('Searching for bot by name:', extractedName);
+            
+            // Search botProfiles collection by name
+            const profilesQuery = query(
+                collection(db, 'botProfiles'),
+                where('name', '==', extractedName)
+            );
+            const querySnapshot = await getDocs(profilesQuery);
+            
+            if (!querySnapshot.empty) {
+                profile = querySnapshot.docs[0].data();
+            }
+        }
+        
+        if (!profile) {
             // Profile not found
             modalBody.innerHTML = `
                 <div style="padding: 3rem; text-align: center;">
@@ -295,8 +317,6 @@ async function openBotProfile(botUid) {
             `;
             return;
         }
-        
-        const profile = profileDoc.data();
         
         // Render profile
         const arrBadge = getARRBadge(profile.arr);
@@ -374,19 +394,17 @@ function closeBotModal() {
     }
 }
 
-// Check if rider is a bot (UID starts with "Bot")
-function isBot(uid) {
+// Check if rider is a bot (UID starts with "Bot" or explicit flag)
+function isBot(uid, isBotFlag) {
+    if (isBotFlag === true) return true;
     return uid && typeof uid === 'string' && uid.startsWith('Bot');
 }
 
 // Make rider name clickable if it's a bot
-function makeNameClickable(name, uid) {
-    // Debug logging (can be removed after testing)
-    if (uid && uid.startsWith('Bot')) {
+// isBotFlag: optional boolean to explicitly mark as bot (for data that has isBot field)
+function makeNameClickable(name, uid, isBotFlag) {
+    if (isBot(uid, isBotFlag)) {
         console.log('Making bot name clickable:', name, uid);
-    }
-    
-    if (isBot(uid)) {
         return `<span class="bot-name-link" onclick="window.openBotProfile('${uid}')">${name}</span>`;
     }
     return name;
@@ -509,7 +527,7 @@ function getCountryFlag(code) {
     
     const upper = code.toUpperCase();
     
-    // Custom UK nations → custom SVGs (except NIR which stays emoji)
+    // Custom UK nations â†’ custom SVGs (except NIR which stays emoji)
     if (upper === 'ENG') {
         return `<img class="flag-icon" src="assets/flags/england.svg" alt="England flag" loading="lazy">`;
     }
