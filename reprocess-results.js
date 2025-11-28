@@ -939,9 +939,11 @@ async function main() {
     return;
   }
   
-  // List files
+  // List files with timestamps to verify order
+  console.log('   CSV files (in processing order by timestamp):');
   for (const file of csvFiles) {
-    console.log(`   - Event ${file.event}: ${file.path}`);
+    const date = new Date(file.modifiedTime);
+    console.log(`   - Event ${file.event}: ${date.toISOString()} - ${file.path}`);
   }
   console.log('');
   
