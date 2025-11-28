@@ -625,6 +625,27 @@
     margin-bottom: 1rem;
 }
 
+.event-image {
+    position: relative;
+    width: 100%;
+    padding: 2rem 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.event-image-placeholder {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+
+.event-image-placeholder span {
+    font-size: 4rem;
+    line-height: 1;
+}
+
 .stage-title {
     font-family: 'Orbitron', sans-serif;
     font-size: 1.8rem;
