@@ -94,7 +94,7 @@
                                 <details>
                                     <summary>CSV Format Guide</summary>
                                     <div class="csv-format-info">
-                                        <p><strong>Required columns:</strong> uid, name, team, arr, gender, nationality, backstory, imageUrl</p>
+                                        <p><strong>Required columns:</strong> uid, name, team, , gender, nationality, backstory, imageUrl</p>
                                         <p><strong>Optional columns:</strong> age, ridingStyle</p>
                                         <p><strong>Example row:</strong></p>
                                         <code>Bot123ABC,Marco DiCicco,Formix,1250,Male,IT,"Paragraph 1...\n\nParagraph 2...",https://example.com/image.jpg,28,Climber</code>
@@ -163,10 +163,9 @@
                                     type="number" 
                                     id="botArr" 
                                     placeholder="e.g., 1250"
-                                    min="800"
+                                    min="100"
                                     max="2000"
                                     required>
-                                <small class="field-help">Bronze: <1196 | Silver: 1196-1320 | Gold: 1321-1450 | Platinum: 1451+</small>
                             </div>
 
                             <!-- Gender -->
