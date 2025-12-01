@@ -158,11 +158,12 @@ async function calculateUserStats(userUID) {
     };
     
     // Fetch all results for this user from all events
-    const eventCount = 9; // Assuming 9 events per season for now
+    const eventCount = 15; // All possible events
     const season = 1;
     
     for (let eventNum = 1; eventNum <= eventCount; eventNum++) {
-        const resultDocId = `season${season}_event${eventNum}`;
+        // Results are now stored per-user
+        const resultDocId = `season${season}_event${eventNum}_${userUID}`;
         
         try {
             const resultDoc = await getDoc(doc(db, 'results', resultDocId));
