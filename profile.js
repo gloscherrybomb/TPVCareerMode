@@ -162,7 +162,8 @@ async function calculateUserStats(userUID) {
     const season = 1;
     
     for (let eventNum = 1; eventNum <= eventCount; eventNum++) {
-        const resultDocId = `season${season}_event${eventNum}`;
+        // User-specific results collection
+        const resultDocId = `season${season}_event${eventNum}_${userUID}`;
         
         try {
             const resultDoc = await getDoc(doc(db, 'results', resultDocId));
