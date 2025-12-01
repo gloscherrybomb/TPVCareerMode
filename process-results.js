@@ -1099,6 +1099,28 @@ async function processResults(csvFiles) {
         await processUserResult(uid, eventInfo, results);
       }
       
+      // Rename CSV to include timestamp for chronological tracking
+      // Format: originalname_YYYYMMDD_HHMMSS.csv
+      const timestamp = new Date().toISOString()
+        .replace(/[-:]/g, '')  // Remove dashes and colons
+        .replace(/\..+/, '')   // Remove milliseconds
+        .replace('T', '_');    // Replace T with underscore: YYYYMMDD_HHMMSS
+      
+      // Check if filename already has a timestamp (pattern: _YYYYMMDD_HHMMSS.csv)
+      const hasTimestamp = /(_\d{8}_\d{6})\.csv$/.test(filePath);
+      
+      if (!hasTimestamp) {
+        const newPath = filePath.replace(/\.csv$/, `_${timestamp}.csv`);
+        try {
+          fs.renameSync(filePath, newPath);
+          console.log(`   📅 Renamed to: ${path.basename(newPath)}`);
+        } catch (renameError) {
+          console.log(`   ⚠️  Could not rename CSV (file may be locked): ${renameError.message}`);
+        }
+      } else {
+        console.log(`   📅 CSV already has timestamp, skipping rename`);
+      }
+      
     } catch (error) {
       console.error(`âŒ Error processing ${filePath}:`, error);
     }

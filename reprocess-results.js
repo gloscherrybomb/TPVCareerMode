@@ -375,17 +375,43 @@ async function findAllCSVFiles(season) {
     for (const file of files) {
       const fullPath = path.join(eventPath, file);
       const stats = fs.statSync(fullPath);
+      
+      // Try to extract timestamp from filename: filename_YYYYMMDD_HHMMSS.csv
+      const timestampMatch = file.match(/_(\d{8})_(\d{6})\.csv$/);
+      let timestamp;
+      
+      if (timestampMatch) {
+        // Parse timestamp from filename: YYYYMMDD_HHMMSS
+        const dateStr = timestampMatch[1]; // YYYYMMDD
+        const timeStr = timestampMatch[2]; // HHMMSS
+        
+        const year = dateStr.substring(0, 4);
+        const month = dateStr.substring(4, 6);
+        const day = dateStr.substring(6, 8);
+        const hour = timeStr.substring(0, 2);
+        const minute = timeStr.substring(2, 4);
+        const second = timeStr.substring(4, 6);
+        
+        // Create ISO string and parse
+        const isoString = `${year}-${month}-${day}T${hour}:${minute}:${second}Z`;
+        timestamp = new Date(isoString).getTime();
+      } else {
+        // Fallback to file modification time for files without timestamp
+        timestamp = stats.mtime.getTime();
+      }
+      
       csvFiles.push({
         path: fullPath,
         season: season,
         event: eventNum,
-        modifiedTime: stats.mtime.getTime() // Add modification timestamp
+        timestamp: timestamp,
+        hasFilenameTimestamp: !!timestampMatch
       });
     }
   }
   
-  // Sort by modification time (chronological order)
-  csvFiles.sort((a, b) => a.modifiedTime - b.modifiedTime);
+  // Sort by timestamp (chronological order)
+  csvFiles.sort((a, b) => a.timestamp - b.timestamp);
   
   return csvFiles;
 }
@@ -942,8 +968,9 @@ async function main() {
   // List files with timestamps to verify order
   console.log('   CSV files (in processing order by timestamp):');
   for (const file of csvFiles) {
-    const date = new Date(file.modifiedTime);
-    console.log(`   - Event ${file.event}: ${date.toISOString()} - ${file.path}`);
+    const date = new Date(file.timestamp);
+    const source = file.hasFilenameTimestamp ? '📅 filename' : '📁 file modified';
+    console.log(`   - Event ${file.event}: ${date.toISOString()} (${source}) - ${path.basename(file.path)}`);
   }
   console.log('');
   
