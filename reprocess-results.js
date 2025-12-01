@@ -835,6 +835,9 @@ async function processResultsForUser(userDoc, csvFiles, season) {
     // Calculate next stage
     currentStage = nextStage;
     
+    // Update results summary for this user's event
+    await updateResultsSummary(season, eventNumber, results, userUid);
+    
     console.log(`      ✅ Event ${eventNumber}: P${position}, +${points}pts (Stage → ${currentStage})`);
   }
   
@@ -877,8 +880,8 @@ async function processResultsForUser(userDoc, csvFiles, season) {
   return { totalEvents, totalPoints };
 }
 
-async function updateResultsSummary(season, eventNumber, results) {
-  const summaryRef = db.collection('results').doc(`season${season}_event${eventNumber}`);
+async function updateResultsSummary(season, eventNumber, results, userUid) {
+  const summaryRef = db.collection('results').doc(`season${season}_event${eventNumber}_${userUid}`);
   
   const calculatePredictedPositionForResult = (uid) => {
     const finishers = results.filter(r => 
@@ -1034,21 +1037,8 @@ async function main() {
   }
   console.log('');
   
-  // Step 4: Update results summaries first
-  console.log('STEP 4: Updating results summaries...');
-  for (const csvFile of csvFiles) {
-    try {
-      const csvContent = fs.readFileSync(csvFile.path, 'utf8');
-      const results = await parseCSV(csvContent);
-      await updateResultsSummary(season, csvFile.event, results);
-    } catch (error) {
-      console.log(`   ❌ Error processing event ${csvFile.event}:`, error.message);
-    }
-  }
-  console.log('');
-  
-  // Step 5: Process each user
-  console.log('STEP 5: Processing user results...');
+  // Step 4: Process each user
+  console.log('STEP 4: Processing user results...');
   
   let query = db.collection('users');
   if (options.user) {

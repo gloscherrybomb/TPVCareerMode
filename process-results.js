@@ -605,8 +605,8 @@ async function processUserResult(uid, eventInfo, results) {
   console.log(`Processed event ${eventNumber} for user ${uid}: Position ${position}${predictionLog}, Points ${points}${bonusLog}${punchingLog}${giantKillerLog}`);
   console.log(`   Stage ${currentStage} complete -> Stage ${nextStage}`);
   
-  // Update results summary collection
-  await updateResultsSummary(season, eventNumber, results);
+  // Update results summary collection (per-user)
+  await updateResultsSummary(season, eventNumber, results, uid);
 }
 
 /**
@@ -923,9 +923,11 @@ async function updateBotARRs(season, event, results) {
 
 /**
  * Update results summary collection (for quick access to full results)
+ * Each user gets their own results document
  */
-async function updateResultsSummary(season, event, results) {
-  const summaryRef = db.collection('results').doc(`season${season}_event${event}`);
+async function updateResultsSummary(season, event, results, userUid) {
+  // Store results per-user, not shared
+  const summaryRef = db.collection('results').doc(`season${season}_event${event}_${userUid}`);
   
   // First calculate predictions for all results
   const calculatePredictedPositionForResult = (uid) => {
@@ -1020,6 +1022,7 @@ async function updateResultsSummary(season, event, results) {
   await summaryRef.set({
     season: season,
     event: event,
+    userUid: userUid,
     totalParticipants: validResults.length,
     processedAt: admin.firestore.FieldValue.serverTimestamp(),
     results: validResults
