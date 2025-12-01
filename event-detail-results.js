@@ -192,20 +192,21 @@ async function loadEventResults() {
         // Build results table
         let tableHTML = storyHTML + `
             <div class="results-table-container">
-                <table class="results-table">
-                    <thead>
-                        <tr>
-                            <th>Pos</th>
-                            <th>Rider</th>
-                            <th>Team</th>
-                            <th>Time</th>
-                            <th>ARR</th>
-                            <th>Points</th>
-                            ${results[0].eventPoints != null ? '<th>PR Pts</th>' : ''}
-                            <th>Bonuses</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+                <div class="results-table-wrapper">
+                    <table class="results-table">
+                        <thead>
+                            <tr>
+                                <th>Pos</th>
+                                <th>Rider</th>
+                                <th>Team</th>
+                                <th>Time</th>
+                                <th>ARR</th>
+                                <th>Points</th>
+                                ${results[0].eventPoints != null ? '<th>PR Pts</th>' : ''}
+                                <th>Bonuses</th>
+                            </tr>
+                        </thead>
+                        <tbody>
         `;
 
         results.forEach((result) => {
@@ -280,6 +281,7 @@ async function loadEventResults() {
                     </tbody>
                 </table>
             </div>
+        </div>
         `;
 
         // Add explanation for points races if applicable

@@ -498,6 +498,31 @@
     margin-top: 2rem;
 }
 
+/* Horizontal scroll wrapper for mobile */
+.results-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+}
+
+/* Custom scrollbar for results table */
+.results-table-wrapper::-webkit-scrollbar {
+    height: 8px;
+}
+
+.results-table-wrapper::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+
+.results-table-wrapper::-webkit-scrollbar-thumb {
+    background: var(--accent-blue);
+    border-radius: 10px;
+}
+
+.results-table-wrapper::-webkit-scrollbar-thumb:hover {
+    background: var(--accent-pink);
+}
+
 .results-table {
     width: 100%;
     border-collapse: collapse;
