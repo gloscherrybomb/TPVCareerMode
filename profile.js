@@ -849,7 +849,7 @@ function displayCareerSummary(userData, stats) {
     if (!container) return;
     
     // Check if career summary generator is loaded
-    if (typeof window.careerSummaryGenerator === 'undefined') {
+    if (typeof window.careerSummaryGen === 'undefined') {
         container.textContent = 'Your career is just beginning. Complete more races to see your personalized career summary.';
         return;
     }
@@ -949,20 +949,24 @@ function displayCareerSummary(userData, stats) {
         totalPoints: stats.totalPoints || 0,
         totalWins: stats.totalWins || 0,
         totalPodiums: stats.totalPodiums || 0,
+        totalTop10s: stats.positions ? stats.positions.filter(p => p <= 10).length : 0,
         currentSeasonStages: currentSeasonStages,
         currentSeasonPoints: currentSeasonPoints,
         currentSeasonWins: currentSeasonWins,
         currentSeasonPodiums: currentSeasonPodiums,
-        careerBestPosition: careerBestPosition < 999 ? careerBestPosition : null,
-        recentForm: recentForm,
+        careerBest: {
+            position: careerBestPosition < 999 ? careerBestPosition : null,
+            eventName: careerBestEvent
+        },
         totalAwards: totalAwardsCount,
-        signatureAchievement: signatureAchievement,
-        currentStage: userData.currentStage || 1
+        recentResults: stats.recentResults ? stats.recentResults.slice(0, 5).map(r => r.position) : [],
+        averageFinish: stats.positions && stats.positions.length > 0 ? 
+            stats.positions.reduce((a, b) => a + b, 0) / stats.positions.length : null
     };
     
     // Generate and display summary
     try {
-        const summary = window.careerSummaryGenerator.generateCareerSummary(careerData);
+        const summary = window.careerSummaryGen.generateCareerSummary(careerData);
         container.textContent = summary;
     } catch (error) {
         console.error('Error generating career summary:', error);
