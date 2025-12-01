@@ -120,8 +120,20 @@ async function loadEventResults() {
     const eventResultsContent = document.getElementById('eventResultsContent');
 
     try {
-        // Fetch results summary from Firestore
-        const resultsRef = doc(db, 'results', `season1_event${eventNumber}`);
+        // Get current user's UID first
+        const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
+        const userData = userDoc.data();
+        const userUid = userData?.uid;
+        
+        if (!userUid) {
+            console.error('Could not get user UID');
+            eventResultsSection.style.display = 'none';
+            showPreRaceSections();
+            return;
+        }
+        
+        // Fetch THIS USER's results summary from Firestore
+        const resultsRef = doc(db, 'results', `season1_event${eventNumber}_${userUid}`);
         const resultsDoc = await getDoc(resultsRef);
 
         if (!resultsDoc.exists()) {
@@ -158,12 +170,7 @@ async function loadEventResults() {
             }
         });
 
-        // Get current user's UID and their event results
-        const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
-        const userData = userDoc.data();
-        const userUid = userData?.uid;
-        
-        // Get user's result for this event to extract story
+        // Get user's result for this event to extract story (already have userData from above)
         const userEventResults = userData?.[`event${eventNumber}Results`];
         let storyHTML = '';
         
@@ -194,7 +201,7 @@ async function loadEventResults() {
                             <th>Time</th>
                             <th>ARR</th>
                             <th>Points</th>
-                            ${results[0].eventPoints !== null ? '<th>PR Pts</th>' : ''}
+                            ${results[0].eventPoints != null ? '<th>PR Pts</th>' : ''}
                             <th>Bonuses</th>
                         </tr>
                     </thead>
@@ -263,7 +270,7 @@ async function loadEventResults() {
                     <td class="points-cell">
                         <span class="points-value">${result.points}</span>
                     </td>
-                    ${result.eventPoints !== null ? `<td class="event-points-cell">${result.eventPoints}</td>` : ''}
+                    ${result.eventPoints != null ? `<td class="event-points-cell">${result.eventPoints}</td>` : ''}
                     <td class="bonus-cell">${bonusHTML}</td>
                 </tr>
             `;
@@ -276,7 +283,7 @@ async function loadEventResults() {
         `;
 
         // Add explanation for points races if applicable
-        if (results[0].eventPoints !== null) {
+        if (results[0].eventPoints != null) {
             tableHTML += `
                 <div class="results-note">
                     <strong>PR Pts:</strong> Points Race points (used to determine finishing order in points races)
