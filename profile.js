@@ -317,7 +317,7 @@ async function calculateUserStats(userUID) {
         // zeroToHero is already tracked per-event
     }
     
-    console.log('Stats calculated:', stats);
+    console.log('Stats calculated:', stats.totalRaces, 'races');
     return stats;
 }
 
@@ -484,8 +484,10 @@ function displayProfileInfo(user, userData, stats, seasonRanking, globalRanking)
     // Awards
     displayAwards(stats.awards);
     
-    // TODO: Career summary temporarily disabled for debugging
-    // displayCareerSummary(userData, stats);
+    // Generate and display career summary
+    console.log('About to call displayCareerSummary...');
+    displayCareerSummary(userData, stats);
+    console.log('Returned from displayCareerSummary');
 }
 
 // Display recent results
@@ -844,7 +846,121 @@ function displayAwards(awards) {
 }
 
 // Generate and display career summary
-// Career summary function removed - will be re-added after debugging
+// Display career summary paragraph
+function displayCareerSummary(userData, stats) {
+    console.log('=== CAREER SUMMARY DEBUG ===');
+    console.log('Stats object:', stats);
+    console.log('Stats.totalRaces:', stats?.totalRaces);
+    console.log('Generator exists:', typeof window.careerSummaryGen !== 'undefined');
+    
+    const container = document.getElementById('careerSummary');
+    
+    if (!container) {
+        console.log('❌ Career summary container not found in HTML');
+        return;
+    }
+    
+    console.log('✓ Container found');
+    
+    // Check if we have enough data
+    if (!stats || stats.totalRaces === 0) {
+        console.log('❌ Not enough data - totalRaces:', stats?.totalRaces);
+        container.textContent = 'Complete your first race to see your career summary.';
+        return;
+    }
+    
+    console.log('✓ Stats check passed - totalRaces:', stats.totalRaces);
+    
+    // Check if career summary generator is loaded
+    if (typeof window.careerSummaryGen === 'undefined') {
+        console.warn('❌ Career summary generator not loaded');
+        container.textContent = 'Your career is just beginning. Complete more races to see your personalized career summary.';
+        return;
+    }
+    
+    console.log('✓ Generator loaded, building career data...');
+    
+    // Calculate current season stats
+    const season = 1;
+    const currentSeasonStages = (userData.completedStages || []).length;
+    const currentSeasonPoints = userData.totalPoints || 0;
+    
+    // Count current season wins and podiums
+    let currentSeasonWins = 0;
+    let currentSeasonPodiums = 0;
+    
+    for (let i = 1; i <= 15; i++) {
+        const eventResults = userData[`event${i}Results`];
+        if (eventResults) {
+            if (eventResults.position === 1) currentSeasonWins++;
+            if (eventResults.position <= 3) currentSeasonPodiums++;
+        }
+    }
+    
+    // Find career best result
+    let careerBestPosition = 999;
+    let careerBestEvent = null;
+    
+    for (let i = 1; i <= 15; i++) {
+        const eventResults = userData[`event${i}Results`];
+        if (eventResults && eventResults.position < careerBestPosition) {
+            careerBestPosition = eventResults.position;
+            const eventNames = {
+                1: 'Coast and Roast Crit',
+                2: 'Island Classic',
+                3: 'The Forest Velodrome Elimination',
+                4: 'Coastal Loop Time Challenge',
+                5: 'North Lake Points Race',
+                6: 'Easy Hill Climb',
+                7: 'Flat Eight Criterium',
+                8: 'The Grand Gilbert Fondo',
+                9: 'Base Camp Classic',
+                10: 'Beach and Pine TT',
+                11: 'South Lake Points Race',
+                12: 'Unbound - Little Egypt',
+                13: 'Local Tour Stage 1',
+                14: 'Local Tour Stage 2',
+                15: 'Local Tour Stage 3'
+            };
+            careerBestEvent = eventNames[i] || `Event ${i}`;
+        }
+    }
+    
+    // Calculate total awards
+    const totalAwardsCount = Object.values(stats.awards || {}).reduce((sum, val) => sum + val, 0);
+    
+    // Build career data object for generator
+    const careerData = {
+        totalSeasons: 1,
+        totalStages: stats.totalRaces || 0,
+        totalPoints: stats.totalPoints || 0,
+        totalWins: stats.totalWins || 0,
+        totalPodiums: stats.totalPodiums || 0,
+        totalTop10s: stats.positions ? stats.positions.filter(p => p <= 10).length : 0,
+        currentSeasonStages: currentSeasonStages,
+        currentSeasonPoints: currentSeasonPoints,
+        currentSeasonWins: currentSeasonWins,
+        currentSeasonPodiums: currentSeasonPodiums,
+        careerBest: {
+            position: careerBestPosition < 999 ? careerBestPosition : null,
+            eventName: careerBestEvent
+        },
+        totalAwards: totalAwardsCount,
+        recentResults: stats.recentResults ? stats.recentResults.slice(0, 5).map(r => r.position) : [],
+        averageFinish: stats.positions && stats.positions.length > 0 ? 
+            stats.positions.reduce((a, b) => a + b, 0) / stats.positions.length : null
+    };
+    
+    // Generate and display summary
+    try {
+        const summary = window.careerSummaryGen.generateCareerSummary(careerData);
+        container.textContent = summary;
+        console.log('Career summary generated successfully');
+    } catch (error) {
+        console.error('Error generating career summary:', error);
+        container.textContent = 'Your career is taking shape, one race at a time. Keep competing to build your story.';
+    }
+}
 
 // Handle photo upload
 async function handlePhotoUpload(file) {
