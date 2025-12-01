@@ -14,6 +14,8 @@ on:
 jobs:
   process-results:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Needed to push commits back
     
     steps:
       - name: Checkout code
@@ -53,12 +55,14 @@ jobs:
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           
-          # Check if there are any changes (renamed files)
-          if [[ -n $(git status --porcelain) ]]; then
-            git add race_results/**/*.csv
+          # Add only CSV files that have changed
+          git add race_results/**/*.csv || true
+          
+          # Check if there are staged changes
+          if git diff --cached --quiet; then
+            echo "ℹ️  No CSV files to commit (already renamed or no changes)"
+          else
             git commit -m "Auto: Add timestamps to processed CSV files"
             git push
             echo "✅ Committed renamed CSV files"
-          else
-            echo "ℹ️  No CSV files to commit"
           fi
