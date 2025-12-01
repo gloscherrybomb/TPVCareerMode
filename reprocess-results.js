@@ -20,6 +20,7 @@ const fs = require('fs');
 const path = require('path');
 const Papa = require('papaparse');
 const awardsCalc = require('./awards-calculation');
+const storyGen = require('./story-generator');
 
 // Initialize Firebase Admin
 const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
@@ -746,6 +747,63 @@ async function processResultsForUser(userDoc, csvFiles, season) {
     completedStages.push(currentStage); // Store STAGE number
     processedEvents.push(eventNumber);  // Store EVENT number for reference
     
+    // Generate story for this race
+    const winMargin = (position === 1 && times.secondPlaceTime) ? 
+      times.secondPlaceTime - times.winnerTime : 0;
+    const lossMargin = (position > 1 && times.winnerTime && times.userTime) ?
+      times.userTime - times.winnerTime : 0;
+    
+    // Determine next stage
+    const nextStage = calculateNextStage(currentStage, tourProgress);
+    
+    // Determine next event number
+    let nextEventNumber = nextStage;
+    const STAGE_TO_EVENT = { 1: 1, 2: 2, 4: 3, 5: 4, 7: 5, 9: 13 };
+    if (STAGE_TO_EVENT[nextStage]) {
+      nextEventNumber = STAGE_TO_EVENT[nextStage];
+    }
+    
+    // Calculate form metrics
+    const recentPositions = processedEvents.slice(-3).map(evtNum => {
+      const evtData = updates[`event${evtNum}Results`];
+      return evtData ? evtData.position : null;
+    }).filter(p => p !== null);
+    recentPositions.push(position);
+    
+    const isOnStreak = recentPositions.length >= 2 && recentPositions.every(p => p === 1);
+    
+    let totalPodiums = 0;
+    processedEvents.forEach(evtNum => {
+      const evtData = updates[`event${evtNum}Results`];
+      if (evtData && evtData.position <= 3) totalPodiums++;
+    });
+    if (position <= 3) totalPodiums++;
+    
+    const story = storyGen.generateRaceStory(
+      {
+        eventNumber: eventNumber,
+        position: position,
+        predictedPosition: predictedPosition,
+        winMargin: winMargin,
+        lossMargin: lossMargin,
+        earnedDomination: earnedDomination,
+        earnedCloseCall: earnedCloseCall,
+        earnedPhotoFinish: earnedPhotoFinish,
+        earnedDarkHorse: earnedDarkHorse,
+        earnedZeroToHero: earnedZeroToHero
+      },
+      {
+        stagesCompleted: completedStages.length,
+        totalPoints: totalPoints,
+        nextStageNumber: nextStage,
+        nextEventNumber: nextEventNumber,
+        recentResults: recentPositions,
+        isOnStreak: isOnStreak,
+        totalPodiums: totalPodiums,
+        seasonPosition: null
+      }
+    );
+    
     // Store event results
     updates[`event${eventNumber}Results`] = {
       position: position,
@@ -769,11 +827,13 @@ async function processResultsForUser(userDoc, csvFiles, season) {
       distance: parseFloat(userResult.Distance) || 0,
       deltaTime: parseFloat(userResult.DeltaTime) || 0,
       eventPoints: parseInt(userResult.Points) || null,
+      storyRecap: story.recap,
+      storyContext: story.context,
       processedAt: admin.firestore.FieldValue.serverTimestamp()
     };
     
     // Calculate next stage
-    currentStage = calculateNextStage(currentStage, tourProgress);
+    currentStage = nextStage;
     
     console.log(`      ✅ Event ${eventNumber}: P${position}, +${points}pts (Stage → ${currentStage})`);
   }
