@@ -54,7 +54,8 @@ function generateRaceRecap(data) {
     earnedCloseCall,
     earnedPhotoFinish,
     earnedDarkHorse,
-    earnedZeroToHero
+    earnedZeroToHero,
+    isFirstRace
   } = data;
 
   const eventType = EVENT_TYPES[eventNumber];
@@ -116,7 +117,11 @@ function generateRaceRecap(data) {
     if (predictionTier === 'beat') {
       recap += `A solid performance at ${eventName}. The predictions had you further down the order, somewhere in the mid-twenties, but you rode a tactically sound race that delivered better than expected. You stayed with the main group when it mattered, positioning yourself well through the technical sections and responding when the pace ramped up. When the decisive moves came, you couldn't quite go with the very strongest riders, but you held your ground and finished inside the top ten. Not every race needs to deliver a podium or a dramatic victory. Sometimes a solid, consistent performance that exceeds expectations is exactly what the season requires. You banked points, gained valuable experience, and showed you can compete in the middle of a strong field. That's progress.`;
     } else if (predictionTier === 'worse') {
-      recap += `${eventName} didn't quite deliver the result you were hoping for. The predictions had you finishing higher up the order, maybe even threatening for a podium, but racing has a way of humbling expectations. You were in contention for much of the race, positioned well and feeling reasonably strong, but when the decisive moves came—when the strongest riders made their attacks—you couldn't quite respond. The gap opened, slowly at first, then more decisively, and you had to settle into your own pace and focus on salvaging what you could. Still, a top-ten finish keeps you in the conversation. It's not the result that'll make headlines, but it's another race completed, more experience gained, and points added to your tally. That counts for something.`;
+      if (isFirstRace) {
+        recap += `${eventName} didn't quite deliver the result you were hoping for in your season opener. The predictions had you finishing higher up the order, maybe even threatening for a podium, but racing has a way of humbling expectations. You were in contention for much of the race, positioned well and feeling reasonably strong, but when the decisive moves came—when the strongest riders made their attacks—you couldn't quite respond. The gap opened, slowly at first, then more decisively, and you had to settle into your own pace and focus on salvaging what you could. Still, a top-ten finish in your first outing is a respectable start. It's not the result that'll make headlines, but you've established a baseline, gained valuable experience, and banked your first points. That's a foundation to build on.`;
+      } else {
+        recap += `${eventName} didn't quite deliver the result you were hoping for. The predictions had you finishing higher up the order, maybe even threatening for a podium, but racing has a way of humbling expectations. You were in contention for much of the race, positioned well and feeling reasonably strong, but when the decisive moves came—when the strongest riders made their attacks—you couldn't quite respond. The gap opened, slowly at first, then more decisively, and you had to settle into your own pace and focus on salvaging what you could. Still, a top-ten finish keeps you in the conversation. It's not the result that'll make headlines, but it's another race completed, more experience gained, and points added to your tally. That counts for something.`;
+      }
     } else {
       recap += `${eventName} was about consistency and smart positioning rather than heroics. You rode within yourself, avoiding unnecessary risks and conserving energy for when it mattered most. The race unfolded predictably—the strongest riders controlling things from the front, the pack staying together through the early phases, then splitting as the pace increased. You stayed out of trouble, positioned yourself reasonably well, and when the final selection was made, you were in the group that finished in the top ten. It's not the kind of result that generates excitement or changes your season trajectory, but it's solid, professional racing. You banked points, stayed competitive, and lived to fight another day. Sometimes that's enough.`;
     }
@@ -179,8 +184,17 @@ function generateSeasonContext(data) {
     context += `The season is entering its final stretch with ${stagesCompleted} stages in the books. `;
   }
 
-  // Points assessment (2-3 sentences depending on total)
-  if (totalPoints < 100) {
+  // Points assessment - special case for first race
+  if (stagesCompleted === 1) {
+    // First race only - no talk of consistency yet
+    if (totalPoints >= 90) {
+      context += `Starting strong with ${totalPoints} points from your opening race shows you came ready to compete. `;
+    } else if (totalPoints >= 60) {
+      context += `With ${totalPoints} points from your debut, you've made a solid start to the campaign. `;
+    } else {
+      context += `Your opening race yielded ${totalPoints} points—a foundation to build on as the season unfolds. `;
+    }
+  } else if (totalPoints < 100) {
     context += `With ${totalPoints} points on the board, you're building a foundation—not through any single spectacular result, but through consistent effort and smart racing. `;
   } else if (totalPoints < 200) {
     context += `Your tally of ${totalPoints} points represents solid, steady work across multiple events. `;
@@ -193,7 +207,19 @@ function generateSeasonContext(data) {
   }
 
   // Form analysis based on recent results and achievements (2-3 sentences)
-  if (isOnStreak && recentResults && recentResults[0] === 1) {
+  // Special case: First race - no consistency talk yet
+  if (stagesCompleted === 1) {
+    // First race - focus on getting started, learning, setting baseline
+    if (recentResults && recentResults[0] === 1) {
+      context += `Winning your season opener is the best possible start—it establishes you as a threat from the very beginning and sets the tone for everything that follows. You've proven you can deliver when it counts, and that confidence is invaluable heading into the rest of the campaign. `;
+    } else if (recentResults && recentResults[0] <= 3) {
+      context += `Opening with a podium is an excellent way to start the season. You've shown you can compete at the front immediately, and that's a strong foundation to build on. `;
+    } else if (recentResults && recentResults[0] <= 10) {
+      context += `A top-ten finish in your opener shows you're ready to compete, even if you haven't quite found your best form yet. The first race is as much about learning—understanding the competition, gauging your fitness, figuring out what works—as it is about results. `;
+    } else {
+      context += `Every season has to start somewhere, and your opener has given you a baseline to work from. You've learned where you stand relative to the field, what areas need work, and what you can build on. That knowledge is the foundation for improvement. `;
+    }
+  } else if (isOnStreak && recentResults && recentResults[0] === 1) {
     context += `The winning streak you're currently riding has caught everyone's attention—back-to-back victories aren't luck, they're form, and right now your form is undeniable. You've found that elusive combination of confidence, fitness, and tactical sharpness that turns good riders into dangerous ones. The question everyone's asking is how long you can maintain this momentum, and right now, there's no reason to think it'll end soon. `;
   } else if (totalPodiums >= 5) {
     context += `Multiple trips to the podium have defined your season—five or more top-three finishes is the hallmark of genuine consistency. You've proven you can compete at the front across different types of events and conditions. That kind of reliability is what builds successful campaigns. `;
@@ -274,7 +300,8 @@ function generateRaceStory(raceData, seasonData) {
   
   const recapData = {
     ...raceData,
-    eventName
+    eventName,
+    isFirstRace: seasonData.stagesCompleted === 1  // Add flag for first race
   };
 
   const contextData = {
