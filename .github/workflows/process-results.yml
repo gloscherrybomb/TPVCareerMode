@@ -47,3 +47,18 @@ jobs:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
         run: |
           node process-results.js '${{ steps.changed-files.outputs.files }}'
+      
+      - name: Commit renamed CSV files
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          
+          # Check if there are any changes (renamed files)
+          if [[ -n $(git status --porcelain) ]]; then
+            git add race_results/**/*.csv
+            git commit -m "Auto: Add timestamps to processed CSV files"
+            git push
+            echo "✅ Committed renamed CSV files"
+          else
+            echo "ℹ️  No CSV files to commit"
+          fi
