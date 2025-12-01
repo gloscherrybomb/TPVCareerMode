@@ -483,8 +483,8 @@ function displayProfileInfo(user, userData, stats, seasonRanking, globalRanking)
     // Awards
     displayAwards(stats.awards);
     
-    // Generate and display career summary
-    displayCareerSummary(userData, stats);
+    // TODO: Career summary temporarily disabled for debugging
+    // displayCareerSummary(userData, stats);
 }
 
 // Display recent results
@@ -846,10 +846,20 @@ function displayAwards(awards) {
 function displayCareerSummary(userData, stats) {
     const container = document.getElementById('careerSummary');
     
-    if (!container) return;
+    if (!container) {
+        console.log('Career summary container not found');
+        return;
+    }
+    
+    // Check if we have enough data
+    if (!stats || stats.totalRaces === 0) {
+        container.textContent = 'Complete your first race to see your career summary.';
+        return;
+    }
     
     // Check if career summary generator is loaded
     if (typeof window.careerSummaryGen === 'undefined') {
+        console.warn('Career summary generator not loaded');
         container.textContent = 'Your career is just beginning. Complete more races to see your personalized career summary.';
         return;
     }
