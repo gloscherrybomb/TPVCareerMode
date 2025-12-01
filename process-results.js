@@ -5,6 +5,7 @@ const path = require('path');
 const Papa = require('papaparse');
 const admin = require('firebase-admin');
 const awardsCalc = require('./awards-calculation');
+const storyGen = require('./story-generator');
 
 // Initialize Firebase Admin
 const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
@@ -490,6 +491,92 @@ async function processUserResult(uid, eventInfo, results) {
   
   // Calculate next stage
   const nextStage = calculateNextStage(currentStage, newTourProgress);
+  
+  // Generate story text for this race result
+  // Calculate win margin or margin to winner
+  const sortedResults = results.filter(r => r.Position !== 'DNF' && !isNaN(parseInt(r.Position)))
+    .sort((a, b) => parseInt(a.Position) - parseInt(b.Position));
+  
+  let winMargin = 0;
+  let marginToWinner = 0;
+  
+  if (position === 1 && sortedResults.length >= 2) {
+    const secondPlace = sortedResults[1];
+    winMargin = parseFloat(secondPlace.Time) - parseFloat(userResult.Time);
+  } else if (position > 1 && sortedResults.length >= 1) {
+    const winner = sortedResults[0];
+    marginToWinner = parseFloat(userResult.Time) - parseFloat(winner.Time);
+  }
+  
+  // Find previous event number and all completed events for story context
+  const completedEventNumbers = [];
+  for (let i = 1; i <= 15; i++) {
+    if (userData[`event${i}Results`]) {
+      completedEventNumbers.push(i);
+    }
+  }
+  const previousEventNumber = completedEventNumbers.length > 0 ? completedEventNumbers[completedEventNumbers.length - 1] : null;
+  
+  // Determine next event number based on next stage
+  let nextEventNumber = nextStage;
+  const STAGE_REQUIREMENTS_MAP = {
+    1: 1, 2: 2, 4: 3, 5: 4, 7: 5, 9: 13
+  };
+  if (STAGE_REQUIREMENTS_MAP[nextStage]) {
+    nextEventNumber = STAGE_REQUIREMENTS_MAP[nextStage];
+  }
+  
+  // Collect recent results for form analysis
+  const recentResults = completedEventNumbers.slice(-3).map(evtNum => {
+    const evtData = userData[`event${evtNum}Results`];
+    return evtData ? evtData.position : null;
+  }).filter(p => p !== null);
+  recentResults.push(position); // Add current race
+  
+  // Check if on winning streak
+  const isOnStreak = recentResults.length >= 2 && recentResults.every(p => p === 1);
+  
+  // Count total podiums
+  let totalPodiums = 0;
+  for (let i = 1; i <= 15; i++) {
+    const evtData = userData[`event${i}Results`];
+    if (evtData && evtData.position <= 3) {
+      totalPodiums++;
+    }
+  }
+  if (position <= 3) totalPodiums++; // Include current race
+  
+  // Generate story using story-generator module
+  const story = storyGen.generateRaceStory(
+    {
+      eventNumber: eventNumber,
+      position: position,
+      predictedPosition: predictedPosition,
+      winMargin: winMargin,
+      lossMargin: marginToWinner,
+      earnedDomination: earnedDomination,
+      earnedCloseCall: earnedCloseCall,
+      earnedPhotoFinish: earnedPhotoFinish,
+      earnedDarkHorse: earnedDarkHorse,
+      earnedZeroToHero: earnedZeroToHero
+    },
+    {
+      stagesCompleted: (userData.completedStages || []).length + 1, // Include this race
+      totalPoints: (userData.totalPoints || 0) + points, // Include points from this race
+      nextStageNumber: nextStage,
+      nextEventNumber: nextEventNumber,
+      recentResults: recentResults,
+      isOnStreak: isOnStreak,
+      totalPodiums: totalPodiums,
+      seasonPosition: null // Could calculate from seasonStandings if needed
+    }
+  );
+  
+  // Add story to event results
+  eventResults.storyRecap = story.recap;
+  eventResults.storyContext = story.context;
+  
+  console.log(`   📖 Generated race story`);
   
   // Update user document
   const updates = {

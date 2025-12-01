@@ -158,13 +158,32 @@ async function loadEventResults() {
             }
         });
 
-        // Get current user's UID
+        // Get current user's UID and their event results
         const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
         const userData = userDoc.data();
         const userUid = userData?.uid;
+        
+        // Get user's result for this event to extract story
+        const userEventResults = userData?.[`event${eventNumber}Results`];
+        let storyHTML = '';
+        
+        if (userEventResults && userEventResults.storyRecap && userEventResults.storyContext) {
+            storyHTML = `
+                <div class="race-story">
+                    <div class="story-section">
+                        <h3>Race Recap</h3>
+                        <p>${userEventResults.storyRecap}</p>
+                    </div>
+                    <div class="story-section">
+                        <h3>Season Context</h3>
+                        <p>${userEventResults.storyContext}</p>
+                    </div>
+                </div>
+            `;
+        }
 
         // Build results table
-        let tableHTML = `
+        let tableHTML = storyHTML + `
             <div class="results-table-container">
                 <table class="results-table">
                     <thead>
