@@ -51,7 +51,7 @@ function generateCareerSummary(careerData) {
   paragraph += ' ';
   
   // 4. Racing identity - What defines them
-  paragraph += getRacingIdentitySentence(racingIdentity, performanceLevel, totalSeasons);
+  paragraph += getRacingIdentitySentence(racingIdentity, performanceLevel, totalSeasons, totalStages);
   paragraph += ' ';
   
   // 5. Current season context - Where they are now
@@ -199,7 +199,33 @@ function getOpeningSentence(careerStage, totalSeasons, totalStages) {
 
 
 // SENTENCE 2: Results Summary (narrative-focused, minimal stats)
-function getResultsSummary(performanceLevel) {
+function getResultsSummary(performanceLevel, totalPoints, totalWins, totalPodiums, totalTop10s, totalStages) {
+  // Special handling for first race only
+  if (totalStages === 1) {
+    if (totalWins === 1) {
+      return `Your first race delivered a victory—the best possible start to a racing career, proving immediately that you have the speed to compete at the front.`;
+    } else if (totalPodiums === 1) {
+      return `Your debut race put you on the podium—an impressive first outing that suggests you'll be competitive from the start.`;
+    } else if (totalTop10s === 1) {
+      return `Your opening race brought a top-ten finish—a solid debut that establishes you as someone who can compete from day one.`;
+    } else {
+      return `Your first race is complete, providing a baseline to build from and valuable experience about what racing at this level demands.`;
+    }
+  }
+  
+  // For 2-3 races, acknowledge it's still very early
+  if (totalStages <= 3) {
+    if (performanceLevel === 'dominant' || performanceLevel === 'elite') {
+      return `The early races show promise: strong performances that suggest you've arrived ready to compete, with the speed and race craft to challenge for wins.`;
+    } else if (performanceLevel === 'competitive') {
+      return `The opening races have been competitive—you're in the mix, finishing in strong positions, showing you belong in the virtual peloton.`;
+    } else if (performanceLevel === 'solid' || performanceLevel === 'developing') {
+      return `The first few races have given you valuable data: you're learning what works, building experience, and establishing your baseline.`;
+    } else {
+      return `The early races have been about learning and adapting—not every career starts with immediate success, and that's perfectly fine.`;
+    }
+  }
+  
   if (performanceLevel === 'dominant') {
     const options = [
       `You've built a career on winning—not occasionally, not when conditions align perfectly, but regularly and decisively, establishing yourself as one of the fastest riders in the virtual peloton.`,
@@ -365,7 +391,16 @@ function getSignatureMoment(careerBest, totalWins, totalPodiums, totalAwards, pe
 
 
 // SENTENCE 4: Racing Identity
-function getRacingIdentitySentence(racingIdentity, performanceLevel, totalSeasons) {
+function getRacingIdentitySentence(racingIdentity, performanceLevel, totalSeasons, totalStages) {
+  // Special handling for very limited data
+  if (totalStages === 1) {
+    return `It's far too early to define your racing identity—one race doesn't make a pattern, but it's a start, and future races will reveal what kind of racer you'll become.`;
+  }
+  
+  if (totalStages <= 3) {
+    return `Your racing identity is still forming—these early races are exploratory, each one teaching you something about your strengths, your approach, and where you fit in the field.`;
+  }
+  
   if (racingIdentity === 'win-or-bust') {
     const options = [
       `You race to win, not to accumulate mid-pack finishes—it's victory or nothing, an approach that's delivered triumphs but also taught hard lessons about the fine margins at the front.`,
