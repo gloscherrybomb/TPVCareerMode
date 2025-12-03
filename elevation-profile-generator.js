@@ -68,9 +68,6 @@ class ElevationProfileGenerator {
             return null;
         }
     }
-            return null;
-        }
-    }
 
     /**
      * Find route by course name
