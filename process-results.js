@@ -764,6 +764,11 @@ async function processUserResult(uid, eventInfo, results) {
     totalEvents: (userData.totalEvents || 0) + 1,
     totalWins: careerStats.totalWins,
     totalPodiums: careerStats.totalPodiums,
+    totalTop10s: careerStats.totalTop10s,
+    bestFinish: careerStats.bestFinish,
+    averageFinish: careerStats.averageFinish,
+    winRate: careerStats.winRate,
+    podiumRate: careerStats.podiumRate,
     awards: careerStats.awards,
     [`season${season}Standings`]: seasonStandings,
     team: userResult.Team || '',
@@ -806,8 +811,12 @@ async function processUserResult(uid, eventInfo, results) {
  */
 async function calculateCareerStats(userData) {
   const stats = {
+    totalRaces: 0,
     totalWins: 0,
     totalPodiums: 0,
+    totalTop10s: 0,
+    bestFinish: null,
+    positions: [],
     awards: {
       gold: 0,
       silver: 0,
@@ -835,6 +844,12 @@ async function calculateCareerStats(userData) {
     if (eventResults && eventResults.position && eventResults.position !== 'DNF') {
       const position = eventResults.position;
       
+      // Count races
+      stats.totalRaces++;
+      
+      // Track positions for average calculation
+      stats.positions.push(position);
+      
       // Count wins and podiums
       if (position === 1) {
         stats.totalWins++;
@@ -848,6 +863,16 @@ async function calculateCareerStats(userData) {
       }
       if (position <= 3) {
         stats.totalPodiums++;
+      }
+      
+      // Count top 10s
+      if (position <= 10) {
+        stats.totalTop10s++;
+      }
+      
+      // Track best finish
+      if (stats.bestFinish === null || position < stats.bestFinish) {
+        stats.bestFinish = position;
       }
       
       // Count special awards
@@ -890,6 +915,23 @@ async function calculateCareerStats(userData) {
       // Note: Lantern Rouge would need access to total finishers
       // We'll calculate this during results processing, not here
     }
+  }
+  
+  // Calculate derived stats
+  if (stats.totalRaces > 0) {
+    // Average finish position
+    const totalPositions = stats.positions.reduce((sum, pos) => sum + pos, 0);
+    stats.averageFinish = parseFloat((totalPositions / stats.totalRaces).toFixed(1));
+    
+    // Win rate (percentage)
+    stats.winRate = parseFloat(((stats.totalWins / stats.totalRaces) * 100).toFixed(1));
+    
+    // Podium rate (percentage)
+    stats.podiumRate = parseFloat(((stats.totalPodiums / stats.totalRaces) * 100).toFixed(1));
+  } else {
+    stats.averageFinish = null;
+    stats.winRate = 0;
+    stats.podiumRate = 0;
   }
   
   return stats;

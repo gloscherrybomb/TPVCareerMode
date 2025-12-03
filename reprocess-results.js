@@ -880,6 +880,11 @@ async function processResultsForUser(userDoc, csvFiles, season) {
   const careerStats = calculateCareerStats(tempUserData);
   updates.totalWins = careerStats.totalWins;
   updates.totalPodiums = careerStats.totalPodiums;
+  updates.totalTop10s = careerStats.totalTop10s;
+  updates.bestFinish = careerStats.bestFinish;
+  updates.averageFinish = careerStats.averageFinish;
+  updates.winRate = careerStats.winRate;
+  updates.podiumRate = careerStats.podiumRate;
   updates.awards = careerStats.awards;
   
   // Apply updates
@@ -888,7 +893,8 @@ async function processResultsForUser(userDoc, csvFiles, season) {
   }
   
   console.log(`      📈 Final: ${totalEvents} events, ${totalPoints} points, stage ${currentStage}`);
-  console.log(`      🏆 Career: ${careerStats.totalWins} wins, ${careerStats.totalPodiums} podiums`);
+  console.log(`      🏆 Career: ${careerStats.totalWins} wins, ${careerStats.totalPodiums} podiums, ${careerStats.totalTop10s} top-10s`);
+  console.log(`      📊 Stats: Avg finish ${careerStats.averageFinish || 'N/A'}, Best ${careerStats.bestFinish || 'N/A'}, Win rate ${careerStats.winRate}%`);
   
   return { totalEvents, totalPoints };
 }
@@ -898,8 +904,12 @@ async function processResultsForUser(userDoc, csvFiles, season) {
  */
 function calculateCareerStats(userData) {
   const stats = {
+    totalRaces: 0,
     totalWins: 0,
     totalPodiums: 0,
+    totalTop10s: 0,
+    bestFinish: null,
+    positions: [],
     awards: {
       gold: 0,
       silver: 0,
@@ -927,6 +937,12 @@ function calculateCareerStats(userData) {
     if (eventResults && eventResults.position && eventResults.position !== 'DNF') {
       const position = eventResults.position;
       
+      // Count races
+      stats.totalRaces++;
+      
+      // Track positions for average calculation
+      stats.positions.push(position);
+      
       // Count wins and podiums
       if (position === 1) {
         stats.totalWins++;
@@ -940,6 +956,16 @@ function calculateCareerStats(userData) {
       }
       if (position <= 3) {
         stats.totalPodiums++;
+      }
+      
+      // Count top 10s
+      if (position <= 10) {
+        stats.totalTop10s++;
+      }
+      
+      // Track best finish
+      if (stats.bestFinish === null || position < stats.bestFinish) {
+        stats.bestFinish = position;
       }
       
       // Count special awards
@@ -980,6 +1006,23 @@ function calculateCareerStats(userData) {
         stats.awards.gcBronze++;
       }
     }
+  }
+  
+  // Calculate derived stats
+  if (stats.totalRaces > 0) {
+    // Average finish position
+    const totalPositions = stats.positions.reduce((sum, pos) => sum + pos, 0);
+    stats.averageFinish = parseFloat((totalPositions / stats.totalRaces).toFixed(1));
+    
+    // Win rate (percentage)
+    stats.winRate = parseFloat(((stats.totalWins / stats.totalRaces) * 100).toFixed(1));
+    
+    // Podium rate (percentage)
+    stats.podiumRate = parseFloat(((stats.totalPodiums / stats.totalRaces) * 100).toFixed(1));
+  } else {
+    stats.averageFinish = null;
+    stats.winRate = 0;
+    stats.podiumRate = 0;
   }
   
   return stats;

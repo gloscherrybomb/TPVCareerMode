@@ -55,6 +55,16 @@ function getARRBand(arr) {
     return 'Unranked';
 }
 
+// Get ordinal suffix for position (1st, 2nd, 3rd, etc.)
+function getOrdinalSuffix(num) {
+    const j = num % 10;
+    const k = num % 100;
+    if (j === 1 && k !== 11) return 'st';
+    if (j === 2 && k !== 12) return 'nd';
+    if (j === 3 && k !== 13) return 'rd';
+    return 'th';
+}
+
 // Initialize modal
 function initializeRiderModal() {
     if (modalInitialized) return;
@@ -601,8 +611,24 @@ function buildRiderProfileHTML(data, name) {
                 <div class="rider-stat-value">${podiums}</div>
             </div>
             <div class="rider-stat-card">
+                <div class="rider-stat-label">Top 10s</div>
+                <div class="rider-stat-value">${data.totalTop10s || 0}</div>
+            </div>
+            <div class="rider-stat-card">
+                <div class="rider-stat-label">Best Finish</div>
+                <div class="rider-stat-value">${data.bestFinish ? `${data.bestFinish}${getOrdinalSuffix(data.bestFinish)}` : 'N/A'}</div>
+            </div>
+            <div class="rider-stat-card">
                 <div class="rider-stat-label">Avg Finish</div>
                 <div class="rider-stat-value">${avgFinish}</div>
+            </div>
+            <div class="rider-stat-card">
+                <div class="rider-stat-label">Win Rate</div>
+                <div class="rider-stat-value">${data.winRate !== undefined ? data.winRate + '%' : 'N/A'}</div>
+            </div>
+            <div class="rider-stat-card">
+                <div class="rider-stat-label">Podium Rate</div>
+                <div class="rider-stat-value">${data.podiumRate !== undefined ? data.podiumRate + '%' : 'N/A'}</div>
             </div>
         </div>
     `;

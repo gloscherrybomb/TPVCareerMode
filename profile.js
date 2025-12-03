@@ -123,21 +123,17 @@ function getARRBand(arr) {
 
 // Calculate user statistics from race results
 async function calculateUserStats(userUID) {
-    console.log('Calculating stats for user:', userUID);
+    console.log('Calculating supplemental stats for user:', userUID);
     
-    // NOTE: totalWins, totalPodiums, and awards are now stored in the user document
-    // and updated when results are processed. This function still calculates them
-    // for backwards compatibility and for stats not yet stored (like recent results).
+    // NOTE: Most career stats (totalWins, totalPodiums, awards, bestFinish, etc.) are now 
+    // stored in the user document and updated when results are processed.
+    // This function now only calculates data that isn't stored: recent results, positions array, and ARR.
     
     const stats = {
-        totalRaces: 0,
-        totalWins: 0,
-        totalPodiums: 0,
-        totalPoints: 0,
         positions: [],
         recentResults: [],
-        bestFinish: null,
         arr: null,
+        // These will be overwritten by stored values in loadProfile
         awards: {
             goldMedals: 0,
             silverMedals: 0,
@@ -147,7 +143,6 @@ async function calculateUserStats(userUID) {
             giantKillerMedals: 0,
             bullseyeMedals: 0,
             hotStreakMedals: 0,
-            // New awards
             domination: 0,
             closeCall: 0,
             photoFinish: 0,
@@ -158,7 +153,6 @@ async function calculateUserStats(userUID) {
             zeroToHero: 0,
             trophyCollector: 0,
             technicalIssues: 0,
-            // GC awards
             gcGoldMedal: 0,
             gcSilverMedal: 0,
             gcBronzeMedal: 0
@@ -184,89 +178,15 @@ async function calculateUserStats(userUID) {
                 const userResult = results.find(r => r.uid === userUID);
                 
                 if (userResult) {
-                    stats.totalRaces++;
-                    stats.totalPoints += userResult.points || 0;
-                    
                     const position = userResult.position || 0;
                     
-                    // Count only finishers (non-DNF riders) for Lantern Rouge
-                    const finishers = results.filter(r => r.position && r.position !== 'DNF' && !isNaN(parseInt(r.position)));
-                    const totalFinishers = finishers.length;
-                    
-                    // Track punching medal if earned
-                    if (userResult.earnedPunchingMedal) {
-                        stats.awards.punchingMedals++;
-                    }
-                    
-                    // Track Giant Killer medal if earned
-                    if (userResult.earnedGiantKillerMedal) {
-                        stats.awards.giantKillerMedals++;
-                    }
-                    
-                    // Track Bullseye medal if earned
-                    if (userResult.earnedBullseyeMedal) {
-                        stats.awards.bullseyeMedals++;
-                    }
-                    
-                    // Track GC awards if earned (events 13-15)
-                    if (userResult.earnedGCGoldMedal) {
-                        stats.awards.gcGoldMedal = (stats.awards.gcGoldMedal || 0) + 1;
-                    }
-                    if (userResult.earnedGCSilverMedal) {
-                        stats.awards.gcSilverMedal = (stats.awards.gcSilverMedal || 0) + 1;
-                    }
-                    if (userResult.earnedGCBronzeMedal) {
-                        stats.awards.gcBronzeMedal = (stats.awards.gcBronzeMedal || 0) + 1;
-                    }
-                    
-                    // Track Hot Streak medal if earned
-                    if (userResult.earnedHotStreakMedal) {
-                        stats.awards.hotStreakMedals++;
-                    }
-                    
-                    // Track new awards
-                    if (userResult.earnedDomination) {
-                        stats.awards.domination++;
-                    }
-                    if (userResult.earnedCloseCall) {
-                        stats.awards.closeCall++;
-                    }
-                    if (userResult.earnedPhotoFinish) {
-                        stats.awards.photoFinish++;
-                    }
-                    if (userResult.earnedDarkHorse) {
-                        stats.awards.darkHorse++;
-                    }
-                    if (userResult.earnedZeroToHero) {
-                        stats.awards.zeroToHero++;
-                    }
-                    
+                    // Track positions array (for charts/graphs)
                     if (position > 0) {
                         stats.positions.push(position);
-                        
-                        if (position === 1) {
-                            stats.totalWins++;
-                            stats.awards.goldMedals++;
-                        }
-                        if (position === 2) {
-                            stats.awards.silverMedals++;
-                        }
-                        if (position === 3) {
-                            stats.awards.bronzeMedals++;
-                        }
-                        // Lantern Rouge: last place among finishers (ignore DNFs)
-                        if (position === totalFinishers && totalFinishers > 1) {
-                            stats.awards.lanternRouge++;
-                        }
-                        if (position <= 3) stats.totalPodiums++;
-                        
-                        if (!stats.bestFinish || position < stats.bestFinish) {
-                            stats.bestFinish = position;
-                        }
                     }
                     
-                    // Store ARR if available
-                    if (userResult.arr && !stats.arr) {
+                    // Store ARR if available (use most recent)
+                    if (userResult.arr) {
                         stats.arr = userResult.arr;
                     }
                     
@@ -300,43 +220,7 @@ async function calculateUserStats(userUID) {
     // Sort recent results by event number (descending)
     stats.recentResults.sort((a, b) => b.eventNum - a.eventNum);
     
-    // Calculate average finish
-    if (stats.positions.length > 0) {
-        const sum = stats.positions.reduce((a, b) => a + b, 0);
-        stats.avgFinish = Math.round(sum / stats.positions.length);
-    }
-    
-    // Calculate rates
-    if (stats.totalRaces > 0) {
-        stats.winRate = ((stats.totalWins / stats.totalRaces) * 100).toFixed(0);
-        stats.podiumRate = ((stats.totalPodiums / stats.totalRaces) * 100).toFixed(0);
-    } else {
-        stats.winRate = 0;
-        stats.podiumRate = 0;
-    }
-    
-    // Calculate career-based awards
-    if (window.awardsCalculation && stats.recentResults.length > 0) {
-        const careerAwards = window.awardsCalculation.calculateCareerAwards(
-            stats.recentResults.map(r => ({
-                eventNum: r.eventNum,
-                position: r.position,
-                predictedPosition: r.predictedPosition,
-                processedAt: r.date,
-                totalFinishers: null // Will be calculated inside the function if needed
-            }))
-        );
-        
-        // Merge career awards into stats.awards
-        stats.awards.overrated = careerAwards.overrated || 0;
-        stats.awards.backToBack = careerAwards.backToBack || 0;
-        stats.awards.weekendWarrior = careerAwards.weekendWarrior || 0;
-        stats.awards.trophyCollector = careerAwards.trophyCollector || 0;
-        stats.awards.technicalIssues = careerAwards.technicalIssues || 0;
-        // zeroToHero is already tracked per-event
-    }
-    
-    console.log('Stats calculated:', stats.totalRaces, 'races');
+    console.log('Supplemental stats calculated:', stats.recentResults.length, 'results');
     return stats;
 }
 
@@ -417,8 +301,29 @@ async function loadProfile(user) {
         
         userData = userDoc.data();
         
-        // Calculate stats from race results
-        userStats = await calculateUserStats(userData.uid);
+        // Build stats object from stored data and calculated data
+        // Stored stats (from results processing): wins, podiums, awards, etc.
+        // Calculated stats (from calculateUserStats): recent results, positions array
+        const calculatedStats = await calculateUserStats(userData.uid);
+        
+        // Merge stored stats with calculated stats
+        userStats = {
+            // Use stored stats (always up-to-date from results processing)
+            totalRaces: userData.totalEvents || 0,
+            totalWins: userData.totalWins || 0,
+            totalPodiums: userData.totalPodiums || 0,
+            totalTop10s: userData.totalTop10s || 0,
+            totalPoints: userData.totalPoints || 0,
+            bestFinish: userData.bestFinish || null,
+            averageFinish: userData.averageFinish || null,
+            winRate: userData.winRate || 0,
+            podiumRate: userData.podiumRate || 0,
+            arr: calculatedStats.arr, // ARR comes from most recent race
+            awards: userData.awards || calculatedStats.awards, // Prefer stored awards
+            // Use calculated stats for data not stored
+            positions: calculatedStats.positions,
+            recentResults: calculatedStats.recentResults
+        };
         
         // Calculate rankings
         const seasonRanking = await calculateSeasonRanking(userData.uid, userData);
