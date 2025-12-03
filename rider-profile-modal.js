@@ -501,12 +501,8 @@ function buildRiderProfileHTML(data, name) {
     // Get profile photo URL if exists
     const photoURL = data.photoURL || null;
     
-    // Calculate average finish position
-    let avgFinish = 'N/A';
-    if (completedStages.length > 0) {
-        const totalFinish = completedStages.reduce((sum, stage) => sum + (stage.position || 0), 0);
-        avgFinish = (totalFinish / completedStages.length).toFixed(1);
-    }
+    // Use stored average finish (already calculated and stored)
+    const avgFinish = data.averageFinish ? Math.round(data.averageFinish) : 'N/A';
     
     // Get awards from user document
     const awards = data.awards || {};

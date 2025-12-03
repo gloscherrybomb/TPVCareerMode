@@ -387,7 +387,7 @@ function displayProfileInfo(user, userData, stats, seasonRanking, globalRanking)
     }
     
     document.getElementById('arrRating').textContent = stats.arr ? stats.arr : 'N/A';
-    document.getElementById('avgFinish').textContent = stats.averageFinish ? `${stats.averageFinish}th` : 'N/A';
+    document.getElementById('avgFinish').textContent = stats.averageFinish ? `${Math.round(stats.averageFinish)}th` : 'N/A';
     document.getElementById('winRate').textContent = `${stats.winRate}%`;
     document.getElementById('podiumRate').textContent = `${stats.podiumRate}%`;
     
