@@ -364,10 +364,22 @@ class ElevationProfileGenerator {
         const maxElevation = Math.max(...elevations);
         const elevationRange = maxElevation - minElevation;
 
-        // Add vertical padding (10% on each side)
-        const elevationPadding = elevationRange * 0.1;
-        const displayMinElevation = minElevation - elevationPadding;
-        const displayMaxElevation = maxElevation + elevationPadding;
+        // Ensure minimum Y-axis range of 400m to prevent flat routes looking extreme
+        const MIN_Y_RANGE = 400;
+        let displayMinElevation, displayMaxElevation;
+        
+        if (elevationRange < MIN_Y_RANGE) {
+            // Center the actual elevation range within the 400m minimum
+            const centerElevation = (minElevation + maxElevation) / 2;
+            displayMinElevation = centerElevation - MIN_Y_RANGE / 2;
+            displayMaxElevation = centerElevation + MIN_Y_RANGE / 2;
+        } else {
+            // Use actual range with 10% padding on each side
+            const elevationPadding = elevationRange * 0.1;
+            displayMinElevation = minElevation - elevationPadding;
+            displayMaxElevation = maxElevation + elevationPadding;
+        }
+        
         const displayRange = displayMaxElevation - displayMinElevation;
 
         const xScale = chartWidth / maxDistance;
