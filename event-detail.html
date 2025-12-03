@@ -107,22 +107,8 @@
     <section class="event-route">
         <div class="container">
             <h2 class="section-title-medium">Route Profile</h2>
-            <div class="route-placeholder">
-                <p>Route elevation profile will be displayed here</p>
-                <div class="route-details-grid">
-                    <div class="route-detail">
-                        <strong>Start:</strong> Town Square
-                    </div>
-                    <div class="route-detail">
-                        <strong>Key Climb:</strong> Oak Hill (km 25-28)
-                    </div>
-                    <div class="route-detail">
-                        <strong>Sprint Point:</strong> Riverside (km 35)
-                    </div>
-                    <div class="route-detail">
-                        <strong>Finish:</strong> Town Square
-                    </div>
-                </div>
+            <div class="route-profile-container">
+                <canvas id="elevationProfileCanvas" width="1200" height="400"></canvas>
             </div>
         </div>
     </section>
@@ -335,6 +321,7 @@
     </div>
 
     <script src="event-data.js"></script>
+    <script src="elevation-profile-generator.js"></script>
     <script type="module" src="app.js"></script>
     <script type="module" src="event-detail-results.js"></script>
     <script>
@@ -348,7 +335,7 @@
         }
 
         // Update page content
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             // Update title
             document.title = `${event.name} - TPV Career Mode`;
 
@@ -479,6 +466,20 @@
             // Update course name in breadcrumb callout
             document.querySelector('.scoring-note').textContent = 
                 `Points are awarded based on finishing position (top 40 only). Course: ${event.course}`;
+            
+            // Generate elevation profile
+            const laps = parseInt(event.format.match(/(\d+)\s*lap/i)?.[1] || 1);
+            console.log(`Generating elevation profile for ${event.course} (${laps} lap${laps > 1 ? 's' : ''})`);
+            
+            if (window.elevationProfileGen) {
+                await window.elevationProfileGen.generateProfile(
+                    'elevationProfileCanvas',
+                    event.course,
+                    laps
+                );
+            } else {
+                console.error('Elevation profile generator not loaded');
+            }
         });
     </script>
 </body>
