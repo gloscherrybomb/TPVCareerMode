@@ -172,6 +172,11 @@ function initializeRiderModal() {
                 font-family: 'Orbitron', sans-serif;
             }
             
+            .rider-profile-progress {
+                padding-top: 1.5rem;
+                border-top: 1px solid rgba(255, 255, 255, 0.1);
+            }
+            
             .rider-stats-grid {
                 display: grid;
                 grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -330,6 +335,7 @@ function buildRiderProfileHTML(data, name) {
     const totalPoints = data.totalPoints || 0;
     const totalEvents = data.totalEvents || 0;
     const completedStages = data.completedStages || [];
+    const completedOptionalEvents = data.completedOptionalEvents || [];
     const wins = data.wins || 0;
     const podiums = data.podiums || 0;
     
@@ -349,9 +355,11 @@ function buildRiderProfileHTML(data, name) {
     // Get awards (assuming awards are stored in data.awards as an array)
     const awards = data.awards || [];
     
-    // Calculate stage progression percentage
-    const totalStages = 50; // Assuming 50 total stages across all seasons
-    const progressPercent = Math.min((completedStages.length / totalStages) * 100, 100);
+    // Calculate season progression
+    const seasonsCompleted = season - 1; // Current season minus 1
+    const eventsPerSeason = 9; // 6 mandatory + 3 optional that must be completed
+    const currentSeasonEvents = completedStages.length + completedOptionalEvents.length;
+    const currentSeasonProgressPercent = Math.min((currentSeasonEvents / eventsPerSeason) * 100, 100);
     
     let html = `
         <div class="rider-profile-card">
@@ -382,12 +390,18 @@ function buildRiderProfileHTML(data, name) {
                 </div>
             </div>
             
-            <div class="rider-profile-meta-item">
-                <span class="rider-profile-meta-label">Career Progress</span>
-                <div class="rider-progress-bar">
-                    <div class="rider-progress-fill" style="width: ${progressPercent}%"></div>
+            <div class="rider-profile-progress">
+                <div class="rider-profile-meta-item" style="margin-bottom: 1rem;">
+                    <span class="rider-profile-meta-label">Seasons Completed</span>
+                    <span class="rider-profile-meta-value">${seasonsCompleted}</span>
                 </div>
-                <span class="rider-profile-meta-label" style="margin-top: 0.25rem;">${completedStages.length} / ${totalStages} stages completed</span>
+                <div class="rider-profile-meta-item">
+                    <span class="rider-profile-meta-label">Current Season Progress (Season ${season})</span>
+                    <div class="rider-progress-bar">
+                        <div class="rider-progress-fill" style="width: ${currentSeasonProgressPercent}%"></div>
+                    </div>
+                    <span class="rider-profile-meta-label" style="margin-top: 0.25rem;">${currentSeasonEvents} / ${eventsPerSeason} events completed</span>
+                </div>
             </div>
         </div>
         
