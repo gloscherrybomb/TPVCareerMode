@@ -292,6 +292,140 @@ function isBot(uid, gender) {
 }
 
 /**
+ * Calculate General Classification (GC) for stage race (events 13, 14, 15)
+ * Returns GC standings with cumulative times and awards
+ * Can calculate partial GC (after stage 1 or 2) or final GC (after stage 3)
+ */
+async function calculateGC(season, userUid, upToEvent = 15) {
+  console.log(`   Calculating GC through event ${upToEvent}...`);
+  
+  // Determine which stages to include
+  const stageRefs = [];
+  const stageNumbers = [];
+  
+  if (upToEvent >= 13) {
+    stageRefs.push(db.collection('results').doc(`season${season}_event13_${userUid}`));
+    stageNumbers.push(13);
+  }
+  if (upToEvent >= 14) {
+    stageRefs.push(db.collection('results').doc(`season${season}_event14_${userUid}`));
+    stageNumbers.push(14);
+  }
+  if (upToEvent >= 15) {
+    stageRefs.push(db.collection('results').doc(`season${season}_event15_${userUid}`));
+    stageNumbers.push(15);
+  }
+  
+  // Fetch results from all completed stages
+  const stageDocs = await Promise.all(stageRefs.map(ref => ref.get()));
+  
+  // Check which stages are available
+  const availableResults = [];
+  stageDocs.forEach((doc, index) => {
+    if (doc.exists()) {
+      availableResults.push({
+        stageNumber: stageNumbers[index],
+        results: doc.data().results || []
+      });
+    }
+  });
+  
+  if (availableResults.length === 0) {
+    console.log('   ⚠️ No stage results available for GC calculation');
+    return null;
+  }
+  
+  console.log(`   Found ${availableResults.length} completed stage(s)`);
+  
+  // Build a map of cumulative times for each rider
+  const gcMap = new Map();
+  
+  // Add times from each available stage
+  availableResults.forEach(({ stageNumber, results }) => {
+    results.forEach(r => {
+      if (r.position && r.position !== 'DNF' && r.time) {
+        const riderTime = parseFloat(r.time);
+        
+        if (gcMap.has(r.uid)) {
+          // Rider already exists, add this stage time
+          const rider = gcMap.get(r.uid);
+          rider.cumulativeTime += riderTime;
+          rider[`stage${stageNumber}Time`] = riderTime;
+          rider.stagesCompleted++;
+        } else {
+          // New rider
+          gcMap.set(r.uid, {
+            uid: r.uid,
+            name: r.name,
+            team: r.team,
+            arr: r.arr,
+            cumulativeTime: riderTime,
+            stage13Time: stageNumber === 13 ? riderTime : 0,
+            stage14Time: stageNumber === 14 ? riderTime : 0,
+            stage15Time: stageNumber === 15 ? riderTime : 0,
+            stagesCompleted: 1,
+            isBot: isBot(r.uid, r.gender)
+          });
+        }
+      }
+    });
+  });
+  
+  // Filter to riders who completed all available stages
+  const requiredStages = availableResults.length;
+  const gcStandings = Array.from(gcMap.values())
+    .filter(r => r.stagesCompleted === requiredStages)
+    .sort((a, b) => a.cumulativeTime - b.cumulativeTime);
+  
+  // Assign GC positions and calculate gaps
+  gcStandings.forEach((rider, index) => {
+    rider.gcPosition = index + 1;
+    if (index === 0) {
+      rider.gapToLeader = 0;
+    } else {
+      rider.gapToLeader = rider.cumulativeTime - gcStandings[0].cumulativeTime;
+    }
+  });
+  
+  console.log(`   ✓ GC calculated: ${gcStandings.length} riders completed all ${requiredStages} stage(s)`);
+  
+  // Calculate GC awards and bonus points for the user (only on final stage)
+  const userGC = gcStandings.find(r => r.uid === userUid);
+  let gcAwards = {
+    gcGoldMedal: false,
+    gcSilverMedal: false,
+    gcBronzeMedal: false
+  };
+  let gcBonusPoints = 0;
+  
+  // Only award GC trophies and bonus points after the final stage (event 15)
+  if (upToEvent === 15 && userGC) {
+    if (userGC.gcPosition === 1) {
+      gcAwards.gcGoldMedal = true;
+      gcBonusPoints = 50;
+      console.log('   🏆 User won GC! (+50 bonus points)');
+    } else if (userGC.gcPosition === 2) {
+      gcAwards.gcSilverMedal = true;
+      gcBonusPoints = 35;
+      console.log('   🥈 User 2nd in GC (+35 bonus points)');
+    } else if (userGC.gcPosition === 3) {
+      gcAwards.gcBronzeMedal = true;
+      gcBonusPoints = 25;
+      console.log('   🥉 User 3rd in GC (+25 bonus points)');
+    }
+  }
+  
+  return {
+    standings: gcStandings,
+    userGC: userGC,
+    awards: gcAwards,
+    bonusPoints: gcBonusPoints,
+    stagesIncluded: requiredStages,
+    isProvisional: upToEvent < 15  // Mark as provisional if not final
+  };
+}
+
+/**
  * Parse CSV and extract results
  */
 function parseCSV(csvContent) {
@@ -459,6 +593,10 @@ async function processUserResult(uid, eventInfo, results) {
     earnedPhotoFinish: earnedPhotoFinish,
     earnedDarkHorse: earnedDarkHorse,
     earnedZeroToHero: earnedZeroToHero,
+    earnedGCGoldMedal: gcAwards.gcGoldMedal,
+    earnedGCSilverMedal: gcAwards.gcSilverMedal,
+    earnedGCBronzeMedal: gcAwards.gcBronzeMedal,
+    gcBonusPoints: gcBonusPoints,
     distance: parseFloat(userResult.Distance) || 0,
     deltaTime: parseFloat(userResult.DeltaTime) || 0,
     eventPoints: parseInt(userResult.Points) || null, // Points race points (for display only)
@@ -486,6 +624,34 @@ async function processUserResult(uid, eventInfo, results) {
     } else if (eventNumber === 15) {
       newTourProgress.event15Completed = true;
       newTourProgress.event15Date = new Date().toISOString();
+    }
+  }
+  
+  // Calculate GC if this is any tour stage (events 13, 14, or 15)
+  let gcResults = null;
+  let gcBonusPoints = 0;
+  let gcAwards = {
+    gcGoldMedal: false,
+    gcSilverMedal: false,
+    gcBronzeMedal: false
+  };
+  
+  if (validation.isTour) {
+    console.log('   🏁 Tour stage complete - calculating current GC...');
+    gcResults = await calculateGC(season, uid, eventNumber);
+    
+    if (gcResults) {
+      // Only add bonus points on final stage (event 15)
+      if (eventNumber === 15) {
+        gcBonusPoints = gcResults.bonusPoints;
+        gcAwards = gcResults.awards;
+        
+        // Add GC bonus points to total points
+        points += gcBonusPoints;
+        if (gcBonusPoints > 0) {
+          console.log(`   💰 GC bonus points added: +${gcBonusPoints}`);
+        }
+      }
     }
   }
   
@@ -589,6 +755,17 @@ async function processUserResult(uid, eventInfo, results) {
     usedOptionalEvents: newUsedOptionalEvents,
     tourProgress: newTourProgress
   };
+  
+  // Add GC results if this was the final tour stage
+  if (gcResults) {
+    updates.gcResults = {
+      standings: gcResults.standings,
+      userGCPosition: gcResults.userGC?.gcPosition || null,
+      userGCTime: gcResults.userGC?.cumulativeTime || null,
+      userGCGap: gcResults.userGC?.gapToLeader || null,
+      completedAt: new Date().toISOString()
+    };
+  }
   
   // Add to completedStages (store the STAGE number, not event number)
   const completedStages = userData.completedStages || [];

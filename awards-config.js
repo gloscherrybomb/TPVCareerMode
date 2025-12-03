@@ -93,7 +93,7 @@ const AWARD_DEFINITIONS = {
     id: 'photoFinish',
     title: 'Photo Finish',
     icon: '📸',
-    description: 'Finish within 0.1s of winner (or win by less than 0.1s)',
+    description: 'Finish within 0.1s of winner',
     calculationType: 'event'
   },
   
@@ -152,6 +152,29 @@ const AWARD_DEFINITIONS = {
     icon: '🔧',
     description: 'DNF 3+ times',
     calculationType: 'career'
+  },
+  
+  // GC (General Classification) awards for stage races
+  gcGoldMedal: {
+    id: 'gcGoldMedal',
+    title: 'GC Winner',
+    icon: '🏆',
+    description: 'Win the overall General Classification',
+    calculationType: 'event'
+  },
+  gcSilverMedal: {
+    id: 'gcSilverMedal',
+    title: 'GC Second',
+    icon: '🥈',
+    description: 'Finish 2nd in overall General Classification',
+    calculationType: 'event'
+  },
+  gcBronzeMedal: {
+    id: 'gcBronzeMedal',
+    title: 'GC Third',
+    icon: '🥉',
+    description: 'Finish 3rd in overall General Classification',
+    calculationType: 'event'
   }
 };
 

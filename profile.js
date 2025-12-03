@@ -153,7 +153,11 @@ async function calculateUserStats(userUID) {
             weekendWarrior: 0,
             zeroToHero: 0,
             trophyCollector: 0,
-            technicalIssues: 0
+            technicalIssues: 0,
+            // GC awards
+            gcGoldMedal: 0,
+            gcSilverMedal: 0,
+            gcBronzeMedal: 0
         }
     };
     
@@ -198,6 +202,17 @@ async function calculateUserStats(userUID) {
                     // Track Bullseye medal if earned
                     if (userResult.earnedBullseyeMedal) {
                         stats.awards.bullseyeMedals++;
+                    }
+                    
+                    // Track GC awards if earned (events 13-15)
+                    if (userResult.earnedGCGoldMedal) {
+                        stats.awards.gcGoldMedal = (stats.awards.gcGoldMedal || 0) + 1;
+                    }
+                    if (userResult.earnedGCSilverMedal) {
+                        stats.awards.gcSilverMedal = (stats.awards.gcSilverMedal || 0) + 1;
+                    }
+                    if (userResult.earnedGCBronzeMedal) {
+                        stats.awards.gcBronzeMedal = (stats.awards.gcBronzeMedal || 0) + 1;
                     }
                     
                     // Track Hot Streak medal if earned
@@ -608,7 +623,8 @@ function displayAwards(awards) {
                         (awards.domination || 0) + (awards.closeCall || 0) + (awards.photoFinish || 0) +
                         (awards.overrated || 0) + (awards.darkHorse || 0) + (awards.backToBack || 0) +
                         (awards.weekendWarrior || 0) + (awards.zeroToHero || 0) + 
-                        (awards.trophyCollector || 0) + (awards.technicalIssues || 0);
+                        (awards.trophyCollector || 0) + (awards.technicalIssues || 0) +
+                        (awards.gcGoldMedal || 0) + (awards.gcSilverMedal || 0) + (awards.gcBronzeMedal || 0);
     
     if (totalAwards === 0) {
         container.innerHTML = `
@@ -655,6 +671,42 @@ function displayAwards(awards) {
                 <div class="award-count">${awards.bronzeMedals}x</div>
                 <div class="award-title">Bronze Medal</div>
                 <div class="award-description">3rd Place Finish</div>
+            </div>
+        `;
+    }
+    
+    // GC Winner (Tour overall)
+    if (awards.gcGoldMedal > 0) {
+        html += `
+            <div class="award-card gc-gold">
+                <div class="award-icon">🏆</div>
+                <div class="award-count">${awards.gcGoldMedal}x</div>
+                <div class="award-title">GC Winner</div>
+                <div class="award-description">Tour Overall Champion</div>
+            </div>
+        `;
+    }
+    
+    // GC Second (Tour overall)
+    if (awards.gcSilverMedal > 0) {
+        html += `
+            <div class="award-card gc-silver">
+                <div class="award-icon">🥈</div>
+                <div class="award-count">${awards.gcSilverMedal}x</div>
+                <div class="award-title">GC Second</div>
+                <div class="award-description">Tour Overall 2nd Place</div>
+            </div>
+        `;
+    }
+    
+    // GC Third (Tour overall)
+    if (awards.gcBronzeMedal > 0) {
+        html += `
+            <div class="award-card gc-bronze">
+                <div class="award-icon">🥉</div>
+                <div class="award-count">${awards.gcBronzeMedal}x</div>
+                <div class="award-title">GC Third</div>
+                <div class="award-description">Tour Overall 3rd Place</div>
             </div>
         `;
     }

@@ -107,6 +107,137 @@ function showPreRaceSections() {
 }
 
 /**
+ * Display GC (General Classification) results table
+ */
+async function displayGCResults(gcData, currentUserUid, eventNumber) {
+    if (!gcData || !gcData.standings || gcData.standings.length === 0) {
+        return '';
+    }
+    
+    const standings = gcData.standings;
+    const isProvisional = gcData.isProvisional || eventNumber < 15;
+    const stagesIncluded = gcData.stagesIncluded || (eventNumber - 12); // 13->1, 14->2, 15->3
+    
+    // Determine title and description based on stage
+    let title, description;
+    if (eventNumber === 13) {
+        title = '📊 General Classification - After Stage 1';
+        description = 'Current GC standings after the opening stage. Two stages remain.';
+    } else if (eventNumber === 14) {
+        title = '📊 General Classification - After Stage 2';  
+        description = 'Current GC standings after two stages. One stage remains - the GC battle continues tomorrow!';
+    } else {
+        title = '🏆 General Classification - Final Overall Results';
+        description = 'Final GC standings after all three stages of the Local Tour';
+    }
+    
+    // Format time helper
+    const formatGCTime = (seconds) => {
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const secs = Math.floor(seconds % 60);
+        
+        if (hours > 0) {
+            return `${hours}h ${minutes}m ${secs}s`;
+        } else {
+            return `${minutes}m ${secs}s`;
+        }
+    };
+    
+    // Format gap helper
+    const formatGap = (gap) => {
+        if (gap === 0) return '-';
+        return `+${formatGCTime(gap)}`;
+    };
+    
+    let html = `
+        <div class="gc-results-section ${isProvisional ? 'provisional' : 'final'}">
+            <h3 class="gc-title">${title}</h3>
+            <p class="gc-description">${description}</p>
+            <div class="results-table-wrapper">
+                <table class="results-table gc-table">
+                    <thead>
+                        <tr>
+                            <th>GC</th>
+                            <th>Rider</th>
+                            <th>Team</th>
+                            <th>Total Time</th>
+                            <th>Gap</th>
+                            <th>ARR</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+    `;
+    
+    standings.forEach((rider) => {
+        const isCurrentUser = rider.uid === currentUserUid;
+        const rowClass = isCurrentUser ? 'current-user-row' : '';
+        const teamDisplay = rider.team || '<span class="no-team">—</span>';
+        
+        // Podium class for GC top 3 (only show trophies on final GC)
+        let rankClass = '';
+        let trophyIcon = '';
+        if (!isProvisional) {
+            if (rider.gcPosition === 1) {
+                rankClass = 'rank-gold';
+                trophyIcon = ' 🏆';
+            } else if (rider.gcPosition === 2) {
+                rankClass = 'rank-silver';
+                trophyIcon = ' 🥈';
+            } else if (rider.gcPosition === 3) {
+                rankClass = 'rank-bronze';
+                trophyIcon = ' 🥉';
+            }
+        }
+        
+        html += `
+            <tr class="${rowClass}">
+                <td class="rank-cell">
+                    <span class="rank-number ${rankClass}">${rider.gcPosition}${trophyIcon}</span>
+                </td>
+                <td class="name-cell">
+                    <span class="rider-name">${makeNameClickable(rider.name, rider.uid)}</span>
+                    ${isCurrentUser ? '<span class="you-badge">YOU</span>' : ''}
+                </td>
+                <td class="team-cell">${teamDisplay}</td>
+                <td class="time-cell">${formatGCTime(rider.cumulativeTime)}</td>
+                <td class="gap-cell">${formatGap(rider.gapToLeader)}</td>
+                <td class="arr-cell">
+                    <span class="arr-value">${rider.arr || '-'}</span>
+                </td>
+            </tr>
+        `;
+    });
+    
+    html += `
+                    </tbody>
+                </table>
+            </div>
+    `;
+    
+    // Add appropriate note based on final vs provisional
+    if (isProvisional) {
+        html += `
+            <div class="results-note gc-provisional-note">
+                <strong>Provisional GC:</strong> These are the current overall standings after ${stagesIncluded} stage${stagesIncluded > 1 ? 's' : ''}. 
+                The classification will change as more stages are completed. Only riders who complete all remaining stages will be eligible for final GC honors.
+            </div>
+        `;
+    } else {
+        html += `
+            <div class="results-note gc-final-note">
+                <strong>Final General Classification:</strong> Riders ranked by cumulative time across all three tour stages. 
+                Top 3 riders earn GC trophies and bonus points (1st: +50pts, 2nd: +35pts, 3rd: +25pts).
+            </div>
+        `;
+    }
+    
+    html += `</div>`;
+    
+    return html;
+}
+
+/**
  * Load and display event results
  */
 async function loadEventResults() {
@@ -170,7 +301,7 @@ async function loadEventResults() {
             }
         });
 
-        // Get user's result for this event to extract story (already have userData from above)
+        // Get user's result for this event to extract story (userData already fetched above)
         const userEventResults = userData?.[`event${eventNumber}Results`];
         let storyHTML = '';
         
@@ -291,6 +422,11 @@ async function loadEventResults() {
                     <strong>PR Pts:</strong> Points Race points (used to determine finishing order in points races)
                 </div>
             `;
+        }
+        
+        // Add GC (General Classification) table if this is a tour event (13, 14, or 15)
+        if ((eventNumber === 13 || eventNumber === 14 || eventNumber === 15) && userEventResults?.gcResults) {
+            tableHTML += await displayGCResults(userEventResults.gcResults, userUid, eventNumber);
         }
 
         eventResultsContent.innerHTML = tableHTML;
