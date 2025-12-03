@@ -6,6 +6,7 @@
 class ElevationProfileGenerator {
     constructor() {
         this.routesData = null;
+        this.gpxData = {}; // Store GPX routes separately
         
         // Map event courses to route names in ExportedWorld.json
         this.courseToRouteMapping = {
@@ -20,8 +21,84 @@ class ElevationProfileGenerator {
             'Base Camp': 'Base Camp',
             'Big Loop': 'Big Loop',
             'South Lake Loop Reverse': 'South Lake Loop Reverse',
-            'Unbound Little Egypt': null // Not in dataset
+            'Unbound Little Egypt': 'gpx:UnboundLittleEgypt' // Special marker for GPX
         };
+    }
+
+    /**
+     * Load GPX file and parse to elevation data
+     */
+    async loadGPXRoute(gpxFileName) {
+        if (this.gpxData[gpxFileName]) {
+            console.log(`GPX data already loaded (cached): ${gpxFileName}`);
+            return this.gpxData[gpxFileName];
+        }
+
+        try {
+            console.log(`Loading GPX file: ${gpxFileName}`);
+            const response = await fetch(gpxFileName);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const gpxText = await response.text();
+            const parser = new DOMParser();
+            const xmlDoc = parser.parseFromString(gpxText, 'text/xml');
+            
+            // Extract track points
+            const trkpts = xmlDoc.getElementsByTagName('trkpt');
+            const points = [];
+            
+            for (let i = 0; i < trkpts.length; i++) {
+                const pt = trkpts[i];
+                const lat = parseFloat(pt.getAttribute('lat'));
+                const lon = parseFloat(pt.getAttribute('lon'));
+                const eleTag = pt.getElementsByTagName('ele')[0];
+                const ele = eleTag ? parseFloat(eleTag.textContent) : 0;
+                
+                points.push({ lat, lon, ele });
+            }
+            
+            console.log(`✓ Loaded GPX: ${points.length} points`);
+            
+            // Calculate distances using Haversine formula
+            const distances = [0];
+            let totalDist = 0;
+            
+            for (let i = 1; i < points.length; i++) {
+                const R = 6371; // Earth radius in km
+                const lat1 = points[i-1].lat * Math.PI / 180;
+                const lat2 = points[i].lat * Math.PI / 180;
+                const dLat = (points[i].lat - points[i-1].lat) * Math.PI / 180;
+                const dLon = (points[i].lon - points[i-1].lon) * Math.PI / 180;
+                
+                const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                         Math.cos(lat1) * Math.cos(lat2) *
+                         Math.sin(dLon/2) * Math.sin(dLon/2);
+                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+                const dist = R * c;
+                
+                totalDist += dist;
+                distances.push(totalDist);
+            }
+            
+            const elevations = points.map(p => p.ele);
+            
+            const gpxRoute = {
+                distances,
+                elevations,
+                totalDistance: totalDist
+            };
+            
+            this.gpxData[gpxFileName] = gpxRoute;
+            console.log(`✓ Processed GPX: ${totalDist.toFixed(2)} km`);
+            
+            return gpxRoute;
+        } catch (error) {
+            console.error(`Error loading GPX file ${gpxFileName}:`, error);
+            return null;
+        }
     }
 
     /**
@@ -178,7 +255,29 @@ class ElevationProfileGenerator {
             return;
         }
 
-        // Ensure routes are loaded
+        // Check if this is a GPX route
+        const mappedName = this.courseToRouteMapping[courseName];
+        if (mappedName && mappedName.startsWith('gpx:')) {
+            // Load from GPX file
+            const gpxFileName = mappedName.replace('gpx:', '') + '.gpx';
+            console.log(`Loading GPX route: ${gpxFileName}`);
+            
+            const gpxRoute = await this.loadGPXRoute(gpxFileName);
+            
+            if (!gpxRoute) {
+                console.error(`Failed to load GPX file: ${gpxFileName}`);
+                this.drawNoDataMessage(canvas, courseName);
+                return;
+            }
+            
+            // Draw profile from GPX data
+            console.log(`Drawing GPX profile: ${gpxRoute.distances.length} points, ${gpxRoute.totalDistance.toFixed(2)}km`);
+            this.drawProfile(canvas, gpxRoute.distances, gpxRoute.elevations, courseName, laps);
+            console.log('✓ GPX profile rendered successfully');
+            return;
+        }
+
+        // Ensure routes are loaded for JSON routes
         console.log('Loading routes data...');
         await this.loadRoutesData();
         
