@@ -311,6 +311,150 @@ async function openRiderProfile(riderUid, riderName) {
         
         const riderData = riderDoc.data();
         
+        // Build profile HTML (stats are now stored in user document)
+        const profileHTML = buildRiderProfileHTML(riderData, riderName);
+        modalBody.innerHTML = profileHTML;
+        
+    } catch (error) {
+        console.error('Error loading rider profile:', error);
+        modalBody.innerHTML = `
+            <div class="error-state">
+                <p>Error loading rider profile. Please try again.</p>
+            </div>
+        `;
+    }
+}
+
+// Calculate rider stats from race results
+async function calculateRiderStats(userUID) {
+    console.log('Calculating stats for rider:', userUID);
+    
+    const stats = {
+        totalWins: 0,
+        totalPodiums: 0,
+        awards: {}
+    };
+    
+    // Fetch all results for this user from all events
+    const eventCount = 15; // All possible events
+    const season = 1;
+    
+    for (let eventNum = 1; eventNum <= eventCount; eventNum++) {
+        // User-specific results collection
+        const resultDocId = `season${season}_event${eventNum}_${userUID}`;
+        
+        try {
+            const resultDoc = await getDoc(doc(db, 'results', resultDocId));
+            
+            if (resultDoc.exists()) {
+                const resultData = resultDoc.data();
+                const results = resultData.results || [];
+                
+                // Find user's result in this event
+                const userResult = results.find(r => r.uid === userUID);
+                
+                if (userResult) {
+                    const position = userResult.position || 0;
+                    
+                    if (position > 0) {
+                        if (position === 1) {
+                            stats.totalWins++;
+                        }
+                        if (position <= 3) {
+                            stats.totalPodiums++;
+                        }
+                    }
+                    
+                    // Track all awards
+                    if (userResult.earnedPunchingMedal) {
+                        stats.awards.punchingMedal = (stats.awards.punchingMedal || 0) + 1;
+                    }
+                    if (userResult.earnedGiantKillerMedal) {
+                        stats.awards.giantKiller = (stats.awards.giantKiller || 0) + 1;
+                    }
+                    if (userResult.earnedBullseyeMedal) {
+                        stats.awards.bullseye = (stats.awards.bullseye || 0) + 1;
+                    }
+                    if (userResult.earnedHotStreakMedal) {
+                        stats.awards.hotStreak = (stats.awards.hotStreak || 0) + 1;
+                    }
+                    if (userResult.earnedDomination) {
+                        stats.awards.domination = (stats.awards.domination || 0) + 1;
+                    }
+                    if (userResult.earnedCloseCall) {
+                        stats.awards.closeCall = (stats.awards.closeCall || 0) + 1;
+                    }
+                    if (userResult.earnedPhotoFinish) {
+                        stats.awards.photoFinish = (stats.awards.photoFinish || 0) + 1;
+                    }
+                    if (userResult.earnedDarkHorse) {
+                        stats.awards.darkHorse = (stats.awards.darkHorse || 0) + 1;
+                    }
+                    if (userResult.earnedZeroToHero) {
+                        stats.awards.zeroToHero = (stats.awards.zeroToHero || 0) + 1;
+                    }
+                    if (userResult.earnedGCGoldMedal) {
+                        stats.awards.gcGold = (stats.awards.gcGold || 0) + 1;
+                    }
+                    if (userResult.earnedGCSilverMedal) {
+                        stats.awards.gcSilver = (stats.awards.gcSilver || 0) + 1;
+                    }
+                    if (userResult.earnedGCBronzeMedal) {
+                        stats.awards.gcBronze = (stats.awards.gcBronze || 0) + 1;
+                    }
+                    
+                    // Medal positions
+                    if (position === 1) {
+                        stats.awards.gold = (stats.awards.gold || 0) + 1;
+                    }
+                    if (position === 2) {
+                        stats.awards.silver = (stats.awards.silver || 0) + 1;
+                    }
+                    if (position === 3) {
+                        stats.awards.bronze = (stats.awards.bronze || 0) + 1;
+                    }
+                }
+            }
+        } catch (error) {
+            console.error(`Error fetching event ${eventNum} results:`, error);
+        }
+    }
+    
+    console.log('Calculated stats:', stats);
+    return stats;
+}
+
+// Open modal and load rider profile
+async function openRiderProfile(riderUid, riderName) {
+    if (!db) {
+        console.error('Firestore not initialized');
+        return;
+    }
+    
+    initializeRiderModal();
+    
+    const modal = document.getElementById('riderProfileModal');
+    const modalBody = document.getElementById('riderProfileModalBody');
+    
+    // Show modal with loading state
+    modal.classList.add('active');
+    modalBody.innerHTML = `
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p>Loading rider profile...</p>
+        </div>
+    `;
+    
+    try {
+        // Fetch rider data from Firestore
+        const riderDoc = await getDoc(doc(db, 'users', riderUid));
+        
+        if (!riderDoc.exists()) {
+            throw new Error('Rider not found');
+        }
+        
+        const riderData = riderDoc.data();
+        
         // Build profile HTML
         const profileHTML = buildRiderProfileHTML(riderData, riderName);
         modalBody.innerHTML = profileHTML;
@@ -336,8 +480,10 @@ function buildRiderProfileHTML(data, name) {
     const totalEvents = data.totalEvents || 0;
     const completedStages = data.completedStages || [];
     const completedOptionalEvents = data.completedOptionalEvents || [];
-    const wins = data.wins || 0;
-    const podiums = data.podiums || 0;
+    
+    // Read wins, podiums, and awards directly from user document
+    const wins = data.totalWins || 0;
+    const podiums = data.totalPodiums || 0;
     
     // Get initials for avatar placeholder
     const initials = displayName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
@@ -352,8 +498,40 @@ function buildRiderProfileHTML(data, name) {
         avgFinish = (totalFinish / completedStages.length).toFixed(1);
     }
     
-    // Get awards (assuming awards are stored in data.awards as an array)
-    const awards = data.awards || [];
+    // Get awards from user document
+    const awards = data.awards || {};
+    
+    // Convert awards object to array format for display
+    const awardsList = [];
+    
+    // Award configuration with icons and names
+    const awardConfig = {
+        gold: { icon: '🥇', name: 'Gold Medal' },
+        silver: { icon: '🥈', name: 'Silver Medal' },
+        bronze: { icon: '🥉', name: 'Bronze Medal' },
+        punchingMedal: { icon: '🥊', name: 'Punching Above Weight' },
+        giantKiller: { icon: '⚔️', name: 'Giant Killer' },
+        bullseye: { icon: '🎯', name: 'Bullseye' },
+        hotStreak: { icon: '🔥', name: 'Hot Streak' },
+        domination: { icon: '👑', name: 'Domination' },
+        closeCall: { icon: '😅', name: 'Close Call' },
+        photoFinish: { icon: '📸', name: 'Photo Finish' },
+        darkHorse: { icon: '🐴', name: 'Dark Horse' },
+        zeroToHero: { icon: '🦸', name: 'Zero to Hero' },
+        gcGold: { icon: '🏆', name: 'GC Gold' },
+        gcSilver: { icon: '🥈', name: 'GC Silver' },
+        gcBronze: { icon: '🥉', name: 'GC Bronze' }
+    };
+    
+    // Build awards list with counts
+    Object.entries(awards).forEach(([key, count]) => {
+        if (count > 0 && awardConfig[key]) {
+            awardsList.push({
+                icon: awardConfig[key].icon,
+                name: count > 1 ? `${awardConfig[key].name} ×${count}` : awardConfig[key].name
+            });
+        }
+    });
     
     // Calculate season progression
     const seasonsCompleted = season - 1; // Current season minus 1
@@ -430,18 +608,18 @@ function buildRiderProfileHTML(data, name) {
     `;
     
     // Add awards section if rider has awards
-    if (awards && awards.length > 0) {
+    if (awardsList && awardsList.length > 0) {
         html += `
             <div class="rider-awards-section">
                 <h3 class="rider-awards-title">🏆 Awards & Achievements</h3>
                 <div class="rider-awards-grid">
         `;
         
-        awards.forEach(award => {
+        awardsList.forEach(award => {
             html += `
                 <div class="rider-award-item">
-                    <div class="rider-award-icon">${award.icon || '🏅'}</div>
-                    <div class="rider-award-name">${award.name || 'Achievement'}</div>
+                    <div class="rider-award-icon">${award.icon}</div>
+                    <div class="rider-award-name">${award.name}</div>
                 </div>
             `;
         });

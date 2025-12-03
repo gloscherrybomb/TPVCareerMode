@@ -125,6 +125,10 @@ function getARRBand(arr) {
 async function calculateUserStats(userUID) {
     console.log('Calculating stats for user:', userUID);
     
+    // NOTE: totalWins, totalPodiums, and awards are now stored in the user document
+    // and updated when results are processed. This function still calculates them
+    // for backwards compatibility and for stats not yet stored (like recent results).
+    
     const stats = {
         totalRaces: 0,
         totalWins: 0,

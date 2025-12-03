@@ -875,14 +875,114 @@ async function processResultsForUser(userDoc, csvFiles, season) {
   updates.usedOptionalEvents = usedOptionalEvents;
   updates.tourProgress = tourProgress;
   
+  // Calculate career statistics from all event results
+  const tempUserData = { ...userData.data(), ...updates };
+  const careerStats = calculateCareerStats(tempUserData);
+  updates.totalWins = careerStats.totalWins;
+  updates.totalPodiums = careerStats.totalPodiums;
+  updates.awards = careerStats.awards;
+  
   // Apply updates
   if (!options.dryRun) {
     await userDoc.ref.update(updates);
   }
   
   console.log(`      📈 Final: ${totalEvents} events, ${totalPoints} points, stage ${currentStage}`);
+  console.log(`      🏆 Career: ${careerStats.totalWins} wins, ${careerStats.totalPodiums} podiums`);
   
   return { totalEvents, totalPoints };
+}
+
+/**
+ * Calculate career statistics from all event results
+ */
+function calculateCareerStats(userData) {
+  const stats = {
+    totalWins: 0,
+    totalPodiums: 0,
+    awards: {
+      gold: 0,
+      silver: 0,
+      bronze: 0,
+      punchingMedal: 0,
+      giantKiller: 0,
+      bullseye: 0,
+      hotStreak: 0,
+      domination: 0,
+      closeCall: 0,
+      photoFinish: 0,
+      darkHorse: 0,
+      zeroToHero: 0,
+      gcGold: 0,
+      gcSilver: 0,
+      gcBronze: 0,
+      lanternRouge: 0
+    }
+  };
+  
+  // Iterate through all possible events
+  for (let eventNum = 1; eventNum <= 15; eventNum++) {
+    const eventResults = userData[`event${eventNum}Results`];
+    
+    if (eventResults && eventResults.position && eventResults.position !== 'DNF') {
+      const position = eventResults.position;
+      
+      // Count wins and podiums
+      if (position === 1) {
+        stats.totalWins++;
+        stats.awards.gold++;
+      }
+      if (position === 2) {
+        stats.awards.silver++;
+      }
+      if (position === 3) {
+        stats.awards.bronze++;
+      }
+      if (position <= 3) {
+        stats.totalPodiums++;
+      }
+      
+      // Count special awards
+      if (eventResults.earnedPunchingMedal) {
+        stats.awards.punchingMedal++;
+      }
+      if (eventResults.earnedGiantKillerMedal) {
+        stats.awards.giantKiller++;
+      }
+      if (eventResults.earnedBullseyeMedal) {
+        stats.awards.bullseye++;
+      }
+      if (eventResults.earnedHotStreakMedal) {
+        stats.awards.hotStreak++;
+      }
+      if (eventResults.earnedDomination) {
+        stats.awards.domination++;
+      }
+      if (eventResults.earnedCloseCall) {
+        stats.awards.closeCall++;
+      }
+      if (eventResults.earnedPhotoFinish) {
+        stats.awards.photoFinish++;
+      }
+      if (eventResults.earnedDarkHorse) {
+        stats.awards.darkHorse++;
+      }
+      if (eventResults.earnedZeroToHero) {
+        stats.awards.zeroToHero++;
+      }
+      if (eventResults.earnedGCGoldMedal) {
+        stats.awards.gcGold++;
+      }
+      if (eventResults.earnedGCSilverMedal) {
+        stats.awards.gcSilver++;
+      }
+      if (eventResults.earnedGCBronzeMedal) {
+        stats.awards.gcBronze++;
+      }
+    }
+  }
+  
+  return stats;
 }
 
 async function updateResultsSummary(season, eventNumber, results, userUid) {
