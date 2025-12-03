@@ -576,6 +576,14 @@ async function processUserResult(uid, eventInfo, results) {
     }
   }
   
+  // Initialize GC awards (will be populated later for tour stages)
+  let gcBonusPoints = 0;
+  let gcAwards = {
+    gcGoldMedal: false,
+    gcSilverMedal: false,
+    gcBronzeMedal: false
+  };
+  
   // Prepare event results
   const eventResults = {
     position: position,
@@ -629,12 +637,6 @@ async function processUserResult(uid, eventInfo, results) {
   
   // Calculate GC if this is any tour stage (events 13, 14, or 15)
   let gcResults = null;
-  let gcBonusPoints = 0;
-  let gcAwards = {
-    gcGoldMedal: false,
-    gcSilverMedal: false,
-    gcBronzeMedal: false
-  };
   
   if (validation.isTour) {
     console.log('   🏁 Tour stage complete - calculating current GC...');
