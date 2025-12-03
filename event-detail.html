@@ -428,30 +428,33 @@
 
             // Update route details
             const routeDetailsGrid = document.querySelector('.route-details-grid');
-            if (event.isStageRace) {
-                routeDetailsGrid.innerHTML = `
-                    <div class="route-detail">
-                        <strong>Stage 1:</strong> ${event.routeDetails.stage1}
-                    </div>
-                    <div class="route-detail">
-                        <strong>Stage 2:</strong> ${event.routeDetails.stage2}
-                    </div>
-                    <div class="route-detail">
-                        <strong>Stage 3:</strong> ${event.routeDetails.stage3}
-                    </div>
-                    <div class="route-detail">
-                        <strong>Difficulty:</strong> ${event.routeDetails.difficulty}
-                    </div>
-                `;
-            } else {
-                const routeKeys = Object.keys(event.routeDetails);
-                routeDetailsGrid.innerHTML = routeKeys.map(key => `
-                    <div class="route-detail">
-                        <strong>${key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}:</strong>
-                        ${event.routeDetails[key]}
-                    </div>
-                `).join('');
+            if (routeDetailsGrid) {
+                if (event.isStageRace) {
+                    routeDetailsGrid.innerHTML = `
+                        <div class="route-detail">
+                            <strong>Stage 1:</strong> ${event.routeDetails.stage1}
+                        </div>
+                        <div class="route-detail">
+                            <strong>Stage 2:</strong> ${event.routeDetails.stage2}
+                        </div>
+                        <div class="route-detail">
+                            <strong>Stage 3:</strong> ${event.routeDetails.stage3}
+                        </div>
+                        <div class="route-detail">
+                            <strong>Difficulty:</strong> ${event.routeDetails.difficulty}
+                        </div>
+                    `;
+                } else {
+                    const routeKeys = Object.keys(event.routeDetails);
+                    routeDetailsGrid.innerHTML = routeKeys.map(key => `
+                        <div class="route-detail">
+                            <strong>${key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}:</strong>
+                            ${event.routeDetails[key]}
+                        </div>
+                    `).join('');
+                }
             }
+
 
             // Update scoring section
             const scoringGrid = document.querySelector('.scoring-grid');
