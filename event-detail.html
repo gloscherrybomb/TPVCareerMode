@@ -408,6 +408,13 @@
             // Add stage breakdown for stage races
             if (event.isStageRace && event.stages) {
                 storyHTML += `
+                    <div class="story-callout story-callout-warning">
+                        <div class="callout-icon">⚠️</div>
+                        <div class="callout-text">
+                            <strong>Important Stage Race Rules:</strong> Stages must be completed on consecutive days. If you miss a day, you will not be eligible to enter the next stage and your tour will be over. Plan your schedule carefully!
+                        </div>
+                    </div>
+                    
                     <div class="stage-race-breakdown">
                         <h3>Stage Breakdown</h3>
                         ${event.stages.map((stage, i) => `
@@ -529,10 +536,14 @@
                 const ctaBox = document.getElementById('ctaBox');
                 ctaBox.innerHTML = `
                     <h2>Ready to Race?</h2>
-                    <p>The Local Tour has three stages. Schedule each stage separately on TrainingPeaks Virtual.</p>
+                    <p class="cta-warning">
+                        <strong>⚠️ Important:</strong> Stages must be completed on <strong>consecutive days</strong>. 
+                        Missing a day disqualifies you from continuing the tour.
+                    </p>
                     <div class="stage-cta-grid">
                         ${event.stages.map((stage, idx) => `
                             <div class="stage-cta-card">
+                                <div class="stage-number-badge">Day ${idx + 1}</div>
                                 <h3>${stage.name}</h3>
                                 <div class="stage-cta-details">
                                     <span>📍 ${stage.distance}</span>

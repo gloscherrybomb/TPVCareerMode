@@ -167,6 +167,15 @@
     margin-top: 3rem;
 }
 
+.story-callout-warning {
+    background: linear-gradient(135deg, rgba(255, 193, 7, 0.15), rgba(255, 152, 0, 0.1));
+    border-left: 4px solid #ffc107;
+}
+
+.story-callout-warning .callout-text strong {
+    color: #ffc107;
+}
+
 .callout-icon {
     font-size: 2.5rem;
     flex-shrink: 0;
@@ -417,6 +426,19 @@
     margin-bottom: 3rem;
 }
 
+.cta-warning {
+    background: linear-gradient(135deg, rgba(255, 193, 7, 0.15), rgba(255, 152, 0, 0.1));
+    border: 2px solid #ffc107;
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin: 1.5rem auto 2rem;
+    max-width: 700px;
+}
+
+.cta-warning strong {
+    color: #ffc107;
+}
+
 .cta-buttons {
     display: flex;
     gap: 1.5rem;
@@ -439,12 +461,27 @@
     border-radius: 15px;
     text-align: center;
     transition: all 0.3s ease;
+    position: relative;
 }
 
 .stage-cta-card:hover {
     border-color: var(--accent-blue);
     transform: translateY(-5px);
     box-shadow: 0 15px 40px rgba(69, 202, 255, 0.3);
+}
+
+.stage-number-badge {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background: var(--accent-blue);
+    color: white;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    box-shadow: 0 4px 10px rgba(69, 202, 255, 0.4);
 }
 
 .stage-cta-card h3 {
