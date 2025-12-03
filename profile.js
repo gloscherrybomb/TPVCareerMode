@@ -387,7 +387,7 @@ function displayProfileInfo(user, userData, stats, seasonRanking, globalRanking)
     }
     
     document.getElementById('arrRating').textContent = stats.arr ? stats.arr : 'N/A';
-    document.getElementById('avgFinish').textContent = stats.avgFinish ? `${stats.avgFinish}th` : 'N/A';
+    document.getElementById('avgFinish').textContent = stats.averageFinish ? `${stats.averageFinish}th` : 'N/A';
     document.getElementById('winRate').textContent = `${stats.winRate}%`;
     document.getElementById('podiumRate').textContent = `${stats.podiumRate}%`;
     
@@ -524,6 +524,35 @@ function displayRecentResults(results) {
 // Display awards (placeholder for future implementation)
 function displayAwards(awards) {
     const container = document.getElementById('awardsContainer');
+    
+    // Map old property names to new ones for backwards compatibility
+    // New stored format uses: gold, silver, bronze, punchingMedal, giantKiller, etc.
+    const mappedAwards = {
+        goldMedals: awards.gold || 0,
+        silverMedals: awards.silver || 0,
+        bronzeMedals: awards.bronze || 0,
+        lanternRouge: awards.lanternRouge || 0,
+        punchingMedals: awards.punchingMedal || 0,
+        giantKillerMedals: awards.giantKiller || 0,
+        bullseyeMedals: awards.bullseye || 0,
+        hotStreakMedals: awards.hotStreak || 0,
+        domination: awards.domination || 0,
+        closeCall: awards.closeCall || 0,
+        photoFinish: awards.photoFinish || 0,
+        overrated: awards.overrated || 0,
+        darkHorse: awards.darkHorse || 0,
+        backToBack: awards.backToBack || 0,
+        weekendWarrior: awards.weekendWarrior || 0,
+        zeroToHero: awards.zeroToHero || 0,
+        trophyCollector: awards.trophyCollector || 0,
+        technicalIssues: awards.technicalIssues || 0,
+        gcGoldMedal: awards.gcGold || 0,
+        gcSilverMedal: awards.gcSilver || 0,
+        gcBronzeMedal: awards.gcBronze || 0
+    };
+    
+    // Use mapped awards for the rest of the function
+    awards = mappedAwards;
     
     // Check if user has any awards (include all award types)
     const totalAwards = awards.goldMedals + awards.silverMedals + awards.bronzeMedals + 
