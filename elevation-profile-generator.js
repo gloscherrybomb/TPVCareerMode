@@ -195,25 +195,37 @@ class ElevationProfileGenerator {
             return;
         }
 
-        // Get route coordinates (prefer leadin which contains the full route)
-        const routeCoordinates = route.leadin?.coordinates || route.lapRoute?.coordinates || [];
+        // Build coordinates using: leadin + (lap × number of laps)
+        const leadinCoords = route.leadin?.coordinates || [];
+        const lapCoords = route.lap?.coordinates || [];
         
-        console.log(`Route "${route.name}" has ${routeCoordinates.length} coordinates`);
+        console.log(`Route "${route.name}": ${leadinCoords.length} leadin points, ${lapCoords.length} lap points`);
         
-        if (routeCoordinates.length === 0) {
-            console.error('Route has no coordinates');
+        let allCoordinates = [];
+        
+        if (leadinCoords.length > 0) {
+            // Add leadin
+            allCoordinates = [...leadinCoords];
+            
+            // Add lap(s)
+            if (lapCoords.length > 0 && laps > 0) {
+                for (let i = 0; i < laps; i++) {
+                    allCoordinates = allCoordinates.concat(lapCoords);
+                }
+                console.log(`Built route: leadin + ${laps} lap(s) = ${allCoordinates.length} total points`);
+            } else {
+                console.log(`No lap data available, using leadin only (${allCoordinates.length} points)`);
+            }
+        } else {
+            console.error('Route has no leadin coordinates');
             this.drawNoDataMessage(canvas, courseName);
             return;
         }
 
-        // For multi-lap events, repeat the coordinates
-        let allCoordinates = routeCoordinates;
-        if (laps > 1) {
-            allCoordinates = [];
-            for (let lap = 0; lap < laps; lap++) {
-                allCoordinates = allCoordinates.concat(routeCoordinates);
-            }
-            console.log(`Repeated for ${laps} laps: ${allCoordinates.length} total points`);
+        if (allCoordinates.length === 0) {
+            console.error('No coordinates to display');
+            this.drawNoDataMessage(canvas, courseName);
+            return;
         }
 
         // Process coordinates
@@ -313,6 +325,11 @@ class ElevationProfileGenerator {
         ctx.textAlign = 'center';
         const title = laps > 1 ? `${courseName} (${laps} laps)` : courseName;
         ctx.fillText(title, width / 2, 30);
+        
+        // Add subtitle
+        ctx.fillStyle = '#888888';
+        ctx.font = '11px "Exo 2", -apple-system, sans-serif';
+        ctx.fillText('Elevation Profile', width / 2, 48);
 
         // Draw elevation stats in bottom left
         const stats = this.getElevationStats(elevations);
