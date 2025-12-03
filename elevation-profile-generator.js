@@ -29,17 +29,45 @@ class ElevationProfileGenerator {
      */
     async loadRoutesData() {
         if (this.routesData) {
+            console.log('Routes data already loaded (cached)');
             return this.routesData;
         }
 
         try {
-            const response = await fetch('ExportedWorld.json');
+            console.log('Fetching ExportedWorld.json...');
+            const response = await fetch('ExportedWorld.json', {
+                cache: 'no-cache',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            console.log(`Fetch response status: ${response.status}`);
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
+            }
+            
             const data = await response.json();
+            
+            if (!data.routes || !Array.isArray(data.routes)) {
+                throw new Error('Invalid data structure: routes array not found');
+            }
+            
             this.routesData = data.routes;
             console.log(`✓ Loaded ${this.routesData.length} routes from ExportedWorld.json`);
+            
+            // Log first few route names for debugging
+            console.log('Available routes:', this.routesData.slice(0, 5).map(r => r.name).join(', '), '...');
+            
             return this.routesData;
         } catch (error) {
-            console.error('Error loading routes data:', error);
+            console.error('❌ Error loading routes data:', error);
+            console.error('Fetch URL attempted:', window.location.origin + '/ExportedWorld.json');
+            console.error('Make sure ExportedWorld.json is in the same directory as event-detail.html');
+            return null;
+        }
+    }
             return null;
         }
     }
@@ -145,6 +173,8 @@ class ElevationProfileGenerator {
      * Generate elevation profile using Canvas
      */
     async generateProfile(canvasId, courseName, laps = 1) {
+        console.log(`generateProfile called: canvas="${canvasId}", course="${courseName}", laps=${laps}`);
+        
         const canvas = document.getElementById(canvasId);
         if (!canvas) {
             console.error(`Canvas element not found: ${canvasId}`);
@@ -152,10 +182,18 @@ class ElevationProfileGenerator {
         }
 
         // Ensure routes are loaded
+        console.log('Loading routes data...');
         await this.loadRoutesData();
+        
+        if (!this.routesData) {
+            console.error('Routes data failed to load');
+            this.drawNoDataMessage(canvas, courseName);
+            return;
+        }
 
         const route = this.findRoute(courseName);
         if (!route) {
+            console.warn(`No route found for: ${courseName}`);
             this.drawNoDataMessage(canvas, courseName);
             return;
         }
@@ -163,7 +201,10 @@ class ElevationProfileGenerator {
         // Get route coordinates (prefer leadin which contains the full route)
         const routeCoordinates = route.leadin?.coordinates || route.lapRoute?.coordinates || [];
         
+        console.log(`Route "${route.name}" has ${routeCoordinates.length} coordinates`);
+        
         if (routeCoordinates.length === 0) {
+            console.error('Route has no coordinates');
             this.drawNoDataMessage(canvas, courseName);
             return;
         }
@@ -175,15 +216,18 @@ class ElevationProfileGenerator {
             for (let lap = 0; lap < laps; lap++) {
                 allCoordinates = allCoordinates.concat(routeCoordinates);
             }
+            console.log(`Repeated for ${laps} laps: ${allCoordinates.length} total points`);
         }
 
         // Process coordinates
         const { distances, elevations } = this.processCoordinates(allCoordinates);
         
-        console.log(`Profile data: ${distances.length} points, ${distances[distances.length-1].toFixed(2)}km`);
+        console.log(`Processed: ${distances.length} points, ${distances[distances.length-1].toFixed(2)}km total`);
+        console.log(`Elevation range: ${Math.min(...elevations).toFixed(1)}m to ${Math.max(...elevations).toFixed(1)}m`);
         
         // Draw profile
         this.drawProfile(canvas, distances, elevations, courseName, laps);
+        console.log('✓ Profile rendered successfully');
     }
 
     /**
@@ -400,13 +444,22 @@ class ElevationProfileGenerator {
      * Draw "no data" message
      */
     drawNoDataMessage(canvas, courseName) {
+        console.log('Drawing "no data" message for:', courseName);
+        
         const ctx = canvas.getContext('2d');
+        if (!ctx) {
+            console.error('Failed to get 2D context from canvas');
+            return;
+        }
+        
         const width = canvas.width;
         const height = canvas.height;
 
+        // Draw background
         ctx.fillStyle = '#0f0f23';
         ctx.fillRect(0, 0, width, height);
 
+        // Draw message
         ctx.fillStyle = '#666666';
         ctx.font = '16px "Exo 2", -apple-system, sans-serif';
         ctx.textAlign = 'center';
@@ -415,6 +468,8 @@ class ElevationProfileGenerator {
         ctx.fillStyle = '#888888';
         ctx.font = '13px "Exo 2", -apple-system, sans-serif';
         ctx.fillText('Check back soon as we continue adding route profiles', width / 2, height / 2 + 15);
+        
+        console.log('✓ "No data" message drawn successfully');
     }
 }
 
@@ -422,6 +477,21 @@ class ElevationProfileGenerator {
 if (typeof window !== 'undefined') {
     window.elevationProfileGen = new ElevationProfileGenerator();
     console.log('✓ Elevation Profile Generator initialized');
+    
+    // Test if ExportedWorld.json is accessible
+    fetch('ExportedWorld.json', { method: 'HEAD' })
+        .then(response => {
+            if (response.ok) {
+                console.log('✓ ExportedWorld.json is accessible (status: ' + response.status + ')');
+            } else {
+                console.warn('⚠️ ExportedWorld.json returned status: ' + response.status);
+            }
+        })
+        .catch(error => {
+            console.error('❌ Cannot access ExportedWorld.json:', error.message);
+            console.error('   File must be in the same directory as this HTML page');
+            console.error('   Current page:', window.location.href);
+        });
 }
 
 // Export for Node.js if needed

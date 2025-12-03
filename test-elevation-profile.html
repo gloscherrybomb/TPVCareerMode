@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elevation Profile Test</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+            background: #1a1a2e;
+            color: #fff;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: #0f0f23;
+            border-radius: 10px;
+        }
+        canvas {
+            border: 2px solid #3498db;
+            border-radius: 10px;
+            display: block;
+            max-width: 100%;
+            height: auto;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+        }
+        .success { background: #27ae60; }
+        .error { background: #e74c3c; }
+        .info { background: #3498db; }
+        pre {
+            background: #000;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🏔️ Elevation Profile Generator Test</h1>
+    
+    <div class="test-section">
+        <h2>Step 1: Check File Access</h2>
+        <div id="fileCheckStatus">Testing...</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Step 2: Load Route Data</h2>
+        <div id="dataLoadStatus">Waiting for file check...</div>
+        <pre id="routeList"></pre>
+    </div>
+    
+    <div class="test-section">
+        <h2>Step 3: Test Profile Generation</h2>
+        <div id="profileStatus">Waiting for data load...</div>
+        <canvas id="testCanvas" width="1200" height="400"></canvas>
+    </div>
+    
+    <div class="test-section">
+        <h2>Console Output</h2>
+        <pre id="console"></pre>
+    </div>
+
+    <script src="elevation-profile-generator.js"></script>
+    <script>
+        const consoleLog = document.getElementById('console');
+        const originalLog = console.log;
+        const originalError = console.error;
+        const originalWarn = console.warn;
+        
+        // Capture console output
+        function captureLog(level, args) {
+            const message = Array.from(args).map(arg => 
+                typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+            ).join(' ');
+            consoleLog.textContent += `[${level}] ${message}\n`;
+            consoleLog.scrollTop = consoleLog.scrollHeight;
+        }
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            captureLog('LOG', args);
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            captureLog('ERROR', args);
+        };
+        
+        console.warn = function(...args) {
+            originalWarn.apply(console, args);
+            captureLog('WARN', args);
+        };
+
+        async function runTests() {
+            // Test 1: Check file access
+            try {
+                const response = await fetch('ExportedWorld.json', { method: 'HEAD' });
+                if (response.ok) {
+                    document.getElementById('fileCheckStatus').innerHTML = 
+                        `<div class="status success">✓ ExportedWorld.json is accessible (Status: ${response.status})</div>`;
+                } else {
+                    document.getElementById('fileCheckStatus').innerHTML = 
+                        `<div class="status error">✗ ExportedWorld.json returned status ${response.status}</div>`;
+                    return;
+                }
+            } catch (error) {
+                document.getElementById('fileCheckStatus').innerHTML = 
+                    `<div class="status error">✗ Cannot access ExportedWorld.json: ${error.message}</div>`;
+                return;
+            }
+            
+            // Test 2: Load data
+            try {
+                await window.elevationProfileGen.loadRoutesData();
+                const routes = window.elevationProfileGen.routesData;
+                
+                if (routes && routes.length > 0) {
+                    document.getElementById('dataLoadStatus').innerHTML = 
+                        `<div class="status success">✓ Loaded ${routes.length} routes</div>`;
+                    
+                    // Show first 15 routes
+                    const routeList = routes.slice(0, 15).map((r, i) => 
+                        `${i + 1}. ${r.name} (${r.leadin?.coordinates?.length || 0} points)`
+                    ).join('\n');
+                    document.getElementById('routeList').textContent = routeList + '\n... and more';
+                } else {
+                    document.getElementById('dataLoadStatus').innerHTML = 
+                        `<div class="status error">✗ No routes loaded</div>`;
+                    return;
+                }
+            } catch (error) {
+                document.getElementById('dataLoadStatus').innerHTML = 
+                    `<div class="status error">✗ Error loading data: ${error.message}</div>`;
+                return;
+            }
+            
+            // Test 3: Generate profile
+            try {
+                document.getElementById('profileStatus').innerHTML = 
+                    `<div class="status info">⏳ Generating Coastal Loop profile...</div>`;
+                
+                await window.elevationProfileGen.generateProfile('testCanvas', 'Coastal Loop', 1);
+                
+                document.getElementById('profileStatus').innerHTML = 
+                    `<div class="status success">✓ Profile generated successfully!</div>`;
+            } catch (error) {
+                document.getElementById('profileStatus').innerHTML = 
+                    `<div class="status error">✗ Error generating profile: ${error.message}</div>`;
+            }
+        }
+        
+        // Wait for everything to load
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', runTests);
+        } else {
+            setTimeout(runTests, 100);
+        }
+    </script>
+</body>
+</html>

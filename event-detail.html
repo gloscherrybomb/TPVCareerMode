@@ -455,17 +455,21 @@
 
             // Update scoring section
             const scoringGrid = document.querySelector('.scoring-grid');
-            const points = calculatePoints(event.maxPoints);
-            scoringGrid.innerHTML = points.map(p => `
-                <div class="scoring-card">
-                    <div class="scoring-rank">${p.rank}</div>
-                    <div class="scoring-points">${p.points} pts</div>
-                </div>
-            `).join('');
+            if (scoringGrid) {
+                const points = calculatePoints(event.maxPoints);
+                scoringGrid.innerHTML = points.map(p => `
+                    <div class="scoring-card">
+                        <div class="scoring-rank">${p.rank}</div>
+                        <div class="scoring-points">${p.points} pts</div>
+                    </div>
+                `).join('');
+            }
 
             // Update course name in breadcrumb callout
-            document.querySelector('.scoring-note').textContent = 
-                `Points are awarded based on finishing position (top 40 only). Course: ${event.course}`;
+            const scoringNote = document.querySelector('.scoring-note');
+            if (scoringNote) {
+                scoringNote.textContent = `Points are awarded based on finishing position (top 40 only). Course: ${event.course}`;
+            }
             
             // Generate elevation profile
             const laps = parseInt(event.format.match(/(\d+)\s*lap/i)?.[1] || 1);
