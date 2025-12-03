@@ -4,6 +4,7 @@ import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/
 import { getFirestore, doc, getDoc, collection, getDocs, query, orderBy, limit } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import { makeNameClickable } from './bot-profile-modal.js';
+import { initRiderProfileModal, makeRiderNameClickable } from './rider-profile-modal.js';
 
 // Firebase configuration
 const firebaseConfig = {
@@ -19,6 +20,9 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+
+// Initialize rider profile modal
+initRiderProfileModal(db);
 
 let currentUser = null;
 
@@ -384,13 +388,24 @@ async function renderGlobalRankings() {
                 else if (rank === 2) rankClass = 'rank-silver';
                 else if (rank === 3) rankClass = 'rank-bronze';
                 
+                // Determine if this is a bot or human rider
+                const isBot = racer.uid.startsWith('Bot');
+                
+                // Make name clickable with appropriate modal
+                let nameHTML;
+                if (isBot) {
+                    nameHTML = makeNameClickable(racer.name, racer.uid);
+                } else {
+                    nameHTML = makeRiderNameClickable(racer.name, racer.uid, false);
+                }
+                
                 tableHTML += `
                     <tr class="${rowClass}">
                         <td class="rank-cell">
                             <span class="rank-number ${rankClass}">${rank}</span>
                         </td>
                         <td class="name-cell">
-                            <span class="rider-name">${makeNameClickable(racer.name, racer.uid)}</span>
+                            <span class="rider-name">${nameHTML}</span>
                             ${racer.isCurrentUser ? '<span class="you-badge">YOU</span>' : ''}
                         </td>
                         <td class="season-cell">Season ${racer.season}</td>
