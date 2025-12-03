@@ -184,6 +184,146 @@ class ElevationProfileGenerator {
     }
 
     /**
+     * Detect and score climbs from elevation data
+     */
+    detectClimbs(distances, elevations, totalDistance) {
+        const CHUNK_SIZE = 0.04; // Analyze route in 40m chunks
+        const MIN_UPHILL_GRADIENT = 1.5; // Threshold for uphill segment
+        const MAX_MERGE_GAP_KM = 0.35; // Merge climbs if gap is <= 0.35 km
+        
+        let chunks = [];
+        
+        // Create points array with distance and elevation
+        const points = distances.map((dist, i) => ({ dist, ele: elevations[i] }));
+        
+        // 1. Break route into distance chunks to calculate local gradient
+        for (let i = 0; i < points.length; i++) {
+            const start = points[i];
+            let j = i + 1;
+            while (j < points.length && points[j].dist - start.dist < CHUNK_SIZE) {
+                j++;
+            }
+            if (j < points.length) {
+                const end = points[j];
+                const dist = end.dist - start.dist;
+                const gain = end.ele - start.ele;
+                const gradient = (gain / (dist * 1000)) * 100;
+                chunks.push({ 
+                    startDist: start.dist, 
+                    endDist: end.dist, 
+                    gradient, 
+                    gain, 
+                    startEle: start.ele, 
+                    endEle: end.ele 
+                });
+                i = j - 1;
+            }
+        }
+        
+        // 2. Identify raw uphill runs (contiguous chunks > threshold gradient)
+        let rawUphillRuns = [];
+        let currentRun = null;
+        
+        chunks.forEach((chunk) => {
+            const isUphill = chunk.gradient > MIN_UPHILL_GRADIENT;
+            
+            if (isUphill) {
+                if (!currentRun) {
+                    currentRun = {
+                        startDist: chunk.startDist,
+                        endDist: chunk.endDist,
+                        gain: chunk.gain,
+                        chunks: [chunk]
+                    };
+                } else {
+                    currentRun.endDist = chunk.endDist;
+                    currentRun.gain += chunk.gain;
+                    currentRun.chunks.push(chunk);
+                }
+            } else {
+                if (currentRun) {
+                    rawUphillRuns.push(currentRun);
+                    currentRun = null;
+                }
+            }
+        });
+        
+        if (currentRun) rawUphillRuns.push(currentRun);
+        
+        // 3. Merge runs if gap between them is small
+        let climbs = [];
+        let currentClimbToBuild = null;
+        
+        rawUphillRuns.forEach((run, index) => {
+            if (!currentClimbToBuild) {
+                currentClimbToBuild = { ...run };
+            } else {
+                const gap = run.startDist - currentClimbToBuild.endDist;
+                
+                if (gap <= MAX_MERGE_GAP_KM) {
+                    currentClimbToBuild.endDist = run.endDist;
+                    currentClimbToBuild.gain += run.gain;
+                    currentClimbToBuild.chunks = currentClimbToBuild.chunks.concat(run.chunks);
+                } else {
+                    climbs.push(currentClimbToBuild);
+                    currentClimbToBuild = { ...run };
+                }
+            }
+            
+            if (index === rawUphillRuns.length - 1) {
+                climbs.push(currentClimbToBuild);
+            }
+        });
+        
+        // 4. Filter and score climbs
+        let validClimbs = climbs.filter(c => c.gain > 20).map((c) => {
+            const lengthKm = c.endDist - c.startDist;
+            const gradientAvg = lengthKm > 0 ? (c.gain / (lengthKm * 1000)) * 100 : 0;
+            const maxGradient = Math.max(...c.chunks.map(chunk => chunk.gradient));
+            const rawScore = Math.pow(gradientAvg / 2, 2) * lengthKm;
+            const distFromFinish = totalDistance - c.endDist;
+            
+            return {
+                ...c,
+                lengthKm,
+                gradientAvg,
+                maxGradient,
+                rawScore,
+                distFromFinish
+            };
+        }).sort((a, b) => a.startDist - b.startDist);
+        
+        // Filter out climbs that are too easy
+        validClimbs = validClimbs.filter(climb => {
+            return !(climb.gradientAvg < 2 && climb.maxGradient < 3);
+        });
+        
+        // Add climb IDs
+        validClimbs = validClimbs.map((climb, index) => ({
+            ...climb,
+            id: index + 1
+        }));
+        
+        return validClimbs;
+    }
+    
+    /**
+     * Get color based on climb difficulty score
+     */
+    getScoreHexColor(score) {
+        if (score >= 46) return '#991b1b'; // Red 800
+        if (score >= 41) return '#b91c1c'; // Red 700
+        if (score >= 36) return '#dc2626'; // Red 600
+        if (score >= 31) return '#ef4444'; // Red 500
+        if (score >= 26) return '#f87171'; // Red 400
+        if (score >= 21) return '#fb923c'; // Orange 400
+        if (score >= 16) return '#fbbf24'; // Amber 400
+        if (score >= 11) return '#facc15'; // Yellow 400
+        if (score >= 6) return '#a3e635';  // Lime 400
+        return '#4ade80'; // Green 400
+    }
+
+    /**
      * Calculate distance and elevation data from coordinates
      * Coordinates have x, y, z where y is elevation
      */
@@ -384,6 +524,10 @@ class ElevationProfileGenerator {
 
         const xScale = chartWidth / maxDistance;
         const yScale = chartHeight / displayRange;
+        
+        // Detect climbs
+        const climbs = this.detectClimbs(distances, elevations, maxDistance);
+        console.log(`✓ Detected ${climbs.length} climbs`);
 
         // Draw background
         ctx.fillStyle = '#0f0f23';
@@ -391,6 +535,10 @@ class ElevationProfileGenerator {
 
         // Draw grid
         this.drawGrid(ctx, padding, chartWidth, chartHeight, maxDistance, displayMinElevation, displayMaxElevation);
+
+        // Draw climb fill areas first (behind the elevation line)
+        this.drawClimbHighlights(ctx, climbs, distances, elevations, padding, chartWidth, chartHeight,
+                                maxDistance, displayMinElevation, displayRange, xScale, yScale);
 
         // Draw elevation area fill
         ctx.beginPath();
@@ -430,6 +578,14 @@ class ElevationProfileGenerator {
             }
         });
         ctx.stroke();
+        
+        // Draw thicker lines over climb sections
+        this.drawClimbLines(ctx, climbs, distances, elevations, padding, chartWidth, chartHeight,
+                           maxDistance, displayMinElevation, displayRange, xScale, yScale);
+        
+        // Draw climb numbers
+        this.drawClimbNumbers(ctx, climbs, distances, elevations, padding, chartWidth, chartHeight,
+                             maxDistance, displayMinElevation, displayRange, xScale, yScale);
 
         // Draw axes
         this.drawAxes(ctx, padding, chartWidth, chartHeight, maxDistance, displayMinElevation, displayMaxElevation);
@@ -463,6 +619,127 @@ class ElevationProfileGenerator {
         ctx.fillStyle = '#ffffff';
         ctx.font = '14px "Exo 2", -apple-system, sans-serif';
         ctx.fillText(`${maxDistance.toFixed(2)} km`, width - padding.right, 30);
+    }
+    
+    /**
+     * Draw colored fill areas for climbs
+     */
+    drawClimbHighlights(ctx, climbs, distances, elevations, padding, chartWidth, chartHeight,
+                       maxDistance, displayMinElevation, displayRange, xScale, yScale) {
+        climbs.forEach(climb => {
+            // Get all points within the climb distance range
+            const climbPoints = [];
+            for (let i = 0; i < distances.length; i++) {
+                if (distances[i] >= climb.startDist && distances[i] <= climb.endDist) {
+                    climbPoints.push({ dist: distances[i], ele: elevations[i] });
+                }
+            }
+            
+            if (climbPoints.length < 2) return;
+            
+            // Create fill path
+            ctx.beginPath();
+            
+            // Start at bottom left of climb
+            const startX = padding.left + climb.startDist * xScale;
+            ctx.moveTo(startX, padding.top + chartHeight);
+            
+            // Draw along the elevation profile
+            climbPoints.forEach(point => {
+                const x = padding.left + point.dist * xScale;
+                const y = padding.top + chartHeight - (point.ele - displayMinElevation) * yScale;
+                ctx.lineTo(x, y);
+            });
+            
+            // Close to bottom right
+            const endX = padding.left + climb.endDist * xScale;
+            ctx.lineTo(endX, padding.top + chartHeight);
+            ctx.closePath();
+            
+            // Fill with color based on difficulty
+            const color = this.getScoreHexColor(climb.rawScore);
+            ctx.fillStyle = color;
+            ctx.globalAlpha = 0.3;
+            ctx.fill();
+            ctx.globalAlpha = 1.0;
+        });
+    }
+    
+    /**
+     * Draw thicker colored lines over climb sections
+     */
+    drawClimbLines(ctx, climbs, distances, elevations, padding, chartWidth, chartHeight,
+                  maxDistance, displayMinElevation, displayRange, xScale, yScale) {
+        climbs.forEach(climb => {
+            // Draw thicker line over each chunk (uphill segment)
+            climb.chunks.forEach(chunk => {
+                ctx.beginPath();
+                let isFirstPoint = true;
+                
+                for (let i = 0; i < distances.length; i++) {
+                    if (distances[i] >= chunk.startDist && distances[i] <= chunk.endDist) {
+                        const x = padding.left + distances[i] * xScale;
+                        const y = padding.top + chartHeight - (elevations[i] - displayMinElevation) * yScale;
+                        
+                        if (isFirstPoint) {
+                            ctx.moveTo(x, y);
+                            isFirstPoint = false;
+                        } else {
+                            ctx.lineTo(x, y);
+                        }
+                    }
+                }
+                
+                const color = this.getScoreHexColor(climb.rawScore);
+                ctx.strokeStyle = color;
+                ctx.lineWidth = 3.5;
+                ctx.lineJoin = 'round';
+                ctx.lineCap = 'round';
+                ctx.stroke();
+            });
+        });
+    }
+    
+    /**
+     * Draw climb numbers above climbs
+     */
+    drawClimbNumbers(ctx, climbs, distances, elevations, padding, chartWidth, chartHeight,
+                    maxDistance, displayMinElevation, displayRange, xScale, yScale) {
+        climbs.forEach(climb => {
+            // Find the first point of the climb
+            let startPoint = null;
+            for (let i = 0; i < distances.length; i++) {
+                if (distances[i] >= climb.startDist) {
+                    startPoint = { dist: distances[i], ele: elevations[i] };
+                    break;
+                }
+            }
+            
+            if (!startPoint) return;
+            
+            // Position the number above the start of the climb
+            const x = padding.left + startPoint.dist * xScale;
+            const y = padding.top + chartHeight - (startPoint.ele - displayMinElevation) * yScale - 30;
+            
+            const color = this.getScoreHexColor(climb.rawScore);
+            
+            // Draw number with shadow for visibility
+            ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
+            ctx.shadowBlur = 3;
+            ctx.shadowOffsetX = 1;
+            ctx.shadowOffsetY = 1;
+            
+            ctx.fillStyle = color;
+            ctx.font = 'bold 16px "Exo 2", -apple-system, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(climb.id.toString(), x, y);
+            
+            // Reset shadow
+            ctx.shadowColor = 'transparent';
+            ctx.shadowBlur = 0;
+            ctx.shadowOffsetX = 0;
+            ctx.shadowOffsetY = 0;
+        });
     }
 
     /**
