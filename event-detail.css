@@ -273,6 +273,39 @@
     color: var(--text-primary);
 }
 
+/* Stage Switcher */
+.stage-switcher {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.stage-btn {
+    padding: 0.8rem 2rem;
+    background: var(--dark-bg);
+    color: var(--text-muted);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    font-family: 'Exo 2', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.stage-btn:hover {
+    border-color: var(--accent-blue);
+    color: var(--text-primary);
+    transform: translateY(-2px);
+}
+
+.stage-btn.active {
+    background: var(--accent-blue);
+    color: #ffffff;
+    border-color: var(--accent-blue);
+}
+
 .route-profile-container {
     max-width: 1200px;
     margin: 0 auto;
@@ -366,7 +399,7 @@
 }
 
 .cta-box {
-    max-width: 800px;
+    max-width: 1000px;
     margin: 0 auto;
     text-align: center;
 }
@@ -389,6 +422,54 @@
     gap: 1.5rem;
     justify-content: center;
     flex-wrap: wrap;
+}
+
+/* Stage CTA Grid */
+.stage-cta-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    margin: 2rem 0;
+}
+
+.stage-cta-card {
+    padding: 2rem;
+    background: var(--dark-card);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+
+.stage-cta-card:hover {
+    border-color: var(--accent-blue);
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(69, 202, 255, 0.3);
+}
+
+.stage-cta-card h3 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+}
+
+.stage-cta-details {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.stage-cta-details span {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.stage-cta-card .btn {
+    width: 100%;
 }
 
 /* Responsive Design */

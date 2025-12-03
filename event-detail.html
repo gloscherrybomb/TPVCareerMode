@@ -104,9 +104,18 @@
         </div>
     </section>
 
-    <section class="event-route">
+    <!-- Route Profile Section -->
+    <section class="event-route" id="routeSection">
         <div class="container">
-            <h2 class="section-title-medium">Route Profile</h2>
+            <h2 class="section-title-medium" id="routeTitle">Route Profile</h2>
+            
+            <!-- Stage Switcher (only shown for stage races) -->
+            <div class="stage-switcher" id="stageSwitcher" style="display: none;">
+                <button class="stage-btn active" data-stage="0">Stage 1</button>
+                <button class="stage-btn" data-stage="1">Stage 2</button>
+                <button class="stage-btn" data-stage="2">Stage 3</button>
+            </div>
+            
             <div class="route-profile-container">
                 <canvas id="elevationProfileCanvas" width="1200" height="400"></canvas>
             </div>
@@ -156,13 +165,8 @@
 
     <section class="event-cta">
         <div class="container">
-            <div class="cta-box">
-                <h2>Ready to Race?</h2>
-                <p>Schedule this event on TrainingPeaks Virtual and complete it to progress in your career.</p>
-                <div class="cta-buttons">
-                    <button class="btn btn-primary btn-large" id="scheduleButton">Schedule Event</button>
-                    <button class="btn btn-secondary btn-large" onclick="location.href='events.html'">Back to Events</button>
-                </div>
+            <div class="cta-box" id="ctaBox">
+                <!-- Content will be populated by JavaScript -->
             </div>
         </div>
     </section>
@@ -474,18 +478,110 @@
                 scoringNote.textContent = `Points are awarded based on finishing position (top 40 only). Course: ${event.course}`;
             }
             
-            // Generate elevation profile
-            const laps = parseInt(event.format.match(/(\d+)\s*lap/i)?.[1] || 1);
-            console.log(`Generating elevation profile for ${event.course} (${laps} lap${laps > 1 ? 's' : ''})`);
-            
-            if (window.elevationProfileGen) {
-                await window.elevationProfileGen.generateProfile(
-                    'elevationProfileCanvas',
-                    event.course,
-                    laps
-                );
+            // Handle stage races vs single events
+            if (event.isStageRace && event.stages) {
+                // Stage race: show stage switcher and multiple schedule buttons
+                let currentStage = 0;
+                
+                // Show stage switcher
+                const stageSwitcher = document.getElementById('stageSwitcher');
+                stageSwitcher.style.display = 'flex';
+                
+                // Map stages to actual courses
+                const stageCourses = [
+                    'Figure Of Eight',
+                    'Loop the Loop', 
+                    'A Bit Of Everything'
+                ];
+                
+                // Function to update profile for current stage
+                async function updateStageProfile(stageIndex) {
+                    currentStage = stageIndex;
+                    
+                    // Update active button
+                    document.querySelectorAll('.stage-btn').forEach((btn, idx) => {
+                        btn.classList.toggle('active', idx === stageIndex);
+                    });
+                    
+                    // Update route title
+                    document.getElementById('routeTitle').textContent = 
+                        `${event.stages[stageIndex].name} Profile`;
+                    
+                    // Generate profile for this stage
+                    const courseName = stageCourses[stageIndex];
+                    console.log(`Generating profile for ${courseName}`);
+                    
+                    if (window.elevationProfileGen) {
+                        await window.elevationProfileGen.generateProfile(
+                            'elevationProfileCanvas',
+                            courseName,
+                            1 // Stages are always 1 lap
+                        );
+                    }
+                }
+                
+                // Set up stage switcher buttons
+                document.querySelectorAll('.stage-btn').forEach((btn, idx) => {
+                    btn.addEventListener('click', () => updateStageProfile(idx));
+                });
+                
+                // Populate CTA with stage buttons
+                const ctaBox = document.getElementById('ctaBox');
+                ctaBox.innerHTML = `
+                    <h2>Ready to Race?</h2>
+                    <p>The Local Tour has three stages. Schedule each stage separately on TrainingPeaks Virtual.</p>
+                    <div class="stage-cta-grid">
+                        ${event.stages.map((stage, idx) => `
+                            <div class="stage-cta-card">
+                                <h3>${stage.name}</h3>
+                                <div class="stage-cta-details">
+                                    <span>📍 ${stage.distance}</span>
+                                    <span>⛰️ ${stage.climbing}</span>
+                                    <span>⭐ ${stage.points} pts</span>
+                                </div>
+                                <button class="btn btn-primary" onclick="alert('Schedule Stage ${idx + 1} on TPV')">
+                                    Schedule Stage ${idx + 1}
+                                </button>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <div class="cta-buttons" style="margin-top: 2rem;">
+                        <button class="btn btn-secondary btn-large" onclick="location.href='events.html'">Back to Events</button>
+                    </div>
+                `;
+                
+                // Load Stage 1 profile by default
+                await updateStageProfile(0);
+                
             } else {
-                console.error('Elevation profile generator not loaded');
+                // Single event: standard flow
+                // Hide stage switcher
+                document.getElementById('stageSwitcher').style.display = 'none';
+                
+                // Populate standard CTA
+                const ctaBox = document.getElementById('ctaBox');
+                ctaBox.innerHTML = `
+                    <h2>Ready to Race?</h2>
+                    <p>Schedule this event on TrainingPeaks Virtual and complete it to progress in your career.</p>
+                    <div class="cta-buttons">
+                        <button class="btn btn-primary btn-large" id="scheduleButton">Schedule Event</button>
+                        <button class="btn btn-secondary btn-large" onclick="location.href='events.html'">Back to Events</button>
+                    </div>
+                `;
+                
+                // Generate elevation profile
+                const laps = parseInt(event.format.match(/(\d+)\s*lap/i)?.[1] || 1);
+                console.log(`Generating elevation profile for ${event.course} (${laps} lap${laps > 1 ? 's' : ''})`);
+                
+                if (window.elevationProfileGen) {
+                    await window.elevationProfileGen.generateProfile(
+                        'elevationProfileCanvas',
+                        event.course,
+                        laps
+                    );
+                } else {
+                    console.error('Elevation profile generator not loaded');
+                }
             }
         });
     </script>

@@ -21,7 +21,11 @@ class ElevationProfileGenerator {
             'Base Camp': 'Base Camp',
             'Big Loop': 'Big Loop',
             'South Lake Loop Reverse': 'South Lake Loop Reverse',
-            'Unbound Little Egypt': 'gpx:UnboundLittleEgypt' // Special marker for GPX
+            'Unbound Little Egypt': 'gpx:UnboundLittleEgypt', // Special marker for GPX
+            // Tour stage courses
+            'Figure Of Eight': 'Figure Of Eight',
+            'Loop the Loop': 'Loop the Loop',
+            'A Bit Of Everything': 'A Bit Of Everything'
         };
     }
 
