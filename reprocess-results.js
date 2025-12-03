@@ -876,7 +876,7 @@ async function processResultsForUser(userDoc, csvFiles, season) {
   updates.tourProgress = tourProgress;
   
   // Calculate career statistics from all event results
-  const tempUserData = { ...userData.data(), ...updates };
+  const tempUserData = { ...userData, ...updates };
   const careerStats = calculateCareerStats(tempUserData);
   updates.totalWins = careerStats.totalWins;
   updates.totalPodiums = careerStats.totalPodiums;
