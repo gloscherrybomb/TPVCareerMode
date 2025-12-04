@@ -1,7 +1,7 @@
 ﻿OVERALL INDIVIDUAL RESULTS:
 
 "EventKey","Pen","Position","Name","Team","Country","Time","DeltaTime","Distance","DeltaDistance","Points","Gender","UID","ARR","ARRBand","EventRating","EventRatingBand","AgeBand","NGB","NGB ID","UCI ID"
-"888613","2","1","James Wilson","","GBR","1800.000","0","19800.000","0","0","Male","212354980F57BA1B","1102","Gold 3","1102","Gold 3","40-44","British Cycling","1652049","10116817585"
+"888613","2","1","James Eastwood","","GBR","1800.000","0","19800.000","0","0","Male","212354980F57BA1B","1102","Gold 3","1102","Gold 3","40-44","British Cycling","1652049","10116817585"
 "888613","2","2","Morgan Taylor","","NED","1803.442","3.442","19800.000","0","0","Bot","Bot9926","1169","Gold 3","1169","Gold 3","","","",""
 "888613","2","3","Ava Walker","","SCO","1804.545","4.545","19800.000","0","0","Bot","Bot6344","909","Gold 1","909","Gold 1","","","",""
 "888613","2","4","Sam King","","CAN","1805.167","5.167","19800.000","0","0","Bot","Bot5532","972","Gold 1","972","Gold 1","","","",""
@@ -51,3 +51,4 @@
 "888613","2","48","Emma Jones","Eckleson","IRL","1914.368","114.368","19800.000","0","0","Bot","Bot5264","572","Bronze 3","572","Bronze 3","","","",""
 "888613","2","49","Michael Lewis","","AUS","1949.188","149.188","19800.000","0","0","Bot","Bot6877","832","Silver 3","832","Silver 3","","","",""
 "888613","2","50","Casey Martinez","Hinal","ENG","1933.800","133.800","19800.000","0","0","Bot","Bot3800","743","Silver 2","743","Silver 2","","","",""
+
