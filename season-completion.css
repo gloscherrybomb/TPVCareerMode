@@ -1,0 +1,356 @@
+/* season-completion.css - Styles for end-of-season experience */
+
+/* Season Complete Banner */
+.season-complete-banner {
+    background: linear-gradient(135deg, #1a472a 0%, #2d5a3d 100%);
+    border: 2px solid var(--accent-green);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 255, 136, 0.2);
+}
+
+.season-complete-banner h2 {
+    color: var(--accent-green);
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.season-complete-banner h2::before {
+    content: '🏆';
+    font-size: 2.5rem;
+}
+
+.season-complete-banner p {
+    color: var(--text-primary);
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+}
+
+.season-complete-actions {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.season-complete-actions .btn {
+    min-width: 200px;
+}
+
+/* Season Complete Modal */
+.season-complete-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.season-complete-modal.hidden {
+    display: none;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.season-complete-content {
+    background: linear-gradient(135deg, #0a1612 0%, #1a2a24 100%);
+    border: 3px solid var(--accent-green);
+    border-radius: 20px;
+    padding: 3rem;
+    max-width: 800px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(0, 255, 136, 0.3);
+    animation: slideUp 0.5s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(50px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.season-complete-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+
+.season-trophy {
+    font-size: 5rem;
+    margin-bottom: 1rem;
+    animation: trophyBounce 1s ease-in-out infinite;
+}
+
+@keyframes trophyBounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.season-complete-title {
+    font-size: 2.5rem;
+    color: var(--accent-green);
+    margin-bottom: 0.5rem;
+    text-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+}
+
+.season-complete-subtitle {
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+}
+
+.season-complete-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin: 2rem 0;
+}
+
+.season-stat-card {
+    background: rgba(0, 255, 136, 0.1);
+    border: 1px solid rgba(0, 255, 136, 0.3);
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.season-stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--accent-green);
+    margin-bottom: 0.5rem;
+}
+
+.season-stat-label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.season-complete-highlights {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin: 2rem 0;
+}
+
+.season-complete-highlights h3 {
+    color: var(--accent-green);
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+}
+
+.season-complete-highlights ul {
+    list-style: none;
+    padding: 0;
+}
+
+.season-complete-highlights li {
+    color: var(--text-primary);
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.season-complete-highlights li:last-child {
+    border-bottom: none;
+}
+
+.season-complete-highlights li::before {
+    content: '✓';
+    color: var(--accent-green);
+    font-weight: bold;
+    margin-right: 0.75rem;
+}
+
+.season-complete-footer {
+    text-align: center;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.season-complete-footer p {
+    color: var(--text-secondary);
+    margin-bottom: 1.5rem;
+    font-size: 1.1rem;
+}
+
+.season-complete-footer .btn {
+    min-width: 200px;
+}
+
+/* Reset Confirmation Modal */
+.reset-confirm-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.95);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10001;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.reset-confirm-modal.hidden {
+    display: none;
+}
+
+.reset-confirm-content {
+    background: linear-gradient(135deg, #2a1a1a 0%, #3a2424 100%);
+    border: 3px solid #ff4444;
+    border-radius: 20px;
+    padding: 2.5rem;
+    max-width: 600px;
+    width: 90%;
+    position: relative;
+    box-shadow: 0 20px 60px rgba(255, 68, 68, 0.3);
+}
+
+.reset-confirm-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.reset-warning-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+.reset-confirm-title {
+    font-size: 2rem;
+    color: #ff4444;
+    margin-bottom: 1rem;
+}
+
+.reset-confirm-body {
+    color: var(--text-primary);
+    line-height: 1.6;
+    margin-bottom: 2rem;
+}
+
+.reset-confirm-body strong {
+    color: #ff4444;
+}
+
+.reset-loss-list {
+    background: rgba(255, 68, 68, 0.1);
+    border: 1px solid rgba(255, 68, 68, 0.3);
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 1rem 0;
+}
+
+.reset-loss-list li {
+    color: var(--text-secondary);
+    padding: 0.5rem 0;
+}
+
+.reset-confirm-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.reset-confirm-actions .btn {
+    min-width: 150px;
+}
+
+.btn-danger {
+    background: #ff4444;
+    color: white;
+    border: none;
+}
+
+.btn-danger:hover {
+    background: #ff6666;
+}
+
+/* Confetti Animation for celebration */
+.confetti-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+    overflow: hidden;
+}
+
+.confetti {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: var(--accent-green);
+    opacity: 0;
+    animation: confettiFall 3s linear;
+}
+
+@keyframes confettiFall {
+    0% {
+        transform: translateY(-100vh) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(100vh) rotate(720deg);
+        opacity: 0;
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .season-complete-content {
+        padding: 2rem;
+    }
+    
+    .season-complete-title {
+        font-size: 2rem;
+    }
+    
+    .season-trophy {
+        font-size: 4rem;
+    }
+    
+    .season-complete-stats {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    .season-complete-actions {
+        flex-direction: column;
+    }
+    
+    .season-complete-actions .btn {
+        width: 100%;
+    }
+}

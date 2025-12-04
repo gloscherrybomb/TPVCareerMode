@@ -175,6 +175,29 @@ const AWARD_DEFINITIONS = {
     icon: '🥉',
     description: 'Finish 3rd in overall General Classification',
     calculationType: 'event'
+  },
+  
+  // Season Overall Podium Trophies
+  seasonChampion: {
+    id: 'seasonChampion',
+    title: 'Season Champion',
+    icon: '🏆',
+    description: 'Win the overall season standings',
+    calculationType: 'season'
+  },
+  seasonRunnerUp: {
+    id: 'seasonRunnerUp',
+    title: 'Season Runner-Up',
+    icon: '🥈',
+    description: 'Finish 2nd in overall season standings',
+    calculationType: 'season'
+  },
+  seasonThirdPlace: {
+    id: 'seasonThirdPlace',
+    title: 'Season Third Place',
+    icon: '🥉',
+    description: 'Finish 3rd in overall season standings',
+    calculationType: 'season'
   }
 };
 

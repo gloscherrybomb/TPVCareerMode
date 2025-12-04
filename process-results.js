@@ -873,6 +873,9 @@ async function processUserResult(uid, eventInfo, results) {
   console.log(`Processed event ${eventNumber} for user ${uid}: Position ${position}${predictionLog}, Points ${points}${bonusLog}${punchingLog}${giantKillerLog}`);
   console.log(`   Stage ${currentStage} complete -> Stage ${nextStage}`);
   
+  // Check if season is now complete after this event
+  await checkAndMarkSeasonComplete(userRef, userData, eventNumber, updates);
+  
   // Update results summary collection (per-user)
   await updateResultsSummary(season, eventNumber, results, uid);
 }
@@ -1449,6 +1452,85 @@ async function updateResultsSummary(season, event, results, userUid) {
   await updateBotARRs(season, event, results);
 }
 
+
+/**
+ * Check if season is complete and mark it, award season podium trophies
+ */
+async function checkAndMarkSeasonComplete(userRef, userData, eventNumber, recentUpdates) {
+  // Merge recent updates with existing userData for checking
+  const currentData = { ...userData, ...recentUpdates };
+  
+  // Season 1 is complete when:
+  // 1. Event 15 is completed with results
+  // 2. OR Event 14 or 15 are marked as DNS
+  
+  const event15Complete = currentData.event15Results && 
+                         currentData.event15Results.position && 
+                         currentData.event15Results.position !== 'DNF';
+  const event14DNS = currentData.event14DNS === true;
+  const event15DNS = currentData.event15DNS === true;
+  
+  const isSeasonComplete = event15Complete || event14DNS || event15DNS;
+  
+  // If season is already marked complete, skip
+  if (currentData.season1Complete === true) {
+    return;
+  }
+  
+  // If season is not yet complete, skip
+  if (!isSeasonComplete) {
+    return;
+  }
+  
+  console.log('🏆 Season 1 is now COMPLETE for this user!');
+  
+  // Get all users' season 1 standings to determine season podium
+  const usersSnapshot = await db.collection('users').get();
+  const allStandings = [];
+  
+  usersSnapshot.forEach(doc => {
+    const user = doc.data();
+    if (user.season1Standings && user.season1Standings.length > 0) {
+      allStandings.push({
+        uid: user.uid,
+        name: user.name,
+        totalPoints: user.totalPoints || 0
+      });
+    }
+  });
+  
+  // Sort by points descending
+  allStandings.sort((a, b) => b.totalPoints - a.totalPoints);
+  
+  // Find user's rank
+  const userRank = allStandings.findIndex(u => u.uid === userData.uid) + 1;
+  
+  console.log(`   User's season rank: ${userRank}`);
+  
+  // Prepare season completion updates
+  const seasonUpdates = {
+    season1Complete: true,
+    season1CompletionDate: admin.firestore.FieldValue.serverTimestamp(),
+    season1Rank: userRank,
+    localTourStatus: event14DNS || event15DNS ? 'dnf' : 'completed',
+    currentSeason: 1 // For future use when season 2 launches
+  };
+  
+  // Award season podium trophies
+  if (userRank === 1) {
+    console.log('   🏆 SEASON CHAMPION! Awarding Season Champion trophy');
+    seasonUpdates['awards.seasonChampion'] = admin.firestore.FieldValue.increment(1);
+  } else if (userRank === 2) {
+    console.log('   🥈 SEASON RUNNER-UP! Awarding Season Runner-Up trophy');
+    seasonUpdates['awards.seasonRunnerUp'] = admin.firestore.FieldValue.increment(1);
+  } else if (userRank === 3) {
+    console.log('   🥉 SEASON THIRD PLACE! Awarding Season Third Place trophy');
+    seasonUpdates['awards.seasonThirdPlace'] = admin.firestore.FieldValue.increment(1);
+  }
+  
+  // Update user document with season completion
+  await userRef.update(seasonUpdates);
+}
 /**
  * Main processing function
  */
