@@ -108,6 +108,224 @@ function showPreRaceSections() {
 /**
  * Display GC (General Classification) results table
  */
+/**
+ * Display tour overview with progress and stage links
+ */
+async function displayTourOverview(eventNumber, userData, userUid) {
+    const tourStages = [13, 14, 15];
+    const tourName = "Local Tour";
+    
+    // Check which stages are completed
+    const completedStages = [];
+    for (const stage of tourStages) {
+        if (userData[`event${stage}Results`]) {
+            completedStages.push(stage);
+        }
+    }
+    
+    const currentStageIndex = tourStages.indexOf(eventNumber);
+    const progress = completedStages.length;
+    
+    let html = `
+        <div class="tour-overview-section">
+            <h3 class="tour-title">
+                <span class="tour-icon">🏆</span>
+                ${tourName} - Progress
+            </h3>
+            <p class="tour-subtitle">${progress} of 3 stages completed</p>
+            
+            <div class="tour-stages-grid">
+    `;
+    
+    // Display each stage
+    for (let i = 0; i < tourStages.length; i++) {
+        const stage = tourStages[i];
+        const isCompleted = completedStages.includes(stage);
+        const isCurrent = stage === eventNumber;
+        const stageResults = userData[`event${stage}Results`];
+        
+        html += `
+            <div class="tour-stage-card ${isCompleted ? 'completed' : 'upcoming'} ${isCurrent ? 'current' : ''}">
+                <div class="stage-header">
+                    <div class="stage-number">Stage ${i + 1}</div>
+                    <div class="stage-event">Event ${stage}</div>
+                </div>
+                <div class="stage-name">${window.eventData?.[stage]?.name || `Event ${stage}`}</div>
+                
+                ${isCompleted ? `
+                    <div class="stage-result">
+                        <div class="result-item">
+                            <span class="result-label">Position</span>
+                            <span class="result-value">${stageResults.position}${getOrdinalSuffix(stageResults.position)}</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Time</span>
+                            <span class="result-value">${formatTime(stageResults.time)}</span>
+                        </div>
+                    </div>
+                    ${stage !== eventNumber ? `
+                        <a href="event-detail.html?id=${stage}" class="stage-link-btn">View Results</a>
+                    ` : `
+                        <div class="stage-current-badge">Current</div>
+                    `}
+                ` : `
+                    <div class="stage-status">
+                        <span class="status-icon">⏳</span>
+                        <span class="status-text">Not Started</span>
+                    </div>
+                `}
+            </div>
+        `;
+    }
+    
+    html += `
+            </div>
+        </div>
+    `;
+    
+    return html;
+}
+
+/**
+ * Generate tour completion story for after all 3 stages
+ */
+function generateTourCompletionStory(userData, gcResults) {
+    if (!gcResults || !gcResults.standings) return '';
+    
+    const userResult = gcResults.standings.find(r => r.uid === userData.uid);
+    if (!userResult) return '';
+    
+    const gcPosition = userResult.gcPosition;
+    const totalRiders = gcResults.standings.length;
+    const gapToLeader = userResult.gapToLeader;
+    
+    // Get stage results
+    const stage1Result = userData.event13Results;
+    const stage2Result = userData.event14Results;
+    const stage3Result = userData.event15Results;
+    
+    let storyRecap = '';
+    let storyContext = '';
+    
+    // Different story based on GC performance
+    if (gcPosition === 1) {
+        storyRecap = `What a remarkable performance across all three stages! You dominated the Local Tour from start to finish, showcasing consistency and strength. `;
+        storyRecap += `Stage by stage, you built your advantage: ${getStagePerformanceText(stage1Result, stage2Result, stage3Result)}. `;
+        storyRecap += `Your cumulative time of ${formatGCTime(userResult.cumulativeTime)} was unbeatable, earning you the prestigious yellow jersey and the GC victory!`;
+        
+        storyContext = `This Local Tour win is a massive milestone in your career. The ability to perform across multiple consecutive days shows true stage racing prowess. `;
+        storyContext += `You've earned 50 bonus points for the overall GC victory, plus your stage points. This victory will boost your reputation and open doors to bigger opportunities!`;
+    } else if (gcPosition === 2) {
+        storyRecap = `A strong performance across the three-day Local Tour, earning you second place overall. `;
+        storyRecap += `${getStagePerformanceText(stage1Result, stage2Result, stage3Result)}. `;
+        storyRecap += `You finished just ${formatGCTime(gapToLeader)} behind the leader, showing you have what it takes to compete at this level.`;
+        
+        storyContext = `Second place in a multi-stage tour is an excellent result! You've earned 35 bonus points for your GC performance. `;
+        storyContext += `The consistency you showed across all three days proves you're developing into a serious stage racer. Keep building on this momentum!`;
+    } else if (gcPosition === 3) {
+        storyRecap = `You secured third place overall in the Local Tour, earning a spot on the final GC podium! `;
+        storyRecap += `${getStagePerformanceText(stage1Result, stage2Result, stage3Result)}. `;
+        storyRecap += `Finishing ${formatGCTime(gapToLeader)} down on the leader, you demonstrated solid stage racing ability.`;
+        
+        storyContext = `A podium finish in your first multi-stage tour is something to be proud of! You've earned 25 bonus points for third place in the GC. `;
+        storyContext += `This experience will serve you well as you continue to develop your stage racing skills and target even bigger goals.`;
+    } else if (gcPosition <= 10) {
+        storyRecap = `You finished the Local Tour in ${gcPosition}${getOrdinalSuffix(gcPosition)} place overall, a respectable result in a competitive field. `;
+        storyRecap += `${getStagePerformanceText(stage1Result, stage2Result, stage3Result)}. `;
+        storyRecap += `You finished ${formatGCTime(gapToLeader)} behind the race leader.`;
+        
+        storyContext = `Completing all three stages and finishing in the top 10 is a solid achievement. While you didn't make the GC podium this time, `;
+        storyContext += `you've gained valuable experience in multi-day racing. Analyze where you lost time and use this as motivation for future tours!`;
+    } else {
+        storyRecap = `You completed all three stages of the Local Tour, finishing ${gcPosition}${getOrdinalSuffix(gcPosition)} overall out of ${totalRiders} riders. `;
+        storyRecap += `${getStagePerformanceText(stage1Result, stage2Result, stage3Result)}. `;
+        storyRecap += `Every rider who completes a three-day tour has earned respect - consistency across multiple days is challenging!`;
+        
+        storyContext = `While you didn't challenge for the GC podium, you've completed your first multi-stage tour. This experience is invaluable. `;
+        storyContext += `Stage racing requires a different skillset than single-day events. Learn from this, work on your recovery between stages, and you'll improve!`;
+    }
+    
+    return `
+        <div class="tour-completion-story">
+            <div class="story-header">
+                <h3>🏁 Local Tour Complete - Final GC Review</h3>
+            </div>
+            <div class="story-section">
+                <h4>Tour Performance</h4>
+                <p>${storyRecap}</p>
+            </div>
+            <div class="story-section">
+                <h4>Looking Ahead</h4>
+                <p>${storyContext}</p>
+            </div>
+        </div>
+    `;
+}
+
+/**
+ * Get text describing performance across stages
+ */
+function getStagePerformanceText(stage1, stage2, stage3) {
+    const positions = [stage1.position, stage2.position, stage3.position];
+    const bestStage = Math.min(...positions);
+    const bestStageNum = positions.indexOf(bestStage) + 1;
+    
+    let text = '';
+    
+    if (bestStage === 1) {
+        text += `You won stage ${bestStageNum}, showing your winning capability. `;
+    } else if (bestStage <= 3) {
+        text += `You finished on the podium in stage ${bestStageNum}, demonstrating strong form. `;
+    } else if (bestStage <= 10) {
+        text += `Your best stage was a ${bestStage}${getOrdinalSuffix(bestStage)} place finish in stage ${bestStageNum}. `;
+    }
+    
+    // Check consistency
+    const maxPos = Math.max(...positions);
+    const minPos = Math.min(...positions);
+    const variance = maxPos - minPos;
+    
+    if (variance <= 3) {
+        text += `Your consistent performance across all three stages (positions ${positions.join(', ')}) was key to your GC result`;
+    } else if (variance <= 10) {
+        text += `With stage finishes of ${positions.join(', ')}, you showed decent consistency`;
+    } else {
+        text += `Your stage results varied (${positions.join(', ')}), showing some ups and downs`;
+    }
+    
+    return text;
+}
+
+/**
+ * Format GC time (hours, minutes, seconds)
+ */
+function formatGCTime(seconds) {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = Math.floor(seconds % 60);
+    
+    if (hours > 0) {
+        return `${hours}h ${minutes}m ${secs}s`;
+    } else {
+        return `${minutes}m ${secs}s`;
+    }
+}
+
+/**
+ * Get ordinal suffix (1st, 2nd, 3rd, etc.)
+ */
+function getOrdinalSuffix(num) {
+    const j = num % 10;
+    const k = num % 100;
+    if (j === 1 && k !== 11) return 'st';
+    if (j === 2 && k !== 12) return 'nd';
+    if (j === 3 && k !== 13) return 'rd';
+    return 'th';
+}
+
+/**
+ * Display GC (General Classification) results for tour events
+ */
 async function displayGCResults(gcData, currentUserUid, eventNumber) {
     if (!gcData || !gcData.standings || gcData.standings.length === 0) {
         return '';
@@ -320,7 +538,20 @@ async function loadEventResults() {
         }
 
         // Build results table
-        let tableHTML = storyHTML + `
+        let tableHTML = '';
+        
+        // Add tour overview if this is a tour event
+        if (eventNumber === 13 || eventNumber === 14 || eventNumber === 15) {
+            tableHTML += await displayTourOverview(eventNumber, userData, userUid);
+        }
+        
+        // Add tour completion story ONLY for event 15 (after all 3 stages)
+        if (eventNumber === 15 && userEventResults?.gcResults) {
+            tableHTML += generateTourCompletionStory(userData, userEventResults.gcResults);
+        }
+        
+        // Add regular race story
+        tableHTML += storyHTML + `
             <div class="results-table-container">
                 <div class="results-table-wrapper">
                     <table class="results-table">

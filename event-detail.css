@@ -905,3 +905,246 @@
         text-align: left;
     }
 }
+
+/* ===== TOUR OVERVIEW SECTION ===== */
+.tour-overview-section {
+    margin: 3rem 0;
+    padding: 2.5rem;
+    background: linear-gradient(135deg, rgba(69, 202, 255, 0.05), rgba(255, 27, 107, 0.05));
+    border-radius: 16px;
+    border: 2px solid rgba(69, 202, 255, 0.2);
+}
+
+.tour-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.75rem;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.tour-icon {
+    font-size: 2rem;
+}
+
+.tour-subtitle {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+}
+
+.tour-stages-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+}
+
+.tour-stage-card {
+    background: var(--dark-card);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.tour-stage-card.completed {
+    border-color: var(--accent-blue);
+    background: linear-gradient(135deg, rgba(69, 202, 255, 0.1), rgba(255, 27, 107, 0.05));
+}
+
+.tour-stage-card.current {
+    border-color: var(--accent-pink);
+    box-shadow: 0 0 20px rgba(255, 27, 107, 0.3);
+}
+
+.tour-stage-card.upcoming {
+    opacity: 0.6;
+}
+
+.stage-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.stage-number {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    font-weight: 700;
+}
+
+.stage-event {
+    font-size: 0.875rem;
+    color: var(--accent-blue);
+    font-weight: 600;
+}
+
+.stage-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 1.5rem;
+    min-height: 2.5rem;
+}
+
+.stage-result {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.result-item {
+    text-align: center;
+}
+
+.result-label {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.5rem;
+}
+
+.result-value {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.stage-link-btn {
+    display: block;
+    width: 100%;
+    padding: 0.75rem;
+    background: var(--accent-blue);
+    color: var(--dark-bg);
+    text-align: center;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.stage-link-btn:hover {
+    background: var(--text-primary);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(69, 202, 255, 0.4);
+}
+
+.stage-current-badge {
+    padding: 0.75rem;
+    background: rgba(255, 27, 107, 0.2);
+    color: var(--accent-pink);
+    text-align: center;
+    border-radius: 8px;
+    font-weight: 700;
+    border: 1px solid var(--accent-pink);
+}
+
+.stage-status {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 2rem 1rem;
+}
+
+.status-icon {
+    font-size: 2.5rem;
+    opacity: 0.5;
+}
+
+.status-text {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* ===== TOUR COMPLETION STORY ===== */
+.tour-completion-story {
+    margin: 3rem 0;
+    padding: 2.5rem;
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(69, 202, 255, 0.05));
+    border-radius: 16px;
+    border: 2px solid rgba(255, 215, 0, 0.3);
+}
+
+.story-header h3 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.75rem;
+    color: var(--text-primary);
+    margin-bottom: 2rem;
+}
+
+.tour-completion-story .story-section {
+    margin-bottom: 2rem;
+}
+
+.tour-completion-story .story-section:last-child {
+    margin-bottom: 0;
+}
+
+.tour-completion-story .story-section h4 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--accent-blue);
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.tour-completion-story .story-section p {
+    font-size: 1.1rem;
+    line-height: 1.9;
+    color: var(--text-primary);
+}
+
+/* ===== RESPONSIVE TOUR STYLES ===== */
+@media (max-width: 1024px) {
+    .tour-stages-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+    
+    .tour-stage-card {
+        max-width: 500px;
+        margin: 0 auto;
+    }
+}
+
+@media (max-width: 768px) {
+    .tour-overview-section,
+    .tour-completion-story {
+        padding: 1.5rem;
+        margin: 2rem 0;
+    }
+    
+    .tour-title {
+        font-size: 1.5rem;
+    }
+    
+    .tour-subtitle {
+        font-size: 1rem;
+    }
+    
+    .stage-result {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .result-value {
+        font-size: 1.25rem;
+    }
+    
+    .tour-completion-story .story-section p {
+        font-size: 1rem;
+        line-height: 1.7;
+    }
+}
