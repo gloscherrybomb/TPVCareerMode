@@ -499,7 +499,16 @@ function displayAwards(awards) {
         technicalIssues: awards.technicalIssues || 0,
         gcGoldMedal: awards.gcGold || 0,
         gcSilverMedal: awards.gcSilver || 0,
-        gcBronzeMedal: awards.gcBronze || 0
+        gcBronzeMedal: awards.gcBronze || 0,
+        seasonChampion: awards.seasonChampion || 0,
+        seasonRunnerUp: awards.seasonRunnerUp || 0,
+        seasonThirdPlace: awards.seasonThirdPlace || 0,
+        perfectSeason: awards.perfectSeason || 0,
+        podiumStreak: awards.podiumStreak || 0,
+        ironMan: awards.ironMan || 0,
+        specialist: awards.specialist || 0,
+        allRounder: awards.allRounder || 0,
+        comeback: awards.comeback || 0
     };
     
     // Use mapped awards for the rest of the function
@@ -513,7 +522,10 @@ function displayAwards(awards) {
                         (awards.overrated || 0) + (awards.darkHorse || 0) + (awards.backToBack || 0) +
                         (awards.weekendWarrior || 0) + (awards.zeroToHero || 0) + 
                         (awards.trophyCollector || 0) + (awards.technicalIssues || 0) +
-                        (awards.gcGoldMedal || 0) + (awards.gcSilverMedal || 0) + (awards.gcBronzeMedal || 0);
+                        (awards.gcGoldMedal || 0) + (awards.gcSilverMedal || 0) + (awards.gcBronzeMedal || 0) +
+                        (awards.seasonChampion || 0) + (awards.seasonRunnerUp || 0) + (awards.seasonThirdPlace || 0) +
+                        (awards.perfectSeason || 0) + (awards.podiumStreak || 0) + (awards.ironMan || 0) +
+                        (awards.specialist || 0) + (awards.allRounder || 0) + (awards.comeback || 0);
     
     if (totalAwards === 0) {
         container.innerHTML = `
@@ -596,6 +608,44 @@ function displayAwards(awards) {
                 <div class="award-count">${awards.gcBronzeMedal}x</div>
                 <div class="award-title">GC Third</div>
                 <div class="award-description">Tour Overall 3rd Place</div>
+            </div>
+        `;
+    }
+    
+    // SEASON OVERALL TROPHIES (Most Prestigious!)
+    
+    // Season Champion (1st place in season standings)
+    if (awards.seasonChampion > 0) {
+        html += `
+            <div class="award-card season-champion">
+                <div class="award-icon">🏆</div>
+                <div class="award-count">${awards.seasonChampion}x</div>
+                <div class="award-title">Season Champion</div>
+                <div class="award-description">1st Place Overall Season Standings</div>
+            </div>
+        `;
+    }
+    
+    // Season Runner-Up (2nd place in season standings)
+    if (awards.seasonRunnerUp > 0) {
+        html += `
+            <div class="award-card season-runnerup">
+                <div class="award-icon">🥈</div>
+                <div class="award-count">${awards.seasonRunnerUp}x</div>
+                <div class="award-title">Season Runner-Up</div>
+                <div class="award-description">2nd Place Overall Season Standings</div>
+            </div>
+        `;
+    }
+    
+    // Season Third Place (3rd place in season standings)
+    if (awards.seasonThirdPlace > 0) {
+        html += `
+            <div class="award-card season-third">
+                <div class="award-icon">🥉</div>
+                <div class="award-count">${awards.seasonThirdPlace}x</div>
+                <div class="award-title">Season Third Place</div>
+                <div class="award-description">3rd Place Overall Season Standings</div>
             </div>
         `;
     }
@@ -778,6 +828,80 @@ function displayAwards(awards) {
                 <div class="award-count">${awards.technicalIssues}x</div>
                 <div class="award-title">Technical Issues</div>
                 <div class="award-description">3+ DNFs</div>
+            </div>
+        `;
+    }
+    
+    // NEW SPECIAL AWARDS
+    
+    // Perfect Season (win every event)
+    if (awards.perfectSeason > 0) {
+        html += `
+            <div class="award-card perfect-season">
+                <div class="award-icon">💯</div>
+                <div class="award-count">${awards.perfectSeason}x</div>
+                <div class="award-title">Perfect Season</div>
+                <div class="award-description">Won Every Event in a Season</div>
+            </div>
+        `;
+    }
+    
+    // Podium Streak (5+ consecutive top 3 finishes)
+    if (awards.podiumStreak > 0) {
+        html += `
+            <div class="award-card podium-streak">
+                <div class="award-icon">📈</div>
+                <div class="award-count">${awards.podiumStreak}x</div>
+                <div class="award-title">Podium Streak</div>
+                <div class="award-description">5+ Consecutive Top 3 Finishes</div>
+            </div>
+        `;
+    }
+    
+    // Iron Rider (complete all 15 events)
+    if (awards.ironMan > 0) {
+        html += `
+            <div class="award-card iron-rider">
+                <div class="award-icon">💪</div>
+                <div class="award-count">${awards.ironMan}x</div>
+                <div class="award-title">Iron Rider</div>
+                <div class="award-description">Completed All 15 Events in a Season</div>
+            </div>
+        `;
+    }
+    
+    // Specialist (win 3+ of same type)
+    if (awards.specialist > 0) {
+        html += `
+            <div class="award-card specialist">
+                <div class="award-icon">⭐</div>
+                <div class="award-count">${awards.specialist}x</div>
+                <div class="award-title">Specialist</div>
+                <div class="award-description">Won 3+ Events of Same Type</div>
+            </div>
+        `;
+    }
+    
+    // All-Rounder (win 5+ different event types)
+    if (awards.allRounder > 0) {
+        html += `
+            <div class="award-card all-rounder">
+                <div class="award-icon">🌟</div>
+                <div class="award-count">${awards.allRounder}x</div>
+                <div class="award-title">All-Rounder</div>
+                <div class="award-description">Won 5+ Different Event Types</div>
+            </div>
+        `;
+    }
+    
+    // Comeback Kid (top 5 after bottom half)
+    if (awards.comeback > 0) {
+        html += `
+            <div class="award-card comeback">
+                <div class="award-icon">🔄</div>
+                <div class="award-count">${awards.comeback}x</div>
+                <div class="award-title">Comeback Kid</div>
+                <div class="award-description">Top 5 After Bottom Half Finish</div>
             </div>
         `;
     }

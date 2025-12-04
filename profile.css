@@ -425,6 +425,147 @@
     box-shadow: 0 10px 30px rgba(255, 69, 0, 0.3);
 }
 
+/* GC Trophy Awards */
+.award-card.gc-gold {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.15) 0%, rgba(255, 215, 0, 0.05) 100%);
+    border-color: rgba(255, 215, 0, 0.4);
+}
+
+.award-card.gc-gold:hover {
+    border-color: rgb(255, 215, 0);
+    box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3);
+}
+
+.award-card.gc-silver {
+    background: linear-gradient(135deg, rgba(192, 192, 192, 0.15) 0%, rgba(192, 192, 192, 0.05) 100%);
+    border-color: rgba(192, 192, 192, 0.4);
+}
+
+.award-card.gc-silver:hover {
+    border-color: rgb(192, 192, 192);
+    box-shadow: 0 10px 30px rgba(192, 192, 192, 0.3);
+}
+
+.award-card.gc-bronze {
+    background: linear-gradient(135deg, rgba(205, 127, 50, 0.15) 0%, rgba(205, 127, 50, 0.05) 100%);
+    border-color: rgba(205, 127, 50, 0.4);
+}
+
+.award-card.gc-bronze:hover {
+    border-color: rgb(205, 127, 50);
+    box-shadow: 0 10px 30px rgba(205, 127, 50, 0.3);
+}
+
+/* Season Overall Trophy Awards - Extra Special! */
+.award-card.season-champion {
+    background: linear-gradient(135deg, rgba(0, 255, 136, 0.2) 0%, rgba(255, 215, 0, 0.15) 100%);
+    border: 2px solid rgba(255, 215, 0, 0.5);
+    box-shadow: 0 8px 25px rgba(255, 215, 0, 0.3);
+}
+
+.award-card.season-champion:hover {
+    border-color: rgb(255, 215, 0);
+    box-shadow: 0 12px 40px rgba(255, 215, 0, 0.5);
+    transform: translateY(-8px) scale(1.02);
+}
+
+.award-card.season-champion .award-icon {
+    font-size: 4rem;
+    animation: trophyGlow 2s ease-in-out infinite;
+}
+
+@keyframes trophyGlow {
+    0%, 100% {
+        filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.5));
+    }
+    50% {
+        filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.8));
+    }
+}
+
+.award-card.season-runnerup {
+    background: linear-gradient(135deg, rgba(192, 192, 192, 0.2) 0%, rgba(192, 192, 192, 0.1) 100%);
+    border: 2px solid rgba(192, 192, 192, 0.5);
+}
+
+.award-card.season-runnerup:hover {
+    border-color: rgb(192, 192, 192);
+    box-shadow: 0 10px 35px rgba(192, 192, 192, 0.4);
+    transform: translateY(-6px) scale(1.02);
+}
+
+.award-card.season-third {
+    background: linear-gradient(135deg, rgba(205, 127, 50, 0.2) 0%, rgba(205, 127, 50, 0.1) 100%);
+    border: 2px solid rgba(205, 127, 50, 0.5);
+}
+
+.award-card.season-third:hover {
+    border-color: rgb(205, 127, 50);
+    box-shadow: 0 10px 35px rgba(205, 127, 50, 0.4);
+    transform: translateY(-6px) scale(1.02);
+}
+
+/* Special Achievement Awards */
+.award-card.perfect-season {
+    background: linear-gradient(135deg, rgba(138, 43, 226, 0.2) 0%, rgba(255, 215, 0, 0.15) 100%);
+    border: 2px solid rgba(138, 43, 226, 0.5);
+}
+
+.award-card.perfect-season:hover {
+    border-color: rgb(138, 43, 226);
+    box-shadow: 0 10px 35px rgba(138, 43, 226, 0.4);
+}
+
+.award-card.podium-streak {
+    background: linear-gradient(135deg, rgba(0, 191, 255, 0.15) 0%, rgba(0, 191, 255, 0.05) 100%);
+    border-color: rgba(0, 191, 255, 0.4);
+}
+
+.award-card.podium-streak:hover {
+    border-color: rgb(0, 191, 255);
+    box-shadow: 0 10px 30px rgba(0, 191, 255, 0.3);
+}
+
+.award-card.iron-rider {
+    background: linear-gradient(135deg, rgba(169, 169, 169, 0.15) 0%, rgba(105, 105, 105, 0.05) 100%);
+    border-color: rgba(169, 169, 169, 0.4);
+}
+
+.award-card.iron-rider:hover {
+    border-color: rgb(169, 169, 169);
+    box-shadow: 0 10px 30px rgba(169, 169, 169, 0.3);
+}
+
+.award-card.specialist {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.15) 0%, rgba(255, 140, 0, 0.05) 100%);
+    border-color: rgba(255, 215, 0, 0.4);
+}
+
+.award-card.specialist:hover {
+    border-color: rgb(255, 215, 0);
+    box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3);
+}
+
+.award-card.all-rounder {
+    background: linear-gradient(135deg, rgba(0, 255, 136, 0.15) 0%, rgba(0, 204, 255, 0.05) 100%);
+    border-color: rgba(0, 255, 136, 0.4);
+}
+
+.award-card.all-rounder:hover {
+    border-color: rgb(0, 255, 136);
+    box-shadow: 0 10px 30px rgba(0, 255, 136, 0.3);
+}
+
+.award-card.comeback {
+    background: linear-gradient(135deg, rgba(50, 205, 50, 0.15) 0%, rgba(50, 205, 50, 0.05) 100%);
+    border-color: rgba(50, 205, 50, 0.4);
+}
+
+.award-card.comeback:hover {
+    border-color: rgb(50, 205, 50);
+    box-shadow: 0 10px 30px rgba(50, 205, 50, 0.3);
+}
+
 .award-icon {
     font-size: 3.5rem;
     margin-bottom: 0.5rem;

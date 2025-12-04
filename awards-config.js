@@ -198,6 +198,50 @@ const AWARD_DEFINITIONS = {
     icon: '🥉',
     description: 'Finish 3rd in overall season standings',
     calculationType: 'season'
+  },
+  
+  // Fun/Special Awards
+  perfectSeason: {
+    id: 'perfectSeason',
+    title: 'Perfect Season',
+    icon: '💯',
+    description: 'Win every event in a season',
+    calculationType: 'season'
+  },
+  podiumStreak: {
+    id: 'podiumStreak',
+    title: 'Podium Streak',
+    icon: '📈',
+    description: 'Finish top 3 in 5+ consecutive races',
+    calculationType: 'career'
+  },
+  ironMan: {
+    id: 'ironMan',
+    title: 'Iron Rider',
+    icon: '💪',
+    description: 'Complete all 15 events in a season',
+    calculationType: 'season'
+  },
+  specialist: {
+    id: 'specialist',
+    title: 'Specialist',
+    icon: '⭐',
+    description: 'Win 3+ events of the same type',
+    calculationType: 'career'
+  },
+  allRounder: {
+    id: 'allRounder',
+    title: 'All-Rounder',
+    icon: '🌟',
+    description: 'Win at least one event of 5+ different types',
+    calculationType: 'career'
+  },
+  comeback: {
+    id: 'comeback',
+    title: 'Comeback Kid',
+    icon: '🔄',
+    description: 'Finish top 5 after being bottom half in previous race',
+    calculationType: 'event'
   }
 };
 
