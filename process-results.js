@@ -136,6 +136,35 @@ function parseEventPath(filePath) {
   };
 }
 
+/**
+ * Extract timestamp from filename if present
+ * Pattern: _YYYYMMDD_HHMMSS.csv
+ * Example: results_20241204_103045.csv -> 2024-12-04T10:30:45.000Z
+ * Returns null if no timestamp found
+ */
+function extractTimestampFromFilename(filePath) {
+  const match = filePath.match(/_(\d{8})_(\d{6})\.csv$/);
+  if (!match) {
+    return null;
+  }
+  
+  const dateStr = match[1]; // YYYYMMDD
+  const timeStr = match[2]; // HHMMSS
+  
+  const year = dateStr.substring(0, 4);
+  const month = dateStr.substring(4, 6);
+  const day = dateStr.substring(6, 8);
+  const hour = timeStr.substring(0, 2);
+  const minute = timeStr.substring(2, 4);
+  const second = timeStr.substring(4, 6);
+  
+  // Construct ISO string and parse
+  const isoString = `${year}-${month}-${day}T${hour}:${minute}:${second}Z`;
+  const timestamp = new Date(isoString);
+  
+  return timestamp.getTime();
+}
+
 // Event maximum points lookup (from Career Mode spreadsheet)
 const EVENT_MAX_POINTS = {
   1: 65,   // Coast and Roast Crit
@@ -1426,31 +1455,48 @@ async function updateResultsSummary(season, event, results, userUid) {
 async function processResults(csvFiles) {
   console.log(`Processing ${csvFiles.length} CSV file(s)...`);
   
-  // Sort files by modification time (chronological order) to process in the correct sequence
-  // This is important when multiple files are uploaded at once
+  // Sort files by timestamp - prefer filename timestamp over file modification time
+  // This is important when files are copied and lose their original modification times
   const filesWithStats = csvFiles.map(filePath => {
+    // First, try to extract timestamp from filename
+    const filenameTimestamp = extractTimestampFromFilename(filePath);
+    
+    if (filenameTimestamp) {
+      return {
+        path: filePath,
+        timestamp: filenameTimestamp,
+        source: 'filename'
+      };
+    }
+    
+    // Fall back to file modification time
     try {
       const stats = fs.statSync(filePath);
       return {
         path: filePath,
-        modifiedTime: stats.mtime.getTime()
+        timestamp: stats.mtime.getTime(),
+        source: 'file_modified'
       };
     } catch (error) {
       console.error(`⚠️  Could not stat file ${filePath}:`, error.message);
       return {
         path: filePath,
-        modifiedTime: 0 // If stat fails, process first
+        timestamp: 0, // If both fail, process first
+        source: 'none'
       };
     }
   });
   
-  // Sort by modification time (oldest first)
-  filesWithStats.sort((a, b) => a.modifiedTime - b.modifiedTime);
+  // Sort by timestamp (oldest first)
+  filesWithStats.sort((a, b) => a.timestamp - b.timestamp);
   
-  console.log('Processing order (by file timestamp):');
+  console.log('Processing order (by timestamp):');
   filesWithStats.forEach((file, index) => {
-    const date = new Date(file.modifiedTime);
-    console.log(`  ${index + 1}. ${file.path} (${date.toISOString()})`);
+    const date = new Date(file.timestamp);
+    const sourceLabel = file.source === 'filename' ? '📅 filename' : 
+                        file.source === 'file_modified' ? '📁 file modified' : 
+                        '⚠️  no timestamp';
+    console.log(`  ${index + 1}. ${file.path} (${date.toISOString()}) [${sourceLabel}]`);
   });
   console.log('');
   
