@@ -322,7 +322,7 @@ async function calculateGC(season, userUid, upToEvent = 15) {
   // Check which stages are available
   const availableResults = [];
   stageDocs.forEach((doc, index) => {
-    if (doc.exists()) {
+    if (doc.exists) {
       availableResults.push({
         stageNumber: stageNumbers[index],
         results: doc.data().results || []
