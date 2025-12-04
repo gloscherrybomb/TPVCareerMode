@@ -1150,27 +1150,34 @@ async function buildSeasonStandings(results, userData, eventNumber, currentUid) 
     
     const botStanding = standingsMap.get(botName);
     
-    // Calculate total points for all completed events (recalculate from scratch)
-    // This ensures bot points are always accurate, not accumulated
-    let totalPoints = 0;
+    // IMPORTANT: Reset bot points to 0 before recalculating
+    // This prevents accumulation bug where points were inflated from previous runs
+    botStanding.points = 0;
+    
+    // Recalculate points from ALL completed events
     let simulatedEvents = 0;
     
     for (const eventNum of completedEventNumbers) {
       if (botInfo.actualEvents.has(eventNum)) {
-        // Bot actually participated - use their real points from that event
-        const eventData = botInfo.actualEvents.get(eventNum);
-        totalPoints += eventData.points || 0;
+        // Bot actually participated - their points are stored in the standings from CSV processing above
+        // We need to recalculate from the result itself
+        const eventResultsDoc = await getDoc(doc(db, 'results', `season1_event${eventNum}`));
+        if (eventResultsDoc.exists()) {
+          const eventResults = eventResultsDoc.data().results || [];
+          const botResult = eventResults.find(r => r.name === botName);
+          if (botResult && botResult.points) {
+            botStanding.points += botResult.points;
+          }
+        }
       } else {
         // Bot didn't participate in this event, simulate it
         const simulatedPosition = simulatePosition(botName, botInfo.arr, eventNum);
         const points = calculatePoints(simulatedPosition, eventNum).points; // Base points only, no bonus
-        totalPoints += points;
+        botStanding.points += points;
         simulatedEvents++;
       }
     }
     
-    // Set bot standing with recalculated total (not +=, use =)
-    botStanding.points = totalPoints;
     botStanding.events = completedEventNumbers.length; // Count of events user has completed
     botStanding.simulatedEvents = simulatedEvents; // Track how many were simulated
   }
