@@ -366,7 +366,7 @@
                 return eventToStage[eventId] || `Event ${eventId}`;
             }
 
-            const stageLabel = getStageLabel(eventNumber);
+            const stageLabel = getStageLabel(parseInt(eventId));
 
             // Update breadcrumb
             document.querySelector('.breadcrumb').innerHTML = `
