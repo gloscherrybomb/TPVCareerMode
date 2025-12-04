@@ -288,6 +288,22 @@ async function resetUserData(userRef, userData, season) {
     if (userData[key]) {
       updates[key] = admin.firestore.FieldValue.delete();
     }
+    
+    // Also delete from /results collection
+    if (!options.dryRun) {
+      const resultsDocId = `season${season}_event${i}_${userData.uid}`;
+      try {
+        await db.collection('results').doc(resultsDocId).delete();
+        console.log(`  Deleted results doc: ${resultsDocId}`);
+      } catch (error) {
+        // Document might not exist, that's okay
+      }
+    }
+  }
+  
+  // Clear GC results (tour-specific)
+  if (userData.gcResults) {
+    updates.gcResults = admin.firestore.FieldValue.delete();
   }
   
   // Reset progress fields

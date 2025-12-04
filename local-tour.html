@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Local Tour - TPV Career Mode</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="tpv-team-car.png">
+    <link rel="apple-touch-icon" href="tpv-team-car.png">
+    
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="local-tour.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <span class="logo-text">TPV</span>
+                <span class="logo-subtitle">Career Mode</span>
+            </div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="events.html" class="nav-link">Season</a>
+                <a href="standings.html" class="nav-link">Standings</a>
+                <a href="peloton.html" class="nav-link">Peloton</a>
+                <a href="profile.html" class="nav-link">Profile</a>
+                <a href="#" class="nav-link nav-login" id="loginBtn">Login</a>
+                <a href="#" class="nav-link nav-logout" id="logoutBtn" style="display: none;">Logout</a>
+            </div>
+            <button class="nav-toggle" id="navToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="page-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="breadcrumb">
+                    <a href="index.html">Home</a> / <a href="events.html">Season</a> / Local Tour
+                </div>
+                <h1 class="page-title">🏆 Local Tour</h1>
+                <p class="page-subtitle">Three-day stage race testing consistency and tactics</p>
+            </div>
+        </div>
+    </div>
+
+    <section class="tour-content">
+        <div class="container">
+            <!-- Tour Introduction -->
+            <div class="tour-intro-section">
+                <div class="tour-intro-icon">🚴</div>
+                <div class="tour-intro-text">
+                    <h2>Welcome to the Local Tour</h2>
+                    <p>The Local Tour is a three-day stage race that tests everything: endurance, tactics, consistency, and mental fortitude. Each stage presents unique challenges, and overall success requires performing well across all disciplines.</p>
+                    
+                    <p>This is where you learn what it takes to race over multiple days—managing fatigue, maintaining focus, and adapting to different race situations. It's the crown jewel of the local calendar.</p>
+                    
+                    <div class="tour-rules">
+                        <h3>⏱️ Important: 24-Hour Timing Rules</h3>
+                        <ul>
+                            <li><strong>Stage 2</strong> must be completed within 24 hours of completing Stage 1</li>
+                            <li><strong>Stage 3</strong> must be completed within 24 hours of completing Stage 2</li>
+                            <li>Missing the 24-hour window results in DNS (Did Not Start) for that stage</li>
+                            <li>Plan your schedule carefully to complete all three stages within the timeframes</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stage Cards -->
+            <div class="stages-section">
+                <h2 class="section-title">Tour Stages</h2>
+                <p class="section-subtitle" id="stagesProgress">Loading progress...</p>
+                
+                <div class="stages-grid" id="stagesGrid">
+                    <!-- Stage cards will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- GC Standings -->
+            <div class="gc-section" id="gcSection" style="display: none;">
+                <div class="gc-header-banner">
+                    <div class="gc-header-icon">🏆</div>
+                    <div class="gc-header-content">
+                        <h2 class="gc-section-title">GENERAL CLASSIFICATION</h2>
+                        <p class="gc-description" id="gcDescription">Overall standings based on cumulative time</p>
+                    </div>
+                </div>
+                
+                <div class="results-table-wrapper" id="gcTableContainer">
+                    <!-- GC table will be populated by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Firebase and App Scripts -->
+    <script type="module" src="app.js"></script>
+    <script src="event-data.js"></script>
+    <script type="module" src="local-tour.js"></script>
+</body>
+</html>

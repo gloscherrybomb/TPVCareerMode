@@ -104,15 +104,9 @@ async function showPreRaceSections(userData, userUid) {
         }
     });
     
-    // Add tour overview for tour events (13, 14, 15) even before completion
-    if ((eventNumber === 13 || eventNumber === 14 || eventNumber === 15) && userData && userUid) {
-        const tourOverviewHTML = await displayTourOverview(eventNumber, userData, userUid);
-        
-        // Insert tour overview before the event story section
-        const eventStorySection = document.querySelector('.event-story');
-        if (eventStorySection && tourOverviewHTML) {
-            eventStorySection.insertAdjacentHTML('beforebegin', tourOverviewHTML);
-        }
+    // Add "Back to Local Tour" button for tour events (13, 14, 15)
+    if (eventNumber === 13 || eventNumber === 14 || eventNumber === 15) {
+        addBackToTourButton();
     }
     
     // Add tour timing warning for multi-stage events
@@ -122,6 +116,31 @@ async function showPreRaceSections(userData, userUid) {
 /**
  * Display GC (General Classification) results table
  */
+/**
+ * Add back to Local Tour button
+ */
+function addBackToTourButton() {
+    // Check if button already exists
+    if (document.querySelector('.back-to-tour-button')) {
+        return;
+    }
+    
+    const buttonHTML = `
+        <div class="back-to-tour-button">
+            <a href="local-tour.html" class="back-button">
+                <span class="back-icon">←</span>
+                <span>Back to Local Tour</span>
+            </a>
+        </div>
+    `;
+    
+    // Insert at the top of the main content
+    const mainContent = document.querySelector('.page-header');
+    if (mainContent) {
+        mainContent.insertAdjacentHTML('afterend', buttonHTML);
+    }
+}
+
 /**
  * Display tour overview with progress and stage links
  */
@@ -459,8 +478,14 @@ async function displayGCResults(gcData, currentUserUid, eventNumber) {
     
     let html = `
         <div class="gc-results-section ${isProvisional ? 'provisional' : 'final'}">
-            <h3 class="gc-title">${title}</h3>
-            <p class="gc-description">${description}</p>
+            <div class="gc-header-banner">
+                <div class="gc-header-icon">🏆</div>
+                <div class="gc-header-content">
+                    <h2 class="gc-section-title">LOCAL TOUR GENERAL CLASSIFICATION</h2>
+                    <h3 class="gc-title">${title}</h3>
+                    <p class="gc-description">${description}</p>
+                </div>
+            </div>
             <div class="results-table-wrapper">
                 <table class="results-table gc-table">
                     <thead>
@@ -630,9 +655,9 @@ async function loadEventResults() {
         // Build results table
         let tableHTML = '';
         
-        // Add tour overview if this is a tour event
+        // Add "Back to Local Tour" button for tour events
         if (eventNumber === 13 || eventNumber === 14 || eventNumber === 15) {
-            tableHTML += await displayTourOverview(eventNumber, userData, userUid);
+            addBackToTourButton();
         }
         
         // Add tour completion story ONLY for event 15 (after all 3 stages)

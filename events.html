@@ -432,7 +432,33 @@
                 return;
             }
             
+            // Helper function to calculate tour progress from user data
+            async function getTourProgress() {
+                if (!progressManager.currentUser) return { completed: 0, total: 3 };
+                
+                try {
+                    const { getFirestore, doc, getDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+                    const db = getFirestore();
+                    const userDoc = await getDoc(doc(db, 'users', progressManager.currentUser.uid));
+                    const userData = userDoc.data();
+                    
+                    // Count how many tour stages have results
+                    let completed = 0;
+                    if (userData?.event13Results) completed++;
+                    if (userData?.event14Results) completed++;
+                    if (userData?.event15Results) completed++;
+                    
+                    return { completed, total: 3 };
+                } catch (error) {
+                    console.error('Error getting tour progress:', error);
+                    return { completed: 0, total: 3 };
+                }
+            }
+            
             console.log('Mapping eventSequence with', eventSequence.length, 'stages');
+            
+            // Get tour progress first (async)
+            getTourProgress().then(tourProgress => {
             
             try {
                 eventsSequence.innerHTML = eventSequence.map((stage, index) => {
@@ -443,7 +469,7 @@
                     
                     console.log(`Rendering stage ${stage.stage}: status=${status}, isChoice=${isChoice}`);
                     
-                    if (isChoice) {
+                if (isChoice) {
                         // Choice stage
                         const selectedEventId = progressManager.getChoiceSelection(stage.stage);
                         const availableCount = progressManager.getAvailableOptionalEvents(stage.stage).length;
@@ -505,19 +531,10 @@
                     
                     // Check if this is the Local Tour (event 13-15)
                     const isTourEvent = stage.eventId >= 13 && stage.eventId <= 15;
-                    let tourProgress = '';
+                    let tourProgressBadge = '';
                     if (isTourEvent) {
-                        // Calculate tour progress using progressManager
-                        const tourStages = [13, 14, 15];
-                        const completedTourStages = tourStages.filter(id => {
-                            // Check if this event ID has been completed
-                            // progressManager.progress.completedStages contains stage numbers, not event IDs
-                            // We need to find which stages correspond to events 13-15
-                            // Event 13 is stage 9 in the sequence
-                            const stageNum = eventSequence.find(s => s.eventId === id)?.stage;
-                            return stageNum && progressManager.progress.completedStages.includes(stageNum);
-                        }).length;
-                        tourProgress = `<div class="tour-progress-badge">${completedTourStages} of 3 stages completed</div>`;
+                        // Use the tour progress from userData (already calculated above)
+                        tourProgressBadge = `<div class="tour-progress-badge">${tourProgress.completed} of 3 stages completed</div>`;
                     }
                     
                     return `
@@ -528,7 +545,7 @@
                                     <span class="stage-number-badge">Stage ${stage.stage}</span>
                                     <span class="stage-type-badge mandatory">Mandatory</span>
                                 </div>
-                                ${isTourEvent ? tourProgress : ''}
+                                ${isTourEvent ? tourProgressBadge : ''}
                                 <div class="event-image">
                                     <div class="event-image-placeholder">
                                         <span>${event.icon}</span>
@@ -553,8 +570,8 @@
                                     </div>
                                 </div>
                                 <div class="stage-card-footer">
-                                    ${!isLocked ? `<button class="btn btn-secondary btn-full" onclick="location.href='event-detail.html?id=${stage.eventId}'">View Details</button>` : ''}
-                                    ${isCompleted ? '<span class="completed-badge">✓ Completed</span>' : ''}
+                                    ${!isLocked ? `<button class="btn btn-secondary btn-full" onclick="location.href='${isTourEvent ? 'local-tour.html' : `event-detail.html?id=${stage.eventId}`}'">View Details</button>` : ''}
+                                    ${isCompleted && tourProgress.completed === 3 ? '<span class="completed-badge">✓ Completed</span>' : isCompleted && !isTourEvent ? '<span class="completed-badge">✓ Completed</span>' : ''}
                                 </div>
                                 ${isLocked ? '<div class="locked-overlay"><span>🔒</span><p>Complete previous stage to unlock</p></div>' : ''}
                             </div>
@@ -568,7 +585,8 @@
         } catch (error) {
             console.error('Error in renderEventSequence:', error);
         }
-    }
+            }); // End of getTourProgress().then()
+        }
 
         // Update progress stats
         async function updateProgressStats() {
