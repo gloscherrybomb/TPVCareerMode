@@ -46,7 +46,7 @@ function getOrdinalSuffix(num) {
 }
 
 /**
- * Load and display stage cards
+ * Load and display stage cards with completion status
  */
 async function loadStageCards() {
     if (!currentUser) {
@@ -59,9 +59,9 @@ async function loadStageCards() {
         const userData = userDoc.data();
 
         const stages = [
-            { eventNum: 13, name: "Stage 1: Figure of 8", route: "Figure of 8", distance: "35.2km", climbing: "174m" },
-            { eventNum: 14, name: "Stage 2: Loop the Loop", route: "Loop the Loop", distance: "27.3km", climbing: "169m" },
-            { eventNum: 15, name: "Stage 3: A Bit of Everything", route: "A Bit of Everything", distance: "28.1km", climbing: "471m" }
+            { eventNum: 13, stageLabel: "STAGE 1", name: "Stage 1: Figure of Eight", route: "Figure of Eight", distance: "35.2 km", climbing: "174 m", points: 120, description: "A flowing opener that sets the tone for the tour." },
+            { eventNum: 14, stageLabel: "STAGE 2", name: "Stage 2: Loop the Loop", route: "Loop the Loop", distance: "27.3 km", climbing: "169 m", points: 95, description: "Shorter and punchier with aggressive racing expected." },
+            { eventNum: 15, stageLabel: "STAGE 3", name: "Stage 3: A Bit of Everything", route: "A Bit of Everything", distance: "28.1 km", climbing: "471 m", points: 135, description: "The queen stage with significant climbing to decide the GC." }
         ];
 
         let completedCount = 0;
@@ -73,56 +73,68 @@ async function loadStageCards() {
             
             if (isCompleted) completedCount++;
 
-            let statusBadge = '';
-            let resultsSection = '';
-            let dnsSection = '';
-
+            let statusSection = '';
+            
             if (isDNS) {
-                statusBadge = '<div class="stage-status-badge dns">⚠️ DNS</div>';
-                dnsSection = `
-                    <div class="stage-dns-badge">
-                        <div class="dns-icon">⚠️</div>
-                        <div class="dns-text">
-                            <strong>Did Not Start</strong>
-                            <span class="dns-reason">${dnsReason || 'Did not start within 24-hour window'}</span>
+                statusSection = `
+                    <div class="stage-card-status dns">
+                        <div class="status-icon">⚠️</div>
+                        <div class="status-text">
+                            <strong>DNS</strong>
+                            <span class="status-reason">${dnsReason || 'Did not start within 24-hour window'}</span>
                         </div>
                     </div>
                 `;
             } else if (isCompleted) {
-                statusBadge = '<div class="stage-status-badge completed">✓ Completed</div>';
-                resultsSection = `
-                    <div class="stage-results">
-                        <div class="stage-result-item">
-                            <span class="result-label">Position</span>
-                            <span class="result-value">${results.position}${getOrdinalSuffix(results.position)}</span>
-                        </div>
-                        <div class="stage-result-item">
-                            <span class="result-label">Time</span>
-                            <span class="result-value">${formatTime(results.time)}</span>
+                statusSection = `
+                    <div class="stage-card-status completed">
+                        <div class="status-badge">✓ Completed</div>
+                        <div class="stage-results-mini">
+                            <div class="result-mini">
+                                <span class="result-label">Position</span>
+                                <span class="result-value">${results.position}${getOrdinalSuffix(results.position)}</span>
+                            </div>
+                            <div class="result-mini">
+                                <span class="result-label">Time</span>
+                                <span class="result-value">${formatTime(results.time)}</span>
+                            </div>
                         </div>
                     </div>
                 `;
             } else {
-                statusBadge = '<div class="stage-status-badge upcoming">📅 Upcoming</div>';
+                statusSection = `
+                    <div class="stage-card-status upcoming">
+                        <div class="status-badge upcoming">📅 Upcoming</div>
+                    </div>
+                `;
             }
 
             return `
-                <div class="stage-card ${isCompleted ? 'completed' : ''} ${isDNS ? 'dns' : ''}" 
+                <div class="stage-card-main ${isCompleted ? 'completed' : ''} ${isDNS ? 'dns' : ''}" 
                      onclick="window.location.href='event-detail.html?id=${stage.eventNum}'">
                     <div class="stage-card-header">
-                        <div class="stage-number">Local Tour ${stage.name}</div>
-                        <div class="stage-stats">${stage.distance} • ${stage.climbing}</div>
+                        <span class="stage-label">${stage.stageLabel}</span>
+                        <span class="stage-points">${stage.points} pts</span>
                     </div>
-                    <div class="stage-name">${stage.route}</div>
-                    ${statusBadge}
-                    ${dnsSection}
-                    ${resultsSection}
-                    <div class="stage-action">Click to view ${isCompleted ? 'results' : 'details'}</div>
+                    <h3 class="stage-card-title">${stage.name}</h3>
+                    <div class="stage-card-stats">
+                        <div class="stat-item">
+                            <span class="stat-icon">📍</span>
+                            <span>${stage.distance}</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-icon">⛰️</span>
+                            <span>${stage.climbing}</span>
+                        </div>
+                    </div>
+                    <p class="stage-card-description">${stage.description}</p>
+                    ${statusSection}
+                    <div class="stage-card-action">Click to view ${isCompleted ? 'results' : 'details'}</div>
                 </div>
             `;
         }).join('');
 
-        document.getElementById('stagesGrid').innerHTML = stagesHTML;
+        document.getElementById('stageCardsGrid').innerHTML = stagesHTML;
         document.getElementById('stagesProgress').textContent = `${completedCount} of 3 stages completed`;
 
         // Load GC standings if any results exist
@@ -130,9 +142,73 @@ async function loadStageCards() {
             await loadGCStandings(userData);
         }
 
+        // Initialize elevation profiles after stage cards are loaded
+        initializeElevationProfiles();
+
     } catch (error) {
         console.error('Error loading stage cards:', error);
         document.getElementById('stagesProgress').textContent = 'Error loading stages';
+    }
+}
+
+/**
+ * Initialize elevation profile viewer with tab switching
+ */
+function initializeElevationProfiles() {
+    const routes = {
+        1: 'Figure Of Eight',
+        2: 'Loop The Loop',
+        3: 'A Bit Of Everything'
+    };
+    
+    let currentStage = 1;
+    
+    // Load first profile
+    if (typeof window.generateElevationProfile === 'function') {
+        loadProfile(currentStage, routes[currentStage]);
+    }
+    
+    // Add click handlers to tabs
+    document.querySelectorAll('.profile-tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+            const stage = parseInt(this.getAttribute('data-stage'));
+            
+            // Update active tab
+            document.querySelectorAll('.profile-tab').forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Load profile for this stage
+            loadProfile(stage, routes[stage]);
+            currentStage = stage;
+        });
+    });
+}
+
+/**
+ * Load elevation profile for a specific stage
+ */
+function loadProfile(stageNum, routeName) {
+    const canvas = document.getElementById('elevationCanvas');
+    const loading = document.getElementById('profileLoading');
+    
+    if (!canvas || typeof window.generateElevationProfile !== 'function') {
+        console.error('Elevation profile generator not available');
+        return;
+    }
+    
+    // Show loading state
+    if (loading) loading.style.display = 'block';
+    
+    // Generate profile
+    try {
+        window.generateElevationProfile(routeName, canvas);
+        if (loading) loading.style.display = 'none';
+    } catch (error) {
+        console.error('Error generating profile:', error);
+        if (loading) {
+            loading.textContent = 'Error loading profile';
+            loading.style.color = '#ff6b6b';
+        }
     }
 }
 

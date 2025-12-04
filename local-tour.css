@@ -78,6 +78,187 @@
     color: var(--accent-pink);
 }
 
+/* ===== LOCAL TOUR STAGE CARDS ===== */
+.stage-cards-section {
+    margin-bottom: 4rem;
+}
+
+.stage-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.stage-card-main {
+    background: linear-gradient(135deg, rgba(69, 202, 255, 0.05), rgba(255, 27, 107, 0.05));
+    border: 2px solid rgba(69, 202, 255, 0.3);
+    border-radius: 12px;
+    padding: 2rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+}
+
+.stage-card-main:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(69, 202, 255, 0.3);
+    border-color: var(--accent-blue);
+}
+
+.stage-card-main.completed {
+    border-color: var(--accent-blue);
+}
+
+.stage-card-main.dns {
+    border-color: #ff9800;
+    background: linear-gradient(135deg, rgba(255, 152, 0, 0.1), rgba(255, 87, 34, 0.1));
+}
+
+.stage-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.stage-label {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--accent-pink);
+    letter-spacing: 1px;
+}
+
+.stage-points {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--accent-blue);
+}
+
+.stage-card-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+}
+
+.stage-card-stats {
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 1rem;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+    color: var(--text-secondary);
+}
+
+.stat-icon {
+    font-size: 1.2rem;
+}
+
+.stage-card-description {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+}
+
+.stage-card-status {
+    margin-bottom: 1rem;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-badge.completed {
+    background: rgba(69, 202, 255, 0.2);
+    color: var(--accent-blue);
+}
+
+.status-badge.upcoming {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-secondary);
+}
+
+.stage-card-status.dns {
+    background: rgba(255, 152, 0, 0.1);
+    border: 1px solid rgba(255, 152, 0, 0.3);
+    border-radius: 8px;
+    padding: 1rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.status-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.status-text strong {
+    display: block;
+    color: #ff9800;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+}
+
+.status-reason {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+}
+
+.stage-results-mini {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 0.75rem;
+}
+
+.result-mini {
+    text-align: center;
+}
+
+.result-label {
+    display: block;
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.25rem;
+}
+
+.result-value {
+    display: block;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.stage-card-action {
+    text-align: center;
+    font-size: 0.875rem;
+    color: var(--accent-blue);
+    font-weight: 600;
+    margin-top: 1rem;
+}
+
 /* ===== ROUTE PROFILE VIEWER ===== */
 .route-profile-section {
     margin-bottom: 4rem;
@@ -121,122 +302,39 @@
     border: 2px solid rgba(69, 202, 255, 0.3);
     border-radius: 12px;
     padding: 2rem;
-    min-height: 500px;
+    min-height: 550px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
+#elevationCanvas {
+    width: 100%;
+    height: auto;
+    max-width: 1200px;
+    display: block;
+}
+
+.profile-loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    font-family: 'Orbitron', sans-serif;
+    display: none;
+}
+
+/* Remove old profile content styles */
 .profile-content {
     display: none;
 }
 
-.profile-content.active {
-    display: block;
-}
-
-.profile-title {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 1.8rem;
-    font-weight: 900;
-    color: var(--text-primary);
-    text-align: center;
-    margin-bottom: 0.5rem;
-}
-
-.profile-distance {
-    text-align: center;
-    font-size: 1.1rem;
-    color: var(--text-secondary);
-    margin-bottom: 2rem;
-}
-
+.profile-title,
+.profile-distance,
 .route-image {
-    width: 100%;
-    height: auto;
-    border-radius: 8px;
-}
-
-/* ===== STAGE BREAKDOWN ===== */
-.stage-breakdown-section {
-    margin-bottom: 4rem;
-}
-
-.breakdown-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2rem;
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-.breakdown-card {
-    background: linear-gradient(135deg, rgba(69, 202, 255, 0.05), rgba(255, 27, 107, 0.05));
-    border: 2px solid rgba(69, 202, 255, 0.3);
-    border-radius: 12px;
-    padding: 2rem;
-    transition: all 0.3s ease;
-}
-
-.breakdown-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(69, 202, 255, 0.3);
-    border-color: var(--accent-blue);
-}
-
-.breakdown-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1rem;
-}
-
-.breakdown-stage {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 0.875rem;
-    font-weight: 700;
-    color: var(--accent-pink);
-    letter-spacing: 1px;
-}
-
-.breakdown-points {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: var(--accent-blue);
-}
-
-.breakdown-title {
-    font-size: 1.4rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin-bottom: 1rem;
-}
-
-.breakdown-stats {
-    display: flex;
-    gap: 2rem;
-    margin-bottom: 1rem;
-}
-
-.breakdown-stat {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 1rem;
-    color: var(--text-secondary);
-}
-
-.breakdown-stat .stat-icon {
-    font-size: 1.2rem;
-}
-
-.breakdown-description {
-    font-size: 1rem;
-    color: var(--text-secondary);
-    line-height: 1.6;
-}
-
-/* ===== STAGES SECTION ===== */
-.stages-section {
-    margin-bottom: 3rem;
+    display: none;
 }
 
 .section-title {
@@ -253,164 +351,6 @@
     color: var(--text-secondary);
     text-align: center;
     margin-bottom: 2rem;
-}
-
-.stages-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2rem;
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-/* ===== STAGE CARD ===== */
-.stage-card {
-    background: var(--card-background);
-    border: 2px solid rgba(69, 202, 255, 0.3);
-    border-radius: 12px;
-    padding: 2rem;
-    transition: all 0.3s ease;
-    cursor: pointer;
-    position: relative;
-}
-
-.stage-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(69, 202, 255, 0.3);
-    border-color: var(--accent-blue);
-}
-
-.stage-card.completed {
-    border-color: var(--accent-blue);
-    background: linear-gradient(135deg, rgba(69, 202, 255, 0.05), rgba(255, 27, 107, 0.05));
-}
-
-.stage-card.dns {
-    border-color: #ff9800;
-    background: linear-gradient(135deg, rgba(255, 152, 0, 0.1), rgba(255, 87, 34, 0.1));
-    opacity: 1;
-}
-
-.stage-card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 1rem;
-}
-
-.stage-number {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 0.75rem;
-    color: var(--text-secondary);
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.stage-stats {
-    font-size: 0.75rem;
-    color: var(--text-secondary);
-    font-weight: 600;
-    text-align: right;
-}
-
-.stage-name {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin-bottom: 1.5rem;
-    line-height: 1.3;
-}
-
-.stage-status-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    font-family: 'Orbitron', sans-serif;
-    font-size: 0.875rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin-bottom: 1.5rem;
-}
-
-.stage-status-badge.completed {
-    background: rgba(69, 202, 255, 0.2);
-    color: var(--accent-blue);
-}
-
-.stage-status-badge.upcoming {
-    background: rgba(255, 255, 255, 0.1);
-    color: var(--text-secondary);
-}
-
-.stage-status-badge.dns {
-    background: rgba(255, 152, 0, 0.2);
-    color: #ff9800;
-}
-
-.stage-results {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-}
-
-.stage-result-item {
-    text-align: center;
-}
-
-.result-label {
-    display: block;
-    font-size: 0.875rem;
-    color: var(--text-secondary);
-    margin-bottom: 0.25rem;
-}
-
-.result-value {
-    display: block;
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--text-primary);
-}
-
-.stage-dns-badge {
-    display: flex;
-    align-items: flex-start;
-    gap: 1rem;
-    padding: 1rem;
-    background: rgba(255, 152, 0, 0.1);
-    border: 1px solid rgba(255, 152, 0, 0.3);
-    border-radius: 8px;
-    margin-bottom: 1.5rem;
-}
-
-.dns-icon {
-    font-size: 1.5rem;
-    flex-shrink: 0;
-}
-
-.dns-text strong {
-    display: block;
-    color: #ff9800;
-    font-family: 'Orbitron', sans-serif;
-    font-size: 1rem;
-    margin-bottom: 0.25rem;
-}
-
-.dns-reason {
-    font-size: 0.875rem;
-    color: var(--text-secondary);
-    line-height: 1.4;
-}
-
-.stage-action {
-    text-align: center;
-    font-size: 0.875rem;
-    color: var(--accent-blue);
-    font-weight: 600;
 }
 
 /* ===== GC SECTION ===== */
@@ -536,7 +476,7 @@
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 1024px) {
-    .stages-grid {
+    .stage-cards-grid {
         grid-template-columns: 1fr;
         max-width: 600px;
     }
@@ -566,6 +506,22 @@
         padding: 1rem;
     }
     
+    .stage-cards-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .stage-card-main {
+        padding: 1.5rem;
+    }
+    
+    .stage-card-title {
+        font-size: 1.2rem;
+    }
+    
+    .stage-card-stats {
+        gap: 1.5rem;
+    }
+    
     .profile-tabs {
         flex-direction: column;
         gap: 0.75rem;
@@ -581,40 +537,12 @@
         min-height: 400px;
     }
     
-    .profile-title {
-        font-size: 1.4rem;
-    }
-    
-    .profile-distance {
-        font-size: 1rem;
-    }
-    
-    .breakdown-cards {
-        grid-template-columns: 1fr;
-    }
-    
-    .breakdown-card {
-        padding: 1.5rem;
-    }
-    
-    .breakdown-title {
-        font-size: 1.2rem;
-    }
-    
-    .breakdown-stats {
-        gap: 1.5rem;
+    #elevationCanvas {
+        max-width: 100%;
     }
     
     .section-title {
         font-size: 1.5rem;
-    }
-    
-    .stage-card {
-        padding: 1.5rem;
-    }
-    
-    .stage-name {
-        font-size: 1.25rem;
     }
     
     .gc-header-banner {
