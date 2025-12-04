@@ -170,9 +170,9 @@ async function displayTourOverview(eventNumber, userData, userUid) {
                  ${isClickable ? `onclick="window.location.href='event-detail.html?id=${stage.eventNum}'"` : ''}>
                 <div class="stage-header">
                     <div class="stage-number">${stage.stageName}</div>
-                    <div class="stage-event">${stage.routeName}</div>
+                    <div class="stage-stats">${stage.distance} • ${stage.climbing}</div>
                 </div>
-                <div class="stage-name">${stage.distance} • ${stage.climbing} climbing</div>
+                <div class="stage-name">${stage.routeName}</div>
                 
                 ${isDNS ? `
                     <div class="stage-dns-badge">
@@ -210,9 +210,14 @@ async function displayTourOverview(eventNumber, userData, userUid) {
                     `}
                 ` : `
                     <div class="stage-status">
-                        <span class="status-icon">🔒</span>
-                        <span class="status-text">Complete previous stages first</span>
+                        <span class="status-icon">📅</span>
+                        <span class="status-text">Upcoming</span>
                     </div>
+                    ${!isViewing ? `
+                        <div class="stage-action">Click to view details</div>
+                    ` : `
+                        <div class="stage-viewing-badge">Viewing details below</div>
+                    `}
                 `}
             </div>
         `;
