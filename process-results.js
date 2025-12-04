@@ -1325,7 +1325,7 @@ async function updateResultsSummary(season, event, results, userUid) {
       
       // Photo Finish should not be awarded for time challenge events (where everyone does the same time)
       // Event 4 is Coastal Loop Time Challenge (20 minutes)
-      const isTimeChallenge = eventNumber === 4;
+      const isTimeChallenge = event === 4;
       const earnedPhotoFinish = isTimeChallenge ? false : awardsCalc.checkPhotoFinish(position, times.userTime, times.winnerTime);
       
       const earnedDarkHorse = awardsCalc.checkDarkHorse(position, predictedPosition);

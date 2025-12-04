@@ -76,23 +76,11 @@ function initializeRiderModal() {
     document.getElementById('riderProfileModalClose').addEventListener('click', closeRiderModal);
     document.getElementById('riderProfileModalOverlay').addEventListener('click', closeRiderModal);
     
-    // Add required CSS if not already present
-    if (!document.getElementById('rider-modal-styles')) {
+    // Add remaining modal CSS if not already present
+    if (!document.getElementById('rider-modal-additional-styles')) {
         const styles = document.createElement('style');
-        styles.id = 'rider-modal-styles';
+        styles.id = 'rider-modal-additional-styles';
         styles.textContent = `
-            .rider-name-link {
-                color: var(--accent-blue) !important;
-                cursor: pointer !important;
-                text-decoration: none;
-                transition: color 0.3s ease;
-                display: inline;
-            }
-            .rider-name-link:hover {
-                color: var(--text-primary) !important;
-                text-decoration: underline;
-            }
-            
             .rider-profile-card {
                 background: linear-gradient(135deg, var(--card-gradient-start), var(--card-gradient-end));
                 border-radius: 12px;
@@ -324,7 +312,21 @@ function buildRiderProfileHTML(data, name) {
     const displayName = data.displayName || name || 'Unknown Rider';
     
     // Get ARR from user document (stored from most recent race)
-    const arr = data.arr || 1000;
+    let arr = data.arr;
+    
+    // Fallback: if ARR not in user document yet, get from most recent event result
+    if (!arr) {
+        for (let eventNum = 15; eventNum >= 1; eventNum--) {
+            const eventResults = data[`event${eventNum}Results`];
+            if (eventResults && eventResults.arr) {
+                arr = eventResults.arr;
+                break;
+            }
+        }
+    }
+    
+    // Default to 1000 only if no ARR found anywhere
+    arr = arr || 1000;
     
     const arrBand = getARRBand(arr);
     const team = data.team || 'Independent';
@@ -518,6 +520,26 @@ export function makeRiderNameClickable(name, uid, isBot = false) {
 // Initialize when page loads
 export function initRiderProfileModal(firestoreInstance) {
     db = firestoreInstance;
+    
+    // Add required CSS immediately
+    if (!document.getElementById('rider-modal-styles')) {
+        const styles = document.createElement('style');
+        styles.id = 'rider-modal-styles';
+        styles.textContent = `
+            .rider-name-link {
+                color: var(--accent-blue) !important;
+                cursor: pointer !important;
+                text-decoration: none;
+                transition: color 0.3s ease;
+                display: inline;
+            }
+            .rider-name-link:hover {
+                color: var(--text-primary) !important;
+                text-decoration: underline;
+            }
+        `;
+        document.head.appendChild(styles);
+    }
     
     // Add click event delegation for rider name links
     document.addEventListener('click', (e) => {
