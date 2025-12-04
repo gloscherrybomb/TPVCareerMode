@@ -368,6 +368,64 @@ This is where you learn what it takes to race over multiple days—managing fati
                 description: "The queen stage with significant climbing to decide the GC."
             }
         ]
+    },
+    14: {
+        number: "14",
+        name: "Local Tour Stage 2",
+        subtitle: "Loop the Loop",
+        type: "Stage Race - Stage 2",
+        level: "Local Amateur",
+        mandatory: true,
+        distance: "27.3 km",
+        climbing: "169 m",
+        course: "Loop the Loop",
+        format: "1 stage",
+        maxPoints: 95,
+        icon: "🏆",
+        description: `Stage 2 of the Local Tour is shorter and punchier than the opening stage. The Loop the Loop course features technical sections and opportunities for aggressive racing.
+
+This is where attacks happen. Riders looking to make up time from Stage 1 will be on the offensive, while race leaders must stay vigilant to protect their advantage.
+
+Time bonuses are available for stage placings, and every second counts in the overall GC battle. Stay near the front and be ready to respond to moves.`,
+        strategy: "Expect aggressive racing from the start. Cover any dangerous moves but don't waste energy chasing everything. Position yourself well for the finale - stage wins here can shift the GC significantly.",
+        routeDetails: {
+            start: "Loop the Loop start",
+            keyPoint: "Technical sections with attack opportunities",
+            difficulty: "Punchy and aggressive",
+            finish: "Loop the Loop finish"
+        },
+        isStageRace: true,
+        tourStage: 2,
+        tourEvent: "Local Tour"
+    },
+    15: {
+        number: "15",
+        name: "Local Tour Stage 3",
+        subtitle: "A Bit of Everything",
+        type: "Stage Race - Stage 3",
+        level: "Local Amateur",
+        mandatory: true,
+        distance: "28.1 km",
+        climbing: "471 m",
+        course: "A Bit of Everything",
+        format: "1 stage",
+        maxPoints: 135,
+        icon: "🏆",
+        description: `The queen stage of the Local Tour. This is where the overall classification will be decided. With 471m of climbing on tired legs from the previous two days, only the strongest will survive.
+
+This stage lives up to its name - you'll encounter everything: climbs, descents, flats, and technical sections. The significant elevation gain makes this the hardest stage of the tour.
+
+If you're in GC contention, this is where you make your move. If you're behind, it's a chance to salvage a stage win and pride. Either way, you'll need to dig deep.`,
+        strategy: "Pace yourself on the early climbs - it's a long day. If you're defending a GC position, stay with the main contenders. If attacking for the GC, wait for the final climbs. Save energy for when it matters most.",
+        routeDetails: {
+            start: "A Bit of Everything start",
+            keyPoint: "Multiple climbs testing tired legs",
+            difficulty: "Queen stage - significant climbing",
+            finish: "A Bit of Everything finish"
+        },
+        isStageRace: true,
+        tourStage: 3,
+        tourEvent: "Local Tour"
     }
 };
 
