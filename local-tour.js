@@ -163,8 +163,18 @@ function initializeElevationProfiles() {
     
     let currentStage = 1;
     
-    // Load first profile
-    loadProfile(currentStage, routes[currentStage]);
+    // Wait for elevation generator to be available before loading first profile
+    const checkAndLoadProfile = () => {
+        if (window.elevationProfileGen) {
+            console.log('Elevation generator ready, loading first profile');
+            loadProfile(currentStage, routes[currentStage]);
+        } else {
+            console.log('Waiting for elevation generator...');
+            setTimeout(checkAndLoadProfile, 100);
+        }
+    };
+    
+    checkAndLoadProfile();
     
     // Add click handlers to tabs
     document.querySelectorAll('.profile-tab').forEach(tab => {
@@ -186,6 +196,8 @@ function initializeElevationProfiles() {
  * Load elevation profile for a specific stage
  */
 async function loadProfile(stageNum, routeName) {
+    console.log(`loadProfile called for stage ${stageNum}: ${routeName}`);
+    
     const canvas = document.getElementById('elevationCanvas');
     const loading = document.getElementById('profileLoading');
     
@@ -194,31 +206,39 @@ async function loadProfile(stageNum, routeName) {
         return;
     }
     
-    // Show loading state
-    if (loading) loading.style.display = 'block';
+    console.log('Canvas found:', canvas.id);
     
-    // Wait for elevation generator to be available
+    // Show loading state
+    if (loading) {
+        loading.style.display = 'block';
+        loading.textContent = 'Loading profile...';
+        loading.style.color = '';
+    }
+    
+    // Check if elevation generator is available
     if (!window.elevationProfileGen) {
-        console.error('Elevation profile generator not yet loaded');
+        console.warn('Elevation profile generator not yet loaded, retrying...');
         if (loading) {
-            loading.textContent = 'Loading elevation generator...';
+            loading.textContent = 'Initializing elevation generator...';
         }
         // Try again after a delay
-        setTimeout(() => loadProfile(stageNum, routeName), 500);
+        setTimeout(() => loadProfile(stageNum, routeName), 200);
         return;
     }
     
+    console.log('Elevation generator available, generating profile...');
+    
     // Generate profile
     try {
-        console.log(`Generating profile for ${routeName}`);
         await window.elevationProfileGen.generateProfile('elevationCanvas', routeName, 1);
         if (loading) loading.style.display = 'none';
-        console.log('Profile generated successfully');
+        console.log('✓ Profile generated successfully for', routeName);
     } catch (error) {
         console.error('Error generating profile:', error);
         if (loading) {
             loading.textContent = 'Error loading profile';
             loading.style.color = '#ff6b6b';
+            loading.style.display = 'block';
         }
     }
 }

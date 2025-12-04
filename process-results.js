@@ -751,6 +751,18 @@ async function processUserResult(uid, eventInfo, results) {
   eventResults.storyContext = story.context;
   eventResults.timestamp = admin.firestore.FieldValue.serverTimestamp(); // Add timestamp for 24-hour checking
   
+  // Add GC results to event results if this is a tour stage
+  if (gcResults) {
+    eventResults.gcResults = {
+      standings: gcResults.standings,
+      userGCPosition: gcResults.userGC?.gcPosition || null,
+      userGCTime: gcResults.userGC?.cumulativeTime || null,
+      userGCGap: gcResults.userGC?.gapToLeader || null,
+      stagesIncluded: gcResults.stagesIncluded,
+      isProvisional: gcResults.isProvisional
+    };
+  }
+  
   console.log(`   📖 Generated race story`);
   
   // Check for DNS on Local Tour stages (24-hour window enforcement)
@@ -816,17 +828,6 @@ async function processUserResult(uid, eventInfo, results) {
     tourProgress: newTourProgress,
     ...dnsFlags // Add DNS flags if any
   };
-  
-  // Add GC results if this was the final tour stage
-  if (gcResults) {
-    updates.gcResults = {
-      standings: gcResults.standings,
-      userGCPosition: gcResults.userGC?.gcPosition || null,
-      userGCTime: gcResults.userGC?.cumulativeTime || null,
-      userGCGap: gcResults.userGC?.gapToLeader || null,
-      completedAt: new Date().toISOString()
-    };
-  }
   
   // Add to completedStages (store the STAGE number, not event number)
   const completedStages = userData.completedStages || [];

@@ -149,13 +149,11 @@ function calculateNextStage(currentStage, tourProgress = {}) {
   }
   
   if (currentStage === 9) {
-    if (tourProgress.event13Completed && tourProgress.event14Completed && tourProgress.event15Completed) {
-      return 10;
-    }
+    // Stay at stage 9 during tour, and when complete (no stage 10)
     return 9;
   }
   
-  return currentStage + 1;
+  return currentStage;
 }
 
 function calculatePoints(position, eventNumber, predictedPosition) {
