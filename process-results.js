@@ -563,7 +563,7 @@ async function processUserResult(uid, eventInfo, results) {
   
   // Calculate points (including bonus points)
   const pointsResult = calculatePoints(position, eventNumber, predictedPosition);
-  const { points, bonusPoints } = pointsResult;
+  let { points, bonusPoints } = pointsResult;
   
   // Check if earned punching medal (beat prediction by 10+ places)
   let earnedPunchingMedal = false;
