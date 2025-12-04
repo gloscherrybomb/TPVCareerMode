@@ -110,14 +110,15 @@ function calculateNextStage(currentStage, tourProgress = {}) {
     return currentStage + 1;
   }
   
-  // Stage 9 is the tour - advance only when all 3 events complete
+  // Stage 9 is the tour - stay at stage 9 until all 3 events complete
   if (currentStage === 9) {
     if (tourProgress.event13Completed && tourProgress.event14Completed && tourProgress.event15Completed) {
-      return 10; // Beyond the tour
+      return 9; // Season complete - no stage 10
     }
+    return 9; // Stay at stage 9 until all tour events done
   }
   
-  return currentStage + 1;
+  return currentStage;
 }
 
 /**
