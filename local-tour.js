@@ -164,9 +164,7 @@ function initializeElevationProfiles() {
     let currentStage = 1;
     
     // Load first profile
-    if (typeof window.generateElevationProfile === 'function') {
-        loadProfile(currentStage, routes[currentStage]);
-    }
+    loadProfile(currentStage, routes[currentStage]);
     
     // Add click handlers to tabs
     document.querySelectorAll('.profile-tab').forEach(tab => {
@@ -187,22 +185,35 @@ function initializeElevationProfiles() {
 /**
  * Load elevation profile for a specific stage
  */
-function loadProfile(stageNum, routeName) {
+async function loadProfile(stageNum, routeName) {
     const canvas = document.getElementById('elevationCanvas');
     const loading = document.getElementById('profileLoading');
     
-    if (!canvas || typeof window.generateElevationProfile !== 'function') {
-        console.error('Elevation profile generator not available');
+    if (!canvas) {
+        console.error('Canvas element not found');
         return;
     }
     
     // Show loading state
     if (loading) loading.style.display = 'block';
     
+    // Wait for elevation generator to be available
+    if (!window.elevationProfileGen) {
+        console.error('Elevation profile generator not yet loaded');
+        if (loading) {
+            loading.textContent = 'Loading elevation generator...';
+        }
+        // Try again after a delay
+        setTimeout(() => loadProfile(stageNum, routeName), 500);
+        return;
+    }
+    
     // Generate profile
     try {
-        window.generateElevationProfile(routeName, canvas);
+        console.log(`Generating profile for ${routeName}`);
+        await window.elevationProfileGen.generateProfile('elevationCanvas', routeName, 1);
         if (loading) loading.style.display = 'none';
+        console.log('Profile generated successfully');
     } catch (error) {
         console.error('Error generating profile:', error);
         if (loading) {

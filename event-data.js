@@ -313,63 +313,6 @@ For many newcomers, this race carries personal meaning. In your case, your famil
         }
     },
     13: {
-        number: "13-15",
-        name: "Local Tour",
-        subtitle: "Three-stage race testing consistency and tactics",
-        type: "Stage Race",
-        level: "Local Amateur",
-        mandatory: true,
-        distance: "90.6 km (total)",
-        climbing: "814 m (total)",
-        course: "Various stages",
-        format: "3 stages",
-        maxPoints: 350,
-        icon: "🏆",
-        description: `The Local Tour is a three-day stage race that tests everything: endurance, tactics, consistency, and mental fortitude. Each stage presents unique challenges, and overall success requires performing well across all disciplines.
-
-**Stage 1: Figure of Eight** (35.2km, 174m climbing, 120 points)
-A flowing stage that sets the tone for the tour. Not overly difficult, but positioning and time gaps earned here matter.
-
-**Stage 2: Loop the Loop** (27.3km, 169m climbing, 95 points)
-Shorter and punchier. Expect aggressive racing and opportunities for time bonuses. Stay alert.
-
-**Stage 3: A Bit of Everything** (28.1km, 471m climbing, 135 points)
-The queen stage. Significant climbing tests tired legs. The GC battle is often decided here, with attackers looking to overturn gaps from earlier stages.
-
-This is where you learn what it takes to race over multiple days—managing fatigue, maintaining focus, and adapting to different race situations. It's the crown jewel of the local calendar.`,
-        strategy: "Stage racing is about consistency. Don't lose time unnecessarily on Stage 1. Stay near the front and avoid crashes. Stage 2 is where attacks happen—cover moves and don't give away time. Stage 3 is the decider: if you're in contention, be ready to dig deep on the climbs. If not, focus on a strong stage result.",
-        routeDetails: {
-            stage1: "Figure of Eight - 35.2km, 174m",
-            stage2: "Loop the Loop - 27.3km, 169m",
-            stage3: "A Bit of Everything - 28.1km, 471m",
-            difficulty: "Multi-day endurance and tactics"
-        },
-        isStageRace: true,
-        stages: [
-            {
-                name: "Stage 1: Figure of Eight",
-                distance: "35.2 km",
-                climbing: "174 m",
-                points: 120,
-                description: "A flowing opener that sets the tone for the tour."
-            },
-            {
-                name: "Stage 2: Loop the Loop",
-                distance: "27.3 km",
-                climbing: "169 m",
-                points: 95,
-                description: "Shorter and punchier with aggressive racing expected."
-            },
-            {
-                name: "Stage 3: A Bit of Everything",
-                distance: "28.1 km",
-                climbing: "471 m",
-                points: 135,
-                description: "The queen stage with significant climbing to decide the GC."
-            }
-        ]
-    },
-    13: {
         number: "13",
         name: "Local Tour Stage 1",
         subtitle: "Figure of 8",
@@ -378,7 +321,7 @@ This is where you learn what it takes to race over multiple days—managing fati
         mandatory: true,
         distance: "35.2 km",
         climbing: "174 m",
-        course: "Figure of 8",
+        course: "Figure Of Eight",
         format: "1 stage",
         maxPoints: 120,
         icon: "🏆",
@@ -436,7 +379,7 @@ Time bonuses are available for stage placings, and every second counts in the ov
         mandatory: true,
         distance: "28.1 km",
         climbing: "471 m",
-        course: "A Bit of Everything",
+        course: "A Bit Of Everything",
         format: "1 stage",
         maxPoints: 135,
         icon: "🏆",
