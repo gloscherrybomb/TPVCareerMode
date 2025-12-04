@@ -158,11 +158,15 @@ async function displayTourOverview(eventNumber, userData, userUid) {
         const isViewing = stage.eventNum === eventNumber;
         const stageResults = userData[`event${stage.eventNum}Results`];
         
+        // Check for DNS
+        const isDNS = userData[`event${stage.eventNum}DNS`];
+        const dnsReason = userData[`event${stage.eventNum}DNSReason`];
+        
         // Determine if this card should be clickable
         const isClickable = (stage.eventNum !== eventNumber); // Can click if not currently viewing this stage
         
         html += `
-            <div class="tour-stage-card ${isCompleted ? 'completed' : 'upcoming'} ${isCurrent ? 'current' : ''} ${isClickable ? 'clickable' : 'viewing'}" 
+            <div class="tour-stage-card ${isCompleted ? 'completed' : ''} ${isCurrent ? 'current' : ''} ${isDNS ? 'dns' : 'upcoming'} ${isClickable ? 'clickable' : 'viewing'}" 
                  ${isClickable ? `onclick="window.location.href='event-detail.html?id=${stage.eventNum}'"` : ''}>
                 <div class="stage-header">
                     <div class="stage-number">${stage.stageName}</div>
@@ -170,7 +174,15 @@ async function displayTourOverview(eventNumber, userData, userUid) {
                 </div>
                 <div class="stage-name">${stage.distance} • ${stage.climbing} climbing</div>
                 
-                ${isCompleted ? `
+                ${isDNS ? `
+                    <div class="stage-dns-badge">
+                        <div class="dns-icon">⚠️</div>
+                        <div class="dns-text">
+                            <strong>DNS</strong>
+                            <span class="dns-reason">${dnsReason || 'Did not start within 24-hour window'}</span>
+                        </div>
+                    </div>
+                ` : isCompleted ? `
                     <div class="stage-result">
                         <div class="result-item">
                             <span class="result-label">Position</span>

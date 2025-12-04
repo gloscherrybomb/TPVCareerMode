@@ -963,6 +963,12 @@
     opacity: 0.6;
 }
 
+.tour-stage-card.dns {
+    border-color: #ff9800;
+    background: linear-gradient(135deg, rgba(255, 152, 0, 0.1), rgba(255, 87, 34, 0.1));
+    opacity: 1;
+}
+
 .tour-stage-card.clickable {
     cursor: pointer;
 }
@@ -1100,6 +1106,42 @@
     font-size: 0.875rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+}
+
+/* DNS Badge */
+.stage-dns-badge {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: rgba(255, 152, 0, 0.1);
+    border: 1px solid rgba(255, 152, 0, 0.3);
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+.dns-icon {
+    font-size: 2rem;
+    flex-shrink: 0;
+}
+
+.dns-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.dns-text strong {
+    color: #ff9800;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 0.5px;
+}
+
+.dns-reason {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    line-height: 1.4;
 }
 
 /* ===== TOUR COMPLETION STORY ===== */
