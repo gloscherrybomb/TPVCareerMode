@@ -849,7 +849,7 @@ async function processUserResult(uid, eventInfo, results) {
     averageFinish: careerStats.averageFinish,
     winRate: careerStats.winRate,
     podiumRate: careerStats.podiumRate,
-    awards: careerStats.awards,
+    // Note: awards are updated via individual field increments below
     arr: eventResults.arr, // Store most recent ARR
     [`season${season}Standings`]: seasonStandings,
     team: userResult.Team || '',
@@ -857,6 +857,12 @@ async function processUserResult(uid, eventInfo, results) {
     tourProgress: newTourProgress,
     ...dnsFlags // Add DNS flags if any
   };
+  
+  // Update individual award counters using FieldValue.increment
+  // This allows us to add special awards without conflicts
+  Object.keys(careerStats.awards).forEach(awardKey => {
+    updates[`awards.${awardKey}`] = careerStats.awards[awardKey];
+  });
   
   // Add to completedStages (store the STAGE number, not event number)
   const completedStages = userData.completedStages || [];
