@@ -1150,36 +1150,36 @@ async function buildSeasonStandings(results, userData, eventNumber, currentUid) 
     
     const botStanding = standingsMap.get(botName);
     
-    // IMPORTANT: Reset bot points to 0 before recalculating
-    // This prevents accumulation bug where points were inflated from previous runs
+    // CRITICAL: Reset bot points to prevent accumulation bug
+    // Bot points will be recalculated from scratch below
     botStanding.points = 0;
     
-    // Recalculate points from ALL completed events
+    // Calculate points for all completed events (real + simulated)
     let simulatedEvents = 0;
     
     for (const eventNum of completedEventNumbers) {
       if (botInfo.actualEvents.has(eventNum)) {
-        // Bot actually participated - their points are stored in the standings from CSV processing above
-        // We need to recalculate from the result itself
-        const eventResultsDoc = await getDoc(doc(db, 'results', `season1_event${eventNum}`));
-        if (eventResultsDoc.exists()) {
-          const eventResults = eventResultsDoc.data().results || [];
-          const botResult = eventResults.find(r => r.name === botName);
-          if (botResult && botResult.points) {
-            botStanding.points += botResult.points;
+        // Bot participated - their points should be in allEventResults
+        const eventResults = allEventResults[eventNum] || [];
+        const botResult = eventResults.find(r => (r.Name || r.name) === botName);
+        if (botResult) {
+          const position = parseInt(botResult.Position || botResult.position);
+          if (!isNaN(position) && (botResult.Position !== 'DNF' && botResult.position !== 'DNF')) {
+            const pointsResult = calculatePoints(position, eventNum);
+            botStanding.points += pointsResult.points;
           }
         }
       } else {
-        // Bot didn't participate in this event, simulate it
+        // Bot didn't participate - simulate it
         const simulatedPosition = simulatePosition(botName, botInfo.arr, eventNum);
-        const points = calculatePoints(simulatedPosition, eventNum).points; // Base points only, no bonus
+        const points = calculatePoints(simulatedPosition, eventNum).points;
         botStanding.points += points;
         simulatedEvents++;
       }
     }
     
-    botStanding.events = completedEventNumbers.length; // Count of events user has completed
-    botStanding.simulatedEvents = simulatedEvents; // Track how many were simulated
+    botStanding.events = completedEventNumbers.length;
+    botStanding.simulatedEvents = simulatedEvents;
   }
   
   // IMPORTANT: Ensure ALL bots in standings (not just those in allBots) have correct events count
