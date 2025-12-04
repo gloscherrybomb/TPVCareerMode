@@ -949,3 +949,28 @@
         font-size: 1.5rem;
     }
 }
+
+/* ===== TOUR PROGRESS BADGE ===== */
+.tour-progress-badge {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: linear-gradient(135deg, rgba(69, 202, 255, 0.2), rgba(255, 27, 107, 0.2));
+    border: 2px solid var(--accent-blue);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--accent-blue);
+    z-index: 2;
+    box-shadow: 0 4px 12px rgba(69, 202, 255, 0.3);
+}
+
+@media (max-width: 768px) {
+    .tour-progress-badge {
+        position: static;
+        margin-bottom: 1rem;
+        text-align: center;
+    }
+}

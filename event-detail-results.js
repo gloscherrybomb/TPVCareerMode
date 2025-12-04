@@ -103,6 +103,9 @@ function showPreRaceSections() {
             section.style.display = 'block';
         }
     });
+    
+    // Add tour timing warning for multi-stage events
+    addTourTimingWarning(eventNumber);
 }
 
 /**
@@ -112,25 +115,36 @@ function showPreRaceSections() {
  * Display tour overview with progress and stage links
  */
 async function displayTourOverview(eventNumber, userData, userUid) {
-    const tourStages = [13, 14, 15];
-    const tourName = "Local Tour";
+    const tourStages = [
+        { eventNum: 13, stageName: "Local Tour Stage 1", routeName: "Figure of 8", distance: "35.2km", climbing: "174m" },
+        { eventNum: 14, stageName: "Local Tour Stage 2", routeName: "Loop the Loop", distance: "27.3km", climbing: "169m" },
+        { eventNum: 15, stageName: "Local Tour Stage 3", routeName: "A Bit of Everything", distance: "28.1km", climbing: "471m" }
+    ];
     
     // Check which stages are completed
     const completedStages = [];
     for (const stage of tourStages) {
-        if (userData[`event${stage}Results`]) {
-            completedStages.push(stage);
+        if (userData[`event${stage.eventNum}Results`]) {
+            completedStages.push(stage.eventNum);
         }
     }
     
-    const currentStageIndex = tourStages.indexOf(eventNumber);
+    // Determine which stage is "current" (next to complete)
+    let currentStage = null;
+    for (const stage of tourStages) {
+        if (!completedStages.includes(stage.eventNum)) {
+            currentStage = stage.eventNum;
+            break;
+        }
+    }
+    
     const progress = completedStages.length;
     
     let html = `
         <div class="tour-overview-section">
             <h3 class="tour-title">
                 <span class="tour-icon">🏆</span>
-                ${tourName} - Progress
+                Local Tour Progress
             </h3>
             <p class="tour-subtitle">${progress} of 3 stages completed</p>
             
@@ -138,19 +152,23 @@ async function displayTourOverview(eventNumber, userData, userUid) {
     `;
     
     // Display each stage
-    for (let i = 0; i < tourStages.length; i++) {
-        const stage = tourStages[i];
-        const isCompleted = completedStages.includes(stage);
-        const isCurrent = stage === eventNumber;
-        const stageResults = userData[`event${stage}Results`];
+    for (const stage of tourStages) {
+        const isCompleted = completedStages.includes(stage.eventNum);
+        const isCurrent = stage.eventNum === currentStage;
+        const isViewing = stage.eventNum === eventNumber;
+        const stageResults = userData[`event${stage.eventNum}Results`];
+        
+        // Determine if this card should be clickable
+        const isClickable = (stage.eventNum !== eventNumber); // Can click if not currently viewing this stage
         
         html += `
-            <div class="tour-stage-card ${isCompleted ? 'completed' : 'upcoming'} ${isCurrent ? 'current' : ''}">
+            <div class="tour-stage-card ${isCompleted ? 'completed' : 'upcoming'} ${isCurrent ? 'current' : ''} ${isClickable ? 'clickable' : 'viewing'}" 
+                 ${isClickable ? `onclick="window.location.href='event-detail.html?id=${stage.eventNum}'"` : ''}>
                 <div class="stage-header">
-                    <div class="stage-number">Stage ${i + 1}</div>
-                    <div class="stage-event">Event ${stage}</div>
+                    <div class="stage-number">${stage.stageName}</div>
+                    <div class="stage-event">${stage.routeName}</div>
                 </div>
-                <div class="stage-name">${window.eventData?.[stage]?.name || `Event ${stage}`}</div>
+                <div class="stage-name">${stage.distance} • ${stage.climbing} climbing</div>
                 
                 ${isCompleted ? `
                     <div class="stage-result">
@@ -163,15 +181,25 @@ async function displayTourOverview(eventNumber, userData, userUid) {
                             <span class="result-value">${formatTime(stageResults.time)}</span>
                         </div>
                     </div>
-                    ${stage !== eventNumber ? `
-                        <a href="event-detail.html?id=${stage}" class="stage-link-btn">View Results</a>
+                    ${!isViewing ? `
+                        <div class="stage-action">Click to view results</div>
                     ` : `
-                        <div class="stage-current-badge">Current</div>
+                        <div class="stage-viewing-badge">Viewing results below</div>
+                    `}
+                ` : isCurrent ? `
+                    <div class="stage-status">
+                        <span class="status-icon">▶️</span>
+                        <span class="status-text">Next Stage</span>
+                    </div>
+                    ${!isViewing ? `
+                        <div class="stage-action">Click to view details</div>
+                    ` : `
+                        <div class="stage-viewing-badge">Viewing details below</div>
                     `}
                 ` : `
                     <div class="stage-status">
-                        <span class="status-icon">⏳</span>
-                        <span class="status-text">Not Started</span>
+                        <span class="status-icon">🔒</span>
+                        <span class="status-text">Complete previous stages first</span>
                     </div>
                 `}
             </div>
@@ -308,6 +336,40 @@ function formatGCTime(seconds) {
         return `${hours}h ${minutes}m ${secs}s`;
     } else {
         return `${minutes}m ${secs}s`;
+    }
+}
+
+/**
+ * Add 24-hour warning for multi-stage tour events
+ */
+function addTourTimingWarning(eventNumber) {
+    const tourEvents = [13, 14, 15];
+    if (!tourEvents.includes(eventNumber)) return;
+    
+    // Find the event CTA section
+    const ctaSection = document.querySelector('.event-cta');
+    if (!ctaSection) return;
+    
+    // Create warning message
+    const warningHTML = `
+        <div class="tour-timing-warning">
+            <div class="warning-icon">⚠️</div>
+            <div class="warning-content">
+                <h4>Multi-Stage Race Timing Requirements</h4>
+                <p><strong>Important:</strong> All tour stages must be completed within strict time windows:</p>
+                <ul>
+                    <li>Stage 2 must be completed within <strong>24 hours</strong> of completing Stage 1</li>
+                    <li>Stage 3 must be completed within <strong>24 hours</strong> of completing Stage 2</li>
+                </ul>
+                <p class="warning-note">Schedule your stages carefully to ensure you can complete all three within the required timeframes!</p>
+            </div>
+        </div>
+    `;
+    
+    // Insert warning before the CTA button
+    const scheduleButton = document.getElementById('scheduleButton');
+    if (scheduleButton) {
+        scheduleButton.insertAdjacentHTML('beforebegin', warningHTML);
     }
 }
 
@@ -699,6 +761,10 @@ document.addEventListener('DOMContentLoaded', () => {
         
         if (user) {
             await loadEventResults();
+        } else {
+            // Not logged in - show pre-race sections and add tour warning if applicable
+            showPreRaceSections();
+            addTourTimingWarning(eventNumber);
         }
     });
 });

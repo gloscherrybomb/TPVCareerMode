@@ -963,6 +963,19 @@
     opacity: 0.6;
 }
 
+.tour-stage-card.clickable {
+    cursor: pointer;
+}
+
+.tour-stage-card.clickable:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(69, 202, 255, 0.3);
+}
+
+.tour-stage-card.viewing {
+    cursor: default;
+}
+
 .stage-header {
     display: flex;
     justify-content: space-between;
@@ -1035,6 +1048,28 @@
     background: var(--text-primary);
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(69, 202, 255, 0.4);
+}
+
+.stage-action {
+    padding: 0.75rem;
+    background: rgba(69, 202, 255, 0.1);
+    color: var(--accent-blue);
+    text-align: center;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    border: 1px solid rgba(69, 202, 255, 0.3);
+}
+
+.stage-viewing-badge {
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-secondary);
+    text-align: center;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.875rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .stage-current-badge {
@@ -1146,5 +1181,75 @@
     .tour-completion-story .story-section p {
         font-size: 1rem;
         line-height: 1.7;
+    }
+}
+
+/* ===== 24-HOUR TIMING WARNING ===== */
+.tour-timing-warning {
+    display: flex;
+    gap: 1.5rem;
+    padding: 2rem;
+    margin: 2rem 0;
+    background: linear-gradient(135deg, rgba(255, 152, 0, 0.1), rgba(255, 87, 34, 0.05));
+    border: 2px solid rgba(255, 152, 0, 0.3);
+    border-radius: 12px;
+}
+
+.warning-icon {
+    font-size: 2.5rem;
+    flex-shrink: 0;
+}
+
+.warning-content h4 {
+    font-family: 'Orbitron', sans-serif;
+    color: #ff9800;
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+}
+
+.warning-content p {
+    color: var(--text-primary);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+.warning-content ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 1rem 0;
+}
+
+.warning-content li {
+    padding: 0.5rem 0;
+    padding-left: 1.5rem;
+    position: relative;
+    color: var(--text-primary);
+}
+
+.warning-content li:before {
+    content: "⏱️";
+    position: absolute;
+    left: 0;
+}
+
+.warning-note {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    font-style: italic;
+}
+
+@media (max-width: 768px) {
+    .tour-timing-warning {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1.5rem;
+    }
+    
+    .warning-icon {
+        font-size: 2rem;
+    }
+    
+    .warning-content h4 {
+        font-size: 1.1rem;
     }
 }
