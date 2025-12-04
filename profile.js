@@ -121,99 +121,57 @@ function getARRBand(arr) {
 }
 
 // Calculate user statistics from race results
-async function calculateUserStats(userUID) {
-    console.log('Calculating supplemental stats for user:', userUID);
+async function calculateUserStats(userUID, userData) {
+    console.log('Building supplemental stats for user:', userUID);
     
-    // NOTE: Most career stats (totalWins, totalPodiums, awards, bestFinish, ARR, etc.) are now 
-    // stored in the user document and updated when results are processed.
-    // This function now only calculates data that isn't stored: recent results and positions array.
+    // NOTE: Most career stats are stored in userData and passed in.
+    // This function just extracts positions and recent results from event results already in userData.
     
     const stats = {
         positions: [],
         recentResults: [],
-        // These will be overwritten by stored values in loadProfile
-        awards: {
-            goldMedals: 0,
-            silverMedals: 0,
-            bronzeMedals: 0,
-            lanternRouge: 0,
-            punchingMedals: 0,
-            giantKillerMedals: 0,
-            bullseyeMedals: 0,
-            hotStreakMedals: 0,
-            domination: 0,
-            closeCall: 0,
-            photoFinish: 0,
-            overrated: 0,
-            darkHorse: 0,
-            backToBack: 0,
-            weekendWarrior: 0,
-            zeroToHero: 0,
-            trophyCollector: 0,
-            technicalIssues: 0,
-            gcGoldMedal: 0,
-            gcSilverMedal: 0,
-            gcBronzeMedal: 0
-        }
+        awards: {} // Will be overwritten by stored values
     };
     
-    // Fetch all results for this user from all events
-    const eventCount = 15; // All possible events
-    const season = 1;
-    
-    for (let eventNum = 1; eventNum <= eventCount; eventNum++) {
-        // User-specific results collection
-        const resultDocId = `season${season}_event${eventNum}_${userUID}`;
+    // Extract positions and recent results from userData event results
+    for (let eventNum = 1; eventNum <= 15; eventNum++) {
+        const eventResults = userData[`event${eventNum}Results`];
         
-        try {
-            const resultDoc = await getDoc(doc(db, 'results', resultDocId));
+        if (eventResults && eventResults.position && eventResults.position !== 'DNF') {
+            const position = eventResults.position;
             
-            if (resultDoc.exists()) {
-                const resultData = resultDoc.data();
-                const results = resultData.results || [];
-                
-                // Find user's result in this event
-                const userResult = results.find(r => r.uid === userUID);
-                
-                if (userResult) {
-                    const position = userResult.position || 0;
-                    
-                    // Track positions array (for charts/graphs)
-                    if (position > 0) {
-                        stats.positions.push(position);
-                    }
-                    
-                    // Add to recent results
-                    stats.recentResults.push({
-                        eventNum: eventNum,
-                        eventName: window.eventData?.[eventNum]?.name || `Event ${eventNum}`,
-                        position: position,
-                        time: userResult.time || 'N/A',
-                        points: userResult.points || 0,
-                        bonusPoints: userResult.bonusPoints || 0,
-                        predictedPosition: userResult.predictedPosition || null,
-                        earnedPunchingMedal: userResult.earnedPunchingMedal || false,
-                        earnedGiantKillerMedal: userResult.earnedGiantKillerMedal || false,
-                        earnedBullseyeMedal: userResult.earnedBullseyeMedal || false,
-                        earnedHotStreakMedal: userResult.earnedHotStreakMedal || false,
-                        earnedDomination: userResult.earnedDomination || false,
-                        earnedCloseCall: userResult.earnedCloseCall || false,
-                        earnedPhotoFinish: userResult.earnedPhotoFinish || false,
-                        earnedDarkHorse: userResult.earnedDarkHorse || false,
-                        earnedZeroToHero: userResult.earnedZeroToHero || false,
-                        date: resultData.processedAt
-                    });
-                }
+            // Track positions array (for charts/graphs)
+            if (position > 0) {
+                stats.positions.push(position);
             }
-        } catch (error) {
-            console.log(`No results for event ${eventNum}`);
+            
+            // Add to recent results
+            stats.recentResults.push({
+                eventNum: eventNum,
+                eventName: window.eventData?.[eventNum]?.name || `Event ${eventNum}`,
+                position: position,
+                time: eventResults.time || 'N/A',
+                points: eventResults.points || 0,
+                bonusPoints: eventResults.bonusPoints || 0,
+                predictedPosition: eventResults.predictedPosition || null,
+                earnedPunchingMedal: eventResults.earnedPunchingMedal || false,
+                earnedGiantKillerMedal: eventResults.earnedGiantKillerMedal || false,
+                earnedBullseyeMedal: eventResults.earnedBullseyeMedal || false,
+                earnedHotStreakMedal: eventResults.earnedHotStreakMedal || false,
+                earnedDomination: eventResults.earnedDomination || false,
+                earnedCloseCall: eventResults.earnedCloseCall || false,
+                earnedPhotoFinish: eventResults.earnedPhotoFinish || false,
+                earnedDarkHorse: eventResults.earnedDarkHorse || false,
+                earnedZeroToHero: eventResults.earnedZeroToHero || false,
+                date: eventResults.processedAt
+            });
         }
     }
     
     // Sort recent results by event number (descending)
     stats.recentResults.sort((a, b) => b.eventNum - a.eventNum);
     
-    console.log('Supplemental stats calculated:', stats.recentResults.length, 'results');
+    console.log('Supplemental stats built:', stats.recentResults.length, 'results');
     return stats;
 }
 
@@ -296,8 +254,8 @@ async function loadProfile(user) {
         
         // Build stats object from stored data and calculated data
         // Stored stats (from results processing): wins, podiums, awards, etc.
-        // Calculated stats (from calculateUserStats): recent results, positions array
-        const calculatedStats = await calculateUserStats(userData.uid);
+        // Calculated stats (from user event results): recent results, positions array
+        const calculatedStats = await calculateUserStats(userData.uid, userData);
         
         // Merge stored stats with calculated stats
         userStats = {
