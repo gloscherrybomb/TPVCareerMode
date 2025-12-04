@@ -1588,17 +1588,6 @@ async function checkAndMarkSeasonComplete(userRef, userData, eventNumber, recent
     seasonUpdates['awards.perfectSeason'] = admin.firestore.FieldValue.increment(1);
   }
   
-  // IRON RIDER - Complete all 15 events without DNS
-  const completedStages = currentData.completedStages || [];
-  const hasEvent14DNS = currentData.event14DNS === true;
-  const hasEvent15DNS = currentData.event15DNS === true;
-  const allEventsCompleted = completedStages.length === 9; // All 9 stages
-  
-  if (allEventsCompleted && !hasEvent14DNS && !hasEvent15DNS) {
-    console.log('   💪 IRON RIDER! Completed all 15 events without DNS');
-    seasonUpdates['awards.ironMan'] = admin.firestore.FieldValue.increment(1);
-  }
-  
   // SPECIALIST - Win 3+ events of the same type
   const eventTypeWins = {}; // Track wins by event type
   const EVENT_TYPES = {

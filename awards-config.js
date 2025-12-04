@@ -215,13 +215,6 @@ const AWARD_DEFINITIONS = {
     description: 'Finish top 3 in 5+ consecutive races',
     calculationType: 'career'
   },
-  ironMan: {
-    id: 'ironMan',
-    title: 'Iron Rider',
-    icon: '💪',
-    description: 'Complete all 15 events in a season',
-    calculationType: 'season'
-  },
   specialist: {
     id: 'specialist',
     title: 'Specialist',

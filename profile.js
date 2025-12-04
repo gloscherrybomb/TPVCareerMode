@@ -476,6 +476,13 @@ function displayRecentResults(results) {
 function displayAwards(awards) {
     const container = document.getElementById('awardsContainer');
     
+    // Safety check - if awards is undefined, initialize it as empty object
+    if (!awards) {
+        awards = {};
+    }
+    
+    console.log('displayAwards called with:', awards);
+    
     // Map old property names to new ones for backwards compatibility
     // New stored format uses: gold, silver, bronze, punchingMedal, giantKiller, etc.
     const mappedAwards = {
@@ -505,11 +512,14 @@ function displayAwards(awards) {
         seasonThirdPlace: awards.seasonThirdPlace || 0,
         perfectSeason: awards.perfectSeason || 0,
         podiumStreak: awards.podiumStreak || 0,
-        ironMan: awards.ironMan || 0,
         specialist: awards.specialist || 0,
         allRounder: awards.allRounder || 0,
         comeback: awards.comeback || 0
     };
+    
+    console.log('Mapped awards:', mappedAwards);
+    console.log('Season trophies - Champion:', mappedAwards.seasonChampion, 'Runner-up:', mappedAwards.seasonRunnerUp, 'Third:', mappedAwards.seasonThirdPlace);
+    console.log('GC trophies - Gold:', mappedAwards.gcGoldMedal, 'Silver:', mappedAwards.gcSilverMedal, 'Bronze:', mappedAwards.gcBronzeMedal);
     
     // Use mapped awards for the rest of the function
     awards = mappedAwards;
@@ -524,7 +534,7 @@ function displayAwards(awards) {
                         (awards.trophyCollector || 0) + (awards.technicalIssues || 0) +
                         (awards.gcGoldMedal || 0) + (awards.gcSilverMedal || 0) + (awards.gcBronzeMedal || 0) +
                         (awards.seasonChampion || 0) + (awards.seasonRunnerUp || 0) + (awards.seasonThirdPlace || 0) +
-                        (awards.perfectSeason || 0) + (awards.podiumStreak || 0) + (awards.ironMan || 0) +
+                        (awards.perfectSeason || 0) + (awards.podiumStreak || 0) +
                         (awards.specialist || 0) + (awards.allRounder || 0) + (awards.comeback || 0);
     
     if (totalAwards === 0) {
@@ -854,18 +864,6 @@ function displayAwards(awards) {
                 <div class="award-count">${awards.podiumStreak}x</div>
                 <div class="award-title">Podium Streak</div>
                 <div class="award-description">5+ Consecutive Top 3 Finishes</div>
-            </div>
-        `;
-    }
-    
-    // Iron Rider (complete all 15 events)
-    if (awards.ironMan > 0) {
-        html += `
-            <div class="award-card iron-rider">
-                <div class="award-icon">💪</div>
-                <div class="award-count">${awards.ironMan}x</div>
-                <div class="award-title">Iron Rider</div>
-                <div class="award-description">Completed All 15 Events in a Season</div>
             </div>
         `;
     }

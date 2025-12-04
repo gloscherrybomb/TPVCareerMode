@@ -526,16 +526,6 @@
     box-shadow: 0 10px 30px rgba(0, 191, 255, 0.3);
 }
 
-.award-card.iron-rider {
-    background: linear-gradient(135deg, rgba(169, 169, 169, 0.15) 0%, rgba(105, 105, 105, 0.05) 100%);
-    border-color: rgba(169, 169, 169, 0.4);
-}
-
-.award-card.iron-rider:hover {
-    border-color: rgb(169, 169, 169);
-    box-shadow: 0 10px 30px rgba(169, 169, 169, 0.3);
-}
-
 .award-card.specialist {
     background: linear-gradient(135deg, rgba(255, 215, 0, 0.15) 0%, rgba(255, 140, 0, 0.05) 100%);
     border-color: rgba(255, 215, 0, 0.4);
