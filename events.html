@@ -11,6 +11,7 @@
     
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="events.css">
+    <link rel="stylesheet" href="season-completion.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -787,7 +788,7 @@
         async function showEndOfSeasonReport(storyContent) {
             try {
                 // Get user's final rank
-                const { getFirestore, doc, getDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+                const { getFirestore, doc, getDoc, updateDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
                 const db = getFirestore();
                 
                 if (!progressManager.currentUser) {
@@ -796,55 +797,53 @@
                 }
                 
                 // Fetch user data
-                const userDoc = await getDoc(doc(db, 'users', progressManager.currentUser.uid));
+                const userDocRef = doc(db, 'users', progressManager.currentUser.uid);
+                const userDoc = await getDoc(userDocRef);
                 const userData = userDoc.data();
                 
-                // Get standings
-                let standings = userData?.season1Standings;
-                
-                if (!standings || standings.length === 0) {
-                    storyContent.innerHTML = '<p>Complete the season to see your final report!</p>';
+                if (!userData) {
+                    storyContent.innerHTML = '<p>Loading season data...</p>';
                     return;
                 }
                 
-                // Find user's final position
-                const userPosition = standings.findIndex(racer => racer.isCurrentUser === true);
-                
-                if (userPosition === -1) {
-                    storyContent.innerHTML = '<p>Complete the season to see your final report!</p>';
-                    return;
-                }
-                
-                const rank = userPosition + 1;
-                const totalRiders = standings.length;
-                const midPoint = Math.ceil(totalRiders / 2);
-                
-                let reportText = '';
-                let reportTitle = '';
-                
-                if (rank === 1) {
-                    reportTitle = 'Post-Season Report: 1st Place';
-                    reportText = 'You could not have asked for a stronger first season. Race after race, you showed up ready, handled whatever the course threw at you, and kept placing well above what anyone expected at this level. You looked confident in the fast races, sharp in the climbs, and steady in the tougher moments, rewarded with a 1st place finish. Riders who finish a season like this do not stay in the local ranks for long. You have clearly outgrown this tier - now it is time to see what you can do against bigger fields.';
-                } else if (rank <= 3) {
-                    reportTitle = 'Post-Season Report: Podium Finish';
-                    reportText = 'This season showed you are right on the edge of breaking through. You were in the mix almost every weekend - close to the front, picking up strong finishes, and proving you know how to handle different types of races. There is a bit of polishing left to do, but the foundation is there. You have built momentum, gained respect in the local bunch, and put yourself in a position where moving up a tier feels like a matter of when, not if. You were rightly rewarded with a podium finish.';
-                } else if (rank <= midPoint) {
-                    reportTitle = 'Post-Season Report: Upper Half Finish';
-                    reportText = 'You ended the year in the middle of the standings, but the story is not about the ranking - it is about the steps you took. You held your own in tougher fields, figured out your strengths, and learned how to manage the chaos of real racing. There were moments where everything clicked, and others where you were simply hanging on, but that is what these early seasons are for. With a bit more experience and focus, you will be fighting for bigger results before long.';
+                // Use the new season completion module
+                if (window.seasonCompletion) {
+                    const summaryText = window.seasonCompletion.generateSeasonSummaryText(userData);
+                    storyContent.innerHTML = `<p>${summaryText}</p>`;
+                    storyContent.classList.add('report');
+                    
+                    // Show season complete banner
+                    if (window.seasonCompletionUI) {
+                        window.seasonCompletionUI.showSeasonCompleteBanner(userData, summaryText);
+                        
+                        // Show celebration modal if not seen yet
+                        if (window.seasonCompletionUI.shouldShowCelebration(userData)) {
+                            const seasonData = {
+                                seasonRank: userData.season1Rank || null,
+                                totalPoints: userData.totalPoints || 0,
+                                totalWins: userData.totalWins || 0,
+                                totalPodiums: userData.totalPodiums || 0,
+                                totalEvents: (userData.completedStages || []).length,
+                                localTourGCPosition: userData.localTourGCPosition,
+                                earnedSeasonPodium: userData.season1Rank <= 3,
+                                awards: userData.awards || {}
+                            };
+                            window.seasonCompletionUI.showSeasonCompleteModal(seasonData);
+                            
+                            // Mark as viewed
+                            await updateDoc(userDocRef, { season1CelebrationViewed: true });
+                        }
+                    }
                 } else {
-                    reportTitle = 'Post-Season Report: Season Complete';
-                    reportText = 'It was a tough season, and the results show it - but that does not mean it was wasted. Every rider has a year like this early on, where the learning curve is steep and every race feels like a new lesson. You stuck it out, finished your events, and started to understand what this level demands. The important part is that you are still here and now have a clearer picture of where you need to improve. Take what you have learned, regroup, and come back stronger next season.';
+                    // Fallback if modules not loaded
+                    storyContent.innerHTML = '<p>Season 1 is complete! Congratulations on finishing all events.</p>';
+                    storyContent.classList.add('report');
                 }
-                
-                storyContent.innerHTML = `
-                    <div class="season-story-title">${reportTitle}</div>
-                    <p>${reportText}</p>
-                `;
-                storyContent.classList.add('report');
                 
             } catch (error) {
                 console.error('Error showing end-of-season report:', error);
-                storyContent.innerHTML = '<p>Complete the season to see your final report!</p>';
+                storyContent.innerHTML = '<p>Season complete! Your final standings are being calculated.</p>';
+                storyContent.classList.add('report');
             }
         }
         
@@ -1016,6 +1015,98 @@
             // In the future, this will load different season data
             console.log(`Season ${seasonNumber} selected`);
         };
+        
+        // Season 1 Reset Function
+        window.resetSeason1 = async function() {
+            if (!progressManager.currentUser) {
+                alert('You must be logged in to reset your season.');
+                return;
+            }
+            
+            try {
+                const { getFirestore, doc, updateDoc, deleteField, collection, query, where, getDocs } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+                const db = getFirestore();
+                
+                // Find user document
+                const usersRef = collection(db, 'users');
+                const q = query(usersRef, where('email', '==', progressManager.currentUser.email));
+                const querySnapshot = await getDocs(q);
+                
+                if (querySnapshot.empty) {
+                    alert('User data not found.');
+                    return;
+                }
+                
+                const userDoc = querySnapshot.docs[0];
+                const userDocRef = userDoc.ref;
+                
+                // Reset all season 1 data
+                const resetData = {
+                    currentStage: 1,
+                    totalPoints: 0,
+                    totalEvents: 0,
+                    totalWins: 0,
+                    totalPodiums: 0,
+                    totalTop10s: 0,
+                    bestFinish: null,
+                    averageFinish: null,
+                    winRate: 0,
+                    podiumRate: 0,
+                    completedStages: [],
+                    usedOptionalEvents: [],
+                    tourProgress: {},
+                    season1Standings: [],
+                    season1Complete: false,
+                    season1Rank: null,
+                    localTourStatus: 'in_progress',
+                    season1CelebrationViewed: false,
+                    awards: {
+                        gold: 0,
+                        silver: 0,
+                        bronze: 0,
+                        punchingMedal: 0,
+                        giantKiller: 0,
+                        bullseye: 0,
+                        hotStreak: 0,
+                        domination: 0,
+                        closeCall: 0,
+                        photoFinish: 0,
+                        darkHorse: 0,
+                        zeroToHero: 0,
+                        gcGold: 0,
+                        gcSilver: 0,
+                        gcBronze: 0,
+                        lanternRouge: 0,
+                        seasonChampion: 0,
+                        seasonRunnerUp: 0,
+                        seasonThirdPlace: 0
+                    }
+                };
+                
+                // Delete all event results and DNS flags
+                const deleteFields = {};
+                for (let i = 1; i <= 15; i++) {
+                    deleteFields[`event${i}Results`] = deleteField();
+                }
+                deleteFields.event14DNS = deleteField();
+                deleteFields.event15DNS = deleteField();
+                deleteFields.event14DNSReason = deleteField();
+                deleteFields.event15DNSReason = deleteField();
+                deleteFields.season1CompletionDate = deleteField();
+                deleteFields.localTourGCPosition = deleteField();
+                
+                // Update user document
+                await updateDoc(userDocRef, { ...resetData, ...deleteFields });
+                
+                console.log('Season 1 reset successful');
+                
+            } catch (error) {
+                console.error('Error resetting season:', error);
+                throw error;
+            }
+        };
     </script>
+    <script src="season-completion.js"></script>
+    <script src="season-completion-ui.js"></script>
 </body>
 </html>

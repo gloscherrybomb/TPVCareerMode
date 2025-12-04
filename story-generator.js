@@ -298,6 +298,30 @@ function generateSeasonContext(data) {
 function generateRaceStory(raceData, seasonData) {
   const eventName = EVENT_NAMES[raceData.eventNumber] || `Event ${raceData.eventNumber}`;
   
+  // Special handling for Event 15 when season is complete
+  if (raceData.eventNumber === 15 && seasonData.isSeasonComplete && typeof window !== 'undefined' && window.seasonCompletion) {
+    console.log('Generating season completion story for Event 15');
+    try {
+      const seasonCompleteStory = window.seasonCompletion.generateSeasonCompleteStory({
+        position: raceData.position,
+        seasonRank: seasonData.seasonRank,
+        totalPoints: seasonData.totalPoints,
+        totalWins: seasonData.totalWins,
+        totalPodiums: seasonData.totalPodiums,
+        localTourGCPosition: seasonData.localTourGCPosition,
+        earnedSeasonPodium: seasonData.seasonRank && seasonData.seasonRank <= 3
+      });
+      
+      return {
+        recap: seasonCompleteStory,
+        context: '' // No additional context needed for season complete
+      };
+    } catch (error) {
+      console.error('Error generating season complete story:', error);
+      // Fall through to regular story generation
+    }
+  }
+  
   const recapData = {
     ...raceData,
     eventName,

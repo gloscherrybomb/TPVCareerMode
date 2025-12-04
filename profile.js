@@ -870,6 +870,31 @@ function displayCareerSummary(userData, stats) {
     // Calculate total awards
     const totalAwardsCount = Object.values(stats.awards || {}).reduce((sum, val) => sum + val, 0);
     
+    // Check if season is complete
+    const seasonComplete = userData.season1Complete === true;
+    console.log('Season complete status:', seasonComplete);
+    
+    // If season is complete, show season review instead of ongoing summary
+    if (seasonComplete && window.seasonCompletion) {
+        console.log('Generating season review...');
+        try {
+            const reviewText = window.seasonCompletion.generateProfileSeasonReview(userData);
+            // Convert markdown-style text to HTML
+            const htmlText = reviewText
+                .replace(/## (.*)/g, '<h2>$1</h2>')
+                .replace(/### (.*)/g, '<h3>$1</h3>')
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\n\n/g, '</p><p>')
+                .replace(/\n/g, '<br>');
+            container.innerHTML = '<p>' + htmlText + '</p>';
+            console.log('Season review displayed successfully');
+            return;
+        } catch (error) {
+            console.error('Error generating season review:', error);
+            // Fall through to regular summary
+        }
+    }
+    
     // Build career data object for generator
     const careerData = {
         totalSeasons: 1,

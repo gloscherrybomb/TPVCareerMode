@@ -320,6 +320,36 @@ function generateTourCompletionStory(userData, gcResults) {
         storyContext += `Stage racing requires a different skillset than single-day events. Learn from this, work on your recovery between stages, and you'll improve!`;
     }
     
+    // Check if season is complete
+    const seasonComplete = userData.season1Complete === true;
+    const seasonRank = userData.season1Rank || null;
+    
+    // If season is complete, add season wrap-up
+    let seasonWrapUp = '';
+    if (seasonComplete) {
+        seasonWrapUp = `
+            <div class="story-section" style="background: linear-gradient(135deg, #1a472a 0%, #2d5a3d 100%); border: 2px solid #00ff88; border-radius: 8px; padding: 1.5rem; margin-top: 1.5rem;">
+                <h4>🏆 Season 1 Complete</h4>
+                <p>The Local Tour was the final chapter of Season 1, and now the season is officially complete. `;
+        
+        if (seasonRank === 1) {
+            seasonWrapUp += `You didn't just finish the season—you won it. First place overall in the Season 1 standings. Champion. `;
+        } else if (seasonRank === 2) {
+            seasonWrapUp += `You finished second overall in the Season 1 standings—a runner-up finish that proves you belong at the front of the field. `;
+        } else if (seasonRank === 3) {
+            seasonWrapUp += `Third place overall in the Season 1 standings earns you a spot on the season podium. A bronze medal season is an excellent foundation. `;
+        } else if (seasonRank <= 10) {
+            seasonWrapUp += `You finished ${seasonRank}th overall in the Season 1 standings—a top-10 finish shows consistent performance throughout the year. `;
+        } else {
+            seasonWrapUp += `Season 1 is now in the books. You competed in all the events, gained experience, and finished ${seasonRank}th overall in the standings. `;
+        }
+        
+        seasonWrapUp += `</p><p>Every race this season taught you something. Every result—good or bad—built experience. The local amateur circuits have been conquered. `;
+        seasonWrapUp += `Season 2 launches in Spring 2026 with Continental Pro racing: longer events, tougher competition, and bigger stakes. `;
+        seasonWrapUp += `The off-season is here. Time to rest, reflect on how far you've come, and prepare for the next level. Your journey continues.</p>`;
+        seasonWrapUp += `</div>`;
+    }
+    
     return `
         <div class="tour-completion-story">
             <div class="story-header">
@@ -330,9 +360,10 @@ function generateTourCompletionStory(userData, gcResults) {
                 <p>${storyRecap}</p>
             </div>
             <div class="story-section">
-                <h4>Looking Ahead</h4>
+                <h4>${seasonComplete ? 'Tour Reflection' : 'Looking Ahead'}</h4>
                 <p>${storyContext}</p>
             </div>
+            ${seasonWrapUp}
         </div>
     `;
 }
