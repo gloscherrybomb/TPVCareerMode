@@ -89,7 +89,7 @@ function getARRBand(arr) {
 /**
  * Show pre-race sections (story, route, scoring, cta)
  */
-function showPreRaceSections() {
+async function showPreRaceSections(userData, userUid) {
     const sectionsToShow = [
         '.event-story',
         '.event-route',
@@ -103,6 +103,17 @@ function showPreRaceSections() {
             section.style.display = 'block';
         }
     });
+    
+    // Add tour overview for tour events (13, 14, 15) even before completion
+    if ((eventNumber === 13 || eventNumber === 14 || eventNumber === 15) && userData && userUid) {
+        const tourOverviewHTML = await displayTourOverview(eventNumber, userData, userUid);
+        
+        // Insert tour overview before the event story section
+        const eventStorySection = document.querySelector('.event-story');
+        if (eventStorySection && tourOverviewHTML) {
+            eventStorySection.insertAdjacentHTML('beforebegin', tourOverviewHTML);
+        }
+    }
     
     // Add tour timing warning for multi-stage events
     addTourTimingWarning(eventNumber);
@@ -538,8 +549,8 @@ async function displayGCResults(gcData, currentUserUid, eventNumber) {
  */
 async function loadEventResults() {
     if (!currentUser) {
-        // Not logged in - show pre-race sections
-        showPreRaceSections();
+        // Not logged in - show pre-race sections (no userData available)
+        await showPreRaceSections(null, null);
         return;
     }
 
@@ -555,7 +566,7 @@ async function loadEventResults() {
         if (!userUid) {
             console.error('Could not get user UID');
             eventResultsSection.style.display = 'none';
-            showPreRaceSections();
+            await showPreRaceSections(userData, userUid);
             return;
         }
         
@@ -564,9 +575,9 @@ async function loadEventResults() {
         const resultsDoc = await getDoc(resultsRef);
 
         if (!resultsDoc.exists()) {
-            // No results available yet - show pre-race sections
+            // No results available yet - show pre-race sections with tour overview
             eventResultsSection.style.display = 'none';
-            showPreRaceSections();
+            await showPreRaceSections(userData, userUid);
             return;
         }
 
@@ -575,7 +586,7 @@ async function loadEventResults() {
 
         if (results.length === 0) {
             eventResultsSection.style.display = 'none';
-            showPreRaceSections();
+            await showPreRaceSections(userData, userUid);
             return;
         }
 
@@ -743,7 +754,14 @@ async function loadEventResults() {
     } catch (error) {
         console.error('Error loading event results:', error);
         eventResultsSection.style.display = 'none';
-        showPreRaceSections();
+        // Try to get userData if available for tour overview
+        try {
+            const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
+            const userData = userDoc.data();
+            await showPreRaceSections(userData, userData?.uid);
+        } catch {
+            await showPreRaceSections(null, null);
+        }
     }
 }
 
@@ -779,8 +797,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (user) {
             await loadEventResults();
         } else {
-            // Not logged in - show pre-race sections and add tour warning if applicable
-            showPreRaceSections();
+            // Not logged in - show pre-race sections (no userData available)
+            await showPreRaceSections(null, null);
             addTourTimingWarning(eventNumber);
         }
     });
