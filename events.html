@@ -688,9 +688,71 @@
             // Check if season is complete (all 9 stages completed)
             const totalStages = eventSequence.length;
             const completedStages = progressManager.progress.completedStages.length;
-            const isSeasonComplete = completedStages === totalStages;
             
-            console.log(`Season status: ${completedStages}/${totalStages} stages completed`);
+            // Special check for Local Tour (stage 9 = events 13, 14, 15)
+            // Even if stage 9 is marked complete, we need to verify all 3 tour stages are done
+            // OR if the tour was DNS'd due to 24-hour window violations
+            let isSeasonComplete = completedStages === totalStages;
+            let tourDNS = false;
+            
+            if (isSeasonComplete && progressManager.currentUser) {
+                // Additional check: verify Local Tour is fully complete or DNS
+                try {
+                    const { getFirestore, doc, getDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+                    const db = getFirestore();
+                    const userDoc = await getDoc(doc(db, 'users', progressManager.currentUser.uid));
+                    const userData = userDoc.data();
+                    
+                    // Check if all 3 Local Tour stages are completed
+                    const event13Complete = userData?.event13Results;
+                    const event14Complete = userData?.event14Results;
+                    const event15Complete = userData?.event15Results;
+                    
+                    const tourComplete = event13Complete && event14Complete && event15Complete;
+                    
+                    // Check for DNS (Did Not Start) - if a stage is marked DNS or wasn't completed in time
+                    if (event13Complete) {
+                        // Check if stage 2 or 3 are marked as DNS
+                        tourDNS = userData?.event14DNS || userData?.event15DNS;
+                        
+                        // Also check if enough time has passed without completing the stages
+                        // If event 13 was done but 14/15 are missing and more than 24 hours passed, it's effectively DNS
+                        if (!tourDNS && !event14Complete && event13Complete.timestamp) {
+                            const event13Time = event13Complete.timestamp?.toMillis ? event13Complete.timestamp.toMillis() : event13Complete.timestamp;
+                            const now = Date.now();
+                            const hoursPassed = (now - event13Time) / (1000 * 60 * 60);
+                            
+                            if (hoursPassed > 24) {
+                                tourDNS = true;
+                                console.log('Event 14 DNS - 24 hour window expired');
+                            }
+                        }
+                        
+                        if (!tourDNS && event14Complete && !event15Complete && event14Complete.timestamp) {
+                            const event14Time = event14Complete.timestamp?.toMillis ? event14Complete.timestamp.toMillis() : event14Complete.timestamp;
+                            const now = Date.now();
+                            const hoursPassed = (now - event14Time) / (1000 * 60 * 60);
+                            
+                            if (hoursPassed > 24) {
+                                tourDNS = true;
+                                console.log('Event 15 DNS - 24 hour window expired');
+                            }
+                        }
+                    }
+                    
+                    if (!tourComplete && !tourDNS) {
+                        isSeasonComplete = false;
+                        console.log('Season appears complete but Local Tour not finished - treating as incomplete');
+                    } else if (tourDNS) {
+                        isSeasonComplete = true;
+                        console.log('Local Tour DNS - season considered complete with incomplete tour');
+                    }
+                } catch (error) {
+                    console.error('Error checking Local Tour completion:', error);
+                }
+            }
+            
+            console.log(`Season status: ${completedStages}/${totalStages} stages completed, isSeasonComplete: ${isSeasonComplete}, tourDNS: ${tourDNS}`);
             
             if (!isSeasonComplete) {
                 // Show introduction text

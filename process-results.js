@@ -748,8 +748,46 @@ async function processUserResult(uid, eventInfo, results) {
   // Add story to event results
   eventResults.storyRecap = story.recap;
   eventResults.storyContext = story.context;
+  eventResults.timestamp = admin.firestore.FieldValue.serverTimestamp(); // Add timestamp for 24-hour checking
   
   console.log(`   📖 Generated race story`);
+  
+  // Check for DNS on Local Tour stages (24-hour window enforcement)
+  const dnsFlags = {};
+  if (eventNumber >= 13 && eventNumber <= 15) {
+    // Check if previous tour stage was completed in time
+    if (eventNumber === 14 && userData.event13Results) {
+      // Check if event 13 was done more than 24 hours ago
+      const event13Timestamp = userData.event13Results.timestamp;
+      if (event13Timestamp) {
+        const event13Time = event13Timestamp.toMillis ? event13Timestamp.toMillis() : event13Timestamp;
+        const now = Date.now();
+        const hoursSinceEvent13 = (now - event13Time) / (1000 * 60 * 60);
+        
+        if (hoursSinceEvent13 > 24) {
+          console.log(`   ⚠️ WARNING: Event 14 completed ${hoursSinceEvent13.toFixed(1)} hours after Event 13 (>24hr window)`);
+          dnsFlags.event14DNS = true;
+          dnsFlags.event14DNSReason = `Completed ${hoursSinceEvent13.toFixed(1)} hours after Stage 1 (24hr limit exceeded)`;
+        }
+      }
+    }
+    
+    if (eventNumber === 15 && userData.event14Results) {
+      // Check if event 14 was done more than 24 hours ago
+      const event14Timestamp = userData.event14Results.timestamp;
+      if (event14Timestamp) {
+        const event14Time = event14Timestamp.toMillis ? event14Timestamp.toMillis() : event14Timestamp;
+        const now = Date.now();
+        const hoursSinceEvent14 = (now - event14Time) / (1000 * 60 * 60);
+        
+        if (hoursSinceEvent14 > 24) {
+          console.log(`   ⚠️ WARNING: Event 15 completed ${hoursSinceEvent14.toFixed(1)} hours after Event 14 (>24hr window)`);
+          dnsFlags.event15DNS = true;
+          dnsFlags.event15DNSReason = `Completed ${hoursSinceEvent14.toFixed(1)} hours after Stage 2 (24hr limit exceeded)`;
+        }
+      }
+    }
+  }
   
   // Calculate career statistics from all event results (including current)
   const tempUserData = { ...userData };
@@ -774,7 +812,8 @@ async function processUserResult(uid, eventInfo, results) {
     [`season${season}Standings`]: seasonStandings,
     team: userResult.Team || '',
     usedOptionalEvents: newUsedOptionalEvents,
-    tourProgress: newTourProgress
+    tourProgress: newTourProgress,
+    ...dnsFlags // Add DNS flags if any
   };
   
   // Add GC results if this was the final tour stage

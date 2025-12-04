@@ -809,6 +809,9 @@ async function processResultsForUser(userDoc, csvFiles, season) {
       }
     );
     
+    // Note: 24-hour DNS checking for Local Tour stages is done in process-results.js
+    // during live processing, not during reprocessing of historical results
+    
     // Store event results
     updates[`event${eventNumber}Results`] = {
       position: position,
