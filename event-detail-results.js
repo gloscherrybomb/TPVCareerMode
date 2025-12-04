@@ -669,16 +669,22 @@ async function loadEventResults() {
         let storyHTML = '';
         
         if (userEventResults && userEventResults.storyRecap && userEventResults.storyContext) {
+            // For Event 15, don't show the season context if season is complete
+            // The tour completion story will have the season wrap-up instead
+            const isEvent15Complete = eventNumber === 15 && userData.season1Complete === true;
+            
             storyHTML = `
                 <div class="race-story">
                     <div class="story-section">
                         <h3>Race Recap</h3>
                         <p>${userEventResults.storyRecap}</p>
                     </div>
+                    ${!isEvent15Complete ? `
                     <div class="story-section">
                         <h3>Season Context</h3>
                         <p>${userEventResults.storyContext}</p>
                     </div>
+                    ` : ''}
                 </div>
             `;
         }

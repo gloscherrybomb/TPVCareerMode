@@ -167,6 +167,12 @@ function generateSeasonContext(data) {
     seasonPosition
   } = data;
 
+  // Special case: If this is the final stage (stage 9 = Local Tour complete) and season is complete
+  // Return empty context - the season wrap-up will be shown separately
+  if (stagesCompleted === 9 && data.isSeasonComplete) {
+    return '';
+  }
+
   let context = '';
 
   // Opening - season progress (1-2 sentences)
