@@ -864,6 +864,43 @@ async function processUserResult(uid, eventInfo, results) {
     updates.completedStages = admin.firestore.FieldValue.arrayUnion(currentStage);
   }
   
+  // Check for special event-based awards
+  
+  // PODIUM STREAK - 5 consecutive top 3 finishes
+  // Get the last 4 event results (before this one)
+  const recentPositions = [];
+  for (let i = 1; i <= 15; i++) {
+    if (userData[`event${i}Results`] && userData[`event${i}Results`].position) {
+      recentPositions.push(userData[`event${i}Results`].position);
+    }
+  }
+  
+  // Add current position
+  recentPositions.push(position);
+  
+  // Check if last 5 results are all top 3
+  if (recentPositions.length >= 5) {
+    const last5 = recentPositions.slice(-5);
+    const allPodiums = last5.every(pos => pos <= 3);
+    
+    if (allPodiums) {
+      console.log('   📈 PODIUM STREAK! 5 consecutive top 3 finishes');
+      updates['awards.podiumStreak'] = admin.firestore.FieldValue.increment(1);
+    }
+  }
+  
+  // COMEBACK KID - Top 5 after bottom half finish
+  if (recentPositions.length >= 2 && position <= 5) {
+    const previousPosition = recentPositions[recentPositions.length - 2];
+    const totalRiders = results.length;
+    const bottomHalf = totalRiders / 2;
+    
+    if (previousPosition > bottomHalf) {
+      console.log(`   🔄 COMEBACK KID! Top 5 finish after position ${previousPosition}`);
+      updates['awards.comeback'] = admin.firestore.FieldValue.increment(1);
+    }
+  }
+  
   await userRef.update(updates);
   
   const bonusLog = bonusPoints > 0 ? ` (including +${bonusPoints} bonus)` : '';
@@ -1526,6 +1563,65 @@ async function checkAndMarkSeasonComplete(userRef, userData, eventNumber, recent
   } else if (userRank === 3) {
     console.log('   🥉 SEASON THIRD PLACE! Awarding Season Third Place trophy');
     seasonUpdates['awards.seasonThirdPlace'] = admin.firestore.FieldValue.increment(1);
+  }
+  
+  // Check for special season achievement awards
+  console.log('   Checking for special achievement awards...');
+  
+  // PERFECT SEASON - Win every event (all 15 events with position 1)
+  let isPerfectSeason = true;
+  for (let i = 1; i <= 15; i++) {
+    const eventResults = currentData[`event${i}Results`];
+    if (!eventResults || eventResults.position !== 1) {
+      isPerfectSeason = false;
+      break;
+    }
+  }
+  if (isPerfectSeason) {
+    console.log('   💯 PERFECT SEASON! Won every single event!');
+    seasonUpdates['awards.perfectSeason'] = admin.firestore.FieldValue.increment(1);
+  }
+  
+  // IRON RIDER - Complete all 15 events without DNS
+  const completedStages = currentData.completedStages || [];
+  const hasEvent14DNS = currentData.event14DNS === true;
+  const hasEvent15DNS = currentData.event15DNS === true;
+  const allEventsCompleted = completedStages.length === 9; // All 9 stages
+  
+  if (allEventsCompleted && !hasEvent14DNS && !hasEvent15DNS) {
+    console.log('   💪 IRON RIDER! Completed all 15 events without DNS');
+    seasonUpdates['awards.ironMan'] = admin.firestore.FieldValue.increment(1);
+  }
+  
+  // SPECIALIST - Win 3+ events of the same type
+  const eventTypeWins = {}; // Track wins by event type
+  const EVENT_TYPES = {
+    1: 'criterium', 2: 'road race', 3: 'track elimination', 4: 'time trial',
+    5: 'points race', 6: 'hill climb', 7: 'criterium', 8: 'gran fondo',
+    9: 'hill climb', 10: 'time trial', 11: 'points race', 12: 'gravel race',
+    13: 'road race', 14: 'road race', 15: 'time trial'
+  };
+  
+  for (let i = 1; i <= 15; i++) {
+    const eventResults = currentData[`event${i}Results`];
+    if (eventResults && eventResults.position === 1) {
+      const eventType = EVENT_TYPES[i];
+      eventTypeWins[eventType] = (eventTypeWins[eventType] || 0) + 1;
+    }
+  }
+  
+  const maxWinsInType = Math.max(...Object.values(eventTypeWins), 0);
+  if (maxWinsInType >= 3) {
+    const specialistType = Object.keys(eventTypeWins).find(t => eventTypeWins[t] === maxWinsInType);
+    console.log(`   ⭐ SPECIALIST! Won ${maxWinsInType} ${specialistType} events`);
+    seasonUpdates['awards.specialist'] = admin.firestore.FieldValue.increment(1);
+  }
+  
+  // ALL-ROUNDER - Win at least one event of 5+ different types
+  const uniqueTypesWon = Object.keys(eventTypeWins).length;
+  if (uniqueTypesWon >= 5) {
+    console.log(`   🌟 ALL-ROUNDER! Won ${uniqueTypesWon} different event types`);
+    seasonUpdates['awards.allRounder'] = admin.firestore.FieldValue.increment(1);
   }
   
   // Update user document with season completion
