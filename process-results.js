@@ -1150,23 +1150,27 @@ async function buildSeasonStandings(results, userData, eventNumber, currentUid) 
     
     const botStanding = standingsMap.get(botName);
     
-    // Calculate simulated points for missing events
-    // ONLY simulate for events the user has actually completed
-    let simulatedPoints = 0;
+    // Calculate total points for all completed events (recalculate from scratch)
+    // This ensures bot points are always accurate, not accumulated
+    let totalPoints = 0;
     let simulatedEvents = 0;
     
     for (const eventNum of completedEventNumbers) {
-      if (!botInfo.actualEvents.has(eventNum)) {
+      if (botInfo.actualEvents.has(eventNum)) {
+        // Bot actually participated - use their real points from that event
+        const eventData = botInfo.actualEvents.get(eventNum);
+        totalPoints += eventData.points || 0;
+      } else {
         // Bot didn't participate in this event, simulate it
         const simulatedPosition = simulatePosition(botName, botInfo.arr, eventNum);
         const points = calculatePoints(simulatedPosition, eventNum).points; // Base points only, no bonus
-        simulatedPoints += points;
+        totalPoints += points;
         simulatedEvents++;
       }
     }
     
-    // Update bot standing with simulated results
-    botStanding.points += simulatedPoints;
+    // Set bot standing with recalculated total (not +=, use =)
+    botStanding.points = totalPoints;
     botStanding.events = completedEventNumbers.length; // Count of events user has completed
     botStanding.simulatedEvents = simulatedEvents; // Track how many were simulated
   }
