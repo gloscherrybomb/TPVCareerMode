@@ -1,7 +1,20 @@
-import { auth } from './app.js';
-import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
+// Firebase configuration
+const firebaseConfig = {
+    apiKey: "AIzaSyDd7gFGIXiL-_frLZAW0dl-qv2yc3cQN4A",
+    authDomain: "careermodelogin.firebaseapp.com",
+    projectId: "careermodelogin",
+    storageBucket: "careermodelogin.firebasestorage.app",
+    messagingSenderId: "606687951454",
+    appId: "1:606687951454:web:c7e50d1de38d79d79be8f2"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
 const db = getFirestore();
 let currentUser = null;
 
