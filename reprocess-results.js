@@ -546,7 +546,7 @@ async function buildSeasonStandings(results, eventNumber, completedEvents, curre
     
     const botStanding = standingsMap.get(botName);
     const botUsedOptionals = new Set();
-    let simulatedPoints = 0;
+    let totalPoints = 0; // Recalculate total, not just simulated
     
     for (let stage = 1; stage <= numStagesCompleted; stage++) {
       let eventNumForStage;
@@ -565,14 +565,22 @@ async function buildSeasonStandings(results, eventNumber, completedEvents, curre
         eventNumForStage = STAGE_TO_EVENT[stage];
       }
       
-      if (eventNumForStage && !botInfo.actualEvents.has(eventNumForStage)) {
-        const simulatedPosition = simulatePosition(botName, botInfo.arr, eventNumForStage);
-        const points = calculatePoints(simulatedPosition, eventNumForStage).points;
-        simulatedPoints += points;
+      if (eventNumForStage) {
+        if (botInfo.actualEvents.has(eventNumForStage)) {
+          // Bot actually participated - use their real points
+          const eventData = botInfo.actualEvents.get(eventNumForStage);
+          totalPoints += eventData.points || 0;
+        } else {
+          // Bot didn't participate - simulate it
+          const simulatedPosition = simulatePosition(botName, botInfo.arr, eventNumForStage);
+          const points = calculatePoints(simulatedPosition, eventNumForStage).points;
+          totalPoints += points;
+        }
       }
     }
     
-    botStanding.points += simulatedPoints;
+    // Set bot standing with recalculated total (not +=, use =)
+    botStanding.points = totalPoints;
     botStanding.events = numCompletedEvents;
   }
   
