@@ -369,6 +369,35 @@ This is where you learn what it takes to race over multiple days—managing fati
             }
         ]
     },
+    13: {
+        number: "13",
+        name: "Local Tour Stage 1",
+        subtitle: "Figure of 8",
+        type: "Stage Race - Stage 1",
+        level: "Local Amateur",
+        mandatory: true,
+        distance: "35.2 km",
+        climbing: "174 m",
+        course: "Figure of 8",
+        format: "1 stage",
+        maxPoints: 120,
+        icon: "🏆",
+        description: `Stage 1 of the Local Tour sets the tone for the entire three-day race. The Figure of 8 course is a flowing opener that isn't overly difficult, but every second counts—positioning and time gaps earned here will matter for the overall GC.
+
+This opening stage is about finding your rhythm and avoiding mistakes. It's not the hardest day, but it's crucial. Start conservatively, settle into the race, and finish with something left in the tank. The real battles are still to come, but a solid performance here puts you in the mix.
+
+This is your first taste of multi-day stage racing. Focus on clean execution and smart positioning. Don't burn matches unnecessarily—you'll need them for the days ahead.`,
+        strategy: "Stage racing is about consistency. Don't lose time unnecessarily. Stay near the front and avoid crashes. This isn't the day to win the tour, but it is a day you could lose it. Ride smart, stay safe, and set yourself up for the stages ahead.",
+        routeDetails: {
+            start: "Figure of 8 start",
+            keyPoint: "Flowing roads with good positioning opportunities",
+            difficulty: "Moderate opener",
+            finish: "Figure of 8 finish"
+        },
+        isStageRace: true,
+        tourStage: 1,
+        tourEvent: "Local Tour"
+    },
     14: {
         number: "14",
         name: "Local Tour Stage 2",

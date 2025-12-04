@@ -343,13 +343,38 @@
             // Update title
             document.title = `${event.name} - TPV Career Mode`;
 
+            // Helper function to get stage label
+            function getStageLabel(eventId) {
+                // Map event IDs to stage numbers
+                const eventToStage = {
+                    1: 'Stage 1',
+                    2: 'Stage 2',
+                    3: 'Stage 4',
+                    4: 'Stage 5',
+                    5: 'Stage 7',
+                    13: 'Local Tour Stage 1',
+                    14: 'Local Tour Stage 2',
+                    15: 'Local Tour Stage 3'
+                    // Optional events (6-12) handled separately
+                };
+                
+                // For optional events, just say "Optional Event"
+                if (eventId >= 6 && eventId <= 12) {
+                    return 'Optional Event';
+                }
+                
+                return eventToStage[eventId] || `Event ${eventId}`;
+            }
+
+            const stageLabel = getStageLabel(eventNumber);
+
             // Update breadcrumb
             document.querySelector('.breadcrumb').innerHTML = `
-                <a href="index.html">Home</a> / <a href="events.html">Events</a> / Event ${event.number}
+                <a href="index.html">Home</a> / <a href="events.html">Events</a> / ${event.name}
             `;
 
             // Update hero section
-            document.querySelector('.event-badge').textContent = `Event ${event.number} • ${event.level}`;
+            document.querySelector('.event-badge').textContent = `${stageLabel} • ${event.level}`;
             document.querySelector('.event-hero-title').textContent = event.name;
             document.querySelector('.event-hero-subtitle').textContent = event.subtitle;
 
