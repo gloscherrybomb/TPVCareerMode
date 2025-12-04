@@ -78,6 +78,162 @@
     color: var(--accent-pink);
 }
 
+/* ===== ROUTE PROFILE VIEWER ===== */
+.route-profile-section {
+    margin-bottom: 4rem;
+}
+
+.profile-tabs {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+
+.profile-tab {
+    padding: 0.75rem 2rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(69, 202, 255, 0.3);
+    border-radius: 8px;
+    color: var(--text-secondary);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.profile-tab:hover {
+    background: rgba(69, 202, 255, 0.1);
+    border-color: var(--accent-blue);
+    color: var(--accent-blue);
+}
+
+.profile-tab.active {
+    background: var(--accent-blue);
+    border-color: var(--accent-blue);
+    color: white;
+}
+
+.profile-viewer {
+    position: relative;
+    background: var(--card-background);
+    border: 2px solid rgba(69, 202, 255, 0.3);
+    border-radius: 12px;
+    padding: 2rem;
+    min-height: 500px;
+}
+
+.profile-content {
+    display: none;
+}
+
+.profile-content.active {
+    display: block;
+}
+
+.profile-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: var(--text-primary);
+    text-align: center;
+    margin-bottom: 0.5rem;
+}
+
+.profile-distance {
+    text-align: center;
+    font-size: 1.1rem;
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+}
+
+.route-image {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+/* ===== STAGE BREAKDOWN ===== */
+.stage-breakdown-section {
+    margin-bottom: 4rem;
+}
+
+.breakdown-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.breakdown-card {
+    background: linear-gradient(135deg, rgba(69, 202, 255, 0.05), rgba(255, 27, 107, 0.05));
+    border: 2px solid rgba(69, 202, 255, 0.3);
+    border-radius: 12px;
+    padding: 2rem;
+    transition: all 0.3s ease;
+}
+
+.breakdown-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(69, 202, 255, 0.3);
+    border-color: var(--accent-blue);
+}
+
+.breakdown-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.breakdown-stage {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--accent-pink);
+    letter-spacing: 1px;
+}
+
+.breakdown-points {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--accent-blue);
+}
+
+.breakdown-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+}
+
+.breakdown-stats {
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 1rem;
+}
+
+.breakdown-stat {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+    color: var(--text-secondary);
+}
+
+.breakdown-stat .stat-icon {
+    font-size: 1.2rem;
+}
+
+.breakdown-description {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
 /* ===== STAGES SECTION ===== */
 .stages-section {
     margin-bottom: 3rem;
@@ -408,6 +564,45 @@
     
     .tour-rules {
         padding: 1rem;
+    }
+    
+    .profile-tabs {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+    
+    .profile-tab {
+        padding: 0.6rem 1.5rem;
+        font-size: 0.875rem;
+    }
+    
+    .profile-viewer {
+        padding: 1.5rem;
+        min-height: 400px;
+    }
+    
+    .profile-title {
+        font-size: 1.4rem;
+    }
+    
+    .profile-distance {
+        font-size: 1rem;
+    }
+    
+    .breakdown-cards {
+        grid-template-columns: 1fr;
+    }
+    
+    .breakdown-card {
+        padding: 1.5rem;
+    }
+    
+    .breakdown-title {
+        font-size: 1.2rem;
+    }
+    
+    .breakdown-stats {
+        gap: 1.5rem;
     }
     
     .section-title {

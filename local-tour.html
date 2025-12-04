@@ -74,6 +74,99 @@
                 </div>
             </div>
 
+            <!-- Route Profile Viewer -->
+            <div class="route-profile-section">
+                <h2 class="section-title">Route Profiles</h2>
+                
+                <div class="profile-tabs">
+                    <button class="profile-tab active" onclick="showProfile(1)">Stage 1</button>
+                    <button class="profile-tab" onclick="showProfile(2)">Stage 2</button>
+                    <button class="profile-tab" onclick="showProfile(3)">Stage 3</button>
+                </div>
+                
+                <div class="profile-viewer">
+                    <div class="profile-content active" id="profile1">
+                        <h3 class="profile-title">Stage 1: Figure of Eight Profile</h3>
+                        <p class="profile-distance">35.18 km</p>
+                        <img src="https://tpvcareermode.s3.us-east-1.amazonaws.com/Figure+Of+Eight.png" alt="Figure of Eight Profile" class="route-image">
+                    </div>
+                    <div class="profile-content" id="profile2">
+                        <h3 class="profile-title">Stage 2: Loop the Loop Profile</h3>
+                        <p class="profile-distance">27.3 km</p>
+                        <img src="https://tpvcareermode.s3.us-east-1.amazonaws.com/Loop+The+Loop.png" alt="Loop the Loop Profile" class="route-image">
+                    </div>
+                    <div class="profile-content" id="profile3">
+                        <h3 class="profile-title">Stage 3: A Bit of Everything Profile</h3>
+                        <p class="profile-distance">28.1 km</p>
+                        <img src="https://tpvcareermode.s3.us-east-1.amazonaws.com/A+Bit+Of+Everything.png" alt="A Bit of Everything Profile" class="route-image">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stage Breakdown -->
+            <div class="stage-breakdown-section">
+                <h2 class="section-title">Stage Breakdown</h2>
+                
+                <div class="breakdown-cards">
+                    <div class="breakdown-card">
+                        <div class="breakdown-header">
+                            <span class="breakdown-stage">STAGE 1</span>
+                            <span class="breakdown-points">120 pts</span>
+                        </div>
+                        <h3 class="breakdown-title">Stage 1: Figure of Eight</h3>
+                        <div class="breakdown-stats">
+                            <div class="breakdown-stat">
+                                <span class="stat-icon">📍</span>
+                                <span>35.2 km</span>
+                            </div>
+                            <div class="breakdown-stat">
+                                <span class="stat-icon">⛰️</span>
+                                <span>174 m</span>
+                            </div>
+                        </div>
+                        <p class="breakdown-description">A flowing opener that sets the tone for the tour.</p>
+                    </div>
+
+                    <div class="breakdown-card">
+                        <div class="breakdown-header">
+                            <span class="breakdown-stage">STAGE 2</span>
+                            <span class="breakdown-points">95 pts</span>
+                        </div>
+                        <h3 class="breakdown-title">Stage 2: Loop the Loop</h3>
+                        <div class="breakdown-stats">
+                            <div class="breakdown-stat">
+                                <span class="stat-icon">📍</span>
+                                <span>27.3 km</span>
+                            </div>
+                            <div class="breakdown-stat">
+                                <span class="stat-icon">⛰️</span>
+                                <span>169 m</span>
+                            </div>
+                        </div>
+                        <p class="breakdown-description">Shorter and punchier with aggressive racing expected.</p>
+                    </div>
+
+                    <div class="breakdown-card">
+                        <div class="breakdown-header">
+                            <span class="breakdown-stage">STAGE 3</span>
+                            <span class="breakdown-points">135 pts</span>
+                        </div>
+                        <h3 class="breakdown-title">Stage 3: A Bit of Everything</h3>
+                        <div class="breakdown-stats">
+                            <div class="breakdown-stat">
+                                <span class="stat-icon">📍</span>
+                                <span>28.1 km</span>
+                            </div>
+                            <div class="breakdown-stat">
+                                <span class="stat-icon">⛰️</span>
+                                <span>471 m</span>
+                            </div>
+                        </div>
+                        <p class="breakdown-description">The queen stage with significant climbing to decide the GC.</p>
+                    </div>
+                </div>
+            </div>
+
             <!-- Stage Cards -->
             <div class="stages-section">
                 <h2 class="section-title">Tour Stages</h2>
@@ -105,5 +198,25 @@
     <script type="module" src="app.js"></script>
     <script src="event-data.js"></script>
     <script type="module" src="local-tour.js"></script>
+    <script>
+        // Profile tab switching
+        function showProfile(stageNum) {
+            // Hide all profiles
+            document.querySelectorAll('.profile-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active from all tabs
+            document.querySelectorAll('.profile-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected profile
+            document.getElementById(`profile${stageNum}`).classList.add('active');
+            
+            // Activate selected tab
+            document.querySelectorAll('.profile-tab')[stageNum - 1].classList.add('active');
+        }
+    </script>
 </body>
 </html>
