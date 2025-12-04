@@ -887,6 +887,15 @@ async function processResultsForUser(userDoc, csvFiles, season) {
   updates.podiumRate = careerStats.podiumRate;
   updates.awards = careerStats.awards;
   
+  // Get ARR from most recent event
+  if (processedEvents.length > 0) {
+    const lastEventNum = processedEvents[processedEvents.length - 1];
+    const lastEventResults = updates[`event${lastEventNum}Results`];
+    if (lastEventResults && lastEventResults.arr) {
+      updates.arr = lastEventResults.arr;
+    }
+  }
+  
   // Apply updates
   if (!options.dryRun) {
     await userDoc.ref.update(updates);

@@ -10,47 +10,31 @@ let modalInitialized = false;
 function getARRBand(arr) {
     if (!arr || arr < 300) return 'Unranked';
     
-    // Diamond: 1500-2000
-    if (arr >= 1900) return 'Diamond 5';
-    if (arr >= 1800) return 'Diamond 4';
-    if (arr >= 1700) return 'Diamond 3';
-    if (arr >= 1600) return 'Diamond 2';
-    if (arr >= 1500) return 'Diamond 1';
+    // Diamond: 1600-2000 (4 tiers)
+    if (arr >= 1900) return 'Diamond 4';
+    if (arr >= 1800) return 'Diamond 3';
+    if (arr >= 1700) return 'Diamond 2';
+    if (arr >= 1600) return 'Diamond 1';
     
-    // Platinum: 1400-1499
-    if (arr >= 1450) return 'Platinum 5';
-    if (arr >= 1425) return 'Platinum 4';
-    if (arr >= 1400) return 'Platinum 3';
-    if (arr >= 1375) return 'Platinum 2';
-    if (arr >= 1350) return 'Platinum 1';
+    // Platinum: 1300-1599 (3 tiers)
+    if (arr >= 1500) return 'Platinum 3';
+    if (arr >= 1400) return 'Platinum 2';
+    if (arr >= 1300) return 'Platinum 1';
     
-    // Gold: 1200-1349
-    if (arr >= 1325) return 'Gold 5';
-    if (arr >= 1300) return 'Gold 4';
-    if (arr >= 1275) return 'Gold 3';
-    if (arr >= 1250) return 'Gold 2';
-    if (arr >= 1200) return 'Gold 1';
+    // Gold: 1000-1299 (3 tiers)
+    if (arr >= 1200) return 'Gold 3';
+    if (arr >= 1100) return 'Gold 2';
+    if (arr >= 1000) return 'Gold 1';
     
-    // Silver: 1000-1199
-    if (arr >= 1175) return 'Silver 5';
-    if (arr >= 1150) return 'Silver 4';
-    if (arr >= 1125) return 'Silver 3';
-    if (arr >= 1100) return 'Silver 2';
-    if (arr >= 1000) return 'Silver 1';
+    // Silver: 700-999 (3 tiers)
+    if (arr >= 900) return 'Silver 3';
+    if (arr >= 800) return 'Silver 2';
+    if (arr >= 700) return 'Silver 1';
     
-    // Bronze: 700-999
-    if (arr >= 950) return 'Bronze 5';
-    if (arr >= 900) return 'Bronze 4';
-    if (arr >= 850) return 'Bronze 3';
-    if (arr >= 800) return 'Bronze 2';
-    if (arr >= 700) return 'Bronze 1';
-    
-    // Iron: 300-699
-    if (arr >= 650) return 'Iron 5';
-    if (arr >= 600) return 'Iron 4';
-    if (arr >= 550) return 'Iron 3';
-    if (arr >= 500) return 'Iron 2';
-    if (arr >= 300) return 'Iron 1';
+    // Bronze: 300-699 (3 tiers)
+    if (arr >= 500) return 'Bronze 3';
+    if (arr >= 400) return 'Bronze 2';
+    if (arr >= 300) return 'Bronze 1';
     
     return 'Unranked';
 }
@@ -338,7 +322,10 @@ async function openRiderProfile(riderUid, riderName) {
 // Build rider profile HTML
 function buildRiderProfileHTML(data, name) {
     const displayName = data.displayName || name || 'Unknown Rider';
+    
+    // Get ARR from user document (stored from most recent race)
     const arr = data.arr || 1000;
+    
     const arrBand = getARRBand(arr);
     const team = data.team || 'Independent';
     const season = data.currentSeason || 1;

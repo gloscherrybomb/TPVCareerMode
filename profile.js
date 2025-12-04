@@ -91,29 +91,28 @@ function formatTime(seconds) {
 function getARRBand(arr) {
     if (!arr || arr < 300) return 'Unranked';
     
-    // Diamond: 1500-2000
-    if (arr >= 1900) return 'Diamond 5';
-    if (arr >= 1800) return 'Diamond 4';
-    if (arr >= 1700) return 'Diamond 3';
-    if (arr >= 1600) return 'Diamond 2';
-    if (arr >= 1500) return 'Diamond 1';
+    // Diamond: 1600-2000 (4 tiers)
+    if (arr >= 1900) return 'Diamond 4';
+    if (arr >= 1800) return 'Diamond 3';
+    if (arr >= 1700) return 'Diamond 2';
+    if (arr >= 1600) return 'Diamond 1';
     
-    // Platinum: 1200-1499
-    if (arr >= 1400) return 'Platinum 3';
-    if (arr >= 1300) return 'Platinum 2';
-    if (arr >= 1200) return 'Platinum 1';
+    // Platinum: 1300-1599 (3 tiers)
+    if (arr >= 1500) return 'Platinum 3';
+    if (arr >= 1400) return 'Platinum 2';
+    if (arr >= 1300) return 'Platinum 1';
     
-    // Gold: 900-1199
-    if (arr >= 1100) return 'Gold 3';
-    if (arr >= 1000) return 'Gold 2';
-    if (arr >= 900) return 'Gold 1';
+    // Gold: 1000-1299 (3 tiers)
+    if (arr >= 1200) return 'Gold 3';
+    if (arr >= 1100) return 'Gold 2';
+    if (arr >= 1000) return 'Gold 1';
     
-    // Silver: 600-899
-    if (arr >= 800) return 'Silver 3';
-    if (arr >= 700) return 'Silver 2';
-    if (arr >= 600) return 'Silver 1';
+    // Silver: 700-999 (3 tiers)
+    if (arr >= 900) return 'Silver 3';
+    if (arr >= 800) return 'Silver 2';
+    if (arr >= 700) return 'Silver 1';
     
-    // Bronze: 300-599
+    // Bronze: 300-699 (3 tiers)
     if (arr >= 500) return 'Bronze 3';
     if (arr >= 400) return 'Bronze 2';
     if (arr >= 300) return 'Bronze 1';
@@ -125,14 +124,13 @@ function getARRBand(arr) {
 async function calculateUserStats(userUID) {
     console.log('Calculating supplemental stats for user:', userUID);
     
-    // NOTE: Most career stats (totalWins, totalPodiums, awards, bestFinish, etc.) are now 
+    // NOTE: Most career stats (totalWins, totalPodiums, awards, bestFinish, ARR, etc.) are now 
     // stored in the user document and updated when results are processed.
-    // This function now only calculates data that isn't stored: recent results, positions array, and ARR.
+    // This function now only calculates data that isn't stored: recent results and positions array.
     
     const stats = {
         positions: [],
         recentResults: [],
-        arr: null,
         // These will be overwritten by stored values in loadProfile
         awards: {
             goldMedals: 0,
@@ -183,11 +181,6 @@ async function calculateUserStats(userUID) {
                     // Track positions array (for charts/graphs)
                     if (position > 0) {
                         stats.positions.push(position);
-                    }
-                    
-                    // Store ARR if available (use most recent)
-                    if (userResult.arr) {
-                        stats.arr = userResult.arr;
                     }
                     
                     // Add to recent results
@@ -318,7 +311,7 @@ async function loadProfile(user) {
             averageFinish: userData.averageFinish || null,
             winRate: userData.winRate || 0,
             podiumRate: userData.podiumRate || 0,
-            arr: calculatedStats.arr, // ARR comes from most recent race
+            arr: userData.arr || null, // ARR stored from most recent race
             awards: userData.awards || calculatedStats.awards, // Prefer stored awards
             // Use calculated stats for data not stored
             positions: calculatedStats.positions,

@@ -770,6 +770,7 @@ async function processUserResult(uid, eventInfo, results) {
     winRate: careerStats.winRate,
     podiumRate: careerStats.podiumRate,
     awards: careerStats.awards,
+    arr: eventResults.arr, // Store most recent ARR
     [`season${season}Standings`]: seasonStandings,
     team: userResult.Team || '',
     usedOptionalEvents: newUsedOptionalEvents,
