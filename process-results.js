@@ -619,6 +619,29 @@ async function processUserResult(uid, eventInfo, results) {
     gcBronzeMedal: false
   };
   
+  // Calculate GC if this is any tour stage (events 13, 14, or 15)
+  // MUST happen BEFORE creating eventResults so gcAwards are set correctly
+  let gcResults = null;
+  
+  if (validation.isTour) {
+    console.log('   🏁 Tour stage complete - calculating current GC...');
+    gcResults = await calculateGC(season, uid, eventNumber);
+    
+    if (gcResults) {
+      // Only add bonus points on final stage (event 15)
+      if (eventNumber === 15) {
+        gcBonusPoints = gcResults.bonusPoints;
+        gcAwards = gcResults.awards;
+        
+        // Add GC bonus points to total points
+        points += gcBonusPoints;
+        if (gcBonusPoints > 0) {
+          console.log(`   💰 GC bonus points added: +${gcBonusPoints}`);
+        }
+      }
+    }
+  }
+  
   // Prepare event results
   const eventResults = {
     position: position,
@@ -667,28 +690,6 @@ async function processUserResult(uid, eventInfo, results) {
     } else if (eventNumber === 15) {
       newTourProgress.event15Completed = true;
       newTourProgress.event15Date = new Date().toISOString();
-    }
-  }
-  
-  // Calculate GC if this is any tour stage (events 13, 14, or 15)
-  let gcResults = null;
-  
-  if (validation.isTour) {
-    console.log('   🏁 Tour stage complete - calculating current GC...');
-    gcResults = await calculateGC(season, uid, eventNumber);
-    
-    if (gcResults) {
-      // Only add bonus points on final stage (event 15)
-      if (eventNumber === 15) {
-        gcBonusPoints = gcResults.bonusPoints;
-        gcAwards = gcResults.awards;
-        
-        // Add GC bonus points to total points
-        points += gcBonusPoints;
-        if (gcBonusPoints > 0) {
-          console.log(`   💰 GC bonus points added: +${gcBonusPoints}`);
-        }
-      }
     }
   }
   
@@ -902,6 +903,11 @@ async function processUserResult(uid, eventInfo, results) {
   
   // GC trophies (only on Event 15)
   if (eventNumber === 15) {
+    console.log(`   🔍 Checking GC trophy awards...`);
+    console.log(`      earnedGCGoldMedal: ${eventResults.earnedGCGoldMedal}`);
+    console.log(`      earnedGCSilverMedal: ${eventResults.earnedGCSilverMedal}`);
+    console.log(`      earnedGCBronzeMedal: ${eventResults.earnedGCBronzeMedal}`);
+    
     if (eventResults.earnedGCGoldMedal) {
       console.log('   🏆 GC WINNER! Awarding GC Gold trophy');
       eventAwards['awards.gcGold'] = admin.firestore.FieldValue.increment(1);
@@ -1406,7 +1412,7 @@ async function updateBotARRs(season, event, results) {
       const botProfileRef = db.collection('botProfiles').doc(uid);
       const botProfileDoc = await botProfileRef.get();
       
-      if (!botProfileDoc.exists()) {
+      if (!botProfileDoc.exists) {
         console.log(`   â„¹ï¸  Bot profile not found for ${uid}, skipping`);
         botsNotFound++;
         continue;
