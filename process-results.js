@@ -902,7 +902,7 @@ async function processUserResult(uid, eventInfo, results) {
   let introStory = '';
   try {
     introStory = await narrativeSelector.generateIntroStory(
-      userUid,
+      uid,
       narrativeContext,
       db
     );
