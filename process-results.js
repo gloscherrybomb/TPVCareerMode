@@ -858,11 +858,66 @@ async function processUserResult(uid, eventInfo, results) {
     ...dnsFlags // Add DNS flags if any
   };
   
-  // Update individual award counters using FieldValue.increment
-  // This allows us to add special awards without conflicts
-  Object.keys(careerStats.awards).forEach(awardKey => {
-    updates[`awards.${awardKey}`] = careerStats.awards[awardKey];
-  });
+  // Track awards earned in THIS event specifically
+  // We'll increment these in Firebase
+  const eventAwards = {};
+  
+  // Race position awards (if earned this event)
+  if (position === 1) {
+    eventAwards['awards.gold'] = admin.firestore.FieldValue.increment(1);
+  } else if (position === 2) {
+    eventAwards['awards.silver'] = admin.firestore.FieldValue.increment(1);
+  } else if (position === 3) {
+    eventAwards['awards.bronze'] = admin.firestore.FieldValue.increment(1);
+  }
+  
+  // Special medals earned this event
+  if (earnedPunchingMedal) {
+    eventAwards['awards.punchingMedal'] = admin.firestore.FieldValue.increment(1);
+  }
+  if (earnedGiantKillerMedal) {
+    eventAwards['awards.giantKiller'] = admin.firestore.FieldValue.increment(1);
+  }
+  if (eventResults.earnedBullseyeMedal) {
+    eventAwards['awards.bullseye'] = admin.firestore.FieldValue.increment(1);
+  }
+  if (eventResults.earnedHotStreakMedal) {
+    eventAwards['awards.hotStreak'] = admin.firestore.FieldValue.increment(1);
+  }
+  if (eventResults.earnedDomination) {
+    eventAwards['awards.domination'] = admin.firestore.FieldValue.increment(1);
+  }
+  if (eventResults.earnedCloseCall) {
+    eventAwards['awards.closeCall'] = admin.firestore.FieldValue.increment(1);
+  }
+  if (eventResults.earnedPhotoFinish) {
+    eventAwards['awards.photoFinish'] = admin.firestore.FieldValue.increment(1);
+  }
+  if (eventResults.earnedDarkHorse) {
+    eventAwards['awards.darkHorse'] = admin.firestore.FieldValue.increment(1);
+  }
+  if (eventResults.earnedZeroToHero) {
+    eventAwards['awards.zeroToHero'] = admin.firestore.FieldValue.increment(1);
+  }
+  
+  // GC trophies (only on Event 15)
+  if (eventNumber === 15) {
+    if (eventResults.earnedGCGoldMedal) {
+      console.log('   🏆 GC WINNER! Awarding GC Gold trophy');
+      eventAwards['awards.gcGold'] = admin.firestore.FieldValue.increment(1);
+    }
+    if (eventResults.earnedGCSilverMedal) {
+      console.log('   🥈 GC SECOND! Awarding GC Silver trophy');
+      eventAwards['awards.gcSilver'] = admin.firestore.FieldValue.increment(1);
+    }
+    if (eventResults.earnedGCBronzeMedal) {
+      console.log('   🥉 GC THIRD! Awarding GC Bronze trophy');
+      eventAwards['awards.gcBronze'] = admin.firestore.FieldValue.increment(1);
+    }
+  }
+  
+  // Merge event awards into updates
+  Object.assign(updates, eventAwards);
   
   // Add to completedStages (store the STAGE number, not event number)
   const completedStages = userData.completedStages || [];
