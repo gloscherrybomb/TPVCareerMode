@@ -837,6 +837,16 @@ async function processUserResult(uid, eventInfo, results) {
     marginToWinner = parseFloat(userResult.Time) - parseFloat(winner.Time);
   }
   
+  // Extract winner and second place names for narrative context
+  let winnerName = null;
+  let secondPlaceName = null;
+  if (sortedResults.length >= 1) {
+    winnerName = sortedResults[0].Name || 'the winner';
+  }
+  if (sortedResults.length >= 2) {
+    secondPlaceName = sortedResults[1].Name || null;
+  }
+  
   // Find previous event number and all completed events for story context
   const completedEventNumbers = [];
   for (let i = 1; i <= 15; i++) {
@@ -899,7 +909,11 @@ async function processUserResult(uid, eventInfo, results) {
         earnedCloseCall: earnedCloseCall,
         earnedPhotoFinish: earnedPhotoFinish,
         earnedDarkHorse: earnedDarkHorse,
-        earnedZeroToHero: earnedZeroToHero
+        earnedZeroToHero: earnedZeroToHero,
+        winnerName: winnerName,
+        secondPlaceName: secondPlaceName,
+        gcPosition: gcResults?.userGC?.gcPosition || null,
+        gcGap: gcResults?.userGC?.gapToLeader || null
       },
       {
         stagesCompleted: (userData.completedStages || []).length + 1,
