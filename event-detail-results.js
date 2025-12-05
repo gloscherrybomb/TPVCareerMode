@@ -668,30 +668,44 @@ async function loadEventResults() {
         const userEventResults = userData?.[`event${eventNumber}Results`];
         let storyHTML = '';
         
-        if (userEventResults && userEventResults.storyRecap && userEventResults.storyContext) {
-            // For Event 15, don't show the season context if season is complete
-            // The tour completion story will have the season wrap-up instead
-            const isEvent15Complete = eventNumber === 15 && userData.season1Complete === true;
-            
-            storyHTML = `
-                <div class="race-story">
-                    ${userEventResults.storyIntro ? `
-                    <div class="story-section story-intro">
-                        ${userEventResults.storyIntro}
+        if (userEventResults) {
+            // Check for new unified story format first
+            if (userEventResults.story) {
+                // New format: single unified story field with 2-3 paragraphs
+                const paragraphs = userEventResults.story.split('\n\n').filter(p => p.trim());
+                
+                storyHTML = `
+                    <div class="race-story">
+                        <div class="story-section unified-story">
+                            ${paragraphs.map(p => `<p>${p}</p>`).join('')}
+                        </div>
                     </div>
-                    ` : ''}
-                    <div class="story-section">
-                        <h3>Race Recap</h3>
-                        <p>${userEventResults.storyRecap}</p>
+                `;
+            }
+            // Fallback to old format for backward compatibility
+            else if (userEventResults.storyRecap && userEventResults.storyContext) {
+                const isEvent15Complete = eventNumber === 15 && userData.season1Complete === true;
+                
+                storyHTML = `
+                    <div class="race-story">
+                        ${userEventResults.storyIntro ? `
+                        <div class="story-section story-intro">
+                            ${userEventResults.storyIntro}
+                        </div>
+                        ` : ''}
+                        <div class="story-section">
+                            <h3>Race Recap</h3>
+                            <p>${userEventResults.storyRecap}</p>
+                        </div>
+                        ${!isEvent15Complete ? `
+                        <div class="story-section">
+                            <h3>Season Context</h3>
+                            <p>${userEventResults.storyContext}</p>
+                        </div>
+                        ` : ''}
                     </div>
-                    ${!isEvent15Complete ? `
-                    <div class="story-section">
-                        <h3>Season Context</h3>
-                        <p>${userEventResults.storyContext}</p>
-                    </div>
-                    ` : ''}
-                </div>
-            `;
+                `;
+            }
         }
 
         // Build results table

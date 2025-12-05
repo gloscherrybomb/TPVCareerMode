@@ -1548,3 +1548,49 @@
 .story-context {
   animation-delay: 0.4s;
 }
+
+/* ============================================
+   UNIFIED STORY STYLES
+   ============================================ */
+
+/* Unified story container - no separate sections */
+.unified-story {
+  font-size: 1.05rem;
+  line-height: 1.9;
+  color: #333;
+}
+
+.unified-story p {
+  margin-bottom: 1.5rem;
+}
+
+.unified-story p:last-child {
+  margin-bottom: 0;
+}
+
+/* First paragraph gets subtle emphasis */
+.unified-story p:first-child {
+  font-size: 1.08rem;
+  color: #222;
+}
+
+/* Smooth reading experience */
+.unified-story {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* Mobile adjustments for unified story */
+@media (max-width: 768px) {
+  .unified-story {
+    font-size: 1rem;
+  }
+  
+  .unified-story p:first-child {
+    font-size: 1.05rem;
+  }
+  
+  .unified-story p {
+    margin-bottom: 1.25rem;
+  }
+}

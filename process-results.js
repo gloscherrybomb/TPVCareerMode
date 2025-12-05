@@ -10,6 +10,7 @@ const storyGen = require('./story-generator');
 // Import narrative system modules
 const { NARRATIVE_DATABASE } = require('./narrative-database.js');
 const { StorySelector } = require('./story-selector.js');
+const { generateUnifiedStory } = require('./unified-story-generator.js');
 
 // Initialize Firebase Admin
 const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
@@ -884,67 +885,75 @@ async function processUserResult(uid, eventInfo, results) {
   }
   if (position === 1) totalWins++; // Include current race
 
-  // Prepare context for narrative selection  
-  const narrativeContext = {
-    eventNumber: eventNumber,
-    eventName: storyGen.EVENT_NAMES[eventNumber] || `Event ${eventNumber}`,
-    position: position,
-    predictedPosition: predictedPosition,
-    performanceTier: determinePerformanceTier(position),
-    totalPoints: (userData.totalPoints || 0) + points,
-    totalWins: totalWins,
-    recentResults: recentResults,
-    isFirstWin: position === 1 && totalWins === 1,
-    isWorseResult: position > predictedPosition + 3
-  };
-
-  // Generate personalized intro story
-  let introStory = '';
+  // Generate unified cohesive story (merges intro, recap, and context)
+  let unifiedStory = '';
   try {
-    introStory = await narrativeSelector.generateIntroStory(
+    unifiedStory = await generateUnifiedStory(
+      {
+        eventNumber: eventNumber,
+        position: position,
+        predictedPosition: predictedPosition,
+        winMargin: winMargin,
+        lossMargin: marginToWinner,
+        earnedDomination: earnedDomination,
+        earnedCloseCall: earnedCloseCall,
+        earnedPhotoFinish: earnedPhotoFinish,
+        earnedDarkHorse: earnedDarkHorse,
+        earnedZeroToHero: earnedZeroToHero
+      },
+      {
+        stagesCompleted: (userData.completedStages || []).length + 1,
+        totalPoints: (userData.totalPoints || 0) + points,
+        totalWins: totalWins,
+        nextStageNumber: nextStage,
+        nextEventNumber: nextEventNumber,
+        recentResults: recentResults,
+        isOnStreak: isOnStreak,
+        totalPodiums: totalPodiums,
+        seasonPosition: null
+      },
       uid,
-      narrativeContext,
-      db
+      narrativeSelector,
+      db,
+      storyGen
     );
-    if (introStory) {
-      console.log(`   📖 Generated personalized intro story`);
+    
+    if (unifiedStory) {
+      console.log(`   📖 Generated unified story (${unifiedStory.split('\n\n').length} paragraphs)`);
     }
   } catch (error) {
-    console.error(`   ⚠️ Error generating intro story:`, error.message);
-    introStory = ''; // Fall back to no intro
+    console.error(`   ⚠️ Error generating unified story:`, error.message);
+    // Fallback to original story generator
+    const fallbackStory = storyGen.generateRaceStory(
+      {
+        eventNumber: eventNumber,
+        position: position,
+        predictedPosition: predictedPosition,
+        winMargin: winMargin,
+        lossMargin: marginToWinner,
+        earnedDomination: earnedDomination,
+        earnedCloseCall: earnedCloseCall,
+        earnedPhotoFinish: earnedPhotoFinish,
+        earnedDarkHorse: earnedDarkHorse,
+        earnedZeroToHero: earnedZeroToHero
+      },
+      {
+        stagesCompleted: (userData.completedStages || []).length + 1,
+        totalPoints: (userData.totalPoints || 0) + points,
+        nextStageNumber: nextStage,
+        nextEventNumber: nextEventNumber,
+        recentResults: recentResults,
+        isOnStreak: isOnStreak,
+        totalPodiums: totalPodiums,
+        seasonPosition: null
+      }
+    );
+    unifiedStory = `${fallbackStory.recap}\n\n${fallbackStory.context}`;
   }
-
-  // Generate story using story-generator module
-  const story = storyGen.generateRaceStory(
-    {
-      eventNumber: eventNumber,
-      position: position,
-      predictedPosition: predictedPosition,
-      winMargin: winMargin,
-      lossMargin: marginToWinner,
-      earnedDomination: earnedDomination,
-      earnedCloseCall: earnedCloseCall,
-      earnedPhotoFinish: earnedPhotoFinish,
-      earnedDarkHorse: earnedDarkHorse,
-      earnedZeroToHero: earnedZeroToHero
-    },
-    {
-      stagesCompleted: (userData.completedStages || []).length + 1, // Include this race
-      totalPoints: (userData.totalPoints || 0) + points, // Include points from this race
-      nextStageNumber: nextStage,
-      nextEventNumber: nextEventNumber,
-      recentResults: recentResults,
-      isOnStreak: isOnStreak,
-      totalPodiums: totalPodiums,
-      seasonPosition: null // Could calculate from seasonStandings if needed
-    }
-  );
   
-  // Add story to event results (now with intro)
-  eventResults.storyIntro = introStory;  // NEW: Personalized intro
-  eventResults.storyRecap = story.recap;
-  eventResults.storyContext = story.context;
-  eventResults.timestamp = admin.firestore.FieldValue.serverTimestamp(); // Add timestamp for 24-hour checking
+  // Store unified story (single field instead of separate recap/context)
+  eventResults.story = unifiedStory;
+  eventResults.timestamp = admin.firestore.FieldValue.serverTimestamp();
   
   // Add GC results to event results if this is a tour stage
   if (gcResults) {
