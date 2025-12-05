@@ -314,8 +314,19 @@ async function resetUserData(userRef, userData, season) {
   if (userData[`season${season}Rank`]) {
     updates[`season${season}Rank`] = admin.firestore.FieldValue.delete();
   }
+  if (userData[`season${season}CelebrationViewed`]) {
+    updates[`season${season}CelebrationViewed`] = admin.firestore.FieldValue.delete();
+  }
   if (userData.localTourStatus) {
     updates.localTourStatus = admin.firestore.FieldValue.delete();
+  }
+  
+  // Clear DNS flags for Local Tour events
+  if (userData.event14DNS !== undefined) {
+    updates.event14DNS = admin.firestore.FieldValue.delete();
+  }
+  if (userData.event15DNS !== undefined) {
+    updates.event15DNS = admin.firestore.FieldValue.delete();
   }
   
   // Clear ALL awards (will be recalculated during reprocessing)
