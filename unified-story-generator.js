@@ -612,12 +612,24 @@ function generateSeasonImplications(raceData, seasonData, raceContext) {
   }
 
   // Add forward look
+  const nextStageLabel = seasonData.isNextStageChoice 
+    ? `Stage ${stagesCompleted + 1}` 
+    : nextEventName;
+  
   if (stagesCompleted <= 5) {
-    implications += `${nextEventName} awaits at Stage ${stagesCompleted + 1}—another opportunity to test your limits and push for better results. The season is young, the points are accumulating, and there's plenty of racing ahead to make your mark.`;
+    if (seasonData.isNextStageChoice) {
+      implications += `Stage ${stagesCompleted + 1} awaits—your choice from the optional events. Another opportunity to test your limits and push for better results. The season is young, the points are accumulating, and there's plenty of racing ahead to make your mark.`;
+    } else {
+      implications += `${nextEventName} awaits at Stage ${stagesCompleted + 1}—another opportunity to test your limits and push for better results. The season is young, the points are accumulating, and there's plenty of racing ahead to make your mark.`;
+    }
   } else if (stagesCompleted <= 10) {
-    implications += `${nextEventName} comes next at Stage ${stagesCompleted + 1}, and you're past the season's halfway point. The standings are taking shape, but there's still time to climb, still chances to prove yourself. Keep racing, keep pushing, keep showing up.`;
+    if (seasonData.isNextStageChoice) {
+      implications += `Stage ${stagesCompleted + 1} comes next—you'll choose from the optional events. You're past the season's halfway point. The standings are taking shape, but there's still time to climb, still chances to prove yourself. Keep racing, keep pushing, keep showing up.`;
+    } else {
+      implications += `${nextEventName} comes next at Stage ${stagesCompleted + 1}, and you're past the season's halfway point. The standings are taking shape, but there's still time to climb, still chances to prove yourself. Keep racing, keep pushing, keep showing up.`;
+    }
   } else {
-    implications += `The season is in its final stretch, and ${nextEventName} at Stage ${stagesCompleted + 1} is one of the last opportunities to bank points and chase results. Every race matters now. Every place counts. This is where seasons are defined.`;
+    implications += `The season is in its final stretch, and ${seasonData.isNextStageChoice ? `Stage ${stagesCompleted + 1}` : `${nextEventName} at Stage ${stagesCompleted + 1}`} is one of the last opportunities to bank points and chase results. Every race matters now. Every place counts. This is where seasons are defined.`;
   }
 
   return implications;

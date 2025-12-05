@@ -959,6 +959,7 @@ async function processUserResult(uid, eventInfo, results) {
         totalWins: totalWins,
         nextStageNumber: nextStage,
         nextEventNumber: nextEventNumber,
+        isNextStageChoice: [3, 6, 8].includes(nextStage), // Choice stages
         recentResults: recentResults,
         isOnStreak: isOnStreak,
         totalPodiums: totalPodiums,
