@@ -1427,3 +1427,124 @@
         padding: 0.6rem 1.2rem;
     }
 }
+
+/* ============================================
+   NARRATIVE STORY STYLES
+   ============================================ */
+
+/* Main story section container */
+.race-story-section {
+  margin: 2rem 0;
+  padding: 0 1rem;
+}
+
+/* Story wrapper */
+.story-wrapper {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* NEW: Personalized intro paragraph */
+.story-intro {
+  font-size: 1rem;
+  line-height: 1.8;
+  color: #555;
+  font-style: italic;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  border-left: 4px solid #007bff;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Optional: Add a label above the intro */
+.story-intro::before {
+  content: "Your Story";
+  display: block;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #007bff;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  font-style: normal;
+}
+
+/* Race recap paragraph */
+.story-recap {
+  font-size: 1.05rem;
+  line-height: 1.8;
+  margin-bottom: 2rem;
+  color: #333;
+  font-family: inherit;
+}
+
+/* Season context paragraph */
+.story-context {
+  font-size: 1rem;
+  line-height: 1.7;
+  color: #666;
+  padding-top: 2rem;
+  border-top: 1px solid #e0e0e0;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .race-story-section {
+    padding: 0 0.5rem;
+  }
+  
+  .story-intro {
+    font-size: 0.95rem;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .story-recap {
+    font-size: 1rem;
+  }
+  
+  .story-context {
+    font-size: 0.95rem;
+    padding-top: 1.5rem;
+  }
+}
+
+/* Tablet */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .story-intro {
+    padding: 1.25rem;
+  }
+}
+
+/* Optional: Smooth fade-in animation */
+@keyframes fadeInStory {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.story-intro,
+.story-recap,
+.story-context {
+  animation: fadeInStory 0.6s ease-out;
+}
+
+/* Stagger the animations */
+.story-intro {
+  animation-delay: 0s;
+}
+
+.story-recap {
+  animation-delay: 0.2s;
+}
+
+.story-context {
+  animation-delay: 0.4s;
+}

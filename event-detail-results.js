@@ -675,6 +675,11 @@ async function loadEventResults() {
             
             storyHTML = `
                 <div class="race-story">
+                    ${userEventResults.storyIntro ? `
+                    <div class="story-section story-intro">
+                        ${userEventResults.storyIntro}
+                    </div>
+                    ` : ''}
                     <div class="story-section">
                         <h3>Race Recap</h3>
                         <p>${userEventResults.storyRecap}</p>
