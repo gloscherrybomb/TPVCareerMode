@@ -1,237 +1,817 @@
-// narrative-database.js - Comprehensive narrative story elements database
-// This contains all possible story moments that can be selected dynamically for each rider
+// narrative-database-expanded.js - 100+ story elements for maximum variety
+// Comprehensive narrative moments database with extensive variety
 
 /**
- * NARRATIVE DATABASE STRUCTURE
+ * EXPANDED NARRATIVE DATABASE - 100+ Story Moments
  * 
  * Categories:
- * - seasonOpening: Season 1 opening narratives (first race setup)
- * - earlyCareer: Events 1-5 story moments
- * - midSeason: Events 6-10 story moments  
- * - lateSeasonIntros: Events 11-15 intro moments
- * - equipment: Bike/gear upgrade stories
- * - lifestyle: Daily life, training, struggles
- * - offSeason: Winter training, preparation
- * - motivation: Inspiration moments
- * - breakthrough: Key performance moments
- * - setback: Dealing with disappointment
- * - rivalry: Interactions with specific competitors
- * - localColor: Race location/venue details
+ * - seasonOpening: Season 1 opening narratives (6 stories)
+ * - earlyCareer: Events 1-5 story moments (15 stories)
+ * - midSeason: Events 6-10 story moments (15 stories)
+ * - lateSeasonIntros: Events 11-15 intro moments (8 stories)
+ * - equipment: Bike/gear stories (10 stories)
+ * - lifestyle: Daily life, training, struggles (12 stories)
+ * - offSeason: Winter training, preparation (5 stories)
+ * - motivation: Inspiration moments (8 stories)
+ * - breakthrough: Key performance moments (6 stories)
+ * - setback: Dealing with disappointment (8 stories)
+ * - rivalry: Interactions with competitors (6 stories)
+ * - localColor: Race location/venue details (8 stories)
+ * - weather: Conditions and elements (5 stories)
+ * - travel: Getting to races (4 stories)
+ * - mentalGame: Psychology and mindset (6 stories)
  */
 
 const NARRATIVE_DATABASE = {
   
-  // ===== SEASON OPENING NARRATIVES =====
-  // These set the scene for a rider's first race
+  // ===== SEASON OPENING NARRATIVES (6) =====
   seasonOpening: [
     {
       id: "opening_hometown",
-      text: "Six months ago you were racing your local club rides, wondering if you had what it takes to compete at a higher level. Now you're lined up at {eventName}, registration paid, race number pinned on, heart pounding with a mixture of excitement and pure terror. The riders around you look fast—lean, confident, decked out in team kit that probably costs more than your entire bike. You've trained for this, visualized this, dreamed about this moment. But standing here in the pre-race churn of nervous energy and racing bikes, the reality hits differently than the fantasy. This is it. This is actually happening.",
+      text: "Six months ago you were racing your local club rides, wondering if you had what it takes to compete at a higher level. Now you're lined up at {eventName}, registration paid, race number pinned on, heart pounding with a mixture of excitement and pure terror. The riders around you look fast—lean, confident, decked out in team kit that probably costs more than your entire bike. You've trained for this, visualized this, dreamed about this moment. But standing here in the pre-race churn of nervous energy and racing bikes, the reality hits differently than the fantasy.",
       triggers: { raceNumber: 1 },
-      used: false
+      weight: 0.9
     },
     {
       id: "opening_leap",
-      text: "The decision to race seriously didn't come gradually—it came all at once, late one night scrolling through race results and realizing you'd been making excuses for too long. A few weeks later you registered for {eventName}, paid the entry fee before you could change your mind, and committed to showing up no matter how intimidating it felt. Your bike isn't the newest model and your kit doesn't match, but you've put in the training miles. You've done the intervals until your legs burned and your lungs screamed. Standing at the start line now, you're exactly where you chose to be. Nervous? Absolutely. Ready? Time to find out.",
+      text: "The decision to race seriously didn't come gradually—it came all at once, late one night scrolling through race results and realizing you'd been making excuses for too long. A few weeks later you registered for {eventName}, paid the entry fee before you could change your mind, and committed to showing up no matter how intimidating it felt. Your bike isn't the newest model and your kit doesn't match, but you've put in the training miles. You've done the intervals until your legs burned and your lungs screamed.",
       triggers: { raceNumber: 1 },
-      used: false
+      weight: 0.9
     },
     {
       id: "opening_investment",
-      text: "The registration fee for {eventName} felt steep—money you could've spent on anything else. But you clicked 'confirm payment' anyway because something inside you needed to know if you could actually do this. The weeks of training that followed were harder than expected: early morning rides when the bed felt impossibly comfortable, interval sessions that left you gasping, nights falling asleep wondering if you were good enough. But you showed up, week after week, and now here you are at the start line, surrounded by riders who've been doing this for years. They don't know you're new to this. They don't know this is your first real race. And that's exactly how you want to keep it.",
+      text: "The registration fee for {eventName} felt steep—money you could've spent on anything else. But you clicked 'confirm payment' anyway because something inside you needed to know if you could actually do this. The weeks of training that followed were harder than expected: early morning rides when the bed felt impossibly comfortable, interval sessions that left you gasping, nights falling asleep wondering if you were good enough. But you showed up, week after week, and now here you are at the start line.",
       triggers: { raceNumber: 1 },
-      used: false
+      weight: 0.9
+    },
+    {
+      id: "opening_dream",
+      text: "You've been dreaming about this for longer than you'd admit out loud. Watching races online, studying the tactics, imagining yourself in the peloton. Now the imagination becomes reality at {eventName}. The nerves are almost overwhelming—what if you get dropped immediately? What if you can't keep up? What if this whole dream was just that, a dream? But you're here. The start line doesn't care about your doubts. It only cares if you're willing to race.",
+      triggers: { raceNumber: 1 },
+      weight: 0.8
+    },
+    {
+      id: "opening_transformation",
+      text: "Three months ago, racing wasn't even on your radar. Then a friend invited you to a group ride that turned competitive, and something clicked. The feeling of pushing hard, of testing yourself against others, of finding out what you're really capable of—it was addictive. One thing led to another, and now you're at {eventName}, about to race for real. You're not sure if you're ready, but you're done wondering. Time to find out.",
+      triggers: { raceNumber: 1 },
+      weight: 0.8
+    },
+    {
+      id: "opening_solo_journey",
+      text: "Nobody in your life really understands why you're doing this. Your friends think you're crazy for spending money on entry fees and equipment. Your family worries about you getting hurt. But this isn't about them—it's about you, testing yourself, proving something to yourself. Standing at the start of {eventName}, surrounded by strangers who share this inexplicable need to race bicycles, you feel less alone than you have in months.",
+      triggers: { raceNumber: 1 },
+      weight: 0.7
     }
   ],
 
-  // ===== EARLY CAREER MOMENTS (Events 1-5) =====
+  // ===== EARLY CAREER MOMENTS (15) =====
   earlyCareer: [
     {
       id: "early_bike_struggles",
-      text: "Your bike isn't the problem—you keep telling yourself that as you pass another rider on a carbon race machine that costs more than your car. It's not about the equipment, it's about the legs. At least that's what you're choosing to believe right now as your aluminum frame clatters over rough pavement while the rider ahead seems to float effortlessly on electronic shifting. You'll upgrade eventually, but first you need to prove you can race. First you need results.",
+      text: "Your bike isn't the problem—you keep telling yourself that as you pass another rider on a carbon race machine that costs more than your car. It's not about the equipment, it's about the legs. At least that's what you're choosing to believe right now as your aluminum frame clatters over rough pavement while the rider ahead seems to float effortlessly on electronic shifting.",
       triggers: { raceNumber: [2, 3, 4], performanceTier: ["midpack", "back"] },
       weight: 0.7
     },
     {
       id: "early_race_day_routine",
-      text: "You're still figuring out your pre-race routine. Coffee? No coffee? Eat two hours before or three? You watch other riders going through their warm-up routines with practiced ease—static stretches, a few openers on the trainer, calves perfectly taped—while you're still anxiously checking your tire pressure for the third time. Everyone had to start somewhere, you remind yourself. They've just had more practice at looking like they belong here.",
+      text: "You're still figuring out your pre-race routine. Coffee? No coffee? Eat two hours before or three? You watch other riders going through their warm-up routines with practiced ease—static stretches, a few openers on the trainer, calves perfectly taped—while you're still anxiously checking your tire pressure for the third time.",
       triggers: { raceNumber: [1, 2, 3], performanceTier: ["any"] },
       weight: 0.6
     },
     {
       id: "early_first_upgrade",
-      text: "After weeks of researching and comparing prices, you finally pulled the trigger: new wheels. Not the top-tier carbon dream wheels, but a solid mid-range upgrade that represents a serious chunk of your budget. When you first spun them up, the difference was immediately noticeable—smoother, faster, more responsive. Whether they'll actually make you faster in races remains to be seen, but psychologically, they've already paid dividends. You feel more like a real racer now, like someone who's in this for real.",
+      text: "After weeks of researching and comparing prices, you finally pulled the trigger: new wheels. Not the top-tier carbon dream wheels, but a solid mid-range upgrade that represents a serious chunk of your budget. When you first spun them up, the difference was immediately noticeable—smoother, faster, more responsive. Whether they'll actually make you faster in races remains to be seen, but psychologically, they've already paid dividends.",
       triggers: { raceNumber: [3, 4, 5], performanceTier: ["top10", "podium", "win"] },
       weight: 0.5
     },
     {
       id: "early_nutrition_learning",
-      text: "You bonked hard in your last race—that terrible, empty-tank feeling where your legs just stop responding. Turns out racing requires a completely different fueling strategy than training rides. Now you're carrying gels, bars, and sports drink, maybe too much of everything, paranoid about running out of energy again. Other riders make it look effortless, grabbing feed bags on the fly and unwrapping bars one-handed at 40 kph. You'll get there. For now, you're just trying not to forget to eat before it's too late.",
+      text: "You bonked hard in your last race—that terrible, empty-tank feeling where your legs just stop responding. Turns out racing requires a completely different fueling strategy than training rides. Now you're carrying gels, bars, and sports drink, maybe too much of everything, paranoid about running out of energy again.",
       triggers: { raceNumber: [2, 3, 4], performanceTier: ["back"] },
       weight: 0.6
     },
     {
       id: "early_first_good_result",
-      text: "Something clicked in that last race—you're not entirely sure what. Maybe it was better positioning, maybe you're finally getting fitter, maybe you just got lucky with the break. Whatever it was, you finished higher than you expected, higher than you dared hope, and suddenly this whole racing thing feels possible. Not easy, not guaranteed, but possible. You caught yourself checking the results repeatedly, just to make sure your name was really there, that you really did finish that high. It's a small result in the grand scheme of things, but it feels huge.",
+      text: "Something clicked in that last race—you're not entirely sure what. Maybe it was better positioning, maybe you're finally getting fitter, maybe you just got lucky with the break. Whatever it was, you finished higher than you expected, higher than you dared hope, and suddenly this whole racing thing feels possible.",
       triggers: { raceNumber: [3, 4, 5], performanceTier: ["podium", "top10"], improvementFromPrediction: 5 },
       weight: 0.8
+    },
+    {
+      id: "early_imposter_syndrome",
+      text: "Every race, you feel like someone's going to tap you on the shoulder and tell you that you don't belong here. That feeling of being an imposter never quite goes away, even when your results say otherwise. You look at the riders around you and assume they all know something you don't, have some secret knowledge that makes racing easier for them.",
+      triggers: { raceNumber: [2, 3, 4, 5], performanceTier: ["any"] },
+      weight: 0.5
+    },
+    {
+      id: "early_learning_positioning",
+      text: "You're starting to understand that where you are in the pack matters almost as much as how strong your legs are. Last race you wasted so much energy fighting for position, surging and braking, stuck in bad spots. This time you're more aware, more deliberate about where you place yourself before key moments.",
+      triggers: { raceNumber: [3, 4, 5], performanceTier: ["top10", "podium"] },
+      weight: 0.7
+    },
+    {
+      id: "early_mechanical_lesson",
+      text: "A dropped chain two races ago taught you a valuable lesson: check everything, twice. Now your pre-race ritual includes running through gears multiple times, checking brake pad clearance, testing quick releases. It feels obsessive, but one mechanical DNF was enough to make you paranoid about equipment failure.",
+      triggers: { raceNumber: [3, 4, 5], performanceTier: ["any"] },
+      weight: 0.5
+    },
+    {
+      id: "early_pacing_discovery",
+      text: "You went out too hard in the first few races, burning matches you'd need later. Now you're learning the art of patience—staying near the front without actually working, following the right wheels, conserving energy for when it actually matters. It's a harder skill than it looks.",
+      triggers: { raceNumber: [3, 4, 5], performanceTier: ["top10", "podium", "win"] },
+      weight: 0.6
+    },
+    {
+      id: "early_kit_pride",
+      text: "You finally invested in proper racing kit—not team issue, just quality shorts and a jersey that actually fit. It's a small thing, but pulling on that kit this morning, you felt more legitimate. More like someone who takes this seriously. Clothes don't make the racer, but they don't hurt confidence either.",
+      triggers: { raceNumber: [2, 3, 4], performanceTier: ["any"] },
+      weight: 0.4
+    },
+    {
+      id: "early_recovery_awareness",
+      text: "The soreness from your last race lingered longer than expected. Your legs felt heavy, your motivation low. You're learning that recovery is part of training, that showing up race after race without proper rest is a recipe for burnout. Now you're paying attention to sleep, nutrition, and giving your body time to adapt.",
+      triggers: { raceNumber: [3, 4, 5], performanceTier: ["any"] },
+      weight: 0.5
+    },
+    {
+      id: "early_group_ride_confidence",
+      text: "The local group rides that used to intimidate you now feel manageable. You can hang with the front group, cover attacks, even throw in a dig occasionally. That confidence is translating to races—you're not intimidated by speed anymore.",
+      triggers: { raceNumber: [3, 4, 5], performanceTier: ["top10", "podium", "win"] },
+      weight: 0.6
+    },
+    {
+      id: "early_race_face",
+      text: "You've started recognizing the same faces at races. There's the rider who always attacks early, the one who never pulls through, the cagey veteran who seems to win without ever looking like they're trying. You're learning their habits, their tells, becoming part of this community of racers.",
+      triggers: { raceNumber: [3, 4, 5], performanceTier: ["any"] },
+      weight: 0.5
+    },
+    {
+      id: "early_suffering_acceptance",
+      text: "Racing hurts. That shouldn't have been surprising, but the first few times that deep, lung-burning, leg-screaming suffering hit, it was almost overwhelming. Now you're learning to accept it, even embrace it. The pain means you're going hard enough. The pain means you're racing.",
+      triggers: { raceNumber: [2, 3, 4], performanceTier: ["any"] },
+      weight: 0.6
+    },
+    {
+      id: "early_tactical_awakening",
+      text: "You used to think racing was just about being the strongest. Then you watched a rider half your power output beat you through better tactics—sitting in, conserving energy, attacking at exactly the right moment. Now you're studying race tactics like you're cramming for an exam, learning that bike racing is as much chess as it is physical.",
+      triggers: { raceNumber: [4, 5], performanceTier: ["any"] },
+      weight: 0.7
     }
   ],
 
-  // ===== MID-SEASON MOMENTS (Events 6-10) =====
+  // ===== MID-SEASON MOMENTS (15) =====
   midSeason: [
     {
       id: "mid_confidence_building",
-      text: "The pack dynamics are starting to make sense now. You can read moves before they happen, anticipate attacks, find the right wheels to follow. What felt like chaos a few races ago now has patterns, rhythms, logic. You're not just surviving in the peloton anymore—you're racing with intent. The nervousness hasn't disappeared, but it's been joined by something else: confidence, earned through repetition and results.",
+      text: "The pack dynamics are starting to make sense now. You can read moves before they happen, anticipate attacks, find the right wheels to follow. What felt like chaos a few races ago now has patterns, rhythms, logic. You're not just surviving in the peloton anymore—you're racing with intent.",
       triggers: { raceNumber: [6, 7, 8], performanceTier: ["top10", "podium"], consecutiveGoodResults: 2 },
       weight: 0.7
     },
     {
       id: "mid_equipment_upgrade",
-      text: "The new bike arrived this week—a proper race machine, not just an upgraded version of your old setup but a completely different category of equipment. Carbon frame, electronic shifting, integrated cockpit, the works. It represents months of saving, of choosing to skip other expenses, of committing fully to this racing thing. When you first threw your leg over it, the difference was staggering: lighter, stiffer, more responsive. You almost don't want to race on it, too precious to risk in the chaos of competition. But bikes are meant to be ridden, especially race bikes.",
+      text: "The new bike arrived this week—a proper race machine, not just an upgraded version of your old setup but a completely different category of equipment. Carbon frame, electronic shifting, integrated cockpit, the works. It represents months of saving, of choosing to skip other expenses, of committing fully to this racing thing.",
       triggers: { raceNumber: [7, 8, 9], performanceTier: ["win", "podium"], totalPoints: 100 },
       weight: 0.6
     },
     {
       id: "mid_training_dedication",
-      text: "The off-bike training has become as important as the riding itself. You've set up a corner of your place as a makeshift gym: yoga mat, resistance bands, foam roller, a set of dumbbells picked up secondhand. Core work three times a week, mobility sessions, strength training focused on the posterior chain. It's not glamorous—nobody watches the Tour de France for the planks and single-leg deadlifts—but this is where races are won. In the invisible hours between events, in the unglamorous work that nobody sees.",
+      text: "The off-bike training has become as important as the riding itself. You've set up a corner of your place as a makeshift gym: yoga mat, resistance bands, foam roller, a set of dumbbells picked up secondhand. Core work three times a week, mobility sessions, strength training focused on the posterior chain.",
       triggers: { raceNumber: [7, 8, 9, 10], performanceTier: ["any"] },
       weight: 0.5
     },
     {
       id: "mid_financial_reality",
-      text: "Racing isn't cheap, and the costs add up faster than you anticipated: entry fees, equipment, travel, food, the endless small expenses that weren't part of the original budget. You've started packing your own race-day meals, driving instead of flying when possible, researching every discount and deal available. Some riders roll up in team vans with mechanics and soigneurs; you roll up in your car with sandwiches in a cooler. It's not the dream, but it's honest work, and you're making it happen on your own terms.",
+      text: "Racing isn't cheap, and the costs add up faster than you anticipated: entry fees, equipment, travel, food, the endless small expenses that weren't part of the original budget. You've started packing your own race-day meals, driving instead of flying when possible, researching every discount and deal available.",
       triggers: { raceNumber: [6, 7, 8], performanceTier: ["midpack", "back"] },
       weight: 0.6
     },
     {
       id: "mid_rival_emergence",
-      text: "There's a rider you keep seeing in results, someone racing a similar schedule who seems to be on a similar trajectory. You've never spoken, barely made eye contact, but you track their results obsessively. When they finish ahead of you, it stings more than it should. When you beat them, the satisfaction is disproportionate. This unspoken rivalry has become a motivating force, an extra reason to push when the training gets hard. Racing is both collective and individual, and right now, your measuring stick has a name and a race number.",
+      text: "There's a rider you keep seeing in results, someone racing a similar schedule who seems to be on a similar trajectory. You've never spoken, barely made eye contact, but you track their results obsessively. When they finish ahead of you, it stings more than it should. When you beat them, the satisfaction is disproportionate.",
       triggers: { raceNumber: [8, 9, 10], performanceTier: ["top10", "podium"] },
       weight: 0.7
+    },
+    {
+      id: "mid_power_meter_insight",
+      text: "You finally got a power meter, and the data is both enlightening and humbling. Those efforts that felt hard? Turns out you were barely above threshold. The intervals you thought were maximal? You had way more to give. Now you're training with numbers, and the numbers don't lie about your limits.",
+      triggers: { raceNumber: [6, 7, 8], performanceTier: ["any"] },
+      weight: 0.5
+    },
+    {
+      id: "mid_sprint_development",
+      text: "You've been working on your sprint—not just raw power, but timing, positioning, reading the final kilometers. In training, you practice launching at exactly the right moment, staying seated for maximum watts, throwing the bike at the line. All for those crucial seconds that separate winners from also-rans.",
+      triggers: { raceNumber: [7, 8, 9], performanceTier: ["win", "podium", "top10"] },
+      weight: 0.6
+    },
+    {
+      id: "mid_climbing_focus",
+      text: "Hills have become your focus. You've been hitting every climb in your area repeatedly, working on sustained power, learning to suffer efficiently uphill. Your power-to-weight ratio is improving, and you're starting to look forward to races with elevation rather than dreading them.",
+      triggers: { raceNumber: [6, 7, 8, 9], performanceTier: ["top10", "podium"] },
+      weight: 0.5
+    },
+    {
+      id: "mid_race_craft",
+      text: "You're developing race craft—those subtle skills that separate experienced racers from strong riders. How to shelter from the wind without being obvious. When to close gaps and when to let them go. Reading body language to anticipate attacks. It's an education you can only get through racing.",
+      triggers: { raceNumber: [7, 8, 9, 10], performanceTier: ["top10", "podium", "win"] },
+      weight: 0.7
+    },
+    {
+      id: "mid_consistency_pride",
+      text: "You're building a reputation for consistency. Not the flashiest rider, not the strongest on any given day, but always there, always competitive, always finishing in the points. That reliability matters more than occasional brilliance, and you're starting to embrace being the steady, dependable competitor.",
+      triggers: { raceNumber: [8, 9, 10], performanceTier: ["top10", "podium"], consecutiveGoodResults: 3 },
+      weight: 0.7
+    },
+    {
+      id: "mid_nutrition_mastery",
+      text: "You've dialed in your race nutrition to a science. Exactly 60 grams of carbs per hour, starting 30 minutes in, alternating between gels and bars. Water every 15 minutes. Electrolytes when it's hot. The bonk from early in the season feels like a distant memory—now you're fueling like a pro.",
+      triggers: { raceNumber: [7, 8, 9, 10], performanceTier: ["any"] },
+      weight: 0.4
+    },
+    {
+      id: "mid_team_consideration",
+      text: "A local team has been watching your results, and there's been talk of you joining for next season. It's flattering and terrifying in equal measure. Team racing means obligations, tactics, racing for someone else sometimes. But it also means support, equipment deals, a sense of belonging.",
+      triggers: { raceNumber: [8, 9, 10], performanceTier: ["win", "podium"], totalPoints: 150 },
+      weight: 0.6
+    },
+    {
+      id: "mid_weather_toughness",
+      text: "You've raced in the rain now, in wind, in heat that made you question your sanity. Each one taught you something—how your tires handle on wet corners, how to stay fueled when it's too hot to want to eat, how to position yourself to use crosswinds to your advantage. You're becoming an all-conditions racer.",
+      triggers: { raceNumber: [7, 8, 9], performanceTier: ["any"] },
+      weight: 0.5
+    },
+    {
+      id: "mid_experience_advantage",
+      text: "The newer racers at the startline look at you differently now. You've been doing this long enough that you're no longer the nervous newbie. You know the courses, you recognize the officials, you understand the unwritten rules. That experience is its own form of strength.",
+      triggers: { raceNumber: [8, 9, 10], performanceTier: ["any"] },
+      weight: 0.6
+    },
+    {
+      id: "mid_photo_analysis",
+      text: "You've been studying finish photos and race footage obsessively, analyzing your position in the pack, your body language, when you were on the wrong wheel. Every image is a lesson in what you did right and what you need to fix. The attention to detail is paying off.",
+      triggers: { raceNumber: [7, 8, 9], performanceTier: ["top10", "podium", "win"] },
+      weight: 0.5
     }
   ],
 
-  // ===== LATE SEASON INTROS (Events 11-15) =====
+  // ===== LATE SEASON INTROS (8) =====
   lateSeasonIntros: [
     {
       id: "late_season_fatigue",
-      text: "The season is taking its toll. You can feel it in the way your legs respond to hard efforts, in the extra time needed for recovery, in the mental weight of showing up race after race. This is where consistency matters most—when everyone is tired, when the excitement of early season has faded into the grind, when it would be easy to skip a race or mail in a performance. But this is also where you separate yourself. The riders who show up tired and race anyway are the ones who finish the season strong.",
+      text: "The season is taking its toll. You can feel it in the way your legs respond to hard efforts, in the extra time needed for recovery, in the mental weight of showing up race after race. This is where consistency matters most—when everyone is tired, when the excitement of early season has faded into the grind, when it would be easy to skip a race or mail in a performance.",
       triggers: { raceNumber: [11, 12, 13], performanceTier: ["any"] },
       weight: 0.6
     },
     {
       id: "late_season_reflection",
-      text: "Looking back at where you started this season, the progress is undeniable. The rider who toed the line at Event 1, nervous and uncertain, barely resembles who you are now. You've learned to race, learned to suffer, learned what you're capable of when you commit fully. There are still races to go, still chances to improve, but you've already proven something important to yourself: you belong here.",
+      text: "Looking back at where you started this season, the progress is undeniable. The rider who toed the line at Event 1, nervous and uncertain, barely resembles who you are now. You've learned to race, learned to suffer, learned what you're capable of when you commit fully.",
       triggers: { raceNumber: [13, 14], performanceTier: ["win", "podium", "top10"] },
       weight: 0.7
     },
     {
       id: "late_final_push",
-      text: "Everything comes down to these final races. Points accumulated over months, form built through countless training hours, lessons learned in a dozen race situations—it all matters now. The standings are still fluid, positions can change, and every place gained or lost carries weight. You've come too far to coast now. This is where you empty the tank, leave nothing in reserve, and find out what you're really made of.",
+      text: "Everything comes down to these final races. Points accumulated over months, form built through countless training hours, lessons learned in a dozen race situations—it all matters now. The standings are still fluid, positions can change, and every place gained or lost carries weight.",
       triggers: { raceNumber: [13, 14, 15], performanceTier: ["any"] },
       weight: 0.8
+    },
+    {
+      id: "late_championship_mindset",
+      text: "The math is simple: if you can string together strong results in these final races, you're in contention for the overall. It's no longer about individual race results—it's about the season as a whole, about proving you can perform when it counts most, when fatigue is highest and the pressure is real.",
+      triggers: { raceNumber: [13, 14, 15], performanceTier: ["win", "podium", "top10"] },
+      weight: 0.7
+    },
+    {
+      id: "late_no_regrets",
+      text: "The season is almost over, and you're determined to finish strong. No regrets, no 'what ifs,' no holding back. You've come too far, worked too hard, sacrificed too much to coast through the final races. This is the time to empty the tank completely.",
+      triggers: { raceNumber: [13, 14, 15], performanceTier: ["any"] },
+      weight: 0.7
+    },
+    {
+      id: "late_lessons_learned",
+      text: "Every race this season taught you something valuable—about tactics, about your body, about who you are under pressure. Now, in these final events, you're putting all those lessons into practice. This is where the education becomes wisdom, where experience transforms into results.",
+      triggers: { raceNumber: [12, 13, 14], performanceTier: ["any"] },
+      weight: 0.6
+    },
+    {
+      id: "late_next_season_thoughts",
+      text: "Your mind keeps drifting to next season—how much stronger you'll be with a full year of racing experience, what you'll do differently, where you can improve. But first, you need to finish this season strong, to prove to yourself that you can close when it matters.",
+      triggers: { raceNumber: [13, 14, 15], performanceTier: ["any"] },
+      weight: 0.5
+    },
+    {
+      id: "late_emotional_investment",
+      text: "You didn't expect to care this much. At the start of the season, racing was just something you were trying. Now, the results matter deeply. The standings mean something. You check them compulsively, run through scenarios, calculate what you need to happen. Racing has become personal.",
+      triggers: { raceNumber: [12, 13, 14], performanceTier: ["any"] },
+      weight: 0.6
     }
   ],
 
-  // ===== LIFESTYLE & DAILY LIFE =====
+  // ===== EQUIPMENT STORIES (10) =====
+  equipment: [
+    {
+      id: "equip_tire_choice",
+      text: "You spent an embarrassing amount of time researching tire choices for this race. Thread count, rubber compound, tubeless vs tubes, optimal pressure for your weight. Your friends think you're overthinking it. But marginal gains matter, and if the right tires save you five watts or give you better cornering confidence, that's worth the research.",
+      triggers: { raceNumber: [3, 4, 5, 6], performanceTier: ["any"] },
+      weight: 0.4
+    },
+    {
+      id: "equip_saddle_saga",
+      text: "Finding the right saddle has been a months-long odyssey. You've tried five different models, adjusting height and fore-aft position countless times. Finally, this one feels right—you can put down power without discomfort, stay aero without numbness. It's amazing how much difference a few centimeters of shaped carbon and padding can make.",
+      triggers: { raceNumber: [4, 5, 6, 7], performanceTier: ["any"] },
+      weight: 0.3
+    },
+    {
+      id: "equip_aero_obsession",
+      text: "You've gone full aero-nerd: tight clothing, tucked elbows, flat back position. You practice in the mirror, film yourself on training rides, optimize every detail. Whether it's actually making you faster is unclear, but the psychological benefit of knowing you're doing everything possible to reduce drag is real.",
+      triggers: { raceNumber: [6, 7, 8, 9], performanceTier: ["top10", "podium", "win"] },
+      weight: 0.5
+    },
+    {
+      id: "equip_maintenance_ritual",
+      text: "The night before races has become a ritual: bike completely clean, chain freshly lubed, bolts checked, wheels true, brake pads inspected. Some might call it obsessive. You call it preparation. A mechanical DNF is preventable, and you're not leaving anything to chance.",
+      triggers: { raceNumber: [5, 6, 7, 8], performanceTier: ["any"] },
+      weight: 0.4
+    },
+    {
+      id: "equip_clothing_experiment",
+      text: "You've been experimenting with race clothing—speedsuits vs separate bibs and jersey, short vs long socks, aero fabrics vs comfort. Every choice is a trade-off between aerodynamics, comfort, and looking the part. Today's kit represents your current best guess at the optimal combination.",
+      triggers: { raceNumber: [6, 7, 8], performanceTier: ["any"] },
+      weight: 0.3
+    },
+    {
+      id: "equip_tech_adoption",
+      text: "Your bike computer now tracks everything: power, heart rate, cadence, GPS, even the weather. Post-race, you spend almost as much time analyzing the data as you did racing. Every file reveals something—a premature effort, an inefficient cadence spike, proof that you had more to give.",
+      triggers: { raceNumber: [6, 7, 8, 9], performanceTier: ["any"] },
+      weight: 0.4
+    },
+    {
+      id: "equip_helmet_upgrade",
+      text: "The new aero helmet looked ridiculous in the shop, but the wind tunnel data doesn't lie—it's measurably faster than your old one. You've stopped caring what it looks like. Racing is about going fast, not looking cool. Well, mostly.",
+      triggers: { raceNumber: [5, 6, 7], performanceTier: ["any"] },
+      weight: 0.3
+    },
+    {
+      id: "equip_budget_creativity",
+      text: "You can't afford the top-tier equipment the front of the pack is riding, so you've become creative: used race wheels from last year's model, take-off components from bike shop, waiting for sales. The bike may not be Instagram-worthy, but it's race-ready, and that's what matters.",
+      triggers: { raceNumber: [3, 4, 5, 6], performanceTier: ["midpack", "back"] },
+      weight: 0.5
+    },
+    {
+      id: "equip_position_refinement",
+      text: "You've been working with online fit guides, adjusting saddle height by millimeters, tweaking stem length, rotating handlebar angle. The goal: maximum power output with minimum discomfort. Every adjustment is tested on rides, refined, tested again. Your position is becoming truly yours.",
+      triggers: { raceNumber: [6, 7, 8], performanceTier: ["top10", "podium"] },
+      weight: 0.4
+    },
+    {
+      id: "equip_minimalist_approach",
+      text: "You've started stripping unnecessary weight and items from your race setup. No saddlebag, minimal tools, just what's absolutely essential. Every gram counts, or so you tell yourself. In reality, the mental benefit of a cleaner, simpler setup might matter more than the actual weight savings.",
+      triggers: { raceNumber: [7, 8, 9], performanceTier: ["any"] },
+      weight: 0.3
+    }
+  ],
+
+  // ===== LIFESTYLE STORIES (12) =====
   lifestyle: [
     {
       id: "life_morning_routine",
-      text: "The alarm goes off at 5:30 AM and for three full seconds you debate whether racing is really worth this. Then you remember why you started: the feeling of speed, the challenge, the person you're becoming through this process. You roll out of bed, stumble to the kitchen, start the coffee. By the time you're clipped in and rolling through dark streets, the exhaustion has transformed into something else—anticipation, purpose, the quiet satisfaction of doing hard things before most people are awake.",
+      text: "The alarm goes off at 5:30 AM and for three full seconds you debate whether racing is really worth this. Then you remember why you started: the feeling of speed, the challenge, the person you're becoming through this process. You roll out of bed, stumble to the kitchen, start the coffee.",
       triggers: { raceNumber: [2, 3, 4, 5, 6], performanceTier: ["any"] },
       weight: 0.4
     },
     {
       id: "life_grocery_store",
-      text: "The grocery store has become a different place since you started racing seriously. You find yourself reading nutrition labels obsessively, calculating protein content, comparing carbohydrate sources. Your cart looks different too—less junk food, more rice and pasta, vegetables actually purchased with intent rather than guilt. Other shoppers probably think you're either a bodybuilder or have some kind of eating disorder. They don't know you're just trying to fuel a racing habit that demands more calories than seems possible.",
+      text: "The grocery store has become a different place since you started racing seriously. You find yourself reading nutrition labels obsessively, calculating protein content, comparing carbohydrate sources. Your cart looks different too—less junk food, more rice and pasta, vegetables actually purchased with intent rather than guilt.",
       triggers: { raceNumber: [4, 5, 6, 7], performanceTier: ["any"] },
       weight: 0.3
     },
     {
       id: "life_social_sacrifice",
-      text: "Your friends have stopped inviting you to late-night events. They know you'll either decline because of early training rides or show up and leave early, checking your watch and calculating sleep hours. Racing has rearranged your social life in ways you didn't fully anticipate. Some relationships have faded; others have adapted. The ones who matter understand that this isn't forever, just right now, just this season while you chase something that matters to you.",
+      text: "Your friends have stopped inviting you to late-night events. They know you'll either decline because of early training rides or show up and leave early, checking your watch and calculating sleep hours. Racing has rearranged your social life in ways you didn't fully anticipate.",
       triggers: { raceNumber: [5, 6, 7], performanceTier: ["any"] },
       weight: 0.3
+    },
+    {
+      id: "life_work_balance",
+      text: "Balancing work and training has become an art form. You schedule meetings around key workouts, take lunch breaks for quick spins, sneak in intervals before the office. Your colleagues don't understand the dedication, but you've found a rhythm that mostly works.",
+      triggers: { raceNumber: [6, 7, 8, 9], performanceTier: ["any"] },
+      weight: 0.4
+    },
+    {
+      id: "life_laundry_reality",
+      text: "The laundry situation has reached critical levels—sweaty cycling kit piling up after every ride, the constant washing, the gear that never quite dries in time. You've considered buying duplicates of everything just to keep up with the volume. Racing is glamorous until it's time to deal with the logistics.",
+      triggers: { raceNumber: [4, 5, 6], performanceTier: ["any"] },
+      weight: 0.2
+    },
+    {
+      id: "life_weather_watching",
+      text: "You've become obsessed with weather forecasts. Not just for race day, but for every training ride. Wind direction, temperature, chance of rain—it all affects your preparation. Your phone's weather app is checked more often than social media now.",
+      triggers: { raceNumber: [5, 6, 7], performanceTier: ["any"] },
+      weight: 0.3
+    },
+    {
+      id: "life_sleep_priority",
+      text: "Sleep has become non-negotiable. Eight hours minimum, nine when possible. You've reorganized your entire evening routine around getting to bed early enough to wake up recovered. Friends joke about your grandmother bedtime, but the performance benefits are undeniable.",
+      triggers: { raceNumber: [6, 7, 8, 9], performanceTier: ["any"] },
+      weight: 0.4
+    },
+    {
+      id: "life_food_timing",
+      text: "You've become that person who times meals around training. Carbs four hours before long rides, protein within thirty minutes after hard efforts, fat restricted when glycogen loading. Your eating habits would seem neurotic to anyone who doesn't race bikes.",
+      triggers: { raceNumber: [5, 6, 7, 8], performanceTier: ["any"] },
+      weight: 0.3
+    },
+    {
+      id: "life_family_support",
+      text: "Your family has been incredibly supportive, even when they don't fully understand the appeal. They show up at races when they can, ask about your results, tolerate the bikes in the living room. That support means more than they probably realize.",
+      triggers: { raceNumber: [7, 8, 9, 10], performanceTier: ["any"] },
+      weight: 0.4
+    },
+    {
+      id: "life_time_management",
+      text: "Every hour of your week is accounted for: work, training, recovery, race prep. You've become ruthlessly efficient with time, cutting out activities that don't serve your goals. It's probably unsustainable long-term, but right now, in this season, the focus feels necessary.",
+      triggers: { raceNumber: [7, 8, 9], performanceTier: ["any"] },
+      weight: 0.4
+    },
+    {
+      id: "life_injury_avoidance",
+      text: "You've become paranoid about staying healthy—washing hands obsessively, avoiding sick people, taking vitamins, stretching religiously. A cold or injury could derail weeks of training. Prevention has become as important as the training itself.",
+      triggers: { raceNumber: [6, 7, 8], performanceTier: ["any"] },
+      weight: 0.3
+    },
+    {
+      id: "life_bike_shop_regular",
+      text: "The local bike shop staff know you by name now. You're there weekly—picking up nutrition, getting last-minute adjustments, browsing components you can't afford yet. It's become your community hub, where you hear about group rides, get course beta, share war stories from races.",
+      triggers: { raceNumber: [5, 6, 7, 8], performanceTier: ["any"] },
+      weight: 0.4
     }
   ],
 
-  // ===== MOTIVATION & INSPIRATION =====
+  // ===== OFF-SEASON & PREPARATION (5) =====
+  offSeason: [
+    {
+      id: "off_season_training",
+      text: "Winter training is different from racing season: less intense, more volume, focused on building the base that'll support next season's efforts. You're putting in long, steady hours in the cold, sometimes questioning why you're out here when you could be warm inside.",
+      triggers: { raceNumber: [1], performanceTier: ["any"] },
+      weight: 0.4
+    },
+    {
+      id: "off_season_planning",
+      text: "You spent the off-season mapping out this entire year—which races to target, when to build form, where to rest. The plan is taped to your wall, and you've been following it religiously. Today's race is exactly where the plan said you should be, with the fitness you worked months to build.",
+      triggers: { raceNumber: [1, 2], performanceTier: ["any"] },
+      weight: 0.5
+    },
+    {
+      id: "off_season_base_building",
+      text: "The foundation for racing success was laid in December and January—months of long, steady rides building aerobic capacity. Hour after hour, week after week, no glory, no results, just the patient accumulation of base fitness. Now you're reaping what you sowed.",
+      triggers: { raceNumber: [1, 2, 3], performanceTier: ["win", "podium", "top10"] },
+      weight: 0.5
+    },
+    {
+      id: "off_season_weakness_work",
+      text: "Last season exposed your weaknesses clearly: you got dropped on climbs, struggled in crosswinds, faded in long races. This off-season you targeted those weaknesses specifically—hill repeats, tempo efforts, endurance rides. You're not the same rider who finished last season.",
+      triggers: { raceNumber: [1, 2, 3], performanceTier: ["any"] },
+      weight: 0.5
+    },
+    {
+      id: "off_season_mental_prep",
+      text: "Physical preparation is only part of the equation. You've been working on the mental side too—visualization exercises, reviewing race tactics, studying course profiles. By the time you arrived at the start line today, you'd already raced this event a dozen times in your head.",
+      triggers: { raceNumber: [1, 2], performanceTier: ["any"] },
+      weight: 0.4
+    }
+  ],
+
+  // ===== MOTIVATION & INSPIRATION (8) =====
   motivation: [
     {
       id: "motiv_tour_watching",
-      text: "You stayed up late watching Tour de France highlights, studying how the professionals navigate the chaos of the peloton, how they position themselves before climbs, the body language that telegraphs attacks before they happen. It's inspiring and humbling in equal measure—you're racing at a completely different level, but the fundamental challenge is the same: human against human, will against will, the question of who wants it more when everyone is suffering. Tomorrow's training ride feels different after watching the pros. Harder. More purposeful. More real.",
+      text: "You stayed up late watching Tour de France highlights, studying how the professionals navigate the chaos of the peloton, how they position themselves before climbs, the body language that telegraphs attacks before they happen. It's inspiring and humbling in equal measure.",
       triggers: { raceNumber: [3, 4, 5, 6], performanceTier: ["any"] },
       weight: 0.5
     },
     {
       id: "motiv_why_you_race",
-      text: "Someone asked you why you race, and you struggled to articulate an answer that made sense. For the competition? For the fitness? Because suffering builds character? All true, none complete. The real answer is messier: you race because it makes you feel alive in a way few other things do. Because it's hard and therefore meaningful. Because you're curious about your own limits. Because pushing through discomfort and emerging on the other side is addictive. Not everyone understands that, and that's okay. You're not doing this for them.",
+      text: "Someone asked you why you race, and you struggled to articulate an answer that made sense. For the competition? For the fitness? Because suffering builds character? All true, none complete. The real answer is messier: you race because it makes you feel alive in a way few other things do.",
       triggers: { raceNumber: [6, 7, 8], performanceTier: ["any"] },
       weight: 0.4
+    },
+    {
+      id: "motiv_role_model",
+      text: "There's a rider you admire—someone who races clean, works hard, carries themselves with quiet confidence. You've never met them, but you study their results, watch how they race, try to emulate their approach. Everyone needs a north star, and they're yours.",
+      triggers: { raceNumber: [5, 6, 7, 8], performanceTier: ["any"] },
+      weight: 0.4
+    },
+    {
+      id: "motiv_proving_doubters_wrong",
+      text: "Not everyone believed you could do this. Some people laughed at your ambitions, told you racing was for younger athletes, suggested you were wasting your time. Part of you races to prove them wrong. But the bigger part races to prove something to yourself.",
+      triggers: { raceNumber: [6, 7, 8, 9], performanceTier: ["win", "podium", "top10"] },
+      weight: 0.5
+    },
+    {
+      id: "motiv_personal_growth",
+      text: "Racing has changed you in unexpected ways. You're more disciplined in all areas of life now, more resilient when things go wrong, more confident in your ability to push through discomfort. The person in the mirror barely resembles who you were a year ago.",
+      triggers: { raceNumber: [7, 8, 9, 10], performanceTier: ["any"] },
+      weight: 0.5
+    },
+    {
+      id: "motiv_community",
+      text: "The cycling community has become your tribe. These are people who understand the sacrifices, celebrate the victories, commiserate over the defeats. You've found your people, and that sense of belonging is worth more than any result.",
+      triggers: { raceNumber: [6, 7, 8], performanceTier: ["any"] },
+      weight: 0.4
+    },
+    {
+      id: "motiv_age_defiance",
+      text: "You're not the youngest rider in the field anymore, and you won't be the oldest either. But you refuse to let age become an excuse. If anything, starting later means you appreciate this more, work harder, waste less time doubting yourself.",
+      triggers: { raceNumber: [5, 6, 7, 8], performanceTier: ["any"] },
+      weight: 0.4
+    },
+    {
+      id: "motiv_pure_love",
+      text: "Strip away the tactics, the technology, the data, and what's left is simple: you love riding bikes fast. The wind in your face, the burn in your legs, the sensation of pushing your body to its limits—this is what you're here for.",
+      triggers: { raceNumber: [4, 5, 6, 7, 8], performanceTier: ["any"] },
+      weight: 0.5
     }
   ],
 
-  // ===== BREAKTHROUGH MOMENTS =====
+  // ===== BREAKTHROUGH MOMENTS (6) =====
   breakthrough: [
     {
       id: "break_first_win",
-      text: "You won. Actually won. Not just placed well, not just exceeded expectations, but crossed the line first with everyone else behind you. The feeling is indescribable—euphoria mixed with disbelief mixed with validation of every hard training session and early morning and sacrifice. You keep replaying it: the decisive move, the gap opening, the final meters where you could taste victory before you had it. This changes things. Not just the result itself but what it proves about what's possible. You're not just participating anymore. You're competing. You're winning.",
+      text: "You won. Actually won. Not just placed well, not just exceeded expectations, but crossed the line first with everyone else behind you. The feeling is indescribable—euphoria mixed with disbelief mixed with validation of every hard training session and early morning and sacrifice.",
       triggers: { performanceTier: ["win"], isFirstWin: true },
       weight: 1.0
     },
     {
       id: "break_podium_streak",
-      text: "Three races, three podiums. This isn't luck anymore—it's form, consistency, the accumulation of everything you've been working toward. Other riders are starting to recognize you at race sign-in, and not just casually but with the kind of respect reserved for genuine competitors. You're being marked now, watched, covered. It's a different kind of pressure, but pressure you've earned. The question isn't whether you can compete at this level anymore. The question is how much higher you can go.",
+      text: "Three races, three podiums. This isn't luck anymore—it's form, consistency, the accumulation of everything you've been working toward. Other riders are starting to recognize you at race sign-in, and not just casually but with the kind of respect reserved for genuine competitors.",
       triggers: { performanceTier: ["podium"], consecutivePodiums: 3 },
       weight: 0.9
+    },
+    {
+      id: "break_pack_control",
+      text: "There was a moment in your last race where you realized you weren't just reacting to the pack—you were controlling it. Setting tempo, covering moves, dictating when attacks could go. That shift from participant to protagonist felt seismic.",
+      triggers: { raceNumber: [6, 7, 8, 9], performanceTier: ["win", "podium"] },
+      weight: 0.7
+    },
+    {
+      id: "break_mental_strength",
+      text: "Your last race taught you something crucial: your mind quits before your body does. When you pushed past that mental barrier, past the voice saying 'this is too hard,' you found another gear entirely. Now you know—true limits are further than you thought.",
+      triggers: { raceNumber: [5, 6, 7, 8], performanceTier: ["win", "podium", "top10"], improvementFromPrediction: 5 },
+      weight: 0.8
+    },
+    {
+      id: "break_tactical_victory",
+      text: "Your last win wasn't about being the strongest—it was about being the smartest. You conserved energy when others wasted it, positioned perfectly for the finale, timed your effort to perfection. That's the kind of racing that wins championships.",
+      triggers: { raceNumber: [7, 8, 9, 10], performanceTier: ["win"] },
+      weight: 0.8
+    },
+    {
+      id: "break_confidence_shift",
+      text: "Something fundamental has shifted in how you approach races. You used to hope for good results. Now you expect them. That confidence isn't arrogance—it's earned through consistent performance and the knowledge that you belong at the front.",
+      triggers: { raceNumber: [7, 8, 9, 10], performanceTier: ["win", "podium"], consecutiveGoodResults: 4 },
+      weight: 0.8
     }
   ],
 
-  // ===== SETBACK MOMENTS =====
+  // ===== SETBACK MOMENTS (8) =====
   setback: [
     {
       id: "set_mechanical",
-      text: "A mechanical ended your race today—chain drop, derailleur issue, something that could've been prevented with better pre-race prep. You sat on the roadside while the peloton disappeared, feeling equal parts frustration and self-recrimination. These are the lessons that stick: check everything twice, maintain your equipment obsessively, never assume things will just work. Racing is unforgiving of small mistakes. You won't make this one again.",
+      text: "A mechanical ended your race today—chain drop, derailleur issue, something that could've been prevented with better pre-race prep. You sat on the roadside while the peloton disappeared, feeling equal parts frustration and self-recrimination.",
       triggers: { performanceTier: ["back"], isWorseResult: true },
       weight: 0.6
     },
     {
       id: "set_bad_day",
-      text: "Some days the legs just aren't there. No explanation, no warning, just the terrible realization mid-race that you're off form and there's nothing you can do about it. You fought through to the finish, but it was ugly—dropped on climbs you normally handle easily, gapped on accelerations that shouldn't hurt. The important thing isn't that you had a bad day—everyone has bad days. The important thing is that you finished, that you learned what it feels like to race when everything hurts, and that tomorrow is another chance.",
+      text: "Some days the legs just aren't there. No explanation, no warning, just the terrible realization mid-race that you're off form and there's nothing you can do about it. You fought through to the finish, but it was ugly.",
       triggers: { performanceTier: ["back"], predictedMuchBetter: true },
+      weight: 0.7
+    },
+    {
+      id: "set_tactical_error",
+      text: "You made a tactical mistake today—attacked too early, chased the wrong move, positioned yourself poorly for the finale. The legs were there, but the brain made the wrong call. Sometimes the hardest lessons come from races you should have won.",
+      triggers: { performanceTier: ["midpack", "back"], predictedMuchBetter: true },
+      weight: 0.6
+    },
+    {
+      id: "set_crash",
+      text: "Someone went down in front of you, and you had nowhere to go. The crash itself was minor—road rash, bruised ego, lost time. But the race was over, and watching the pack ride away while you picked yourself up was its own kind of pain.",
+      triggers: { performanceTier: ["back"], isWorseResult: true },
+      weight: 0.5
+    },
+    {
+      id: "set_illness_impact",
+      text: "You probably shouldn't have raced today. The cold you thought was behind you clearly wasn't, and your body made that abundantly clear during the race. Pride got you to the start line, but wisdom would have kept you home.",
+      triggers: { performanceTier: ["back"], isWorseResult: true },
+      weight: 0.5
+    },
+    {
+      id: "set_overconfidence",
+      text: "You went into today's race overconfident, expecting an easy result based on recent form. Racing doesn't work that way. The pack punished your assumptions, and you learned again that every race must be respected, every field taken seriously.",
+      triggers: { performanceTier: ["midpack", "back"], predictedMuchBetter: true },
+      weight: 0.6
+    },
+    {
+      id: "set_equipment_failure",
+      text: "Your equipment let you down today—a flat at the worst possible moment, a component that chose this race to fail. You can't control everything, but that doesn't make it less frustrating when mechanical bad luck decides your result.",
+      triggers: { performanceTier: ["back"], isWorseResult: true },
+      weight: 0.5
+    },
+    {
+      id: "set_learning_experience",
+      text: "Today hurt, both physically and psychologically. But you're choosing to treat it as tuition paid for the education. Every failure teaches something if you're willing to learn. Tomorrow you'll be smarter, stronger, more prepared.",
+      triggers: { performanceTier: ["back"], isWorseResult: true },
       weight: 0.7
     }
   ],
 
-  // ===== LOCAL COLOR (Race-Specific) =====
+  // ===== RIVALRY STORIES (6) =====
+  rivalry: [
+    {
+      id: "rival_emergence",
+      text: "There's a rider you keep seeing in results, someone racing a similar schedule who seems to be on a similar trajectory. You've never spoken, barely made eye contact, but you track their results obsessively. When they finish ahead of you, it stings more than it should.",
+      triggers: { raceNumber: [8, 9, 10], performanceTier: ["top10", "podium"] },
+      weight: 0.7
+    },
+    {
+      id: "rival_respect",
+      text: "You've been racing against the same core group all season, and a mutual respect has developed. You know their strengths and weaknesses, they know yours. In the pack, you acknowledge each other with nods—competitors, but also fellow travelers on this journey.",
+      triggers: { raceNumber: [7, 8, 9, 10], performanceTier: ["any"] },
+      weight: 0.5
+    },
+    {
+      id: "rival_revenge",
+      text: "A rider who beat you soundly in your last encounter is here again. You've been thinking about that race, analyzing what went wrong, planning how to approach today differently. Revenge might be petty, but it's also motivating.",
+      triggers: { raceNumber: [6, 7, 8, 9], performanceTier: ["any"] },
+      weight: 0.6
+    },
+    {
+      id: "rival_friendly",
+      text: "Your main rival has become something close to a friend. You warm up together, share race intel, commiserate after tough days. The competition is fierce, but the friendship is genuine. It's possible to want to beat someone and genuinely hope they do well.",
+      triggers: { raceNumber: [8, 9, 10], performanceTier: ["podium", "top10"] },
+      weight: 0.5
+    },
+    {
+      id: "rival_shadowing",
+      text: "You've been watching one rider in particular—studying their race tactics, their training posts, their equipment choices. Call it respect or obsession, but you're learning from them, using them as a benchmark for where you want to be.",
+      triggers: { raceNumber: [6, 7, 8], performanceTier: ["any"] },
+      weight: 0.5
+    },
+    {
+      id: "rival_motivation",
+      text: "Knowing your rival will be racing today adds an extra layer of motivation. You want to beat them specifically, to prove something you're not even sure how to articulate. Personal competition elevates performance in ways general competition never could.",
+      triggers: { raceNumber: [7, 8, 9, 10], performanceTier: ["any"] },
+      weight: 0.6
+    }
+  ],
+
+  // ===== LOCAL COLOR (8) =====
   localColor: [
     {
       id: "color_coast_and_roast",
-      text: "The Coast and Roast Crit has a reputation: fast, technical, and absolutely unforgiving of positioning mistakes. The tight corners come rapid-fire, and one moment of hesitation can cost you twenty places. Locals dominate this race because they know every corner, every rough patch, exactly where to brake and where to carry speed. You're learning, but the learning curve is steep and painful.",
+      text: "The Coast and Roast Crit has a reputation: fast, technical, and absolutely unforgiving of positioning mistakes. The tight corners come rapid-fire, and one moment of hesitation can cost you twenty places. Locals dominate this race because they know every corner, every rough patch, exactly where to brake and where to carry speed.",
       triggers: { raceNumber: [1], performanceTier: ["any"] },
       weight: 0.5
     },
     {
       id: "color_forest_velodrome",
-      text: "Track racing is a different animal entirely—nowhere to hide, nowhere to rest, just raw speed and tactical awareness. The Forest Velodrome Elimination is particularly brutal: every lap someone goes home, and the pressure is relentless from the opening whistle. You can feel the track banking under your tires, the strange sensation of leaning into turns at impossible angles, the way everything happens faster than it does on the road.",
+      text: "Track racing is a different animal entirely—nowhere to hide, nowhere to rest, just raw speed and tactical awareness. The Forest Velodrome Elimination is particularly brutal: every lap someone goes home, and the pressure is relentless from the opening whistle.",
       triggers: { raceNumber: [3], performanceTier: ["any"] },
       weight: 0.6
     },
     {
       id: "color_unbound",
-      text: "Unbound - Little Egypt isn't your typical race. The gravel sections are rough and unpredictable, the distance is long enough to expose any weakness in fitness or pacing, and the whole event has this adventurous, slightly wild energy that's different from standard road racing. Some riders thrive here; others suffer and wonder why they signed up. You're about to find out which category you fall into.",
+      text: "Unbound - Little Egypt isn't your typical race. The gravel sections are rough and unpredictable, the distance is long enough to expose any weakness in fitness or pacing, and the whole event has this adventurous, slightly wild energy that's different from standard road racing.",
       triggers: { raceNumber: [12], performanceTier: ["any"] },
       weight: 0.7
+    },
+    {
+      id: "color_time_trial",
+      text: "Time trials are the race of truth—just you, the bike, and the clock. No tactics to hide behind, no teammates to help, nowhere to coast. Every watt matters, every second of position savings counts. It's pure suffering converted directly into time.",
+      triggers: { raceNumber: [4, 10], performanceTier: ["any"] },
+      weight: 0.6
+    },
+    {
+      id: "color_criterium_chaos",
+      text: "Criteriums are controlled chaos—same corners lap after lap, speeds that feel dangerous, positioning that changes every turn. The technical demands are enormous: handling skills, spatial awareness, the ability to accelerate out of corners repeatedly without burning all your matches.",
+      triggers: { raceNumber: [1, 7], performanceTier: ["any"] },
+      weight: 0.5
+    },
+    {
+      id: "color_hill_climb",
+      text: "Hill climbs are elegantly simple and brutally hard. The road goes up, and you either have the legs to go fast or you don't. No hiding, no tactics, just you versus gravity in its purest form.",
+      triggers: { raceNumber: [6], performanceTier: ["any"] },
+      weight: 0.6
+    },
+    {
+      id: "color_points_race",
+      text: "Points races reward consistency over single efforts. You need to be alert for every sprint, positioned well each time, smart about when to go all-in and when to take what you can get. It's about accumulation, not one decisive moment.",
+      triggers: { raceNumber: [5, 11], performanceTier: ["any"] },
+      weight: 0.5
+    },
+    {
+      id: "color_gran_fondo",
+      text: "The gran fondo distance changes everything. What seems sustainable for an hour becomes questionable over three or four. Pacing becomes critical, nutrition essential, mental strength as important as physical. These races reveal who prepared properly and who overestimated their fitness.",
+      triggers: { raceNumber: [8], performanceTier: ["any"] },
+      weight: 0.6
     }
   ],
 
-  // ===== OFF-SEASON & PREPARATION =====
-  offSeason: [
+  // ===== WEATHER & CONDITIONS (5) =====
+  weather: [
     {
-      id: "off_season_training",
-      text: "Winter training is different from racing season: less intense, more volume, focused on building the base that'll support next season's efforts. You're putting in long, steady hours in the cold, sometimes questioning why you're out here when you could be warm inside. But you know that seasons are built in the off-season, that the work done now in anonymity will pay dividends when racing resumes. It's not glamorous, but it's necessary.",
-      triggers: { raceNumber: [1], performanceTier: ["any"] },
+      id: "weather_rain",
+      text: "Rain changes everything about bike racing. Corners become sketchy, braking distances extend, vision decreases. Some riders thrive in these conditions, comfortable when others are terrified. You're learning which category you fall into.",
+      triggers: { raceNumber: [2, 3, 4, 5, 6, 7, 8], performanceTier: ["any"] },
+      weight: 0.3
+    },
+    {
+      id: "weather_heat",
+      text: "The heat is brutal today—the kind that makes every effort feel twice as hard, that drains your energy even before the race starts. Staying hydrated becomes as important as staying in position. Some riders wilt in heat; others seem unaffected. Today you'll find out which you are.",
+      triggers: { raceNumber: [5, 6, 7, 8, 9], performanceTier: ["any"] },
+      weight: 0.4
+    },
+    {
+      id: "weather_wind",
+      text: "The wind is howling—crosswinds that will split the field, headwinds that will punish anyone who works too hard early. Wind racing requires different tactics: echelon positioning, selective effort, tactical patience. Get it wrong and you'll be gapped before you know what happened.",
+      triggers: { raceNumber: [3, 4, 5, 6, 7, 8], performanceTier: ["any"] },
+      weight: 0.4
+    },
+    {
+      id: "weather_cold",
+      text: "The cold makes warming up crucial and staying warm during the race a challenge. Your fingers hurt, your face goes numb, and finding that perfect balance between enough clothing and too much becomes its own tactical decision.",
+      triggers: { raceNumber: [1, 2, 3], performanceTier: ["any"] },
+      weight: 0.3
+    },
+    {
+      id: "weather_perfect",
+      text: "Today's weather is perfect—temperature in the sweet spot, minimal wind, dry roads. These are the conditions where pure form wins out, where there are no excuses about weather affecting performance. Either you're fast today or you're not.",
+      triggers: { raceNumber: [4, 5, 6, 7, 8], performanceTier: ["any"] },
+      weight: 0.3
+    }
+  ],
+
+  // ===== TRAVEL & LOGISTICS (4) =====
+  travel: [
+    {
+      id: "travel_long_drive",
+      text: "The drive to this race was longer than expected—three hours each way, leaving before dawn to make the start time. You tried to rest in the car, but pre-race nerves made that impossible. Now you're here, slightly tired from travel but committed to making the drive worth it.",
+      triggers: { raceNumber: [4, 5, 6, 7, 8], performanceTier: ["any"] },
+      weight: 0.3
+    },
+    {
+      id: "travel_local_race",
+      text: "There's something comforting about racing close to home. You know these roads, you've trained on them countless times, and sleeping in your own bed last night meant arriving fresh and ready. Local races have their advantages.",
+      triggers: { raceNumber: [1, 2, 3], performanceTier: ["any"] },
+      weight: 0.4
+    },
+    {
+      id: "travel_logistics_stress",
+      text: "Race day logistics are more complicated than they should be—parking, registration, warming up, bathroom, pinning numbers, one last bike check. You've developed a system, a routine that minimizes stress, but there's always that underlying anxiety that you've forgotten something crucial.",
+      triggers: { raceNumber: [2, 3, 4, 5], performanceTier: ["any"] },
+      weight: 0.3
+    },
+    {
+      id: "travel_course_recon",
+      text: "You drove the course yesterday, studying the key sections, noting where attacks might happen, visualizing the finale. That reconnaissance gives you confidence—you won't be surprised by anything today. You know what's coming.",
+      triggers: { raceNumber: [5, 6, 7, 8, 9], performanceTier: ["any"] },
+      weight: 0.4
+    }
+  ],
+
+  // ===== MENTAL GAME (6) =====
+  mentalGame: [
+    {
+      id: "mental_visualization",
+      text: "You've been visualizing this race for days—seeing yourself positioned perfectly, feeling strong in the key moments, executing your plan flawlessly. Sports psychology says visualization improves performance. You're about to find out if that's true.",
+      triggers: { raceNumber: [5, 6, 7, 8, 9], performanceTier: ["any"] },
+      weight: 0.4
+    },
+    {
+      id: "mental_anxiety_management",
+      text: "The pre-race anxiety is intense—stomach churning, heart racing, mind spinning through worst-case scenarios. You've learned this is normal, even useful. The key is channeling that nervous energy into focused intensity once the race starts.",
+      triggers: { raceNumber: [1, 2, 3, 4], performanceTier: ["any"] },
+      weight: 0.4
+    },
+    {
+      id: "mental_process_over_outcome",
+      text: "You've been working on focusing on process rather than outcome—perfect your positioning, execute your nutrition plan, hit your power targets. Results take care of themselves when the process is right. Today you're committed to the process.",
+      triggers: { raceNumber: [6, 7, 8, 9], performanceTier: ["any"] },
+      weight: 0.5
+    },
+    {
+      id: "mental_mantras",
+      text: "You have a mantra for when things get hard: 'One pedal stroke at a time.' It sounds simplistic, but breaking suffering down into manageable chunks makes it bearable. You'll need that mantra today.",
+      triggers: { raceNumber: [4, 5, 6, 7, 8], performanceTier: ["any"] },
+      weight: 0.4
+    },
+    {
+      id: "mental_pressure_handling",
+      text: "You're learning to handle pressure—to race well when expectations are high, when you're marked by competitors, when the stakes feel significant. That mental toughness wasn't there at the start of the season. It's developing now.",
+      triggers: { raceNumber: [8, 9, 10], performanceTier: ["win", "podium", "top10"] },
+      weight: 0.6
+    },
+    {
+      id: "mental_enjoyment",
+      text: "Somewhere along the way, you'd forgotten that racing is supposed to be fun. Today you're determined to actually enjoy this—to appreciate the absurdity and beauty of suffering on a bicycle, to remember why you started. The results will follow if you stay present.",
+      triggers: { raceNumber: [6, 7, 8, 9], performanceTier: ["any"] },
       weight: 0.4
     }
   ]
