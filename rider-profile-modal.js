@@ -357,9 +357,22 @@ function buildRiderProfileHTML(data, name) {
     
     // Award configuration with icons and names
     const awardConfig = {
+        // Race medals
         gold: { icon: '🥇', name: 'Gold Medal' },
         silver: { icon: '🥈', name: 'Silver Medal' },
         bronze: { icon: '🥉', name: 'Bronze Medal' },
+        
+        // GC trophies
+        gcGold: { icon: '🏆', name: 'GC Winner' },
+        gcSilver: { icon: '🥈', name: 'GC Second' },
+        gcBronze: { icon: '🥉', name: 'GC Third' },
+        
+        // Season trophies (MOST PRESTIGIOUS!)
+        seasonChampion: { icon: '🏆', name: 'Season Champion' },
+        seasonRunnerUp: { icon: '🥈', name: 'Season Runner-Up' },
+        seasonThirdPlace: { icon: '🥉', name: 'Season Third Place' },
+        
+        // Special achievements
         punchingMedal: { icon: '🥊', name: 'Punching Above Weight' },
         giantKiller: { icon: '⚔️', name: 'Giant Killer' },
         bullseye: { icon: '🎯', name: 'Bullseye' },
@@ -369,9 +382,14 @@ function buildRiderProfileHTML(data, name) {
         photoFinish: { icon: '📸', name: 'Photo Finish' },
         darkHorse: { icon: '🐴', name: 'Dark Horse' },
         zeroToHero: { icon: '🦸', name: 'Zero to Hero' },
-        gcGold: { icon: '🏆', name: 'GC Gold' },
-        gcSilver: { icon: '🥈', name: 'GC Silver' },
-        gcBronze: { icon: '🥉', name: 'GC Bronze' }
+        lanternRouge: { icon: '🏮', name: 'Lantern Rouge' },
+        
+        // New special awards
+        perfectSeason: { icon: '💯', name: 'Perfect Season' },
+        podiumStreak: { icon: '📈', name: 'Podium Streak' },
+        specialist: { icon: '⭐', name: 'Specialist' },
+        allRounder: { icon: '🌟', name: 'All-Rounder' },
+        comeback: { icon: '🔄', name: 'Comeback Kid' }
     };
     
     // Build awards list with counts
@@ -384,8 +402,13 @@ function buildRiderProfileHTML(data, name) {
         }
     });
     
-    // Calculate season progression
-    const seasonsCompleted = season - 1; // Current season minus 1
+    // Calculate seasons completed by checking completion flags
+    let seasonsCompleted = 0;
+    if (data.season1Complete === true) seasonsCompleted++;
+    if (data.season2Complete === true) seasonsCompleted++;
+    if (data.season3Complete === true) seasonsCompleted++;
+    // Add more seasons as they're released
+    
     const eventsPerSeason = 9; // 6 mandatory + 3 optional that must be completed
     const currentSeasonEvents = completedStages.length + completedOptionalEvents.length;
     const currentSeasonProgressPercent = Math.min((currentSeasonEvents / eventsPerSeason) * 100, 100);
