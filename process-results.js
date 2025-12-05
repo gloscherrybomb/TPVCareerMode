@@ -335,17 +335,42 @@ async function calculateGC(season, userUid, upToEvent = 15) {
   if (upToEvent >= 14) stageNumbers.push(14);
   if (upToEvent >= 15) stageNumbers.push(15);
   
-  // Fetch results from all stages
+  // Fetch results from all stages by querying all result documents for each event
   const stageResults = {};
+  
   for (const eventNum of stageNumbers) {
-    const resultDocId = `season${season}_event${eventNum}`;
     try {
-      const resultDoc = await db.collection('results').doc(resultDocId).get();
-      if (resultDoc.exists) {
-        stageResults[eventNum] = resultDoc.data().results || [];
+      // Query all result documents for this event (format: season1_event13_*)
+      const querySnapshot = await db.collection('results')
+        .where(admin.firestore.FieldPath.documentId(), '>=', `season${season}_event${eventNum}_`)
+        .where(admin.firestore.FieldPath.documentId(), '<', `season${season}_event${eventNum}_\uf8ff`)
+        .get();
+      
+      if (!querySnapshot.empty) {
+        // Collect all results from all users
+        const allResults = [];
+        querySnapshot.forEach(doc => {
+          const data = doc.data();
+          if (data.results && Array.isArray(data.results)) {
+            allResults.push(...data.results);
+          }
+        });
+        
+        // De-duplicate by UID (in case same rider appears in multiple result docs)
+        const uniqueResults = [];
+        const seenUIDs = new Set();
+        allResults.forEach(r => {
+          if (!seenUIDs.has(r.uid)) {
+            seenUIDs.add(r.uid);
+            uniqueResults.push(r);
+          }
+        });
+        
+        stageResults[eventNum] = uniqueResults;
+        console.log(`   Event ${eventNum}: Found ${uniqueResults.length} riders`);
       }
     } catch (error) {
-      console.log(`   Warning: Could not fetch ${resultDocId}:`, error.message);
+      console.log(`   Warning: Could not fetch results for event ${eventNum}:`, error.message);
     }
   }
   
@@ -1249,15 +1274,37 @@ async function getAllPreviousEventResults(season, currentEvent) {
   const allEventResults = {};
   
   for (let eventNum = 1; eventNum <= currentEvent; eventNum++) {
-    const resultDocId = `season${season}_event${eventNum}`;
     try {
-      const resultDoc = await db.collection('results').doc(resultDocId).get();
-      if (resultDoc.exists()) {
-        const data = resultDoc.data();
-        allEventResults[eventNum] = data.results || [];
+      // Query all result documents for this event
+      const querySnapshot = await db.collection('results')
+        .where(admin.firestore.FieldPath.documentId(), '>=', `season${season}_event${eventNum}_`)
+        .where(admin.firestore.FieldPath.documentId(), '<', `season${season}_event${eventNum}_\uf8ff`)
+        .get();
+      
+      if (!querySnapshot.empty) {
+        // Collect all results from all users
+        const allResults = [];
+        querySnapshot.forEach(doc => {
+          const data = doc.data();
+          if (data.results && Array.isArray(data.results)) {
+            allResults.push(...data.results);
+          }
+        });
+        
+        // De-duplicate by UID
+        const uniqueResults = [];
+        const seenUIDs = new Set();
+        allResults.forEach(r => {
+          if (!seenUIDs.has(r.uid)) {
+            seenUIDs.add(r.uid);
+            uniqueResults.push(r);
+          }
+        });
+        
+        allEventResults[eventNum] = uniqueResults;
       }
     } catch (error) {
-      console.log(`   Warning: Could not fetch ${resultDocId}:`, error.message);
+      console.log(`   Warning: Could not fetch results for event ${eventNum}:`, error.message);
     }
   }
   
