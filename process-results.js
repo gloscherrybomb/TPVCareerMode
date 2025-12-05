@@ -347,7 +347,7 @@ function isBot(uid, gender) {
  * Returns GC standings with cumulative times and awards
  * Can calculate partial GC (after stage 1 or 2) or final GC (after stage 3)
  */
-async function calculateGC(season, userUid, upToEvent = 15) {
+async function calculateGC(season, userUid, upToEvent = 15, currentUserResult = null) {
   console.log(`   Calculating GC through event ${upToEvent}...`);
   
   // Determine which stages to include
@@ -407,8 +407,33 @@ async function calculateGC(season, userUid, upToEvent = 15) {
   // Collect all unique riders who appeared in ANY stage
   const allRiders = new Map();
   
+  // If current user result is provided, add them first
+  if (currentUserResult) {
+    console.log(`   ℹ️  Including current user result for event ${upToEvent}`);
+    allRiders.set(userUid, {
+      uid: userUid,
+      name: currentUserResult.name,
+      team: currentUserResult.team || '',
+      arr: currentUserResult.arr || 1000,
+      isBot: false,
+      actualStages: new Set([upToEvent]),
+      stageResults: {
+        [upToEvent]: {
+          position: currentUserResult.position,
+          time: currentUserResult.time,
+          isActual: true
+        }
+      }
+    });
+  }
+  
   availableStages.forEach(eventNum => {
     stageResults[eventNum].forEach(r => {
+      // Skip if this is the current user's current event (already added above)
+      if (currentUserResult && r.uid === userUid && eventNum === upToEvent) {
+        return; // Already added this result
+      }
+      
       if (!allRiders.has(r.uid)) {
         allRiders.set(r.uid, {
           uid: r.uid,
@@ -750,7 +775,15 @@ async function processUserResult(uid, eventInfo, results) {
   
   if (validation.isTour) {
     console.log('   🏁 Tour stage complete - calculating current GC...');
-    gcResults = await calculateGC(season, uid, eventNumber);
+    // Pass current user's result so they're included in GC even before data is stored
+    const currentUserResult = {
+      name: userResult.Name,
+      team: userResult.Team || '',
+      arr: parseInt(userResult.ARR) || 1000,
+      position: position,
+      time: parseFloat(userResult.Time) || 0
+    };
+    gcResults = await calculateGC(season, uid, eventNumber, currentUserResult);
     
     if (gcResults) {
       // Only add bonus points on final stage (event 15)
@@ -898,6 +931,11 @@ async function processUserResult(uid, eventInfo, results) {
   // Generate unified cohesive story (merges intro, recap, and context)
   let unifiedStory = '';
   try {
+    // Debug: Log GC data if available
+    if (gcResults) {
+      console.log(`   📊 GC Data available: userGC position = ${gcResults.userGC?.gcPosition || 'null'}, gap = ${gcResults.userGC?.gapToLeader || 'null'}s`);
+    }
+    
     unifiedStory = await generateUnifiedStory(
       {
         eventNumber: eventNumber,

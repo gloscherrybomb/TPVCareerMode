@@ -575,22 +575,22 @@ function generateSeasonImplications(raceData, seasonData, raceContext) {
       if (gcPosition && gcPosition <= 3) {
         implications = `After Stage 1, you're ${gcPosition === 1 ? 'in the leader\'s jersey' : `${gcPosition}${getOrdinal(gcPosition)} overall`}${gcGap > 0 ? `, ${formatGapText(gcGap)} down` : ''}. Two stages remain in the Local Tour. The GC is tight, the racing will be aggressive, and every second counts. Stage 2 comes next—defend or attack, your choice.`;
       } else {
-        implications = `Stage 1 complete, but you're ${gcPosition}${getOrdinal(gcPosition)} in GC, ${formatGapText(gcGap)} behind the leader. That's a significant gap to pull back, but two stages remain. Time bonuses for stage placings can change everything. The Local Tour isn't over yet.`;
+        implications = `Stage 1 complete${gcPosition ? `, but you're ${gcPosition}${getOrdinal(gcPosition)} in GC, ${formatGapText(gcGap)} behind the leader` : ', and the GC battle is heating up'}. That's a significant gap to pull back, but two stages remain. Time bonuses for stage placings can change everything. The Local Tour isn't over yet.`;
       }
     } else if (stageInfo.stageNumber === 2) {
       if (gcPosition && gcPosition <= 3) {
         implications = `Two stages down, one to go. You're ${gcPosition === 1 ? 'still leading the tour' : `${gcPosition}${getOrdinal(gcPosition)} overall`}${gcGap > 0 ? `, ${formatGapText(gcGap)} behind` : ''}. Tomorrow's queen stage will decide everything. The hardest climbing of the tour, on the most fatigued legs. This is where the overall is won or lost.`;
       } else {
-        implications = `Two stages down, one to go. The overall GC is out of reach—you're ${gcPosition}${getOrdinal(gcPosition)}—but the queen stage tomorrow is still a chance for a strong finish and a stage win. Pride and points are still on the line.`;
+        implications = `Two stages down, one to go. ${gcPosition ? `The overall GC is out of reach—you're ${gcPosition}${getOrdinal(gcPosition)}—but` : 'The overall GC battle continues, but'} the queen stage tomorrow is still a chance for a strong finish and a stage win. Pride and points are still on the line.`;
       }
     } else {
       // Stage 3 complete - tour finished AND season finished
       if (gcPosition === 1) {
         implications = `Local Tour champion. Three stages, countless attacks defended, and you held the leader's jersey to the finish. This is what multi-day racing demands: consistency, strength, and the ability to suffer efficiently day after day. The overall classification is yours. And with that, the season is complete.`;
-      } else if (gcPosition <= 3) {
+      } else if (gcPosition && gcPosition <= 3) {
         implications = `The Local Tour is complete: ${gcPosition}${getOrdinal(gcPosition)} overall, ${formatGapText(gcGap)} behind the winner. A podium finish in a three-day stage race is an achievement—you proved you can handle the demands of multi-day racing, even if the top step eluded you. The season ends here, and you can be proud of what you accomplished.`;
       } else {
-        implications = `The Local Tour is finished. ${gcPosition}${getOrdinal(gcPosition)} overall isn't where you hoped to be, but you completed all three stages and learned what multi-day racing demands. The season is over. The experience matters more than the result, and there's always next season to apply what you've learned.`;
+        implications = `The Local Tour is finished${gcPosition ? `. ${gcPosition}${getOrdinal(gcPosition)} overall` : ''} ${gcPosition && gcPosition > 10 ? "isn't where you hoped to be, but" : ', and'} you completed all three stages and learned what multi-day racing demands. The season is over. The experience matters more than the result, and there's always next season to apply what you've learned.`;
       }
       return implications;
     }
