@@ -1532,7 +1532,7 @@ const NARRATIVE_DATABASE = {
       triggers: { raceNumber: [6, 7, 8], performanceTier: ["any"] },
       weight: 0.4
     }
-  ],,
+  ],
 
   // ===== LEARNING =====
   learning: [
