@@ -1557,7 +1557,7 @@
 .unified-story {
   font-size: 1.05rem;
   line-height: 1.9;
-  color: #333;
+  color: #ffffff;
 }
 
 .unified-story p {
@@ -1571,7 +1571,7 @@
 /* First paragraph gets subtle emphasis */
 .unified-story p:first-child {
   font-size: 1.08rem;
-  color: #222;
+  color: #e0e0e0;
 }
 
 /* Smooth reading experience */
