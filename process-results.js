@@ -7,6 +7,10 @@ const admin = require('firebase-admin');
 const awardsCalc = require('./awards-calculation');
 const storyGen = require('./story-generator');
 
+// Import narrative system modules
+const { NARRATIVE_DATABASE } = require('./narrative-database.js');
+const { StorySelector } = require('./story-selector.js');
+
 // Initialize Firebase Admin
 const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
 admin.initializeApp({
@@ -14,6 +18,22 @@ admin.initializeApp({
 });
 
 const db = admin.firestore();
+
+// Initialize narrative story selector
+const narrativeSelector = new StorySelector();
+narrativeSelector.initialize(NARRATIVE_DATABASE);
+console.log('📖 Narrative system initialized');
+
+/**
+ * Determine performance tier from position
+ */
+function determinePerformanceTier(position) {
+  if (position === 1) return 'win';
+  if (position <= 3) return 'podium';
+  if (position <= 10) return 'top10';
+  if (position <= 20) return 'midpack';
+  return 'back';
+}
 
 // Stage requirements for Career Mode progression
 const STAGE_REQUIREMENTS = {
@@ -854,6 +874,46 @@ async function processUserResult(uid, eventInfo, results) {
   }
   if (position <= 3) totalPodiums++; // Include current race
   
+  // Count total wins for isFirstWin detection
+  let totalWins = 0;
+  for (let i = 1; i <= 15; i++) {
+    const evtData = userData[`event${i}Results`];
+    if (evtData && evtData.position === 1) {
+      totalWins++;
+    }
+  }
+  if (position === 1) totalWins++; // Include current race
+
+  // Prepare context for narrative selection  
+  const narrativeContext = {
+    eventNumber: eventNumber,
+    eventName: storyGen.EVENT_NAMES[eventNumber] || `Event ${eventNumber}`,
+    position: position,
+    predictedPosition: predictedPosition,
+    performanceTier: determinePerformanceTier(position),
+    totalPoints: (userData.totalPoints || 0) + points,
+    totalWins: totalWins,
+    recentResults: recentResults,
+    isFirstWin: position === 1 && totalWins === 1,
+    isWorseResult: position > predictedPosition + 3
+  };
+
+  // Generate personalized intro story
+  let introStory = '';
+  try {
+    introStory = await narrativeSelector.generateIntroStory(
+      userUid,
+      narrativeContext,
+      db
+    );
+    if (introStory) {
+      console.log(`   📖 Generated personalized intro story`);
+    }
+  } catch (error) {
+    console.error(`   ⚠️ Error generating intro story:`, error.message);
+    introStory = ''; // Fall back to no intro
+  }
+
   // Generate story using story-generator module
   const story = storyGen.generateRaceStory(
     {
@@ -880,7 +940,8 @@ async function processUserResult(uid, eventInfo, results) {
     }
   );
   
-  // Add story to event results
+  // Add story to event results (now with intro)
+  eventResults.storyIntro = introStory;  // NEW: Personalized intro
   eventResults.storyRecap = story.recap;
   eventResults.storyContext = story.context;
   eventResults.timestamp = admin.firestore.FieldValue.serverTimestamp(); // Add timestamp for 24-hour checking
