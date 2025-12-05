@@ -330,82 +330,159 @@ async function calculateGC(season, userUid, upToEvent = 15) {
   console.log(`   Calculating GC through event ${upToEvent}...`);
   
   // Determine which stages to include
-  const stageRefs = [];
   const stageNumbers = [];
+  if (upToEvent >= 13) stageNumbers.push(13);
+  if (upToEvent >= 14) stageNumbers.push(14);
+  if (upToEvent >= 15) stageNumbers.push(15);
   
-  if (upToEvent >= 13) {
-    stageRefs.push(db.collection('results').doc(`season${season}_event13_${userUid}`));
-    stageNumbers.push(13);
-  }
-  if (upToEvent >= 14) {
-    stageRefs.push(db.collection('results').doc(`season${season}_event14_${userUid}`));
-    stageNumbers.push(14);
-  }
-  if (upToEvent >= 15) {
-    stageRefs.push(db.collection('results').doc(`season${season}_event15_${userUid}`));
-    stageNumbers.push(15);
-  }
-  
-  // Fetch results from all completed stages
-  const stageDocs = await Promise.all(stageRefs.map(ref => ref.get()));
-  
-  // Check which stages are available
-  const availableResults = [];
-  stageDocs.forEach((doc, index) => {
-    if (doc.exists) {
-      availableResults.push({
-        stageNumber: stageNumbers[index],
-        results: doc.data().results || []
-      });
+  // Fetch results from all stages
+  const stageResults = {};
+  for (const eventNum of stageNumbers) {
+    const resultDocId = `season${season}_event${eventNum}`;
+    try {
+      const resultDoc = await db.collection('results').doc(resultDocId).get();
+      if (resultDoc.exists) {
+        stageResults[eventNum] = resultDoc.data().results || [];
+      }
+    } catch (error) {
+      console.log(`   Warning: Could not fetch ${resultDocId}:`, error.message);
     }
-  });
+  }
   
-  if (availableResults.length === 0) {
+  const availableStages = Object.keys(stageResults).map(k => parseInt(k));
+  
+  if (availableStages.length === 0) {
     console.log('   ⚠️ No stage results available for GC calculation');
     return null;
   }
   
-  console.log(`   Found ${availableResults.length} completed stage(s)`);
+  console.log(`   Found ${availableStages.length} completed stage(s)`);
   
-  // Build a map of cumulative times for each rider
-  const gcMap = new Map();
+  // Collect all unique riders who appeared in ANY stage
+  const allRiders = new Map();
   
-  // Add times from each available stage
-  availableResults.forEach(({ stageNumber, results }) => {
-    results.forEach(r => {
-      if (r.position && r.position !== 'DNF' && r.time) {
-        const riderTime = parseFloat(r.time);
-        
-        if (gcMap.has(r.uid)) {
-          // Rider already exists, add this stage time
-          const rider = gcMap.get(r.uid);
-          rider.cumulativeTime += riderTime;
-          rider[`stage${stageNumber}Time`] = riderTime;
-          rider.stagesCompleted++;
-        } else {
-          // New rider
-          gcMap.set(r.uid, {
-            uid: r.uid,
-            name: r.name,
-            team: r.team,
-            arr: r.arr,
-            cumulativeTime: riderTime,
-            stage13Time: stageNumber === 13 ? riderTime : 0,
-            stage14Time: stageNumber === 14 ? riderTime : 0,
-            stage15Time: stageNumber === 15 ? riderTime : 0,
-            stagesCompleted: 1,
-            isBot: isBot(r.uid, r.gender)
-          });
-        }
+  availableStages.forEach(eventNum => {
+    stageResults[eventNum].forEach(r => {
+      if (!allRiders.has(r.uid)) {
+        allRiders.set(r.uid, {
+          uid: r.uid,
+          name: r.name,
+          team: r.team,
+          arr: r.arr || 1000, // Default ARR if missing
+          isBot: isBot(r.uid, r.gender),
+          actualStages: new Set(),
+          stageResults: {}
+        });
       }
+      // Mark this stage as actually raced
+      const rider = allRiders.get(r.uid);
+      rider.actualStages.add(eventNum);
+      rider.stageResults[eventNum] = {
+        position: r.position,
+        time: parseFloat(r.time) || 0,
+        isActual: true
+      };
     });
   });
   
-  // Filter to riders who completed all available stages
-  const requiredStages = availableResults.length;
-  const gcStandings = Array.from(gcMap.values())
-    .filter(r => r.stagesCompleted === requiredStages)
-    .sort((a, b) => a.cumulativeTime - b.cumulativeTime);
+  console.log(`   Processing ${allRiders.size} unique riders (including simulations)`);
+  
+  // Determine DNS for bots (5% chance on Event 14, carries to Event 15)
+  const botDNS = new Set();
+  if (availableStages.includes(14)) {
+    allRiders.forEach((rider, uid) => {
+      if (rider.isBot && !rider.actualStages.has(14)) {
+        // 5% chance of DNS on Event 14
+        const dnsRoll = getSeededRandom(uid, 14);
+        if (dnsRoll < 0.05) {
+          botDNS.add(uid);
+          console.log(`   🚫 Bot ${uid} simulated DNS on Event 14`);
+        }
+      }
+    });
+  }
+  
+  // Simulate missing stages for bots (not humans, not DNS bots)
+  allRiders.forEach((rider, uid) => {
+    if (rider.isBot && !botDNS.has(uid)) {
+      stageNumbers.forEach(eventNum => {
+        if (!rider.actualStages.has(eventNum)) {
+          // Simulate this stage for this bot
+          const fieldSize = stageResults[eventNum]?.length || 50;
+          const simulatedPosition = simulatePosition(uid, rider.arr, eventNum, fieldSize);
+          
+          // Convert position to approximate time based on event characteristics
+          // Use the median time from actual results as baseline
+          const actualTimes = stageResults[eventNum]
+            ?.filter(r => r.time && r.position !== 'DNF')
+            .map(r => parseFloat(r.time))
+            .sort((a, b) => a - b) || [3600];
+          
+          const medianTime = actualTimes[Math.floor(actualTimes.length / 2)] || 3600;
+          const maxTime = actualTimes[actualTimes.length - 1] || 4000;
+          
+          // Scale time based on simulated position
+          // Better positions = closer to median, worse = closer to max
+          const positionRatio = (simulatedPosition - 1) / fieldSize;
+          const simulatedTime = medianTime + (maxTime - medianTime) * positionRatio;
+          
+          rider.stageResults[eventNum] = {
+            position: simulatedPosition,
+            time: simulatedTime,
+            isActual: false,
+            isSimulated: true
+          };
+        }
+      });
+    }
+  });
+  
+  // Calculate GC for riders who completed all stages (actual or simulated)
+  const gcStandings = [];
+  
+  allRiders.forEach(rider => {
+    // Count stages (actual + simulated)
+    const stagesCompleted = Object.keys(rider.stageResults).length;
+    const requiredStages = stageNumbers.length;
+    
+    // Only include riders who have results for ALL stages
+    // (either actual or simulated, but not DNS)
+    if (stagesCompleted === requiredStages && !botDNS.has(rider.uid)) {
+      let cumulativeTime = 0;
+      let actualStagesCount = 0;
+      let simulatedStagesCount = 0;
+      
+      stageNumbers.forEach(eventNum => {
+        const result = rider.stageResults[eventNum];
+        if (result) {
+          cumulativeTime += result.time;
+          if (result.isActual) {
+            actualStagesCount++;
+          } else {
+            simulatedStagesCount++;
+          }
+        }
+      });
+      
+      gcStandings.push({
+        uid: rider.uid,
+        name: rider.name,
+        team: rider.team,
+        arr: rider.arr,
+        isBot: rider.isBot,
+        cumulativeTime: cumulativeTime,
+        stage13Time: rider.stageResults[13]?.time || 0,
+        stage14Time: rider.stageResults[14]?.time || 0,
+        stage15Time: rider.stageResults[15]?.time || 0,
+        stagesCompleted: requiredStages,
+        actualStagesRaced: actualStagesCount,
+        simulatedStages: simulatedStagesCount
+      });
+    }
+  });
+  
+  // Sort by cumulative time (lowest = best)
+  gcStandings.sort((a, b) => a.cumulativeTime - b.cumulativeTime);
   
   // Assign GC positions and calculate gaps
   gcStandings.forEach((rider, index) => {
@@ -417,7 +494,9 @@ async function calculateGC(season, userUid, upToEvent = 15) {
     }
   });
   
-  console.log(`   ✓ GC calculated: ${gcStandings.length} riders completed all ${requiredStages} stage(s)`);
+  const realRiders = gcStandings.filter(r => r.actualStagesRaced === stageNumbers.length).length;
+  const simulatedRiders = gcStandings.filter(r => r.simulatedStages > 0).length;
+  console.log(`   ✓ GC calculated: ${gcStandings.length} total riders (${realRiders} completed all stages, ${simulatedRiders} with simulated results)`);
   
   // Calculate GC awards and bonus points for the user (only on final stage)
   const userGC = gcStandings.find(r => r.uid === userUid);
@@ -450,7 +529,7 @@ async function calculateGC(season, userUid, upToEvent = 15) {
     userGC: userGC,
     awards: gcAwards,
     bonusPoints: gcBonusPoints,
-    stagesIncluded: requiredStages,
+    stagesIncluded: stageNumbers.length,
     isProvisional: upToEvent < 15  // Mark as provisional if not final
   };
 }
