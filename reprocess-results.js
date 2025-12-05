@@ -304,6 +304,48 @@ async function resetUserData(userRef, userData, season) {
     updates.gcResults = admin.firestore.FieldValue.delete();
   }
   
+  // Clear season completion fields (CRITICAL for reprocessing!)
+  if (userData[`season${season}Complete`]) {
+    updates[`season${season}Complete`] = admin.firestore.FieldValue.delete();
+  }
+  if (userData[`season${season}CompletionDate`]) {
+    updates[`season${season}CompletionDate`] = admin.firestore.FieldValue.delete();
+  }
+  if (userData[`season${season}Rank`]) {
+    updates[`season${season}Rank`] = admin.firestore.FieldValue.delete();
+  }
+  if (userData.localTourStatus) {
+    updates.localTourStatus = admin.firestore.FieldValue.delete();
+  }
+  
+  // Clear ALL awards (will be recalculated during reprocessing)
+  if (userData.awards) {
+    updates.awards = admin.firestore.FieldValue.delete();
+  }
+  
+  // Clear career stats (will be recalculated)
+  if (userData.totalWins !== undefined) {
+    updates.totalWins = 0;
+  }
+  if (userData.totalPodiums !== undefined) {
+    updates.totalPodiums = 0;
+  }
+  if (userData.totalTop10s !== undefined) {
+    updates.totalTop10s = 0;
+  }
+  if (userData.bestFinish !== undefined) {
+    updates.bestFinish = admin.firestore.FieldValue.delete();
+  }
+  if (userData.averageFinish !== undefined) {
+    updates.averageFinish = admin.firestore.FieldValue.delete();
+  }
+  if (userData.winRate !== undefined) {
+    updates.winRate = 0;
+  }
+  if (userData.podiumRate !== undefined) {
+    updates.podiumRate = 0;
+  }
+  
   // Reset progress fields
   updates.currentStage = 1;
   updates.totalPoints = 0;

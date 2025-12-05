@@ -1558,6 +1558,13 @@ async function checkAndMarkSeasonComplete(userRef, userData, eventNumber, recent
   // Merge recent updates with existing userData for checking
   const currentData = { ...userData, ...recentUpdates };
   
+  console.log(`\n🔍 Checking season completion for event ${eventNumber}...`);
+  console.log(`   Event 15 results exist: ${!!currentData.event15Results}`);
+  console.log(`   Event 15 position: ${currentData.event15Results?.position}`);
+  console.log(`   Event 14 DNS: ${currentData.event14DNS}`);
+  console.log(`   Event 15 DNS: ${currentData.event15DNS}`);
+  console.log(`   Season already complete: ${currentData.season1Complete}`);
+  
   // Season 1 is complete when:
   // 1. Event 15 is completed with results
   // 2. OR Event 14 or 15 are marked as DNS
@@ -1570,13 +1577,17 @@ async function checkAndMarkSeasonComplete(userRef, userData, eventNumber, recent
   
   const isSeasonComplete = event15Complete || event14DNS || event15DNS;
   
+  console.log(`   Is season complete: ${isSeasonComplete}`);
+  
   // If season is already marked complete, skip
   if (currentData.season1Complete === true) {
+    console.log('   ⚠️  Season already marked complete, skipping trophy awards');
     return;
   }
   
   // If season is not yet complete, skip
   if (!isSeasonComplete) {
+    console.log('   ℹ️  Season not yet complete');
     return;
   }
   
