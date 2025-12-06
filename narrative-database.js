@@ -1,14 +1,14 @@
-// narrative-database-mega.js - 200+ story elements for maximum variety
-// Comprehensive narrative moments database - MERGED VERSION
+// narrative-database-mega.js - 247 story elements for maximum variety (UPDATED v2.0)
+// Comprehensive narrative moments database - MERGED VERSION WITH NEW ADDITIONS
 
 /**
- * MEGA NARRATIVE DATABASE - 203 Story Moments
+ * MEGA NARRATIVE DATABASE - 247 Story Moments (Updated from 203)
  * 
- * This is the complete merged database containing all stories from both
- * narrative-database-expanded.js (107 stories) and 
- * narrative-database-extension.js (96 stories)
+ * This is the complete merged database containing all stories from the original
+ * narrative-database-expanded.js and narrative-database-extension.js,
+ * PLUS 44 new race-type specific narratives added in v2.0
  * 
- * Categories (with total story counts):
+ * Original Categories (203 stories):
  * - seasonOpening: Season 1 opening narratives (10 stories)
  * - earlyCareer: Events 1-5 story moments (25 stories)
  * - midSeason: Events 6-10 story moments (25 stories)
@@ -29,7 +29,20 @@
  * - community: Social aspects of racing (10 stories)
  * - learning: Skill development (12 stories)
  * 
- * TOTAL: 203 unique story moments
+ * NEW Categories v2.0 (44 stories):
+ * - stageRacePrep: Pre-stage race specific moments (10 stories)
+ * - stagingStruggle: Multi-day racing challenges (10 stories)
+ * - gcBattle: General classification focused moments (10 stories)
+ * - timeTrialMindset: TT-specific psychology (8 stories)
+ * - trackRacing: Velodrome specific moments (6 stories)
+ * 
+ * TOTAL: 247 unique story moments
+ * 
+ * VERSION: 2.0 - December 2024
+ * - Added race-type specific narratives
+ * - Enhanced stage racing context
+ * - Time trial and track racing psychology
+ * - GC battle moments
  */
 
 const NARRATIVE_DATABASE = {
@@ -1607,6 +1620,290 @@ const NARRATIVE_DATABASE = {
       text: "You've been working with sports psychology resources—visualization techniques, anxiety management, focus training. The mental side of racing is as trainable as the physical, and you're seeing benefits in how you handle pressure and adversity.",
       triggers: { raceNumber: [7, 8, 9, 10], performanceTier: ["any"] },
       weight: 0.4
+    }
+  ],
+
+  // ===== STAGERACEPREP ===== (NEW)
+  stageRacePrep: [
+    {
+      id: "stage_race_first_tour",
+      text: "The Local Tour is different from anything you've raced before. Three stages over three days means racing with tired legs, managing recovery between stages, and thinking about the overall classification instead of just today's result. You've been studying stage race tactics, learning how to pace across multiple days, understanding that winning stage one means nothing if you blow up on stage three.",
+      triggers: { raceNumber: [13], performanceTier: ["any"] },
+      weight: 0.9
+    },
+    {
+      id: "stage_race_gc_mindset",
+      text: "Stage racing requires a completely different mindset. Every decision affects not just today but tomorrow and the day after. Attack too much on stage one and you'll pay for it on the queen stage. Ride too conservatively and you'll give away time you can't get back. It's a three-day chess match, and you're still learning the opening moves.",
+      triggers: { raceNumber: [13], performanceTier: ["any"] },
+      weight: 0.8
+    },
+    {
+      id: "stage_race_recovery_prep",
+      text: "The key to stage racing isn't just how you race—it's how you recover. You've spent the week leading into the Local Tour practicing your between-stage routine: nutrition, hydration, sleep, compression, stretching. Race hard, recover fast, repeat. Your legs need to be ready to race again tomorrow, and the day after.",
+      triggers: { raceNumber: [13], performanceTier: ["any"] },
+      weight: 0.7
+    },
+    {
+      id: "stage_two_aftermath",
+      text: "Yesterday's stage is still in your legs. You can feel it—that deep fatigue that comes from racing hard less than 24 hours ago. The warm-up felt heavier than usual, your heart rate climbing faster than normal. This is what stage racing demands: the ability to perform when you're not fully fresh, to race on tired legs and still dig deep when it matters.",
+      triggers: { raceNumber: [14], performanceTier: ["any"] },
+      weight: 0.9
+    },
+    {
+      id: "stage_two_gc_awareness",
+      text: "You studied the GC standings this morning, analyzing time gaps, calculating what needs to happen today. Every second matters now. The riders ahead of you on GC are marked—you need to stay with them at minimum, drop them if possible. The riders behind you are threats—let them get away and your GC position evaporates. It's not just about today's stage finish; it's about the overall.",
+      triggers: { raceNumber: [14], performanceTier: ["any"] },
+      weight: 0.8
+    },
+    {
+      id: "queen_stage_pressure",
+      text: "The queen stage. Two days of racing in your legs, and the hardest day still ahead. This is where the Local Tour will be decided—where leads are defended or lost, where attacks are made or broken, where the overall classification crystallizes into its final form. The accumulated fatigue, the climbing, the pressure of GC implications—it all comes together today.",
+      triggers: { raceNumber: [15], performanceTier: ["any"] },
+      weight: 0.9
+    },
+    {
+      id: "queen_stage_defending",
+      text: "You're defending a GC position today, which means riding smart, not just hard. Cover the attacks from riders behind you. Don't waste energy chasing moves that don't matter. Stay with the contenders. The queen stage is where tours are lost more often than won—one bad moment, one lapse in concentration, and all the work from the previous stages evaporates.",
+      triggers: { raceNumber: [15], performanceTier: ["any"], gcPosition: [1, 2, 3, 4, 5] },
+      weight: 0.8
+    },
+    {
+      id: "queen_stage_attacking",
+      text: "You're behind on GC, which means today is for attacking. Sitting in won't change anything—you need to take time back, and the only way to do that is to hurt yourself and hope your rivals hurt more. The queen stage favors the desperate, the brave, the riders with nothing to lose. That's you today.",
+      triggers: { raceNumber: [15], performanceTier: ["any"], gcPosition: [6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20] },
+      weight: 0.8
+    },
+    {
+      id: "stage_race_experience",
+      text: "Everything you learned in one-day races has to be recalibrated for stage racing. Efforts that feel sustainable for a single race become unsustainable across three days. Positioning that seems cautious in a one-day event becomes smart when you need to race again tomorrow. You're learning a new kind of racing, one measured in accumulated fatigue and multi-day strategy.",
+      triggers: { raceNumber: [13, 14], performanceTier: ["any"] },
+      weight: 0.6
+    },
+    {
+      id: "final_stage_everything",
+      text: "This is it—the final stage of both the Local Tour and your first season. Everything comes down to today: the GC classification, the season standings, the culmination of months of training and racing. Your legs are tired, your mind is tired, but this is the moment that matters most. Leave nothing in reserve. The off-season starts tomorrow.",
+      triggers: { raceNumber: [15], performanceTier: ["any"] },
+      weight: 0.9
+    }
+  ],
+
+  // ===== STAGINGSTRUGGLE ===== (NEW)
+  stagingStruggle: [
+    {
+      id: "stage_two_fatigue",
+      text: "Your legs lied to you this morning. The warm-up felt okay, normal even. Then the stage started and within five kilometers you realized yesterday's effort took more out of you than you thought. The pace feels harder than it should, the accelerations hurt more than normal, and you're working just to stay in contact. This is stage racing—competing on tired legs.",
+      triggers: { raceNumber: [14], performanceTier: ["midpack", "back"] },
+      weight: 0.8
+    },
+    {
+      id: "recovery_failure",
+      text: "You did everything right last night—ate well, stretched, elevated your legs, got decent sleep. But somehow it wasn't enough. Your body hasn't recovered from yesterday's effort, and now you're paying for it. Each acceleration feels like it's coming from an empty tank. Stage racing is brutal: race hard, recover as best you can, race hard again. Sometimes recovery just doesn't come.",
+      triggers: { raceNumber: [14, 15], performanceTier: ["back", "midpack"] },
+      weight: 0.7
+    },
+    {
+      id: "gc_math_desperation",
+      text: "You spent the entire stage doing GC math in your head. 'If I finish here, and they finish there, I move up two spots. If I can stay with that group, I only lose 30 seconds.' Stage racing becomes an obsession with numbers, gaps, and positions. But math doesn't help when your legs just don't have the strength to execute the calculations.",
+      triggers: { raceNumber: [14, 15], performanceTier: ["midpack", "back"] },
+      weight: 0.6
+    },
+    {
+      id: "watching_gc_slip",
+      text: "The group containing the GC contenders rolled away, and you couldn't respond. You tried—attacked out of your chase group, drilled it on the climbs, but the gap just grew. Watching your GC ambitions disappear up the road while you suffer in the second group is a particular kind of painful. The tour isn't over, but your shot at a top GC placing probably is.",
+      triggers: { raceNumber: [14, 15], performanceTier: ["midpack", "back"] },
+      weight: 0.8
+    },
+    {
+      id: "stage_race_learning",
+      text: "Every stage is a lesson in pacing, recovery, and race management. Today's lesson was harsh: you can't race every stage like it's your last. The aggressive move that felt smart in the moment cost you energy you needed later. Stage racing punishes enthusiasm and rewards patience. You're learning, but the tuition is expensive.",
+      triggers: { raceNumber: [14, 15], performanceTier: ["any"] },
+      weight: 0.6
+    },
+    {
+      id: "mental_fatigue_tour",
+      text: "The physical fatigue is one thing—your legs hurt, your body is tired. But the mental fatigue of stage racing might be harder. Staying focused when you're exhausted, making tactical decisions with a fogged mind, finding motivation to push hard when every fiber of your being wants to soft-pedal. Your mind is as tired as your legs.",
+      triggers: { raceNumber: [15], performanceTier: ["any"] },
+      weight: 0.7
+    },
+    {
+      id: "cumulative_damage",
+      text: "It's not one big blow-up that ends your GC hopes—it's the accumulation of small losses. Thirty seconds lost on stage one. Another forty-five seconds today. Suddenly you're two minutes down with one stage left, and barring disaster for those ahead, your GC position is cemented. Stage racing is ruthless in how it accumulates time gaps.",
+      triggers: { raceNumber: [14, 15], performanceTier: ["midpack", "back"], gcPosition: [11, 12, 13, 14, 15, 16, 17, 18, 19, 20] },
+      weight: 0.7
+    },
+    {
+      id: "survival_mode_tour",
+      text: "You're in survival mode now—forget about GC placing, forget about stage wins. The goal is simple: finish the tour. Get through today, get through tomorrow, make it to the finish line with your dignity intact. It's not the Local Tour you dreamed of, but finishing a three-day stage race is an accomplishment regardless of the result.",
+      triggers: { raceNumber: [14, 15], performanceTier: ["back"] },
+      weight: 0.7
+    },
+    {
+      id: "legs_not_responding",
+      text: "Your mind wanted to go with that attack, but your legs just said no. That's the reality of racing on accumulated fatigue—the communication between brain and muscles breaks down. You see the move, you know you should cover it, you try to respond, and your legs simply don't have the snap. Stage racing exposes limitations you didn't know you had.",
+      triggers: { raceNumber: [14, 15], performanceTier: ["midpack", "back"] },
+      weight: 0.6
+    },
+    {
+      id: "respect_for_stage_racers",
+      text: "You have new respect for professional stage racers who do this for three weeks straight. Three days is brutal enough—imagining twenty-one days of racing on tired legs seems impossible. The Local Tour is teaching you what Grand Tour riders endure, and you're only seeing a tiny fraction of it. Stage racing is a different kind of suffering.",
+      triggers: { raceNumber: [14, 15], performanceTier: ["any"] },
+      weight: 0.5
+    }
+  ],
+
+  // ===== GCBATTLE ===== (NEW)
+  gcBattle: [
+    {
+      id: "gc_gaps_checking",
+      text: "Every few kilometers you're checking your cycling computer, doing mental math on time gaps. 'They're 45 seconds ahead, I'm 20 seconds behind the next group.' The GC battle happens in seconds, not minutes, and every split matters. You're hyper-aware of who's around you, who's ahead, and what it all means for the overall classification.",
+      triggers: { raceNumber: [14, 15], performanceTier: ["podium", "top10"], gcPosition: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] },
+      weight: 0.8
+    },
+    {
+      id: "gc_leader_pressure",
+      text: "Wearing the leader's jersey (or being on the virtual podium) changes everything. Suddenly you're marked. Every attack is aimed at you. Every acceleration is a test. You're no longer hunting—you're being hunted, and that's a very different kind of pressure. Defending is harder than attacking. You're learning that now.",
+      triggers: { raceNumber: [14, 15], performanceTier: ["any"], gcPosition: [1, 2, 3] },
+      weight: 0.9
+    },
+    {
+      id: "gc_attacking_move",
+      text: "This was your moment to make a move on GC. You attacked hard, trying to distance the riders ahead of you in the classification. For a few glorious kilometers, you dangled off the front, gaining time. But stage racing is cruel—attacks cost energy, and that energy bill comes due later. Whether the gamble pays off depends on whether you can hold the gap to the finish.",
+      triggers: { raceNumber: [14, 15], performanceTier: ["podium", "top10", "win"] },
+      weight: 0.8
+    },
+    {
+      id: "gc_covering_attacks",
+      text: "You spent the entire stage in defensive mode—covering attacks from riders behind you on GC, marking moves, staying vigilant. It's exhausting to race reactively, always responding rather than initiating. But when you're protecting a GC position, you don't need to win the stage. You just need to not lose time.",
+      triggers: { raceNumber: [14, 15], performanceTier: ["any"], gcPosition: [1, 2, 3, 4, 5] },
+      weight: 0.8
+    },
+    {
+      id: "gc_time_bonuses",
+      text: "Time bonuses for stage placings suddenly matter enormously. Five seconds for third place doesn't sound like much, but when GC gaps are measured in seconds, those bonuses can move you up or down the classification. You're racing for every second now, calculating whether it's worth the effort to sprint for a top-three stage finish.",
+      triggers: { raceNumber: [14, 15], performanceTier: ["podium", "top10"], gcPosition: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] },
+      weight: 0.7
+    },
+    {
+      id: "gc_podium_hope",
+      text: "You're in striking distance of a GC podium. Not the win, probably, but a top-three overall is within reach if things go right today. That possibility changes how you race—more aggressive than if you were defending, more calculated than if you had nothing to lose. You're in the dangerous middle ground where mistakes cost dearly.",
+      triggers: { raceNumber: [15], performanceTier: ["any"], gcPosition: [4, 5, 6] },
+      weight: 0.9
+    },
+    {
+      id: "gc_gaps_stable",
+      text: "The GC gaps have been remarkably stable across the stages. No one has made a decisive move, no one has blown up spectacularly. That means today becomes even more critical—the status quo can't hold forever, and someone needs to make something happen. Will it be you, or will you be responding to someone else's move?",
+      triggers: { raceNumber: [15], performanceTier: ["any"], gcPosition: [1, 2, 3, 4, 5] },
+      weight: 0.6
+    },
+    {
+      id: "gc_mathematical_certainty",
+      text: "You've done the math a hundred times: the gap to first place is too big to close unless something dramatic happens. You're racing for pride now, for a good final GC placing, for a stage win if the opportunity presents itself. The overall victory is out of reach, but there's still racing to be done and positions to fight for.",
+      triggers: { raceNumber: [15], performanceTier: ["any"], gcPosition: [6, 7, 8, 9, 10, 11, 12, 13, 14, 15] },
+      weight: 0.7
+    },
+    {
+      id: "gc_seconds_matter",
+      text: "You lost the stage by fifteen seconds but gained five seconds on your GC rival. In the moment, losing the stage stung. But when you check the overall standings and see you've moved up a position, the pain eases. Stage racing is about the long game—sacrificing stage glory for GC position, accepting losses that actually move you forward overall.",
+      triggers: { raceNumber: [14, 15], performanceTier: ["top10"], gcPosition: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] },
+      weight: 0.7
+    },
+    {
+      id: "gc_final_shake",
+      text: "The queen stage is where the GC will be decided—no more tactical games, no more conserving energy. Today is about going as hard as you can for as long as you can and seeing where you end up when the suffering is over. The accumulated fatigue from previous stages adds another layer of difficulty. This is where tours are won and lost.",
+      triggers: { raceNumber: [15], performanceTier: ["any"] },
+      weight: 0.8
+    }
+  ],
+
+  // ===== TIMETRIALMINDSET ===== (NEW)
+  timeTrialMindset: [
+    {
+      id: "tt_naked_effort",
+      text: "There's something both terrifying and liberating about time trials. No pack to hide in, no tactics to consider, no one to blame but yourself. It's just you and the bike and the clock, and the only question is: how much power can you sustain before your body says no? Your FTP is about to be revealed to everyone watching.",
+      triggers: { raceNumber: [4, 10], performanceTier: ["any"] },
+      weight: 0.9
+    },
+    {
+      id: "tt_pacing_anxiety",
+      text: "The pacing strategy for this time trial has been keeping you awake at night. Start too hard and you'll blow up spectacularly in the final minutes. Too conservative and you'll leave watts on the table. You've practiced the effort dozens of times, but race day always adds variables—adrenaline, wind, that voice in your head screaming to go harder.",
+      triggers: { raceNumber: [4, 10], performanceTier: ["any"] },
+      weight: 0.8
+    },
+    {
+      id: "tt_suffering_alone",
+      text: "The unique suffering of time trials is that you're doing it alone. No one to share the pain with, no one to push you through the bad moments, just you and the mounting fatigue and the clock ticking. When your legs start screaming at the halfway point, there's no pack to hide in. You either push through or you don't.",
+      triggers: { raceNumber: [4, 10], performanceTier: ["any"] },
+      weight: 0.7
+    },
+    {
+      id: "tt_numbers_game",
+      text: "Time trials are a numbers game, and you've been obsessing over them. Your FTP, your power-to-weight ratio, your average speed from training efforts. You know exactly what you're capable of on paper. Now you get to find out if you can deliver those numbers under the pressure of competition, when your heart rate is elevated and your mind is screaming that you're going too hard.",
+      triggers: { raceNumber: [4, 10], performanceTier: ["any"] },
+      weight: 0.6
+    },
+    {
+      id: "tt_mental_battle",
+      text: "The mental game in time trials is brutal. Every second feels like an hour when you're at threshold. Your brain keeps suggesting reasons to ease off—'you're going too hard,' 'you'll blow up,' 'this pace isn't sustainable.' You have to override every self-preservation instinct and trust your training. The clock doesn't care about your discomfort.",
+      triggers: { raceNumber: [4, 10], performanceTier: ["any"] },
+      weight: 0.7
+    },
+    {
+      id: "tt_aero_obsession",
+      text: "You've been obsessing over aerodynamics—position on the bike, tucking your elbows, keeping your head down. At time trial speeds, aero matters as much as power. Every watt saved through better position is a watt you can put into the pedals. You've practiced your TT position until it's almost comfortable, but 'almost' is the key word.",
+      triggers: { raceNumber: [4, 10], performanceTier: ["top10", "podium", "win"] },
+      weight: 0.6
+    },
+    {
+      id: "tt_no_hiding",
+      text: "In a road race, you can have an off day and still finish anonymously in the pack. In a time trial, there's nowhere to hide. Your result will tell everyone exactly how strong you were today—no excuses about bad positioning, no blaming the pack. Just you versus the clock, and the clock doesn't lie.",
+      triggers: { raceNumber: [4, 10], performanceTier: ["any"] },
+      weight: 0.8
+    },
+    {
+      id: "tt_breakthrough_potential",
+      text: "Time trials are where pure fitness gets rewarded. No lucky breaks, no clever tactics—just sustained power output. If you've done the training, if you've built your FTP, if you can hold threshold for the full duration, you'll see it reflected in the result. This is your chance to prove the winter training block was worth it.",
+      triggers: { raceNumber: [4, 10], performanceTier: ["podium", "top10", "win"] },
+      weight: 0.7
+    }
+  ],
+
+  // ===== TRACKRACING ===== (NEW)
+  trackRacing: [
+    {
+      id: "track_first_velodrome",
+      text: "The velodrome is intimidating in person. The banking is steeper than it looks in videos, the track surface is unforgiving, and the speed at which riders take the turns seems impossible. You've been practicing, but racing on the track is different from training on it. The elimination format means one mistake and you're done—no second chances, no recovering from a bad position.",
+      triggers: { raceNumber: [3], performanceTier: ["any"] },
+      weight: 0.9
+    },
+    {
+      id: "track_elimination_stress",
+      text: "Every lap in an elimination race feels like sudden death. Stay near the front, cover moves, accelerate out of turns, and whatever you do, don't be last across the line. The constant vigilance is exhausting—twenty laps of high-intensity efforts with no time to rest. One lap of inattention and you're watching the rest of the race from the sidelines.",
+      triggers: { raceNumber: [3], performanceTier: ["any"] },
+      weight: 0.9
+    },
+    {
+      id: "track_banking_mastery",
+      text: "You're starting to trust the banking—leaning into turns at speeds that would terrify you on the road. The track demands confidence in bike handling. Hesitate and you lose momentum. Brake in the corners and you drift down the banking. The riders who excel here ride with a smoothness that makes it look easy. You're not quite there yet.",
+      triggers: { raceNumber: [3], performanceTier: ["top10", "podium", "win"] },
+      weight: 0.6
+    },
+    {
+      id: "track_sprint_intervals",
+      text: "An elimination race is essentially twenty consecutive sprint efforts with no recovery. Your anaerobic capacity is being tested to its limit. Each lap you accelerate hard, hold the pace, then have to do it again fifteen seconds later. By lap ten, your legs are screaming. By lap fifteen, you're racing on willpower and lactic acid.",
+      triggers: { raceNumber: [3], performanceTier: ["any"] },
+      weight: 0.8
+    },
+    {
+      id: "track_positioning_paramount",
+      text: "On the track, positioning is everything. Get stuck on the outside of a turn and you're done—too much extra distance to make up. Drift to the back of the group and you'll be eliminated. You need to be constantly aware of your position relative to every other rider, every moment of every lap. It's exhausting mentally before it even becomes exhausting physically.",
+      triggers: { raceNumber: [3], performanceTier: ["any"] },
+      weight: 0.8
+    },
+    {
+      id: "track_fixed_gear_rhythm",
+      text: "Racing on a fixed gear is its own skill—no coasting, no shifting, just pure rhythm and cadence. You can't rest on descents (there are none), you can't shift for attacks, you just have to modulate your power output through leg speed. It's both limiting and freeing. You're learning to love the simplicity of fixed gear racing.",
+      triggers: { raceNumber: [3], performanceTier: ["any"] },
+      weight: 0.5
     }
   ]
 };

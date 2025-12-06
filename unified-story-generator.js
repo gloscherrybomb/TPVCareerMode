@@ -1,5 +1,6 @@
 // unified-story-generator-enhanced.js - Context-aware narrative generation
 // Generates cohesive 2-3 paragraph stories with race type awareness, GC context, and dynamic race analysis
+// IMPROVED VERSION with better race type handling, winner names, time gaps, and stage race context
 
 /**
  * Generate a unified story that flows naturally across 2-3 paragraphs
@@ -64,12 +65,23 @@ async function generateUnifiedStory(raceData, seasonData, riderId, narrativeSele
  * Get race-specific context including type, GC data, and race dynamics
  */
 async function getRaceContext(eventNumber, raceData, seasonData, db) {
-  // Event type mapping
+  // Event type mapping - EXPANDED with more specific types
   const EVENT_TYPES = {
-    1: 'criterium', 2: 'road race', 3: 'track elimination', 4: 'time trial',
-    5: 'points race', 6: 'hill climb', 7: 'criterium', 8: 'gran fondo',
-    9: 'hill climb', 10: 'time trial', 11: 'points race', 12: 'gravel race',
-    13: 'stage race', 14: 'stage race', 15: 'stage race'
+    1: 'criterium', 
+    2: 'road race', 
+    3: 'track elimination', 
+    4: 'time trial',
+    5: 'points race', 
+    6: 'hill climb', 
+    7: 'criterium', 
+    8: 'gran fondo',
+    9: 'hill climb', 
+    10: 'time trial', 
+    11: 'points race', 
+    12: 'gravel race',
+    13: 'stage race', 
+    14: 'stage race', 
+    15: 'stage race'
   };
 
   const raceType = EVENT_TYPES[eventNumber] || 'road race';
@@ -80,12 +92,14 @@ async function getRaceContext(eventNumber, raceData, seasonData, db) {
     stageInfo = {
       stageNumber: eventNumber === 13 ? 1 : eventNumber === 14 ? 2 : 3,
       isFirstStage: eventNumber === 13,
+      isMiddleStage: eventNumber === 14,
       isQueenStage: eventNumber === 15,
+      isFinalStage: eventNumber === 15,
       totalStages: 3
     };
   }
 
-  // Determine race dynamics from time gaps
+  // Determine race dynamics from time gaps - IMPROVED
   let raceDynamics = 'unknown';
   if (raceData.winMargin !== undefined && raceData.lossMargin !== undefined) {
     raceDynamics = analyzeRaceDynamics(raceData, raceType);
@@ -99,29 +113,36 @@ async function getRaceContext(eventNumber, raceData, seasonData, db) {
 }
 
 /**
- * Analyze race dynamics based on time gaps
+ * Analyze race dynamics based on time gaps - IMPROVED with better thresholds
  */
 function analyzeRaceDynamics(raceData, raceType) {
   const { position, winMargin, lossMargin } = raceData;
   
-  // Time trials are always solo efforts
-  if (raceType === 'time trial') {
+  // Time trials and hill climbs are always solo efforts
+  if (raceType === 'time trial' || raceType === 'hill climb') {
     return 'time trial';
   }
 
-  // For winners
-  if (position === 1) {
-    if (winMargin > 60) return 'solo victory';  // Over 1 minute clear
-    if (winMargin > 30) return 'breakaway win';  // 30-60 seconds
-    if (winMargin > 5) return 'small group';     // 5-30 seconds
-    return 'bunch sprint';                        // < 5 seconds
+  // Track elimination is different format
+  if (raceType === 'track elimination') {
+    return 'elimination';
   }
 
-  // For non-winners
-  if (lossMargin < 5) return 'bunch sprint';
-  if (lossMargin < 30) return 'small group';
-  if (lossMargin < 60) return 'breakaway';
-  return 'chasing group';
+  // For winners - analyze how they won
+  if (position === 1) {
+    if (winMargin > 60) return 'solo victory';      // Over 1 minute clear - dominant solo
+    if (winMargin > 30) return 'breakaway win';     // 30-60 seconds - successful break
+    if (winMargin > 5) return 'small group sprint'; // 5-30 seconds - small group finish
+    return 'bunch sprint';                          // < 5 seconds - mass sprint
+  }
+
+  // For non-winners - what kind of race was it?
+  if (lossMargin < 1) return 'photo finish';        // Same time essentially
+  if (lossMargin < 5) return 'bunch sprint';        // In the main sprint
+  if (lossMargin < 30) return 'small group';        // In a small group behind
+  if (lossMargin < 60) return 'chase group';        // In the chase group
+  if (lossMargin < 120) return 'second group';      // Well behind in second group
+  return 'back of pack';                            // Very far back
 }
 
 /**
@@ -166,17 +187,23 @@ function buildUnifiedNarrative({ introMoment, raceData, seasonData, raceContext 
     // Use the narrative moment and bridge into the race
     paragraph1 = introMoment + ' ';
     
-    // Add a transition sentence based on performance and race type
+    // Add a transition sentence based on performance and race type - IMPROVED
     if (raceContext.raceType === 'time trial') {
       if (performanceTier === 'win') {
-        paragraph1 += `At ${eventName}, it was time to put that power to the test.`;
+        paragraph1 += `At ${eventName}, it was time to prove your power against the clock.`;
+      } else if (performanceTier === 'podium') {
+        paragraph1 += `${eventName} would test your FTP and pacing discipline.`;
       } else {
-        paragraph1 += `${eventName} would be the ultimate test of pacing and power.`;
+        paragraph1 += `${eventName} would reveal exactly where your fitness stands—no hiding in a time trial.`;
       }
+    } else if (raceContext.raceType === 'track elimination') {
+      paragraph1 += `The Forest Velodrome Elimination demanded perfect positioning lap after lap.`;
     } else if (raceContext.stageInfo?.isFirstStage) {
-      paragraph1 += `Stage 1 of the Local Tour was where the GC battle would begin.`;
+      paragraph1 += `The Local Tour's opening stage was where the GC battle would begin—set your mark early or spend three days chasing.`;
+    } else if (raceContext.stageInfo?.isMiddleStage) {
+      paragraph1 += `Stage 2 of the Local Tour—the GC is taking shape, and today's result could shift everything.`;
     } else if (raceContext.stageInfo?.isQueenStage) {
-      paragraph1 += `The queen stage of the Local Tour—this is where the overall would be decided.`;
+      paragraph1 += `The queen stage. The final chapter of the Local Tour and the last chance to make a move on GC. This is where it would all be decided.`;
     } else {
       // Standard transitions based on performance
       if (performanceTier === 'win') {
@@ -194,7 +221,7 @@ function buildUnifiedNarrative({ introMoment, raceData, seasonData, raceContext 
     paragraph1 = generateContextualOpening(raceData, seasonData, raceContext);
   }
 
-  // PARAGRAPH 2: Race performance with type-specific context
+  // PARAGRAPH 2: Race performance with type-specific context - IMPROVED
   let paragraph2 = generateRacePerformance(raceData, raceContext);
 
   // PARAGRAPH 3: Season/GC context and forward look (conditional)
@@ -211,7 +238,7 @@ function buildUnifiedNarrative({ introMoment, raceData, seasonData, raceContext 
 }
 
 /**
- * Generate contextual opening when no narrative moment exists
+ * Generate contextual opening when no narrative moment exists - IMPROVED
  */
 function generateContextualOpening(raceData, seasonData, raceContext) {
   const { eventNumber, eventName, position } = raceData;
@@ -223,30 +250,34 @@ function generateContextualOpening(raceData, seasonData, raceContext) {
     return `This is it—your first race. ${eventName} marks the beginning of everything you've been working toward. The nerves are real, the competition is fierce, but you're here. You're racing.`;
   }
   
-  // Stage race openings
+  // Stage race openings - IMPROVED
   if (stageInfo?.isFirstStage) {
-    return `The Local Tour begins with ${eventName}. Three stages, one overall classification. This first stage sets the tone—not just for your GC position, but for how the next two days will unfold.`;
+    return `The Local Tour begins with ${eventName}. Three stages over three days, one overall classification. This opening stage sets the tone—not just for your GC position, but for how the entire tour will unfold. Start strong or spend the next two days chasing.`;
   }
   
-  if (stageInfo?.stageNumber === 2) {
-    return `Stage 2 of the Local Tour. Yesterday's result matters, but today's result matters more. The GC is fluid, time gaps can change, and every second counts.`;
+  if (stageInfo?.isMiddleStage) {
+    return `Stage 2 of the Local Tour—the middle act where the GC story continues to develop. Yesterday's result is done; today's result will reshape the standings. The race lead can change hands, time gaps can be extended or closed. Everything is still in play.`;
   }
   
   if (stageInfo?.isQueenStage) {
-    return `The queen stage. The GC will be decided today on the hardest climbs of the Local Tour. Whatever gap you have—defending or attacking—this is where it all comes down to suffering and strength.`;
+    return `The queen stage. The final stage of the Local Tour and the deciding day for the overall classification. Whatever GC gap you have—whether you're defending or attacking—this is where the tour will be won or lost. The hardest climbs, the deepest suffering, the final reckoning.`;
   }
   
-  // Race type specific openings
+  // Race type specific openings - IMPROVED
   if (raceType === 'time trial') {
-    return `${eventName}: just you, your bike, and the clock. No tactics, no drafting, no hiding. Pure power and pacing discipline.`;
+    return `${eventName}: just you, your bike, and the clock. No tactics, no drafting, no hiding in the wheels. This is pure power and pacing discipline—your FTP laid bare for everyone to see. The numbers don't lie.`;
   }
   
   if (raceType === 'track elimination') {
-    return `The Forest Velodrome Elimination—last rider each lap is out. No room for error, no time to rest, just relentless positioning and repeated high-intensity efforts.`;
+    return `The Forest Velodrome Elimination—a simple format with brutal execution. Last rider across the line each lap is eliminated. Do that for 20 laps until only one rider remains. No room for error, no time to rest, just relentless positioning and the constant threat of elimination.`;
   }
   
   if (raceType === 'hill climb') {
-    return `${eventName} is a simple equation: you versus gravity. The road goes up, and either you have the legs to go fast or you don't.`;
+    return `${eventName} strips racing down to its purest form: you versus gravity. No tactics, no draft, no clever positioning. Just the road pointing upward and the question of whether your legs are strong enough to go fast while everything burns.`;
+  }
+
+  if (raceType === 'points race') {
+    return `${eventName} isn't about one decisive moment—it's about accumulating points across multiple sprint banners. You need to be sharp for every intermediate sprint, positioned well each time, and smart about when to commit fully versus when to conserve. Consistency wins points races.`;
   }
   
   // Default openings by season position
@@ -262,7 +293,7 @@ function generateContextualOpening(raceData, seasonData, raceContext) {
 }
 
 /**
- * Generate detailed race performance paragraph with type-specific context
+ * Generate detailed race performance paragraph with type-specific context - SIGNIFICANTLY IMPROVED
  */
 function generateRacePerformance(raceData, raceContext) {
   const {
@@ -276,6 +307,7 @@ function generateRacePerformance(raceData, raceContext) {
     earnedPhotoFinish,
     earnedDarkHorse,
     winnerName,
+    secondPlaceName,
     gcPosition,
     gcGap
   } = raceData;
@@ -286,119 +318,228 @@ function generateRacePerformance(raceData, raceContext) {
   
   let performance = '';
 
-  // WINS
+  // ========== WINS ==========
   if (performanceTier === 'win') {
-    // Time Trial Wins
+    
+    // TIME TRIAL WINS - Solo effort against the clock
     if (raceType === 'time trial') {
       if (earnedDarkHorse) {
-        performance = `The predictions had you down for ${predictedPosition}th, but predictions don't account for perfect pacing and threshold power sustained for the full duration. You started controlled, built into your rhythm, and held the watts to the finish. When the results came through—first place, clear of the field. This is the kind of solo effort that proves you have the engine.`;
+        performance = `The predictions had you down for ${predictedPosition}th, but predictions don't account for perfect pacing and sustained threshold power. You started controlled, built into your rhythm by the halfway point, and held the watts all the way to the finish. When the results came through—first place, ${formatGapText(winMargin)} clear of second. This is the kind of solo effort that proves you have the engine to compete.`;
+      } else if (earnedDomination) {
+        performance = `${eventName} was a statement ride. From the first kilometer you were on pace, power numbers sitting exactly where they needed to be. The gap grew steadily as weaker riders faded, and you crossed the line ${formatGapText(winMargin)} clear of the field. First place. In a time trial, that margin means you had significantly more FTP—the numbers don't lie.`;
       } else {
-        performance = `${eventName} was all about you versus the clock. Twenty minutes of threshold power, perfectly paced from start to finish. No tactics, no draft, just raw FTP laid bare. First place. The numbers don't lie—you had the strongest legs today.`;
+        performance = `Twenty minutes of threshold power, perfectly paced from start to finish. No tactics, no draft, just raw FTP and pacing discipline. You finished ${formatGapText(winMargin)} ahead of second place—first overall. Time trials reveal exactly where your fitness stands, and today you had the strongest legs in the field.`;
       }
     }
-    // Track Elimination Wins
+    
+    // TRACK ELIMINATION WINS
     else if (raceType === 'track elimination') {
-      performance = `The Forest Velodrome Elimination is brutal—last rider every lap until only one remains. You stayed near the front every single lap, never drifted back, covered every surge. Lap after lap, riders were pulled until finally, it was just you. Winner. The sharpest positioning and the deepest reserves won out.`;
+      performance = `The Forest Velodrome Elimination is brutal in its simplicity—last rider every lap is eliminated until only one remains. You stayed near the front the entire race, never drifted back, covered every surge and acceleration. Lap by lap, riders were pulled from the track. Twenty laps of high-intensity efforts, constant vigilance, and perfect positioning. When the final bell rang and the last elimination was made, only you remained. Winner. The sharpest bike handling and the deepest reserves won out.`;
     }
-    // Stage Race Wins
+    
+    // HILL CLIMB WINS
+    else if (raceType === 'hill climb') {
+      if (earnedDomination) {
+        performance = `${eventName} was pure domination. You started at a sustainable pace and simply rode away from everyone else as the gradient increased. By the top, you'd put ${formatGapText(winMargin)} into second place. First overall. Hill climbs don't lie about climbing strength—you had more watts-per-kilo than anyone else today.`;
+      } else {
+        performance = `The road pointed up, and you had the legs to go fast. Smooth pedaling, controlled breathing, sustainable power output all the way to the summit. First place, ${formatGapText(winMargin)} ahead of the next climber. In a hill climb there's nowhere to hide—you versus gravity, and you won.`;
+      }
+    }
+    
+    // STAGE RACE WINS - GC context is critical
     else if (stageInfo) {
       if (earnedDomination) {
-        performance = `Stage ${stageInfo.stageNumber} wasn't just a win—it was a statement. You dominated from early on, establishing control and never letting go. First across the line with a significant gap.`;
+        performance = `Stage ${stageInfo.stageNumber} wasn't just a win—it was a statement of intent. ${getDynamicsText(raceDynamics, true, winMargin)} You dominated from the start and crossed the line ${formatGapText(winMargin)} clear of second place.`;
         if (gcPosition) {
-          performance += ` More importantly, you now ${gcPosition === 1 ? 'lead the overall classification' : `sit ${gcPosition}${getOrdinal(gcPosition)} in GC`}${gcGap > 0 ? `, ${formatGapText(gcGap)} behind the leader` : ''}.`;
-        } else {
-          performance += ` The GC implications are significant—every second gained today matters for the overall.`;
+          if (gcPosition === 1) {
+            performance += ` Crucially, you now wear the race leader's jersey${gcGap === 0 ? '' : `, having taken the GC lead`}.`;
+            if (stageInfo.isFinalStage) {
+              performance += ` With the queen stage complete, the Local Tour is yours—stage winner and overall classification champion.`;
+            } else {
+              performance += ` ${stageInfo.totalStages - stageInfo.stageNumber} ${stageInfo.totalStages - stageInfo.stageNumber === 1 ? 'stage' : 'stages'} remain, and you're in the strongest position possible.`;
+            }
+          } else {
+            performance += ` You're now ${gcPosition}${getOrdinal(gcPosition)} in GC, ${formatGapText(gcGap)} ${gcGap > 0 ? 'behind the leader' : 'ahead'}.`;
+            if (stageInfo.isFinalStage) {
+              performance += ` The Local Tour ends with you on the podium—a successful three days of racing.`;
+            }
+          }
+        }
+      } else if (earnedCloseCall || raceDynamics === 'bunch sprint' || raceDynamics === 'small group sprint') {
+        const dynamicsText = getDynamicsText(raceDynamics, true, winMargin);
+        performance = `Stage ${stageInfo.stageNumber} came down to a sprint finish. ${dynamicsText} You timed it perfectly, found the gap, and hit the line first${winMargin < 1 ? ' by mere centimeters' : ` with ${formatGapText(winMargin)} to spare`}.`;
+        if (gcPosition && gcPosition <= 3) {
+          performance += ` More importantly, you're now ${gcPosition === 1 ? 'wearing the leader\'s jersey' : `${gcPosition}${getOrdinal(gcPosition)} overall`}${gcGap > 0 ? `, ${formatGapText(gcGap)} ${gcPosition === 1 ? 'ahead' : 'behind the leader'}` : ''}.`;
+          if (stageInfo.isFinalStage) {
+            performance += ` The Local Tour is complete, and you've ${gcPosition === 1 ? 'won the overall classification' : 'secured a podium finish on GC'}.`;
+          }
         }
       } else {
-        performance = `Stage ${stageInfo.stageNumber} victory! You timed your effort perfectly, had the legs when it mattered, and crossed the line first.`;
-        if (gcPosition && gcPosition <= 3) {
-          performance += ` Crucially, you're now ${gcPosition === 1 ? 'in the race leader\'s jersey' : `${gcPosition}${getOrdinal(gcPosition)} overall`}${gcGap > 0 ? `, just ${formatGapText(gcGap)} behind the leader` : ''}. The Local Tour is very much on.`;
-        } else {
-          performance += ` The stage win is yours, and you've strengthened your GC position significantly.`;
+        const dynamicsText = getDynamicsText(raceDynamics, true, winMargin);
+        performance = `Stage ${stageInfo.stageNumber} victory! ${dynamicsText} First across the line.`;
+        if (gcPosition) {
+          if (gcPosition === 1) {
+            performance += ` You now lead the Local Tour${gcGap > 0 ? ` by ${formatGapText(gcGap)}` : ''}.`;
+            if (stageInfo.isFinalStage) {
+              performance += ` With the queen stage won, the overall classification is yours—Local Tour champion.`;
+            } else {
+              performance += ` ${stageInfo.totalStages - stageInfo.stageNumber} more ${stageInfo.totalStages - stageInfo.stageNumber === 1 ? 'stage' : 'stages'} to defend this lead.`;
+            }
+          } else {
+            performance += ` On GC, you're ${gcPosition}${getOrdinal(gcPosition)}${gcGap > 0 ? `, ${formatGapText(gcGap)} from the lead` : ''}.`;
+          }
         }
       }
     }
-    // Standard Race Wins with dynamics
+    
+    // STANDARD RACE WINS - with better dynamics analysis
     else {
       if (earnedDarkHorse) {
         const dynamicsText = getDynamicsText(raceDynamics, true, winMargin);
-        performance = `Nobody predicted this. Coming into ${eventName}, you were forecasted for ${predictedPosition}th—respectable, but not threatening. ${dynamicsText} First place. Winner. The kind of result that changes how you see yourself as a racer.`;
+        performance = `Nobody predicted this. Coming into ${eventName}, you were forecasted for ${predictedPosition}th—respectable, but not threatening. ${dynamicsText} First place. Winner. Dark horse. The kind of result that changes how you see yourself as a racer.`;
       } else if (earnedDomination) {
-        performance = `${eventName} wasn't just a win—it was a statement. You went clear ${getRaceTypeAction(raceType)} and never looked back. The gap grew steadily until you crossed the line over a minute clear of second place. This wasn't about luck or tactics; this was about having the legs to dominate.`;
-      } else if (earnedCloseCall) {
-        performance = `${eventName} came down to the absolute wire—a ${raceType === 'criterium' ? 'criterium sprint' : 'bunch sprint'} so close that for a split second, you genuinely didn't know if you'd won. Multiple riders hit the line together, engines redlined, every ounce of power squeezed from exhausted legs. First by less than half a second. Races this close are decided by millimeters. Today, they went your way.`;
+        if (raceDynamics === 'solo victory') {
+          performance = `${eventName} was complete domination. You went clear early and never looked back, building the gap relentlessly until you crossed the line over a minute ahead of second place. This wasn't about tactics or luck—this was about having the legs to ride away from the entire field and solo to victory.`;
+        } else {
+          performance = `${eventName} wasn't just a win—it was a statement. ${getDynamicsText(raceDynamics, true, winMargin)} You crushed the field, finishing ${formatGapText(winMargin)} clear. The kind of dominant performance that gets remembered.`;
+        }
+      } else if (earnedCloseCall || raceDynamics === 'bunch sprint' || raceDynamics === 'photo finish') {
+        performance = `${eventName} came down to an absolute sprint finish—chaotic, desperate, and decided by millimeters. Multiple riders hit the line together, every ounce of power squeezed from exhausted legs. You emerged with the victory by ${winMargin < 1 ? 'a bike length' : `less than ${Math.ceil(winMargin)} seconds`}. Races this close are as much about bike handling and positioning as pure power. Today it went your way.`;
       } else if (placeDiff >= 5) {
         const dynamicsText = getDynamicsText(raceDynamics, true, winMargin);
-        performance = `The predictions had you down for ${predictedPosition}th at ${eventName}, but those numbers didn't account for the form you brought. ${dynamicsText} First place—better than predicted, better than hoped.`;
+        performance = `The predictions had you down for ${predictedPosition}th at ${eventName}, but you had other plans. ${dynamicsText} First place—exceeding expectations and proving you belong at the front of the race.`;
       } else {
         const dynamicsText = getDynamicsText(raceDynamics, true, winMargin);
-        performance = `${eventName} played out well, and you executed flawlessly. ${dynamicsText} First across the line. This is what consistency and preparation look like.`;
+        performance = `${eventName} played out well and you executed your race plan flawlessly. ${dynamicsText} First across the line. This is what good form and smart racing look like.`;
       }
     }
   }
   
-  // PODIUMS
+  // ========== PODIUMS ==========
   else if (performanceTier === 'podium') {
+    
+    // TIME TRIAL PODIUMS
     if (raceType === 'time trial') {
-      performance = `${eventName} demanded perfect pacing and you delivered. ${position === 2 ? 'Second place' : 'Third place'}—just ${formatGapText(lossMargin)} behind the winner. In a time trial, that gap represents pure power difference. You left everything out there.`;
-    } else if (stageInfo) {
-      performance = `Stage ${stageInfo.stageNumber} produced a podium finish in ${position === 2 ? 'second' : 'third'} place.`;
+      const gap = lossMargin;
+      performance = `${eventName} demanded perfect pacing and maximum sustained power. You delivered a strong ride, finishing ${position === 2 ? 'second' : 'third'} place, ${formatGapText(gap)} behind ${winnerName || 'the winner'}. In a time trial, that gap represents pure power difference—${winnerName || 'they'} had slightly more FTP today, but you left everything out there. ${position === 2 ? 'A silver medal' : 'A bronze medal'} in a pure power test is a solid result.`;
+    }
+    
+    // HILL CLIMB PODIUMS
+    else if (raceType === 'hill climb') {
+      performance = `${eventName} was a test of climbing strength, and you proved you can suffer uphill. ${position === 2 ? 'Second place' : 'Third place'}, ${formatGapText(lossMargin)} behind ${winnerName || 'the winner'}. ${winnerName || 'They'} had stronger legs on the climbs today, but a podium finish on a hill climb means you can climb at a competitive level.`;
+    }
+    
+    // STAGE RACE PODIUMS
+    else if (stageInfo) {
+      const dynamicsText = getDynamicsText(raceDynamics, false, lossMargin);
+      performance = `Stage ${stageInfo.stageNumber}: ${position === 2 ? 'second' : 'third'} place. ${dynamicsText}`;
       if (gcPosition && gcPosition <= 5) {
-        performance += ` On GC, you're now ${gcPosition}${getOrdinal(gcPosition)} overall${gcGap > 0 ? `, ${formatGapText(gcGap)} behind the leader` : ''}. ${stageInfo.stageNumber < 3 ? 'Still everything to race for in the stages ahead.' : 'The overall classification is decided, but this podium finish matters.'}`;
+        performance += ` On the overall classification, you're now ${gcPosition}${getOrdinal(gcPosition)}${gcGap > 0 ? `, ${formatGapText(gcGap)} behind the race leader` : ''}.`;
+        if (stageInfo.isFinalStage) {
+          performance += ` The Local Tour is complete—you've ${gcPosition <= 3 ? 'secured a podium finish on GC' : 'finished in the top 5 overall'}, a solid result across three days of racing.`;
+        } else {
+          performance += ` ${stageInfo.totalStages - stageInfo.stageNumber} more ${stageInfo.totalStages - stageInfo.stageNumber === 1 ? 'stage' : 'stages'} remain—everything is still to race for.`;
+        }
       } else {
-        performance += ` The stage result is solid, though the overall GC battle is elsewhere.`;
+        performance += ` The stage podium is a good result, though the GC battle is happening elsewhere.`;
       }
-    } else if (earnedPhotoFinish) {
-      const dynamicsText = getDynamicsText(raceDynamics, false, lossMargin);
-      performance = `${eventName} produced one of those finishes that'll be remembered—a genuine photo finish with multiple riders crossing the line in a desperate, chaotic sprint. ${dynamicsText} ${position === 2 ? 'Second place' : 'Third place'} by centimeters. So close to the win you could taste it, but podium finishes are earned, not given.`;
+    }
+    
+    // STANDARD RACE PODIUMS
+    else if (earnedPhotoFinish || raceDynamics === 'bunch sprint' || raceDynamics === 'photo finish') {
+      performance = `${eventName} produced a sprint finish so close it needed photo review. Multiple riders crossed the line in a desperate, chaotic finale. You finished ${position === 2 ? 'second' : 'third'}, ${lossMargin < 1 ? 'by mere centimeters' : `just ${formatGapText(lossMargin)} back`}. ${winnerName ? `${winnerName} took the win, but only barely.` : 'The winner edged it, but only barely.'} Podium finishes earned through photo finishes are testament to explosive finishing speed.`;
     } else if (placeDiff >= 5) {
-      performance = `Coming into ${eventName}, you were predicted for ${predictedPosition}th, but you had other ideas. Through smart ${getRaceTypeRacing(raceType)}, you worked your way into the sharp end and held your place. ${position === 2 ? 'Second place' : 'Third place'}—a podium finish that exceeded expectations.`;
+      const dynamicsText = getDynamicsText(raceDynamics, false, lossMargin);
+      performance = `Coming into ${eventName}, you were predicted for ${predictedPosition}th, but you had other plans. ${dynamicsText} ${position === 2 ? 'Second place' : 'Third place'}—a podium finish that exceeded expectations significantly.`;
     } else {
       const dynamicsText = getDynamicsText(raceDynamics, false, lossMargin);
-      performance = `${eventName} delivered a solid podium finish in ${position === 2 ? 'second' : 'third'} place. ${dynamicsText} Not every podium is dramatic; some are just the product of good racing and consistent effort.`;
+      performance = `${eventName} delivered a solid ${position === 2 ? 'second' : 'third'} place finish. ${dynamicsText} ${winnerName ? `${winnerName} took the victory, but you were right there.` : 'Not every podium is dramatic—some are just the product of consistent, smart racing.'}`;
     }
   }
   
-  // TOP 10
+  // ========== TOP 10 ==========
   else if (performanceTier === 'top10') {
+    
+    // TIME TRIAL TOP 10
     if (raceType === 'time trial') {
-      performance = `${eventName} resulted in a ${position}${getOrdinal(position)} place finish. Your power numbers were solid, pacing discipline held, but others simply had more watts today. Still, a top-10 in a time trial means your engine is competitive.`;
-    } else if (stageInfo) {
+      performance = `${eventName} resulted in ${position}${getOrdinal(position)} place. Your pacing was disciplined and power output was solid, but others simply had more watts today. Still, a top-10 finish in a time trial means your engine is competitive at this level. The FTP numbers are there; it's about continuing to build threshold power.`;
+    }
+    
+    // STAGE RACE TOP 10
+    else if (stageInfo) {
       performance = `Stage ${stageInfo.stageNumber}: ${position}${getOrdinal(position)} place. A solid result that keeps you in the race.`;
-      if (gcPosition) {
-        performance += ` You're ${gcPosition}${getOrdinal(gcPosition)} in the overall standings${gcGap > 0 ? `, ${formatGapText(gcGap)} down` : ''}. ${stageInfo.stageNumber < 3 ? 'The GC is still fluid—everything depends on the stages ahead.' : 'The overall is decided, but you finished the tour strong.'}`;
+      if (gcPosition && gcPosition <= 10) {
+        performance += ` You're ${gcPosition}${getOrdinal(gcPosition)} in the overall standings${gcGap > 0 ? `, ${formatGapText(gcGap)} down from the lead` : ''}.`;
+        if (stageInfo.isFinalStage) {
+          performance += ` The Local Tour is complete with a top-10 GC finish—you raced consistently across three days.`;
+        } else {
+          performance += ` The GC is still fluid with ${stageInfo.totalStages - stageInfo.stageNumber} more ${stageInfo.totalStages - stageInfo.stageNumber === 1 ? 'stage' : 'stages'}—plenty of racing left.`;
+        }
       }
-    } else if (placeDiff >= 5) {
-      performance = `${eventName} produced a ${position}${getOrdinal(position)} place finish—significantly better than the predicted ${predictedPosition}th. You rode tactically smart, conserved energy when needed, and had enough left to push hard when the race ${getRaceSplitPhrase(raceType)}. Top-10 finishes like this build momentum.`;
+    }
+    
+    // STANDARD RACE TOP 10
+    else if (placeDiff >= 5) {
+      const dynamicsText = getDynamicsText(raceDynamics, false, lossMargin);
+      performance = `${eventName} produced ${position}${getOrdinal(position)} place—significantly better than the predicted ${predictedPosition}th. ${dynamicsText} You rode tactically smart, conserved energy when needed, and had enough left to finish strong. Top-10 finishes like this build momentum and bank valuable points.`;
     } else {
-      performance = `${eventName} resulted in a ${position}${getOrdinal(position)} place finish. You stayed competitive throughout, never got dropped from the main group, and finished roughly where predictions suggested. These solid, consistent results accumulate points and build the foundation for a successful campaign.`;
+      const dynamicsText = getDynamicsText(raceDynamics, false, lossMargin);
+      performance = `${eventName}: ${position}${getOrdinal(position)} place. ${dynamicsText} You stayed competitive throughout and finished roughly where predictions suggested. Solid, consistent results like this accumulate points and build the foundation for a successful season.`;
     }
   }
   
-  // MIDPACK
+  // ========== MIDPACK ==========
   else if (performanceTier === 'midpack') {
+    
+    // TIME TRIAL MIDPACK
     if (raceType === 'time trial') {
-      performance = `${eventName} was a reality check. You paced it as best you could, but the power just wasn't there today. ${position}${getOrdinal(position)} place. Time trials don't lie about fitness—you need more FTP to move up in these events.`;
-    } else if (stageInfo) {
-      performance = `Stage ${stageInfo.stageNumber} didn't go to plan—${position}${getOrdinal(position)} place. The race split apart and you found yourself in the second group.`;
+      performance = `${eventName} was a reality check. You paced it as best you could, focused on your breathing and power output, but the threshold just wasn't there today. ${position}${getOrdinal(position)} place. Time trials are brutally honest about fitness—you need more FTP to move up in these events. Back to the training plan.`;
+    }
+    
+    // STAGE RACE MIDPACK
+    else if (stageInfo) {
+      performance = `Stage ${stageInfo.stageNumber} didn't go to plan—${position}${getOrdinal(position)} place. The race split apart and you found yourself in the second group, unable to bridge across to the leaders.`;
       if (gcPosition) {
-        performance += ` That puts you ${gcPosition}${getOrdinal(gcPosition)} overall, ${formatGapText(gcGap)} behind. ${stageInfo.stageNumber < 3 ? 'You\'ll need something special in the remaining stages to climb back into contention.' : 'The overall was decided elsewhere, but you finished the tour.'}`;
+        performance += ` That puts you ${gcPosition}${getOrdinal(gcPosition)} overall, ${formatGapText(gcGap)} behind the GC leader.`;
+        if (stageInfo.isFinalStage) {
+          performance += ` The Local Tour is complete, though the overall classification was decided elsewhere.`;
+        } else {
+          performance += ` ${stageInfo.totalStages - stageInfo.stageNumber} more ${stageInfo.totalStages - stageInfo.stageNumber === 1 ? 'stage' : 'stages'} to try and climb back into contention.`;
+        }
       }
-    } else {
-      performance = `${eventName} was tougher than expected, with a ${position}${getOrdinal(position)} place finish. The race ${getRaceSplitPhrase(raceType)} early and you found yourself in the second group, chasing but never quite bridging the gap. Days like this happen—the key is learning from them.`;
+    }
+    
+    // STANDARD RACE MIDPACK
+    else {
+      const splitPhrase = getRaceSplitPhrase(raceType);
+      performance = `${eventName} was tougher than expected—${position}${getOrdinal(position)} place. The race ${splitPhrase} early and you found yourself in the second group, chasing but never quite bridging the gap. ${lossMargin ? `You finished ${formatGapText(lossMargin)} behind the winner.` : ''} Days like this happen in racing. The key is learning from them and coming back stronger.`;
     }
   }
   
-  // BACK OF PACK
+  // ========== BACK OF PACK ==========
   else {
+    
+    // TIME TRIAL BACK
     if (raceType === 'time trial') {
-      performance = `${eventName} was a struggle from start to finish. Pacing felt off, power wasn't there, and the result reflects it: ${position}${getOrdinal(position)} place. Time trials are humbling—they show you exactly where your fitness stands. Back to training.`;
-    } else if (raceType === 'track elimination') {
-      performance = `The Forest Velodrome Elimination was brutal today. You tried to stay near the front, but positioning mistakes add up quickly. Out with several laps still to go. Track racing demands perfection—you'll learn from this.`;
-    } else if (stageInfo) {
-      performance = `Stage ${stageInfo.stageNumber} was one of those days where nothing quite clicked—${position}${getOrdinal(position)} place. Whether it was fatigue from previous stages, bad positioning, or just being off form, the result wasn't what you wanted. The Local Tour is harder than it looks.`;
-    } else {
-      performance = `${eventName} was one of those days where nothing quite clicked—a ${position}${getOrdinal(position)} place finish that stung more than you expected. Whether it was fatigue, bad positioning, or just being off form, the result wasn't what you wanted. But here's the thing about racing: bad days make you better. You finished the race. That matters.`;
+      performance = `${eventName} was a struggle from start to finish. Pacing felt off, power wasn't there, and the result reflects it: ${position}${getOrdinal(position)} place${lossMargin ? `, ${formatGapText(lossMargin)} behind the winner` : ''}. Time trials are humbling—they show you exactly where your fitness stands with nowhere to hide. This is valuable data for training. Back to building FTP.`;
+    }
+    
+    // TRACK ELIMINATION BACK
+    else if (raceType === 'track elimination') {
+      performance = `The Forest Velodrome Elimination was brutal today. You tried to stay near the front, but positioning mistakes compound quickly in this format. Eliminated with several laps still to go. Track racing demands perfection—one lap in the wrong position and you're out. It's a harsh format, but you learn fast from mistakes here.`;
+    }
+    
+    // STAGE RACE BACK
+    else if (stageInfo) {
+      performance = `Stage ${stageInfo.stageNumber} was one of those days where nothing quite clicked—${position}${getOrdinal(position)} place. Whether it was fatigue from previous stages, bad positioning in the key moments, or just being off form, the result wasn't what you wanted. The Local Tour is harder than it looks when you're racing for GC.`;
+      if (stageInfo.isFinalStage) {
+        performance += ` The three-day tour is complete, and while the results weren't what you hoped for, you finished all three stages and gained valuable experience in stage racing.`;
+      }
+    }
+    
+    // STANDARD RACE BACK
+    else {
+      performance = `${eventName} was one of those days where nothing quite clicked—${position}${getOrdinal(position)} place${lossMargin ? `, ${formatGapText(lossMargin)} behind the leaders` : ''}. Whether it was fatigue, bad positioning, or just being off form, the result stung more than expected. But here's the thing about racing: bad days make you better if you learn from them. You finished the race. That matters. Analyze what went wrong, adjust the training, and come back stronger.`;
     }
   }
 
@@ -429,6 +570,7 @@ function getRaceTypeRacing(raceType) {
     case 'points race': return 'sprint selection';
     case 'track elimination': return 'positioning and awareness';
     case 'gravel race': return 'bike handling and power';
+    case 'time trial': return 'pacing discipline';
     default: return 'positioning and tactics';
   }
 }
@@ -441,55 +583,71 @@ function getRaceSplitPhrase(raceType) {
     case 'criterium': return 'picked up speed in the corners';
     case 'hill climb': return 'hit the steep sections';
     case 'points race': return 'surged for the sprint points';
-    case 'gravel race': return 'hit the rough gravel';
+    case 'gravel race': return 'hit the rough gravel sections';
+    case 'time trial': return 'demanded sustained power';
+    case 'track elimination': return 'eliminated riders lap by lap';
     default: return 'broke apart';
   }
 }
 
 /**
- * Get dynamics-based narrative text
+ * Get dynamics-based narrative text - IMPROVED with winner names
  */
-function getDynamicsText(dynamics, isWinner, gapSeconds) {
-  const gap = formatGapText(gapSeconds);
+function getDynamicsText(raceDynamics, isWinner, gap, winnerName = null) {
+  const gapText = gap ? formatGapText(gap) : '';
   
-  switch (dynamics) {
-    case 'solo victory':
-      return `You went clear early and rode solo to the finish, over a minute clear of the field. Nobody could follow when you attacked.`;
-    case 'breakaway win':
-      return `You made it into the decisive breakaway and had the strongest legs when it mattered. Crossing the line ${gap} clear of the chasers.`;
-    case 'small group':
-      if (isWinner) {
-        return `It came down to a small group sprint—five or six riders all with a chance. You timed it perfectly and took the victory by ${gap}.`;
-      } else {
-        return `A small group sprint decided it—five or six riders all with a shot. You were in the mix but came up just short, finishing ${gap} behind the winner.`;
-      }
-    case 'bunch sprint':
-      if (isWinner) {
-        return `The full pack came to the line together and you won the chaotic bunch sprint. Positioning, timing, and raw power—all three came together perfectly.`;
-      } else {
-        return `The full pack came to the line together for a massive bunch sprint. You were well-positioned but couldn't quite match the winner's speed in the final meters.`;
-      }
-    case 'time trial':
-      return `In a time trial, every second is earned through sustained power. Pure FTP, perfectly paced.`;
-    case 'breakaway':
-      return `The race was decided by a breakaway that went clear early. You were in the chasing group, working hard to limit losses, but the gap held.`;
-    case 'chasing group':
-      return `The race split apart and you found yourself in the main chasing group, working to limit losses but never quite bringing back the leaders.`;
-    default:
-      return `The race unfolded in typical fashion—fast, tactical, and decided in the final kilometers.`;
+  if (isWinner) {
+    switch (raceDynamics) {
+      case 'solo victory':
+        return `You went clear and rode solo to victory, building an insurmountable gap of ${gapText}.`;
+      case 'breakaway win':
+        return `You made it into the winning breakaway and held off the chase to finish ${gapText} clear.`;
+      case 'small group sprint':
+        return `A small group contested the finish, and you emerged victorious${gap && gap < 5 ? ' in a tight sprint' : ''}.`;
+      case 'bunch sprint':
+        return `The race came down to a mass bunch sprint—chaos, power, and positioning all coming together in the final meters.`;
+      case 'time trial':
+        return `Perfect pacing and sustained power.`;
+      default:
+        return `You executed perfectly when it mattered.`;
+    }
+  } else {
+    const winnerText = winnerName ? `${winnerName} took the win` : 'The winner prevailed';
+    switch (raceDynamics) {
+      case 'bunch sprint':
+      case 'photo finish':
+        return `${winnerText} in a bunch sprint by ${gapText}.`;
+      case 'small group sprint':
+      case 'small group':
+        return `You were in the front group, but ${winnerText.toLowerCase()}, finishing ${gapText} ahead.`;
+      case 'chase group':
+        return `The leaders went clear and you finished in the chase group, ${gapText} back.`;
+      case 'second group':
+        return `You finished in the second group, ${gapText} behind the leaders.`;
+      case 'breakaway win':
+        return `The breakaway stayed clear, and you finished ${gapText} behind.`;
+      case 'solo victory':
+        return `${winnerText} in a solo effort, ${gapText} ahead of the field.`;
+      case 'time trial':
+        return `In a time trial, that's a power difference of ${gapText}.`;
+      default:
+        return `You finished ${gapText} behind ${winnerName || 'the winner'}.`;
+    }
   }
 }
 
 /**
- * Format time gap as readable text
+ * Format time gap text
  */
 function formatGapText(seconds) {
-  if (seconds < 1) return 'less than a second';
+  if (!seconds || seconds === 0) return 'on the same time';
+  if (seconds < 1) return 'by a bike length';
   if (seconds < 5) return `${Math.round(seconds)} seconds`;
   if (seconds < 60) return `${Math.round(seconds)} seconds`;
+  
   const minutes = Math.floor(seconds / 60);
   const secs = Math.round(seconds % 60);
-  if (secs === 0) return `${minutes} minute${minutes > 1 ? 's' : ''}`;
+  if (secs === 0) return `${minutes} ${minutes === 1 ? 'minute' : 'minutes'}`;
   return `${minutes}:${secs.toString().padStart(2, '0')}`;
 }
 
@@ -506,138 +664,163 @@ function getOrdinal(num) {
 }
 
 /**
- * Determine if we should include season context paragraph
+ * Determine if season context paragraph should be included - IMPROVED for stage races
  */
 function shouldIncludeSeasonContext(seasonData, raceContext) {
-  const { stagesCompleted } = seasonData;
-  
-  // Always include for first race
-  if (stagesCompleted === 1) return true;
-  
-  // Always include for stage races (GC context important)
-  if (raceContext.stageInfo) return true;
-  
-  // Include every other race in early season (2-5)
-  if (stagesCompleted >= 2 && stagesCompleted <= 5) {
-    return stagesCompleted % 2 === 0;
-  }
-  
-  // Include more often in mid-season (6-10)
-  if (stagesCompleted >= 6 && stagesCompleted <= 10) {
+  // Always include context for non-stage races
+  if (!raceContext.stageInfo) {
     return true;
   }
   
-  // Always include in late season (11+)
-  if (stagesCompleted >= 11) return true;
+  // For stage races, only include season context on the final stage
+  if (raceContext.stageInfo.isFinalStage) {
+    return true;
+  }
   
+  // Don't include season context for stages 1-2 of the tour
   return false;
 }
 
 /**
- * Generate season implications and forward look
+ * Generate season implications paragraph - IMPROVED for Local Tour context
  */
 function generateSeasonImplications(raceData, seasonData, raceContext) {
-  const { eventNumber, position, gcPosition, gcGap } = raceData;
-  const {
-    stagesCompleted,
-    nextEventName,
-    nextEventNumber,
-    totalPoints,
-    isOnStreak,
-    recentResults
-  } = seasonData;
-  
   const { stageInfo } = raceContext;
+  const { 
+    totalPoints, 
+    totalWins, 
+    totalPodiums,
+    nextEventNumber,
+    nextEventName,
+    stagesCompleted,
+    recentResults = []
+  } = seasonData;
 
-  let implications = '';
-  
-  // Final event of season (Event 15 = Stage 9 complete) - Season over
-  if (eventNumber === 15 || stagesCompleted >= 9) {
-    // Let stage race GC context handle it for Local Tour
-    if (stageInfo && stageInfo.stageNumber === 3) {
-      // Will be handled below in stage race section
+  let context = '';
+
+  // Special handling for the final stage of the Local Tour (Event 15)
+  if (stageInfo?.isFinalStage && nextEventNumber === null) {
+    // This is the end of both the Local Tour AND the season
+    const { gcPosition } = raceData;
+    
+    context = `With the queen stage complete, the Local Tour is over—and with it, your first season. `;
+    
+    if (gcPosition === 1) {
+      context += `You won the overall classification, proving you can race across multiple days and terrains. `;
+    } else if (gcPosition <= 3) {
+      context += `A podium finish on the overall classification across three days of racing—that's a successful Local Tour by any measure. `;
     } else {
-      // Season complete - no forward look
-      implications = `That's the season complete. Nine stages, countless kilometers, and you've reached the finish. Whatever the final standings show, you showed up and raced. That's what matters.`;
-      return implications;
+      context += `The Local Tour taught you what stage racing demands: day-after-day performance, recovery management, and consistency under fatigue. `;
+    }
+    
+    // Season summary
+    if (totalWins >= 3) {
+      context += `Looking back at the full season: ${totalWins} wins, ${totalPodiums} podium finishes, and ${totalPoints} points. You proved you can win races and compete at the front consistently. `;
+    } else if (totalWins >= 1) {
+      context += `Your first season produced ${totalWins} ${totalWins === 1 ? 'win' : 'wins'} and ${totalPodiums} podium${totalPodiums === 1 ? '' : 's'}—real results that prove you belong in competitive racing. `;
+    } else if (totalPodiums >= 3) {
+      context += `While you didn't get a win, ${totalPodiums} podium finishes across the season shows you can compete at the sharp end of races. `;
+    } else {
+      context += `Your first season is complete. ${totalPoints} points earned, lessons learned in every race. `;
+    }
+    
+    context += `This was about more than results—it was about becoming a racer. Off-season training awaits, and then Season 2.`;
+    
+    return context;
+  }
+
+  // If this is stage 1 or 2 of the Local Tour, we shouldn't be here (shouldIncludeSeasonContext prevents it)
+  // But just in case, return empty
+  if (stageInfo && !stageInfo.isFinalStage) {
+    return '';
+  }
+
+  // Standard season context for non-Local Tour races
+  // Points/achievements context
+  if (totalPoints >= 500) {
+    context += `You've accumulated ${totalPoints} points so far—the kind of season total that puts you in championship contention. `;
+  } else if (totalPoints >= 300) {
+    context += `${totalPoints} points on the season represents consistent top-20 finishes and some strong results. `;
+  } else if (totalPoints >= 150) {
+    context += `You've banked ${totalPoints} points so far this season—not spectacular, but building steadily. `;
+  }
+
+  // Wins/podiums context
+  if (totalWins >= 5) {
+    context += `Five or more wins already—you're not just racing, you're dominating events. This kind of win rate separates the good from the great. `;
+  } else if (totalWins >= 3) {
+    context += `Multiple race wins this season have established you as someone who knows how to finish first. You're dangerous in any race format. `;
+  } else if (totalWins === 1 || totalWins === 2) {
+    context += `${totalWins} ${totalWins === 1 ? 'win' : 'wins'} so far—you've proven you can win races, and that confidence carries into every start line. `;
+  } else if (totalPodiums >= 5) {
+    context += `Multiple trips to the podium have defined your season—five or more top-three finishes is the hallmark of genuine consistency. `;
+  } else if (totalPodiums >= 3) {
+    context += `Several podium finishes have given your season real substance. You're competing for the top spots regularly. `;
+  }
+
+  // Recent form
+  if (recentResults.length >= 2) {
+    const lastTwo = recentResults.slice(0, 2);
+    const improving = lastTwo[0] < lastTwo[1];
+    if (improving && lastTwo[0] <= 5) {
+      context += `Your recent form is trending upward—the results are getting better with each race. `;
+    } else if (lastTwo[0] > 20 && lastTwo[1] > 20) {
+      context += `Recent results haven't delivered what you're capable of, but form is temporary. One good result changes everything. `;
     }
   }
-  
-  // First race
-  if (stagesCompleted === 1) {
-    implications = `One race down, many more to go. ${nextEventName} arrives at Stage 2, and the season is just beginning. Every race from here builds on the last—lessons learned, fitness gained, confidence accumulated. The journey is underway.`;
-    return implications;
-  }
 
-  // Stage Race GC Context
-  if (stageInfo) {
-    if (stageInfo.stageNumber === 1) {
-      if (gcPosition && gcPosition <= 3) {
-        implications = `After Stage 1, you're ${gcPosition === 1 ? 'in the leader\'s jersey' : `${gcPosition}${getOrdinal(gcPosition)} overall`}${gcGap > 0 ? `, ${formatGapText(gcGap)} down` : ''}. Two stages remain in the Local Tour. The GC is tight, the racing will be aggressive, and every second counts. Stage 2 comes next—defend or attack, your choice.`;
-      } else {
-        implications = `Stage 1 complete${gcPosition ? `, but you're ${gcPosition}${getOrdinal(gcPosition)} in GC, ${formatGapText(gcGap)} behind the leader` : ', and the GC battle is heating up'}. That's a significant gap to pull back, but two stages remain. Time bonuses for stage placings can change everything. The Local Tour isn't over yet.`;
-      }
-    } else if (stageInfo.stageNumber === 2) {
-      if (gcPosition && gcPosition <= 3) {
-        implications = `Two stages down, one to go. You're ${gcPosition === 1 ? 'still leading the tour' : `${gcPosition}${getOrdinal(gcPosition)} overall`}${gcGap > 0 ? `, ${formatGapText(gcGap)} behind` : ''}. Tomorrow's queen stage will decide everything. The hardest climbing of the tour, on the most fatigued legs. This is where the overall is won or lost.`;
-      } else {
-        implications = `Two stages down, one to go. ${gcPosition ? `The overall GC is out of reach—you're ${gcPosition}${getOrdinal(gcPosition)}—but` : 'The overall GC battle continues, but'} the queen stage tomorrow is still a chance for a strong finish and a stage win. Pride and points are still on the line.`;
-      }
-    } else {
-      // Stage 3 complete - tour finished AND season finished
-      if (gcPosition === 1) {
-        implications = `Local Tour champion. Three stages, countless attacks defended, and you held the leader's jersey to the finish. This is what multi-day racing demands: consistency, strength, and the ability to suffer efficiently day after day. The overall classification is yours. And with that, the season is complete.`;
-      } else if (gcPosition && gcPosition <= 3) {
-        implications = `The Local Tour is complete: ${gcPosition}${getOrdinal(gcPosition)} overall, ${formatGapText(gcGap)} behind the winner. A podium finish in a three-day stage race is an achievement—you proved you can handle the demands of multi-day racing, even if the top step eluded you. The season ends here, and you can be proud of what you accomplished.`;
-      } else {
-        implications = `The Local Tour is finished${gcPosition ? `. ${gcPosition}${getOrdinal(gcPosition)} overall` : ''} ${gcPosition && gcPosition > 10 ? "isn't where you hoped to be, but" : ', and'} you completed all three stages and learned what multi-day racing demands. The season is over. The experience matters more than the result, and there's always next season to apply what you've learned.`;
-      }
-      return implications;
+  // Next race preview - IMPROVED with proper stage race handling
+  if (nextEventNumber) {
+    const EVENT_TYPES = {
+      1: 'criterium', 2: 'road race', 3: 'track elimination', 4: 'time trial',
+      5: 'points race', 6: 'hill climb', 7: 'criterium', 8: 'gran fondo',
+      9: 'hill climb', 10: 'time trial', 11: 'points race', 12: 'gravel race',
+      13: 'stage race', 14: 'stage race', 15: 'stage race'
+    };
+    
+    const nextType = EVENT_TYPES[nextEventNumber];
+    
+    // Local Tour previews
+    if (nextEventNumber === 13) {
+      context += `The Local Tour begins next—three stages over three days that will test your ability to perform consecutively. Stage racing is a different challenge than one-day events: you need consistency, recovery management, and the mental strength to race hard when your legs are already tired from yesterday. `;
+    } else if (nextEventNumber === 14) {
+      context += `Local Tour Stage 2 awaits—the GC battle continues tomorrow. Whatever happened in Stage 1 is done; today's result will reshape the overall classification. `;
+    } else if (nextEventNumber === 15) {
+      context += `The Local Tour concludes with the queen stage—the hardest day and the one that will decide the overall classification. Defend your position or attack for a better one; either way, this is where the tour will be won or lost. `;
     }
-    return implications;
+    // Other race types
+    else if (nextType === 'time trial') {
+      context += `Next up: ${nextEventName}, a time trial where there's nowhere to hide. Just you, the bike, and the clock. FTP and pacing discipline will determine the result. `;
+    } else if (nextType === 'hill climb') {
+      context += `${nextEventName} awaits—a pure climbing test where only the strongest legs prevail. You versus gravity. `;
+    } else if (nextType === 'track elimination') {
+      context += `The Forest Velodrome Elimination is next—20 laps of high-intensity positioning where one mistake means elimination. `;
+    } else if (nextType === 'criterium') {
+      context += `${nextEventName} is next—fast, technical criterium racing where positioning and timing matter as much as power. `;
+    } else {
+      context += `${nextEventName} is the next challenge. `;
+    }
   }
 
-  // Build context based on recent form
-  const recentGoodResults = recentResults.filter(r => r <= 10).length;
-  const onPodiumStreak = recentResults.every(r => r <= 3) && recentResults.length >= 2;
-  
-  if (onPodiumStreak) {
-    implications = `This is the kind of form that wins championships—consistent podium finishes, race after race. `;
-  } else if (recentGoodResults >= 2) {
-    implications = `The results are trending in the right direction, and momentum is building. `;
-  } else if (position >= 20) {
-    implications = `Not every result will be great, and that's the reality of racing. `;
+  // Closing motivation
+  const isLateseason = stagesCompleted >= 8;
+  if (isLateseason) {
+    context += `The season is in its final stages. Every race from here matters. Make them count.`;
+  } else if (stagesCompleted >= 5) {
+    context += `The season is past halfway, and you're in a good position to make a push toward the top of the standings.`;
   } else {
-    implications = `Steady progress through the season, one race at a time. `;
+    context += `The season is still young—plenty of racing ahead, plenty of opportunities to prove yourself.`;
   }
 
-  // Add forward look
-  const nextStageLabel = seasonData.isNextStageChoice 
-    ? `Stage ${stagesCompleted + 1}` 
-    : nextEventName;
-  
-  if (stagesCompleted <= 5) {
-    if (seasonData.isNextStageChoice) {
-      implications += `Stage ${stagesCompleted + 1} awaits—your choice from the optional events. Another opportunity to test your limits and push for better results. The season is young, the points are accumulating, and there's plenty of racing ahead to make your mark.`;
-    } else {
-      implications += `${nextEventName} awaits at Stage ${stagesCompleted + 1}—another opportunity to test your limits and push for better results. The season is young, the points are accumulating, and there's plenty of racing ahead to make your mark.`;
-    }
-  } else if (stagesCompleted <= 10) {
-    if (seasonData.isNextStageChoice) {
-      implications += `Stage ${stagesCompleted + 1} comes next—you'll choose from the optional events. You're past the season's halfway point. The standings are taking shape, but there's still time to climb, still chances to prove yourself. Keep racing, keep pushing, keep showing up.`;
-    } else {
-      implications += `${nextEventName} comes next at Stage ${stagesCompleted + 1}, and you're past the season's halfway point. The standings are taking shape, but there's still time to climb, still chances to prove yourself. Keep racing, keep pushing, keep showing up.`;
-    }
-  } else {
-    implications += `The season is in its final stretch, and ${seasonData.isNextStageChoice ? `Stage ${stagesCompleted + 1}` : `${nextEventName} at Stage ${stagesCompleted + 1}`} is one of the last opportunities to bank points and chase results. Every race matters now. Every place counts. This is where seasons are defined.`;
-  }
-
-  return implications;
+  return context;
 }
 
-// Export for both Node.js and browser
+// Export for Node.js
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { generateUnifiedStory, determinePerformanceTier };
-} else if (typeof window !== 'undefined') {
-  window.unifiedStoryGenerator = { generateUnifiedStory, determinePerformanceTier };
+  module.exports = { generateUnifiedStory };
+}
+
+// Export for browser
+if (typeof window !== 'undefined') {
+  window.unifiedStoryGenerator = { generateUnifiedStory };
 }

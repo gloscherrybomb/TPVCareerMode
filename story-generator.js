@@ -248,6 +248,19 @@ function generateSeasonContext(data) {
   // Strategic/tactical context about next event (2-3 sentences)
   const nextEventType = EVENT_TYPES[nextEventNumber];
   
+  // Special case: Event 15 (Local Tour Stage 3) is the final race of the season
+  if (!nextEventNumber || stagesCompleted >= 9) {
+    // No next event - this was the final race
+    // Context about season completion is handled in unified-story-generator
+    // Don't add duplicate forward-looking text here
+    if (isOnStreak) {
+      context += `You finished the season on a strong note, with momentum that will carry into the off-season training. The work doesn't stop—it just changes form. `;
+    } else {
+      context += `The season is complete. Time to rest, recover, reflect on what worked and what didn't, and prepare for Season 2. `;
+    }
+    return context;
+  }
+  
   if (nextStageNumber === 3 || nextStageNumber === 6 || nextStageNumber === 8) {
     context += `Stage ${nextStageNumber} presents an interesting choice from the optional events, giving you tactical flexibility to play to your strengths. `;
   }
@@ -269,8 +282,12 @@ function generateSeasonContext(data) {
   } else if (nextEventType === 'stage race') {
     if (nextEventNumber === 13) {
       context += `The Local Tour begins at Stage ${nextStageNumber}, a three-stage challenge that will test your ability to perform day after day. Stage racing is different from one-day events—you need to manage effort across multiple days, recover quickly, and stay mentally sharp when fatigue accumulates. It's as much about consistency as peak performance. `;
+    } else if (nextEventNumber === 14) {
+      context += `Local Tour Stage 2 awaits at Stage ${nextStageNumber}. Yesterday's result is done—today will reshape the GC. You're into the multi-day grind now where recovery, consistency, and mental resilience separate the contenders from the pretenders. `;
+    } else if (nextEventNumber === 15) {
+      context += `The queen stage arrives at Stage ${nextStageNumber}—Local Tour Stage 3, the final day that will decide the overall classification. This is the hardest stage, the most important stage, the one where the tour will be won or lost. Defend your GC position or attack for a better one. `;
     } else {
-      context += `${nextEventName} continues the Local Tour—you're into the multi-day grind now where recovery, consistency, and mental resilience separate the contenders from the pretenders. `;
+      context += `${nextEventName} continues the Local Tour at Stage ${nextStageNumber}—the multi-day grind where recovery and consistency matter as much as peak performance. `;
     }
   } else {
     context += `Stage ${nextStageNumber} brings ${nextEventName}, the next challenge in a season that's far from over. `;
