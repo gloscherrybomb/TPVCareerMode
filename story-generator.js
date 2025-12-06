@@ -1,4 +1,5 @@
-// story-generator.js - Generate personalized race story text with longer, more detailed paragraphs
+// story-generator.js v3.0 - Comprehensive race story generation
+// Features: Narrative database integration (277 stories), race-type awareness, detailed recaps, varied closings
 
 // Event name mappings
 const EVENT_NAMES = {
@@ -39,8 +40,127 @@ const EVENT_TYPES = {
 };
 
 /**
+ * Analyze race dynamics based on time gaps
+ */
+function analyzeRaceDynamics(raceData) {
+  const { position, winMargin, lossMargin } = raceData;
+  
+  if (position === 1 && winMargin > 0) {
+    if (winMargin > 60) return { type: 'solo_victory', gap: winMargin };
+    if (winMargin > 30) return { type: 'breakaway_win', gap: winMargin };
+    if (winMargin > 5) return { type: 'small_group', gap: winMargin };
+    return { type: 'bunch_sprint', gap: winMargin };
+  }
+  
+  if (position > 1 && lossMargin > 0) {
+    if (lossMargin < 1) return { type: 'photo_finish', gap: lossMargin };
+    if (lossMargin < 5) return { type: 'bunch_sprint', gap: lossMargin };
+    if (lossMargin < 30) return { type: 'small_group', gap: lossMargin };
+    if (lossMargin < 60) return { type: 'chase_group', gap: lossMargin };
+    return { type: 'back_of_pack', gap: lossMargin };
+  }
+  
+  return { type: 'unknown', gap: 0 };
+}
+
+/**
+ * Format time gap into readable text
+ */
+function formatGapText(seconds) {
+  if (!seconds || seconds === 0) return '';
+  if (seconds < 1) return 'by a bike length';
+  if (seconds < 60) return `${Math.round(seconds)} seconds`;
+  const minutes = Math.floor(seconds / 60);
+  const secs = Math.round(seconds % 60);
+  return `${minutes}:${secs.toString().padStart(2, '0')}`;
+}
+
+/**
+ * Generate intro paragraph using narrative database
+ * Falls back to generic intro if database unavailable
+ */
+async function generateIntroParagraph(raceData, seasonData, riderId, narrativeSelector, db) {
+  // If narrative database is available, try to use it
+  if (narrativeSelector && narrativeSelector.generateIntroStory) {
+    try {
+      const narrativeContext = {
+        eventNumber: raceData.eventNumber,
+        eventName: raceData.eventName,
+        position: raceData.position,
+        predictedPosition: raceData.predictedPosition,
+        performanceTier: raceData.position === 1 ? 'win' : 
+                        raceData.position <= 3 ? 'podium' :
+                        raceData.position <= 10 ? 'top10' :
+                        raceData.position <= 20 ? 'midpack' : 'back',
+        totalPoints: seasonData.totalPoints,
+        totalWins: seasonData.totalWins,
+        recentResults: seasonData.recentResults || [],
+        isFirstWin: raceData.position === 1 && seasonData.totalWins === 1,
+        isWorseResult: raceData.position > raceData.predictedPosition + 3,
+        raceType: EVENT_TYPES[raceData.eventNumber]
+      };
+      
+      const introMoment = await narrativeSelector.generateIntroStory(
+        riderId,
+        narrativeContext,
+        db
+      );
+      
+      if (introMoment) {
+        console.log(`   ✓ Using narrative database intro moment`);
+        return introMoment;
+      }
+    } catch (error) {
+      console.log(`   ⚠️ Narrative database unavailable (${error.message}), using generic intro`);
+    }
+  }
+  
+  // Fallback: Generate generic intro
+  return generateGenericIntro(raceData, seasonData);
+}
+
+/**
+ * Generate generic intro when narrative database unavailable
+ */
+function generateGenericIntro(raceData, seasonData) {
+  const { eventName, isFirstRace } = raceData;
+  const eventType = EVENT_TYPES[raceData.eventNumber];
+  
+  if (isFirstRace) {
+    return `The pre-race jitters for ${eventName} were real—your first event of the season, your first chance to see how the winter training paid off. Standing on the start line surrounded by competitors, some familiar faces from last season and many unknowns, you felt that familiar cocktail of nervousness and excitement that comes with racing.`;
+  }
+  
+  // Race-type specific intros
+  if (eventType === 'time trial') {
+    return `The night before ${eventName}, you couldn't stop thinking about pacing strategy. Time trials are mentally exhausting even before they start—knowing that every watt matters, that there's no pack to hide in, that the clock will reveal exactly how strong you are that day.`;
+  }
+  
+  if (eventType === 'track elimination') {
+    return `The velodrome atmosphere before ${eventName} was electric—the wooden boards echoing with warmups, riders practicing their positioning on the banking, everyone knowing that one lap of inattention could end their day early.`;
+  }
+  
+  if (eventType === 'hill climb') {
+    return `Looking up at the climb before ${eventName}, you ran through your strategy one more time. Hill climbs are brutally honest—there's nowhere to hide when it's just you and gravity, nowhere to recover when the gradient kicks up.`;
+  }
+  
+  if (eventType === 'stage race') {
+    const stageNum = raceData.eventNumber - 12;
+    if (stageNum === 1) {
+      return `The Local Tour was finally here. Three stages over three days—this wasn't just about today's result but about managing effort across multiple days, about racing smart when your legs are already tired from yesterday.`;
+    } else if (stageNum === 2) {
+      return `Waking up on Stage 2 of the Local Tour, you could feel yesterday's effort still in your legs. That deep fatigue that comes from racing hard less than 24 hours ago, the knowledge that you need to do it again today and tomorrow.`;
+    } else {
+      return `The queen stage. Two days of racing in your legs, and the hardest day still ahead. The Local Tour comes down to this—one last effort to defend or improve your GC position.`;
+    }
+  }
+  
+  // Generic intro
+  return `The days leading up to ${eventName} had been about preparation and anticipation. You'd studied the course, planned your strategy, done the training—now it was time to execute and see where you stood against the field.`;
+}
+
+/**
  * Generate race recap paragraph based on performance
- * These are LONG paragraphs (5-7 sentences each) for immersive storytelling
+ * Enhanced with race-type awareness, winner names, and time gaps
  */
 function generateRaceRecap(data) {
   const {
@@ -55,11 +175,17 @@ function generateRaceRecap(data) {
     earnedPhotoFinish,
     earnedDarkHorse,
     earnedZeroToHero,
-    isFirstRace
+    isFirstRace,
+    winnerName,
+    secondPlaceName,
+    gcPosition,
+    gcGap
   } = data;
 
   const eventType = EVENT_TYPES[eventNumber];
   const placeDiff = predictedPosition - position;
+  const dynamics = analyzeRaceDynamics(data);
+  const hasWinnerName = winnerName && winnerName !== 'the winner';
   
   // Determine performance tier
   let tier;
@@ -85,10 +211,23 @@ function generateRaceRecap(data) {
     if (earnedDarkHorse) {
       recap += `Nobody saw this coming. ${eventName} was supposed to be a day for others to shine—predictions had you finishing ${predictedPosition}th, well off the pace. But racing isn't run on spreadsheets and algorithms. Whatever the alchemy, you rode possessed. When the lead group splintered, you were there. When the attacks came, you covered them. And when it came down to the finale—a desperate, all-or-nothing lunge for the line—you found an extra gear that nobody knew you had. The shock on faces at the finish line was palpable. P1. Winner. Giant-slayer. The rider they didn't see coming just stole the show.`;
     } else if (earnedDomination) {
-      if (predictionTier === 'matched') {
-        recap += `${eventName} played out exactly as you'd hoped it would. From the opening lap, you settled into a rhythm that felt comfortable, controlled, and—as it turned out—untouchable. The predictions had you down for a win, and you delivered on that expectation with authority. As the race progressed, you didn't just win—you dominated. The gap grew with every lap, every climb, every acceleration, until you crossed the line over a minute clear of the field. By the final stages, you could focus on bringing it home clean rather than fighting for every second. Sometimes racing is about suffering through close calls and desperate sprints. Today wasn't one of those days. Today was about doing your job efficiently and riding away with the result you came for.`;
+      const gapText = formatGapText(winMargin);
+      
+      // Race-type specific domination language
+      if (eventType === 'time trial') {
+        recap += `${eventName} was a clinic in pacing and power management. From the first pedal stroke, you settled into your threshold rhythm—sustainable but punishing, every watt accounted for. No pack to draft, no tactics to consider, just you versus the clock and everyone else's FTP. ${gapText ? `You crossed the line ${gapText} clear of second place` : 'The margin of victory was decisive'}. Time trials are brutally honest: the strongest rider wins, and today that was you. Pure fitness, perfectly paced, nowhere to hide.`;
+      } else if (eventType === 'hill climb') {
+        recap += `${eventName} turned into a display of climbing dominance. You versus gravity, and gravity lost. From the base of the climb, you found your rhythm—smooth, powerful pedaling, keeping your upper body relaxed while your legs did the work. ${gapText ? `By the summit, you'd opened a ${gapText} gap` : 'The gap grew with every gradient change'}. Hill climbs reward pure power-to-weight and suffering tolerance. Today you had both in abundance.`;
+      } else if (eventType === 'stage race') {
+        const stageText = eventNumber === 13 ? 'opening stage' : eventNumber === 14 ? 'middle stage' : 'queen stage';
+        recap += `The Local Tour's ${stageText} turned into a statement ride. ${gapText ? `You finished ${gapText} ahead of your closest rival` : 'You rode away from the field'}, putting serious time into everyone else's GC hopes. ${gcPosition ? `This moves you into ${gcPosition === 1 ? 'the GC lead' : `${gcPosition}${gcPosition === 2 ? 'nd' : gcPosition === 3 ? 'rd' : 'th'} on GC`}` : 'The overall classification implications are significant'}. Stage racing rewards consistency, but today was about dominance.`;
       } else {
-        recap += `The predictions had you down for a ${predictedPosition}th place finish at ${eventName}, but those numbers don't account for good legs and better timing. From early on, it was clear this was going to be your day. You didn't just edge out the competition—you crushed them. As the race progressed, the gap grew relentlessly, lap after lap, climb after climb, until you crossed the line over a minute clear of second place. It wasn't just a victory; it was a statement of intent that echoed throughout the field. When the decisive moments arrived, you were always there, always positioned perfectly, always with something left in reserve. This is the kind of performance that gets remembered, the kind that makes competitors check their tactics and wonder if they're racing the same sport.`;
+        // Road race, criterium, etc.
+        if (predictionTier === 'matched') {
+          recap += `${eventName} played out exactly as you'd hoped it would. From the opening lap, you settled into a rhythm that felt comfortable, controlled, and—as it turned out—untouchable. The predictions had you down for a win, and you delivered on that expectation with authority. ${gapText ? `You crossed the line ${gapText} clear of the field` : 'The gap grew relentlessly'}. By the final stages, you could focus on bringing it home clean rather than fighting for every second. Sometimes racing is about suffering through close calls and desperate sprints. Today wasn't one of those days.`;
+        } else {
+          recap += `The predictions had you down for a ${predictedPosition}th place finish at ${eventName}, but those numbers don't account for good legs and better timing. From early on, it was clear this was going to be your day. You didn't just edge out the competition—you crushed them. ${gapText ? `You finished ${gapText} ahead` : 'The gap grew lap after lap'}, a statement victory that echoed throughout the field. ${dynamics.type === 'solo_victory' ? 'You rode away solo and never looked back.' : dynamics.type === 'breakaway_win' ? 'The winning breakaway held, and you were the strongest in it.' : 'When the decisive moments arrived, you were always there, always with something left in reserve.'}`;
+        }
       }
     } else if (earnedCloseCall) {
       recap += `${eventName} came down to the wire in the most dramatic fashion possible. From the moment the flag dropped, it was clear this would be a battle—multiple riders with the legs to win, nobody willing to concede an inch. You were in the mix throughout, trading places with the leaders, covering every attack, positioning yourself for the final showdown. The sprint was chaotic, desperate, and decided by millimeters. Coming out of the final corner, three or four riders hit the line together, engines red-lined, everything on the line. Somehow you emerged with the victory by less than half a second. Inches separated you from second place, but in racing, inches are all you need. It's the kind of finish that'll have you rewatching the replay a dozen times, simultaneously exhilarating and nerve-wracking, proof that when it matters most, you can deliver under the highest pressure.`;
@@ -106,7 +245,9 @@ function generateRaceRecap(data) {
     } else if (predictionTier === 'beat' || predictionTier === 'crushed') {
       recap += `${eventName} was a day to be proud of. The predictions suggested you'd finish around ${predictedPosition}th, well out of contention for the podium, but you had other ideas. From the moment things got serious, you were in the mix, trading places with the leaders and proving you belonged at the sharp end. The race unfolded in waves of attacks and counter-attacks, and you covered every significant move with determination. When the final selection was made, you were there—not quite with enough to challenge for the win, but strong enough to hold off those behind and secure ${position === 2 ? 'second' : 'third'} place. A podium is a podium, and there's genuine satisfaction in being up there even if you couldn't quite reach the top step. That's racing. Some days you have everything needed to win, and some days you have everything needed to podium. Today was the latter, and that's nothing to be disappointed about.`;
     } else if (position === 2) {
-      recap += `${eventName} rewarded smart racing, though not quite with the prize you were hoping for. You positioned yourself well throughout the race, reading the moves, staying with the strongest riders, and avoiding the chaos that caught others out. As the race reached its climax, you were right there in the mix, sensing an opportunity for victory. In the sprint, you gave everything—lunging for the line, engines red-lined, fighting for every centimeter. Second place. Close enough to see victory, far enough to know you came up just short. The winner had just slightly more on the day, just that extra fraction of speed or better positioning or fresher legs. It stings to come so close, but second place in a competitive field is still a strong result. You proved you can compete at the front, proved you have the tactical sense and physical strength to be in contention. Victory will come.`;
+      const gapText = formatGapText(lossMargin);
+      const winnerText = hasWinnerName ? winnerName : 'the winner';
+      recap += `${eventName} rewarded smart racing, though not quite with the prize you were hoping for. You positioned yourself well throughout the race, reading the moves, staying with the strongest riders, and avoiding the chaos that caught others out. As the race reached its climax, you were right there in the mix, sensing an opportunity for victory. In the sprint, you gave everything—lunging for the line, engines red-lined, fighting for every centimeter. Second place${gapText ? `, ${gapText} behind ${winnerText}` : ''}. Close enough to see victory, far enough to know you came up just short. ${winnerText.charAt(0).toUpperCase() + winnerText.slice(1)} had just slightly more on the day, just that extra fraction of speed or better positioning or fresher legs. It stings to come so close, but second place in a competitive field is still a strong result.`;
     } else {
       recap += `${eventName} rewarded smart racing and good positioning. You approached the race with a clear plan: stay out of trouble, conserve energy in the early phases, and be ready when the race reached its decisive moments. That plan worked perfectly. You avoided the crashes and chaos that caught others out, stayed with the main group through the challenging sections, and when the final selection was made, you were there. Not quite with enough to challenge for the win—the strongest riders had just slightly more on the day—but strong enough to hold off those behind and secure third place. A podium is a podium, and there's satisfaction in being up there even if you couldn't quite reach the top step. That's racing. You did your job, executed your plan, and came away with a result that adds solid points to your tally and proves you're competitive at this level.`;
     }
@@ -352,7 +493,11 @@ function generateSeasonContext(data) {
 /**
  * Main function to generate complete story
  */
-function generateRaceStory(raceData, seasonData) {
+/**
+ * Main function: Generate complete race story
+ * v3.0: Now async with narrative database integration
+ */
+async function generateRaceStory(raceData, seasonData, riderId = null, narrativeSelector = null, db = null) {
   const eventName = EVENT_NAMES[raceData.eventNumber] || `Event ${raceData.eventNumber}`;
   
   // Special handling for Event 15 when season is complete
@@ -371,28 +516,51 @@ function generateRaceStory(raceData, seasonData) {
       
       return {
         recap: seasonCompleteStory,
-        context: '' // No additional context needed for season complete
+        context: ''
       };
     } catch (error) {
       console.error('Error generating season complete story:', error);
-      // Fall through to regular story generation
     }
   }
   
+  // Generate intro paragraph (uses narrative database if available)
+  let introParagraph = '';
+  if (riderId && narrativeSelector) {
+    introParagraph = await generateIntroParagraph(
+      { ...raceData, eventName, isFirstRace: seasonData.stagesCompleted === 1 },
+      seasonData,
+      riderId,
+      narrativeSelector,
+      db
+    );
+  } else {
+    introParagraph = generateGenericIntro(
+      { ...raceData, eventName, isFirstRace: seasonData.stagesCompleted === 1 },
+      seasonData
+    );
+  }
+  
+  // Generate race recap
   const recapData = {
     ...raceData,
     eventName,
-    isFirstRace: seasonData.stagesCompleted === 1  // Add flag for first race
+    isFirstRace: seasonData.stagesCompleted === 1
   };
+  const recapParagraph = generateRaceRecap(recapData);
 
+  // Generate season context
   const contextData = {
     ...seasonData,
     nextEventName: EVENT_NAMES[seasonData.nextEventNumber] || `Event ${seasonData.nextEventNumber}`
   };
-
+  const contextParagraph = generateSeasonContext(contextData);
+  
+  // Combine into complete story
+  const completeStory = introParagraph + '\n\n' + recapParagraph + (contextParagraph ? '\n\n' + contextParagraph : '');
+  
   return {
-    recap: generateRaceRecap(recapData),
-    context: generateSeasonContext(contextData)
+    recap: completeStory,
+    context: ''
   };
 }
 
