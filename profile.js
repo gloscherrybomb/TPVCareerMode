@@ -189,8 +189,8 @@ async function calculateSeasonRanking(userUID, userData) {
     }
     
     // Standings are already sorted by points (descending)
-    // Find user's position
-    const userIndex = standings.findIndex(r => r.isCurrentUser || r.uid === userUID);
+    // Find user's position by uid only (don't trust isCurrentUser flag)
+    const userIndex = standings.findIndex(r => r.uid === userUID);
     
     if (userIndex === -1) {
         console.log('User not found in standings');
