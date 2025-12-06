@@ -26,6 +26,66 @@ initRiderProfileModal(db);
 
 let currentUser = null;
 
+// Filter state
+let filters = {
+    gender: 'all',
+    ageGroup: 'all',
+    country: 'all'
+};
+
+// Apply filters to rankings
+function applyFilters(rankings) {
+    return rankings.filter(racer => {
+        // Gender filter
+        if (filters.gender !== 'all' && racer.gender !== filters.gender) {
+            return false;
+        }
+        
+        // Age group filter (uses ageBand from user profile)
+        if (filters.ageGroup !== 'all' && racer.ageBand !== filters.ageGroup) {
+            return false;
+        }
+        
+        // Country filter
+        if (filters.country !== 'all' && racer.country !== filters.country) {
+            return false;
+        }
+        
+        return true;
+    });
+}
+
+// Populate country filter options
+function populateCountryFilter(rankings) {
+    const countries = new Set();
+    rankings.forEach(racer => {
+        if (racer.country) {
+            countries.add(racer.country);
+        }
+    });
+    
+    const countryFilter = document.getElementById('countryFilter');
+    const currentValue = countryFilter.value;
+    
+    // Clear existing options except "All Countries"
+    countryFilter.innerHTML = '<option value="all">All Countries</option>';
+    
+    // Add country options sorted alphabetically
+    Array.from(countries).sort().forEach(country => {
+        const option = document.createElement('option');
+        option.value = country;
+        option.textContent = country;
+        countryFilter.appendChild(option);
+    });
+    
+    // Restore previous selection if it still exists
+    if (currentValue !== 'all' && countries.has(currentValue)) {
+        countryFilter.value = currentValue;
+    }
+}
+
+let currentUser = null;
+
 // NOTE: Dummy data function below is no longer used - real standings calculated from results
 // Keeping for reference but can be deleted
 
@@ -338,18 +398,27 @@ async function renderGlobalRankings() {
         usersSnapshot.forEach((doc) => {
             const data = doc.data();
             rankings.push({
-                uid: doc.id,  // Add UID from document ID
+                uid: doc.id,
                 name: data.name || 'Unknown',
                 team: data.team || '',
                 season: data.currentSeason || 1,
                 events: data.totalEvents || (data.completedStages?.length || 0),
                 points: data.totalPoints || 0,
+                gender: data.gender || null,
+                ageBand: data.ageBand || null,
+                country: data.country || null,
                 isCurrentUser: currentUser && doc.id === currentUser.uid
             });
         });
 
+        // Populate country filter with available countries
+        populateCountryFilter(rankings);
+
+        // Apply filters
+        const filteredRankings = applyFilters(rankings);
+
         // Sort by total points (descending)
-        rankings.sort((a, b) => b.points - a.points);
+        filteredRankings.sort((a, b) => b.points - a.points);
 
         // Build table HTML
         let tableHTML = `
@@ -368,17 +437,17 @@ async function renderGlobalRankings() {
                         <tbody>
         `;
 
-        if (rankings.length === 0) {
+        if (filteredRankings.length === 0) {
             tableHTML += `
                 <tr>
                     <td colspan="5" class="empty-state">
                         <div class="empty-icon">📊</div>
-                        <p>No riders yet. Be the first to compete!</p>
+                        <p>No riders match the selected filters.</p>
                     </td>
                 </tr>
             `;
         } else {
-            rankings.forEach((racer, index) => {
+            filteredRankings.forEach((racer, index) => {
                 const rank = index + 1;
                 const rowClass = racer.isCurrentUser ? 'current-user-row' : '';
                 
@@ -685,10 +754,50 @@ onAuthStateChanged(auth, async (user) => {
 document.addEventListener('DOMContentLoaded', () => {
     initTabs();
     initSubTabs();
+    initFilters();
     renderSeasonStandings();
     renderGlobalRankings();
     renderTeamRankings();
 });
+
+// Initialize filter event listeners
+function initFilters() {
+    const genderFilter = document.getElementById('genderFilter');
+    const ageGroupFilter = document.getElementById('ageGroupFilter');
+    const countryFilter = document.getElementById('countryFilter');
+    const clearButton = document.getElementById('clearFilters');
+    
+    // Gender filter change
+    genderFilter.addEventListener('change', () => {
+        filters.gender = genderFilter.value;
+        renderGlobalRankings();
+    });
+    
+    // Age group filter change
+    ageGroupFilter.addEventListener('change', () => {
+        filters.ageGroup = ageGroupFilter.value;
+        renderGlobalRankings();
+    });
+    
+    // Country filter change
+    countryFilter.addEventListener('change', () => {
+        filters.country = countryFilter.value;
+        renderGlobalRankings();
+    });
+    
+    // Clear all filters
+    clearButton.addEventListener('click', () => {
+        filters = {
+            gender: 'all',
+            ageGroup: 'all',
+            country: 'all'
+        };
+        genderFilter.value = 'all';
+        ageGroupFilter.value = 'all';
+        countryFilter.value = 'all';
+        renderGlobalRankings();
+    });
+}
 
 // Make functions available globally
 window.renderSeasonStandings = renderSeasonStandings;

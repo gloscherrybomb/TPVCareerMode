@@ -386,6 +386,96 @@
     margin-bottom: 2rem;
 }
 
+/* Filters Container */
+.filters-container {
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-end;
+    justify-content: center;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    background: var(--dark-card);
+    border-radius: 12px;
+    flex-wrap: wrap;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-width: 150px;
+}
+
+.filter-group label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.filter-select {
+    padding: 0.75rem 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(69, 202, 255, 0.2);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-family: 'Exo 2', sans-serif;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.filter-select:hover {
+    border-color: rgba(69, 202, 255, 0.5);
+    background: rgba(69, 202, 255, 0.05);
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: var(--accent-blue);
+    background: rgba(69, 202, 255, 0.1);
+}
+
+.btn-clear-filters {
+    padding: 0.75rem 1.5rem;
+    background: transparent;
+    border: 2px solid rgba(255, 27, 107, 0.3);
+    border-radius: 8px;
+    color: var(--accent-pink);
+    font-family: 'Exo 2', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.btn-clear-filters:hover {
+    background: rgba(255, 27, 107, 0.1);
+    border-color: var(--accent-pink);
+}
+
+.filter-active-count {
+    display: inline-block;
+    margin-left: 0.5rem;
+    padding: 0.25rem 0.5rem;
+    background: var(--accent-blue);
+    color: white;
+    font-size: 0.75rem;
+    border-radius: 12px;
+    font-weight: 700;
+}
+
+/* Sub-tabs (for Individual vs Team) */
+.sub-tabs-container {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
 .sub-tab-btn {
     padding: 0.75rem 2rem;
     background: var(--dark-card);

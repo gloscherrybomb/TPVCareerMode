@@ -86,6 +86,39 @@
                 <p class="standings-description">Worldwide leaderboards of all human racers</p>
             </div>
 
+            <!-- Filters -->
+            <div class="filters-container">
+                <div class="filter-group">
+                    <label for="genderFilter">Gender</label>
+                    <select id="genderFilter" class="filter-select">
+                        <option value="all">All</option>
+                        <option value="M">Male</option>
+                        <option value="F">Female</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="ageGroupFilter">Age Group</label>
+                    <select id="ageGroupFilter" class="filter-select">
+                        <option value="all">All</option>
+                        <option value="Senior">Senior (18-34)</option>
+                        <option value="35-39">35-39</option>
+                        <option value="40-44">40-44</option>
+                        <option value="45-49">45-49</option>
+                        <option value="50-54">50-54</option>
+                        <option value="55-59">55-59</option>
+                        <option value="60-64">60-64</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="countryFilter">Country</label>
+                    <select id="countryFilter" class="filter-select">
+                        <option value="all">All Countries</option>
+                        <!-- Will be populated dynamically -->
+                    </select>
+                </div>
+                <button id="clearFilters" class="btn-clear-filters">Clear Filters</button>
+            </div>
+
             <!-- Sub-tabs for Individual vs Team -->
             <div class="sub-tabs-container">
                 <button class="sub-tab-btn active" data-subtab="individual">Individual Rankings</button>
