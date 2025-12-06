@@ -10,7 +10,7 @@ const storyGen = require('./story-generator');
 // Import narrative system modules
 const { NARRATIVE_DATABASE } = require('./narrative-database.js');
 const { StorySelector } = require('./story-selector.js');
-// Note: story-generator.js v3.0 now has all functionality - unified-story-generator.js no longer needed
+const { generateUnifiedStory } = require('./unified-story-generator.js');
 
 // Initialize Firebase Admin
 const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
@@ -928,52 +928,80 @@ async function processUserResult(uid, eventInfo, results) {
   }
   if (position === 1) totalWins++; // Include current race
 
-  // Generate story using v3.0 story generator (has all features built-in)
+  // Generate unified cohesive story (merges intro, recap, and context)
   let unifiedStory = '';
-  
-  // Debug: Log GC data if available
-  if (gcResults) {
-    console.log(`   📊 GC Data available: userGC position = ${gcResults.userGC?.gcPosition || 'null'}, gap = ${gcResults.userGC?.gapToLeader || 'null'}s`);
-  }
-  
-  const storyResult = await storyGen.generateRaceStory(
-    {
-      eventNumber: eventNumber,
-      position: position,
-      predictedPosition: predictedPosition,
-      winMargin: winMargin,
-      lossMargin: marginToWinner,
-      earnedDomination: earnedDomination,
-      earnedCloseCall: earnedCloseCall,
-      earnedPhotoFinish: earnedPhotoFinish,
-      earnedDarkHorse: earnedDarkHorse,
-      earnedZeroToHero: earnedZeroToHero,
-      winnerName: winnerName,
-      secondPlaceName: secondPlaceName,
-      gcPosition: gcResults?.userGC?.gcPosition || null,
-      gcGap: gcResults?.userGC?.gapToLeader || null
-    },
-    {
-      stagesCompleted: (userData.completedStages || []).length + 1,
-      totalPoints: (userData.totalPoints || 0) + points,
-      totalWins: totalWins,
-      nextStageNumber: nextStage,
-      nextEventNumber: nextEventNumber,
-      isNextStageChoice: [3, 6, 8].includes(nextStage),
-      recentResults: recentResults,
-      isOnStreak: isOnStreak,
-      totalPodiums: totalPodiums,
-      seasonPosition: null
-    },
-    uid,
-    narrativeSelector,
-    db
-  );
-  
-  unifiedStory = storyResult.recap;
-  
-  if (unifiedStory) {
-    console.log(`   📖 Generated story (${unifiedStory.split('\n\n').length} paragraphs)`);
+  try {
+    // Debug: Log GC data if available
+    if (gcResults) {
+      console.log(`   📊 GC Data available: userGC position = ${gcResults.userGC?.gcPosition || 'null'}, gap = ${gcResults.userGC?.gapToLeader || 'null'}s`);
+    }
+    
+    unifiedStory = await generateUnifiedStory(
+      {
+        eventNumber: eventNumber,
+        position: position,
+        predictedPosition: predictedPosition,
+        winMargin: winMargin,
+        lossMargin: marginToWinner,
+        earnedDomination: earnedDomination,
+        earnedCloseCall: earnedCloseCall,
+        earnedPhotoFinish: earnedPhotoFinish,
+        earnedDarkHorse: earnedDarkHorse,
+        earnedZeroToHero: earnedZeroToHero,
+        winnerName: winnerName,
+        secondPlaceName: secondPlaceName,
+        gcPosition: gcResults?.userGC?.gcPosition || null,
+        gcGap: gcResults?.userGC?.gapToLeader || null
+      },
+      {
+        stagesCompleted: (userData.completedStages || []).length + 1,
+        totalPoints: (userData.totalPoints || 0) + points,
+        totalWins: totalWins,
+        nextStageNumber: nextStage,
+        nextEventNumber: nextEventNumber,
+        isNextStageChoice: [3, 6, 8].includes(nextStage), // Choice stages
+        recentResults: recentResults,
+        isOnStreak: isOnStreak,
+        totalPodiums: totalPodiums,
+        seasonPosition: null
+      },
+      uid,
+      narrativeSelector,
+      db,
+      storyGen
+    );
+    
+    if (unifiedStory) {
+      console.log(`   📖 Generated unified story (${unifiedStory.split('\n\n').length} paragraphs)`);
+    }
+  } catch (error) {
+    console.error(`   ⚠️ Error generating unified story:`, error.message);
+    // Fallback to original story generator
+    const fallbackStory = storyGen.generateRaceStory(
+      {
+        eventNumber: eventNumber,
+        position: position,
+        predictedPosition: predictedPosition,
+        winMargin: winMargin,
+        lossMargin: marginToWinner,
+        earnedDomination: earnedDomination,
+        earnedCloseCall: earnedCloseCall,
+        earnedPhotoFinish: earnedPhotoFinish,
+        earnedDarkHorse: earnedDarkHorse,
+        earnedZeroToHero: earnedZeroToHero
+      },
+      {
+        stagesCompleted: (userData.completedStages || []).length + 1,
+        totalPoints: (userData.totalPoints || 0) + points,
+        nextStageNumber: nextStage,
+        nextEventNumber: nextEventNumber,
+        recentResults: recentResults,
+        isOnStreak: isOnStreak,
+        totalPodiums: totalPodiums,
+        seasonPosition: null
+      }
+    );
+    unifiedStory = `${fallbackStory.recap}\n\n${fallbackStory.context}`;
   }
   
   // Store unified story (single field instead of separate recap/context)
@@ -1820,28 +1848,15 @@ async function checkAndMarkSeasonComplete(userRef, userData, eventNumber, recent
   
   console.log('🏆 Season 1 is now COMPLETE for this user!');
   
-  // Get all users' season 1 standings to determine season podium
-  const usersSnapshot = await db.collection('users').get();
-  const allStandings = [];
+  // Get user's season rank from the season standings we already calculated
+  // (which includes all bots and is properly sorted)
+  const userRank = seasonStandings.findIndex(r => r.uid === userData.uid) + 1;
   
-  usersSnapshot.forEach(doc => {
-    const user = doc.data();
-    if (user.season1Standings && user.season1Standings.length > 0) {
-      allStandings.push({
-        uid: user.uid,
-        name: user.name,
-        totalPoints: user.totalPoints || 0
-      });
-    }
-  });
-  
-  // Sort by points descending
-  allStandings.sort((a, b) => b.totalPoints - a.totalPoints);
-  
-  // Find user's rank
-  const userRank = allStandings.findIndex(u => u.uid === userData.uid) + 1;
-  
-  console.log(`   User's season rank: ${userRank}`);
+  if (userRank === 0 || userRank > seasonStandings.length) {
+    console.log('   ⚠️ User not found in season standings');
+  } else {
+    console.log(`   User's season rank: ${userRank} out of ${seasonStandings.length}`);
+  }
   
   // Prepare season completion updates
   const seasonUpdates = {
