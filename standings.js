@@ -84,8 +84,6 @@ function populateCountryFilter(rankings) {
     }
 }
 
-let currentUser = null;
-
 // NOTE: Dummy data function below is no longer used - real standings calculated from results
 // Keeping for reference but can be deleted
 
