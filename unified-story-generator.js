@@ -55,7 +55,8 @@ async function generateUnifiedStory(raceData, seasonData, riderId, narrativeSele
       ...seasonData,
       nextEventName: storyGen.EVENT_NAMES[seasonData.nextEventNumber] || `Event ${seasonData.nextEventNumber}`
     },
-    raceContext
+    raceContext,
+    narrativeSelector  // Pass narrativeSelector to access the database
   });
 
   return story;
@@ -159,7 +160,7 @@ function determinePerformanceTier(position) {
 /**
  * Build unified narrative by merging intro moment with race story
  */
-function buildUnifiedNarrative({ introMoment, raceData, seasonData, raceContext }) {
+function buildUnifiedNarrative({ introMoment, raceData, seasonData, raceContext, narrativeSelector }) {
   const {
     eventNumber,
     eventName,
@@ -803,7 +804,7 @@ function generateSeasonImplications(raceData, seasonData, raceContext) {
   }
 
   // Closing motivation - SELECT FROM NARRATIVE DATABASE
-  const closingText = selectSeasonContextClosing(seasonData, raceData);
+  const closingText = selectSeasonContextClosing(seasonData, raceData, narrativeSelector);
   if (closingText) {
     context += closingText;
   } else {
@@ -825,7 +826,7 @@ function generateSeasonImplications(raceData, seasonData, raceContext) {
  * Select a contextual closing from the narrative database
  * Returns varied closing text based on form, season progress, and performance
  */
-function selectSeasonContextClosing(seasonData, raceData) {
+function selectSeasonContextClosing(seasonData, raceData, narrativeSelector) {
   const {
     stagesCompleted,
     totalPoints,
@@ -853,20 +854,52 @@ function selectSeasonContextClosing(seasonData, raceData) {
     improvementFromPrediction
   };
 
-  // Access the narrative database (should be loaded globally)
+  // Get the narrative database from narrativeSelector
   let NARRATIVE_DATABASE = null;
   
-  if (typeof window !== 'undefined' && window.narrativeDatabase) {
+  // Try different access methods
+  if (narrativeSelector && narrativeSelector.narrativeDatabase) {
+    NARRATIVE_DATABASE = narrativeSelector.narrativeDatabase;
+    console.log('   ✓ Got narrative database from narrativeSelector.narrativeDatabase');
+  } else if (narrativeSelector && narrativeSelector.NARRATIVE_DATABASE) {
+    NARRATIVE_DATABASE = narrativeSelector.NARRATIVE_DATABASE;
+    console.log('   ✓ Got narrative database from narrativeSelector.NARRATIVE_DATABASE');
+  } else if (typeof require !== 'undefined') {
+    // Try requiring it directly (Node.js environment)
+    try {
+      const narrativeDb = require('./narrative-database.js');
+      NARRATIVE_DATABASE = narrativeDb.NARRATIVE_DATABASE;
+      console.log('   ✓ Got narrative database via require');
+    } catch (e) {
+      console.log('   ⚠️ Could not require narrative-database.js:', e.message);
+    }
+  } else if (typeof window !== 'undefined' && window.narrativeDatabase) {
     NARRATIVE_DATABASE = window.narrativeDatabase.NARRATIVE_DATABASE;
+    console.log('   ✓ Got narrative database from window.narrativeDatabase');
   } else if (typeof global !== 'undefined' && global.NARRATIVE_DATABASE) {
     NARRATIVE_DATABASE = global.NARRATIVE_DATABASE;
+    console.log('   ✓ Got narrative database from global.NARRATIVE_DATABASE');
+  } else {
+    console.log('   ⚠️ Could not find narrative database in any location');
+    console.log('   narrativeSelector type:', typeof narrativeSelector);
+    if (narrativeSelector) {
+      console.log('   narrativeSelector keys:', Object.keys(narrativeSelector));
+    }
   }
 
   if (!NARRATIVE_DATABASE || !NARRATIVE_DATABASE.seasonContextClosing) {
+    console.log('   ⚠️ Narrative database not found or missing seasonContextClosing category');
+    if (NARRATIVE_DATABASE) {
+      console.log('   Available categories:', Object.keys(NARRATIVE_DATABASE));
+    }
     return null; // Fallback will be used
   }
+  
+  console.log(`   ✓ Found ${NARRATIVE_DATABASE.seasonContextClosing.length} season context closings`);
 
   // Filter matching narratives
+  console.log(`   Filtering closings: stages=${stagesCompleted}, points=${totalPoints}, wins=${totalWins}, position=${recentPosition}, streak=${isOnStreak}`);
+  
   const matchingNarratives = NARRATIVE_DATABASE.seasonContextClosing.filter(narrative => {
     const triggers = narrative.triggers;
     
@@ -908,7 +941,10 @@ function selectSeasonContextClosing(seasonData, raceData) {
     return true;
   });
 
+  console.log(`   Found ${matchingNarratives.length} matching closings`);
+
   if (matchingNarratives.length === 0) {
+    console.log('   ⚠️ No matching closings found, using fallback');
     return null; // Use fallback
   }
 
@@ -919,11 +955,13 @@ function selectSeasonContextClosing(seasonData, raceData) {
   for (const narrative of matchingNarratives) {
     random -= (narrative.weight || 1);
     if (random <= 0) {
+      console.log(`   ✓ Selected closing: "${narrative.id}"`);
       return narrative.text;
     }
   }
   
   // Fallback to first matching
+  console.log(`   ✓ Selected closing (fallback): "${matchingNarratives[0].id}"`);
   return matchingNarratives[0].text;
 }
 
