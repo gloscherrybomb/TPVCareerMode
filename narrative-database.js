@@ -1,12 +1,13 @@
-// narrative-database-mega.js - 247 story elements for maximum variety (UPDATED v2.0)
+// narrative-database-mega.js - 277+ story elements for maximum variety (UPDATED v2.1)
 // Comprehensive narrative moments database - MERGED VERSION WITH NEW ADDITIONS
 
 /**
- * MEGA NARRATIVE DATABASE - 247 Story Moments (Updated from 203)
+ * MEGA NARRATIVE DATABASE - 277 Story Moments (Updated from 247)
  * 
  * This is the complete merged database containing all stories from the original
  * narrative-database-expanded.js and narrative-database-extension.js,
- * PLUS 44 new race-type specific narratives added in v2.0
+ * PLUS 44 new race-type specific narratives added in v2.0,
+ * PLUS 30 new season context closing narratives added in v2.1
  * 
  * Original Categories (203 stories):
  * - seasonOpening: Season 1 opening narratives (10 stories)
@@ -36,13 +37,23 @@
  * - timeTrialMindset: TT-specific psychology (8 stories)
  * - trackRacing: Velodrome specific moments (6 stories)
  * 
- * TOTAL: 247 unique story moments
+ * NEW Categories v2.1 (30 stories):
+ * - seasonContextClosing: Varied season context closing lines (30 stories)
+ *   - Winning streak closings (5)
+ *   - Good form closings (6)
+ *   - Early season closings (5)
+ *   - Mid season closings (4)
+ *   - Late season closings (5)
+ *   - Struggling form closings (5)
  * 
- * VERSION: 2.0 - December 2024
- * - Added race-type specific narratives
- * - Enhanced stage racing context
- * - Time trial and track racing psychology
- * - GC battle moments
+ * TOTAL: 277 unique story moments
+ * 
+ * VERSION: 2.1 - December 2024
+ * - Added race-type specific narratives (v2.0)
+ * - Enhanced stage racing context (v2.0)
+ * - Time trial and track racing psychology (v2.0)
+ * - GC battle moments (v2.0)
+ * - Contextual season closing variety (v2.1) ⭐ NEW
  */
 
 const NARRATIVE_DATABASE = {
@@ -1904,6 +1915,201 @@ const NARRATIVE_DATABASE = {
       text: "Racing on a fixed gear is its own skill—no coasting, no shifting, just pure rhythm and cadence. You can't rest on descents (there are none), you can't shift for attacks, you just have to modulate your power output through leg speed. It's both limiting and freeing. You're learning to love the simplicity of fixed gear racing.",
       triggers: { raceNumber: [3], performanceTier: ["any"] },
       weight: 0.5
+    }
+  ],
+
+  // ===== SEASONCONTEXTCLOSING ===== (NEW)
+  seasonContextClosing: [
+    // WINNING STREAK CLOSINGS
+    {
+      id: "streak_momentum_unstoppable",
+      text: "Right now, you're the rider everyone else is worried about. The momentum is real, the confidence is building, and every start line feels like another opportunity to prove this isn't a fluke—it's who you are.",
+      triggers: { isOnStreak: true, stagesCompleted: [1, 2, 3, 4, 5, 6] },
+      weight: 0.9
+    },
+    {
+      id: "streak_riding_high",
+      text: "Winning changes you. Not your character, but your expectations. You're starting to believe that podiums aren't lucky breaks—they're where you belong. Keep this rolling.",
+      triggers: { isOnStreak: true, stagesCompleted: [3, 4, 5, 6, 7] },
+      weight: 0.9
+    },
+    {
+      id: "streak_pressure_building",
+      text: "Success breeds expectation. You've set a standard now, and every race carries the weight of maintaining it. That pressure is good—it means you're doing something worth protecting.",
+      triggers: { isOnStreak: true, stagesCompleted: [4, 5, 6, 7, 8] },
+      weight: 0.8
+    },
+    {
+      id: "streak_late_season_surge",
+      text: "Late-season form is the best kind of form. While others fade with accumulated fatigue, you're hitting peak fitness at exactly the right time. This is where championships are won.",
+      triggers: { isOnStreak: true, stagesCompleted: [7, 8, 9] },
+      weight: 0.9
+    },
+    {
+      id: "streak_dominant_campaign",
+      text: "This is what a dominant campaign looks like—consistent, relentless, always at the front. You're not just participating in this season; you're controlling it.",
+      triggers: { isOnStreak: true, totalWins: [3, 4, 5, 6, 7, 8] },
+      weight: 0.8
+    },
+    
+    // GOOD FORM CLOSINGS
+    {
+      id: "form_sharp_end",
+      text: "You're racing with the kind of consistency that builds careers. Not flashy, not dominant, but reliably competitive. Those steady top-10s accumulate into something significant.",
+      triggers: { recentPosition: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], stagesCompleted: [3, 4, 5, 6, 7] },
+      weight: 0.8
+    },
+    {
+      id: "form_podium_regular",
+      text: "Multiple podiums don't happen by accident. You've proven you can compete at the front, and that's the foundation everything else builds on. Stay hungry.",
+      triggers: { totalPodiums: [3, 4, 5, 6, 7, 8], stagesCompleted: [4, 5, 6, 7, 8] },
+      weight: 0.8
+    },
+    {
+      id: "form_breakthrough_close",
+      text: "You're knocking on the door. Top-5 finishes are becoming routine, and that consistency suggests a win isn't far off. Sometimes you have to be patient, keep showing up, and let the breakthrough come to you.",
+      triggers: { recentPosition: [2, 3, 4, 5, 6], totalWins: [0], stagesCompleted: [4, 5, 6, 7] },
+      weight: 0.9
+    },
+    {
+      id: "form_points_banking",
+      text: "Points accumulation is the name of the game, and you're banking them steadily. Every top-15 finish adds to the total, every top-10 strengthens your position. Consistency wins seasons.",
+      triggers: { totalPoints: [200, 250, 300, 350, 400], stagesCompleted: [5, 6, 7, 8] },
+      weight: 0.7
+    },
+    {
+      id: "form_competitive_rhythm",
+      text: "You've found your rhythm in the peloton. The races don't feel as chaotic anymore, the pace doesn't seem as impossible, and you're reading situations before they develop. Experience is turning into competence.",
+      triggers: { stagesCompleted: [4, 5, 6, 7], recentPosition: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15] },
+      weight: 0.7
+    },
+    {
+      id: "form_respect_earned",
+      text: "You're starting to get the nod from other riders—that subtle acknowledgment that you're legitimate, that you belong here. Respect in the peloton is earned through results, and you're earning it.",
+      triggers: { totalPodiums: [2, 3, 4, 5], stagesCompleted: [5, 6, 7, 8] },
+      weight: 0.8
+    },
+    
+    // EARLY SEASON CLOSINGS
+    {
+      id: "early_foundation_building",
+      text: "The season is still taking shape, and so are you. Every race teaches something, every result adds data. You're building a foundation—not dramatic, not flashy, but solid.",
+      triggers: { stagesCompleted: [1, 2, 3], totalPoints: [0, 50, 100, 150, 200] },
+      weight: 0.8
+    },
+    {
+      id: "early_learning_curve",
+      text: "Three races in, you're already racing smarter than race one. The learning curve is steep but you're climbing it. Give yourself time to adapt to this level of competition.",
+      triggers: { stagesCompleted: [3], recentPosition: [10, 15, 20, 25, 30] },
+      weight: 0.8
+    },
+    {
+      id: "early_potential_showing",
+      text: "The flashes of potential are there—moments in races where everything clicks, where you see what's possible. Now it's about making those moments more frequent, more sustained.",
+      triggers: { stagesCompleted: [2, 3], improvementFromPrediction: [3, 5, 7, 10] },
+      weight: 0.7
+    },
+    {
+      id: "early_commitment_tested",
+      text: "This is the phase where commitment gets tested. The racing is harder than you expected, the competition fiercer, the demands greater. But you're still showing up, still racing, still pushing. That matters.",
+      triggers: { stagesCompleted: [2, 3, 4], recentPosition: [15, 20, 25, 30] },
+      weight: 0.8
+    },
+    {
+      id: "early_season_long",
+      text: "It's a long season, and you're playing the long game. Not every race needs to be spectacular. Some are about survival, about learning, about not giving up. You're doing the work.",
+      triggers: { stagesCompleted: [1, 2, 3, 4], totalPoints: [0, 50, 100, 150] },
+      weight: 0.7
+    },
+    
+    // MID SEASON CLOSINGS
+    {
+      id: "mid_season_push",
+      text: "The season's middle chapters are where campaigns are defined. Not the explosive start, not the dramatic finish, but the sustained effort through the middle miles. You're in the grind now.",
+      triggers: { stagesCompleted: [5, 6, 7], totalPoints: [200, 250, 300, 350] },
+      weight: 0.8
+    },
+    {
+      id: "mid_pivotal_moment",
+      text: "This is a pivotal stretch. Strong results now could launch you into championship contention. Weak results could leave you fighting for scraps in the final races. The middle matters.",
+      triggers: { stagesCompleted: [5, 6], totalPoints: [250, 300, 350, 400] },
+      weight: 0.8
+    },
+    {
+      id: "mid_habits_forming",
+      text: "You're developing habits now—pre-race routines, pacing strategies, recovery protocols. These habits, formed in the season's middle, will define how you finish.",
+      triggers: { stagesCompleted: [6, 7], recentPosition: [5, 10, 15, 20] },
+      weight: 0.7
+    },
+    {
+      id: "mid_second_wind",
+      text: "Some riders fade at mid-season. Others find a second wind. You're searching for yours—that renewed motivation, that fresh focus that carries through to the end.",
+      triggers: { stagesCompleted: [6, 7], recentPosition: [12, 15, 18, 20, 22, 25] },
+      weight: 0.7
+    },
+    
+    // LATE SEASON CLOSINGS
+    {
+      id: "late_final_push",
+      text: "The final races carry extra weight—not just for points, but for how you'll remember this season. You're tired, everyone's tired, but this is when champions dig deepest.",
+      triggers: { stagesCompleted: [8, 9], totalPoints: [300, 400, 500, 600] },
+      weight: 0.9
+    },
+    {
+      id: "late_no_regrets",
+      text: "Leave nothing in the tank. The off-season is for rest; the final races are for emptying yourself completely. You'll have months to recover. You'll only have these moments once.",
+      triggers: { stagesCompleted: [8, 9], recentPosition: [1, 2, 3, 4, 5, 10, 15, 20] },
+      weight: 0.9
+    },
+    {
+      id: "late_position_defense",
+      text: "You've built a solid season position, and now it's about protecting it. Every race matters, every point counts. Finish strong and cement your place in the final standings.",
+      triggers: { stagesCompleted: [8, 9], totalPoints: [400, 450, 500, 550] },
+      weight: 0.8
+    },
+    {
+      id: "late_season_redemption",
+      text: "The season hasn't gone as planned, but it's not over. A strong finish can salvage pride, can prove the early struggles were temporary. Use these final races to show what you're really capable of.",
+      triggers: { stagesCompleted: [8, 9], totalPoints: [100, 150, 200, 250], recentPosition: [15, 20, 25, 30] },
+      weight: 0.8
+    },
+    {
+      id: "late_championship_pressure",
+      text: "Championship pressure is a privilege. Not everyone gets to race with meaningful stakes in the final events. Embrace the pressure—it means you've done something worth protecting.",
+      triggers: { stagesCompleted: [8, 9], totalPoints: [500, 550, 600, 650, 700] },
+      weight: 0.9
+    },
+    
+    // STRUGGLING FORM CLOSINGS
+    {
+      id: "struggle_character_building",
+      text: "This is the part of the season that builds character—the races where nothing clicks, where you're just trying to survive. These experiences make you tougher, even if they don't make you faster right now.",
+      triggers: { recentPosition: [25, 30, 35, 40], stagesCompleted: [3, 4, 5, 6, 7] },
+      weight: 0.9
+    },
+    {
+      id: "struggle_one_result",
+      text: "One result changes everything. One good race shifts momentum, restores confidence, reminds you why you started. You're one performance away from feeling completely different about this season.",
+      triggers: { recentPosition: [20, 25, 30], totalPoints: [50, 100, 150, 200], stagesCompleted: [4, 5, 6, 7] },
+      weight: 0.9
+    },
+    {
+      id: "struggle_experience_value",
+      text: "These tough races are deposits in an experience bank you'll draw on for years. Every struggle teaches resilience, every hard day builds mental toughness. The value isn't always immediate.",
+      triggers: { recentPosition: [25, 30, 35], stagesCompleted: [3, 4, 5, 6] },
+      weight: 0.8
+    },
+    {
+      id: "struggle_showing_up",
+      text: "The hardest part of a tough season is continuing to show up. No one would fault you for DNS entries, for taking it easy, for protecting your ego. But you're still racing. That takes guts.",
+      triggers: { recentPosition: [30, 35, 40], stagesCompleted: [5, 6, 7, 8] },
+      weight: 0.8
+    },
+    {
+      id: "struggle_breakthrough_coming",
+      text: "Breakthroughs often come after extended struggles—not despite them, but because of them. You're building something here, even if you can't see it yet. Trust the process.",
+      triggers: { recentPosition: [20, 25, 30], totalPoints: [100, 150, 200], stagesCompleted: [4, 5, 6, 7] },
+      weight: 0.7
     }
   ]
 };

@@ -802,17 +802,129 @@ function generateSeasonImplications(raceData, seasonData, raceContext) {
     }
   }
 
-  // Closing motivation
-  const isLateseason = stagesCompleted >= 8;
-  if (isLateseason) {
-    context += `The season is in its final stages. Every race from here matters. Make them count.`;
-  } else if (stagesCompleted >= 5) {
-    context += `The season is past halfway, and you're in a good position to make a push toward the top of the standings.`;
+  // Closing motivation - SELECT FROM NARRATIVE DATABASE
+  const closingText = selectSeasonContextClosing(seasonData, raceData);
+  if (closingText) {
+    context += closingText;
   } else {
-    context += `The season is still young—plenty of racing ahead, plenty of opportunities to prove yourself.`;
+    // Fallback if no narrative selected
+    const isLateseason = stagesCompleted >= 8;
+    if (isLateseason) {
+      context += `The season is in its final stages. Every race from here matters. Make them count.`;
+    } else if (stagesCompleted >= 5) {
+      context += `The season is past halfway, and you're in a good position to make a push toward the top of the standings.`;
+    } else {
+      context += `The season is still young—plenty of racing ahead, plenty of opportunities to prove yourself.`;
+    }
   }
 
   return context;
+}
+
+/**
+ * Select a contextual closing from the narrative database
+ * Returns varied closing text based on form, season progress, and performance
+ */
+function selectSeasonContextClosing(seasonData, raceData) {
+  const {
+    stagesCompleted,
+    totalPoints,
+    totalWins,
+    totalPodiums,
+    recentResults = [],
+    isOnStreak
+  } = seasonData;
+
+  const { position } = raceData;
+  const recentPosition = recentResults[0] || position;
+  
+  // Calculate improvement from prediction if available
+  const improvementFromPrediction = raceData.predictedPosition ? 
+    raceData.predictedPosition - position : 0;
+
+  // Build context for narrative selection
+  const narrativeContext = {
+    stagesCompleted,
+    totalPoints,
+    totalWins,
+    totalPodiums,
+    recentPosition,
+    isOnStreak,
+    improvementFromPrediction
+  };
+
+  // Access the narrative database (should be loaded globally)
+  let NARRATIVE_DATABASE = null;
+  
+  if (typeof window !== 'undefined' && window.narrativeDatabase) {
+    NARRATIVE_DATABASE = window.narrativeDatabase.NARRATIVE_DATABASE;
+  } else if (typeof global !== 'undefined' && global.NARRATIVE_DATABASE) {
+    NARRATIVE_DATABASE = global.NARRATIVE_DATABASE;
+  }
+
+  if (!NARRATIVE_DATABASE || !NARRATIVE_DATABASE.seasonContextClosing) {
+    return null; // Fallback will be used
+  }
+
+  // Filter matching narratives
+  const matchingNarratives = NARRATIVE_DATABASE.seasonContextClosing.filter(narrative => {
+    const triggers = narrative.triggers;
+    
+    // Check each trigger condition
+    if (triggers.isOnStreak !== undefined && triggers.isOnStreak !== isOnStreak) {
+      return false;
+    }
+    
+    if (triggers.stagesCompleted && !triggers.stagesCompleted.includes(stagesCompleted)) {
+      return false;
+    }
+    
+    if (triggers.totalPoints) {
+      const pointsInRange = triggers.totalPoints.some(points => {
+        if (typeof points === 'number') {
+          return totalPoints >= points && totalPoints < points + 100;
+        }
+        return false;
+      });
+      if (!pointsInRange) return false;
+    }
+    
+    if (triggers.totalWins && !triggers.totalWins.includes(totalWins)) {
+      return false;
+    }
+    
+    if (triggers.totalPodiums && !triggers.totalPodiums.includes(totalPodiums)) {
+      return false;
+    }
+    
+    if (triggers.recentPosition && !triggers.recentPosition.includes(recentPosition)) {
+      return false;
+    }
+    
+    if (triggers.improvementFromPrediction && !triggers.improvementFromPrediction.includes(improvementFromPrediction)) {
+      return false;
+    }
+    
+    return true;
+  });
+
+  if (matchingNarratives.length === 0) {
+    return null; // Use fallback
+  }
+
+  // Weight-based random selection
+  const totalWeight = matchingNarratives.reduce((sum, n) => sum + (n.weight || 1), 0);
+  let random = Math.random() * totalWeight;
+  
+  for (const narrative of matchingNarratives) {
+    random -= (narrative.weight || 1);
+    if (random <= 0) {
+      return narrative.text;
+    }
+  }
+  
+  // Fallback to first matching
+  return matchingNarratives[0].text;
 }
 
 // Export for Node.js
