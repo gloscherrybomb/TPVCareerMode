@@ -57,6 +57,12 @@ function applyFilters(rankings) {
 
 // Populate country filter options
 function populateCountryFilter(rankings) {
+    const countryFilter = document.getElementById('countryFilter');
+    if (!countryFilter) {
+        console.warn('Country filter element not found');
+        return;
+    }
+    
     const countries = new Set();
     rankings.forEach(racer => {
         if (racer.country) {
@@ -64,7 +70,6 @@ function populateCountryFilter(rankings) {
         }
     });
     
-    const countryFilter = document.getElementById('countryFilter');
     const currentValue = countryFilter.value;
     
     // Clear existing options except "All Countries"

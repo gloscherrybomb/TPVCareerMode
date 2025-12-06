@@ -426,6 +426,11 @@
     transition: all 0.3s ease;
 }
 
+.filter-select option {
+    background: #1a1a1a;
+    color: var(--text-primary);
+}
+
 .filter-select:hover {
     border-color: rgba(69, 202, 255, 0.5);
     background: rgba(69, 202, 255, 0.05);
