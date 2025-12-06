@@ -389,8 +389,9 @@ function generateSeasonContext(data) {
   // Strategic/tactical context about next event (2-3 sentences)
   const nextEventType = EVENT_TYPES[nextEventNumber];
   
-  // Special case: Event 15 (Local Tour Stage 3) is the final race of the season
-  if (!nextEventNumber || stagesCompleted >= 9) {
+  // Special case: Event 15 (Local Tour Stage 3) completes the season (stage 9)
+  // Events 13, 14, 15 are all part of stage 9, so only show "season complete" after event 15
+  if (nextEventNumber === null || nextEventNumber === undefined || nextEventNumber > 15) {
     // No next event - this was the final race
     // Context about season completion is handled in unified-story-generator
     // Don't add duplicate forward-looking text here
