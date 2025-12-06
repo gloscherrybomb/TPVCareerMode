@@ -1053,6 +1053,9 @@ async function processUserResult(uid, eventInfo, results) {
     arr: eventResults.arr, // Store most recent ARR
     [`season${season}Standings`]: seasonStandings,
     team: userResult.Team || '',
+    gender: userResult.Gender || null,
+    country: userResult.Country || null,
+    ageBand: userResult.AgeBand || null,
     usedOptionalEvents: newUsedOptionalEvents,
     tourProgress: newTourProgress,
     ...dnsFlags // Add DNS flags if any
