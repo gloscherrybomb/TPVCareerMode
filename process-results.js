@@ -10,7 +10,7 @@ const storyGen = require('./story-generator');
 // Import narrative system modules
 const { NARRATIVE_DATABASE } = require('./narrative-database.js');
 const { StorySelector } = require('./story-selector.js');
-const { generateUnifiedStory } = require('./unified-story-generator.js');
+// Note: story-generator.js v3.0 has all functionality - unified-story-generator.js no longer needed
 
 // Initialize Firebase Admin
 const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
