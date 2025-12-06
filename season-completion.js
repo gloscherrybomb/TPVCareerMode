@@ -89,12 +89,12 @@ function generateSeasonCompleteStory(data) {
         } else if (seasonRank === 2) {
             story += `Second place in the season standings is an outstanding achievement. ${totalWins > 0 ? `You collected ${totalWins} win${totalWins > 1 ? 's' : ''}, ` : ''}${totalPodiums > 0 ? `${totalPodiums} podium${totalPodiums > 1 ? 's' : ''}, ` : ''}and ${totalPoints} points across the season. `;
         } else {
-            story += `Third place in the season standings marks you as one of the strongest riders in the field. ${totalWins > 0 ? `${totalWins} victory${totalWins > 1 ? ' victories' : ''}, ` : ''}${totalPodiums > 0 ? `${totalPodiums} podium finish${totalPodiums > 1 ? 'es' : ''}, ` : ''}${totalPoints} points—these numbers tell the story of a season well raced. `;
+            story += `Third place in the season standings marks you as one of the strongest riders in the field. ${totalWins > 0 ? `${totalWins} ${totalWins > 1 ? 'victories' : 'victory'}, ` : ''}${totalPodiums > 0 ? `${totalPodiums} podium finish${totalPodiums > 1 ? 'es' : ''}, ` : ''}${totalPoints} points—these numbers tell the story of a season well raced. `;
         }
     } else if (seasonRank <= 10) {
         story += `Season 1 is now in the books. You finished ${seasonRank}th overall in the standings with ${totalPoints} points${totalWins > 0 ? ` and ${totalWins} win${totalWins > 1 ? 's' : ''}` : ''}—a solid campaign that showed steady improvement and plenty of competitive racing. `;
     } else if (seasonRank <= 20) {
-        story += `The final standings are locked in, and you finished ${seasonRank}th overall with ${totalPoints} points across the season. ${totalWins > 0 ? `Your ${totalWins} victory${totalWins > 1 ? ' victories' : ''} proved you can win on your day, ` : ''}It's been a season of learning and gaining experience at this level. `;
+        story += `The final standings are locked in, and you finished ${seasonRank}th overall with ${totalPoints} points across the season. ${totalWins > 0 ? `Your ${totalWins} ${totalWins > 1 ? 'victories' : 'victory'} proved you can win on your day, ` : ''}It's been a season of learning and gaining experience at this level. `;
     } else {
         story += `Season 1 concludes with you placing ${seasonRank}th in the overall standings. You earned ${totalPoints} points across the season's events${totalPodiums > 0 ? ` including ${totalPodiums} podium finish${totalPodiums > 1 ? 'es' : ''}` : ''}. Every race teaches something new, and this season provided plenty of lessons. `;
     }
@@ -129,7 +129,7 @@ function generateSeasonSummaryText(userData) {
         summary = `Season 1 has concluded. You competed in ${completedEvents} of the 15 events, earning ${totalPoints} points before a DNS in the Local Tour ended your season. `;
         
         if (totalWins > 0) {
-            summary += `Despite the early exit from the tour, you secured ${totalWins} victory${totalWins > 1 ? ' victories' : ''} earlier in the season. `;
+            summary += `Despite the early exit from the tour, you secured ${totalWins} ${totalWins > 1 ? 'victories' : 'victory'} earlier in the season. `;
         }
         
         summary += `The experience gained this season will carry forward as you prepare for what's next.`;
@@ -233,7 +233,7 @@ function generateProfileSeasonReview(userData) {
         review += `From the opening criterium to the final climb of the Local Tour, you raced consistently and pushed yourself against a competitive field. ${totalPoints} total points earned. `;
         
         if (totalWins > 0) {
-            review += `${totalWins} victory${totalWins > 1 ? ' victories' : ''} claimed. `;
+            review += `${totalWins} ${totalWins > 1 ? 'victories' : 'victory'} claimed. `;
         }
         
         review += `Season 1: complete.\n\n`;
