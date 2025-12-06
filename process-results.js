@@ -1177,7 +1177,7 @@ async function processUserResult(uid, eventInfo, results) {
   console.log(`   Stage ${currentStage} complete -> Stage ${nextStage}`);
   
   // Check if season is now complete after this event
-  await checkAndMarkSeasonComplete(userRef, userData, eventNumber, updates);
+  await checkAndMarkSeasonComplete(userRef, userData, eventNumber, updates, seasonStandings);
   
   // Update results summary collection (per-user)
   await updateResultsSummary(season, eventNumber, results, uid);
@@ -1781,7 +1781,7 @@ async function updateResultsSummary(season, event, results, userUid) {
 /**
  * Check if season is complete and mark it, award season podium trophies
  */
-async function checkAndMarkSeasonComplete(userRef, userData, eventNumber, recentUpdates) {
+async function checkAndMarkSeasonComplete(userRef, userData, eventNumber, recentUpdates, seasonStandings) {
   // Merge recent updates with existing userData for checking
   const currentData = { ...userData, ...recentUpdates };
   
