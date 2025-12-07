@@ -1,0 +1,57 @@
+name: Reset User Results
+
+on:
+  workflow_dispatch:  # Manual trigger only
+    inputs:
+      confirm:
+        description: 'Type "RESET" to confirm'
+        required: true
+        type: string
+
+jobs:
+  reset:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Verify confirmation
+        run: |
+          if [ "${{ github.event.inputs.confirm }}" != "RESET" ]; then
+            echo "❌ Confirmation failed. You must type 'RESET' to proceed."
+            exit 1
+          fi
+          echo "✅ Confirmation verified"
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      
+      - name: Install dependencies
+        run: npm install firebase-admin
+      
+      - name: Reset user results
+        env:
+          FIREBASE_PROJECT_ID: ${{ secrets.FIREBASE_PROJECT_ID }}
+          FIREBASE_CLIENT_EMAIL: ${{ secrets.FIREBASE_CLIENT_EMAIL }}
+          FIREBASE_PRIVATE_KEY: ${{ secrets.FIREBASE_PRIVATE_KEY }}
+        run: node reset-user-results.js
+      
+      - name: Summary
+        run: |
+          echo "## Reset Complete ✅" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "All user results data has been cleared." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Retained:**" >> $GITHUB_STEP_SUMMARY
+          echo "- name, email, uid" >> $GITHUB_STEP_SUMMARY
+          echo "- team, gender, country, ageBand" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Cleared:**" >> $GITHUB_STEP_SUMMARY
+          echo "- All event results (1-15)" >> $GITHUB_STEP_SUMMARY
+          echo "- Points, wins, podiums" >> $GITHUB_STEP_SUMMARY
+          echo "- Season standings and completion data" >> $GITHUB_STEP_SUMMARY
+          echo "- All awards and trophies" >> $GITHUB_STEP_SUMMARY
+          echo "- Tour progress and optional events" >> $GITHUB_STEP_SUMMARY
