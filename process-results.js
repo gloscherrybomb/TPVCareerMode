@@ -345,6 +345,7 @@ function isBot(uid, gender) {
 /**
  * Get list of optional events the user has completed so far
  * Optional events are: 5, 6, 7, 8, 9, 10, 11, 12
+ * These can be completed at stages 3, 6, or 8
  * @param {Object} userData - User document data
  * @param {number} currentEventNumber - Current event being processed
  * @returns {Array<number>} Array of completed optional event numbers
@@ -353,13 +354,26 @@ function getCompletedOptionalEvents(userData, currentEventNumber) {
   const OPTIONAL_EVENTS = [5, 6, 7, 8, 9, 10, 11, 12];
   const completedOptionals = [];
   
-  // Check which optional events have been completed
-  // (not including the current event being processed)
+  console.log(`Checking completed optional events for user (current event: ${currentEventNumber}):`);
+  
+  // Check each optional event to see if it's been completed
   for (const eventNum of OPTIONAL_EVENTS) {
-    if (eventNum < currentEventNumber && userData[`event${eventNum}Results`]) {
+    // If this event has results stored, it was completed
+    if (userData[`event${eventNum}Results`]) {
+      console.log(`  ✓ Event ${eventNum} completed`);
       completedOptionals.push(eventNum);
     }
   }
+  
+  // If we're currently processing an optional event, don't count it as "completed" yet
+  // (since we're generating the story for completing it right now)
+  const currentEventIndex = completedOptionals.indexOf(currentEventNumber);
+  if (currentEventIndex !== -1) {
+    console.log(`  ⚠️  Removing event ${currentEventNumber} (currently being processed)`);
+    completedOptionals.splice(currentEventIndex, 1);
+  }
+  
+  console.log(`  📊 Final completed optionals: [${completedOptionals.join(', ')}]`);
   
   return completedOptionals;
 }
