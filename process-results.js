@@ -344,14 +344,14 @@ function isBot(uid, gender) {
 
 /**
  * Get list of optional events the user has completed so far
- * Optional events are: 5, 6, 7, 8, 9, 10, 11, 12
+ * Optional events are: 6, 7, 8, 9, 10, 11, 12 (events 6-12)
  * These can be completed at stages 3, 6, or 8
  * @param {Object} userData - User document data
  * @param {number} currentEventNumber - Current event being processed
  * @returns {Array<number>} Array of completed optional event numbers
  */
 function getCompletedOptionalEvents(userData, currentEventNumber) {
-  const OPTIONAL_EVENTS = [5, 6, 7, 8, 9, 10, 11, 12];
+  const OPTIONAL_EVENTS = [6, 7, 8, 9, 10, 11, 12];
   const completedOptionals = [];
   
   console.log(`Checking completed optional events for user (current event: ${currentEventNumber}):`);

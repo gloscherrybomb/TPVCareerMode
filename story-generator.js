@@ -21,11 +21,10 @@ const EVENT_NAMES = {
 };
 
 // Optional choice events (can be selected at stages 3, 6, or 8)
-const OPTIONAL_EVENTS = [5, 6, 7, 8, 9, 10, 11, 12];
+const OPTIONAL_EVENTS = [6, 7, 8, 9, 10, 11, 12];
 
 // Optional event descriptions by type
 const OPTIONAL_EVENT_INFO = {
-  5: { type: "points race", shortDesc: "points race" },
   6: { type: "hill climb", shortDesc: "climb" },
   7: { type: "criterium", shortDesc: "criterium" },
   8: { type: "gran fondo", shortDesc: "endurance challenge" },
