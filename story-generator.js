@@ -437,6 +437,12 @@ function generateSeasonContext(data) {
     const remainingOptionals = OPTIONAL_EVENTS.filter(e => !completedOptionals.includes(e));
     const remainingCount = remainingOptionals.length;
     
+    console.log(`Story Generator Optional Stage Debug:`);
+    console.log(`  nextStageNumber: ${nextStageNumber}`);
+    console.log(`  completedOptionalEvents: [${completedOptionals.join(', ')}]`);
+    console.log(`  remainingOptionals: [${remainingOptionals.join(', ')}]`);
+    console.log(`  remainingCount: ${remainingCount}`);
+    
     // Build description of what's been done and what remains
     let choiceContext = '';
     
