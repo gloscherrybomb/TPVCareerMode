@@ -1024,7 +1024,7 @@
             }
             
             try {
-                const { getFirestore, doc, updateDoc, deleteField, collection, query, where, getDocs } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+                const { getFirestore, doc, updateDoc, deleteField, deleteDoc, collection, query, where, getDocs } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
                 const db = getFirestore();
                 
                 // Find user document
@@ -1039,6 +1039,26 @@
                 
                 const userDoc = querySnapshot.docs[0];
                 const userDocRef = userDoc.ref;
+                const userUid = userDoc.data().uid;
+                
+                // Delete all race result documents for this user (season1_event1_UID through season1_event15_UID)
+                const deletePromises = [];
+                for (let i = 1; i <= 15; i++) {
+                    const resultDocId = `season1_event${i}_${userUid}`;
+                    const resultDocRef = doc(db, 'results', resultDocId);
+                    deletePromises.push(
+                        deleteDoc(resultDocRef).catch(err => {
+                            // Silently catch if document doesn't exist
+                            if (err.code !== 'not-found') {
+                                console.warn(`Failed to delete ${resultDocId}:`, err);
+                            }
+                        })
+                    );
+                }
+                
+                // Wait for all result deletions to complete
+                await Promise.all(deletePromises);
+                console.log('Deleted race result documents');
                 
                 // Reset all season 1 data
                 const resetData = {
