@@ -1504,18 +1504,20 @@ async function buildSeasonStandings(results, userData, eventNumber, currentUid) 
   allEventResults[eventNumber] = results;
   
   // Build a map of all unique bots and track which events they participated in
-  const allBots = new Map(); // botName -> { arr, actualEvents: Set<eventNum> }
+  const allBots = new Map(); // botName -> { uid, arr, actualEvents: Set<eventNum> }
   
   for (const [eventNum, eventResults] of Object.entries(allEventResults)) {
     eventResults.forEach(result => {
       const isBotRacer = isBot(result.UID || result.uid, result.Gender);
       if (isBotRacer && result.Position !== 'DNF' && result.position !== 'DNF') {
         const botName = result.Name || result.name;
+        const botUid = result.UID || result.uid;
         const arr = parseInt(result.ARR || result.arr) || 900;
         
         if (!allBots.has(botName)) {
           allBots.set(botName, {
             name: botName,
+            uid: botUid,
             arr: arr,
             actualEvents: new Set()
           });
@@ -1524,8 +1526,9 @@ async function buildSeasonStandings(results, userData, eventNumber, currentUid) 
         // Track which event this bot actually participated in
         allBots.get(botName).actualEvents.add(parseInt(eventNum));
         
-        // Update ARR to most recent
+        // Update ARR and UID to most recent
         allBots.get(botName).arr = arr;
+        allBots.get(botName).uid = botUid;
       }
     });
   }
@@ -1535,10 +1538,10 @@ async function buildSeasonStandings(results, userData, eventNumber, currentUid) 
   // For each bot, simulate missing events and update standings
   for (const [botName, botInfo] of allBots.entries()) {
     if (!standingsMap.has(botName)) {
-      // Bot not in standings yet, add them
+      // Bot not in standings yet, add them with their actual UID
       standingsMap.set(botName, {
         name: botName,
-        uid: null,
+        uid: botInfo.uid || null,  // Use UID from their race results
         arr: botInfo.arr,
         team: '',
         events: 0,
@@ -1549,6 +1552,11 @@ async function buildSeasonStandings(results, userData, eventNumber, currentUid) 
     }
     
     const botStanding = standingsMap.get(botName);
+    
+    // Backfill UID if it was null but we now have it
+    if (!botStanding.uid && botInfo.uid) {
+      botStanding.uid = botInfo.uid;
+    }
     
     // CRITICAL: Reset bot points to prevent accumulation bug
     // Bot points will be recalculated from scratch below
