@@ -20,6 +20,21 @@ const EVENT_NAMES = {
   15: "Local Tour Stage 3"
 };
 
+// Optional choice events (can be selected at stages 3, 6, or 8)
+const OPTIONAL_EVENTS = [5, 6, 7, 8, 9, 10, 11, 12];
+
+// Optional event descriptions by type
+const OPTIONAL_EVENT_INFO = {
+  5: { type: "points race", shortDesc: "points race" },
+  6: { type: "hill climb", shortDesc: "climb" },
+  7: { type: "criterium", shortDesc: "criterium" },
+  8: { type: "gran fondo", shortDesc: "endurance challenge" },
+  9: { type: "mountain stage", shortDesc: "mountain stage" },
+  10: { type: "time trial", shortDesc: "time trial" },
+  11: { type: "points race", shortDesc: "points race" },
+  12: { type: "gravel race", shortDesc: "gravel race" }
+};
+
 // Event characteristics for context
 const EVENT_TYPES = {
   1: "criterium",
@@ -306,7 +321,8 @@ function generateSeasonContext(data) {
     isOnStreak,
     totalPodiums,
     seasonPosition,
-    isNextStageChoice
+    isNextStageChoice,
+    completedOptionalEvents  // Array of event numbers user has already completed
   } = data;
 
   // Special case: If this is the final stage (stage 9 = Local Tour complete) and season is complete
@@ -414,18 +430,48 @@ function generateSeasonContext(data) {
     return context;
   }
   
-  // Special handling for optional stages - don't describe specific event
+  // Special handling for optional stages - describe remaining choices
   if (isNextStageChoice) {
-    context += `Stage ${nextStageNumber} presents an interesting choice from the optional events, giving you tactical flexibility to play to your strengths. Whether you choose the technical demands of the velodrome, the relentless test of a climb, or the endurance challenge of a long-distance event, each option rewards different skills and exposes different weaknesses. Pick what suits you best, or what will challenge you most—both approaches have merit. `;
+    // Determine which optional events are still available
+    const completedOptionals = completedOptionalEvents || [];
+    const remainingOptionals = OPTIONAL_EVENTS.filter(e => !completedOptionals.includes(e));
+    const remainingCount = remainingOptionals.length;
     
-    // Skip the detailed event-type description below and go to closing
+    // Build description of what's been done and what remains
+    let choiceContext = '';
+    
+    if (completedOptionals.length === 0) {
+      // First optional stage - all 7 available
+      choiceContext = `Stage ${nextStageNumber} presents your first optional choice. Seven different event types are available—hill climbs, time trials, criteriums, endurance challenges, points races, mountain stages, and gravel races. Each tests different skills and reveals different aspects of your abilities. `;
+    } else if (completedOptionals.length === 1) {
+      // Second optional stage - 6 remaining
+      const completedType = OPTIONAL_EVENT_INFO[completedOptionals[0]]?.shortDesc || 'your previous choice';
+      choiceContext = `Stage ${nextStageNumber} brings your second optional choice. You've already tackled the ${completedType}, which narrows the field but leaves ${remainingCount} distinct challenges available. You can double down on a similar discipline or deliberately choose something that tests entirely different skills. `;
+    } else if (completedOptionals.length === 2) {
+      // Third optional stage - 5 remaining
+      const types = completedOptionals.map(e => OPTIONAL_EVENT_INFO[e]?.shortDesc || 'event').join(' and the ');
+      choiceContext = `Stage ${nextStageNumber} is your final optional choice. With the ${types} behind you, ${remainingCount} event types remain. This is your last chance to fill a gap in your racing resume or to lean into what's been working. The decision matters more now—it's your last controlled variable before the season's final stretch. `;
+    }
+    
+    // Add tactical context about making choices
+    const tacticalTexts = [
+      `Some riders consistently choose what they're good at, building confidence and maximizing points. Others deliberately select their weakest disciplines, accepting short-term risk for long-term growth. `,
+      `Your selection reveals something about your racing philosophy. Playing to strengths is pragmatic and often leads to better results. Attacking weaknesses builds a more complete rider but can be frustrating in the short term. `,
+      `The choice says something about your priorities. Maximum points? Choose your strength. Maximum learning? Choose your weakness. Most riders instinctively do one or the other—the best riders consciously decide which serves them better right now. `
+    ];
+    
+    const tacticalIndex = nextStageNumber % tacticalTexts.length;
+    choiceContext += tacticalTexts[tacticalIndex];
+    
+    context += choiceContext;
+    
     // Add closing context about season progression
     if (stagesCompleted <= 3) {
       context += `The season is still young, with plenty of racing ahead, but you're learning what you're capable of and where you can push harder. `;
     } else if (stagesCompleted <= 6) {
-      context += `The season is approaching its midpoint, and you're starting to understand your strengths and weaknesses more clearly. `;
+      context += `The season is approaching its midpoint, and patterns are emerging in your results. `;
     } else {
-      context += `The season is entering its closing chapters, and every stage from here carries extra weight. `;
+      context += `The season is entering its closing chapters, and every choice from here shapes your final standing. `;
     }
     
     return context;

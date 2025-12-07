@@ -343,6 +343,28 @@ function isBot(uid, gender) {
 }
 
 /**
+ * Get list of optional events the user has completed so far
+ * Optional events are: 5, 6, 7, 8, 9, 10, 11, 12
+ * @param {Object} userData - User document data
+ * @param {number} currentEventNumber - Current event being processed
+ * @returns {Array<number>} Array of completed optional event numbers
+ */
+function getCompletedOptionalEvents(userData, currentEventNumber) {
+  const OPTIONAL_EVENTS = [5, 6, 7, 8, 9, 10, 11, 12];
+  const completedOptionals = [];
+  
+  // Check which optional events have been completed
+  // (not including the current event being processed)
+  for (const eventNum of OPTIONAL_EVENTS) {
+    if (eventNum < currentEventNumber && userData[`event${eventNum}Results`]) {
+      completedOptionals.push(eventNum);
+    }
+  }
+  
+  return completedOptionals;
+}
+
+/**
  * Calculate General Classification (GC) for stage race (events 13, 14, 15)
  * Returns GC standings with cumulative times and awards
  * Can calculate partial GC (after stage 1 or 2) or final GC (after stage 3)
@@ -965,6 +987,7 @@ async function processUserResult(uid, eventInfo, results) {
       nextStageNumber: nextStage,
       nextEventNumber: nextEventNumber,
       isNextStageChoice: [3, 6, 8].includes(nextStage),
+      completedOptionalEvents: getCompletedOptionalEvents(userData, eventNumber),
       recentResults: recentResults,
       isOnStreak: isOnStreak,
       totalPodiums: totalPodiums,
