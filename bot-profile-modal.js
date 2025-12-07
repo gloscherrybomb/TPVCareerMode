@@ -283,26 +283,12 @@ async function openBotProfile(botUid) {
     try {
         let profile = null;
         
-        // First try direct lookup by uid
-        const profileDoc = await getDoc(doc(db, 'botProfiles', botUid));
-        
-        if (profileDoc.exists()) {
-            profile = profileDoc.data();
-        } else if (botUid && botUid.startsWith('Bot_')) {
-            // UID is in Bot_Name format, try to find by name
-            // Convert Bot_Some_Name back to "Some Name"
-            const extractedName = botUid.substring(4).replace(/_/g, ' ');
-            console.log('Searching for bot by name:', extractedName);
+        // Direct lookup by UID (e.g., Bot711)
+        if (botUid && botUid !== 'null' && botUid !== 'undefined') {
+            const profileDoc = await getDoc(doc(db, 'botProfiles', botUid));
             
-            // Search botProfiles collection by name
-            const profilesQuery = query(
-                collection(db, 'botProfiles'),
-                where('name', '==', extractedName)
-            );
-            const querySnapshot = await getDocs(profilesQuery);
-            
-            if (!querySnapshot.empty) {
-                profile = querySnapshot.docs[0].data();
+            if (profileDoc.exists()) {
+                profile = profileDoc.data();
             }
         }
         

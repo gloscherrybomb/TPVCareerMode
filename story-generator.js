@@ -317,7 +317,15 @@ function generateSeasonContext(data) {
   let context = '';
 
   // Opening - season progress (1-2 sentences)
-  if (stagesCompleted === 1) {
+  // Special handling for Local Tour (events 13-15 are stages 9-11)
+  const { eventNumber } = data;
+  if (eventNumber === 13) {
+    context += `Seven stages complete, and now the Local Tour begins—Stage 9, the three-day challenge that will define your season. `;
+  } else if (eventNumber === 14) {
+    context += `Local Tour Stage 2 (Stage 10). Day one is done, and today will reshape the GC standings. `;
+  } else if (eventNumber === 15) {
+    context += `The queen stage—Local Tour Stage 3 (Stage 11), the final day of the tour and the final day of the season. Everything comes down to this. `;
+  } else if (stagesCompleted === 1) {
     context += `One stage down, and your season is officially underway. `;
   } else if (stagesCompleted === 2) {
     context += `Two stages completed now, and the season is starting to take shape. `;
@@ -552,6 +560,7 @@ async function generateRaceStory(raceData, seasonData, riderId = null, narrative
   // Generate season context
   const contextData = {
     ...seasonData,
+    eventNumber: raceData.eventNumber,
     nextEventName: EVENT_NAMES[seasonData.nextEventNumber] || `Event ${seasonData.nextEventNumber}`
   };
   const contextParagraph = generateSeasonContext(contextData);
