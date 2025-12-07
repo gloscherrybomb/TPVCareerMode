@@ -898,6 +898,11 @@ async function processUserResult(uid, eventInfo, results) {
     nextEventNumber = STAGE_REQUIREMENTS_MAP[nextStage];
   }
   
+  // After event 15, there is no next event - season is complete
+  if (eventNumber === 15) {
+    nextEventNumber = null;
+  }
+  
   // Collect recent results for form analysis
   const recentResults = completedEventNumbers.slice(-3).map(evtNum => {
     const evtData = userData[`event${evtNum}Results`];
