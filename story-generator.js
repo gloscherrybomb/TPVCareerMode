@@ -54,39 +54,154 @@ const EVENT_TYPES = {
 };
 
 /**
- * Analyze race dynamics based on time gaps
+ * Analyze race dynamics based on time gaps and position
+ * Returns enhanced context about how the race finished
+ * 
+ * Bunch sprint: Many riders within ~5s of winner (field together)
+ * Small group: Winner + few riders broke away together (tight gaps within, big gap behind)
+ * Solo/breakaway: Winner alone or with clear gap
+ * Chase group: User's group finishing together but significantly behind winner(s)
  */
 function analyzeRaceDynamics(raceData) {
   const { position, winMargin, lossMargin } = raceData;
   
   if (position === 1 && winMargin > 0) {
-    if (winMargin > 60) return { type: 'solo_victory', gap: winMargin };
-    if (winMargin > 30) return { type: 'breakaway_win', gap: winMargin };
-    if (winMargin > 5) return { type: 'small_group', gap: winMargin };
-    return { type: 'bunch_sprint', gap: winMargin };
+    // Winner's perspective - how they won
+    if (winMargin > 60) return { type: 'solo_victory', gap: winMargin, description: 'rode away solo' };
+    if (winMargin > 30) return { type: 'breakaway_win', gap: winMargin, description: 'broke clear' };
+    if (winMargin > 10) return { type: 'small_group', gap: winMargin, description: 'won from a small group' };
+    // Small margin = bunch sprint (many riders close together)
+    return { type: 'bunch_sprint', gap: winMargin, description: 'won the bunch sprint' };
   }
   
   if (position > 1 && lossMargin > 0) {
-    if (lossMargin < 1) return { type: 'photo_finish', gap: lossMargin };
-    if (lossMargin < 5) return { type: 'bunch_sprint', gap: lossMargin };
-    if (lossMargin < 30) return { type: 'small_group', gap: lossMargin };
-    if (lossMargin < 60) return { type: 'chase_group', gap: lossMargin };
-    return { type: 'back_of_pack', gap: lossMargin };
+    // Non-winner's perspective - how they finished
+    if (lossMargin < 1) return { type: 'photo_finish', gap: lossMargin, description: 'photo finish' };
+    // Within 5 seconds of winner = part of bunch sprint (field together)
+    if (lossMargin < 5) return { type: 'bunch_sprint', gap: lossMargin, description: 'bunch sprint' };
+    // 5-30 seconds = small group finished together but clear gap to winner(s)
+    if (lossMargin < 30) return { type: 'small_gap', gap: lossMargin, description: 'small group' };
+    // 30-90 seconds = chase group (together with others, but chasing leaders)
+    if (lossMargin < 90) return { type: 'chase_group', gap: lossMargin, description: 'chase group' };
+    // 90+ seconds = significantly behind
+    return { type: 'well_back', gap: lossMargin, description: 'well behind' };
   }
   
-  return { type: 'unknown', gap: 0 };
+  return { type: 'unknown', gap: 0, description: '' };
 }
 
 /**
- * Format time gap into readable text
+ * Format time gap into readable text with context-aware descriptions
  */
-function formatGapText(seconds) {
+function formatGapText(seconds, context = 'neutral') {
   if (!seconds || seconds === 0) return '';
-  if (seconds < 1) return 'by a bike length';
-  if (seconds < 60) return `${Math.round(seconds)} seconds`;
+  
+  // Very close finishes
+  if (seconds < 0.3) return 'by inches';
+  if (seconds < 0.5) return 'by a bike throw';
+  if (seconds < 1) return 'by less than a second';
+  
+  // Small gaps - use exact seconds for sprint contexts
+  if (seconds < 5) {
+    const rounded = Math.round(seconds);
+    return context === 'sprint' ? `${rounded} second${rounded !== 1 ? 's' : ''}` : `${rounded} seconds`;
+  }
+  
+  // Medium gaps - mix exact and descriptive
+  if (seconds < 10) {
+    const rounded = Math.round(seconds);
+    return context === 'dramatic' ? `${rounded} crucial seconds` : `${rounded} seconds`;
+  }
+  
+  if (seconds < 20) {
+    const rounded = Math.round(seconds);
+    return `${rounded} seconds`;
+  }
+  
+  if (seconds < 30) {
+    return `${Math.round(seconds)} seconds`;
+  }
+  
+  // Larger gaps - use descriptive language
+  if (seconds < 40) return 'half a minute';
+  if (seconds < 50) return 'around 45 seconds';
+  if (seconds < 60) return 'nearly a minute';
+  
+  // Very large gaps - minutes format
   const minutes = Math.floor(seconds / 60);
   const secs = Math.round(seconds % 60);
-  return `${minutes}:${secs.toString().padStart(2, '0')}`;
+  
+  if (minutes === 1 && secs < 5) return 'just over a minute';
+  if (minutes === 1 && secs < 30) return `${minutes}:${secs.toString().padStart(2, '0')}`;
+  if (minutes === 1) return 'over a minute and a half';
+  if (minutes === 2 && secs < 5) return 'just over two minutes';
+  if (minutes < 3) return `${minutes}:${secs.toString().padStart(2, '0')}`;
+  if (minutes < 5) return `over ${minutes} minutes`;
+  
+  return `more than ${minutes} minutes`;
+}
+
+/**
+ * Get a descriptive phrase for a time gap
+ */
+function getGapDescription(seconds, ahead = true) {
+  if (!seconds || seconds === 0) return '';
+  
+  if (seconds < 1) return ahead ? 'by the narrowest of margins' : 'just behind';
+  if (seconds < 3) return ahead ? 'in a tight sprint' : 'in the same sprint';
+  if (seconds < 10) return ahead ? 'with a small gap' : 'not far behind';
+  if (seconds < 30) return ahead ? 'with a comfortable margin' : 'chasing hard';
+  if (seconds < 60) return ahead ? 'with a decisive gap' : 'well back';
+  
+  return ahead ? 'with a commanding lead' : 'far behind';
+}
+
+/**
+ * Select a variant based on event number and context
+ * Prioritizes contextually appropriate variants while maintaining some variety
+ */
+function selectVariant(eventNumber, position, variantCount, context = {}) {
+  // Base seed for some determinism
+  const seed = eventNumber * 100 + position;
+  
+  // Context-based prioritization
+  const {
+    hasWinnerName = false,
+    hasLargeGap = false,  // gap > 30s
+    predictionTier = 'matched'
+  } = context;
+  
+  // If we have strong context signals, bias toward relevant variants
+  if (predictionTier === 'beat' || predictionTier === 'crushed') {
+    // Use variants 0 or 1 for beat-predictions content
+    return seed % 2;
+  }
+  
+  if (hasLargeGap && variantCount >= 3) {
+    // Use variants that mention gaps (typically 1, 2, or 3)
+    const gapVariants = [1, 2, 3];
+    return gapVariants[seed % gapVariants.length];
+  }
+  
+  if (hasWinnerName && variantCount >= 3) {
+    // Use variants that can mention winner names (typically 0, 1, 4)
+    const nameVariants = [0, 1, 4 % variantCount];
+    return nameVariants[seed % nameVariants.length];
+  }
+  
+  // Default: use standard modulo for variety
+  return seed % variantCount;
+}
+
+/**
+ * Build winner context text (helper to avoid nested template literals)
+ */
+function buildWinnerText(hasWinnerName, winnerName, gapText, suffix = '') {
+  const winner = hasWinnerName ? winnerName : 'The winner';
+  if (gapText) {
+    return `${winner} finished ${gapText} ahead${suffix}`;
+  }
+  return `${winner} rode away${suffix}`;
 }
 
 /**
@@ -174,7 +289,8 @@ function generateGenericIntro(raceData, seasonData) {
 
 /**
  * Generate race recap paragraph based on performance
- * Enhanced with race-type awareness, winner names, and time gaps
+ * ENHANCED VERSION v2.0 with contextual awareness of time gaps, winner names, and race dynamics
+ * Features: More variants per tier, better gap awareness, contextual bot name usage
  */
 function generateRaceRecap(data) {
   const {
@@ -200,6 +316,7 @@ function generateRaceRecap(data) {
   const placeDiff = predictedPosition - position;
   const dynamics = analyzeRaceDynamics(data);
   const hasWinnerName = winnerName && winnerName !== 'the winner';
+  const winnerText = hasWinnerName ? winnerName : 'the winner';
   
   // Determine performance tier
   let tier;
@@ -217,91 +334,330 @@ function generateRaceRecap(data) {
   else if (placeDiff < 0 && placeDiff >= -5) predictionTier = 'worse';
   else predictionTier = 'much_worse';
 
-  // Build the paragraph - aiming for 5-7 sentences
+  // Helper to randomly pick from an array of variant strings
+  const pickRandom = (variants) => variants[Math.floor(Math.random() * variants.length)];
+  
+  // Helper to format gaps contextually
+  const formatGapContextual = (seconds, context = 'neutral') => {
+    if (!seconds || seconds === 0) return '';
+    
+    if (seconds < 1) {
+      return context === 'win' ? 'by inches' : 'by a bike length';
+    } else if (seconds < 5) {
+      return `${Math.round(seconds)} second${Math.round(seconds) === 1 ? '' : 's'}`;
+    } else if (seconds < 10) {
+      return `${Math.round(seconds)} seconds`;
+    } else if (seconds < 30) {
+      const rounded = Math.round(seconds);
+      return context === 'detailed' ? `${rounded} seconds` : `around ${Math.floor(rounded / 5) * 5} seconds`;
+    } else if (seconds < 60) {
+      return `${Math.round(seconds)} seconds`;
+    } else if (seconds < 90) {
+      return 'just over a minute';
+    } else if (seconds < 120) {
+      const mins = Math.floor(seconds / 60);
+      const secs = Math.round(seconds % 60);
+      return `${mins}:${secs.toString().padStart(2, '0')}`;
+    } else {
+      const mins = Math.floor(seconds / 60);
+      return `over ${mins} minute${mins === 1 ? '' : 's'}`;
+    }
+  };
+
   let recap = '';
 
-  // WINS - Long, detailed paragraphs
+  // ============================================================================
+  // WINS - Enhanced with race dynamics, time gaps, and contextual awareness
+  // ============================================================================
   if (tier === 'win') {
     if (earnedDarkHorse) {
-      recap += `Nobody saw this coming. ${eventName} was supposed to be a day for others to shine—predictions had you finishing ${predictedPosition}th, well off the pace. But racing isn't run on spreadsheets and algorithms. Whatever the alchemy, you rode possessed. When the lead group splintered, you were there. When the attacks came, you covered them. And when it came down to the finale—a desperate, all-or-nothing lunge for the line—you found an extra gear that nobody knew you had. The shock on faces at the finish line was palpable. P1. Winner. Giant-slayer. The rider they didn't see coming just stole the show.`;
+      const variants = [
+        `Nobody saw this coming. ${eventName} was supposed to be a day for others to shine—predictions had you finishing ${predictedPosition}th, well off the pace. But racing isn't run on spreadsheets and algorithms. Whatever the alchemy, you rode possessed. When the lead group splintered, you were there. When the attacks came, you covered them. And when it came down to the finale—a desperate, all-or-nothing lunge for the line—you found an extra gear that nobody knew you had. The shock on faces at the finish line was palpable. P1. Winner. Giant-slayer. The rider they didn't see coming just stole the show.`,
+        
+        `${eventName} will go down as the day you rewrote the script. Predicted ${predictedPosition}th—an afterthought, a mid-pack finisher at best. But from the opening moments, something felt different. The legs had snap, the mind had clarity, and when the race reached its critical phase, you were inexplicably still there. ${dynamics.type === 'bunch_sprint' ? 'The sprint came down to a mass finish, and somehow you timed it perfectly, bursting through the chaos to claim victory.' : dynamics.type === 'small_group' ? 'A small group formed at the front, and you were in it—matching the favorites, then beating them.' : 'You attacked when nobody expected it, and the gap just kept growing.'}${winMargin && winMargin > 5 ? ` You finished ${formatGapText(winMargin)} clear.` : ''} The kind of result that makes you believe anything is possible.`,
+        
+        `They'll be talking about this one for a while. Coming into ${eventName}, you were invisible in the predictions—${predictedPosition}th, written off before the start. But racing rewards those who show up and throw everything at it, predictions be damned. ${dynamics.type === 'solo_victory' ? `You attacked hard, rode away solo, and never looked back. ${winMargin ? `By the finish, you'd opened a ${formatGapText(winMargin)} gap.` : 'The gap just kept growing.'}` : dynamics.type === 'breakaway_win' ? `A breakaway formed, and somehow you were in it—the dark horse among the favorites. When it came down to the sprint, you had the fastest finish.` : `The race stayed together until the finale, and when everyone looked around for the winner, it was you—the one they didn't see coming.`} First place. Against all odds. These are the days that define a season.`
+      ];
+      recap = pickRandom(variants);
+      
     } else if (earnedDomination) {
       const gapText = formatGapText(winMargin);
       
-      // Race-type specific domination language
       if (eventType === 'time trial') {
-        recap += `${eventName} was a clinic in pacing and power management. From the first pedal stroke, you settled into your threshold rhythm—sustainable but punishing, every watt accounted for. No pack to draft, no tactics to consider, just you versus the clock and everyone else's FTP. ${gapText ? `You crossed the line ${gapText} clear of second place` : 'The margin of victory was decisive'}. Time trials are brutally honest: the strongest rider wins, and today that was you. Pure fitness, perfectly paced, nowhere to hide.`;
+        const variants = [
+          `${eventName} was a clinic in pacing and power management. From the first pedal stroke, you settled into your threshold rhythm—sustainable but punishing, every watt accounted for. No pack to draft, no tactics to consider, just you versus the clock and everyone else's FTP. ${gapText ? `You crossed the line ${gapText} clear of second place` : 'The margin of victory was decisive'}. Time trials are brutally honest: the strongest rider wins, and today that was you. Pure fitness, perfectly paced, nowhere to hide.`,
+          
+          `Time trials strip away all the excuses. No team tactics, no draft, no luck—just raw power against the clock. ${eventName} became your proving ground. ${gapText && winMargin > 30 ? `You destroyed the field, finishing ${gapText} ahead of second place.` : gapText ? `Finishing ${gapText} clear of the competition` : 'You dominated from start to finish'}, you showed what happens when form, pacing, and mental focus align perfectly. Every rider goes through the same course, faces the same wind, climbs the same hills. Today, you were simply faster than all of them. That's the beautiful brutality of racing against the clock.`
+        ];
+        recap = pickRandom(variants);
+        
       } else if (eventType === 'hill climb') {
-        recap += `${eventName} turned into a display of climbing dominance. You versus gravity, and gravity lost. From the base of the climb, you found your rhythm—smooth, powerful pedaling, keeping your upper body relaxed while your legs did the work. ${gapText ? `By the summit, you'd opened a ${gapText} gap` : 'The gap grew with every gradient change'}. Hill climbs reward pure power-to-weight and suffering tolerance. Today you had both in abundance.`;
+        const variants = [
+          `${eventName} turned into a display of climbing dominance. You versus gravity, and gravity lost. From the base of the climb, you found your rhythm—smooth, powerful pedaling, keeping your upper body relaxed while your legs did the work. ${gapText ? `By the summit, you'd opened a ${gapText} gap` : 'The gap grew with every gradient change'}. Hill climbs reward pure power-to-weight and suffering tolerance. Today you had both in abundance.`,
+          
+          `Some riders fear the climbs. Others embrace them. Today at ${eventName}, you owned them. ${dynamics.type === 'solo_victory' ? `You attacked early and rode away solo—a gutsy move that paid off spectacularly. ${gapText ? `By the summit, you'd put ${gapText} into everyone else.` : 'The gap grew with every pedal stroke.'}` : `The pace was high from the gun, riders getting shelled off the back one by one. You stayed calm, stayed smooth, and when the gradient kicked up further, you accelerated. ${gapText ? `You summited ${gapText} clear.` : 'You crested alone.'}`} When the road points up, the truth comes out. Today, that truth was simple: you're the strongest climber in this field.`
+        ];
+        recap = pickRandom(variants);
+        
       } else if (eventType === 'stage race') {
         const stageText = eventNumber === 13 ? 'opening stage' : eventNumber === 14 ? 'middle stage' : 'queen stage';
-        recap += `The Local Tour's ${stageText} turned into a statement ride. ${gapText ? `You finished ${gapText} ahead of your closest rival` : 'You rode away from the field'}, putting serious time into everyone else's GC hopes. ${gcPosition ? `This moves you into ${gcPosition === 1 ? 'the GC lead' : `${gcPosition}${gcPosition === 2 ? 'nd' : gcPosition === 3 ? 'rd' : 'th'} on GC`}` : 'The overall classification implications are significant'}. Stage racing rewards consistency, but today was about dominance.`;
+        const variants = [
+          `The Local Tour's ${stageText} turned into a statement ride. ${gapText ? `You finished ${gapText} ahead of your closest rival` : 'You rode away from the field'}, putting serious time into everyone else's GC hopes. ${gcPosition ? `This moves you into ${gcPosition === 1 ? 'the GC lead' : `${gcPosition}${gcPosition === 2 ? 'nd' : gcPosition === 3 ? 'rd' : 'th'} on GC`}` : 'The overall classification implications are significant'}. Stage racing rewards consistency, but today was about dominance.`,
+          
+          `${eventName} was where you needed to make your mark, and you did so emphatically. ${dynamics.type === 'solo_victory' ? `You attacked solo and rode away from everyone. ${gapText ? `By the finish, you'd gained ${gapText} on your GC rivals.` : 'The time gaps were significant.'}` : `You were part of the winning move, and when it came down to the sprint, you had the legs to take it. ${gapText ? `The ${gapText} gap to the chasers` : 'The time gained'} could prove crucial for GC.`} ${gcPosition === 1 ? `You're now in the race lead` : gcPosition ? `You're sitting ${gcPosition}${gcPosition === 2 ? 'nd' : gcPosition === 3 ? 'rd' : 'th'} overall` : `Your GC position has improved significantly`}. In stage racing, days like this can define your tour.`
+        ];
+        recap = pickRandom(variants);
+        
       } else {
-        // Road race, criterium, etc.
-        if (predictionTier === 'matched') {
-          recap += `${eventName} played out exactly as you'd hoped it would. From the opening lap, you settled into a rhythm that felt comfortable, controlled, and—as it turned out—untouchable. The predictions had you down for a win, and you delivered on that expectation with authority. ${gapText ? `You crossed the line ${gapText} clear of the field` : 'The gap grew relentlessly'}. By the final stages, you could focus on bringing it home clean rather than fighting for every second. Sometimes racing is about suffering through close calls and desperate sprints. Today wasn't one of those days.`;
+        const variants = [
+          `${eventName} played out exactly as you'd hoped. From the opening lap, you settled into a rhythm that felt comfortable, controlled, and—as it turned out—untouchable. The predictions had you down for a win, and you delivered with authority. ${gapText ? `You crossed the line ${gapText} clear of the field` : 'The gap grew relentlessly'}. ${dynamics.type === 'solo_victory' ? 'You attacked, rode away, and never saw them again.' : dynamics.type === 'breakaway_win' ? 'The breakaway formed, you made it, and then you proved to be the strongest rider in it.' : 'When the sprint opened up, you already knew you had the legs to win it.'} Sometimes racing is about suffering through close calls. Today wasn't one of those days.`,
+          
+          `The predictions suggested a ${predictedPosition}th place finish at ${eventName}, but those numbers don't account for perfect form and better tactics. From early on, you rode with confidence that bordered on clairvoyance. ${dynamics.type === 'solo_victory' ? `You attacked hard, rode away solo, and ${gapText ? `built a ${gapText} cushion` : 'never looked back'}.` : dynamics.type === 'breakaway_win' ? `A strong move went, you made sure you were in it, and when the group hit the finish, you proved strongest. ${gapText ? `The chasers finished ${gapText} behind.` : 'The peloton was long gone.'}` : `You positioned perfectly for the sprint, launched at exactly the right moment, and ${gapText ? `won by ${gapText}` : 'took a decisive victory'}.`} These are the days when everything clicks—fitness, tactics, timing—and the result feels inevitable.`,
+          
+          `Domination has a feel to it. ${eventName} had that feel from the start. You weren't just racing—you were in control. Every move covered with ease, every acceleration answered with confidence. ${dynamics.type === 'solo_victory' ? `When you went solo, it wasn't desperation—it was calculation. ${gapText ? `By the line, you'd opened ${gapText}.` : 'The gap just grew.'}` : dynamics.type === 'small_group' ? `A small group formed at the front, you were in it, and when it mattered most, you were simply stronger. ${gapText ? `You finished ${gapText} clear.` : 'The win was decisive.'}` : `The bunch sprint felt more like a formality—you timed it perfectly and ${gapText ? `won by ${gapText}` : 'claimed victory clearly'}.`} This is what peak form looks like.`
+        ];
+        recap = pickRandom(variants);
+      }
+      
+    } else if (earnedCloseCall) {
+      const variants = [
+        `${eventName} came down to the wire in the most dramatic fashion possible. From the moment the flag dropped, it was clear this would be a battle—multiple riders with the legs to win, nobody willing to concede an inch. You were in the mix throughout, trading places with the leaders, covering every attack, positioning yourself for the final showdown. The sprint was chaotic, desperate, and decided by millimeters. Coming out of the final corner, three or four riders hit the line together, engines red-lined, everything on the line. Somehow you emerged with the victory by less than half a second. Inches separated you from second place, but in racing, inches are all you need. It's the kind of finish that'll have you rewatching the replay a dozen times, simultaneously exhilarating and nerve-wracking, proof that when it matters most, you can deliver under the highest pressure.`,
+        
+        `Racing doesn't get tighter than this. ${eventName} went down to a photo finish, and when they reviewed the footage, you'd won by ${winMargin && winMargin < 1 ? 'a bike throw' : winMargin ? formatGapText(winMargin) : 'the narrowest of margins'}. ${dynamics.type === 'bunch_sprint' ? 'The entire field came to the line together—twenty riders, thirty riders, all sprinting for the same piece of tarmac.' : 'A small group contested the finale, but the speed was no less intense.'} You were buried in the pack with 200 meters to go, found a gap with 100 to go, and launched everything you had into one desperate final surge. Heart rate maxed, lungs burning, vision narrowing to just the line ahead. You threw your bike at the line and held your breath. When the official result came through—P1—it felt like stealing something precious. Victory by the smallest possible margin. It counts exactly the same as winning by a minute.`,
+        
+        `They'll remember ${eventName} for years because of how it ended. ${dynamics.type === 'bunch_sprint' ? 'Mass sprint finish, chaos everywhere, twenty riders' : 'Small group sprint, elite riders'}, all converging on the line at maximum speed. You were in the mix but not perfectly positioned—boxed in, having to navigate around fading riders, looking for any gap. With 50 meters left, a tiny space opened. You didn't think, just reacted—diving through, throwing everything into one last acceleration. The line arrived in a blur of bikes and bodies. ${winMargin && winMargin < 1 ? 'They needed the photo to separate you from second place.' : winMargin ? `You'd won by ${formatGapText(winMargin)}—barely anything, but enough.` : 'The margin was razor-thin.'} This is bike racing at its purest: suffering, tactics, timing, and that last bit of something extra when it counts most.`
+      ];
+      recap = pickRandom(variants);
+      
+    } else {
+      const variants = [
+        `${eventName} unfolded with the kind of control you dream about. Every move felt calculated, every effort measured, and by the time the finish line approached, the result was never in doubt. ${predictionTier === 'matched' ? 'The predictions had you down for a win, and you delivered with precision.' : `The predictions suggested ${predictedPosition}th, but you had other ideas.`} ${dynamics.type === 'solo_victory' ? `You attacked decisively and rode away solo. ${winMargin ? `By the finish, you'd opened ${formatGapText(winMargin)}.` : 'The gap kept growing.'}` : dynamics.type === 'breakaway_win' ? `The winning move formed, you were in it, and you proved strongest. ${winMargin ? `The chasers were ${formatGapText(winMargin)} back.` : 'The break stayed clear.'}` : `When the sprint opened up, you timed it perfectly and ${winMargin ? `won by ${formatGapText(winMargin)}` : 'claimed a decisive victory'}.`} Sometimes racing is about desperate last-moment saves. Today was about executing a plan and having it work perfectly.`,
+        
+        `Perfect days exist in bike racing, and ${eventName} was one of them. ${predictionTier === 'beat' || predictionTier === 'crushed' ? `Nobody expected this—predictions had you at ${predictedPosition}th—but ` : ''}from the opening moments, you rode with quiet confidence. Never panicked, never dug too deep too early, just patient, intelligent racing. ${dynamics.type === 'solo_victory' ? `When you attacked, it was perfectly timed. Solo to the finish, ${winMargin ? formatGapText(winMargin) : 'a comfortable margin'} ahead.` : dynamics.type === 'bunch_sprint' ? `You positioned yourself perfectly for the sprint, launched at the ideal moment, and ${winMargin ? `won by ${formatGapText(winMargin)}` : 'crossed first'}.` : `A select group formed at the front, and when it came down to it, you were simply the strongest. ${winMargin ? `You finished ${formatGapText(winMargin)} clear.` : 'The win was yours.'}`} These are the days that remind you why you race—when everything aligns and the reward is tangible.`,
+        
+        `Sometimes you have to take victory, and sometimes it feels like it was yours all along. ${eventName} was the latter. ${dynamics.type === 'solo_victory' ? `You attacked with purpose—not desperation, not hope, but the calm certainty that you had the legs to make it stick. ${winMargin ? `You crossed the line ${formatGapText(winMargin)} clear.` : 'You rode away and never looked back.'}` : dynamics.type === 'small_group' ? `A group of strong riders broke clear, and you were among them. When the sprint came, there was no doubt—you were the fastest. ${winMargin ? `Winning margin: ${formatGapText(winMargin)}.` : 'The result was clear.'}` : `The field came to the line together, but you'd already done the hard work—positioning, timing, reading the race. The sprint was just the formality. ${winMargin ? `Victory by ${formatGapText(winMargin)}.` : 'Clean win.'}`} P1. The only position that truly matters.`,
+        
+        `Winning ${eventName} felt earned in the best possible way. Not through luck, not through others' mistakes, but through superior riding. ${predictionTier === 'matched' ? 'The predictions suggested you could win, and you validated them.' : predictionTier === 'beat' || predictionTier === 'crushed' ? `The predictions said ${predictedPosition}th, but the predictions were wrong.` : 'You came prepared to win.'} ${dynamics.type === 'solo_victory' ? `Your attack was decisive—one hard effort, then time trialing alone to the finish. ${winMargin && winMargin > 30 ? `The gap grew to ${formatGapText(winMargin)}.` : winMargin ? `You finished ${formatGapText(winMargin)} clear.` : 'Nobody could follow.'}` : dynamics.type === 'breakaway_win' ? `You made the decisive move and proved strongest in the break. ${winMargin ? `The peloton finished ${formatGapText(winMargin)} behind.` : 'The break held.'}` : `Perfect positioning, perfect timing, perfect execution in the sprint. ${winMargin ? `Winning margin: ${formatGapText(winMargin)}.` : 'Victory.'}`} One race, one result, one winner. Today, that was you.`
+      ];
+      recap = pickRandom(variants);
+    }
+  }
+  
+  // ============================================================================
+  // PODIUM (2nd and 3rd) - Enhanced with 6 variants per position
+  // ============================================================================
+  else if (tier === 'podium') {
+    const gapText = formatGapText(lossMargin, 'sprint');
+    const winnerText = hasWinnerName ? winnerName : 'the winner';
+    const variant = selectVariant(eventNumber, position, 6, {
+      hasWinnerName,
+      hasLargeGap: lossMargin > 15,
+      predictionTier
+    });
+    
+    if (position === 2) {
+      // 2ND PLACE - Always mentions winner and gap when available
+      
+      if (earnedPhotoFinish || dynamics.type === 'photo_finish') {
+        // Photo finish variant
+        recap += `Centimeters. That's what separated you from victory at ${eventName}. The race came down to a desperate lunge for the line—multiple riders sprinting flat out, nobody willing to yield an inch. You threw your bike at the finish with everything you had, crossing ${gapText ? `${gapText} behind ${winnerText}` : 'in second place'}. ${lossMargin < 0.5 ? 'They needed the photo to separate first from second.' : 'Close enough to taste the win, far enough to know you came up just short.'} It's the kind of finish that'll replay in your mind for days—simultaneously thrilling and frustrating, proof you can compete at the highest level but a reminder of how fine the margins are. Still, second place in a field this strong is nothing to dismiss. You were in the fight until the very end.`;
+      } else if (dynamics.type === 'bunch_sprint' && variant % 3 === 0) {
+        // Bunch sprint - close finish
+        recap += `${eventName} came down to a mass sprint finish, and you were right there in the thick of it. ${hasWinnerName ? `${winnerText} proved to be the strongest in the final meters, ` : 'The winner had slightly more speed, '} crossing ${gapText ? `${gapText} ahead of you` : 'just ahead'}. ${lossMargin < 3 ? 'It was tight—a matter of positioning and timing as much as raw power.' : 'The sprint was frantic, everyone fighting for position, and you came out of it in second.'} Not the top step, but you were in contention until the line and finished ahead of most of the field. Bunch sprints are chaotic and often decided by luck as much as strength. You rode smartly, positioned well, and nearly pulled it off.`;
+      } else if (dynamics.type === 'small_gap' && hasWinnerName && variant % 3 === 1) {
+        // Small gap - winner was stronger
+        recap += `${winnerText} rode a strong race at ${eventName}, and you couldn't quite match their best effort. ${lossMargin < 15 ? 'You were close—not dropped, not struggling, just slightly less powerful when it mattered most.' : 'The gap opened in the decisive moments, and you had to settle into your own rhythm.'} You crossed the line in second place, ${gapText ? `${gapText} behind` : 'chasing hard to the end'}. It's frustrating to come so close, but second place still means you were the second-strongest rider in the field. ${winnerText} was simply better today, but you were better than everyone else. That counts for something.`;
+      } else if (predictionTier === 'beat' || predictionTier === 'crushed') {
+        // Better than expected
+        recap += `The predictions had you finishing around ${predictedPosition}th at ${eventName}, well off the podium. But racing doesn't follow scripts. From early on, you felt strong and rode with confidence. You covered the key moves, positioned yourself intelligently, and when the race reached its climax, you were there with the strongest riders. ${hasWinnerName ? `${winnerText} took the victory, ` : 'The winner rode away, '}but you secured second place${gapText ? `, ${gapText} back,` : ','} ahead of everyone else who started the day as favorites. Beating expectations by this much—turning a predicted mid-pack finish into a podium—shows you're improving faster than even the algorithms realize. Second place feels a lot like a win when you weren't supposed to be anywhere near the front.`;
+      } else if (variant % 3 === 2) {
+        // Race dynamics variant
+        recap += `You gave everything at ${eventName} and came away with second place. ${dynamics.type === 'solo_victory' || dynamics.type === 'breakaway_win' ? `${hasWinnerName ? winnerText + ' rode away' : 'The winner broke clear'} earlier in the race, and despite your best efforts, you couldn't bridge. ${gapText ? `You crossed ${gapText} behind` : 'The gap proved too large'}, leading the chase group home.` : `The finish was competitive, with ${hasWinnerName ? winnerText : 'the eventual winner'} proving just slightly stronger. ${gapText ? `You finished ${gapText} back` : 'The margin was small'}, knowing you'd left everything out there.`} Second isn't first, and that stings, but it's still a podium and proof that you belong among the best in this field. You competed, you fought, you finished on the podium. That's something.`;
+      } else {
+        // General second place
+        recap += `${eventName} rewarded smart racing, though not quite with the prize you were hoping for. You positioned yourself well throughout, reading the moves and staying with the strongest riders. As the race reached its climax, you were right there, sensing an opportunity for victory. ${hasWinnerName ? `${winnerText} had just slightly more on the day—` : 'The winner proved marginally stronger—'}${gapText ? `${gapText} separated you at the line` : 'enough to take the win'}. It stings to come so close. Second place means you were competitive, means you belonged in that final selection, means you're racing at a high level. But it's not first, and that's the only position that truly satisfies. Still, you take the points, the confidence, and move forward.`;
+      }
+    } else {
+      // 3RD PLACE - Varied approach (sometimes mentions winner, sometimes doesn't)
+      
+      if (earnedPhotoFinish || (dynamics.type === 'photo_finish' && variant % 2 === 0)) {
+        // Photo finish for 3rd
+        recap += `They say podium is podium, but ${eventName} will sting for a while. The race came down to a photo finish—multiple riders hitting the line together after a desperate sprint. You were in that final group, throwing everything into the last 100 meters, and when the dust settled, you'd claimed third place ${gapText ? `by ${gapText}` : 'by the narrowest of margins'}. ${lossMargin < 2 ? 'Inches separated the top three finishers.' : 'The margins were razor-thin throughout the top positions.'} You were so close to second, maybe even first, but cycling is measured in fractions and today you came up just short. Still, a podium is a podium—even if it's the lowest step, you're up there with the best.`;
+      } else if (variant % 3 === 0 && hasWinnerName) {
+        // Mentions winner's dominance
+        recap += `${winnerText} dominated ${eventName}, and there was nothing anyone could do about it. ${dynamics.type === 'solo_victory' || dynamics.type === 'breakaway_win' ? 'They rode clear and never looked back, leaving the rest of you to race for the remaining podium spots.' : 'They had the power and positioning to control the finish.'} You battled hard for third place, finishing ${gapText ? `${gapText} behind the winner` : 'well back but securing the final podium spot'}. Not every race is winnable when someone else is simply riding at a different level. You did your job—stayed competitive, fought for every position, and earned your spot on the podium alongside the day's strongest riders.`;
+      } else if (predictionTier === 'beat' || predictionTier === 'crushed') {
+        // Beat predictions
+        recap += `The predictions suggested you'd finish around ${predictedPosition}th at ${eventName}—nowhere near the podium. But you had other ideas. From the start, you rode aggressively, positioning yourself with the leaders and proving you belonged in the front group. When the race split apart, you made the selection. ${dynamics.type === 'bunch_sprint' ? 'The sprint was chaotic, but you held your position and crossed third.' : dynamics.type === 'small_gap' ? 'You finished with a small group at the front, claiming third place.' : 'You rode smartly, covering moves and finishing in the top three.'} A podium is a podium, and when you weren't even supposed to be close, third place feels like a significant achievement. You proved the predictions wrong and earned your spot among the best.`;
+      } else if (variant % 3 === 1) {
+        // Own performance focus
+        recap += `${eventName} rewarded consistent, intelligent racing with a podium finish. You approached the race with a clear plan: stay out of trouble early, position well through the decisive sections, and be ready when it counted. That plan worked. ${dynamics.type === 'bunch_sprint' ? 'You battled through a chaotic sprint and emerged in third place.' : dynamics.type === 'chase_group' ? `The front riders ${gapText ? `finished ${gapText} ahead` : 'broke clear'}, and you led the chase group home for third.` : 'You fought hard in the finale and secured the final podium spot.'} Third isn't as satisfying as first, but it's still a podium, still solid points, still proof that you can race at this level. Not every day delivers victory, but bringing home a result like this keeps your season on track.`;
+      } else if (dynamics.type === 'chase_group' || dynamics.type === 'small_gap') {
+        // Gap awareness variant
+        recap += `A breakaway decided ${eventName}, and you couldn't make the split. ${dynamics.type === 'chase_group' ? `The front group ${gapText ? `finished ${gapText} ahead` : 'rode clear'}` : `${gapText ? `With ${gapText} to make up` : 'Facing a gap to the leaders'}`}, you led the chase behind, driving the pace and trying to minimize the damage. When the line came, you'd secured third place—not the result you were hoping for, but still a podium finish. Cycling is about reading the race and making the right moves at the right times. Today the decisive move happened without you, but you salvaged a good result from a difficult situation. That's professional racing—not every day is perfect, but you take what you can get.`;
+      } else {
+        // General 3rd place
+        const predictionText = predictionTier === 'worse' ? 
+          "The predictions had you higher, maybe even threatening for the win, but racing had other plans." : 
+          "You rode a solid race,";
+        const finishText = dynamics.type === 'bunch_sprint' ? 
+          "The sprint came down to a mass finish, and you crossed in third—close to the leaders but not quite able to contest for the win." : 
+          "When the strongest riders made their moves, you couldn't quite go with them, but you held firm for third.";
+        recap += `Third place at ${eventName}—a podium finish, if not quite the result you were gunning for. ${predictionText} positioning yourself well and staying with the main group through the decisive sections. ${finishText} It's easy to focus on what you didn't achieve—first or second—but a podium is still a podium. You finished ahead of most of the field, earned solid points, and showed you belong among the best. That's progress, even if it doesn't feel like it in the moment.`;
+      }
+    }
+  }
+  
+  // ============================================================================
+  // TOP 10 - Enhanced with 5 variants, time gap awareness
+  // ============================================================================
+  else if (tier === 'top10') {
+    const gapText = formatGapText(lossMargin);
+    const variant = selectVariant(eventNumber, position, 5, {
+      hasWinnerName,
+      hasLargeGap: lossMargin > 30,
+      predictionTier
+    });
+    
+    if (predictionTier === 'beat' && variant % 2 === 0) {
+      // Beat expectations with gap awareness
+      let dynamicsText = '';
+      if (dynamics.type === 'well_back' && gapText) {
+        dynamicsText = buildWinnerText(hasWinnerName, winnerName, gapText, ', riding at a different level entirely, but ');
+      } else if (dynamics.type === 'chase_group') {
+        // Mention gap if significant (60+ seconds)
+        if (lossMargin >= 60 && gapText) {
+          dynamicsText = `The leaders finished ${gapText} ahead, but you led the chase group behind and `;
         } else {
-          recap += `The predictions had you down for a ${predictedPosition}th place finish at ${eventName}, but those numbers don't account for good legs and better timing. From early on, it was clear this was going to be your day. You didn't just edge out the competition—you crushed them. ${gapText ? `You finished ${gapText} ahead` : 'The gap grew lap after lap'}, a statement victory that echoed throughout the field. ${dynamics.type === 'solo_victory' ? 'You rode away solo and never looked back.' : dynamics.type === 'breakaway_win' ? 'The winning breakaway held, and you were the strongest in it.' : 'When the decisive moments arrived, you were always there, always with something left in reserve.'}`;
+          dynamicsText = "You couldn't quite make the front group, but you led the chase behind and ";
         }
       }
-    } else if (earnedCloseCall) {
-      recap += `${eventName} came down to the wire in the most dramatic fashion possible. From the moment the flag dropped, it was clear this would be a battle—multiple riders with the legs to win, nobody willing to concede an inch. You were in the mix throughout, trading places with the leaders, covering every attack, positioning yourself for the final showdown. The sprint was chaotic, desperate, and decided by millimeters. Coming out of the final corner, three or four riders hit the line together, engines red-lined, everything on the line. Somehow you emerged with the victory by less than half a second. Inches separated you from second place, but in racing, inches are all you need. It's the kind of finish that'll have you rewatching the replay a dozen times, simultaneously exhilarating and nerve-wracking, proof that when it matters most, you can deliver under the highest pressure.`;
-    } else if (predictionTier === 'beat' || predictionTier === 'crushed') {
-      recap += `The predictions had you down for a ${predictedPosition}th place finish at ${eventName}, but those numbers don't account for good legs and better timing. From early on, it was clear this was going to be your day. You positioned yourself perfectly in the early phases, conserving energy while staying alert to any moves. When the decisive moments arrived, you were always there, always with something left in reserve. The race split into smaller groups as the strongest riders pushed the pace, and you covered every acceleration with confidence. By the final stages, the gap had grown to a comfortable margin, and you could focus on bringing it home clean rather than scrambling in a desperate sprint. Sometimes you have to earn a win through suffering and chaos. Today, you earned it through intelligent racing and superior form.`;
-    } else {
-      recap += `${eventName} unfolded with the kind of control you dream about. Every move felt calculated, every effort measured, and by the time the finish line approached, the result was never in doubt. The predictions had suggested this might be your day, and you delivered with precision. From the opening moments, you settled into a rhythm that felt comfortable yet powerful, reading the race perfectly and responding to every challenge with confidence. When others attacked, you covered. When the pace slowed, you stayed vigilant. And when the moment came to make your own move, you had the reserves to commit fully and ride away from the field. Sometimes racing is about suffering through close calls and desperate sprints. Today wasn't one of those days. Today was about doing your job efficiently and riding away with the result you came for.`;
-    }
-  }
-  
-  // PODIUMS - Long paragraphs
-  else if (tier === 'podium') {
-    if (earnedPhotoFinish) {
-      recap += `They say the margins between success and heartbreak can be measured in fractions of a second, and ${eventName} proved it in the most visceral way possible. This was a race decided by millimeters, by who could throw their bike the furthest across the line, by who wanted it just slightly more in that final desperate moment. You were there in the finale, sprinting for everything, trading paint with the leaders through the last corner. The line approached at terrifying speed, and you threw everything into one last surge. When the dust settled, you'd crossed in ${position === 2 ? 'second' : 'third'} place by the narrowest of margins—close enough to smell victory, far enough to know you came up just short. It's the kind of finish that'll play in your head for days—simultaneously satisfying and frustrating, proof of your competitiveness but a reminder of how fine the margins are at this level. Still, you fought, you committed, and you left everything on the tarmac. There's honor in that, even when the result doesn't quite match the effort.`;
-    } else if (predictionTier === 'beat' || predictionTier === 'crushed') {
-      recap += `${eventName} was a day to be proud of. The predictions suggested you'd finish around ${predictedPosition}th, well out of contention for the podium, but you had other ideas. From the moment things got serious, you were in the mix, trading places with the leaders and proving you belonged at the sharp end. The race unfolded in waves of attacks and counter-attacks, and you covered every significant move with determination. When the final selection was made, you were there—not quite with enough to challenge for the win, but strong enough to hold off those behind and secure ${position === 2 ? 'second' : 'third'} place. A podium is a podium, and there's genuine satisfaction in being up there even if you couldn't quite reach the top step. That's racing. Some days you have everything needed to win, and some days you have everything needed to podium. Today was the latter, and that's nothing to be disappointed about.`;
-    } else if (position === 2) {
-      const gapText = formatGapText(lossMargin);
-      const winnerText = hasWinnerName ? winnerName : 'the winner';
-      recap += `${eventName} rewarded smart racing, though not quite with the prize you were hoping for. You positioned yourself well throughout the race, reading the moves, staying with the strongest riders, and avoiding the chaos that caught others out. As the race reached its climax, you were right there in the mix, sensing an opportunity for victory. In the sprint, you gave everything—lunging for the line, engines red-lined, fighting for every centimeter. Second place${gapText ? `, ${gapText} behind ${winnerText}` : ''}. Close enough to see victory, far enough to know you came up just short. ${winnerText.charAt(0).toUpperCase() + winnerText.slice(1)} had just slightly more on the day, just that extra fraction of speed or better positioning or fresher legs. It stings to come so close, but second place in a competitive field is still a strong result.`;
-    } else {
-      recap += `${eventName} rewarded smart racing and good positioning. You approached the race with a clear plan: stay out of trouble, conserve energy in the early phases, and be ready when the race reached its decisive moments. That plan worked perfectly. You avoided the crashes and chaos that caught others out, stayed with the main group through the challenging sections, and when the final selection was made, you were there. Not quite with enough to challenge for the win—the strongest riders had just slightly more on the day—but strong enough to hold off those behind and secure third place. A podium is a podium, and there's satisfaction in being up there even if you couldn't quite reach the top step. That's racing. You did your job, executed your plan, and came away with a result that adds solid points to your tally and proves you're competitive at this level.`;
-    }
-  }
-  
-  // TOP 10 - Moderate length
-  else if (tier === 'top10') {
-    if (predictionTier === 'beat') {
-      recap += `A solid performance at ${eventName}. The predictions had you further down the order, somewhere in the mid-twenties, but you rode a tactically sound race that delivered better than expected. You stayed with the main group when it mattered, positioning yourself well through the technical sections and responding when the pace ramped up. When the decisive moves came, you couldn't quite go with the very strongest riders, but you held your ground and finished inside the top ten. Not every race needs to deliver a podium or a dramatic victory. Sometimes a solid, consistent performance that exceeds expectations is exactly what the season requires. You banked points, gained valuable experience, and showed you can compete in the middle of a strong field. That's progress.`;
+      recap += `A solid performance at ${eventName}. The predictions had you further back, around ${predictedPosition}th, but you rode a tactically smart race that delivered better. ${dynamicsText}you finished ${position}th, exceeding expectations and banking solid points. Not every race needs to deliver heroics. Sometimes a result that quietly beats expectations is exactly what the season requires—consistent progress, smart positioning, and gradual improvement.`;
     } else if (predictionTier === 'worse') {
+      // Worse than expected
       if (isFirstRace) {
-        recap += `${eventName} didn't quite deliver the result you were hoping for in your season opener. The predictions had you finishing higher up the order, maybe even threatening for a podium, but racing has a way of humbling expectations. You were in contention for much of the race, positioned well and feeling reasonably strong, but when the decisive moves came—when the strongest riders made their attacks—you couldn't quite respond. The gap opened, slowly at first, then more decisively, and you had to settle into your own pace and focus on salvaging what you could. Still, a top-ten finish in your first outing is a respectable start. It's not the result that'll make headlines, but you've established a baseline, gained valuable experience, and banked your first points. That's a foundation to build on.`;
+        const chaseText = dynamics.type === 'chase_group' ? 
+          (gapText ? `The front group rode away with ${gapText} on the chase, and you couldn't respond.` : "The front group broke clear, and you couldn't respond.") :
+          "When the decisive moves came, you couldn't quite match the strongest riders.";
+        recap += `${eventName} didn't quite deliver the result you were hoping for in your season opener. The predictions had you finishing higher, maybe around ${predictedPosition}th, but racing has a way of humbling expectations. ${chaseText} You finished ${position}th, salvaging a top-ten but falling short of where you thought you'd be. Still, it's your first race—establishing a baseline, gathering experience, learning where you stand. That foundation matters, even when the result doesn't excite.`;
       } else {
-        recap += `${eventName} didn't quite deliver the result you were hoping for. The predictions had you finishing higher up the order, maybe even threatening for a podium, but racing has a way of humbling expectations. You were in contention for much of the race, positioned well and feeling reasonably strong, but when the decisive moves came—when the strongest riders made their attacks—you couldn't quite respond. The gap opened, slowly at first, then more decisively, and you had to settle into your own pace and focus on salvaging what you could. Still, a top-ten finish keeps you in the conversation. It's not the result that'll make headlines, but it's another race completed, more experience gained, and points added to your tally. That counts for something.`;
+        const winnerText = (dynamics.type === 'well_back' && gapText) ? 
+          buildWinnerText(hasWinnerName, winnerName, gapText, '. ') : '';
+        const chaseText = dynamics.type === 'chase_group' ? 
+          'You spent the race chasing gaps you could never quite close.' : 
+          'The decisive moments came and went without you in position to respond.';
+        recap += `${eventName} didn't go to plan. The predictions suggested you'd finish around ${predictedPosition}th, threatening for a podium, but you couldn't find the form to match those expectations. ${winnerText}You finished ${position}th—a top-ten finish that keeps you in the conversation but falls well short of what you were hoping for. ${chaseText} Not every day delivers, and today was one of those frustrating races where the legs just didn't have it. Points earned, lessons learned, move forward.`;
       }
+    } else if (variant % 5 === 2 && (dynamics.type === 'chase_group' || dynamics.type === 'well_back')) {
+      // Gap/dynamics awareness
+      const winnerStart = hasWinnerName ? `${winnerName} took` : 'Someone took';
+      const gapPhrase = gapText ? `finishing ${gapText} ahead of the chase group` : 'riding clear of the field';
+      const positionText = dynamics.type === 'chase_group' ? 
+        "leading home a group of riders who couldn't make the front split" : 
+        'among those who fell short of the winning move';
+      recap += `${winnerStart} a strong victory at ${eventName}, ${gapPhrase}. You were in that chase—working hard, trying to minimize losses, racing for the best position available. You finished ${position}th, ${positionText}. It's the kind of result that feels incomplete—you raced hard and finished in the top ten, but you were never truly in contention for the podium. Still, consistency matters. You earned points, stayed competitive, and added another completed race to your tally.`;
+    } else if (variant % 5 === 3) {
+      // Tactical/positioning focus
+      recap += `${eventName} was about consistency and smart positioning rather than heroics. You rode within yourself, avoiding unnecessary risks and conserving energy for when it mattered most. ${dynamics.type === 'bunch_sprint' ? 'The finale came down to a mass sprint, and you navigated the chaos to finish ' + position + 'th.' : dynamics.type === 'chase_group' ? 'The race split into groups, and you were in the chase pack, working efficiently to finish ' + position + 'th.' : 'You stayed with the main group, positioned reasonably well, and finished ' + position + 'th when the dust settled.'} ${predictionTier === 'matched' ? 'Right in line with expectations—' : ''}not a result that generates headlines, but solid professional racing. You banked points, stayed competitive, and lived to fight another day. Sometimes that's exactly what's needed.`;
     } else {
-      recap += `${eventName} was about consistency and smart positioning rather than heroics. You rode within yourself, avoiding unnecessary risks and conserving energy for when it mattered most. The race unfolded predictably—the strongest riders controlling things from the front, the pack staying together through the early phases, then splitting as the pace increased. You stayed out of trouble, positioned yourself reasonably well, and when the final selection was made, you were in the group that finished in the top ten. It's not the kind of result that generates excitement or changes your season trajectory, but it's solid, professional racing. You banked points, stayed competitive, and lived to fight another day. Sometimes that's enough.`;
+      // General top 10
+      const predText = predictionTier === 'matched' ? 'The predictions called it correctly—' : 
+                      predictionTier === 'worse' ? 'You were hoping for better, but ' : '';
+      const dynamicsText = (dynamics.type === 'well_back' && gapText) ?
+        `The strongest riders finished ${gapText} ahead, but you did your job among the rest of the field.` :
+        dynamics.type === 'chase_group' ? 
+          "You couldn't quite make the front group, but you were competitive in the chase." :
+          "You weren't quite fast enough to challenge for the podium, but you held firm in the top ten.";
+      recap += `A ${position}th place finish at ${eventName} keeps you solidly in the points and moving forward. ${predText}you rode a steady race, staying with the main group through the technical sections and holding your position through the finish. ${dynamicsText} Not spectacular, but respectable. You gained experience, earned points, and proved you belong in the middle of a strong field.`;
     }
   }
   
-  // MID-PACK - Moderate length  
+  // ============================================================================
+  // MIDPACK (11-20) - Enhanced with 5 variants
+  // ============================================================================
   else if (tier === 'midpack') {
+    const gapText = formatGapText(lossMargin);
+    const variant = selectVariant(eventNumber, position, 5, {
+      hasWinnerName,
+      hasLargeGap: lossMargin > 60,
+      predictionTier
+    });
+    
     if (earnedZeroToHero) {
-      recap += `What a turnaround. After struggling badly in your previous outing, ${eventName} was a statement of resilience and determination. You came into this race with questions to answer and doubts to silence. The early phases were nervous—you could feel the weight of that last poor result sitting on your shoulders—but as the race developed, so did your confidence. You found your rhythm, started responding to moves rather than being dropped by them, and gradually worked your way up through the field. The result—${position}th place—might not look spectacular on paper, but context matters. After where you were last time, this represents significant progress. You proved you can bounce back, that one bad day doesn't define your season, and that you have the mental strength to turn things around when they're not going well.`;
-    } else if (predictionTier === 'beat') {
-      recap += `${eventName} was a quiet success. The predictions suggested you'd finish well back in the pack, struggling to stay with the main group, but through steady riding and good positioning, you worked your way into the mid-pack. Not spectacular, but solid progress. You stayed out of trouble in the early chaos, found a group that was riding at a sustainable pace, and worked efficiently to maintain your position throughout the race. When others around you faded or made mistakes, you stayed consistent. The result won't generate headlines, but it exceeds expectations and adds decent points to your season total. That's the kind of race that builds a solid foundation for better results to come.`;
+      // Comeback variant
+      const winnerText = (dynamics.type === 'well_back' && gapText) ? 
+        buildWinnerText(hasWinnerName, winnerName, gapText, ", but that wasn't your concern today.") : '';
+      recap += `What a turnaround. After struggling badly in your previous outing, ${eventName} was a statement of resilience. You came into this race with questions to answer and doubts to silence. ${winnerText} Your focus was on competing, on proving you could bounce back. You finished ${position}th—not spectacular, but after where you were last time, this represents genuine progress. You proved you can turn things around, that one bad day doesn't define your season, and that you have the mental strength to respond when things go wrong. Context matters, and in context, this was a successful day.`;
+    } else if (predictionTier === 'beat' && variant % 3 === 0) {
+      // Beat expectations
+      const chaseText = dynamics.type === 'chase_group' ? 
+        "You couldn't make the front group, but you were competitive in the chase pack." : 
+        'You stayed out of trouble, found a group riding at a sustainable pace, and worked efficiently through to the finish.';
+      const gapPrefix = (gapText && dynamics.type === 'well_back') ? 
+        `The leaders finished ${gapText} ahead, riding at a level you couldn't match, but ` : '';
+      recap += `${eventName} was a quiet success. The predictions suggested you'd finish well back in the pack, around ${predictedPosition}th, struggling to stay with the main group. But through steady riding and good positioning, you worked your way to ${position}th place. ${chaseText} Not spectacular, but solid progress. ${gapPrefix}you exceeded expectations and banked decent points. That's the kind of result that builds a foundation for better days ahead.`;
+    } else if (variant % 5 === 1) {
+      // Realistic midpack with gap awareness
+      const winnerText = (dynamics.type === 'well_back' && gapText) ? 
+        buildWinnerText(hasWinnerName, winnerName, gapText, ', ') : '';
+      const chaseText = dynamics.type === 'chase_group' ? 
+        'You fell into a chase group behind the leaders and worked to minimize the time loss.' : 
+        'You found your rhythm, settled in, and focused on getting to the finish.';
+      const predText = predictionTier === 'matched' ? 'Right in line with expectations—' : '';
+      recap += `${position}th place at ${eventName}—firmly in the midpack. ${winnerText}and you were never really in contention to challenge the front runners. You stayed with the main group through the early sections, but when the pace increased, you couldn't respond. ${chaseText} ${predText}not disappointing, but not exciting either. You completed the race, banked some points, and gained more experience. That counts for something, even when the result doesn't generate enthusiasm.`;
+    } else if (variant % 5 === 2 && predictionTier === 'worse') {
+      // Disappointed with result
+      const attackText = dynamics.type === 'well_back' ? 
+        'The strongest riders rode away early, and you were left chasing gaps you could never close.' : 
+        "When the key moves came, you weren't able to respond with the power needed.";
+      const gapSuffix = (gapText && dynamics.type === 'well_back') ? 
+        `The leaders were ${gapText} ahead at the finish. ` : '';
+      recap += `The predictions had you finishing higher at ${eventName}, maybe around ${predictedPosition}th, but the legs didn't have what you were hoping for. ${attackText} You finished ${position}th—midpack, respectable enough, but falling short of expectations. ${gapSuffix}It's frustrating to race hard and finish in the middle, knowing you were hoping for better. But not every day delivers. You completed the distance, earned some points, and will regroup for the next one.`;
+    } else if (variant % 5 === 3) {
+      // Survival/completion focus
+      const gapText2 = (dynamics.type === 'well_back' && gapText) ? 
+        `They finished ${gapText} ahead. ` : '';
+      recap += `${eventName} was about survival more than glory. From early on, it was clear the strongest riders were operating at a different level. ${gapText2}You tried to respond when the pace surged, but the legs weren't there today. Eventually, you settled into your own rhythm—not racing for position anymore, just focusing on reaching the finish line with dignity intact. ${position}th place isn't the result you were hoping for, but you completed the distance and gained experience. Racing isn't always about results—sometimes it's about showing up, doing the work, and learning what you need to improve. Today was one of those days.`;
     } else {
-      recap += `${eventName} was one of those races where you stay in the mix without ever threatening the front runners. The result—${position}th place—reflects a day of steady work without the breakthrough needed to crack the top positions. You were never in serious trouble, never at risk of being dropped completely, but you also couldn't find the extra gear required to move up when the pace increased. The strongest riders rode away from you on the climbs or in the final kilometers, and you had to settle for being part of the main chase group. It's not disappointing, exactly—you rode to your current capabilities—but it's also not the step forward you're looking for. Still, you completed the race, banked some points, and gained more experience. That's valuable even when the result doesn't excite.`;
+      // General midpack
+      const predText = predictionTier === 'matched' ? 'Right where the predictions suggested.' : 
+                      predictionTier === 'worse' ? 'Not quite where you were hoping to be.' : 
+                      'A respectable if unspectacular result.';
+      const raceText = dynamics.type === 'chase_group' ? 
+        'The front group broke clear, and you were left in the chase pack, working with others who missed the move.' : 
+        "You stayed with the main group through most of the race but couldn't find the extra gear needed to move up in the finale.";
+      const gapText2 = (gapText && dynamics.type === 'well_back') ? 
+        `The leaders finished ${gapText} ahead. ` : '';
+      recap += `${eventName} found you solidly in the midpack—${position}th place. ${predText} ${raceText} ${gapText2}Not a day for heroics—just steady work, completing the distance, and banking a few points. Progress isn't always linear, and some days are about ticking boxes rather than making breakthroughs.`;
     }
   }
   
-  // BACK OF FIELD - Honest but measured
+  // ============================================================================
+  // BACK OF FIELD (21+) - Enhanced with 4 honest but varied variants
+  // ============================================================================
   else {
-    if (predictionTier === 'much_worse') {
-      recap += `${eventName} was a struggle from start to finish. Nothing clicked today—the legs weren't there, the positioning was off, and by the time the race reached its climax, you were just trying to limit the damage and get to the finish line. The predictions had you competing in the mid-pack, but racing had other plans. You lost touch with the main group earlier than you'd hoped, found yourself isolated or in a struggling group, and had to dig deep just to complete the distance. It's the kind of day every racer experiences at some point—when form, luck, and circumstance all conspire against you. The only silver lining is that you finished. Tough days are part of racing, and what matters most is how you respond in the next one. This isn't who you are; it's just where you were today.`;
+    const gapText = formatGapText(lossMargin);
+    const variant = selectVariant(eventNumber, position, 4, {
+      hasWinnerName,
+      hasLargeGap: lossMargin > 90,
+      predictionTier
+    });
+    
+    if (predictionTier === 'much_worse' && variant % 2 === 0) {
+      // Well below expectations
+      recap += `${eventName} was a struggle from start to finish. The predictions had you competing around ${predictedPosition}th, solidly in the mix, but racing had very different plans. ${dynamics.type === 'well_back' && gapText ? `${hasWinnerName ? winnerName : 'The winner'} finished ${gapText} ahead—not that it mattered to your race. ` : ''}Nothing clicked today. The legs weren't there, the positioning was off, and by the time the race reached its climax, you were just trying to limit the damage and reach the finish line. You lost touch with the main group earlier than you'd hoped, found yourself isolated or in a struggling group, and had to dig deep just to complete the distance. ${position}th place is honest but painful. Every racer has days like this—when form, luck, and circumstance conspire against you. The only silver lining is that you finished. What matters now is how you respond.`;
+    } else if (variant % 4 === 1) {
+      // Honest struggle with gap awareness
+      recap += `Sometimes racing doesn't go your way, and ${eventName} was emphatically one of those days. ${gapText && dynamics.type === 'well_back' ? `The leaders finished ${gapText} ahead, racing at a level you couldn't even glimpse today. ` : 'The strongest riders rode away early, and you were never in contention. '}Despite your best efforts, you couldn't find the form needed to stay competitive. The gap opened early and never closed, leaving you in survival mode for much of the race. ${position}th place stings—there's no sugarcoating it. You tried to respond when others accelerated, but the legs simply didn't have it. Eventually you had to accept your position and focus on getting to the finish line with whatever small dignity remained. Tough days are part of racing. This was one of them.`;
+    } else if (variant % 4 === 2 && isFirstRace) {
+      // First race reality check
+      recap += `${eventName} was a harsh introduction to competitive racing. The predictions might have suggested ${predictedPosition}th, but your first race delivered a reality check: you finished ${position}th, well back in the field. ${gapText && dynamics.type === 'well_back' ? `The leaders were ${gapText} ahead when you crossed. ` : 'The front of the race rode away and never looked back. '}Racing is humbling, especially when you're just starting. The pace was higher than you expected, the efforts were more sustained, and when it mattered, you simply weren't at the level needed to compete. But everyone starts somewhere, and today was your starting point. You finished. You gained experience. You learned where you stand and what you need to improve. That's valuable, even when the result is painful to process.`;
     } else {
-      recap += `Sometimes racing doesn't go your way, and ${eventName} was one of those days. Despite your best efforts and intentions, you couldn't find the form needed to stay with the front groups or even the main pack. The gap opened early and never closed, leaving you in survival mode for much of the race. You tried to respond when others accelerated, but the legs simply didn't have it today. Eventually you had to accept your position, focus on getting to the finish line with dignity, and extract whatever small lessons you could from a disappointing performance. Every race is a learning experience, even the tough ones. Today taught you where you need to improve, what it takes to compete at this level, and that resilience matters as much as results. You'll come back from this.`;
+      // General back-of-field
+      recap += `${eventName} was one you'd rather forget. ${predictionTier === 'worse' ? `The predictions suggested you'd finish around ${predictedPosition}th, but those numbers proved wildly optimistic.` : `You came in hoping to compete, but the reality was harsh.`} ${dynamics.type === 'well_back' && gapText ? `${hasWinnerName ? winnerName : 'The winner'} finished ${gapText} ahead. ` : ''}From early on, you struggled to stay in touch with the pack. When the pace ramped up, you couldn't respond. When others attacked, you had nothing left to give. ${position}th place is a result that speaks to a difficult day—legs that didn't cooperate, positioning that never came together, a race that went badly from start to finish. But you finished. That's not nothing. Every race is a data point, every struggle teaches something. Today taught you where you need to work harder. Tomorrow you'll respond.`;
     }
   }
-
+  
   return recap;
 }
 
