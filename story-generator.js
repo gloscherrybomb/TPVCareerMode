@@ -420,13 +420,29 @@ function generateSeasonContext(data) {
   } else if (nextEventType === 'criterium') {
     context += `Stage ${nextStageNumber} brings ${nextEventName}, a fast and technical criterium where positioning and timing matter as much as raw power. These races are chess matches played at 40 kilometers per hour—you need to read the moves before they happen, position yourself perfectly coming out of corners, and have the snap to respond when the crucial accelerations come. `;
   } else if (nextEventType === 'hill climb') {
-    context += `Next up: ${nextEventName} at Stage ${nextStageNumber}, where the road points upward and only the strongest climbers thrive. There's nowhere to hide on climbs—no drafting, no tactics, just you against gravity and everyone else suffering alongside you. The riders who love these events are a special breed, and you'll find out if you're one of them. `;
+    const isOptionalStage = (nextStageNumber === 3 || nextStageNumber === 6 || nextStageNumber === 8);
+    if (isOptionalStage) {
+      context += `Stage ${nextStageNumber} points upward—a climb where only the strongest riders thrive. There's nowhere to hide on climbs—no drafting, no tactics, just you against gravity and everyone else suffering alongside you. The riders who love these events are a special breed, and you'll find out if you're one of them. `;
+    } else {
+      context += `Next up: ${nextEventName} at Stage ${nextStageNumber}, where the road points upward and only the strongest climbers thrive. There's nowhere to hide on climbs—no drafting, no tactics, just you against gravity and everyone else suffering alongside you. The riders who love these events are a special breed, and you'll find out if you're one of them. `;
+    }
   } else if (nextEventType === 'gran fondo' || nextEventType === 'gravel race') {
-    context += `${nextEventName} looms at Stage ${nextStageNumber}—a long-distance test of endurance, tactics, and mental resilience. These events aren't won in a single moment but across hours of sustained effort, through accumulated small decisions that either leave you fresh for the finale or spent too early. Patience and pacing are everything. `;
+    // For optional event stages, don't mention the specific event name
+    const isOptionalStage = (nextStageNumber === 3 || nextStageNumber === 6 || nextStageNumber === 8);
+    if (isOptionalStage) {
+      context += `Stage ${nextStageNumber} presents a long-distance test of endurance, tactics, and mental resilience. These events aren't won in a single moment but across hours of sustained effort, through accumulated small decisions that either leave you fresh for the finale or spent too early. Patience and pacing are everything. `;
+    } else {
+      context += `${nextEventName} looms at Stage ${nextStageNumber}—a long-distance test of endurance, tactics, and mental resilience. These events aren't won in a single moment but across hours of sustained effort, through accumulated small decisions that either leave you fresh for the finale or spent too early. Patience and pacing are everything. `;
+    }
   } else if (nextEventType === 'points race') {
     context += `Stage ${nextStageNumber} is ${nextEventName}, a points race where consistency across multiple sprints matters more than a single explosive effort. You'll need to be alert for every intermediate sprint, positioned well each time, and smart about when to commit fully versus when to take what you can get. It's about accumulation rather than one decisive moment. `;
   } else if (nextEventType === 'track elimination') {
-    context += `${nextEventName} awaits at Stage ${nextStageNumber}—a velodrome elimination race where one moment of inattention can end your day. The format is unforgiving: every lap, the last rider across the line is eliminated, and this continues until only the winner remains. You'll need sharp positioning, constant vigilance, and the ability to respond instantly when someone else makes a move. `;
+    const isOptionalStage = (nextStageNumber === 3 || nextStageNumber === 6 || nextStageNumber === 8);
+    if (isOptionalStage) {
+      context += `Stage ${nextStageNumber} brings a velodrome elimination race where one moment of inattention can end your day. The format is unforgiving: every lap, the last rider across the line is eliminated, and this continues until only the winner remains. You'll need sharp positioning, constant vigilance, and the ability to respond instantly when someone else makes a move. `;
+    } else {
+      context += `${nextEventName} awaits at Stage ${nextStageNumber}—a velodrome elimination race where one moment of inattention can end your day. The format is unforgiving: every lap, the last rider across the line is eliminated, and this continues until only the winner remains. You'll need sharp positioning, constant vigilance, and the ability to respond instantly when someone else makes a move. `;
+    }
   } else if (nextEventType === 'road race') {
     context += `Stage ${nextStageNumber} brings ${nextEventName}, a classic road race where tactics, teamwork, and individual strength all play their part. These events can unfold in countless ways—early breakaways, late attacks, sprint finishes—and you'll need to read the race correctly and be ready for anything. `;
   } else if (nextEventType === 'stage race') {
