@@ -305,7 +305,8 @@ function generateSeasonContext(data) {
     recentResults,
     isOnStreak,
     totalPodiums,
-    seasonPosition
+    seasonPosition,
+    isNextStageChoice
   } = data;
 
   // Special case: If this is the final stage (stage 9 = Local Tour complete) and season is complete
@@ -397,6 +398,8 @@ function generateSeasonContext(data) {
   // Strategic/tactical context about next event (2-3 sentences)
   const nextEventType = EVENT_TYPES[nextEventNumber];
   
+  console.log(`Story Generator Debug: nextStageNumber=${nextStageNumber}, nextEventNumber=${nextEventNumber}, isNextStageChoice=${isNextStageChoice}, nextEventType=${nextEventType}`);
+  
   // Special case: Event 15 (Local Tour Stage 3) completes the season (stage 9)
   // Events 13, 14, 15 are all part of stage 9, so only show "season complete" after event 15
   if (nextEventNumber === null || nextEventNumber === undefined || nextEventNumber > 15) {
@@ -411,8 +414,21 @@ function generateSeasonContext(data) {
     return context;
   }
   
-  if (nextStageNumber === 3 || nextStageNumber === 6 || nextStageNumber === 8) {
-    context += `Stage ${nextStageNumber} presents an interesting choice from the optional events, giving you tactical flexibility to play to your strengths. `;
+  // Special handling for optional stages - don't describe specific event
+  if (isNextStageChoice) {
+    context += `Stage ${nextStageNumber} presents an interesting choice from the optional events, giving you tactical flexibility to play to your strengths. Whether you choose the technical demands of the velodrome, the relentless test of a climb, or the endurance challenge of a long-distance event, each option rewards different skills and exposes different weaknesses. Pick what suits you best, or what will challenge you most—both approaches have merit. `;
+    
+    // Skip the detailed event-type description below and go to closing
+    // Add closing context about season progression
+    if (stagesCompleted <= 3) {
+      context += `The season is still young, with plenty of racing ahead, but you're learning what you're capable of and where you can push harder. `;
+    } else if (stagesCompleted <= 6) {
+      context += `The season is approaching its midpoint, and you're starting to understand your strengths and weaknesses more clearly. `;
+    } else {
+      context += `The season is entering its closing chapters, and every stage from here carries extra weight. `;
+    }
+    
+    return context;
   }
   
   if (nextEventType === 'time trial') {
