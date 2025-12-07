@@ -1478,13 +1478,16 @@ async function buildSeasonStandings(results, userData, eventNumber, currentUid) 
       racer.events = (racer.events || 0) + 1;
       racer.arr = arr; // Update to most recent ARR
       racer.team = team || racer.team; // Keep team if exists
+      
+      // Backfill UID if missing (for old standings that had null UIDs)
+      if (!racer.uid) {
+        racer.uid = uid;
+      }
     } else {
-      // Add new racer
-      // For bots, create a name-based identifier that can be used for profile lookup
-      const botUid = isBotRacer ? `Bot_${name.replace(/[^a-zA-Z0-9]/g, '_')}` : uid;
+      // Add new racer - use the UID from CSV (already in correct format like Bot711)
       standingsMap.set(key, {
         name: name,
-        uid: botUid,
+        uid: uid, // Use actual UID from CSV
         arr: arr,
         team: team,
         events: 1,
