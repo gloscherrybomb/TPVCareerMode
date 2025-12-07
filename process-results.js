@@ -1462,6 +1462,11 @@ async function buildSeasonStandings(results, userData, eventNumber, currentUid) 
     const name = result.Name;
     const position = parseInt(result.Position);
     
+    // Debug logging for bot UIDs
+    if (result.Gender === 'Bot' || (uid && uid.startsWith && uid.startsWith('Bot'))) {
+      console.log(`  🤖 Bot detected: name="${name}", uid="${uid}", gender="${result.Gender}"`);
+    }
+    
     // Skip DNFs and invalid positions
     if (result.Position === 'DNF' || isNaN(position)) {
       return;
@@ -1486,10 +1491,14 @@ async function buildSeasonStandings(results, userData, eventNumber, currentUid) 
       
       // Backfill UID if missing (for old standings that had null UIDs)
       if (!racer.uid) {
+        console.log(`  🔧 Backfilling UID for ${name}: null → ${uid}`);
         racer.uid = uid;
       }
     } else {
       // Add new racer - use the UID from CSV (already in correct format like Bot711)
+      if (isBotRacer) {
+        console.log(`  ➕ Adding new bot to standings: ${name} with UID: ${uid}`);
+      }
       standingsMap.set(key, {
         name: name,
         uid: uid, // Use actual UID from CSV
