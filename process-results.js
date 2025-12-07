@@ -1373,38 +1373,20 @@ function simulatePosition(botName, arr, eventNumber, fieldSize = 50) {
 /**
  * Fetch all results from events 1 through currentEvent
  */
-async function getAllPreviousEventResults(season, currentEvent) {
+async function getAllPreviousEventResults(season, currentEvent, userUid) {
   const allEventResults = {};
   
   for (let eventNum = 1; eventNum <= currentEvent; eventNum++) {
     try {
-      // Query all result documents for this event
-      const querySnapshot = await db.collection('results')
-        .where(admin.firestore.FieldPath.documentId(), '>=', `season${season}_event${eventNum}_`)
-        .where(admin.firestore.FieldPath.documentId(), '<', `season${season}_event${eventNum}_\uf8ff`)
-        .get();
+      // Query only THIS USER's result document for this event
+      const docRef = db.collection('results').doc(`season${season}_event${eventNum}_${userUid}`);
+      const docSnapshot = await docRef.get();
       
-      if (!querySnapshot.empty) {
-        // Collect all results from all users
-        const allResults = [];
-        querySnapshot.forEach(doc => {
-          const data = doc.data();
-          if (data.results && Array.isArray(data.results)) {
-            allResults.push(...data.results);
-          }
-        });
-        
-        // De-duplicate by UID
-        const uniqueResults = [];
-        const seenUIDs = new Set();
-        allResults.forEach(r => {
-          if (!seenUIDs.has(r.uid)) {
-            seenUIDs.add(r.uid);
-            uniqueResults.push(r);
-          }
-        });
-        
-        allEventResults[eventNum] = uniqueResults;
+      if (docSnapshot.exists) {
+        const data = docSnapshot.data();
+        if (data.results && Array.isArray(data.results)) {
+          allEventResults[eventNum] = data.results;
+        }
       }
     } catch (error) {
       console.log(`   Warning: Could not fetch results for event ${eventNum}:`, error.message);
@@ -1513,9 +1495,9 @@ async function buildSeasonStandings(results, userData, eventNumber, currentUid) 
   });
   
   // Now backfill bots with simulated results
-  // Get all results from events 1 through current
+  // Get all results from events 1 through current FOR THIS USER ONLY
   console.log('   Backfilling bot results...');
-  const allEventResults = await getAllPreviousEventResults(season, eventNumber);
+  const allEventResults = await getAllPreviousEventResults(season, eventNumber, currentUid);
   
   // IMPORTANT: Also include current event's results (not yet in Firestore)
   // The 'results' parameter contains the current event being processed
