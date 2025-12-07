@@ -1041,26 +1041,23 @@
                 const userDocRef = userDoc.ref;
                 const userUid = userDoc.data().uid;
                 
-                console.log('User UID:', userUid);
-                
                 // Delete all race result documents for this user (season1_event1_UID through season1_event15_UID)
                 const deletePromises = [];
                 for (let i = 1; i <= 15; i++) {
                     const resultDocId = `season1_event${i}_${userUid}`;
-                    console.log('Attempting to delete:', resultDocId);
                     const resultDocRef = doc(db, 'results', resultDocId);
                     deletePromises.push(
-                        deleteDoc(resultDocRef)
-                            .then(() => console.log(`✓ Deleted ${resultDocId}`))
-                            .catch(err => {
-                                console.log(`✗ Failed to delete ${resultDocId}:`, err.code, err.message);
-                            })
+                        deleteDoc(resultDocRef).catch(err => {
+                            // Silently catch if document doesn't exist
+                            if (err.code !== 'not-found') {
+                                console.warn(`Failed to delete ${resultDocId}:`, err);
+                            }
+                        })
                     );
                 }
                 
                 // Wait for all result deletions to complete
                 await Promise.all(deletePromises);
-                console.log('Finished attempting to delete race result documents');
                 
                 // Reset all season 1 data
                 const resetData = {

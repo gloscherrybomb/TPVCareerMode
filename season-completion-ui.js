@@ -265,10 +265,10 @@ async function confirmSeasonReset() {
             if (loadingModal) loadingModal.remove();
             
             // Show success message
-            alert('Season 1 has been reset. Check console, then page will reload in 5 seconds...');
+            alert('Season 1 has been reset. Redirecting to events page...');
             
-            // Reload page to show fresh state (with delay for console checking)
-            setTimeout(() => window.location.reload(), 5000);
+            // Reload page to show fresh state
+            window.location.reload();
         } else {
             throw new Error('Reset function not found');
         }
