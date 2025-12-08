@@ -269,10 +269,10 @@ if (signupForm) {
     const password = document.getElementById('signupPassword').value;
 
     // Validate UID format (15 or 16 hexadecimal characters)
-if (!/^[0-9A-F]{15,16}$/.test(uid)) {
-  alert('Invalid UID format. Must be 15 or 16 hexadecimal characters (0-9, A-F).');
-  return;
-}
+    if (!/^[0-9A-F]{15,16}$/.test(uid)) {
+      alert('Invalid UID format. Must be 15 or 16 hexadecimal characters (0-9, A-F).');
+      return;
+    }
 
     try {
       // Check if UID is already claimed by another user
@@ -422,12 +422,11 @@ if (uidForm) {
 
     const uid = document.getElementById('googleUID').value.toUpperCase();
 
-  // Validate UID format
-if (!/^[0-9A-F]{15,16}$/.test(uid)) {
-  alert('Invalid UID format. Must be 15 or 16 hexadecimal characters (0-9, A-F).');
-  return;
-}
-
+    // Validate UID format
+    if (!/^[0-9A-F]{15,16}$/.test(uid)) {
+      alert('Invalid UID format. Must be 15 or 16 hexadecimal characters (0-9, A-F).');
+      return;
+    }
 
     try {
       // Check if UID is already claimed
@@ -486,6 +485,7 @@ onAuthStateChanged(auth, (user) => {
   const loginBtn = document.getElementById('loginBtn');
   const logoutBtn = document.getElementById('logoutBtn');
   const ctaSection = document.getElementById('ctaSection');
+  const loginPrompt = document.querySelector('.login-prompt'); // 👈 NEW
 
   if (user) {
     // User is signed in
@@ -498,6 +498,9 @@ onAuthStateChanged(auth, (user) => {
     if (ctaSection) {
       ctaSection.style.display = 'none'; // Hide signup CTA when logged in
     }
+    if (loginPrompt) {
+      loginPrompt.style.display = 'none'; // 👈 Hide "Track Your Progress" prompt when logged in
+    }
   } else {
     // User is signed out
     if (loginBtn) {
@@ -509,6 +512,9 @@ onAuthStateChanged(auth, (user) => {
     }
     if (ctaSection) {
       ctaSection.style.display = 'block'; // Show signup CTA when logged out
+    }
+    if (loginPrompt) {
+      loginPrompt.style.display = 'block'; // 👈 Show prompt again when logged out
     }
   }
 });
