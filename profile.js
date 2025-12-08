@@ -87,6 +87,27 @@ function formatTime(seconds) {
     }
 }
 
+// Get ordinal suffix for a number (1st, 2nd, 3rd, 4th, etc.)
+function getOrdinalSuffix(num) {
+    if (!num) return '';
+    const n = Math.round(num);
+    const lastDigit = n % 10;
+    const lastTwoDigits = n % 100;
+    
+    // Special cases: 11th, 12th, 13th
+    if (lastTwoDigits >= 11 && lastTwoDigits <= 13) {
+        return n + 'th';
+    }
+    
+    // Regular cases
+    switch (lastDigit) {
+        case 1: return n + 'st';
+        case 2: return n + 'nd';
+        case 3: return n + 'rd';
+        default: return n + 'th';
+    }
+}
+
 // Get ARR band from rating
 function getARRBand(arr) {
     if (!arr || arr < 300) return 'Unranked';
@@ -338,7 +359,7 @@ function displayProfileInfo(user, userData, stats, seasonRanking, globalRanking)
     }
     
     document.getElementById('arrRating').textContent = stats.arr ? stats.arr : 'N/A';
-    document.getElementById('avgFinish').textContent = stats.averageFinish ? `${Math.round(stats.averageFinish)}th` : 'N/A';
+    document.getElementById('avgFinish').textContent = stats.averageFinish ? getOrdinalSuffix(stats.averageFinish) : 'N/A';
     document.getElementById('winRate').textContent = `${stats.winRate}%`;
     document.getElementById('podiumRate').textContent = `${stats.podiumRate}%`;
     
