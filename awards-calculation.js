@@ -32,9 +32,9 @@ function checkCloseCall(position, winnerTime, secondPlaceTime) {
 }
 
 /**
- * Check if Photo Finish award earned (finish within 0.1s of winner)
- * Can be earned by anyone finishing within 0.1s of the winner, INCLUDING the winner
- * if they win by less than 0.1s from 2nd place
+ * Check if Photo Finish award earned (finish within 0.2s of winner)
+ * Can be earned by anyone finishing within 0.2s of the winner, INCLUDING the winner
+ * if they win by less than 0.2s from 2nd place
  * @param {number} position - finishing position
  * @param {number} userTime - user's time in seconds
  * @param {number} winnerTime - winner's time in seconds
@@ -48,13 +48,13 @@ function checkPhotoFinish(position, userTime, winnerTime, secondPlaceTime) {
   if (position === 1) {
     if (!secondPlaceTime) return false;
     const margin = secondPlaceTime - userTime;
-    return margin <= 0.1; // Won by 0.1s or less
+    return margin <= 0.2; // Won by 0.2s or less
   }
   
   // If user is not the winner, check margin to winner
   if (!winnerTime) return false;
   const margin = userTime - winnerTime;
-  return margin <= 0.1; // Within 0.1 seconds of winner
+  return margin <= 0.2; // Within 0.2 seconds of winner
 }
 
 /**
