@@ -93,7 +93,7 @@ const AWARD_DEFINITIONS = {
     id: 'photoFinish',
     title: 'Photo Finish',
     icon: '📸',
-    description: 'Finish within 0.1s of winner',
+    description: 'Finish within 0.2s of winner',
     calculationType: 'event'
   },
   
