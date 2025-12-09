@@ -277,6 +277,4 @@ const INTERVIEW_QUESTIONS = {
 };
 
 // Export for use in other modules
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { INTERVIEW_QUESTIONS };
-}
+export { INTERVIEW_QUESTIONS };

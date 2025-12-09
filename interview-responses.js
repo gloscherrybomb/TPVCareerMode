@@ -892,6 +892,4 @@ const INTERVIEW_RESPONSES = {
 };
 
 // Export for use in other modules
-if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { INTERVIEW_RESPONSES };
-}
+export { INTERVIEW_RESPONSES };
