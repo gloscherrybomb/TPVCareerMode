@@ -931,25 +931,6 @@ async function checkBotProfile(botUid) {
 
 // Attach event listeners to rival elements
 function attachRivalEventListeners() {
-    // Clickable rival names
-    document.querySelectorAll('.rival-name').forEach(nameEl => {
-        nameEl.addEventListener('click', () => {
-            const botUid = nameEl.dataset.botUid;
-            const hasProfile = nameEl.dataset.hasProfile === 'true';
-
-            if (hasProfile) {
-                // Open bot profile modal (from bot-profile-modal.js)
-                if (window.openBotProfile) {
-                    window.openBotProfile(botUid);
-                }
-            } else {
-                // Show request profile modal
-                const botName = nameEl.dataset.botName;
-                openProfileRequestModal(botUid, botName, '', '');
-            }
-        });
-    });
-
     // View Profile buttons
     document.querySelectorAll('.btn-view-profile').forEach(btn => {
         btn.addEventListener('click', () => {
