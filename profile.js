@@ -3,6 +3,7 @@
 import { firebaseConfig } from './firebase-config.js';
 import { getInitials, formatTime, getOrdinalSuffix, getARRBand, formatDate, getCountryCode2 } from './utils.js';
 import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+import { displayPersonality } from './profile-personality.js';
 import {
     getFirestore,
     doc,
@@ -209,6 +210,9 @@ async function loadProfile(user) {
 
         // Display rivals
         displayRivals(userData);
+
+        // Display personality if available
+        displayPersonality(userData);
 
         showProfileContent();
     } catch (error) {

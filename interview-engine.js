@@ -1,0 +1,494 @@
+// interview-engine.js - Question generation and selection logic for post-race interviews
+
+import { INTERVIEW_QUESTIONS } from './interview-questions.js';
+import { INTERVIEW_RESPONSES } from './interview-responses.js';
+
+/**
+ * Default personality values for new users
+ */
+export function getDefaultPersonality() {
+    return {
+        confidence: 50,
+        humility: 50,
+        aggression: 50,
+        professionalism: 50,
+        showmanship: 50,
+        resilience: 50,
+        lastUpdated: new Date()
+    };
+}
+
+/**
+ * Build race context from event results for interview question selection
+ */
+export function buildRaceContext(userResult, allResults, userData, seasonData) {
+    const context = {
+        position: userResult.position,
+        totalRiders: allResults.length,
+        predicted: userResult.predicted || null,
+        beatPredictionBy: userResult.predicted ? (userResult.predicted - userResult.position) : 0,
+        worseThanPredictionBy: userResult.predicted ? (userResult.position - userResult.predicted) : 0,
+
+        // Time gaps
+        winMargin: userResult.position === 1 && allResults[1] ?
+            Math.abs(allResults[1].timeSeconds - userResult.timeSeconds) : null,
+        lossMargin: userResult.position > 1 && allResults[0] ?
+            Math.abs(allResults[0].timeSeconds - userResult.timeSeconds) : null,
+
+        // Rival information (if applicable)
+        rivalEncounter: false,
+        rivalName: null,
+        rivalGap: null,
+        userWon: null,
+        totalEncounters: 0,
+        h2hWins: 0,
+        firstEncounter: false,
+
+        // Season context
+        racesCompleted: seasonData?.racesCompleted || 1,
+        careerWins: userData?.stats?.wins || 0,
+        careerPodiums: userData?.stats?.podiums || 0,
+        consecutiveWins: seasonData?.consecutiveWins || 0,
+        consecutivePodiums: seasonData?.consecutivePodiums || 0,
+        recentRacesBelowExpectation: seasonData?.recentBelowExpectation || 0,
+
+        // Event metadata
+        eventType: userResult.eventType || 'road race',
+        eventCategory: userResult.eventCategory || 'road',
+        isSeasonFinale: seasonData?.isSeasonFinale || false
+    };
+
+    // Check for rival encounters in results
+    if (userData?.rivals && userData.rivals.length > 0) {
+        const rival = userData.rivals[0]; // Primary rival
+        const rivalResult = allResults.find(r => r.name === rival.name);
+
+        if (rivalResult) {
+            context.rivalEncounter = true;
+            context.rivalName = rival.name;
+            context.rivalGap = Math.abs(userResult.timeSeconds - rivalResult.timeSeconds);
+            context.userWon = userResult.position < rivalResult.position;
+            context.totalEncounters = rival.encounters || 1;
+            context.h2hWins = rival.userWins || 0;
+            context.firstEncounter = rival.encounters === 1;
+        }
+    }
+
+    return context;
+}
+
+/**
+ * Check if a trigger condition matches the race context
+ */
+function checkTrigger(trigger, value, context) {
+    if (typeof trigger === 'number') {
+        return value === trigger;
+    }
+
+    if (typeof trigger === 'string') {
+        return value === trigger;
+    }
+
+    if (typeof trigger === 'boolean') {
+        return value === trigger;
+    }
+
+    if (Array.isArray(trigger)) {
+        return trigger.includes(value);
+    }
+
+    // Special trigger types
+    if (trigger.greaterThan !== undefined) {
+        return value > trigger.greaterThan;
+    }
+
+    if (trigger.lessThan !== undefined) {
+        return value < trigger.lessThan;
+    }
+
+    if (trigger.between !== undefined) {
+        return value >= trigger.between[0] && value <= trigger.between[1];
+    }
+
+    return false;
+}
+
+/**
+ * Check if all triggers for a question are satisfied
+ */
+function checkQuestionTriggers(questionTriggers, context) {
+    // Convert trigger object to array of checks
+    const triggerChecks = Object.entries(questionTriggers).map(([key, trigger]) => {
+        // Handle special trigger keys
+        if (key === 'positionIn') {
+            return trigger.includes(context.position);
+        }
+
+        if (key === 'positionBetween') {
+            return context.position >= trigger[0] && context.position <= trigger[1];
+        }
+
+        if (key === 'positionGreaterThan') {
+            return context.position > trigger;
+        }
+
+        if (key === 'positionLessThan') {
+            return context.position < trigger;
+        }
+
+        if (key === 'beatPredictionBy') {
+            return context.beatPredictionBy >= trigger;
+        }
+
+        if (key === 'worseThanPredictionBy') {
+            return context.worseThanPredictionBy >= trigger;
+        }
+
+        if (key === 'winMarginGreaterThan') {
+            return context.winMargin && context.winMargin > trigger;
+        }
+
+        if (key === 'winMarginLessThan') {
+            return context.winMargin && context.winMargin < trigger;
+        }
+
+        if (key === 'gapLessThan') {
+            return context.rivalGap && context.rivalGap < trigger;
+        }
+
+        if (key === 'racesCompletedBetween') {
+            return context.racesCompleted >= trigger[0] && context.racesCompleted <= trigger[1];
+        }
+
+        if (key === 'consecutiveWins') {
+            return context.consecutiveWins >= trigger;
+        }
+
+        if (key === 'consecutivePodiums') {
+            return context.consecutivePodiums >= trigger;
+        }
+
+        if (key === 'careerWins') {
+            return context.careerWins === trigger;
+        }
+
+        if (key === 'careerPodiums') {
+            return context.careerPodiums === trigger;
+        }
+
+        if (key === 'h2hWins') {
+            return context.h2hWins >= trigger;
+        }
+
+        if (key === 'totalEncounters') {
+            return context.totalEncounters >= trigger;
+        }
+
+        if (key === 'recentRacesBelowExpectation') {
+            return context.recentRacesBelowExpectation >= trigger;
+        }
+
+        // Default: check direct context value match
+        const contextValue = context[key];
+        return checkTrigger(trigger, contextValue, context);
+    });
+
+    // All triggers must be satisfied
+    return triggerChecks.every(check => check === true);
+}
+
+/**
+ * Find all eligible questions based on race context
+ */
+function findEligibleQuestions(context) {
+    const eligible = [];
+
+    // Check all question categories
+    Object.values(INTERVIEW_QUESTIONS).forEach(category => {
+        Object.values(category).forEach(question => {
+            if (checkQuestionTriggers(question.triggers, context)) {
+                eligible.push(question);
+            }
+        });
+    });
+
+    return eligible;
+}
+
+/**
+ * Select the best question from eligible questions
+ * Priority order:
+ * 1. Season milestones (first win, first podium, season finale)
+ * 2. Rivalry questions
+ * 3. Performance questions
+ * 4. Tactical questions
+ * 5. Setback questions
+ */
+function selectBestQuestion(eligibleQuestions, context) {
+    if (eligibleQuestions.length === 0) {
+        // Fallback to a generic question if no specific triggers match
+        return INTERVIEW_QUESTIONS.performance.top_ten;
+    }
+
+    // Priority order
+    const priorityOrder = [
+        'first_win',
+        'first_podium',
+        'season_finale',
+        'winning_streak',
+        'podium_streak',
+        'rival_first_encounter',
+        'rival_close_battle',
+        'rival_beat_them',
+        'rival_they_won',
+        'win_dominant',
+        'win_close',
+        'win_standard',
+        'podium_beat_prediction',
+        'beat_prediction_significantly',
+        'worse_than_predicted',
+        'bad_streak',
+        'back_of_pack'
+    ];
+
+    // Find highest priority question
+    for (const questionId of priorityOrder) {
+        const match = eligibleQuestions.find(q => q.id === questionId);
+        if (match) {
+            return match;
+        }
+    }
+
+    // If no priority match, return first eligible
+    return eligibleQuestions[0];
+}
+
+/**
+ * Substitute variables in question text with race context values
+ */
+function substituteVariables(text, context) {
+    let result = text;
+
+    // Replace all {variable} placeholders
+    result = result.replace(/\{(\w+)\}/g, (match, variable) => {
+        if (variable === 'position') {
+            return formatOrdinal(context.position);
+        }
+
+        if (variable === 'predicted') {
+            return formatOrdinal(context.predicted);
+        }
+
+        if (variable === 'winMargin') {
+            return Math.round(context.winMargin);
+        }
+
+        if (variable === 'gap') {
+            return Math.round(context.rivalGap);
+        }
+
+        if (variable === 'rivalName') {
+            return context.rivalName;
+        }
+
+        if (variable === 'racesCompleted') {
+            return context.racesCompleted;
+        }
+
+        if (variable === 'winStreak') {
+            return context.consecutiveWins;
+        }
+
+        if (variable === 'podiumStreak') {
+            return context.consecutivePodiums;
+        }
+
+        return match; // Return original if no match found
+    });
+
+    return result;
+}
+
+/**
+ * Format number as ordinal (1st, 2nd, 3rd, etc.)
+ */
+function formatOrdinal(num) {
+    if (!num) return '';
+
+    const j = num % 10;
+    const k = num % 100;
+
+    if (j === 1 && k !== 11) {
+        return num + 'st';
+    }
+    if (j === 2 && k !== 12) {
+        return num + 'nd';
+    }
+    if (j === 3 && k !== 13) {
+        return num + 'rd';
+    }
+    return num + 'th';
+}
+
+/**
+ * Generate interview question and response options based on race context
+ */
+export function generateInterview(context) {
+    // Find all eligible questions
+    const eligibleQuestions = findEligibleQuestions(context);
+
+    // Select the best question
+    const selectedQuestion = selectBestQuestion(eligibleQuestions, context);
+
+    // Substitute variables in question text
+    const questionText = substituteVariables(selectedQuestion.text, context);
+
+    // Get response options
+    const responseOptions = selectedQuestion.responses.map(responseId => {
+        const response = INTERVIEW_RESPONSES[responseId];
+        if (!response) {
+            console.error(`Response ${responseId} not found in database`);
+            return null;
+        }
+
+        // Substitute variables in response text if needed
+        const responseText = substituteVariables(response.text, context);
+
+        return {
+            id: response.id,
+            text: responseText,
+            style: response.style,
+            badge: response.badge,
+            personalityImpact: response.personalityImpact
+        };
+    }).filter(r => r !== null);
+
+    return {
+        questionId: selectedQuestion.id,
+        questionText: questionText,
+        responseOptions: responseOptions,
+        context: context
+    };
+}
+
+/**
+ * Apply personality changes from interview response
+ */
+export function applyPersonalityChanges(currentPersonality, personalityDelta) {
+    const updated = { ...currentPersonality };
+
+    Object.entries(personalityDelta).forEach(([trait, change]) => {
+        const currentValue = currentPersonality[trait] || 50;
+        let newValue = currentValue + change;
+
+        // Clamp between 0-100
+        newValue = Math.max(0, Math.min(100, newValue));
+
+        updated[trait] = newValue;
+    });
+
+    updated.lastUpdated = new Date();
+
+    return updated;
+}
+
+/**
+ * Get dominant personality traits (top 2)
+ */
+export function getDominantTraits(personality) {
+    const traits = [
+        { name: 'confidence', value: personality.confidence || 50 },
+        { name: 'humility', value: personality.humility || 50 },
+        { name: 'aggression', value: personality.aggression || 50 },
+        { name: 'professionalism', value: personality.professionalism || 50 },
+        { name: 'showmanship', value: personality.showmanship || 50 },
+        { name: 'resilience', value: personality.resilience || 50 }
+    ];
+
+    // Sort by value descending
+    traits.sort((a, b) => b.value - a.value);
+
+    return [traits[0].name, traits[1].name];
+}
+
+/**
+ * Get persona label based on personality profile
+ */
+export function getPersonaLabel(personality) {
+    const dominant = getDominantTraits(personality);
+
+    // Persona mapping based on top 2 traits
+    const personas = {
+        'confidence-aggression': 'The Bold Competitor',
+        'confidence-professionalism': 'The Confident Professional',
+        'confidence-showmanship': 'The Charismatic Star',
+        'confidence-resilience': 'The Determined Champion',
+        'confidence-humility': 'The Grounded Talent',
+
+        'humility-professionalism': 'The Quiet Professional',
+        'humility-resilience': 'The Humble Warrior',
+        'humility-showmanship': 'The Gracious Entertainer',
+        'humility-aggression': 'The Respectful Competitor',
+
+        'aggression-showmanship': 'The Fierce Showman',
+        'aggression-resilience': 'The Relentless Fighter',
+        'aggression-professionalism': 'The Tactical Aggressor',
+
+        'professionalism-resilience': 'The Consistent Performer',
+        'professionalism-showmanship': 'The Polished Entertainer',
+
+        'showmanship-resilience': 'The Dramatic Comeback Kid',
+
+        'resilience-confidence': 'The Confident Climber'
+    };
+
+    const key = `${dominant[0]}-${dominant[1]}`;
+    const reverseKey = `${dominant[1]}-${dominant[0]}`;
+
+    return personas[key] || personas[reverseKey] || 'The Rising Talent';
+}
+
+/**
+ * Calculate season context for interview triggers
+ */
+export function calculateSeasonContext(userData, eventNumber) {
+    const raceHistory = userData?.raceHistory || [];
+
+    // Count consecutive wins/podiums
+    let consecutiveWins = 0;
+    let consecutivePodiums = 0;
+    let recentBelowExpectation = 0;
+
+    // Look at last 3 races
+    const recentRaces = raceHistory.slice(-3);
+
+    for (let i = recentRaces.length - 1; i >= 0; i--) {
+        const race = recentRaces[i];
+
+        // Consecutive wins
+        if (race.position === 1) {
+            consecutiveWins++;
+        } else if (consecutiveWins === 0) {
+            // Only count if still in streak
+            break;
+        }
+
+        // Consecutive podiums
+        if (race.position <= 3) {
+            consecutivePodiums++;
+        }
+
+        // Below expectation
+        if (race.predicted && race.position > race.predicted + 3) {
+            recentBelowExpectation++;
+        }
+    }
+
+    return {
+        racesCompleted: raceHistory.length,
+        consecutiveWins,
+        consecutivePodiums,
+        recentBelowExpectation,
+        isSeasonFinale: eventNumber === 12 // Season 1 has 12 races
+    };
+}

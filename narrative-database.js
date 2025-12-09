@@ -2111,6 +2111,156 @@ const NARRATIVE_DATABASE = {
       triggers: { recentPosition: [20, 25, 30], totalPoints: [100, 150, 200], stagesCompleted: [4, 5, 6, 7] },
       weight: 0.7
     }
+  ],
+
+  // ===== PERSONALITY DRIVEN NARRATIVES =====
+  // Stories that appear based on rider's interview personality profile
+  personalityDriven: [
+    // CONFIDENT PERSONALITY
+    {
+      id: "confident_swagger",
+      text: "You've been carrying yourself differently lately—more swagger, more certainty. The self-doubt that used to creep in before races has been replaced by a calm confidence. You know what you're capable of now, and it shows in how you race.",
+      triggers: { minRacesCompleted: 3, personalityMin: { confidence: 70 } },
+      weight: 0.8
+    },
+    {
+      id: "confident_predictions",
+      text: "Your post-race interviews have been bold lately, predictions stated with conviction rather than hedged with maybes. Some might call it cocky. You call it knowing your own abilities and not being afraid to back yourself.",
+      triggers: { minRacesCompleted: 4, personalityMin: { confidence: 75 } },
+      weight: 0.7
+    },
+    {
+      id: "confident_mentality",
+      text: "There's a mental shift happening. Where you once hoped to compete, you now expect to win. That mindset adjustment is subtle but powerful—it changes how you approach every race, every tactical decision, every moment when the race gets hard.",
+      triggers: { performanceTier: ["podium", "win"], personalityMin: { confidence: 70 } },
+      weight: 0.8
+    },
+
+    // HUMBLE PERSONALITY
+    {
+      id: "humble_grounded",
+      text: "Success hasn't changed you. After each good result, you're quick to credit the competition, to acknowledge the role of luck and timing. It's not false modesty—you genuinely respect how hard this is, how thin the margins are, how much can change in a single race.",
+      triggers: { performanceTier: ["podium", "win"], personalityMin: { humility: 70 } },
+      weight: 0.8
+    },
+    {
+      id: "humble_learning",
+      text: "You're treating every race like a classroom. Win or lose, there's something to learn from the riders around you. After races, you find yourself analyzing what others did well, storing away tactics and strategies for future use. The learning never stops.",
+      triggers: { minRacesCompleted: 3, personalityMin: { humility: 65 } },
+      weight: 0.7
+    },
+    {
+      id: "humble_respect",
+      text: "The cycling community has noticed your humility. After races, you're the one shaking hands, complimenting strong rides, acknowledging good racing from others. That respect you show? It's being returned, slowly building a reputation as someone people want to race with.",
+      triggers: { minRacesCompleted: 5, personalityMin: { humility: 70 } },
+      weight: 0.6
+    },
+
+    // AGGRESSIVE PERSONALITY
+    {
+      id: "aggressive_edge",
+      text: "Your rivals are starting to recognize a pattern: you don't back down. Where others might play it safe, you attack. Where others might be diplomatic, you speak your mind. Racing isn't just about winning for you—it's about proving something every time you pin on a number.",
+      triggers: { minRacesCompleted: 3, personalityMin: { aggression: 70 }, requiresRivalHistory: true },
+      weight: 0.9
+    },
+    {
+      id: "aggressive_fire",
+      text: "There's a competitive fire burning that wasn't there at the start of the season. You're racing angry now—not at anyone specific, but at losing, at being beaten, at anything less than your absolute best. That fire can burn you out or forge you into something dangerous. You're betting on the latter.",
+      triggers: { performanceTier: ["any"], personalityMin: { aggression: 75 } },
+      weight: 0.7
+    },
+    {
+      id: "aggressive_reputation",
+      text: "Word is getting around: you're a rider who attacks. In the start corrals, you've noticed riders positioning themselves to mark you, to watch for your moves. They're taking you seriously now. That's respect, earned the hard way.",
+      triggers: { minRacesCompleted: 6, personalityMin: { aggression: 70 } },
+      weight: 0.6
+    },
+
+    // PROFESSIONAL PERSONALITY
+    {
+      id: "professional_approach",
+      text: "You've developed a systematic approach to racing: data analysis, structured training, careful recovery, tactical planning. Nothing left to chance, nothing left unprepared. The romantic notion of racing on pure passion has given way to calculated professionalism.",
+      triggers: { minRacesCompleted: 4, personalityMin: { professionalism: 70 } },
+      weight: 0.8
+    },
+    {
+      id: "professional_consistency",
+      text: "Consistency over flash, steady progress over dramatic swings. Your results are building a pattern—reliable, professional, predictable in the best way. You're becoming the rider others can count on, the one who shows up prepared and executes the plan.",
+      triggers: { minRacesCompleted: 5, personalityMin: { professionalism: 75 } },
+      weight: 0.7
+    },
+    {
+      id: "professional_measured",
+      text: "Your post-race interviews are composed, analytical, focused on process rather than emotion. You talk about power numbers, pacing strategies, tactical decisions. Some might find it dry. You find it effective. Results speak louder than soundbites.",
+      triggers: { performanceTier: ["top10", "podium", "win"], personalityMin: { professionalism: 70 } },
+      weight: 0.6
+    },
+
+    // SHOWMAN PERSONALITY
+    {
+      id: "showman_entertaining",
+      text: "Racing is theater, and you've embraced your role as entertainer. Bold moves, memorable quotes, a willingness to make the race exciting even when it costs you a better result. The fans are starting to notice. So are the journalists covering these events.",
+      triggers: { minRacesCompleted: 4, personalityMin: { showmanship: 70 } },
+      weight: 0.8
+    },
+    {
+      id: "showman_dramatic",
+      text: "You don't just race—you perform. Every attack is committed, every interview is quotable, every result is part of a larger narrative you're writing. Some riders disappear into the peloton. You make sure people remember your name.",
+      triggers: { performanceTier: ["win", "podium"], personalityMin: { showmanship: 75 } },
+      weight: 0.7
+    },
+    {
+      id: "showman_flair",
+      text: "There's a flair to how you race now—a willingness to try the audacious move, to make the bold statement. It doesn't always work, but when it does, it's spectacular. And even when it doesn't, people are talking about it. That's worth something.",
+      triggers: { minRacesCompleted: 5, personalityMin: { showmanship: 65 } },
+      weight: 0.6
+    },
+
+    // RESILIENT PERSONALITY
+    {
+      id: "resilient_bounce_back",
+      text: "Setbacks don't stick to you anymore. Bad races? Learn and move on. Tough results? Analyze what went wrong and fix it. You've developed a mental resilience that might be more valuable than pure physical ability. Champions aren't made on good days—they're made on how they handle bad ones.",
+      triggers: { minRacesCompleted: 4, personalityMin: { resilience: 70 } },
+      weight: 0.9
+    },
+    {
+      id: "resilient_growth",
+      text: "Every challenge has become an opportunity for growth in your mind. Struggles aren't failures—they're data points, lessons, stepping stones to something better. That perspective shift is powerful. It means you're never really losing, only learning.",
+      triggers: { performanceTier: ["midpack", "back"], personalityMin: { resilience: 75 } },
+      weight: 0.8
+    },
+    {
+      id: "resilient_warrior",
+      text: "Your teammates and competitors have noticed: you don't quit. Terrible race? You're back the next week. Get dropped? You chase back. Crash out? You're already planning the comeback. That warrior mentality can't be taught—it has to be forged through adversity. You're forging it now.",
+      triggers: { minRacesCompleted: 6, personalityMin: { resilience: 70 } },
+      weight: 0.7
+    },
+
+    // MIXED PERSONALITY COMBINATIONS
+    {
+      id: "confident_humble_balance",
+      text: "You've found an interesting balance: confident in your abilities but humble about your place in the sport. You back yourself without disrespecting the competition. It's a rare combination—the self-belief needed to win mixed with the groundedness that keeps you improving.",
+      triggers: { performanceTier: ["podium", "win"], personalityMin: { confidence: 65, humility: 65 } },
+      weight: 0.7
+    },
+    {
+      id: "aggressive_professional",
+      text: "Your racing style is interesting: tactically aggressive but methodically professional. You attack with purpose, not recklessness. Every move is calculated, even the bold ones. It's making you dangerous—unpredictable in execution but entirely predictable in intent: you're here to win.",
+      triggers: { minRacesCompleted: 5, personalityMin: { aggression: 65, professionalism: 65 } },
+      weight: 0.7
+    },
+    {
+      id: "humble_resilient",
+      text: "There's a quiet strength in how you're approaching this season. Grateful for every opportunity, resilient through every setback. You don't demand attention or make bold claims—you just keep showing up, keep working, keep improving. That steady persistence is building into something formidable.",
+      triggers: { minRacesCompleted: 4, personalityMin: { humility: 65, resilience: 65 } },
+      weight: 0.7
+    },
+    {
+      id: "showman_confident",
+      text: "You've got the full package now: the confidence to back up your words and the showmanship to make sure those words are memorable. Pre-race predictions delivered with conviction, post-race interviews full of quotable moments. And the results to justify the swagger. It's working.",
+      triggers: { performanceTier: ["win", "podium"], personalityMin: { showmanship: 65, confidence: 65 } },
+      weight: 0.6
+    }
   ]
 };
 // Export for use in other modules

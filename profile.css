@@ -73,7 +73,7 @@
     padding: 3rem;
     margin-bottom: 2rem;
     display: grid;
-    grid-template-columns: auto 1fr auto;
+    grid-template-columns: auto 1fr auto auto;
     gap: 2.5rem;
     align-items: center;
     position: relative;
@@ -250,6 +250,48 @@
     letter-spacing: 1px;
     margin-top: 0.3rem;
     font-weight: 600;
+}
+
+/* Personality Header Section */
+.profile-personality-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: linear-gradient(135deg, rgba(255, 27, 107, 0.05), rgba(69, 202, 255, 0.05));
+    border: 1px solid rgba(255, 27, 107, 0.2);
+    border-radius: 16px;
+    min-width: 200px;
+}
+
+.personality-header-chart {
+    position: relative;
+}
+
+.personality-header-chart canvas {
+    display: block;
+}
+
+.personality-header-label {
+    text-align: center;
+}
+
+.persona-title-compact {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+.persona-subtitle-compact {
+    font-size: 0.95rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 /* Profile Sections */
@@ -809,6 +851,10 @@
         gap: 2rem;
     }
 
+    .profile-personality-header {
+        margin: 0 auto;
+    }
+
     .profile-quick-stats {
         grid-template-columns: repeat(4, 1fr);
     }
@@ -836,6 +882,15 @@
 
     .profile-name {
         font-size: 2rem;
+    }
+
+    .profile-personality-header {
+        min-width: 180px;
+    }
+
+    .personality-header-chart canvas {
+        width: 180px;
+        height: 180px;
     }
 
     .profile-quick-stats {
@@ -1308,5 +1363,109 @@
 
     .rival-stats {
         grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* ============================================
+   PERSONALITY SECTION STYLES
+   ============================================ */
+
+.personality-section {
+    margin-bottom: 2rem;
+}
+
+.personality-chart-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 12px;
+    margin-bottom: 2rem;
+}
+
+.personality-chart-container canvas {
+    max-width: 100%;
+    height: auto;
+}
+
+.personality-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.personality-stat-card {
+    text-align: center;
+    padding: 1rem;
+    background: var(--dark-elevated);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: all 0.3s ease;
+}
+
+.personality-stat-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--accent-pink);
+    box-shadow: 0 8px 20px rgba(255, 27, 107, 0.2);
+}
+
+.personality-stat-card .stat-icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.personality-stat-card .stat-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-secondary);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.personality-stat-card .stat-value {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--accent-pink), var(--accent-blue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.persona-label {
+    text-align: center;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, rgba(255, 27, 107, 0.1), rgba(69, 202, 255, 0.1));
+    border-radius: 12px;
+    border: 1px solid rgba(255, 27, 107, 0.2);
+}
+
+.persona-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--accent-pink);
+    margin-bottom: 0.5rem;
+}
+
+.persona-subtitle {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+@media (max-width: 768px) {
+    .personality-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .personality-chart-container {
+        padding: 1rem;
+    }
+
+    .personality-stat-card .stat-value {
+        font-size: 1.3rem;
     }
 }

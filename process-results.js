@@ -1170,7 +1170,10 @@ async function processUserResult(uid, eventInfo, results) {
       seasonPosition: null,
       // Rival data for story generation
       topRivals: updatedRivalData.topRivals || [],
-      rivalEncounters: rivalEncounters
+      rivalEncounters: rivalEncounters,
+      // Personality data for story generation
+      personality: userData.personality || null,
+      racesCompleted: (userData.completedStages || []).length
     },
     uid,
     narrativeSelector,

@@ -217,6 +217,24 @@ class StorySelector {
       }
     }
 
+    // Check personality minimum thresholds
+    if (triggers.personalityMin && context.personality) {
+      for (const [trait, minValue] of Object.entries(triggers.personalityMin)) {
+        const userValue = context.personality[trait] || 50;
+        if (userValue < minValue) {
+          return false;
+        }
+      }
+    }
+
+    // Check minimum races completed
+    if (triggers.minRacesCompleted !== undefined) {
+      const racesCompleted = context.racesCompleted || 0;
+      if (racesCompleted < triggers.minRacesCompleted) {
+        return false;
+      }
+    }
+
     return true;
   }
 
@@ -317,7 +335,20 @@ class StorySelector {
 
     // Determine which story categories are appropriate
     let categories = [];
-    
+
+    // PRIORITY: Personality-driven stories (if user has completed interviews and has developed personality)
+    if (context.personality && context.racesCompleted >= 3) {
+      // Check if any personality traits are strong (>= 65)
+      const hasStrongPersonality = Object.values(context.personality).some(value => value >= 65);
+
+      if (hasStrongPersonality) {
+        // 40% chance to use personality-driven story
+        if (Math.random() < 0.4) {
+          categories.push('personalityDriven');
+        }
+      }
+    }
+
     // Early career stories for events 2-5
     if (context.eventNumber >= 2 && context.eventNumber <= 5) {
       categories.push('earlyCareer');
@@ -326,7 +357,7 @@ class StorySelector {
         categories.push('lifestyle');
       }
     }
-    
+
     // Mid season stories for events 6-10
     else if (context.eventNumber >= 6 && context.eventNumber <= 10) {
       categories.push('midSeason');
@@ -335,21 +366,21 @@ class StorySelector {
         categories.push('motivation');
       }
     }
-    
+
     // Late season for events 11+
     else if (context.eventNumber >= 11) {
       categories.push('lateSeasonIntros');
     }
 
     // Add breakthrough moments for exceptional performances
-    if (context.isFirstWin || 
+    if (context.isFirstWin ||
         (context.performanceTier === 'win' && context.totalWins <= 2) ||
         (context.performanceTier === 'podium' && this.countConsecutivePodiums(context.recentResults) >= 3)) {
       categories.unshift('breakthrough'); // Put breakthrough first priority
     }
 
     // Add setback moments for poor performances
-    if (context.performanceTier === 'back' && 
+    if (context.performanceTier === 'back' &&
         (context.predictedPosition - context.position < -5)) {
       categories.unshift('setback');
     }

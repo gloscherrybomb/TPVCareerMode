@@ -105,6 +105,42 @@
         </div>
     </section>
 
+    <!-- Post-Race Interview Section -->
+    <section class="post-race-interview" id="postRaceInterviewSection" style="display: none;">
+        <div class="container">
+            <div class="interview-container">
+                <h2 class="interview-title">POST-RACE INTERVIEW</h2>
+
+                <div class="journalist-bubble">
+                    <div class="journalist-avatar">
+                        <img src="journalist.png" alt="Journalist">
+                    </div>
+                    <div class="journalist-content">
+                        <p class="journalist-question" id="journalistQuestion">
+                            <!-- Question will be populated by JavaScript -->
+                        </p>
+                    </div>
+                </div>
+
+                <div class="response-options" id="responseOptions">
+                    <!-- Response options will be populated by JavaScript -->
+                </div>
+
+                <!-- Submitted response feedback -->
+                <div class="interview-submitted" id="interviewSubmitted" style="display: none;">
+                    <div class="submitted-response">
+                        <p class="submitted-label">Your response:</p>
+                        <p class="submitted-text" id="submittedText"></p>
+                    </div>
+                    <div class="personality-feedback">
+                        <p class="feedback-label">This response affected your personality profile:</p>
+                        <div class="personality-changes" id="personalityChanges"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- Route Profile Section -->
     <section class="event-route" id="routeSection">
         <div class="container">

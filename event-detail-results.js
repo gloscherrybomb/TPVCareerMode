@@ -6,6 +6,7 @@ import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/
 import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import { makeNameClickable } from './bot-profile-modal.js';
+import { displayPostRaceInterview } from './event-detail-interview.js';
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -842,6 +843,23 @@ async function loadEventResults() {
         }
 
         eventResultsContent.innerHTML = tableHTML;
+
+        // Display post-race interview if user has results
+        if (userEventResults && userEventResults.position) {
+            const userResult = {
+                position: userEventResults.position,
+                predicted: userEventResults.predicted,
+                time: userEventResults.time,
+                timeSeconds: userEventResults.timeSeconds || userEventResults.time,
+                eventType: userEventResults.eventType,
+                eventCategory: userEventResults.eventCategory
+            };
+
+            // Display interview after a short delay to let results settle
+            setTimeout(() => {
+                displayPostRaceInterview(db, userUid, eventNumber, userResult, results, userData);
+            }, 1000);
+        }
 
     } catch (error) {
         console.error('Error loading event results:', error);

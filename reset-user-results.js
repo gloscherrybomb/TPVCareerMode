@@ -128,13 +128,57 @@ async function resetUserResults() {
         rivals: admin.firestore.FieldValue.delete(),
         rivalWins: admin.firestore.FieldValue.delete(),
         rivalLosses: admin.firestore.FieldValue.delete(),
-        rivalData: admin.firestore.FieldValue.delete()
+        rivalData: admin.firestore.FieldValue.delete(),
+
+        // Personality and interview data
+        personality: admin.firestore.FieldValue.delete(),
+        interviewHistory: admin.firestore.FieldValue.delete()
       });
     }
 
-    // Commit all updates
+    // Commit all user updates
     await batch.commit();
-    console.log("✅ All users reset successfully!");
+    console.log("✅ All user documents reset successfully!");
+
+    // Delete all interview documents for all users
+    console.log('Deleting interview documents...');
+    const interviewsSnapshot = await db.collection('interviews').get();
+
+    if (!interviewsSnapshot.empty) {
+      const interviewBatch = db.batch();
+      let interviewCount = 0;
+
+      interviewsSnapshot.docs.forEach(doc => {
+        interviewBatch.delete(doc.ref);
+        interviewCount++;
+      });
+
+      await interviewBatch.commit();
+      console.log(`✅ Deleted ${interviewCount} interview documents`);
+    } else {
+      console.log('No interview documents to delete');
+    }
+
+    // Delete narrative history for all riders
+    console.log('Deleting narrative history...');
+    const ridersSnapshot = await db.collection('riders').get();
+
+    if (!ridersSnapshot.empty) {
+      for (const riderDoc of ridersSnapshot.docs) {
+        const narrativeHistorySnapshot = await riderDoc.ref.collection('narrative_history').get();
+
+        if (!narrativeHistorySnapshot.empty) {
+          const narrativeBatch = db.batch();
+          narrativeHistorySnapshot.docs.forEach(doc => {
+            narrativeBatch.delete(doc.ref);
+          });
+          await narrativeBatch.commit();
+        }
+      }
+      console.log('✅ All narrative history cleared');
+    }
+
+    console.log("✅ Complete reset finished successfully!");
 
   } catch (error) {
     console.error("❌ Error resetting users:", error);

@@ -100,6 +100,17 @@
                         </button>
                     </div>
 
+                    <!-- Media Personality Chart (Header) -->
+                    <div class="profile-personality-header" id="personalityHeaderSection" style="display: none;">
+                        <div class="personality-header-chart">
+                            <canvas id="personalityChart" width="240" height="240"></canvas>
+                        </div>
+                        <div class="personality-header-label">
+                            <div class="persona-title-compact" id="personaTitle">Your Persona</div>
+                            <div class="persona-subtitle-compact" id="personaSubtitle">The Rising Talent</div>
+                        </div>
+                    </div>
+
                     <div class="profile-quick-stats">
                         <div class="quick-stat">
                             <div class="quick-stat-value" id="totalRaces">0</div>
@@ -166,6 +177,49 @@
                                 <div class="stat-value" id="podiumRate">0%</div>
                             </div>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Media Personality Detailed Stats -->
+                <div class="profile-section personality-section" id="personalityDetailSection" style="display: none;">
+                    <h2 class="section-title">Media Personality Breakdown</h2>
+                    <p class="section-description">Your interview style shapes how the cycling world perceives you</p>
+
+                    <div class="personality-stats-grid">
+                        <div class="personality-stat-card">
+                            <div class="stat-icon">💪</div>
+                            <div class="stat-label">Confidence</div>
+                            <div class="stat-value" id="confidenceValue">50</div>
+                        </div>
+                        <div class="personality-stat-card">
+                            <div class="stat-icon">🤝</div>
+                            <div class="stat-label">Humility</div>
+                            <div class="stat-value" id="humilityValue">50</div>
+                        </div>
+                        <div class="personality-stat-card">
+                            <div class="stat-icon">😤</div>
+                            <div class="stat-label">Aggression</div>
+                            <div class="stat-value" id="aggressionValue">50</div>
+                        </div>
+                        <div class="personality-stat-card">
+                            <div class="stat-icon">🎯</div>
+                            <div class="stat-label">Professionalism</div>
+                            <div class="stat-value" id="professionalismValue">50</div>
+                        </div>
+                        <div class="personality-stat-card">
+                            <div class="stat-icon">⚡</div>
+                            <div class="stat-label">Showmanship</div>
+                            <div class="stat-value" id="showmanshipValue">50</div>
+                        </div>
+                        <div class="personality-stat-card">
+                            <div class="stat-icon">💚</div>
+                            <div class="stat-label">Resilience</div>
+                            <div class="stat-value" id="resilienceValue">50</div>
+                        </div>
+                    </div>
+
+                    <div class="personality-interview-count" id="interviewCountDisplay" style="text-align: center; margin-top: 1.5rem; opacity: 0.8;">
+                        <!-- Interview count will be populated by JavaScript -->
                     </div>
                 </div>
 

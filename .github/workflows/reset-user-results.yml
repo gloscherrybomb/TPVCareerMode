@@ -54,3 +54,6 @@ jobs:
           echo "- All awards and trophies" >> $GITHUB_STEP_SUMMARY
           echo "- Tour progress and optional events" >> $GITHUB_STEP_SUMMARY
           echo "- Rival tracking data" >> $GITHUB_STEP_SUMMARY
+          echo "- Personality profiles and interview history" >> $GITHUB_STEP_SUMMARY
+          echo "- All interview documents" >> $GITHUB_STEP_SUMMARY
+          echo "- Narrative history" >> $GITHUB_STEP_SUMMARY
