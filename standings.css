@@ -611,9 +611,9 @@
         overflow-x: auto;
     }
     
-    /* Keep table at natural width - don't shrink */
+    /* Keep table at natural width - don't shrink too much */
     .standings-table {
-        min-width: 600px; /* Ensure table doesn't get too narrow */
+        min-width: 480px; /* Allow more compact table on mobile */
     }
 
     /* Don't hide columns - let them scroll */
@@ -673,4 +673,30 @@
         display: none;
     }
 
+}
+
+/* Very small mobile devices */
+@media (max-width: 375px) {
+    .page-title {
+        font-size: 1.8rem;
+    }
+
+    .standings-table {
+        min-width: 360px; /* Further reduce table width for very small screens */
+        font-size: 0.8rem;
+    }
+
+    .standings-table th,
+    .standings-table td {
+        padding: 0.75rem 0.4rem;
+    }
+
+    .rank-cell {
+        width: 40px;
+    }
+
+    .you-badge {
+        font-size: 0.65rem;
+        padding: 0.2rem 0.6rem;
+    }
 }

@@ -591,6 +591,37 @@
     .route-details-grid {
         grid-template-columns: 1fr;
     }
+
+    .section-title-medium {
+        font-size: 1.8rem;
+    }
+
+    .cta-box h2 {
+        font-size: 2rem;
+    }
+}
+
+/* Very small mobile - further reduce large text */
+@media (max-width: 375px) {
+    .event-hero-title {
+        font-size: 1.75rem;
+    }
+
+    .event-hero-subtitle {
+        font-size: 1rem;
+    }
+
+    .story-title {
+        font-size: 1.75rem;
+    }
+
+    .section-title-medium {
+        font-size: 1.6rem;
+    }
+
+    .cta-box h2 {
+        font-size: 1.75rem;
+    }
 }
 
 /* Event Results Section */

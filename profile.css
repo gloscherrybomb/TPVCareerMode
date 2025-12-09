@@ -141,7 +141,7 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.6rem 1.2rem;
+    padding: 0.75rem 1.5rem;
     background: var(--dark-elevated);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 8px;
@@ -150,6 +150,7 @@
     font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
+    min-height: 44px; /* Ensure minimum touch target size */
 }
 
 .btn-upload-photo:hover {
@@ -897,12 +898,39 @@
     }
 }
 
+/* Very small mobile - further optimizations */
+@media (max-width: 375px) {
+    .profile-name {
+        font-size: 1.4rem;
+    }
+
+    .profile-header {
+        padding: 1.25rem;
+    }
+
+    .stats-grid {
+        gap: 0.75rem;
+    }
+
+    .stat-card {
+        padding: 1rem;
+    }
+
+    .stat-value {
+        font-size: 1.75rem;
+    }
+
+    .stat-label {
+        font-size: 0.8rem;
+    }
+}
+
 /* Share Stats Button */
 .btn-share-stats {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.6rem 1.2rem;
+    padding: 0.75rem 1.5rem;
     background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
     border: none;
     border-radius: 8px;
@@ -913,6 +941,7 @@
     cursor: pointer;
     transition: all 0.3s ease;
     margin-top: 1rem;
+    min-height: 44px; /* Ensure minimum touch target size */
 }
 
 .btn-share-stats:hover {
