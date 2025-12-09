@@ -84,7 +84,7 @@ function renderInterview(interview) {
 
             const badgeDiv = document.createElement('div');
             badgeDiv.className = 'response-badge';
-            badgeDiv.textContent = response.badge;
+            badgeDiv.textContent = `Response ${index + 1}`;
 
             const textP = document.createElement('p');
             textP.className = 'response-text';
