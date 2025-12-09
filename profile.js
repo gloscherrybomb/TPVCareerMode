@@ -1275,7 +1275,7 @@ function initShareStats() {
     
     // Preload team car image (same origin, should be fine)
     teamCarImage = new Image();
-    teamCarImage.src = 'tpvteamcar.png';
+    teamCarImage.src = 'tpv-team-car.png';
     
     // Open modal
     shareBtn.addEventListener('click', () => {
