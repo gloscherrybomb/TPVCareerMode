@@ -13,7 +13,8 @@
       "Bash(git stash drop:*)",
       "Bash(git pull:*)",
       "Bash(sort:*)",
-      "Bash(git restore:*)"
+      "Bash(git restore:*)",
+      "Bash(git rm:*)"
     ]
   }
 }
