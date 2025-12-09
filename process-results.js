@@ -1106,14 +1106,35 @@ async function processUserResult(uid, eventInfo, results) {
   }
   if (position === 1) totalWins++; // Include current race
 
+  // Calculate rival encounters for this race (must be before story generation)
+  const rivalEncounters = calculateRivalEncounters(
+    results,
+    uid,
+    position,
+    parseFloat(userResult.Time) || 0
+  );
+
+  // Update rival data (must be before story generation)
+  const existingRivalData = userData.rivalData || null;
+  const updatedRivalData = updateRivalData(existingRivalData, rivalEncounters, eventNumber);
+
+  // Identify top 3 rivals
+  const topRivals = identifyTopRivals(updatedRivalData);
+  updatedRivalData.topRivals = topRivals;
+
+  // Log rival encounters
+  if (rivalEncounters.length > 0) {
+    console.log(`   🤝 Rival encounters: ${rivalEncounters.length} bot(s) within 30s`);
+  }
+
   // Generate story using v3.0 story generator (has all features built-in)
   let unifiedStory = '';
-  
+
   // Debug: Log GC data if available
   if (gcResults) {
     console.log(`   📊 GC Data available: userGC position = ${gcResults.userGC?.gcPosition || 'null'}, gap = ${gcResults.userGC?.gapToLeader || 'null'}s`);
   }
-  
+
   const storyResult = await storyGen.generateRaceStory(
     {
       eventNumber: eventNumber,
@@ -1217,27 +1238,6 @@ async function processUserResult(uid, eventInfo, results) {
   const tempUserData = { ...userData };
   tempUserData[`event${eventNumber}Results`] = eventResults;
   const careerStats = await calculateCareerStats(tempUserData);
-
-  // Calculate rival encounters for this race
-  const rivalEncounters = calculateRivalEncounters(
-    results,
-    uid,
-    position,
-    parseFloat(userResult.Time) || 0
-  );
-
-  // Update rival data
-  const existingRivalData = userData.rivalData || null;
-  const updatedRivalData = updateRivalData(existingRivalData, rivalEncounters, eventNumber);
-
-  // Identify top 3 rivals
-  const topRivals = identifyTopRivals(updatedRivalData);
-  updatedRivalData.topRivals = topRivals;
-
-  // Log rival encounters
-  if (rivalEncounters.length > 0) {
-    console.log(`   🤝 Rival encounters: ${rivalEncounters.length} bot(s) within 30s`);
-  }
 
   // Update user document
   const updates = {
