@@ -1,20 +1,11 @@
 // event-detail-results.js - Display event results on event detail page
 
+import { firebaseConfig } from './firebase-config.js';
+import { formatTime } from './utils.js';
 import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import { makeNameClickable } from './bot-profile-modal.js';
-
-// Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyDo-g0UhDCB8QWRXQ0iapVHQEgA4X7jt4o",
-  authDomain: "careermodelogin.firebaseapp.com",
-  projectId: "careermodelogin",
-  storageBucket: "careermodelogin.firebasestorage.app",
-  messagingSenderId: "599516805754",
-  appId: "1:599516805754:web:7f5c6bbebb8b454a81d9c3",
-  measurementId: "G-Y8BQ4F6H4V"
-};
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -31,14 +22,7 @@ function getEventNumber() {
     return parseInt(params.get('id')) || 1;
 }
 
-/**
- * Format time in seconds to MM:SS format
- */
-function formatTime(seconds) {
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-}
+// formatTime function now imported from utils.js
 
 /**
  * Format delta time with +/- sign

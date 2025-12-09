@@ -941,6 +941,63 @@ function generateSeasonContext(data) {
 /**
  * Main function to generate complete story
  */
+
+/**
+ * Generate rival mention if user raced against a rival
+ * Checks if any of the user's rivals were in the race (within 30s)
+ */
+function generateRivalMention(raceData, seasonData) {
+  // Check if user has rivals and rival data
+  if (!seasonData.topRivals || seasonData.topRivals.length === 0) {
+    return '';
+  }
+
+  // Check if any rivals were in this race (within 30s)
+  const rivalsInRace = [];
+
+  if (seasonData.rivalEncounters && Array.isArray(seasonData.rivalEncounters)) {
+    // rivalEncounters contains bots within 30s in this race
+    for (const encounter of seasonData.rivalEncounters) {
+      // Check if this bot is in user's top 3 rivals
+      if (seasonData.topRivals.includes(encounter.botUid)) {
+        rivalsInRace.push(encounter);
+      }
+    }
+  }
+
+  if (rivalsInRace.length === 0) {
+    return '';
+  }
+
+  // Generate mention for the closest/most significant rival
+  const rival = rivalsInRace[0]; // Take first (should be closest or most significant)
+  const userWon = rival.userFinishedAhead;
+  const gap = rival.timeGap.toFixed(1);
+
+  // Generate different mentions based on result
+  const mentions = [];
+
+  if (userWon) {
+    mentions.push(
+      `In a battle of familiar foes, you finished ahead of ${rival.botName} by ${gap} seconds, extending your rivalry.`,
+      `${rival.botName}, one of your key rivals, couldn't match your pace today, finishing ${gap}s behind.`,
+      `You got the better of ${rival.botName} this time, putting ${gap} seconds between you two.`,
+      `Another chapter in your rivalry with ${rival.botName}, and this one went your way by ${gap} seconds.`
+    );
+  } else {
+    mentions.push(
+      `${rival.botName}, one of your key rivals, edged you out by ${gap} seconds in another close battle.`,
+      `Your ongoing rivalry with ${rival.botName} continues, with them finishing ${gap}s ahead today.`,
+      `${rival.botName} got the upper hand this time, beating you by ${gap} seconds.`,
+      `The battle with ${rival.botName} was fierce, but they came out on top by ${gap} seconds.`
+    );
+  }
+
+  // Select a random mention for variety
+  const selectedMention = mentions[Math.floor(Math.random() * mentions.length)];
+  return selectedMention;
+}
+
 /**
  * Main function: Generate complete race story
  * v3.0: Now async with narrative database integration
@@ -996,6 +1053,9 @@ async function generateRaceStory(raceData, seasonData, riderId = null, narrative
   };
   const recapParagraph = generateRaceRecap(recapData);
 
+  // Generate rival mention if applicable
+  const rivalMention = generateRivalMention(raceData, seasonData);
+
   // Generate season context
   const contextData = {
     ...seasonData,
@@ -1003,10 +1063,11 @@ async function generateRaceStory(raceData, seasonData, riderId = null, narrative
     nextEventName: EVENT_NAMES[seasonData.nextEventNumber] || `Event ${seasonData.nextEventNumber}`
   };
   const contextParagraph = generateSeasonContext(contextData);
-  
+
   // Combine into complete story
-  const completeStory = introParagraph + '\n\n' + recapParagraph + (contextParagraph ? '\n\n' + contextParagraph : '');
-  
+  const storyParts = [introParagraph, recapParagraph, rivalMention, contextParagraph].filter(p => p);
+  const completeStory = storyParts.join('\n\n');
+
   return {
     recap: completeStory,
     context: ''

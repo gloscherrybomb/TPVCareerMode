@@ -343,6 +343,143 @@ function isBot(uid, gender) {
 }
 
 /**
+ * Calculate rival encounters for this race
+ * Finds all bots within 30 seconds of user's time and records the encounter
+ */
+function calculateRivalEncounters(results, userUid, userPosition, userTime) {
+  const encounters = [];
+
+  // Find user's result
+  const userResult = results.find(r => r.UID === userUid);
+  if (!userResult || userResult.Position === 'DNF') {
+    return encounters;
+  }
+
+  // Check all other racers
+  results.forEach(result => {
+    const botUid = result.UID;
+    const botTime = parseFloat(result.Time);
+    const botPosition = parseInt(result.Position);
+
+    // Skip if not a bot, DNF, or invalid data
+    if (!isBot(botUid, result.Gender) || result.Position === 'DNF' || isNaN(botTime) || isNaN(botPosition)) {
+      return;
+    }
+
+    // Calculate time gap
+    const timeGap = Math.abs(userTime - botTime);
+
+    // Only track if within 30 seconds
+    if (timeGap <= 30) {
+      encounters.push({
+        botUid: botUid,
+        botName: result.Name,
+        botCountry: result.Country || '',
+        botArr: parseInt(result.ARR) || 0,
+        timeGap: timeGap,
+        userFinishedAhead: userPosition < botPosition,
+        botPosition: botPosition,
+        userPosition: userPosition
+      });
+    }
+  });
+
+  return encounters;
+}
+
+/**
+ * Update user's rival data with new encounters
+ * Returns updated rivalData object
+ */
+function updateRivalData(existingRivalData, encounters, eventNumber) {
+  // Initialize rivalData if not exists
+  const rivalData = existingRivalData || {
+    encounters: {},
+    topRivals: []
+  };
+
+  // Ensure encounters object exists
+  if (!rivalData.encounters) {
+    rivalData.encounters = {};
+  }
+
+  // Update each encounter
+  encounters.forEach(encounter => {
+    const botUid = encounter.botUid;
+
+    // Initialize bot encounter data if doesn't exist
+    if (!rivalData.encounters[botUid]) {
+      rivalData.encounters[botUid] = {
+        botName: encounter.botName,
+        botCountry: encounter.botCountry,
+        botArr: encounter.botArr,
+        races: 0,
+        userWins: 0,
+        botWins: 0,
+        totalGap: 0,
+        avgGap: 0,
+        closestGap: Infinity,
+        lastRace: eventNumber
+      };
+    }
+
+    const botData = rivalData.encounters[botUid];
+
+    // Update stats
+    botData.races += 1;
+    botData.totalGap += encounter.timeGap;
+    botData.avgGap = botData.totalGap / botData.races;
+    botData.closestGap = Math.min(botData.closestGap, encounter.timeGap);
+    botData.lastRace = eventNumber;
+
+    // Update wins/losses
+    if (encounter.userFinishedAhead) {
+      botData.userWins += 1;
+    } else {
+      botData.botWins += 1;
+    }
+
+    // Update bot info (in case it changed)
+    botData.botName = encounter.botName;
+    botData.botCountry = encounter.botCountry;
+    botData.botArr = encounter.botArr;
+  });
+
+  return rivalData;
+}
+
+/**
+ * Identify top 3 rivals based on rivalry score
+ * Rivalry score = (number of races together) / (average gap + 1)
+ * Higher score = closer racing more often = bigger rival
+ */
+function identifyTopRivals(rivalData) {
+  if (!rivalData || !rivalData.encounters) {
+    return [];
+  }
+
+  // Calculate rivalry score for each bot
+  const rivalScores = Object.keys(rivalData.encounters).map(botUid => {
+    const data = rivalData.encounters[botUid];
+    // Score favors more races and closer gaps
+    const rivalryScore = data.races / (data.avgGap + 1);
+    return {
+      botUid: botUid,
+      score: rivalryScore,
+      races: data.races
+    };
+  });
+
+  // Sort by rivalry score (descending) and return top 3 UIDs
+  const topRivals = rivalScores
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 3)
+    .map(r => r.botUid);
+
+  return topRivals;
+}
+
+/**
  * Get list of optional events the user has completed so far
  * Optional events are: 6, 7, 8, 9, 10, 11, 12 (events 6-12)
  * These can be completed at stages 3, 6, or 8
@@ -1005,7 +1142,10 @@ async function processUserResult(uid, eventInfo, results) {
       recentResults: recentResults,
       isOnStreak: isOnStreak,
       totalPodiums: totalPodiums,
-      seasonPosition: null
+      seasonPosition: null,
+      // Rival data for story generation
+      topRivals: updatedRivalData.topRivals || [],
+      rivalEncounters: rivalEncounters
     },
     uid,
     narrativeSelector,
@@ -1077,7 +1217,28 @@ async function processUserResult(uid, eventInfo, results) {
   const tempUserData = { ...userData };
   tempUserData[`event${eventNumber}Results`] = eventResults;
   const careerStats = await calculateCareerStats(tempUserData);
-  
+
+  // Calculate rival encounters for this race
+  const rivalEncounters = calculateRivalEncounters(
+    results,
+    uid,
+    position,
+    parseFloat(userResult.Time) || 0
+  );
+
+  // Update rival data
+  const existingRivalData = userData.rivalData || null;
+  const updatedRivalData = updateRivalData(existingRivalData, rivalEncounters, eventNumber);
+
+  // Identify top 3 rivals
+  const topRivals = identifyTopRivals(updatedRivalData);
+  updatedRivalData.topRivals = topRivals;
+
+  // Log rival encounters
+  if (rivalEncounters.length > 0) {
+    console.log(`   🤝 Rival encounters: ${rivalEncounters.length} bot(s) within 30s`);
+  }
+
   // Update user document
   const updates = {
     [`event${eventNumber}Results`]: eventResults,
@@ -1100,6 +1261,7 @@ async function processUserResult(uid, eventInfo, results) {
     ageBand: userResult.AgeBand || null,
     usedOptionalEvents: newUsedOptionalEvents,
     tourProgress: newTourProgress,
+    rivalData: updatedRivalData, // Add rival data
     ...dnsFlags // Add DNS flags if any
   };
   
@@ -1397,7 +1559,7 @@ function simulatePosition(botName, arr, eventNumber, fieldSize = 50) {
     expectedPosition = 40; // Tail end
   }
   
-  // Add randomness: Â±10 positions
+  // Add randomness: ±10 positions
   const randomOffset = Math.floor(getSeededRandom(botName, eventNumber) * 20) - 10;
   let simulatedPosition = expectedPosition + randomOffset;
   
@@ -1693,11 +1855,11 @@ async function updateBotARRs(season, event, results) {
         lastEventId: `season${season}_event${event}`
       });
       
-      console.log(`   âœ“ Updated ${uid} ARR: ${arr}`);
+      console.log(`   ✓ Updated ${uid} ARR: ${arr}`);
       botsUpdated++;
       
     } catch (error) {
-      console.error(`   âœ— Error updating bot ${uid}:`, error.message);
+      console.error(`   ✗ Error updating bot ${uid}:`, error.message);
     }
   }
   
@@ -1818,7 +1980,7 @@ async function updateResultsSummary(season, event, results, userUid) {
     results: validResults
   });
   
-  console.log(`âœ… Updated results summary for season ${season} event ${event}`);
+  console.log(`✅ Updated results summary for season ${season} event ${event}`);
   
   // Update bot ARRs from these results
   await updateBotARRs(season, event, results);

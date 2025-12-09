@@ -1,13 +1,5 @@
-// Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyDo-g0UhDCB8QWRXQ0iapVHQEgA4X7jt4o",
-  authDomain: "careermodelogin.firebaseapp.com",
-  projectId: "careermodelogin",
-  storageBucket: "careermodelogin.firebasestorage.app",
-  messagingSenderId: "599516805754",
-  appId: "1:599516805754:web:7f5c6bbebb8b454a81d9c3",
-  measurementId: "G-Y8BQ4F6H4V"
-};
+// Import shared Firebase configuration
+import { firebaseConfig } from './firebase-config.js';
 
 // Initialize Firebase
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
@@ -231,8 +223,6 @@ if (loginForm) {
       await setPersistence(auth, persistence);
 
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      console.log('User logged in:', userCredential.user);
-      console.log('Remember me:', rememberMe ? 'ON (stays logged in)' : 'OFF (session only)');
 
       closeModal();
 
@@ -302,7 +292,6 @@ if (signupForm) {
         createdAt: new Date()
       });
 
-      console.log('User created:', user.uid);
       alert('Account created successfully! Welcome to TPV Career Mode.');
       closeModal();
 
@@ -343,8 +332,6 @@ if (googleLoginBtn) {
       const result = await signInWithPopup(auth, googleProvider);
       const user = result.user;
 
-      console.log('Remember me:', rememberMe ? 'ON (stays logged in)' : 'OFF (session only)');
-
       // Check if user document exists and has UID
       const userDoc = await getDoc(doc(db, 'users', user.uid));
 
@@ -353,7 +340,6 @@ if (googleLoginBtn) {
         openUidModal();
       } else {
         // User has UID, proceed normally
-        console.log('Google user logged in:', user.uid);
         closeModal();
         window.location.href = 'events.html';
       }
@@ -393,7 +379,6 @@ if (googleSignupBtn) {
         openUidModal();
       } else {
         // User has UID, proceed normally
-        console.log('Google user signed up:', user.uid);
         closeModal();
         window.location.href = 'events.html';
       }
@@ -468,7 +453,6 @@ if (uidForm) {
         });
       }
 
-      console.log('UID saved for Google user:', user.uid);
       alert('UID saved successfully! Welcome to TPV Career Mode.');
       closeUidModal();
       closeModal();

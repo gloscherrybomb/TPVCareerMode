@@ -178,6 +178,15 @@
                     </div>
                 </div>
 
+                <!-- Rivals Section -->
+                <div class="profile-section" id="rivalsSection" style="display: none;">
+                    <h2 class="section-title">Your Rivals</h2>
+                    <p class="section-description">These are the riders you've been battling it out with on the road</p>
+                    <div id="rivalsContainer" class="rivals-list">
+                        <!-- Rivals will be dynamically inserted here -->
+                    </div>
+                </div>
+
                 <!-- Awards Section -->
                 <div class="profile-section">
                     <h2 class="section-title">Awards & Achievements</h2>
@@ -372,6 +381,41 @@
                         Download Image
                     </button>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bot Profile Request Modal -->
+    <div class="modal" id="profileRequestModal">
+        <div class="modal-overlay" id="profileRequestModalOverlay"></div>
+        <div class="modal-content modal-small">
+            <div class="modal-header">
+                <h2>Request Bot Profile</h2>
+                <button class="modal-close" id="profileRequestModalClose">&times;</button>
+                <p class="modal-subtitle">Help us create a profile for <span id="requestBotName"></span></p>
+            </div>
+            <div class="modal-body">
+                <form id="profileRequestForm">
+                    <input type="hidden" id="requestBotUid">
+                    <input type="hidden" id="requestBotArr">
+                    <input type="hidden" id="requestBotCountry">
+
+                    <div class="bot-info-preview">
+                        <p><strong>Bot:</strong> <span id="previewBotName"></span></p>
+                        <p><strong>ARR:</strong> <span id="previewBotArr"></span></p>
+                        <p><strong>Country:</strong> <span id="previewBotCountry"></span></p>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="interestFact">
+                            Interesting Fact (Optional)
+                            <span class="form-help">Share something interesting about racing this bot</span>
+                        </label>
+                        <textarea id="interestFact" rows="3" placeholder="e.g., Always attacks on the last lap, Great climber, Tactical sprinter..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-full">Submit Request</button>
+                </form>
             </div>
         </div>
     </div>

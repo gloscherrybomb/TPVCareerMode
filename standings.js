@@ -1,21 +1,12 @@
 // Standings Page Logic for TPV Career Mode
 
+import { firebaseConfig } from './firebase-config.js';
+import { getARRBand } from './utils.js';
 import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 import { getFirestore, doc, getDoc, collection, getDocs, query, orderBy, limit } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import { makeNameClickable } from './bot-profile-modal.js';
 import { initRiderProfileModal, makeRiderNameClickable } from './rider-profile-modal.js';
-
-// Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyDo-g0UhDCB8QWRXQ0iapVHQEgA4X7jt4o",
-  authDomain: "careermodelogin.firebaseapp.com",
-  projectId: "careermodelogin",
-  storageBucket: "careermodelogin.firebasestorage.app",
-  messagingSenderId: "599516805754",
-  appId: "1:599516805754:web:7f5c6bbebb8b454a81d9c3",
-  measurementId: "G-Y8BQ4F6H4V"
-};
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -684,38 +675,7 @@ function initSubTabs() {
     });
 }
 
-// Get ARR band label
-function getARRBand(arr) {
-    if (!arr || arr < 300) return 'Unranked';
-    
-    // Diamond: 1600-2000 (4 tiers)
-    if (arr >= 1900) return 'Diamond 4';
-    if (arr >= 1800) return 'Diamond 3';
-    if (arr >= 1700) return 'Diamond 2';
-    if (arr >= 1600) return 'Diamond 1';
-    
-    // Platinum: 1300-1599 (3 tiers)
-    if (arr >= 1500) return 'Platinum 3';
-    if (arr >= 1400) return 'Platinum 2';
-    if (arr >= 1300) return 'Platinum 1';
-    
-    // Gold: 1000-1299 (3 tiers)
-    if (arr >= 1200) return 'Gold 3';
-    if (arr >= 1100) return 'Gold 2';
-    if (arr >= 1000) return 'Gold 1';
-    
-    // Silver: 700-999 (3 tiers)
-    if (arr >= 900) return 'Silver 3';
-    if (arr >= 800) return 'Silver 2';
-    if (arr >= 700) return 'Silver 1';
-    
-    // Bronze: 300-699 (3 tiers)
-    if (arr >= 500) return 'Bronze 3';
-    if (arr >= 400) return 'Bronze 2';
-    if (arr >= 300) return 'Bronze 1';
-    
-    return 'Unranked';
-}
+// getARRBand function now imported from utils.js
 
 // Tab switching
 function initTabs() {

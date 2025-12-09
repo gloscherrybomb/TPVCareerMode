@@ -2,20 +2,10 @@
 // Now with Firebase Firestore integration
 
 // Firebase imports
+import { firebaseConfig } from './firebase-config.js';
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 import { getFirestore, doc, getDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-
-// Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyDo-g0UhDCB8QWRXQ0iapVHQEgA4X7jt4o",
-  authDomain: "careermodelogin.firebaseapp.com",
-  projectId: "careermodelogin",
-  storageBucket: "careermodelogin.firebasestorage.app",
-  messagingSenderId: "599516805754",
-  appId: "1:599516805754:web:7f5c6bbebb8b454a81d9c3",
-  measurementId: "G-Y8BQ4F6H4V"
-};
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);

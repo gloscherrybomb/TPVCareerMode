@@ -1,14 +1,17 @@
 // Profile Page Logic for TPV Career Mode
 
+import { firebaseConfig } from './firebase-config.js';
+import { getInitials, formatTime, getOrdinalSuffix, getARRBand, formatDate } from './utils.js';
 import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-import { 
-    getFirestore, 
-    doc, 
-    getDoc, 
-    updateDoc, 
-    collection, 
-    query, 
-    where, 
+import {
+    getFirestore,
+    doc,
+    getDoc,
+    setDoc,
+    updateDoc,
+    collection,
+    query,
+    where,
     getDocs,
     orderBy
 } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
@@ -21,17 +24,6 @@ import {
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 
 // Access eventData from global scope (loaded via script tag in HTML)
-
-// Firebase configuration
-const firebaseConfig = {
-    apiKey: "AIzaSyDo-g0UhDCB8QWRXQ0iapVHQEgA4X7jt4o",
-    authDomain: "careermodelogin.firebaseapp.com",
-    projectId: "careermodelogin",
-    storageBucket: "careermodelogin.firebasestorage.app",
-    messagingSenderId: "599516805754",
-    appId: "1:599516805754:web:7f5c6bbebb8b454a81d9c3",
-    measurementId: "G-Y8BQ4F6H4V"
-};
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -61,90 +53,8 @@ function showProfileContent() {
     document.getElementById('profileContent').style.display = 'block';
 }
 
-// Get user's initials for placeholder
-function getInitials(name) {
-    if (!name) return '?';
-    const parts = name.split(' ');
-    if (parts.length >= 2) {
-        return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-    }
-    return name[0].toUpperCase();
-}
-
-// Format time in seconds to hh:mm:ss
-function formatTime(seconds) {
-    if (!seconds || seconds === 'N/A') return 'N/A';
-    
-    const totalSeconds = Math.floor(seconds);
-    const hours = Math.floor(totalSeconds / 3600);
-    const minutes = Math.floor((totalSeconds % 3600) / 60);
-    const secs = totalSeconds % 60;
-    
-    if (hours > 0) {
-        return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-    } else {
-        return `${minutes}:${secs.toString().padStart(2, '0')}`;
-    }
-}
-
-// Get ordinal suffix for a number (1st, 2nd, 3rd, 4th, etc.)
-function getOrdinalSuffix(num) {
-    if (!num) return '';
-    const n = Math.round(num);
-    const lastDigit = n % 10;
-    const lastTwoDigits = n % 100;
-    
-    // Special cases: 11th, 12th, 13th
-    if (lastTwoDigits >= 11 && lastTwoDigits <= 13) {
-        return n + 'th';
-    }
-    
-    // Regular cases
-    switch (lastDigit) {
-        case 1: return n + 'st';
-        case 2: return n + 'nd';
-        case 3: return n + 'rd';
-        default: return n + 'th';
-    }
-}
-
-// Get ARR band from rating
-function getARRBand(arr) {
-    if (!arr || arr < 300) return 'Unranked';
-    
-    // Diamond: 1600-2000 (4 tiers)
-    if (arr >= 1900) return 'Diamond 4';
-    if (arr >= 1800) return 'Diamond 3';
-    if (arr >= 1700) return 'Diamond 2';
-    if (arr >= 1600) return 'Diamond 1';
-    
-    // Platinum: 1300-1599 (3 tiers)
-    if (arr >= 1500) return 'Platinum 3';
-    if (arr >= 1400) return 'Platinum 2';
-    if (arr >= 1300) return 'Platinum 1';
-    
-    // Gold: 1000-1299 (3 tiers)
-    if (arr >= 1200) return 'Gold 3';
-    if (arr >= 1100) return 'Gold 2';
-    if (arr >= 1000) return 'Gold 1';
-    
-    // Silver: 700-999 (3 tiers)
-    if (arr >= 900) return 'Silver 3';
-    if (arr >= 800) return 'Silver 2';
-    if (arr >= 700) return 'Silver 1';
-    
-    // Bronze: 300-699 (3 tiers)
-    if (arr >= 500) return 'Bronze 3';
-    if (arr >= 400) return 'Bronze 2';
-    if (arr >= 300) return 'Bronze 1';
-    
-    return 'Unranked';
-}
-
 // Calculate user statistics from race results
 async function calculateUserStats(userUID, userData) {
-    console.log('Building supplemental stats for user:', userUID);
-    
     // NOTE: Most career stats are stored in userData and passed in.
     // This function just extracts positions and recent results from event results already in userData.
     
@@ -191,30 +101,25 @@ async function calculateUserStats(userUID, userData) {
     
     // Sort recent results by event number (descending)
     stats.recentResults.sort((a, b) => b.eventNum - a.eventNum);
-    
-    console.log('Supplemental stats built:', stats.recentResults.length, 'results');
+
     return stats;
 }
 
 // Calculate season ranking from standings data
 async function calculateSeasonRanking(userUID, userData) {
-    console.log('Calculating season ranking for user:', userUID);
-    
     // Use season1Standings from user document - this is the authoritative source
     // that includes simulated bot results
     const standings = userData.season1Standings || [];
-    
+
     if (standings.length === 0) {
-        console.log('No standings data found');
         return { rank: null, total: 0 };
     }
     
     // Standings are already sorted by points (descending)
     // Find user's position by uid only (don't trust isCurrentUser flag)
     const userIndex = standings.findIndex(r => r.uid === userUID);
-    
+
     if (userIndex === -1) {
-        console.log('User not found in standings');
         return { rank: null, total: standings.length };
     }
     
@@ -226,8 +131,6 @@ async function calculateSeasonRanking(userUID, userData) {
 
 // Calculate global ranking (from user documents)
 async function calculateGlobalRanking(userUID) {
-    console.log('Calculating global ranking for user:', userUID);
-    
     try {
         // Get all users and their total points
         const usersSnapshot = await getDocs(collection(db, 'users'));
@@ -303,7 +206,10 @@ async function loadProfile(user) {
         
         // Display profile information
         displayProfileInfo(user, userData, userStats, seasonRanking, globalRanking);
-        
+
+        // Display rivals
+        displayRivals(userData);
+
         showProfileContent();
     } catch (error) {
         console.error('Error loading profile:', error);
@@ -450,26 +356,8 @@ function displayRecentResults(results) {
             }
         }
         
-        // Format date properly - handle Firestore Timestamp
-        let formattedDate = 'Unknown date';
-        if (result.date) {
-            try {
-                // Check if it's a Firestore Timestamp object with seconds property
-                if (result.date.seconds) {
-                    const date = new Date(result.date.seconds * 1000);
-                    formattedDate = date.toLocaleDateString();
-                } else if (result.date.toDate) {
-                    // If it has a toDate method (Firestore Timestamp)
-                    formattedDate = result.date.toDate().toLocaleDateString();
-                } else {
-                    // Try to parse as regular date
-                    formattedDate = new Date(result.date).toLocaleDateString();
-                }
-            } catch (e) {
-                console.error('Error formatting date:', e);
-                formattedDate = 'Unknown date';
-            }
-        }
+        // Format date using shared utility function
+        const formattedDate = formatDate(result.date);
         
         html += `
             <a href="event-detail.html?id=${result.eventNum}" class="result-card-link">
@@ -496,13 +384,11 @@ function displayRecentResults(results) {
 // Display awards (placeholder for future implementation)
 function displayAwards(awards) {
     const container = document.getElementById('awardsContainer');
-    
+
     // Safety check - if awards is undefined, initialize it as empty object
     if (!awards) {
         awards = {};
     }
-    
-    console.log('displayAwards called with:', awards);
     
     // Map old property names to new ones for backwards compatibility
     // New stored format uses: gold, silver, bronze, punchingMedal, giantKiller, etc.
@@ -537,11 +423,7 @@ function displayAwards(awards) {
         allRounder: awards.allRounder || 0,
         comeback: awards.comeback || 0
     };
-    
-    console.log('Mapped awards:', mappedAwards);
-    console.log('Season trophies - Champion:', mappedAwards.seasonChampion, 'Runner-up:', mappedAwards.seasonRunnerUp, 'Third:', mappedAwards.seasonThirdPlace);
-    console.log('GC trophies - Gold:', mappedAwards.gcGoldMedal, 'Silver:', mappedAwards.gcSilverMedal, 'Bronze:', mappedAwards.gcBronzeMedal);
-    
+
     // Use mapped awards for the rest of the function
     awards = mappedAwards;
     
@@ -929,40 +811,245 @@ function displayAwards(awards) {
     container.innerHTML = html;
 }
 
+// Display rivals section
+async function displayRivals(userData) {
+    const section = document.getElementById('rivalsSection');
+    const container = document.getElementById('rivalsContainer');
+
+    // Check if user has rival data
+    if (!userData.rivalData || !userData.rivalData.topRivals || userData.rivalData.topRivals.length === 0) {
+        section.style.display = 'none';
+        return;
+    }
+
+    section.style.display = 'block';
+
+    const rivalData = userData.rivalData;
+    const topRivals = rivalData.topRivals;
+
+    let html = '';
+
+    // Display each rival
+    for (let i = 0; i < topRivals.length; i++) {
+        const botUid = topRivals[i];
+        const data = rivalData.encounters[botUid];
+
+        if (!data) continue;
+
+        const rankLabel = ['🥇 #1', '🥈 #2', '🥉 #3'][i];
+        const record = `${data.userWins}-${data.botWins}`;
+        const winPercentage = data.races > 0 ? ((data.userWins / data.races) * 100).toFixed(0) : 0;
+
+        // Check if bot has profile by trying to fetch from botProfiles
+        const hasProfile = await checkBotProfile(botUid);
+
+        html += `
+            <div class="rival-card">
+                <div class="rival-header">
+                    <div class="rival-info">
+                        <div class="rival-rank">${rankLabel}</div>
+                        <div class="rival-details">
+                            <div class="rival-name" data-bot-uid="${botUid}" data-bot-name="${data.botName}" data-has-profile="${hasProfile}">
+                                ${data.botName}
+                            </div>
+                            <div class="rival-meta">
+                                <span class="rival-country">${data.botCountry || 'Unknown'}</span>
+                                <span class="rival-arr">ARR: ${data.botArr}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="rival-actions">
+                        ${hasProfile
+                            ? `<button class="btn-rival-action btn-view-profile" data-bot-uid="${botUid}">View Profile</button>`
+                            : `<button class="btn-rival-action btn-request-profile" data-bot-uid="${botUid}" data-bot-name="${data.botName}" data-bot-arr="${data.botArr}" data-bot-country="${data.botCountry}">Request Profile</button>`
+                        }
+                    </div>
+                </div>
+                <div class="rival-stats">
+                    <div class="rival-stat races">
+                        <div class="rival-stat-value">${data.races}</div>
+                        <div class="rival-stat-label">Races Together</div>
+                    </div>
+                    <div class="rival-stat wins">
+                        <div class="rival-stat-value">${data.userWins}</div>
+                        <div class="rival-stat-label">Your Wins</div>
+                    </div>
+                    <div class="rival-stat losses">
+                        <div class="rival-stat-value">${data.botWins}</div>
+                        <div class="rival-stat-label">Their Wins</div>
+                    </div>
+                    <div class="rival-stat gap">
+                        <div class="rival-stat-value">${data.avgGap.toFixed(1)}s</div>
+                        <div class="rival-stat-label">Avg Gap</div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    container.innerHTML = html;
+
+    // Add event listeners for bot names and buttons
+    attachRivalEventListeners();
+}
+
+// Check if bot has a profile in Firestore
+async function checkBotProfile(botUid) {
+    try {
+        const botDoc = await getDoc(doc(db, 'botProfiles', botUid));
+        return botDoc.exists();
+    } catch (error) {
+        console.error('Error checking bot profile:', error);
+        return false;
+    }
+}
+
+// Attach event listeners to rival elements
+function attachRivalEventListeners() {
+    // Clickable rival names
+    document.querySelectorAll('.rival-name').forEach(nameEl => {
+        nameEl.addEventListener('click', () => {
+            const botUid = nameEl.dataset.botUid;
+            const hasProfile = nameEl.dataset.hasProfile === 'true';
+
+            if (hasProfile) {
+                // Open bot profile modal (from bot-profile-modal.js)
+                if (window.openBotProfileModal) {
+                    window.openBotProfileModal(botUid);
+                }
+            } else {
+                // Show request profile modal
+                const botName = nameEl.dataset.botName;
+                openProfileRequestModal(botUid, botName, '', '');
+            }
+        });
+    });
+
+    // View Profile buttons
+    document.querySelectorAll('.btn-view-profile').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const botUid = btn.dataset.botUid;
+            if (window.openBotProfileModal) {
+                window.openBotProfileModal(botUid);
+            }
+        });
+    });
+
+    // Request Profile buttons
+    document.querySelectorAll('.btn-request-profile').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const botUid = btn.dataset.botUid;
+            const botName = btn.dataset.botName;
+            const botArr = btn.dataset.botArr;
+            const botCountry = btn.dataset.botCountry;
+            openProfileRequestModal(botUid, botName, botArr, botCountry);
+        });
+    });
+}
+
+// Open profile request modal
+function openProfileRequestModal(botUid, botName, botArr, botCountry) {
+    const modal = document.getElementById('profileRequestModal');
+
+    // Set hidden fields
+    document.getElementById('requestBotUid').value = botUid;
+    document.getElementById('requestBotArr').value = botArr;
+    document.getElementById('requestBotCountry').value = botCountry;
+
+    // Set display fields
+    document.getElementById('requestBotName').textContent = botName;
+    document.getElementById('previewBotName').textContent = botName;
+    document.getElementById('previewBotArr').textContent = botArr || 'Unknown';
+    document.getElementById('previewBotCountry').textContent = botCountry || 'Unknown';
+
+    // Clear textarea
+    document.getElementById('interestFact').value = '';
+
+    // Show modal
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+// Close profile request modal
+function closeProfileRequestModal() {
+    const modal = document.getElementById('profileRequestModal');
+    modal.classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+// Handle profile request submission
+async function handleProfileRequest(e) {
+    e.preventDefault();
+
+    const botUid = document.getElementById('requestBotUid').value;
+    const botName = document.getElementById('requestBotName').textContent;
+    const botArr = document.getElementById('requestBotArr').value;
+    const botCountry = document.getElementById('requestBotCountry').value;
+    const interestFact = document.getElementById('interestFact').value.trim();
+
+    if (!currentUser) {
+        alert('Please log in to submit a profile request');
+        return;
+    }
+
+    try {
+        // Create request data
+        const requestData = {
+            timestamp: new Date().toISOString(),
+            userUid: currentUser.uid,
+            botUid: botUid,
+            botName: botName,
+            botArr: botArr,
+            botCountry: botCountry,
+            interestFact: interestFact || 'None provided'
+        };
+
+        // Store request in Firestore (for now, as GitHub Actions integration would require API)
+        await setDoc(doc(db, 'botProfileRequests', `${botUid}_${Date.now()}`), requestData);
+
+        alert(`Profile request submitted for ${botName}! An admin will review it soon.`);
+        closeProfileRequestModal();
+    } catch (error) {
+        console.error('Error submitting profile request:', error);
+        alert('Error submitting request. Please try again.');
+    }
+}
+
+// Initialize profile request modal
+function initProfileRequestModal() {
+    const modal = document.getElementById('profileRequestModal');
+    const closeBtn = document.getElementById('profileRequestModalClose');
+    const overlay = document.getElementById('profileRequestModalOverlay');
+    const form = document.getElementById('profileRequestForm');
+
+    if (!modal) return;
+
+    closeBtn?.addEventListener('click', closeProfileRequestModal);
+    overlay?.addEventListener('click', closeProfileRequestModal);
+    form?.addEventListener('submit', handleProfileRequest);
+}
+
 // Generate and display career summary
 // Display career summary paragraph
 function displayCareerSummary(userData, stats) {
-    console.log('=== CAREER SUMMARY DEBUG ===');
-    console.log('Stats object:', stats);
-    console.log('Stats.totalRaces:', stats?.totalRaces);
-    console.log('Generator exists:', typeof window.careerSummaryGen !== 'undefined');
-    
     const container = document.getElementById('careerSummary');
-    
+
     if (!container) {
-        console.log('❌ Career summary container not found in HTML');
         return;
     }
-    
-    console.log('✓ Container found');
-    
+
     // Check if we have enough data
     if (!stats || stats.totalRaces === 0) {
-        console.log('❌ Not enough data - totalRaces:', stats?.totalRaces);
         container.textContent = 'Complete your first race to see your career summary.';
         return;
     }
-    
-    console.log('✓ Stats check passed - totalRaces:', stats.totalRaces);
-    
+
     // Check if career summary generator is loaded
     if (typeof window.careerSummaryGen === 'undefined') {
-        console.warn('❌ Career summary generator not loaded');
+        console.warn('Career summary generator not loaded');
         container.textContent = 'Your career is just beginning. Complete more races to see your personalized career summary.';
         return;
     }
-    
-    console.log('✓ Generator loaded, building career data...');
     
     // Calculate current season stats
     const season = 1;
@@ -1012,14 +1099,12 @@ function displayCareerSummary(userData, stats) {
     
     // Calculate total awards
     const totalAwardsCount = Object.values(stats.awards || {}).reduce((sum, val) => sum + val, 0);
-    
+
     // Check if season is complete
     const seasonComplete = userData.season1Complete === true;
-    console.log('Season complete status:', seasonComplete);
-    
+
     // If season is complete, show season review instead of ongoing summary
     if (seasonComplete && window.seasonCompletion) {
-        console.log('Generating season review...');
         try {
             const reviewText = window.seasonCompletion.generateProfileSeasonReview(userData);
             // Convert markdown-style text to HTML
@@ -1030,7 +1115,6 @@ function displayCareerSummary(userData, stats) {
                 .replace(/\n\n/g, '</p><p>')
                 .replace(/\n/g, '<br>');
             container.innerHTML = '<p>' + htmlText + '</p>';
-            console.log('Season review displayed successfully');
             return;
         } catch (error) {
             console.error('Error generating season review:', error);
@@ -1064,7 +1148,6 @@ function displayCareerSummary(userData, stats) {
     try {
         const summary = window.careerSummaryGen.generateCareerSummary(careerData);
         container.textContent = summary;
-        console.log('Career summary generated successfully');
     } catch (error) {
         console.error('Error generating career summary:', error);
         container.textContent = 'Your career is taking shape, one race at a time. Keep competing to build your story.';
@@ -1147,6 +1230,7 @@ onAuthStateChanged(auth, async (user) => {
 document.addEventListener('DOMContentLoaded', () => {
     initPhotoUpload();
     initShareStats();
+    initProfileRequestModal();
 });
 
 // ============================================================================
