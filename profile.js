@@ -1467,8 +1467,8 @@ async function drawSeasonTemplate(ctx, width, height) {
         });
     }
     
-    // Team car (bottom right corner, small)
-    await drawTeamCar(ctx, width - 150, height - 150, 0.15);
+    // Team car (centered, above website text)
+    await drawTeamCar(ctx, width / 2, height - 200, 0.15);
     
     // Website
     drawWebsite(ctx, width, height);
@@ -1553,8 +1553,8 @@ async function drawTrophyTemplate(ctx, width, height) {
         ctx.fillText('Start racing to earn awards!', width / 2, 700);
     }
     
-    // Team car (bottom right corner, small)
-    await drawTeamCar(ctx, width - 150, height - 150, 0.15);
+    // Team car (centered, above website text)
+    await drawTeamCar(ctx, width / 2, height - 200, 0.15);
     
     // Website
     drawWebsite(ctx, width, height);
@@ -1635,8 +1635,8 @@ async function drawChampionTemplate(ctx, width, height) {
         });
     }
     
-    // Team car (bottom right corner, small)
-    await drawTeamCar(ctx, width - 150, height - 150, 0.15);
+    // Team car (centered, above website text)
+    await drawTeamCar(ctx, width / 2, height - 200, 0.15);
     
     // Website
     drawWebsite(ctx, width, height);
