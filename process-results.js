@@ -2227,17 +2227,92 @@ async function processResults(csvFiles) {
 }
 
 // Main execution
+/**
+ * Process pending bot profile requests from Firestore and append to GitHub text file
+ */
+async function processBotProfileRequests() {
+  try {
+    console.log('\n📋 Checking for pending bot profile requests...');
+
+    // Get all unprocessed bot profile requests
+    const requestsSnapshot = await db.collection('botProfileRequests')
+      .where('processed', '==', false)
+      .get();
+
+    if (requestsSnapshot.empty) {
+      console.log('   No pending bot profile requests');
+      return;
+    }
+
+    console.log(`   Found ${requestsSnapshot.size} pending request(s)`);
+
+    // Prepare the text file path
+    const requestsFilePath = path.join(__dirname, 'bot-profile-requests', 'requests.txt');
+
+    // Ensure directory exists
+    const dirPath = path.dirname(requestsFilePath);
+    if (!fs.existsSync(dirPath)) {
+      fs.mkdirSync(dirPath, { recursive: true });
+    }
+
+    // Append each request to the file
+    let appendedCount = 0;
+    for (const doc of requestsSnapshot.docs) {
+      const request = doc.data();
+
+      // Format timestamp
+      const timestamp = new Date(request.timestamp).toISOString().replace('T', ' ').split('.')[0] + ' UTC';
+
+      // Format the request entry
+      const entry = `
+================================================================================
+Request submitted: ${timestamp}
+Firestore Document ID: ${doc.id}
+Submitted by User UID: ${request.userUid}
+Bot UID: ${request.botUid}
+Bot Name: ${request.botName}
+Bot ARR: ${request.botArr}
+Bot Country: ${request.botCountry}
+Interesting Fact: ${request.interestFact}
+================================================================================
+`;
+
+      // Append to file
+      fs.appendFileSync(requestsFilePath, entry, 'utf8');
+
+      // Mark as processed in Firestore
+      await db.collection('botProfileRequests').doc(doc.id).update({
+        processed: true,
+        processedAt: admin.firestore.FieldValue.serverTimestamp()
+      });
+
+      appendedCount++;
+      console.log(`   ✅ Processed request for ${request.botName} (${request.botUid})`);
+    }
+
+    console.log(`   📝 Appended ${appendedCount} request(s) to ${requestsFilePath}`);
+
+  } catch (error) {
+    console.error('❌ Error processing bot profile requests:', error);
+    // Don't fail the entire job if this fails
+  }
+}
+
 (async () => {
   try {
     const filesArg = process.argv[2];
     const csvFiles = JSON.parse(filesArg);
-    
+
     if (!csvFiles || csvFiles.length === 0) {
       console.log('No CSV files to process');
       process.exit(0);
     }
-    
+
     await processResults(csvFiles);
+
+    // Process any pending bot profile requests
+    await processBotProfileRequests();
+
     process.exit(0);
   } catch (error) {
     console.error('Fatal error:', error);

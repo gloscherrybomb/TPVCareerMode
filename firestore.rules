@@ -1,0 +1,47 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Default deny all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // User profiles - read by anyone, write by owner or admin
+    match /users/{userId} {
+      allow read: if true;
+      allow write: if request.auth != null &&
+                     (request.auth.uid == userId ||
+                      get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true);
+    }
+
+    // Standings - read by anyone, write restricted (written by server-side scripts)
+    match /standings/{botId} {
+      allow read: if true;
+      allow write: if false; // Only server-side scripts can write
+    }
+
+    // Bot profile requests - authenticated users can create, server processes them
+    match /botProfileRequests/{requestId} {
+      // Anyone authenticated can read their own requests or admins can read all
+      allow read: if request.auth != null &&
+                    (resource.data.userUid == request.auth.uid ||
+                     get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true);
+
+      // Authenticated users can create requests with proper data
+      allow create: if request.auth != null &&
+                      request.resource.data.userUid == request.auth.uid &&
+                      request.resource.data.keys().hasAll(['timestamp', 'userUid', 'botUid', 'botName', 'botArr', 'botCountry', 'processed']) &&
+                      request.resource.data.processed == false;
+
+      // Only server can update (to mark as processed)
+      allow update, delete: if false;
+    }
+
+    // Bot profiles - read by anyone, write by admin only
+    match /botProfiles/{botUid} {
+      allow read: if true;
+      allow write: if request.auth != null &&
+                     get(/databases/$(database)/documents/users/$(request.auth.uid)).data.isAdmin == true;
+    }
+  }
+}

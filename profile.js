@@ -993,52 +993,26 @@ async function handleProfileRequest(e) {
     }
 
     try {
-        // Create GitHub issue body with request data
-        const issueBody = `**Bot Name**: ${botName}
-**Bot UID**: ${botUid}
-**Bot ARR**: ${botArr}
-**Bot Country**: ${botCountry}
-**Interesting Fact**: ${interestFact || 'None provided'}
-**Submitted by User UID**: ${currentUser.uid}
+        // Create request data
+        const requestData = {
+            timestamp: new Date().toISOString(),
+            userUid: currentUser.uid,
+            botUid: botUid,
+            botName: botName,
+            botArr: botArr,
+            botCountry: botCountry,
+            interestFact: interestFact || 'None provided',
+            processed: false // Mark as unprocessed
+        };
 
----
-*This request was submitted from the TPV Career Mode profile page.*`;
+        // Store request in Firestore
+        await setDoc(doc(db, 'botProfileRequests', `${botUid}_${Date.now()}`), requestData);
 
-        const issueTitle = `Bot Profile Request: ${botName} (${botUid})`;
-
-        // GitHub Personal Access Token (Fine-grained with only 'Issues: Read and write' permission)
-        // This token is intentionally public and only has permission to create issues in this repo
-        const GITHUB_TOKEN = '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';
-
-        // Create GitHub issue via API
-        const response = await fetch('https://api.github.com/repos/gloscherrybomb/TPVCareerMode/issues', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/vnd.github.v3+json',
-                'Authorization': `Bearer ${GITHUB_TOKEN}`
-            },
-            body: JSON.stringify({
-                title: issueTitle,
-                body: issueBody,
-                labels: ['bot-profile-request']
-            })
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            console.error('GitHub API error:', errorData);
-            throw new Error(`GitHub API error: ${response.status} ${response.statusText}`);
-        }
-
-        const issue = await response.json();
-        console.log('Created issue:', issue.html_url);
-
-        alert(`Profile request submitted for ${botName}!\n\nYour request has been recorded and an admin will review it soon.`);
+        alert(`Profile request submitted for ${botName}! An admin will review it soon.`);
         closeProfileRequestModal();
     } catch (error) {
         console.error('Error submitting profile request:', error);
-        alert('Error submitting request. Please try again. If the problem persists, please contact an administrator.');
+        alert('Error submitting request. Please try again.');
     }
 }
 
