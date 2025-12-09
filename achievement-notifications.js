@@ -247,7 +247,7 @@ class AchievementNotifications {
     overlay.className = 'achievement-notification-overlay';
     overlay.id = 'achievementOverlay';
 
-    const groupTitle = this.getCategoryTitle(group.category);
+    const groupTitle = this.getCategoryTitle(group.category, group.notifications.length);
     const groupIcon = this.getCategoryIcon(group.category);
 
     const cards = group.notifications.map((n, index) => this.createCard(n, index)).join('');
@@ -335,15 +335,16 @@ class AchievementNotifications {
   /**
    * Get category display title
    * @param {string} category
+   * @param {number} count - Number of notifications in the group
    * @returns {string}
    */
-  getCategoryTitle(category) {
+  getCategoryTitle(category, count) {
     const titles = {
-      podium: 'Podium Finishes',
-      event_special: 'Special Achievements',
+      podium: count === 1 ? 'Podium Finish' : 'Podium Finishes',
+      event_special: count === 1 ? 'Special Achievement' : 'Special Achievements',
       performance: 'Outstanding Performance',
       gc: 'Tour Overall Classification',
-      season: 'Season Awards'
+      season: count === 1 ? 'Season Award' : 'Season Awards'
     };
     return titles[category] || 'Achievements';
   }
