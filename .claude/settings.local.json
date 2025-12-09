@@ -10,7 +10,10 @@
       "Bash(find:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(git stash drop:*)"
+      "Bash(git stash drop:*)",
+      "Bash(git pull:*)",
+      "Bash(sort:*)",
+      "Bash(git restore:*)"
     ]
   }
 }
