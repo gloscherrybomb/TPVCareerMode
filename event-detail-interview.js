@@ -51,6 +51,9 @@ export async function displayPostRaceInterview(db, userId, eventNumber, userResu
         if (interviewSection) {
             interviewSection.style.display = 'block';
 
+            // Initialize toggle button
+            initializeToggleButton();
+
             // Scroll to interview after a short delay
             setTimeout(() => {
                 interviewSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -225,6 +228,77 @@ function displaySubmittedFeedback(selectedResponse, personalityDelta) {
     setTimeout(() => {
         submittedSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }, 300);
+
+    // Collapse interview section after 3 seconds
+    setTimeout(() => {
+        collapseInterview();
+    }, 3000);
+}
+
+/**
+ * Collapse the interview section
+ */
+function collapseInterview() {
+    const interviewContainer = document.querySelector('.interview-container');
+    const toggleBtn = document.getElementById('interviewToggleBtn');
+    const toggleText = toggleBtn?.querySelector('.toggle-text');
+
+    if (interviewContainer) {
+        interviewContainer.classList.add('collapsed');
+    }
+
+    if (toggleBtn) {
+        toggleBtn.style.display = 'flex';
+    }
+
+    if (toggleText) {
+        toggleText.textContent = 'Show';
+    }
+}
+
+/**
+ * Expand the interview section
+ */
+function expandInterview() {
+    const interviewContainer = document.querySelector('.interview-container');
+    const toggleText = document.getElementById('interviewToggleBtn')?.querySelector('.toggle-text');
+
+    if (interviewContainer) {
+        interviewContainer.classList.remove('collapsed');
+    }
+
+    if (toggleText) {
+        toggleText.textContent = 'Hide';
+    }
+}
+
+/**
+ * Toggle interview section
+ */
+function toggleInterview() {
+    const interviewContainer = document.querySelector('.interview-container');
+    if (interviewContainer?.classList.contains('collapsed')) {
+        expandInterview();
+    } else {
+        collapseInterview();
+    }
+}
+
+// Initialize toggle button event listener
+document.addEventListener('DOMContentLoaded', () => {
+    const toggleBtn = document.getElementById('interviewToggleBtn');
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', toggleInterview);
+    }
+});
+
+// Also set up the listener when the interview is displayed (in case DOM isn't ready)
+export function initializeToggleButton() {
+    const toggleBtn = document.getElementById('interviewToggleBtn');
+    if (toggleBtn) {
+        toggleBtn.removeEventListener('click', toggleInterview); // Remove any existing listener
+        toggleBtn.addEventListener('click', toggleInterview);
+    }
 }
 
 // Import Firestore functions that are needed

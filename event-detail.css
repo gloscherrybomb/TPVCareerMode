@@ -1654,6 +1654,15 @@
   box-shadow: 0 10px 40px rgba(255, 27, 107, 0.15);
 }
 
+.interview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 2px solid rgba(255, 27, 107, 0.3);
+  padding-bottom: 1rem;
+  margin-bottom: 2rem;
+}
+
 .interview-title {
   font-family: 'Orbitron', sans-serif;
   font-size: 1.4rem;
@@ -1661,9 +1670,42 @@
   text-transform: uppercase;
   letter-spacing: 2px;
   color: var(--accent-pink);
-  border-bottom: 2px solid rgba(255, 27, 107, 0.3);
-  padding-bottom: 1rem;
-  margin-bottom: 2rem;
+  margin: 0;
+}
+
+.interview-toggle-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.interview-toggle-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(255, 27, 107, 0.4);
+}
+
+.interview-toggle-btn .toggle-icon {
+  font-size: 0.8rem;
+  transition: transform 0.3s ease;
+}
+
+.interview-container.collapsed .interview-toggle-btn .toggle-icon {
+  transform: rotate(-90deg);
+}
+
+.interview-container.collapsed .interview-toggle-btn .toggle-text::after {
+  content: ' Interview';
 }
 
 /* Interview Layout - Horizontal */
@@ -1671,6 +1713,14 @@
   display: flex;
   align-items: flex-start;
   gap: 2.5rem;
+  transition: all 0.5s ease;
+  overflow: hidden;
+}
+
+.interview-container.collapsed .interview-layout {
+  max-height: 0;
+  opacity: 0;
+  margin-bottom: 0;
 }
 
 .journalist-avatar {
@@ -1847,8 +1897,21 @@
     padding: 1.5rem;
   }
 
+  .interview-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
   .interview-title {
     font-size: 1.2rem;
+  }
+
+  .interview-toggle-btn {
+    width: 100%;
+    justify-content: center;
+    padding: 0.875rem;
+    font-size: 0.85rem;
   }
 
   .interview-layout {

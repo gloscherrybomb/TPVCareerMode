@@ -109,9 +109,15 @@
     <section class="post-race-interview" id="postRaceInterviewSection" style="display: none;">
         <div class="container">
             <div class="interview-container">
-                <h2 class="interview-title">POST-RACE INTERVIEW</h2>
+                <div class="interview-header">
+                    <h2 class="interview-title">POST-RACE INTERVIEW</h2>
+                    <button class="interview-toggle-btn" id="interviewToggleBtn" style="display: none;">
+                        <span class="toggle-text">Show Interview</span>
+                        <span class="toggle-icon">▼</span>
+                    </button>
+                </div>
 
-                <div class="interview-layout">
+                <div class="interview-layout" id="interviewLayout">
                     <div class="journalist-avatar">
                         <img src="journalist.png" alt="Journalist">
                     </div>
