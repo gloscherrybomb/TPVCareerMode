@@ -3,6 +3,7 @@ firestore.rules
 firestore.indexes.json
 firebase.json
 FIRESTORE_SETUP.md
+firestore-rules.txt
 
 # Node modules
 node_modules/
