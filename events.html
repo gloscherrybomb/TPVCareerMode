@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="events.css">
     <link rel="stylesheet" href="season-completion.css">
+    <link rel="stylesheet" href="achievement-notifications.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -1114,7 +1115,10 @@
                 deleteFields.season1CompletionDate = deleteField();
                 deleteFields.localTourGCPosition = deleteField();
                 deleteFields.rivalData = deleteField();
-                
+                deleteFields.rivals = deleteField();
+                deleteFields.rivalWins = deleteField();
+                deleteFields.rivalLosses = deleteField();
+
                 // Update user document
                 await updateDoc(userDocRef, { ...resetData, ...deleteFields });
                 
@@ -1128,5 +1132,7 @@
     </script>
     <script src="season-completion.js"></script>
     <script src="season-completion-ui.js"></script>
+    <script src="notification-queue.js"></script>
+    <script src="achievement-notifications.js"></script>
 </body>
 </html>

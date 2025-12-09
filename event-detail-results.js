@@ -650,8 +650,35 @@ async function loadEventResults() {
 
         // Get user's result for this event to extract story (userData already fetched above)
         const userEventResults = userData?.[`event${eventNumber}Results`];
+
+        // NEW: Check for earned awards and queue for notifications
+        if (userEventResults && userEventResults.earnedAwards && userEventResults.earnedAwards.length > 0) {
+            console.log(`Found ${userEventResults.earnedAwards.length} earned award(s) for event ${eventNumber}`);
+
+            // Queue each award for notification
+            if (window.notificationQueue) {
+                userEventResults.earnedAwards.forEach(award => {
+                    window.notificationQueue.add({
+                        awardId: award.awardId,
+                        eventNumber: eventNumber,
+                        category: award.category,
+                        intensity: award.intensity
+                    });
+                });
+
+                // Display notifications immediately
+                setTimeout(() => {
+                    if (window.achievementNotifications) {
+                        window.achievementNotifications.display();
+                    }
+                }, 500); // Small delay to let page settle
+            } else {
+                console.warn('Notification system not initialized yet');
+            }
+        }
+
         let storyHTML = '';
-        
+
         if (userEventResults) {
             // Check for new unified story format first
             if (userEventResults.story) {

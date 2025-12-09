@@ -997,6 +997,7 @@ async function processUserResult(uid, eventInfo, results) {
     distance: parseFloat(userResult.Distance) || 0,
     deltaTime: parseFloat(userResult.DeltaTime) || 0,
     eventPoints: parseInt(userResult.Points) || null, // Points race points (for display only)
+    earnedAwards: [], // NEW: Track awards for notification system
     processedAt: admin.firestore.FieldValue.serverTimestamp()
   };
   
@@ -1268,63 +1269,78 @@ async function processUserResult(uid, eventInfo, results) {
   // Track awards earned in THIS event specifically
   // We'll increment these in Firebase
   const eventAwards = {};
-  
+
   // Race position awards (if earned this event)
   if (position === 1) {
     eventAwards['awards.gold'] = admin.firestore.FieldValue.increment(1);
+    eventResults.earnedAwards.push({ awardId: 'goldMedal', category: 'podium', intensity: 'subtle' });
   } else if (position === 2) {
     eventAwards['awards.silver'] = admin.firestore.FieldValue.increment(1);
+    eventResults.earnedAwards.push({ awardId: 'silverMedal', category: 'podium', intensity: 'subtle' });
   } else if (position === 3) {
     eventAwards['awards.bronze'] = admin.firestore.FieldValue.increment(1);
+    eventResults.earnedAwards.push({ awardId: 'bronzeMedal', category: 'podium', intensity: 'subtle' });
   }
-  
+
   // Special medals earned this event
   if (earnedPunchingMedal) {
     eventAwards['awards.punchingMedal'] = admin.firestore.FieldValue.increment(1);
+    eventResults.earnedAwards.push({ awardId: 'punchingMedal', category: 'event_special', intensity: 'moderate' });
   }
   if (earnedGiantKillerMedal) {
     eventAwards['awards.giantKiller'] = admin.firestore.FieldValue.increment(1);
+    eventResults.earnedAwards.push({ awardId: 'giantKillerMedal', category: 'event_special', intensity: 'moderate' });
   }
   if (eventResults.earnedBullseyeMedal) {
     eventAwards['awards.bullseye'] = admin.firestore.FieldValue.increment(1);
+    eventResults.earnedAwards.push({ awardId: 'bullseyeMedal', category: 'event_special', intensity: 'moderate' });
   }
   if (eventResults.earnedHotStreakMedal) {
     eventAwards['awards.hotStreak'] = admin.firestore.FieldValue.increment(1);
+    eventResults.earnedAwards.push({ awardId: 'hotStreakMedal', category: 'event_special', intensity: 'moderate' });
   }
   if (eventResults.earnedDomination) {
     eventAwards['awards.domination'] = admin.firestore.FieldValue.increment(1);
+    eventResults.earnedAwards.push({ awardId: 'domination', category: 'performance', intensity: 'flashy' });
   }
   if (eventResults.earnedCloseCall) {
     eventAwards['awards.closeCall'] = admin.firestore.FieldValue.increment(1);
+    eventResults.earnedAwards.push({ awardId: 'closeCall', category: 'performance', intensity: 'flashy' });
   }
   if (eventResults.earnedPhotoFinish) {
     eventAwards['awards.photoFinish'] = admin.firestore.FieldValue.increment(1);
+    eventResults.earnedAwards.push({ awardId: 'photoFinish', category: 'performance', intensity: 'flashy' });
   }
   if (eventResults.earnedDarkHorse) {
     eventAwards['awards.darkHorse'] = admin.firestore.FieldValue.increment(1);
+    eventResults.earnedAwards.push({ awardId: 'darkHorse', category: 'performance', intensity: 'flashy' });
   }
   if (eventResults.earnedZeroToHero) {
     eventAwards['awards.zeroToHero'] = admin.firestore.FieldValue.increment(1);
+    eventResults.earnedAwards.push({ awardId: 'zeroToHero', category: 'performance', intensity: 'flashy' });
   }
-  
+
   // GC trophies (only on Event 15)
   if (eventNumber === 15) {
     console.log(`   🔍 Checking GC trophy awards...`);
     console.log(`      earnedGCGoldMedal: ${eventResults.earnedGCGoldMedal}`);
     console.log(`      earnedGCSilverMedal: ${eventResults.earnedGCSilverMedal}`);
     console.log(`      earnedGCBronzeMedal: ${eventResults.earnedGCBronzeMedal}`);
-    
+
     if (eventResults.earnedGCGoldMedal) {
       console.log('   🏆 GC WINNER! Awarding GC Gold trophy');
       eventAwards['awards.gcGold'] = admin.firestore.FieldValue.increment(1);
+      eventResults.earnedAwards.push({ awardId: 'gcGoldMedal', category: 'gc', intensity: 'flashy' });
     }
     if (eventResults.earnedGCSilverMedal) {
       console.log('   🥈 GC SECOND! Awarding GC Silver trophy');
       eventAwards['awards.gcSilver'] = admin.firestore.FieldValue.increment(1);
+      eventResults.earnedAwards.push({ awardId: 'gcSilverMedal', category: 'gc', intensity: 'flashy' });
     }
     if (eventResults.earnedGCBronzeMedal) {
       console.log('   🥉 GC THIRD! Awarding GC Bronze trophy');
       eventAwards['awards.gcBronze'] = admin.firestore.FieldValue.increment(1);
+      eventResults.earnedAwards.push({ awardId: 'gcBronzeMedal', category: 'gc', intensity: 'flashy' });
     }
   }
   
@@ -1367,24 +1383,33 @@ async function processUserResult(uid, eventInfo, results) {
     const previousPosition = recentPositions[recentPositions.length - 2];
     const totalRiders = results.length;
     const bottomHalf = totalRiders / 2;
-    
+
     if (previousPosition > bottomHalf) {
       console.log(`   🔄 COMEBACK KID! Top 5 finish after position ${previousPosition}`);
       updates['awards.comeback'] = admin.firestore.FieldValue.increment(1);
+      eventResults.earnedAwards.push({ awardId: 'comeback', category: 'event_special', intensity: 'moderate' });
     }
   }
-  
+
+  // Check if season is now complete and get season awards (BEFORE saving updates)
+  const earnedSeasonAwards = await checkAndMarkSeasonComplete(userRef, userData, eventNumber, updates, seasonStandings);
+
+  // Add season awards to eventResults (if event 15 or if season completed via DNS)
+  if (earnedSeasonAwards && earnedSeasonAwards.length > 0) {
+    console.log(`   Adding ${earnedSeasonAwards.length} season award(s) to event${eventNumber}Results`);
+    eventResults.earnedAwards.push(...earnedSeasonAwards);
+    // Update the eventResults in updates object to include season awards
+    updates[`event${eventNumber}Results`] = eventResults;
+  }
+
   await userRef.update(updates);
-  
+
   const bonusLog = bonusPoints > 0 ? ` (including +${bonusPoints} bonus)` : '';
   const predictionLog = predictedPosition ? ` | Predicted: ${predictedPosition}` : '';
   const punchingLog = earnedPunchingMedal ? ' PUNCHING MEDAL!' : '';
   const giantKillerLog = earnedGiantKillerMedal ? ' GIANT KILLER!' : '';
   console.log(`Processed event ${eventNumber} for user ${uid}: Position ${position}${predictionLog}, Points ${points}${bonusLog}${punchingLog}${giantKillerLog}`);
   console.log(`   Stage ${currentStage} complete -> Stage ${nextStage}`);
-  
-  // Check if season is now complete after this event
-  await checkAndMarkSeasonComplete(userRef, userData, eventNumber, updates, seasonStandings);
   
   // Update results summary collection (per-user)
   await updateResultsSummary(season, eventNumber, results, uid);
@@ -1989,42 +2014,46 @@ async function updateResultsSummary(season, event, results, userUid) {
 
 /**
  * Check if season is complete and mark it, award season podium trophies
+ * @returns {Array} - Array of earned season awards for notifications
  */
 async function checkAndMarkSeasonComplete(userRef, userData, eventNumber, recentUpdates, seasonStandings) {
+  // Track earned season awards for notifications
+  const earnedSeasonAwards = [];
+
   // Merge recent updates with existing userData for checking
   const currentData = { ...userData, ...recentUpdates };
-  
+
   console.log(`\n🔍 Checking season completion for event ${eventNumber}...`);
   console.log(`   Event 15 results exist: ${!!currentData.event15Results}`);
   console.log(`   Event 15 position: ${currentData.event15Results?.position}`);
   console.log(`   Event 14 DNS: ${currentData.event14DNS}`);
   console.log(`   Event 15 DNS: ${currentData.event15DNS}`);
   console.log(`   Season already complete: ${currentData.season1Complete}`);
-  
+
   // Season 1 is complete when:
   // 1. Event 15 is completed with results
   // 2. OR Event 14 or 15 are marked as DNS
-  
-  const event15Complete = currentData.event15Results && 
-                         currentData.event15Results.position && 
+
+  const event15Complete = currentData.event15Results &&
+                         currentData.event15Results.position &&
                          currentData.event15Results.position !== 'DNF';
   const event14DNS = currentData.event14DNS === true;
   const event15DNS = currentData.event15DNS === true;
-  
+
   const isSeasonComplete = event15Complete || event14DNS || event15DNS;
-  
+
   console.log(`   Is season complete: ${isSeasonComplete}`);
-  
+
   // If season is already marked complete, skip
   if (currentData.season1Complete === true) {
     console.log('   ⚠️  Season already marked complete, skipping trophy awards');
-    return;
+    return earnedSeasonAwards;
   }
-  
+
   // If season is not yet complete, skip
   if (!isSeasonComplete) {
     console.log('   ℹ️  Season not yet complete');
-    return;
+    return earnedSeasonAwards;
   }
   
   console.log('🏆 Season 1 is now COMPLETE for this user!');
@@ -2052,17 +2081,20 @@ async function checkAndMarkSeasonComplete(userRef, userData, eventNumber, recent
   if (userRank === 1) {
     console.log('   🏆 SEASON CHAMPION! Awarding Season Champion trophy');
     seasonUpdates['awards.seasonChampion'] = admin.firestore.FieldValue.increment(1);
+    earnedSeasonAwards.push({ awardId: 'seasonChampion', category: 'season', intensity: 'ultraFlashy' });
   } else if (userRank === 2) {
     console.log('   🥈 SEASON RUNNER-UP! Awarding Season Runner-Up trophy');
     seasonUpdates['awards.seasonRunnerUp'] = admin.firestore.FieldValue.increment(1);
+    earnedSeasonAwards.push({ awardId: 'seasonRunnerUp', category: 'season', intensity: 'ultraFlashy' });
   } else if (userRank === 3) {
     console.log('   🥉 SEASON THIRD PLACE! Awarding Season Third Place trophy');
     seasonUpdates['awards.seasonThirdPlace'] = admin.firestore.FieldValue.increment(1);
+    earnedSeasonAwards.push({ awardId: 'seasonThirdPlace', category: 'season', intensity: 'ultraFlashy' });
   }
-  
+
   // Check for special season achievement awards
   console.log('   Checking for special achievement awards...');
-  
+
   // PERFECT SEASON - Win every event (all 15 events with position 1)
   let isPerfectSeason = true;
   for (let i = 1; i <= 15; i++) {
@@ -2075,8 +2107,9 @@ async function checkAndMarkSeasonComplete(userRef, userData, eventNumber, recent
   if (isPerfectSeason) {
     console.log('   💯 PERFECT SEASON! Won every single event!');
     seasonUpdates['awards.perfectSeason'] = admin.firestore.FieldValue.increment(1);
+    earnedSeasonAwards.push({ awardId: 'perfectSeason', category: 'season', intensity: 'ultraFlashy' });
   }
-  
+
   // SPECIALIST - Win 3+ events of the same type
   const eventTypeWins = {}; // Track wins by event type
   const EVENT_TYPES = {
@@ -2085,7 +2118,7 @@ async function checkAndMarkSeasonComplete(userRef, userData, eventNumber, recent
     9: 'hill climb', 10: 'time trial', 11: 'points race', 12: 'gravel race',
     13: 'road race', 14: 'road race', 15: 'time trial'
   };
-  
+
   for (let i = 1; i <= 15; i++) {
     const eventResults = currentData[`event${i}Results`];
     if (eventResults && eventResults.position === 1) {
@@ -2093,23 +2126,28 @@ async function checkAndMarkSeasonComplete(userRef, userData, eventNumber, recent
       eventTypeWins[eventType] = (eventTypeWins[eventType] || 0) + 1;
     }
   }
-  
+
   const maxWinsInType = Math.max(...Object.values(eventTypeWins), 0);
   if (maxWinsInType >= 3) {
     const specialistType = Object.keys(eventTypeWins).find(t => eventTypeWins[t] === maxWinsInType);
     console.log(`   ⭐ SPECIALIST! Won ${maxWinsInType} ${specialistType} events`);
     seasonUpdates['awards.specialist'] = admin.firestore.FieldValue.increment(1);
+    earnedSeasonAwards.push({ awardId: 'specialist', category: 'season', intensity: 'ultraFlashy' });
   }
-  
+
   // ALL-ROUNDER - Win at least one event of 5+ different types
   const uniqueTypesWon = Object.keys(eventTypeWins).length;
   if (uniqueTypesWon >= 5) {
     console.log(`   🌟 ALL-ROUNDER! Won ${uniqueTypesWon} different event types`);
     seasonUpdates['awards.allRounder'] = admin.firestore.FieldValue.increment(1);
+    earnedSeasonAwards.push({ awardId: 'allRounder', category: 'season', intensity: 'ultraFlashy' });
   }
-  
+
   // Update user document with season completion
   await userRef.update(seasonUpdates);
+
+  // Return earned season awards for notification system
+  return earnedSeasonAwards;
 }
 /**
  * Main processing function

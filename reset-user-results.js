@@ -95,7 +95,8 @@ async function resetUserResults() {
         // Rivals
         rivals: admin.firestore.FieldValue.delete(),
         rivalWins: admin.firestore.FieldValue.delete(),
-        rivalLosses: admin.firestore.FieldValue.delete()
+        rivalLosses: admin.firestore.FieldValue.delete(),
+        rivalData: admin.firestore.FieldValue.delete()
       });
     }
 
