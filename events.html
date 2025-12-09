@@ -1113,6 +1113,7 @@
                 deleteFields.event15DNSReason = deleteField();
                 deleteFields.season1CompletionDate = deleteField();
                 deleteFields.localTourGCPosition = deleteField();
+                deleteFields.rivalData = deleteField();
                 
                 // Update user document
                 await updateDoc(userDocRef, { ...resetData, ...deleteFields });

@@ -42,7 +42,9 @@ async function resetUserResults() {
         team: userData.team || '',
         gender: userData.gender || null,
         country: userData.country || null,
-        ageBand: userData.ageBand || null
+        ageBand: userData.ageBand || null,
+        photoURL: userData.photoURL || null,
+        arr: userData.arr || null
       };
       
       // Clear all other fields (results, points, standings, etc)
@@ -57,7 +59,6 @@ async function resetUserResults() {
         totalPodiums: 0,
         careerWins: 0,
         careerPodiums: 0,
-        arr: null,
         // Clear all event results (events 1-15)
         event1Results: admin.firestore.FieldValue.delete(),
         event2Results: admin.firestore.FieldValue.delete(),
@@ -75,9 +76,10 @@ async function resetUserResults() {
         event14Results: admin.firestore.FieldValue.delete(),
         event15Results: admin.firestore.FieldValue.delete(),
         // Clear DNS flags
-        event13DNS: admin.firestore.FieldValue.delete(),
         event14DNS: admin.firestore.FieldValue.delete(),
         event15DNS: admin.firestore.FieldValue.delete(),
+        event14DNSReason: admin.firestore.FieldValue.delete(),
+        event15DNSReason: admin.firestore.FieldValue.delete(),
         // Clear season data
         season1Standings: [],
         season1Complete: false,
@@ -88,6 +90,8 @@ async function resetUserResults() {
         tourProgress: admin.firestore.FieldValue.delete(),
         localTourStatus: admin.firestore.FieldValue.delete(),
         usedOptionalEvents: [],
+        // Clear rival tracking data
+        rivalData: admin.firestore.FieldValue.delete(),
         // Clear awards
         awards: {
           gold: 0,
@@ -126,8 +130,8 @@ async function resetUserResults() {
     }
     
     console.log(`\n✅ Successfully reset ${processed} users`);
-    console.log('Users retain: name, email, uid, team, gender, country, ageBand');
-    console.log('Cleared: all results, points, awards, standings, season data\n');
+    console.log('Users retain: uid, name, email, photoURL, team, arr, gender, country, ageBand');
+    console.log('Cleared: all results, points, awards, standings, season data, rival data\n');
     
   } catch (error) {
     console.error('❌ Error resetting users:', error);

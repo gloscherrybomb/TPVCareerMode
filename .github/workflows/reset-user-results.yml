@@ -46,8 +46,8 @@ jobs:
           echo "All user results data has been cleared." >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Retained:**" >> $GITHUB_STEP_SUMMARY
-          echo "- name, email, uid" >> $GITHUB_STEP_SUMMARY
-          echo "- team, gender, country, ageBand" >> $GITHUB_STEP_SUMMARY
+          echo "- uid, name, email, photoURL" >> $GITHUB_STEP_SUMMARY
+          echo "- team, arr, gender, country, ageBand" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Cleared:**" >> $GITHUB_STEP_SUMMARY
           echo "- All event results (1-15)" >> $GITHUB_STEP_SUMMARY
@@ -55,3 +55,4 @@ jobs:
           echo "- Season standings and completion data" >> $GITHUB_STEP_SUMMARY
           echo "- All awards and trophies" >> $GITHUB_STEP_SUMMARY
           echo "- Tour progress and optional events" >> $GITHUB_STEP_SUMMARY
+          echo "- Rival tracking data" >> $GITHUB_STEP_SUMMARY
