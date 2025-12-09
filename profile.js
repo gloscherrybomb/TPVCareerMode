@@ -886,7 +886,7 @@ async function displayRivals(userData) {
                     <div class="rival-actions">
                         ${hasProfile
                             ? `<button class="btn-rival-action btn-view-profile" data-bot-uid="${botUid}">View Profile</button>`
-                            : `<button class="btn-rival-action btn-request-profile" data-bot-uid="${botUid}" data-bot-name="${data.botName}" data-bot-arr="${data.botArr}" data-bot-country="${data.botCountry}">Request Profile</button>`
+                            : `<button class="btn-rival-action btn-request-profile" data-bot-uid="${botUid}" data-bot-name="${data.botName}" data-bot-team="${data.botTeam || ''}" data-bot-arr="${data.botArr}" data-bot-country="${data.botCountry}">Request Profile</button>`
                         }
                     </div>
                 </div>
@@ -965,25 +965,28 @@ function attachRivalEventListeners() {
         btn.addEventListener('click', () => {
             const botUid = btn.dataset.botUid;
             const botName = btn.dataset.botName;
+            const botTeam = btn.dataset.botTeam;
             const botArr = btn.dataset.botArr;
             const botCountry = btn.dataset.botCountry;
-            openProfileRequestModal(botUid, botName, botArr, botCountry);
+            openProfileRequestModal(botUid, botName, botTeam, botArr, botCountry);
         });
     });
 }
 
 // Open profile request modal
-function openProfileRequestModal(botUid, botName, botArr, botCountry) {
+function openProfileRequestModal(botUid, botName, botTeam, botArr, botCountry) {
     const modal = document.getElementById('profileRequestModal');
 
     // Set hidden fields
     document.getElementById('requestBotUid').value = botUid;
+    document.getElementById('requestBotTeam').value = botTeam || '';
     document.getElementById('requestBotArr').value = botArr;
     document.getElementById('requestBotCountry').value = botCountry;
 
     // Set display fields
     document.getElementById('requestBotName').textContent = botName;
     document.getElementById('previewBotName').textContent = botName;
+    document.getElementById('previewBotTeam').textContent = botTeam || 'Independent';
     document.getElementById('previewBotArr').textContent = botArr || 'Unknown';
     document.getElementById('previewBotCountry').textContent = botCountry || 'Unknown';
 
@@ -1008,6 +1011,7 @@ async function handleProfileRequest(e) {
 
     const botUid = document.getElementById('requestBotUid').value;
     const botName = document.getElementById('requestBotName').textContent;
+    const botTeam = document.getElementById('requestBotTeam').value;
     const botArr = document.getElementById('requestBotArr').value;
     const botCountry = document.getElementById('requestBotCountry').value;
     const interestFact = document.getElementById('interestFact').value.trim();
@@ -1024,6 +1028,7 @@ async function handleProfileRequest(e) {
             userUid: currentUser.uid,
             botUid: botUid,
             botName: botName,
+            botTeam: botTeam || '',
             botArr: botArr,
             botCountry: botCountry,
             interestFact: interestFact || 'None provided',

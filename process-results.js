@@ -374,6 +374,7 @@ function calculateRivalEncounters(results, userUid, userPosition, userTime) {
       encounters.push({
         botUid: botUid,
         botName: result.Name,
+        botTeam: result.Team || '',
         botCountry: result.Country || '',
         botArr: parseInt(result.ARR) || 0,
         timeGap: timeGap,
@@ -411,6 +412,7 @@ function updateRivalData(existingRivalData, encounters, eventNumber) {
     if (!rivalData.encounters[botUid]) {
       rivalData.encounters[botUid] = {
         botName: encounter.botName,
+        botTeam: encounter.botTeam,
         botCountry: encounter.botCountry,
         botArr: encounter.botArr,
         races: 0,
@@ -441,6 +443,7 @@ function updateRivalData(existingRivalData, encounters, eventNumber) {
 
     // Update bot info (in case it changed)
     botData.botName = encounter.botName;
+    botData.botTeam = encounter.botTeam;
     botData.botCountry = encounter.botCountry;
     botData.botArr = encounter.botArr;
   });
@@ -2295,8 +2298,25 @@ async function processBotProfileRequests() {
 
     // Append each request to the file
     let appendedCount = 0;
+    let skippedCount = 0;
+    let deletedCount = 0;
+
     for (const doc of requestsSnapshot.docs) {
       const request = doc.data();
+
+      // Check if bot profile already exists
+      const botProfileDoc = await db.collection('botProfiles').doc(request.botUid).get();
+
+      if (botProfileDoc.exists) {
+        console.log(`   ⏭️  Bot profile already exists for ${request.botName} (${request.botUid}), removing request...`);
+
+        // Delete the request from Firestore
+        await db.collection('botProfileRequests').doc(doc.id).delete();
+
+        deletedCount++;
+        skippedCount++;
+        continue;
+      }
 
       // Format timestamp
       const timestamp = new Date(request.timestamp).toISOString().replace('T', ' ').split('.')[0] + ' UTC';
@@ -2309,6 +2329,7 @@ Firestore Document ID: ${doc.id}
 Submitted by User UID: ${request.userUid}
 Bot UID: ${request.botUid}
 Bot Name: ${request.botName}
+Bot Team: ${request.botTeam || 'Independent'}
 Bot ARR: ${request.botArr}
 Bot Country: ${request.botCountry}
 Interesting Fact: ${request.interestFact}
@@ -2329,6 +2350,9 @@ Interesting Fact: ${request.interestFact}
     }
 
     console.log(`   📝 Appended ${appendedCount} request(s) to ${requestsFilePath}`);
+    if (deletedCount > 0) {
+      console.log(`   🗑️  Removed ${deletedCount} duplicate request(s) (bot profiles already exist)`);
+    }
 
   } catch (error) {
     console.error('❌ Error processing bot profile requests:', error);
