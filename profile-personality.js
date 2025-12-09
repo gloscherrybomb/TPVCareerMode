@@ -128,38 +128,20 @@ function drawPolygon(ctx, centerX, centerY, radius, sides, rotation = 0) {
  */
 export function displayPersonality(userData) {
     const personalityHeaderSection = document.getElementById('personalityHeaderSection');
-    const personalityDetailSection = document.getElementById('personalityDetailSection');
 
     // Check if user has personality data
     if (!userData.personality || !userData.interviewHistory || userData.interviewHistory.totalInterviews === 0) {
-        // Hide sections if no interviews completed
+        // Hide section if no interviews completed
         if (personalityHeaderSection) {
             personalityHeaderSection.style.display = 'none';
-        }
-        if (personalityDetailSection) {
-            personalityDetailSection.style.display = 'none';
         }
         return;
     }
 
-    // Show sections
+    // Show section
     if (personalityHeaderSection) {
         personalityHeaderSection.style.display = 'flex';
     }
-    if (personalityDetailSection) {
-        personalityDetailSection.style.display = 'block';
-    }
-
-    // Get personality stats
-    const stats = getPersonalityStats(userData.personality);
-
-    // Update stat values in detail section
-    document.getElementById('confidenceValue').textContent = stats.confidence;
-    document.getElementById('humilityValue').textContent = stats.humility;
-    document.getElementById('aggressionValue').textContent = stats.aggression;
-    document.getElementById('professionalismValue').textContent = stats.professionalism;
-    document.getElementById('showmanshipValue').textContent = stats.showmanship;
-    document.getElementById('resilienceValue').textContent = stats.resilience;
 
     // Draw spider chart in header
     drawPersonalityChart('personalityChart', userData.personality);
@@ -170,11 +152,4 @@ export function displayPersonality(userData) {
 
     document.getElementById('personaTitle').textContent = 'Your Persona';
     document.getElementById('personaSubtitle').textContent = `"${persona}"`;
-
-    // Update interview count in detail section
-    const interviewCountDisplay = document.getElementById('interviewCountDisplay');
-    if (interviewCountDisplay) {
-        interviewCountDisplay.textContent =
-            `Based on ${interviewCount} post-race interview${interviewCount !== 1 ? 's' : ''}`;
-    }
 }

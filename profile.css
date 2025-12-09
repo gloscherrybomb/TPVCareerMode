@@ -262,7 +262,7 @@
     background: linear-gradient(135deg, rgba(255, 27, 107, 0.05), rgba(69, 202, 255, 0.05));
     border: 1px solid rgba(255, 27, 107, 0.2);
     border-radius: 16px;
-    min-width: 200px;
+    min-width: 320px;
 }
 
 .personality-header-chart {
@@ -885,12 +885,12 @@
     }
 
     .profile-personality-header {
-        min-width: 180px;
+        min-width: 280px;
     }
 
     .personality-header-chart canvas {
-        width: 180px;
-        height: 180px;
+        width: 280px;
+        height: 280px;
     }
 
     .profile-quick-stats {
