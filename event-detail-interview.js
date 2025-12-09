@@ -1,7 +1,7 @@
 // event-detail-interview.js - Handle post-race interview display and interaction
 
 import { generateInterview, buildRaceContext, calculateSeasonContext } from './interview-engine.js';
-import { hasCompletedInterview, saveInterviewResponse, initializePersonalityIfNeeded, formatPersonalityChange } from './interview-persistence.js';
+import { hasCompletedInterview, getCompletedInterview, saveInterviewResponse, initializePersonalityIfNeeded, formatPersonalityChange } from './interview-persistence.js';
 
 let currentInterview = null;
 let selectedResponseIndex = null;
@@ -15,7 +15,12 @@ export async function displayPostRaceInterview(db, userId, eventNumber, userResu
         const alreadyCompleted = await hasCompletedInterview(db, userId, eventNumber);
 
         if (alreadyCompleted) {
-            console.log('Interview already completed for this event');
+            console.log('Interview already completed for this event - showing completed interview');
+            // Load and display completed interview in collapsed state
+            const completedData = await getCompletedInterview(db, userId, eventNumber);
+            if (completedData) {
+                displayCompletedInterview(completedData);
+            }
             return;
         }
 
@@ -62,6 +67,89 @@ export async function displayPostRaceInterview(db, userId, eventNumber, userResu
 
     } catch (error) {
         console.error('Error displaying interview:', error);
+    }
+}
+
+/**
+ * Display a completed interview in collapsed state
+ */
+function displayCompletedInterview(completedData) {
+    // Show the interview section
+    const interviewSection = document.getElementById('postRaceInterviewSection');
+    if (!interviewSection) return;
+
+    interviewSection.style.display = 'block';
+
+    // Set question text
+    const questionElement = document.getElementById('journalistQuestion');
+    if (questionElement) {
+        questionElement.textContent = completedData.question.text;
+    }
+
+    // Hide response options
+    const responseOptionsContainer = document.getElementById('responseOptions');
+    if (responseOptionsContainer) {
+        responseOptionsContainer.style.display = 'none';
+    }
+
+    // Show submitted section
+    const submittedSection = document.getElementById('interviewSubmitted');
+    if (submittedSection) {
+        submittedSection.style.display = 'block';
+    }
+
+    // Set submitted text
+    const submittedText = document.getElementById('submittedText');
+    if (submittedText) {
+        submittedText.textContent = completedData.selectedResponse.text;
+    }
+
+    // Display personality changes
+    const changesContainer = document.getElementById('personalityChanges');
+    if (changesContainer && completedData.personalityDelta) {
+        changesContainer.innerHTML = '';
+
+        Object.entries(completedData.personalityDelta).forEach(([trait, value]) => {
+            if (value !== 0) {
+                const changeData = formatPersonalityChange(trait, value);
+
+                const changeDiv = document.createElement('div');
+                changeDiv.className = `personality-change ${value < 0 ? 'negative' : ''}`;
+
+                const emojiSpan = document.createElement('span');
+                emojiSpan.className = 'personality-change-emoji';
+                emojiSpan.textContent = changeData.emoji;
+
+                const textSpan = document.createElement('span');
+                textSpan.className = 'personality-change-text';
+                textSpan.textContent = `${changeData.trait} ${changeData.value}`;
+
+                changeDiv.appendChild(emojiSpan);
+                changeDiv.appendChild(textSpan);
+
+                changesContainer.appendChild(changeDiv);
+            }
+        });
+    }
+
+    // Initialize toggle button
+    initializeToggleButton();
+
+    // Set to collapsed state immediately
+    const interviewContainer = document.querySelector('.interview-container');
+    const toggleBtn = document.getElementById('interviewToggleBtn');
+    const toggleText = toggleBtn?.querySelector('.toggle-text');
+
+    if (interviewContainer) {
+        interviewContainer.classList.add('collapsed');
+    }
+
+    if (toggleBtn) {
+        toggleBtn.style.display = 'flex';
+    }
+
+    if (toggleText) {
+        toggleText.textContent = 'Show';
     }
 }
 

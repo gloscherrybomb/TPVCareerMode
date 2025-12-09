@@ -18,6 +18,24 @@ export async function hasCompletedInterview(db, userId, eventNumber) {
 }
 
 /**
+ * Get completed interview data
+ */
+export async function getCompletedInterview(db, userId, eventNumber) {
+    try {
+        const interviewRef = doc(db, 'interviews', `${userId}_${eventNumber}`);
+        const interviewDoc = await getDoc(interviewRef);
+
+        if (interviewDoc.exists()) {
+            return interviewDoc.data();
+        }
+        return null;
+    } catch (error) {
+        console.error('Error getting completed interview:', error);
+        return null;
+    }
+}
+
+/**
  * Get user's current personality profile
  */
 export async function getUserPersonality(db, userDocRef) {
