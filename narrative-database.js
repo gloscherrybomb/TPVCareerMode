@@ -145,13 +145,13 @@ const NARRATIVE_DATABASE = {
     {
       id: "early_nutrition_learning",
       text: "You bonked hard in your last race—that terrible, empty-tank feeling where your legs just stop responding. Turns out racing requires a completely different fueling strategy than training rides. Now you're carrying gels, bars, and sports drink, maybe too much of everything, paranoid about running out of energy again.",
-      triggers: { raceNumber: [2, 3, 4], performanceTier: ["back"] },
+      triggers: { raceNumber: [2, 3, 4], performanceTier: ["back"], minRacesCompleted: 2 },
       weight: 0.6
     },
     {
       id: "early_first_good_result",
       text: "Something clicked in that last race—you're not entirely sure what. Maybe it was better positioning, maybe you're finally getting fitter, maybe you just got lucky with the break. Whatever it was, you finished higher than you expected, higher than you dared hope, and suddenly this whole racing thing feels possible.",
-      triggers: { raceNumber: [3, 4, 5], performanceTier: ["podium", "top10"], improvementFromPrediction: 5 },
+      triggers: { raceNumber: [3, 4, 5], performanceTier: ["podium", "top10"], improvementFromPrediction: 5, minRacesCompleted: 2 },
       weight: 0.8
     },
     {
@@ -163,19 +163,19 @@ const NARRATIVE_DATABASE = {
     {
       id: "early_learning_positioning",
       text: "You're starting to understand that where you are in the pack matters almost as much as how strong your legs are. Last race you wasted so much energy fighting for position, surging and braking, stuck in bad spots. This time you're more aware, more deliberate about where you place yourself before key moments.",
-      triggers: { raceNumber: [3, 4, 5], performanceTier: ["top10", "podium"] },
+      triggers: { raceNumber: [3, 4, 5], performanceTier: ["top10", "podium"], minRacesCompleted: 2 },
       weight: 0.7
     },
     {
       id: "early_mechanical_lesson",
       text: "A dropped chain two races ago taught you a valuable lesson: check everything, twice. Now your pre-race ritual includes running through gears multiple times, checking brake pad clearance, testing quick releases. It feels obsessive, but one mechanical DNF was enough to make you paranoid about equipment failure.",
-      triggers: { raceNumber: [3, 4, 5], performanceTier: ["any"] },
+      triggers: { raceNumber: [3, 4, 5], performanceTier: ["any"], minRacesCompleted: 3 },
       weight: 0.5
     },
     {
       id: "early_pacing_discovery",
       text: "You went out too hard in the first few races, burning matches you'd need later. Now you're learning the art of patience—staying near the front without actually working, following the right wheels, conserving energy for when it actually matters. It's a harder skill than it looks.",
-      triggers: { raceNumber: [3, 4, 5], performanceTier: ["top10", "podium", "win"] },
+      triggers: { raceNumber: [3, 4, 5], performanceTier: ["top10", "podium", "win"], minRacesCompleted: 3 },
       weight: 0.6
     },
     {
@@ -187,7 +187,7 @@ const NARRATIVE_DATABASE = {
     {
       id: "early_recovery_awareness",
       text: "The soreness from your last race lingered longer than expected. Your legs felt heavy, your motivation low. You're learning that recovery is part of training, that showing up race after race without proper rest is a recipe for burnout. Now you're paying attention to sleep, nutrition, and giving your body time to adapt.",
-      triggers: { raceNumber: [3, 4, 5], performanceTier: ["any"] },
+      triggers: { raceNumber: [3, 4, 5], performanceTier: ["any"], minRacesCompleted: 2 },
       weight: 0.5
     },
     {
@@ -241,7 +241,7 @@ const NARRATIVE_DATABASE = {
     {
       id: "early_photo_finish",
       text: "The finish line photo from your last race revealed something interesting: you were sitting up, celebrating too early, while riders behind were still sprinting. That mistake probably cost you two or three places. Now you're committed to sprinting through the line, every single time, no matter what.",
-      triggers: { raceNumber: [3, 4, 5], performanceTier: ["midpack"] },
+      triggers: { raceNumber: [3, 4, 5], performanceTier: ["midpack"], minRacesCompleted: 2 },
       weight: 0.5
     },
     {
@@ -877,7 +877,7 @@ const NARRATIVE_DATABASE = {
     {
       id: "motiv_finish_line_memory",
       text: "You keep replaying that moment from a previous race—crossing the finish line, looking down at your result, the rush of accomplishment. That memory fuels you through hard training, through doubts, through moments when quitting seems easier than continuing.",
-      triggers: { raceNumber: [5, 6, 7, 8], performanceTier: ["any"] },
+      triggers: { raceNumber: [5, 6, 7, 8], performanceTier: ["any"], minRacesCompleted: 2 },
       weight: 0.4
     },
     {
@@ -929,19 +929,19 @@ const NARRATIVE_DATABASE = {
     {
       id: "break_pack_control",
       text: "There was a moment in your last race where you realized you weren't just reacting to the pack—you were controlling it. Setting tempo, covering moves, dictating when attacks could go. That shift from participant to protagonist felt seismic.",
-      triggers: { raceNumber: [6, 7, 8, 9], performanceTier: ["win", "podium"] },
+      triggers: { raceNumber: [6, 7, 8, 9], performanceTier: ["win", "podium"], minRacesCompleted: 2 },
       weight: 0.7
     },
     {
       id: "break_mental_strength",
       text: "Your last race taught you something crucial: your mind quits before your body does. When you pushed past that mental barrier, past the voice saying 'this is too hard,' you found another gear entirely. Now you know—true limits are further than you thought.",
-      triggers: { raceNumber: [5, 6, 7, 8], performanceTier: ["win", "podium", "top10"], improvementFromPrediction: 5 },
+      triggers: { raceNumber: [5, 6, 7, 8], performanceTier: ["win", "podium", "top10"], improvementFromPrediction: 5, minRacesCompleted: 2 },
       weight: 0.8
     },
     {
       id: "break_tactical_victory",
       text: "Your last win wasn't about being the strongest—it was about being the smartest. You conserved energy when others wasted it, positioned perfectly for the finale, timed your effort to perfection. That's the kind of racing that wins championships.",
-      triggers: { raceNumber: [7, 8, 9, 10], performanceTier: ["win"] },
+      triggers: { raceNumber: [7, 8, 9, 10], performanceTier: ["win"], minRacesCompleted: 2 },
       weight: 0.8
     },
     {
@@ -953,25 +953,25 @@ const NARRATIVE_DATABASE = {
     {
       id: "break_physical_breakthrough",
       text: "You felt it during your last interval session—a new level of power, sustained longer than before. All the training, all the recovery, all the attention to detail culminating in a physical breakthrough. You're not the same engine you were three months ago.",
-      triggers: { raceNumber: [6, 7, 8], performanceTier: ["win", "podium", "top10"] },
+      triggers: { raceNumber: [6, 7, 8], performanceTier: ["win", "podium", "top10"], minRacesCompleted: 2 },
       weight: 0.6
     },
     {
       id: "break_fearless_moment",
       text: "There was a moment in your last race where fear just... evaporated. Descending at speeds that used to terrify you, cornering on the limit, confident in your bike handling. That fearlessness is a breakthrough as significant as any fitness gain.",
-      triggers: { raceNumber: [7, 8, 9], performanceTier: ["top10", "podium", "win"] },
+      triggers: { raceNumber: [7, 8, 9], performanceTier: ["top10", "podium", "win"], minRacesCompleted: 2 },
       weight: 0.6
     },
     {
       id: "break_recognition_moment",
       text: "A rider you respect pulled you aside after your last race and said, 'You're getting really strong.' Simple words, but the recognition from someone who's been doing this for years hit differently. You're being seen as a legitimate competitor now.",
-      triggers: { raceNumber: [7, 8, 9], performanceTier: ["podium", "win"] },
+      triggers: { raceNumber: [7, 8, 9], performanceTier: ["podium", "win"], minRacesCompleted: 2 },
       weight: 0.6
     },
     {
       id: "break_solo_effort",
       text: "You went solo off the front in your last race and held it to the finish. No teammates, no help, just you against everyone else's collective effort to bring you back. Holding that breakaway required every bit of physical and mental strength you possess.",
-      triggers: { raceNumber: [7, 8, 9, 10], performanceTier: ["win"] },
+      triggers: { raceNumber: [7, 8, 9, 10], performanceTier: ["win"], minRacesCompleted: 2 },
       weight: 0.9
     },
     {
@@ -1023,7 +1023,7 @@ const NARRATIVE_DATABASE = {
     {
       id: "set_overconfidence",
       text: "You went into today's race overconfident, expecting an easy result based on recent form. Racing doesn't work that way. The pack punished your assumptions, and you learned again that every race must be respected, every field taken seriously.",
-      triggers: { performanceTier: ["midpack", "back"], predictedMuchBetter: true },
+      triggers: { performanceTier: ["midpack", "back"], predictedMuchBetter: true, requiresPreviousResults: true },
       weight: 0.6
     },
     {
@@ -1087,73 +1087,73 @@ const NARRATIVE_DATABASE = {
     {
       id: "rival_emergence",
       text: "There's a rider you keep seeing in results, someone racing a similar schedule who seems to be on a similar trajectory. You've never spoken, barely made eye contact, but you track their results obsessively. When they finish ahead of you, it stings more than it should.",
-      triggers: { raceNumber: [8, 9, 10], performanceTier: ["top10", "podium"] },
+      triggers: { raceNumber: [8, 9, 10], performanceTier: ["top10", "podium"], requiresRivalHistory: true },
       weight: 0.7
     },
     {
       id: "rival_respect",
       text: "You've been racing against the same core group all season, and a mutual respect has developed. You know their strengths and weaknesses, they know yours. In the pack, you acknowledge each other with nods—competitors, but also fellow travelers on this journey.",
-      triggers: { raceNumber: [7, 8, 9, 10], performanceTier: ["any"] },
+      triggers: { raceNumber: [7, 8, 9, 10], performanceTier: ["any"], requiresRivalHistory: true },
       weight: 0.5
     },
     {
       id: "rival_revenge",
       text: "A rider who beat you soundly in your last encounter is here again. You've been thinking about that race, analyzing what went wrong, planning how to approach today differently. Revenge might be petty, but it's also motivating.",
-      triggers: { raceNumber: [6, 7, 8, 9], performanceTier: ["any"] },
+      triggers: { raceNumber: [6, 7, 8, 9], performanceTier: ["any"], minRacesCompleted: 2, requiresRivalHistory: true },
       weight: 0.6
     },
     {
       id: "rival_friendly",
       text: "Your main rival has become something close to a friend. You warm up together, share race intel, commiserate after tough days. The competition is fierce, but the friendship is genuine. It's possible to want to beat someone and genuinely hope they do well.",
-      triggers: { raceNumber: [8, 9, 10], performanceTier: ["podium", "top10"] },
+      triggers: { raceNumber: [8, 9, 10], performanceTier: ["podium", "top10"], requiresRivalHistory: true },
       weight: 0.5
     },
     {
       id: "rival_shadowing",
       text: "You've been watching one rider in particular—studying their race tactics, their training posts, their equipment choices. Call it respect or obsession, but you're learning from them, using them as a benchmark for where you want to be.",
-      triggers: { raceNumber: [6, 7, 8], performanceTier: ["any"] },
+      triggers: { raceNumber: [6, 7, 8], performanceTier: ["any"], requiresRivalHistory: true },
       weight: 0.5
     },
     {
       id: "rival_motivation",
       text: "Knowing your rival will be racing today adds an extra layer of motivation. You want to beat them specifically, to prove something you're not even sure how to articulate. Personal competition elevates performance in ways general competition never could.",
-      triggers: { raceNumber: [7, 8, 9, 10], performanceTier: ["any"] },
+      triggers: { raceNumber: [7, 8, 9, 10], performanceTier: ["any"], requiresRivalHistory: true },
       weight: 0.6
     },
     {
       id: "rival_comparison",
       text: "You check their results as obsessively as your own. When they have a good race, you're simultaneously impressed and irritated. When they have a bad race, you feel sympathy mixed with opportunity. This rivalry has become personal in ways that surprise you.",
-      triggers: { raceNumber: [8, 9, 10], performanceTier: ["any"] },
+      triggers: { raceNumber: [8, 9, 10], performanceTier: ["any"], requiresRivalHistory: true },
       weight: 0.5
     },
     {
       id: "rival_final_sprint",
       text: "Your last race came down to a sprint against your main rival. The competition, the tactical chess match, the pure racing between two equally matched competitors—it was bicycle racing at its finest. Win or lose, those are the moments you live for.",
-      triggers: { raceNumber: [7, 8, 9], performanceTier: ["win", "podium"] },
+      triggers: { raceNumber: [7, 8, 9], performanceTier: ["win", "podium"], minRacesCompleted: 2, requiresRivalHistory: true },
       weight: 0.7
     },
     {
       id: "rival_different_strengths",
       text: "You and your rival have completely different racing styles. They're a climber; you're a sprinter. They attack constantly; you race conservatively. That contrast makes your competition interesting—it's not about who's stronger, but whose strengths suit today's race better.",
-      triggers: { raceNumber: [7, 8, 9, 10], performanceTier: ["any"] },
+      triggers: { raceNumber: [7, 8, 9, 10], performanceTier: ["any"], requiresRivalHistory: true },
       weight: 0.5
     },
     {
       id: "rival_age_group_battle",
       text: "In the age group standings, there's one rider you're locked in battle with. Every race, the gap between you shifts slightly. Points accumulate, positions change, and the season-long competition adds meaning to every result.",
-      triggers: { raceNumber: [8, 9, 10, 11], performanceTier: ["any"] },
+      triggers: { raceNumber: [8, 9, 10, 11], performanceTier: ["any"], requiresRivalHistory: true },
       weight: 0.6
     },
     {
       id: "rival_social_media",
       text: "You follow each other on social media, watching training updates, race preparations, results posts. There's an unspoken acknowledgment of the rivalry, a public-facing politeness that masks intense competitive drive underneath.",
-      triggers: { raceNumber: [7, 8, 9], performanceTier: ["any"] },
+      triggers: { raceNumber: [7, 8, 9], performanceTier: ["any"], requiresRivalHistory: true },
       weight: 0.4
     },
     {
       id: "rival_post_race_chat",
       text: "After races, you and your rival often end up chatting—comparing notes on the race, discussing tactics, sharing frustrations. The competitive fire burns hot during races, but afterward, there's genuine respect and even admiration for each other's dedication.",
-      triggers: { raceNumber: [8, 9, 10], performanceTier: ["any"] },
+      triggers: { raceNumber: [8, 9, 10], performanceTier: ["any"], requiresRivalHistory: true },
       weight: 0.5
     }
   ],
@@ -1431,7 +1431,7 @@ const NARRATIVE_DATABASE = {
     {
       id: "recov_ice_bath",
       text: "The ice bath after your last race was brutal but effective. Twenty minutes of cold immersion, reducing inflammation, accelerating recovery. You're not sure if you'll ever enjoy it, but you've stopped dreading it. It works.",
-      triggers: { raceNumber: [5, 6, 7, 8], performanceTier: ["any"] },
+      triggers: { raceNumber: [5, 6, 7, 8], performanceTier: ["any"], minRacesCompleted: 2 },
       weight: 0.2
     },
     {
@@ -1529,7 +1529,7 @@ const NARRATIVE_DATABASE = {
     {
       id: "mental_confidence_building",
       text: "You spent the morning reviewing your recent results, reminding yourself of what you're capable of. Building confidence from evidence, not hope. You've earned the right to believe in yourself—now you just need to race like it.",
-      triggers: { raceNumber: [7, 8, 9, 10], performanceTier: ["podium", "top10"] },
+      triggers: { raceNumber: [7, 8, 9, 10], performanceTier: ["podium", "top10"], requiresPreviousResults: true },
       weight: 0.5
     },
     {

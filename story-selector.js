@@ -168,6 +168,55 @@ class StorySelector {
       }
     }
 
+    // NEW CONTEXTUAL TRIGGERS - Added for adaptive narrative accuracy
+
+    // Check minimum races completed
+    if (triggers.minRacesCompleted !== undefined) {
+      const racesCompleted = context.stagesCompleted || 1;
+      if (racesCompleted < triggers.minRacesCompleted) {
+        return false;
+      }
+    }
+
+    // Exclude first race
+    if (triggers.excludeFirstRace && context.stagesCompleted === 1) {
+      return false;
+    }
+
+    // Require previous results (multiple races)
+    if (triggers.requiresPreviousResults) {
+      if (!context.recentResults || context.recentResults.length < 2) {
+        return false;
+      }
+    }
+
+    // Require bad previous result (for comeback narratives)
+    if (triggers.requiresBadPreviousResult) {
+      if (!context.recentResults || context.recentResults.length < 2) {
+        return false;
+      }
+      const previousResult = context.recentResults[context.recentResults.length - 2];
+      if (previousResult <= 15) {
+        return false;  // Previous race wasn't bad enough for comeback narrative
+      }
+    }
+
+    // Require rival history
+    if (triggers.requiresRivalHistory) {
+      if (!context.topRivals || context.topRivals.length === 0) {
+        return false;
+      }
+    }
+
+    // Require win streak (minimum consecutive wins)
+    if (triggers.requiresStreak) {
+      const streakLength = context.recentResults ?
+        context.recentResults.filter(p => p === 1).length : 0;
+      if (streakLength < triggers.requiresStreak) {
+        return false;
+      }
+    }
+
     return true;
   }
 

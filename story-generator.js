@@ -583,9 +583,13 @@ function generateRaceRecap(data) {
       predictionTier
     });
     
-    if (earnedZeroToHero) {
-      // Comeback variant
-      const winnerText = (dynamics.type === 'well_back' && gapText) ? 
+    // VALIDATE Zero to Hero: Check that previous result was actually bad (> 20th place)
+    const previousResult = seasonData.recentResults?.[seasonData.recentResults.length - 2];
+    const genuineComebackContext = previousResult && previousResult > 20;
+
+    if (earnedZeroToHero && genuineComebackContext) {
+      // Comeback variant - only if previous race was genuinely bad
+      const winnerText = (dynamics.type === 'well_back' && gapText) ?
         buildWinnerText(hasWinnerName, winnerName, gapText, ", but that wasn't your concern today.") : '';
       recap += `What a turnaround. After struggling badly in your previous outing, ${eventName} was a statement of resilience. You came into this race with questions to answer and doubts to silence. ${winnerText} Your focus was on competing, on proving you could bounce back. You finished ${position}th—not spectacular, but after where you were last time, this represents genuine progress. You proved you can turn things around, that one bad day doesn't define your season, and that you have the mental strength to respond when things go wrong. Context matters, and in context, this was a successful day.`;
     } else if (predictionTier === 'beat' && variant % 3 === 0) {
@@ -747,7 +751,19 @@ function generateSeasonContext(data) {
       context += `Every season has to start somewhere, and your opener has given you a baseline to work from. You've learned where you stand relative to the field, what areas need work, and what you can build on. That knowledge is the foundation for improvement. `;
     }
   } else if (isOnStreak && recentResults && recentResults[0] === 1) {
-    context += `The winning streak you're currently riding has caught everyone's attention—back-to-back victories aren't luck, they're form, and right now your form is undeniable. You've found that elusive combination of confidence, fitness, and tactical sharpness that turns good riders into dangerous ones. The question everyone's asking is how long you can maintain this momentum, and right now, there's no reason to think it'll end soon. `;
+    // DIFFERENTIATE: 2 wins = "back-to-back", 3+ wins = "streak"
+    const consecutiveWins = recentResults.filter(p => p === 1).length;
+
+    if (consecutiveWins >= 3) {
+      // True winning streak (3+ consecutive wins)
+      context += `The winning streak you're currently riding has caught everyone's attention—${consecutiveWins} consecutive victories aren't luck, they're form, and right now your form is undeniable. You've found that elusive combination of confidence, fitness, and tactical sharpness that turns good riders into dangerous ones. The question everyone's asking is how long you can maintain this momentum, and right now, there's no reason to think it'll end soon. `;
+    } else if (consecutiveWins === 2) {
+      // Back-to-back wins (not quite a streak yet)
+      context += `Back-to-back victories have given you serious momentum and confidence. You're finding your rhythm, starting to believe you belong at the front, and learning what it takes to win consistently. Two in a row isn't luck—it's the beginning of something. The key now is maintaining this form and pushing for that third win that transforms back-to-back success into a genuine streak. `;
+    } else {
+      // Fallback (shouldn't normally hit this, but safety)
+      context += `Your recent win has given you confidence and momentum. `;
+    }
   } else if (totalPodiums >= 5) {
     context += `Multiple trips to the podium have defined your season—five or more top-three finishes is the hallmark of genuine consistency. You've proven you can compete at the front across different types of events and conditions. That kind of reliability is what builds successful campaigns. `;
   } else if (totalPodiums >= 3) {
@@ -974,23 +990,49 @@ function generateRivalMention(raceData, seasonData) {
   const userWon = rival.userFinishedAhead;
   const gap = rival.timeGap.toFixed(1);
 
-  // Generate different mentions based on result
+  // NEW: Check if this is first encounter or ongoing rivalry
+  const rivalData = seasonData.encounters?.[rival.botUid];
+  const encounterCount = rivalData?.races || 1;
+  const h2hWins = rivalData?.userWins || 0;
+  const h2hLosses = rivalData?.botWins || 0;
+
+  // Generate different mentions based on encounter history
   const mentions = [];
 
-  if (userWon) {
-    mentions.push(
-      `In a battle of familiar foes, you finished ahead of ${rival.botName} by ${gap} seconds, extending your rivalry.`,
-      `${rival.botName}, one of your key rivals, couldn't match your pace today, finishing ${gap}s behind.`,
-      `You got the better of ${rival.botName} this time, putting ${gap} seconds between you two.`,
-      `Another chapter in your rivalry with ${rival.botName}, and this one went your way by ${gap} seconds.`
-    );
+  if (encounterCount === 1) {
+    // FIRST ENCOUNTER - Introductory language
+    if (userWon) {
+      mentions.push(
+        `You battled with ${rival.botName} today, finishing ${gap}s ahead. A competitor to watch.`,
+        `${rival.botName} pushed you hard, but you came out ${gap} seconds ahead. They'll be one to keep an eye on.`,
+        `A close race with ${rival.botName} today, with you edging ahead by ${gap} seconds. The beginning of a rivalry, perhaps.`
+      );
+    } else {
+      mentions.push(
+        `${rival.botName} proved to be formidable competition, finishing ${gap}s ahead.`,
+        `A tough battle with ${rival.botName}, who got the better of you by ${gap} seconds. You'll remember that name.`,
+        `${rival.botName} was the stronger rider today, finishing ${gap} seconds ahead. A competitor to track going forward.`
+      );
+    }
   } else {
-    mentions.push(
-      `${rival.botName}, one of your key rivals, edged you out by ${gap} seconds in another close battle.`,
-      `Your ongoing rivalry with ${rival.botName} continues, with them finishing ${gap}s ahead today.`,
-      `${rival.botName} got the upper hand this time, beating you by ${gap} seconds.`,
-      `The battle with ${rival.botName} was fierce, but they came out on top by ${gap} seconds.`
-    );
+    // ONGOING RIVALRY - Reference history and H2H record
+    const record = `${h2hWins}-${h2hLosses}`;
+
+    if (userWon) {
+      mentions.push(
+        `Your rivalry with ${rival.botName} continues. You won today by ${gap}s, improving to ${record} in head-to-head matchups.`,
+        `Another chapter with ${rival.botName}, this one going your way by ${gap} seconds. You now lead the series ${record}.`,
+        `In a battle of familiar foes, you finished ahead of ${rival.botName} by ${gap} seconds. That's ${record} in your favor now.`,
+        `${rival.botName}, a frequent competitor, couldn't match you today. You beat them by ${gap}s to make it ${record} head-to-head.`
+      );
+    } else {
+      mentions.push(
+        `${rival.botName}, a frequent rival, got the better of you by ${gap}s today. They lead the head-to-head ${record}.`,
+        `The battle with ${rival.botName} continues, with them winning by ${gap} seconds. Record: ${record} in their favor.`,
+        `Your ongoing rivalry with ${rival.botName} saw them finish ${gap}s ahead. The head-to-head stands at ${record}.`,
+        `${rival.botName} edged you out by ${gap} seconds in another close battle. They're up ${record} in your matchups.`
+      );
+    }
   }
 
   // Select a random mention for variety
