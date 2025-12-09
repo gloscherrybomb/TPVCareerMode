@@ -50,19 +50,22 @@ jobs:
         run: |
           node process-results.js '${{ steps.changed-files.outputs.files }}'
       
-      - name: Commit renamed CSV files
+      - name: Commit renamed CSV files and bot profile requests
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          
-          # Add only CSV files that have changed
+
+          # Add CSV files that have changed
           git add race_results/**/*.csv || true
-          
+
+          # Add bot profile requests file if it exists
+          git add bot-profile-requests/requests.txt || true
+
           # Check if there are staged changes
           if git diff --cached --quiet; then
-            echo "ℹ️  No CSV files to commit (already renamed or no changes)"
+            echo "ℹ️  No files to commit (already processed or no changes)"
           else
-            git commit -m "Auto: Add timestamps to processed CSV files"
+            git commit -m "Auto: Add timestamps to processed CSV files and bot profile requests"
             git push
-            echo "✅ Committed renamed CSV files"
+            echo "✅ Committed processed files"
           fi
