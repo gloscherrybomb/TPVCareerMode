@@ -4,3 +4,25 @@ Bot Profile Requests
 This file contains all bot profile requests submitted by users.
 Each request is automatically appended by the GitHub Actions workflow when users submit requests via the website.
 
+
+================================================================================
+Request submitted: 2025-12-09 12:59:46 UTC
+Firestore Document ID: Bot2357_1765285186707
+Submitted by User UID: wivyryjoQnP16Vt1D4gAqRHLEnT2
+Bot UID: Bot2357
+Bot Name: Lionel Martel
+Bot ARR: 1287
+Bot Country: CAN
+Interesting Fact: Testing Lionel
+================================================================================
+
+================================================================================
+Request submitted: 2025-12-09 13:51:52 UTC
+Firestore Document ID: Bot8609_1765288312552
+Submitted by User UID: wivyryjoQnP16Vt1D4gAqRHLEnT2
+Bot UID: Bot8609
+Bot Name: Bhargava Rai
+Bot ARR: 1164
+Bot Country: IND
+Interesting Fact: Reasonably good crit rider, lacks a great sprint
+================================================================================
