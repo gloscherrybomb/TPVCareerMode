@@ -923,16 +923,6 @@ async function checkBotProfile(botUid) {
     }
 }
 
-// Get initials from name for placeholder
-function getInitials(name) {
-    if (!name) return '🚴';
-    const parts = name.split(' ');
-    if (parts.length === 1) {
-        return name.substring(0, 2).toUpperCase();
-    }
-    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
-}
-
 // Attach event listeners to rival elements
 function attachRivalEventListeners() {
     // Clickable rival names
