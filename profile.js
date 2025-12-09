@@ -1008,7 +1008,7 @@ async function handleProfileRequest(e) {
 
         // GitHub Personal Access Token (Fine-grained with only 'Issues: Read and write' permission)
         // This token is intentionally public and only has permission to create issues in this repo
-        const GITHUB_TOKEN = 'YOUR_GITHUB_TOKEN_HERE';
+        const GITHUB_TOKEN = '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';
 
         // Create GitHub issue via API
         const response = await fetch('https://api.github.com/repos/gloscherrybomb/TPVCareerMode/issues', {
