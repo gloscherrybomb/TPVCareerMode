@@ -16,7 +16,7 @@ export function drawPersonalityChart(canvasId, personalityData) {
     const ctx = canvas.getContext('2d');
     const centerX = canvas.width / 2;
     const centerY = canvas.height / 2;
-    const maxRadius = Math.min(centerX, centerY) - 40;
+    const maxRadius = Math.min(centerX, centerY) - 50;
 
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -54,8 +54,8 @@ export function drawPersonalityChart(canvasId, personalityData) {
         ctx.stroke();
 
         // Draw trait labels
-        const labelX = centerX + (maxRadius + 25) * Math.cos(trait.angle - Math.PI / 2);
-        const labelY = centerY + (maxRadius + 25) * Math.sin(trait.angle - Math.PI / 2);
+        const labelX = centerX + (maxRadius + 35) * Math.cos(trait.angle - Math.PI / 2);
+        const labelY = centerY + (maxRadius + 35) * Math.sin(trait.angle - Math.PI / 2);
 
         ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
         ctx.font = 'bold 12px Orbitron, sans-serif';
