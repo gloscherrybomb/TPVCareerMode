@@ -1,7 +1,7 @@
 // Profile Page Logic for TPV Career Mode
 
 import { firebaseConfig } from './firebase-config.js';
-import { getInitials, formatTime, getOrdinalSuffix, getARRBand, formatDate } from './utils.js';
+import { getInitials, formatTime, getOrdinalSuffix, getARRBand, formatDate, getCountryCode2 } from './utils.js';
 import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 import {
     getFirestore,
@@ -856,6 +856,12 @@ async function displayRivals(userData) {
             }
         }
 
+        // Convert country code to 2-letter format for flag icon
+        const countryCode2 = getCountryCode2(data.botCountry);
+        const countryDisplay = countryCode2
+            ? `<img src="assets/flags/${countryCode2}.svg" alt="${data.botCountry}" class="rival-flag" title="${data.botCountry}">`
+            : (data.botCountry || 'Unknown');
+
         html += `
             <div class="rival-card">
                 <div class="rival-header">
@@ -872,7 +878,7 @@ async function displayRivals(userData) {
                                 ${data.botName}
                             </div>
                             <div class="rival-meta">
-                                <span class="rival-country">${data.botCountry || 'Unknown'}</span>
+                                <span class="rival-country">${countryDisplay}</span>
                                 <span class="rival-arr">ARR: ${data.botArr}</span>
                             </div>
                         </div>
