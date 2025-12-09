@@ -843,10 +843,29 @@ async function displayRivals(userData) {
         // Check if bot has profile by trying to fetch from botProfiles
         const hasProfile = await checkBotProfile(botUid);
 
+        // Fetch bot profile for image
+        let profileImage = null;
+        if (hasProfile) {
+            try {
+                const botDoc = await getDoc(doc(db, 'botProfiles', botUid));
+                if (botDoc.exists()) {
+                    profileImage = botDoc.data().imageUrl || null;
+                }
+            } catch (error) {
+                console.error('Error fetching bot profile image:', error);
+            }
+        }
+
         html += `
             <div class="rival-card">
                 <div class="rival-header">
                     <div class="rival-info">
+                        <div class="rival-photo">
+                            ${profileImage
+                                ? `<img src="${profileImage}" alt="${data.botName}">`
+                                : `<div class="rival-photo-placeholder">${getInitials(data.botName)}</div>`
+                            }
+                        </div>
                         <div class="rival-rank">${rankLabel}</div>
                         <div class="rival-details">
                             <div class="rival-name" data-bot-uid="${botUid}" data-bot-name="${data.botName}" data-has-profile="${hasProfile}">
@@ -904,6 +923,16 @@ async function checkBotProfile(botUid) {
     }
 }
 
+// Get initials from name for placeholder
+function getInitials(name) {
+    if (!name) return '🚴';
+    const parts = name.split(' ');
+    if (parts.length === 1) {
+        return name.substring(0, 2).toUpperCase();
+    }
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
 // Attach event listeners to rival elements
 function attachRivalEventListeners() {
     // Clickable rival names
@@ -914,8 +943,8 @@ function attachRivalEventListeners() {
 
             if (hasProfile) {
                 // Open bot profile modal (from bot-profile-modal.js)
-                if (window.openBotProfileModal) {
-                    window.openBotProfileModal(botUid);
+                if (window.openBotProfile) {
+                    window.openBotProfile(botUid);
                 }
             } else {
                 // Show request profile modal
@@ -929,8 +958,8 @@ function attachRivalEventListeners() {
     document.querySelectorAll('.btn-view-profile').forEach(btn => {
         btn.addEventListener('click', () => {
             const botUid = btn.dataset.botUid;
-            if (window.openBotProfileModal) {
-                window.openBotProfileModal(botUid);
+            if (window.openBotProfile) {
+                window.openBotProfile(botUid);
             }
         });
     });

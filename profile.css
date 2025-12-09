@@ -1064,16 +1064,19 @@
 
 .rivals-list {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     gap: 1rem;
+    flex-wrap: wrap;
 }
 
 .rival-card {
     background: linear-gradient(135deg, rgba(255, 0, 128, 0.1) 0%, rgba(0, 212, 255, 0.05) 100%);
     border: 1px solid rgba(255, 0, 128, 0.2);
     border-radius: 12px;
-    padding: 1.5rem;
+    padding: 1rem;
     transition: all 0.3s ease;
+    flex: 1 1 calc(33.333% - 0.75rem);
+    min-width: 280px;
 }
 
 .rival-card:hover {
@@ -1086,7 +1089,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 1rem;
+    margin-bottom: 0.75rem;
     gap: 1rem;
 }
 
@@ -1098,11 +1101,39 @@
 }
 
 .rival-rank {
-    font-size: 2rem;
+    font-size: 1.5rem;
     font-weight: 700;
     color: #ff0080;
     font-family: 'Orbitron', sans-serif;
     min-width: 40px;
+}
+
+.rival-photo {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: rgba(255, 0, 128, 0.1);
+    border: 2px solid rgba(255, 0, 128, 0.3);
+    flex-shrink: 0;
+}
+
+.rival-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.rival-photo-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #ff0080;
+    background: linear-gradient(135deg, rgba(255, 0, 128, 0.2) 0%, rgba(0, 212, 255, 0.1) 100%);
 }
 
 .rival-details {
@@ -1110,7 +1141,7 @@
 }
 
 .rival-name {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     font-weight: 600;
     color: #ffffff;
     cursor: pointer;
@@ -1127,7 +1158,7 @@
     align-items: center;
     gap: 1rem;
     margin-top: 0.3rem;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     color: rgba(255, 255, 255, 0.7);
 }
 
@@ -1169,26 +1200,26 @@
 .rival-stats {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-    gap: 1rem;
-    margin-top: 1rem;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
 }
 
 .rival-stat {
     text-align: center;
-    padding: 0.75rem;
+    padding: 0.5rem;
     background: rgba(0, 0, 0, 0.3);
     border-radius: 8px;
 }
 
 .rival-stat-value {
-    font-size: 1.4rem;
+    font-size: 1.2rem;
     font-weight: 700;
     color: #00d4ff;
     font-family: 'Orbitron', sans-serif;
 }
 
 .rival-stat-label {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     color: rgba(255, 255, 255, 0.6);
     margin-top: 0.25rem;
 }
