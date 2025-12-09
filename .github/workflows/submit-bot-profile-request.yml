@@ -1,0 +1,80 @@
+name: Process Bot Profile Request
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  process-request:
+    # Only run for issues with the "bot-profile-request" label
+    if: contains(github.event.issue.labels.*.name, 'bot-profile-request')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Extract request data from issue
+        id: extract
+        run: |
+          # Parse the issue body to extract fields
+          ISSUE_BODY="${{ github.event.issue.body }}"
+
+          echo "Issue body: $ISSUE_BODY"
+
+          # Extract each field (assuming format: **Field**: value)
+          BOT_NAME=$(echo "$ISSUE_BODY" | grep -oP '(?<=\*\*Bot Name\*\*: ).*' | head -1)
+          BOT_UID=$(echo "$ISSUE_BODY" | grep -oP '(?<=\*\*Bot UID\*\*: ).*' | head -1)
+          BOT_ARR=$(echo "$ISSUE_BODY" | grep -oP '(?<=\*\*Bot ARR\*\*: ).*' | head -1)
+          BOT_COUNTRY=$(echo "$ISSUE_BODY" | grep -oP '(?<=\*\*Bot Country\*\*: ).*' | head -1)
+          INTEREST_FACT=$(echo "$ISSUE_BODY" | grep -oP '(?<=\*\*Interesting Fact\*\*: ).*' | head -1)
+          USER_UID=$(echo "$ISSUE_BODY" | grep -oP '(?<=\*\*Submitted by User UID\*\*: ).*' | head -1)
+
+          echo "bot_name=$BOT_NAME" >> $GITHUB_OUTPUT
+          echo "bot_uid=$BOT_UID" >> $GITHUB_OUTPUT
+          echo "bot_arr=$BOT_ARR" >> $GITHUB_OUTPUT
+          echo "bot_country=$BOT_COUNTRY" >> $GITHUB_OUTPUT
+          echo "interest_fact=$INTEREST_FACT" >> $GITHUB_OUTPUT
+          echo "user_uid=$USER_UID" >> $GITHUB_OUTPUT
+
+      - name: Append bot profile request to file
+        run: |
+          # Create bot-profile-requests directory if it doesn't exist
+          mkdir -p bot-profile-requests
+
+          # Create or append to the requests file
+          TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
+
+          cat >> bot-profile-requests/requests.txt << EOF
+
+          ================================================================================
+          Request submitted: $TIMESTAMP
+          Issue: #${{ github.event.issue.number }}
+          Submitted by User UID: ${{ steps.extract.outputs.user_uid }}
+          Bot UID: ${{ steps.extract.outputs.bot_uid }}
+          Bot Name: ${{ steps.extract.outputs.bot_name }}
+          Bot ARR: ${{ steps.extract.outputs.bot_arr }}
+          Bot Country: ${{ steps.extract.outputs.bot_country }}
+          Interesting Fact: ${{ steps.extract.outputs.interest_fact }}
+          ================================================================================
+          EOF
+
+          echo "Request appended to bot-profile-requests/requests.txt"
+
+      - name: Commit and push changes
+        run: |
+          git config user.name "GitHub Actions Bot"
+          git config user.email "actions@github.com"
+          git add bot-profile-requests/requests.txt
+          git commit -m "Add bot profile request for ${{ steps.extract.outputs.bot_name }} (UID: ${{ steps.extract.outputs.bot_uid }}) - Issue #${{ github.event.issue.number }}" || echo "No changes to commit"
+          git push || echo "Nothing to push"
+
+      - name: Add comment to issue
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '✅ Bot profile request has been recorded! An admin will review and create the profile soon.'
+            })

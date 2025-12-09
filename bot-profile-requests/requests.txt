@@ -1,0 +1,6 @@
+Bot Profile Requests
+====================
+
+This file contains all bot profile requests submitted by users.
+Each request is automatically appended by the GitHub Actions workflow when users submit requests via the website.
+
