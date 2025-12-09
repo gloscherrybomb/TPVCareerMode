@@ -52,12 +52,41 @@ async function resetUserResults() {
         // Reset main scoring fields
         currentStage: 0,
         completedStages: [],
+        usedOptionalEvents: [],
         totalPoints: 0,
         totalEvents: 0,
         totalWins: 0,
         totalPodiums: 0,
+        totalTop10s: 0,
+        bestFinish: null,
+        averageFinish: null,
+        winRate: 0,
+        podiumRate: 0,
         careerWins: 0,
         careerPodiums: 0,
+
+        // Reset awards
+        awards: {
+          gold: 0,
+          silver: 0,
+          bronze: 0,
+          punchingMedal: 0,
+          giantKiller: 0,
+          bullseye: 0,
+          hotStreak: 0,
+          domination: 0,
+          closeCall: 0,
+          photoFinish: 0,
+          darkHorse: 0,
+          zeroToHero: 0,
+          gcGold: 0,
+          gcSilver: 0,
+          gcBronze: 0,
+          lanternRouge: 0,
+          seasonChampion: 0,
+          seasonRunnerUp: 0,
+          seasonThirdPlace: 0
+        },
 
         // Delete all event result blocks (1–15)
         event1Results: admin.firestore.FieldValue.delete(),
@@ -87,6 +116,9 @@ async function resetUserResults() {
         season1Complete: false,
         season1Rank: null,
         season1CompletionDate: admin.firestore.FieldValue.delete(),
+        season1CelebrationViewed: false,
+        localTourStatus: admin.firestore.FieldValue.delete(),
+        localTourGCPosition: admin.firestore.FieldValue.delete(),
         currentSeason: 1,
 
         // Tour progress
