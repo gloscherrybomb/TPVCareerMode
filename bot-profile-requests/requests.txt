@@ -26,3 +26,14 @@ Bot ARR: 1164
 Bot Country: IND
 Interesting Fact: Reasonably good crit rider, lacks a great sprint
 ================================================================================
+
+================================================================================
+Request submitted: 2025-12-09 14:28:13 UTC
+Firestore Document ID: Bot4597_1765290493904
+Submitted by User UID: Wtg1ptJIJzZViHQoOZR7EJIV1vH3
+Bot UID: Bot4597
+Bot Name: Maxime Fontaine
+Bot ARR: 1342
+Bot Country: FRA
+Interesting Fact: Smart tactically. Keeps up with lead group but doesn't sprint
+================================================================================
