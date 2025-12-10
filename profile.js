@@ -1729,12 +1729,12 @@ async function drawPersonalityTemplate(ctx, width, height) {
     ctx.font = 'bold 64px Orbitron, sans-serif';
     ctx.fillText(`"${data.persona}"`, width / 2, 680);
 
-    // Draw personality spider chart
-    drawSpiderChartOnCanvas(ctx, width / 2, 1100, 360, data.personality);
+    // Draw personality spider chart (smaller)
+    drawSpiderChartOnCanvas(ctx, width / 2, 1080, 300, data.personality);
 
-    // Stats at bottom
-    const statsY = 1580;
-    const statsSpacing = 180;
+    // Stats at bottom (more spacing)
+    const statsY = 1560;
+    const statsSpacing = 220;
 
     drawStatBox(ctx, width / 2 - statsSpacing * 1.5, statsY, data.totalRaces, 'RACES', '#b06af3');
     drawStatBox(ctx, width / 2 - statsSpacing * 0.5, statsY, data.totalWins, 'WINS', '#b06af3');
