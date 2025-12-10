@@ -848,9 +848,9 @@ async function loadEventResults() {
         if (userEventResults && userEventResults.position) {
             const userResult = {
                 position: userEventResults.position,
-                predicted: userEventResults.predicted,
+                predicted: userEventResults.predictedPosition,
                 time: userEventResults.time,
-                timeSeconds: userEventResults.timeSeconds || userEventResults.time,
+                timeSeconds: userEventResults.time,
                 eventType: userEventResults.eventType,
                 eventCategory: userEventResults.eventCategory
             };

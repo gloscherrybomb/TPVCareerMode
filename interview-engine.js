@@ -31,9 +31,9 @@ export function buildRaceContext(userResult, allResults, userData, seasonData) {
 
         // Time gaps
         winMargin: userResult.position === 1 && allResults[1] ?
-            Math.abs(allResults[1].timeSeconds - userResult.timeSeconds) : null,
+            Math.abs(allResults[1].time - userResult.time) : null,
         lossMargin: userResult.position > 1 && allResults[0] ?
-            Math.abs(allResults[0].timeSeconds - userResult.timeSeconds) : null,
+            Math.abs(allResults[0].time - userResult.time) : null,
 
         // Rival information (if applicable)
         rivalEncounter: false,
@@ -66,7 +66,7 @@ export function buildRaceContext(userResult, allResults, userData, seasonData) {
         if (rivalResult) {
             context.rivalEncounter = true;
             context.rivalName = rival.name;
-            context.rivalGap = Math.abs(userResult.timeSeconds - rivalResult.timeSeconds);
+            context.rivalGap = Math.abs(userResult.time - rivalResult.time);
             context.userWon = userResult.position < rivalResult.position;
             context.totalEncounters = rival.encounters || 1;
             context.h2hWins = rival.userWins || 0;
@@ -530,7 +530,7 @@ export function calculateSeasonContext(userData, eventNumber) {
         }
 
         // Below expectation
-        if (race.predicted && race.position > race.predicted + 3) {
+        if (race.predictedPosition && race.position > race.predictedPosition + 3) {
             recentBelowExpectation++;
         }
     }

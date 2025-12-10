@@ -36,6 +36,26 @@ function determinePerformanceTier(position) {
   return 'back';
 }
 
+// Event types for each event in Season 1
+const EVENT_TYPES = {
+  1: 'criterium', 2: 'road race', 3: 'track elimination', 4: 'time trial',
+  5: 'points race', 6: 'hill climb', 7: 'criterium', 8: 'gran fondo',
+  9: 'hill climb', 10: 'time trial', 11: 'points race', 12: 'gravel race',
+  13: 'road race', 14: 'road race', 15: 'time trial'
+};
+
+/**
+ * Determine event category based on event type
+ */
+function getEventCategory(eventType) {
+  if (eventType === 'criterium') return 'criterium';
+  if (eventType === 'time trial') return 'time trial';
+  if (eventType === 'track elimination' || eventType === 'points race') return 'track';
+  if (eventType === 'hill climb') return 'climbing';
+  if (eventType === 'gravel race') return 'gravel';
+  return 'road'; // Default for road race, gran fondo, etc.
+}
+
 // Stage requirements for Career Mode progression
 const STAGE_REQUIREMENTS = {
   1: { type: 'fixed', eventId: 1 },
@@ -977,6 +997,10 @@ async function processUserResult(uid, eventInfo, results) {
   }
   
   // Prepare event results
+  // Get event type and category
+  const eventType = EVENT_TYPES[eventNumber] || 'road race';
+  const eventCategory = getEventCategory(eventType);
+
   const eventResults = {
     position: position,
     time: parseFloat(userResult.Time) || 0,
@@ -984,6 +1008,8 @@ async function processUserResult(uid, eventInfo, results) {
     arrBand: userResult.ARRBand || '',
     eventRating: parseInt(userResult.EventRating) || null,
     predictedPosition: predictedPosition,
+    eventType: eventType,
+    eventCategory: eventCategory,
     points: points,
     bonusPoints: bonusPoints,
     earnedPunchingMedal: earnedPunchingMedal,
@@ -2118,12 +2144,6 @@ async function checkAndMarkSeasonComplete(userRef, userData, eventNumber, recent
 
   // SPECIALIST - Win 3+ events of the same type
   const eventTypeWins = {}; // Track wins by event type
-  const EVENT_TYPES = {
-    1: 'criterium', 2: 'road race', 3: 'track elimination', 4: 'time trial',
-    5: 'points race', 6: 'hill climb', 7: 'criterium', 8: 'gran fondo',
-    9: 'hill climb', 10: 'time trial', 11: 'points race', 12: 'gravel race',
-    13: 'road race', 14: 'road race', 15: 'time trial'
-  };
 
   for (let i = 1; i <= 15; i++) {
     const eventResults = currentData[`event${i}Results`];
