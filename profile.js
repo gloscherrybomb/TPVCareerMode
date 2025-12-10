@@ -177,7 +177,10 @@ async function loadProfile(user) {
         }
         
         userData = userDoc.data();
-        
+
+        // Store globally for share functionality
+        window.currentUserData = userData;
+
         // Build stats object from stored data and calculated data
         // Stored stats (from results processing): wins, podiums, awards, etc.
         // Calculated stats (from user event results): recent results, positions array
@@ -1314,7 +1317,11 @@ function collectShareData() {
     const profilePhotoEl = document.getElementById('profilePhoto');
     const hasProfilePhoto = profilePhotoEl?.classList.contains('active');
     const profilePhotoUrl = hasProfilePhoto ? profilePhotoEl.src : null;
-    
+
+    // Get personality data
+    const personaSubtitle = document.getElementById('personaSubtitle')?.textContent || '';
+    const persona = personaSubtitle.replace(/"/g, ''); // Remove quotes from persona
+
     return {
         name: document.getElementById('profileName')?.textContent || 'Rider',
         team: document.getElementById('profileTeam')?.textContent || '',
@@ -1327,7 +1334,9 @@ function collectShareData() {
         winRate: document.getElementById('winRate')?.textContent || '0%',
         podiumRate: document.getElementById('podiumRate')?.textContent || '0%',
         profilePhotoUrl: profilePhotoUrl,
-        awards: collectAwardsData()
+        awards: collectAwardsData(),
+        persona: persona,
+        personality: window.currentUserData?.personality || null
     };
 }
 
@@ -1375,6 +1384,9 @@ async function generateShareImage() {
                 break;
             case 'champion':
                 await drawChampionTemplate(ctx, width, height);
+                break;
+            case 'personality':
+                await drawPersonalityTemplate(ctx, width, height);
                 break;
         }
     } catch (e) {
@@ -1642,6 +1654,205 @@ async function drawChampionTemplate(ctx, width, height) {
     
     // Website
     drawWebsite(ctx, width, height);
+}
+
+async function drawPersonalityTemplate(ctx, width, height) {
+    const data = shareStatsData;
+
+    // Check if user has personality data
+    if (!data.personality || !data.persona) {
+        // Draw "no personality data" message
+        ctx.fillStyle = '#1a1a2e';
+        ctx.fillRect(0, 0, width, height);
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 48px "Exo 2", sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText('Complete interviews to', width / 2, height / 2 - 40);
+        ctx.fillText('unlock your personality!', width / 2, height / 2 + 40);
+        return;
+    }
+
+    // Background gradient (purple theme)
+    const bgGradient = ctx.createLinearGradient(0, 0, 0, height);
+    bgGradient.addColorStop(0, '#0a0e1a');
+    bgGradient.addColorStop(0.3, '#1a1a2e');
+    bgGradient.addColorStop(0.5, '#2a1a3e');
+    bgGradient.addColorStop(0.7, '#1a1a2e');
+    bgGradient.addColorStop(1, '#0a0e1a');
+    ctx.fillStyle = bgGradient;
+    ctx.fillRect(0, 0, width, height);
+
+    // Decorative purple lines
+    ctx.strokeStyle = 'rgba(176, 106, 243, 0.1)';
+    ctx.lineWidth = 2;
+    for (let i = 0; i < 5; i++) {
+        ctx.beginPath();
+        ctx.moveTo(0, 300 + i * 300);
+        ctx.lineTo(width, 350 + i * 300);
+        ctx.stroke();
+    }
+
+    // TPV Logo
+    const logoGradient = ctx.createLinearGradient(0, 80, 0, 140);
+    logoGradient.addColorStop(0, '#b06af3');
+    logoGradient.addColorStop(1, '#ff1b6b');
+    ctx.fillStyle = logoGradient;
+    ctx.font = 'bold 72px Orbitron, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('TPV', width / 2, 120);
+
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+    ctx.font = '600 28px "Exo 2", sans-serif';
+    ctx.fillText('CAREER MODE', width / 2, 165);
+
+    // Profile photo
+    await drawProfilePhoto(ctx, width / 2, 320, 100);
+
+    // Player name
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 52px "Exo 2", sans-serif';
+    ctx.fillText(data.name.toUpperCase(), width / 2, 480);
+
+    // Team
+    if (data.team) {
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+        ctx.font = '32px "Exo 2", sans-serif';
+        ctx.fillText(data.team, width / 2, 530);
+    }
+
+    // Persona label with purple gradient
+    const personaGradient = ctx.createLinearGradient(0, 620, 0, 680);
+    personaGradient.addColorStop(0, '#b06af3');
+    personaGradient.addColorStop(1, '#ff1b6b');
+    ctx.fillStyle = personaGradient;
+    ctx.font = 'bold 64px Orbitron, sans-serif';
+    ctx.fillText(`"${data.persona}"`, width / 2, 680);
+
+    // Draw personality spider chart
+    drawSpiderChartOnCanvas(ctx, width / 2, 1100, 360, data.personality);
+
+    // Stats at bottom
+    const statsY = 1580;
+    const statsSpacing = 180;
+
+    drawStatBox(ctx, width / 2 - statsSpacing * 1.5, statsY, data.totalRaces, 'RACES', '#b06af3');
+    drawStatBox(ctx, width / 2 - statsSpacing * 0.5, statsY, data.totalWins, 'WINS', '#b06af3');
+    drawStatBox(ctx, width / 2 + statsSpacing * 0.5, statsY, data.totalPodiums, 'PODIUMS', '#b06af3');
+    drawStatBox(ctx, width / 2 + statsSpacing * 1.5, statsY, data.seasonRank, 'RANK', '#b06af3');
+
+    // Team car
+    await drawTeamCar(ctx, width / 2, height - 200, 0.15);
+
+    // Website
+    drawWebsite(ctx, width, height);
+}
+
+function drawSpiderChartOnCanvas(ctx, centerX, centerY, maxRadius, personality) {
+    if (!personality) return;
+
+    // Personality traits
+    const traits = [
+        { name: 'Confidence', value: personality.confidence || 50, angle: 0 },
+        { name: 'Humility', value: personality.humility || 50, angle: Math.PI / 3 },
+        { name: 'Aggression', value: personality.aggression || 50, angle: (2 * Math.PI) / 3 },
+        { name: 'Professionalism', value: personality.professionalism || 50, angle: Math.PI },
+        { name: 'Showmanship', value: personality.showmanship || 50, angle: (4 * Math.PI) / 3 },
+        { name: 'Resilience', value: personality.resilience || 50, angle: (5 * Math.PI) / 3 }
+    ];
+
+    // Draw background grid (concentric hexagons)
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+    ctx.lineWidth = 2;
+
+    for (let level = 1; level <= 4; level++) {
+        const radius = (maxRadius * level) / 4;
+        drawPolygonOnCanvas(ctx, centerX, centerY, radius, traits.length, 0);
+    }
+
+    // Draw axes
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+    ctx.lineWidth = 3;
+
+    traits.forEach((trait) => {
+        const x = centerX + maxRadius * Math.cos(trait.angle - Math.PI / 2);
+        const y = centerY + maxRadius * Math.sin(trait.angle - Math.PI / 2);
+
+        ctx.beginPath();
+        ctx.moveTo(centerX, centerY);
+        ctx.lineTo(x, y);
+        ctx.stroke();
+
+        // Draw trait labels
+        const labelX = centerX + (maxRadius + 60) * Math.cos(trait.angle - Math.PI / 2);
+        const labelY = centerY + (maxRadius + 60) * Math.sin(trait.angle - Math.PI / 2);
+
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+        ctx.font = 'bold 28px Orbitron, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(trait.name, labelX, labelY);
+    });
+
+    // Draw data polygon with purple gradient
+    const gradient = ctx.createLinearGradient(
+        centerX - maxRadius,
+        centerY - maxRadius,
+        centerX + maxRadius,
+        centerY + maxRadius
+    );
+    gradient.addColorStop(0, 'rgba(176, 106, 243, 0.3)');
+    gradient.addColorStop(1, 'rgba(255, 27, 107, 0.3)');
+
+    ctx.fillStyle = gradient;
+    ctx.strokeStyle = '#b06af3';
+    ctx.lineWidth = 5;
+
+    ctx.beginPath();
+    traits.forEach((trait, index) => {
+        const value = Math.max(0, Math.min(100, trait.value));
+        const radius = (maxRadius * value) / 100;
+        const x = centerX + radius * Math.cos(trait.angle - Math.PI / 2);
+        const y = centerY + radius * Math.sin(trait.angle - Math.PI / 2);
+
+        if (index === 0) {
+            ctx.moveTo(x, y);
+        } else {
+            ctx.lineTo(x, y);
+        }
+    });
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    // Draw data points
+    ctx.fillStyle = '#ff1b6b';
+    traits.forEach((trait) => {
+        const value = Math.max(0, Math.min(100, trait.value));
+        const radius = (maxRadius * value) / 100;
+        const x = centerX + radius * Math.cos(trait.angle - Math.PI / 2);
+        const y = centerY + radius * Math.sin(trait.angle - Math.PI / 2);
+
+        ctx.beginPath();
+        ctx.arc(x, y, 12, 0, 2 * Math.PI);
+        ctx.fill();
+    });
+}
+
+function drawPolygonOnCanvas(ctx, centerX, centerY, radius, sides, rotation = 0) {
+    ctx.beginPath();
+    for (let i = 0; i <= sides; i++) {
+        const angle = (i * 2 * Math.PI) / sides + rotation - Math.PI / 2;
+        const x = centerX + radius * Math.cos(angle);
+        const y = centerY + radius * Math.sin(angle);
+
+        if (i === 0) {
+            ctx.moveTo(x, y);
+        } else {
+            ctx.lineTo(x, y);
+        }
+    }
+    ctx.stroke();
 }
 
 function drawStatBox(ctx, x, y, value, label, accentColor = '#ff0080') {
