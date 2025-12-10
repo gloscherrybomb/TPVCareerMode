@@ -2,6 +2,7 @@
 
 import { generateInterview, buildRaceContext, calculateSeasonContext } from './interview-engine.js';
 import { hasCompletedInterview, getCompletedInterview, saveInterviewResponse, initializePersonalityIfNeeded, formatPersonalityChange } from './interview-persistence.js';
+import { queuePersonalityAwardNotifications } from './personality-awards-notifications.js';
 
 let currentInterview = null;
 let selectedResponseIndex = null;
@@ -243,6 +244,23 @@ async function submitResponse(responseIndex) {
         );
 
         if (result.success) {
+            // Queue personality award notifications if any were earned
+            if (result.personalityAwards && result.personalityAwards.newAwards) {
+                const hasNewAwards =
+                    result.personalityAwards.newAwards.dominant ||
+                    result.personalityAwards.newAwards.combinations.length > 0 ||
+                    result.personalityAwards.newAwards.special.length > 0 ||
+                    result.personalityAwards.newAwards.evolution.length > 0;
+
+                if (hasNewAwards) {
+                    queuePersonalityAwardNotifications(
+                        result.personalityAwards,
+                        currentInterview.eventNumber
+                    );
+                    console.log('Queued personality award notifications');
+                }
+            }
+
             // Show submitted feedback
             displaySubmittedFeedback(selectedResponse, result.personalityDelta);
         } else {

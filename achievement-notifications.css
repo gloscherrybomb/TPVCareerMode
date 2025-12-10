@@ -482,3 +482,36 @@
 .achievement-notification-container::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.3);
 }
+
+/* ===== PERSONALITY AWARDS CATEGORY ===== */
+
+.achievement-group[data-category="personality"] .achievement-group-title {
+  background: linear-gradient(135deg, #b06af3, #ff1b6b);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.achievement-group[data-category="personality"] .achievement-card {
+  background: linear-gradient(135deg, rgba(176, 106, 243, 0.15), rgba(255, 27, 107, 0.15));
+  border-color: #b06af3;
+}
+
+.achievement-group[data-category="personality"] .achievement-card::before {
+  background: linear-gradient(90deg,
+    rgba(176, 106, 243, 0.3),
+    rgba(255, 27, 107, 0.3),
+    rgba(176, 106, 243, 0.3)
+  );
+}
+
+.achievement-group[data-category="personality"] .achievement-card .achievement-title {
+  color: #b06af3;
+}
+
+/* Mobile adjustments for personality category */
+@media (max-width: 768px) {
+  .achievement-group[data-category="personality"] .achievement-card {
+    min-width: 280px;
+  }
+}

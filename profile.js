@@ -4,6 +4,7 @@ import { firebaseConfig } from './firebase-config.js';
 import { getInitials, formatTime, getOrdinalSuffix, getARRBand, formatDate, getCountryCode2 } from './utils.js';
 import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 import { displayPersonality } from './profile-personality.js';
+import { displayPersonalityAwards } from './personality-awards-display.js';
 import {
     getFirestore,
     doc,
@@ -289,7 +290,12 @@ function displayProfileInfo(user, userData, stats, seasonRanking, globalRanking)
     
     // Awards
     displayAwards(stats.awards);
-    
+
+    // Personality Awards
+    if (userData.personalityAwards) {
+        displayPersonalityAwards(userData.personalityAwards, userData.personality);
+    }
+
     // Generate and display career summary
     console.log('About to call displayCareerSummary...');
     displayCareerSummary(userData, stats);

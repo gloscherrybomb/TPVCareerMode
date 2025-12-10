@@ -2,6 +2,7 @@
 
 import { getFirestore, doc, getDoc, setDoc, updateDoc, serverTimestamp, increment, collection, query, where, orderBy, limit, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 import { getDefaultPersonality, applyPersonalityChanges } from './interview-engine.js';
+import { calculatePersonalityAwards } from './personality-awards-calculation.js';
 
 /**
  * Check if user has already completed interview for this event
@@ -166,22 +167,84 @@ export async function saveInterviewResponse(db, userId, eventNumber, interviewDa
             personalityAfter: newPersonality
         });
 
-        // Update user personality and interview history
-        const responseStyle = selectedResponse.style;
-        await updateDoc(userDocRef, {
+        // Prepare update object
+        const updateData = {
             personality: newPersonality,
             'interviewHistory.totalInterviews': increment(1),
             'interviewHistory.lastInterviewEventNumber': eventNumber,
             'interviewHistory.lastInterviewTimestamp': serverTimestamp(),
             [`interviewHistory.responsePatterns.${responseStyle}`]: increment(1)
-        });
+        };
+
+        // Save personality snapshots at Events 5, 8, 12, 15 for evolution tracking
+        const snapshotEvents = [5, 8, 12, 15];
+        if (snapshotEvents.includes(eventNumber)) {
+            updateData[`personalitySnapshots.event${eventNumber}`] = newPersonality;
+            console.log(`Saved personality snapshot for Event ${eventNumber}`);
+        }
+
+        // Calculate personality awards at Event 8+ (when personality is established)
+        let awardResults = null;
+        const awardCheckEvents = [8, 10, 12, 15];
+        if (awardCheckEvents.includes(eventNumber)) {
+            // Get existing snapshots and awards
+            const snapshots = userData.personalitySnapshots || {};
+            const existingAwards = userData.personalityAwards || {
+                dominant: { current: null, history: [] },
+                combinations: [],
+                special: [],
+                evolution: []
+            };
+
+            // Add current event snapshot for calculation
+            snapshots[`event${eventNumber}`] = newPersonality;
+
+            // Calculate awards
+            awardResults = calculatePersonalityAwards(newPersonality, eventNumber, snapshots, existingAwards);
+
+            // Update awards in user document if any changes
+            if (awardResults.newAwards.dominant) {
+                updateData['personalityAwards.dominant.current'] = awardResults.newAwards.dominant.awardId;
+
+                // Add to history
+                const historyEntry = awardResults.newAwards.dominant;
+                if (!userData.personalityAwards?.dominant?.history) {
+                    updateData['personalityAwards.dominant.history'] = [historyEntry];
+                } else {
+                    const currentHistory = userData.personalityAwards.dominant.history || [];
+                    updateData['personalityAwards.dominant.history'] = [...currentHistory, historyEntry];
+                }
+            }
+
+            if (awardResults.newAwards.combinations.length > 0) {
+                const currentCombos = userData.personalityAwards?.combinations || [];
+                updateData['personalityAwards.combinations'] = [...currentCombos, ...awardResults.newAwards.combinations];
+            }
+
+            if (awardResults.newAwards.special.length > 0) {
+                const currentSpecial = userData.personalityAwards?.special || [];
+                updateData['personalityAwards.special'] = [...currentSpecial, ...awardResults.newAwards.special];
+            }
+
+            if (awardResults.newAwards.evolution.length > 0) {
+                const currentEvolution = userData.personalityAwards?.evolution || [];
+                updateData['personalityAwards.evolution'] = [...currentEvolution, ...awardResults.newAwards.evolution];
+            }
+
+            console.log(`Calculated personality awards for Event ${eventNumber}:`, awardResults);
+        }
+
+        // Update user document
+        const responseStyle = selectedResponse.style;
+        await updateDoc(userDocRef, updateData);
 
         console.log(`Interview saved for user ${userId}, event ${eventNumber}`);
 
         return {
             success: true,
             newPersonality: newPersonality,
-            personalityDelta: selectedResponse.personalityImpact
+            personalityDelta: selectedResponse.personalityImpact,
+            personalityAwards: awardResults // Include awards for notifications
         };
 
     } catch (error) {

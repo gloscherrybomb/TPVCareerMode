@@ -187,6 +187,7 @@ class AchievementNotifications {
     const grouped = {
       season: [],
       gc: [],
+      personality: [],
       performance: [],
       event_special: [],
       podium: []
@@ -201,7 +202,7 @@ class AchievementNotifications {
     });
 
     // Convert to array of groups, filter empty, sort by priority
-    const priorityOrder = ['season', 'gc', 'performance', 'event_special', 'podium'];
+    const priorityOrder = ['season', 'gc', 'personality', 'performance', 'event_special', 'podium'];
     return priorityOrder
       .map(category => ({
         category,
@@ -344,7 +345,8 @@ class AchievementNotifications {
       event_special: count === 1 ? 'Special Achievement' : 'Special Achievements',
       performance: 'Outstanding Performance',
       gc: 'Tour Overall Classification',
-      season: count === 1 ? 'Season Award' : 'Season Awards'
+      season: count === 1 ? 'Season Award' : 'Season Awards',
+      personality: count === 1 ? 'Media Personality Award' : 'Media Personality Awards'
     };
     return titles[category] || 'Achievements';
   }
@@ -360,7 +362,8 @@ class AchievementNotifications {
       event_special: '⭐',
       performance: '💪',
       gc: '🏆',
-      season: '👑'
+      season: '👑',
+      personality: '🎭'
     };
     return icons[category] || '🏆';
   }
