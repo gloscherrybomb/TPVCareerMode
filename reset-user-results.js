@@ -162,20 +162,36 @@ async function resetUserResults() {
     // Delete narrative history for all riders
     console.log('Deleting narrative history...');
     const ridersSnapshot = await db.collection('riders').get();
+    console.log(`Found ${ridersSnapshot.size} rider documents`);
+
+    let totalNarrativesDeleted = 0;
+    let ridersWithNarratives = 0;
 
     if (!ridersSnapshot.empty) {
       for (const riderDoc of ridersSnapshot.docs) {
-        const narrativeHistorySnapshot = await riderDoc.ref.collection('narrative_history').get();
+        try {
+          const narrativeHistorySnapshot = await riderDoc.ref.collection('narrative_history').get();
+          const narrativeCount = narrativeHistorySnapshot.size;
 
-        if (!narrativeHistorySnapshot.empty) {
-          const narrativeBatch = db.batch();
-          narrativeHistorySnapshot.docs.forEach(doc => {
-            narrativeBatch.delete(doc.ref);
-          });
-          await narrativeBatch.commit();
+          if (!narrativeHistorySnapshot.empty) {
+            console.log(`  Rider ${riderDoc.id}: Found ${narrativeCount} narrative history documents`);
+            ridersWithNarratives++;
+
+            const narrativeBatch = db.batch();
+            narrativeHistorySnapshot.docs.forEach(doc => {
+              narrativeBatch.delete(doc.ref);
+            });
+            await narrativeBatch.commit();
+            totalNarrativesDeleted += narrativeCount;
+            console.log(`  ✅ Deleted ${narrativeCount} narratives for rider ${riderDoc.id}`);
+          }
+        } catch (error) {
+          console.error(`  ❌ Error deleting narratives for rider ${riderDoc.id}:`, error);
         }
       }
-      console.log('✅ All narrative history cleared');
+      console.log(`✅ Narrative history cleared: ${totalNarrativesDeleted} documents deleted from ${ridersWithNarratives} riders`);
+    } else {
+      console.log('No rider documents found');
     }
 
     console.log("✅ Complete reset finished successfully!");
