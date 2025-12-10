@@ -4,6 +4,32 @@ import { INTERVIEW_QUESTIONS } from './interview-questions.js';
 import { INTERVIEW_RESPONSES } from './interview-responses.js';
 
 /**
+ * PERSONALITY PROGRESSION SYSTEM
+ * ==============================
+ *
+ * Traits range from 0-100, starting at 50 (neutral)
+ *
+ * WITHIN A SEASON:
+ * - Interview responses adjust traits by +1 to +5 (typically +3-4)
+ * - Diminishing returns apply at high values:
+ *   - 70-79: Changes reduced to 75% effectiveness
+ *   - 80+: Changes reduced to 50% effectiveness
+ * - This naturally plateaus traits around 85-90 for consistent players
+ *
+ * BETWEEN SEASONS:
+ * - Traits drift 35% back toward neutral (50)
+ * - Example: Confidence 85 → starts next season at 73
+ * - Maintains personality tendency but creates room for continued growth
+ * - Requires consistent interview choices to maintain high trait values
+ *
+ * This creates a sustainable multi-season system where:
+ * - Personality feels "sticky" (doesn't reset completely)
+ * - Always room for development and change
+ * - High traits can be maintained but require effort
+ * - Players can shift personality over time if desired
+ */
+
+/**
  * Default personality values for new users
  */
 export function getDefaultPersonality() {
@@ -423,14 +449,44 @@ export function generateInterview(context, recentQuestions = []) {
 }
 
 /**
- * Apply personality changes from interview response
+ * Calculate scaled delta with diminishing returns for high trait values
+ * As traits get higher, they become harder to increase
+ *
+ * @param {number} currentValue - Current trait value (0-100)
+ * @param {number} baseDelta - Base personality change amount
+ * @returns {number} Scaled delta value
+ */
+function getScaledDelta(currentValue, baseDelta) {
+    // No scaling for negative deltas (penalties apply fully)
+    if (baseDelta < 0) {
+        return baseDelta;
+    }
+
+    // Diminishing returns at high values
+    if (currentValue >= 80) {
+        return Math.round(baseDelta * 0.5); // 50% effectiveness above 80
+    }
+    if (currentValue >= 70) {
+        return Math.round(baseDelta * 0.75); // 75% effectiveness 70-79
+    }
+
+    // Full effect below 70
+    return baseDelta;
+}
+
+/**
+ * Apply personality changes from interview response with diminishing returns
+ * Higher trait values are harder to increase (realistic personality development)
  */
 export function applyPersonalityChanges(currentPersonality, personalityDelta) {
     const updated = { ...currentPersonality };
 
     Object.entries(personalityDelta).forEach(([trait, change]) => {
         const currentValue = currentPersonality[trait] || 50;
-        let newValue = currentValue + change;
+
+        // Apply diminishing returns scaling
+        const scaledChange = getScaledDelta(currentValue, change);
+        let newValue = currentValue + scaledChange;
 
         // Clamp between 0-100
         newValue = Math.max(0, Math.min(100, newValue));
@@ -441,6 +497,42 @@ export function applyPersonalityChanges(currentPersonality, personalityDelta) {
     updated.lastUpdated = new Date();
 
     return updated;
+}
+
+/**
+ * Calculate personality values for start of new season
+ * Traits drift 35% back toward neutral (50) to allow continued growth
+ * while maintaining personality tendency from previous season
+ *
+ * Example: Confidence 85 → drifts to 73 (85 + (50-85) * 0.35)
+ *
+ * This creates:
+ * - Room for growth in new season
+ * - Personality "stickiness" (doesn't fully reset)
+ * - Need to maintain personality through consistent choices
+ *
+ * @param {Object} previousSeasonPersonality - Personality at end of previous season
+ * @returns {Object} Starting personality for new season
+ */
+export function calculateSeasonStartPersonality(previousSeasonPersonality) {
+    const driftFactor = 0.35; // 35% drift toward neutral
+    const newSeasonPersonality = {};
+
+    Object.keys(previousSeasonPersonality).forEach(trait => {
+        if (trait === 'lastUpdated') {
+            newSeasonPersonality[trait] = new Date();
+            return;
+        }
+
+        const previousValue = previousSeasonPersonality[trait];
+        const driftAmount = (50 - previousValue) * driftFactor;
+        const newValue = Math.round(previousValue + driftAmount);
+
+        // Ensure we stay in bounds
+        newSeasonPersonality[trait] = Math.max(0, Math.min(100, newValue));
+    });
+
+    return newSeasonPersonality;
 }
 
 /**
