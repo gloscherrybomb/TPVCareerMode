@@ -888,6 +888,372 @@ const INTERVIEW_RESPONSES = {
       humility: 3,
       resilience: 2
     }
+  },
+
+  // Milestone responses
+  milestone_confident: {
+    id: 'milestone_confident',
+    text: "Five wins shows I'm hitting my stride. The confidence is building with every race. This is just the beginning.",
+    style: 'confident',
+    badge: '💪 Confident',
+    personalityImpact: {
+      confidence: 4,
+      aggression: 2
+    }
+  },
+
+  milestone_humble: {
+    id: 'milestone_humble',
+    text: "I'm grateful for every opportunity. Five wins is special, but it's really about the team and the support around me.",
+    style: 'humble',
+    badge: '🤝 Humble',
+    personalityImpact: {
+      humility: 4,
+      professionalism: 1
+    }
+  },
+
+  milestone_hungry: {
+    id: 'milestone_hungry',
+    text: "Five down, plenty more to come. I'm not satisfied yet - each win makes me want the next one even more.",
+    style: 'aggressive',
+    badge: '😤 Aggressive',
+    personalityImpact: {
+      aggression: 4,
+      confidence: 2
+    }
+  },
+
+  milestone_professional: {
+    id: 'milestone_professional',
+    text: "Consistency comes from preparation and execution. Ten podiums means we're doing things right as a team.",
+    style: 'professional',
+    badge: '🎯 Professional',
+    personalityImpact: {
+      professionalism: 4,
+      resilience: 1
+    }
+  },
+
+  milestone_grateful: {
+    id: 'milestone_grateful',
+    text: "Ten podiums is more than I could have hoped for. Every one of them is special and I don't take any for granted.",
+    style: 'humble',
+    badge: '🤝 Humble',
+    personalityImpact: {
+      humility: 4,
+      resilience: 1
+    }
+  },
+
+  milestone_ambitious: {
+    id: 'milestone_ambitious',
+    text: "Ten podiums is a good start, but I want to turn more of those into wins. Time to raise the bar.",
+    style: 'confident',
+    badge: '💪 Confident',
+    personalityImpact: {
+      confidence: 4,
+      aggression: 1
+    }
+  },
+
+  breakthrough_confident: {
+    id: 'breakthrough_confident',
+    text: "I always knew I had this in me. Mid-season is when champions find another gear - that's what's happening here.",
+    style: 'confident',
+    badge: '💪 Confident',
+    personalityImpact: {
+      confidence: 4,
+      showmanship: 1
+    }
+  },
+
+  breakthrough_analytical: {
+    id: 'breakthrough_analytical',
+    text: "We made some key adjustments to training and tactics. The data doesn't lie - we're on the right track now.",
+    style: 'professional',
+    badge: '🎯 Professional',
+    personalityImpact: {
+      professionalism: 4,
+      confidence: 1
+    }
+  },
+
+  breakthrough_relieved: {
+    id: 'breakthrough_relieved',
+    text: "Honestly, it's a relief. Early season was tough, but we kept working and it's finally paying off.",
+    style: 'resilient',
+    badge: '💚 Resilient',
+    personalityImpact: {
+      resilience: 4,
+      humility: 1
+    }
+  },
+
+  // Consistency responses
+  consistency_professional: {
+    id: 'consistency_professional',
+    text: "It's about discipline and process. Show up, execute the plan, recover properly. Repeat. The results follow.",
+    style: 'professional',
+    badge: '🎯 Professional',
+    personalityImpact: {
+      professionalism: 3,
+      resilience: 2
+    }
+  },
+
+  consistency_humble: {
+    id: 'consistency_humble',
+    text: "I'm just trying to do my job every race. The team puts me in position, and I'm fortunate to deliver consistently.",
+    style: 'humble',
+    badge: '🤝 Humble',
+    personalityImpact: {
+      humility: 3,
+      professionalism: 2
+    }
+  },
+
+  consistency_focused: {
+    id: 'consistency_focused',
+    text: "I don't think about the streak. Every race is its own challenge. Stay present, stay focused, get the job done.",
+    style: 'professional',
+    badge: '🎯 Professional',
+    personalityImpact: {
+      professionalism: 3,
+      confidence: 2
+    }
+  },
+
+  progression_patient: {
+    id: 'progression_patient',
+    text: "Progress doesn't happen overnight. Small improvements add up. I trust the process and stay patient.",
+    style: 'professional',
+    badge: '🎯 Professional',
+    personalityImpact: {
+      professionalism: 3,
+      resilience: 2
+    }
+  },
+
+  progression_confident: {
+    id: 'progression_confident',
+    text: "I can feel myself getting stronger every race. The improvements are real and I'm ready for even bigger results.",
+    style: 'confident',
+    badge: '💪 Confident',
+    personalityImpact: {
+      confidence: 3,
+      aggression: 2
+    }
+  },
+
+  progression_tactical: {
+    id: 'progression_tactical',
+    text: "We're learning from each race and adapting tactics. The upward trend shows we're doing the right things.",
+    style: 'professional',
+    badge: '🎯 Professional',
+    personalityImpact: {
+      professionalism: 3,
+      confidence: 1
+    }
+  },
+
+  comeback_resilient: {
+    id: 'comeback_resilient',
+    text: "Tough times don't last, tough people do. I never stopped believing, never stopped working. This is what resilience looks like.",
+    style: 'resilient',
+    badge: '💚 Resilient',
+    personalityImpact: {
+      resilience: 4,
+      confidence: 2
+    }
+  },
+
+  comeback_determined: {
+    id: 'comeback_determined',
+    text: "Those bad results just made me more determined. I had something to prove - to myself and everyone else. Mission accomplished.",
+    style: 'aggressive',
+    badge: '😤 Aggressive',
+    personalityImpact: {
+      aggression: 3,
+      resilience: 3
+    }
+  },
+
+  comeback_learned: {
+    id: 'comeback_learned',
+    text: "The struggles taught me a lot about myself and my approach. I've come back stronger and smarter.",
+    style: 'professional',
+    badge: '🎯 Professional',
+    personalityImpact: {
+      professionalism: 3,
+      resilience: 3
+    }
+  },
+
+  midpack_realistic: {
+    id: 'midpack_realistic',
+    text: "Not every day is a winning day. Mid-pack keeps you honest and motivated to work harder for the next one.",
+    style: 'humble',
+    badge: '🤝 Humble',
+    personalityImpact: {
+      humility: 3,
+      resilience: 1
+    }
+  },
+
+  midpack_motivated: {
+    id: 'midpack_motivated',
+    text: "This just fires me up more. I know I'm capable of better, and I'll use this as fuel for the next race.",
+    style: 'aggressive',
+    badge: '😤 Aggressive',
+    personalityImpact: {
+      aggression: 3,
+      confidence: 1
+    }
+  },
+
+  midpack_tactical: {
+    id: 'midpack_tactical',
+    text: "Sometimes you have to accept where you are and focus on the details. There's always something to learn and improve.",
+    style: 'professional',
+    badge: '🎯 Professional',
+    personalityImpact: {
+      professionalism: 3,
+      resilience: 1
+    }
+  },
+
+  // Enhanced tactical responses
+  tt_analytical: {
+    id: 'tt_analytical',
+    text: "Time trials are all about the numbers - power, cadence, aerodynamics. When you nail the math, you nail the result.",
+    style: 'professional',
+    badge: '🎯 Professional',
+    personalityImpact: {
+      professionalism: 4,
+      confidence: 1
+    }
+  },
+
+  tt_satisfied: {
+    id: 'tt_satisfied',
+    text: "That felt controlled and powerful. Paced it perfectly and finished strong. Very satisfied with today's execution.",
+    style: 'professional',
+    badge: '🎯 Professional',
+    personalityImpact: {
+      professionalism: 3,
+      confidence: 2
+    }
+  },
+
+  tt_powerful: {
+    id: 'tt_powerful',
+    text: "I felt unstoppable out there. Just me, the bike, and pure power. This is where I excel.",
+    style: 'confident',
+    badge: '💪 Confident',
+    personalityImpact: {
+      confidence: 4,
+      aggression: 1
+    }
+  },
+
+  sprint_tactical: {
+    id: 'sprint_tactical',
+    text: "Sprint finishes are chess at 60kph. I positioned early, stayed patient, and opened up at exactly the right moment.",
+    style: 'professional',
+    badge: '🎯 Professional',
+    personalityImpact: {
+      professionalism: 4,
+      confidence: 1
+    }
+  },
+
+  sprint_instinctive: {
+    id: 'sprint_instinctive',
+    text: "In that final kilometer, you just feel it. No thinking, pure instinct. I trusted my legs and went for it.",
+    style: 'confident',
+    badge: '💪 Confident',
+    personalityImpact: {
+      confidence: 3,
+      showmanship: 2
+    }
+  },
+
+  sprint_aggressive: {
+    id: 'sprint_aggressive',
+    text: "I saw the gap and attacked. Sprints are won by the brave - you hesitate, you lose. I wasn't hesitating today.",
+    style: 'aggressive',
+    badge: '😤 Aggressive',
+    personalityImpact: {
+      aggression: 4,
+      confidence: 2
+    }
+  },
+
+  climb_strong: {
+    id: 'climb_strong',
+    text: "The mountains suit me. When the road goes up, I feel strong. This is where I can really make a difference.",
+    style: 'confident',
+    badge: '💪 Confident',
+    personalityImpact: {
+      confidence: 4,
+      resilience: 1
+    }
+  },
+
+  climb_suffering: {
+    id: 'climb_suffering',
+    text: "Climbing is suffering, but I embrace it. The pain means you're pushing your limits. Today I pushed hard.",
+    style: 'resilient',
+    badge: '💚 Resilient',
+    personalityImpact: {
+      resilience: 4,
+      aggression: 1
+    }
+  },
+
+  climb_confident: {
+    id: 'climb_confident',
+    text: "I knew I could climb well, but today proved I can hang with anyone in the mountains. Really confident now.",
+    style: 'confident',
+    badge: '💪 Confident',
+    personalityImpact: {
+      confidence: 4,
+      humility: -1
+    }
+  },
+
+  attack_calculated: {
+    id: 'attack_calculated',
+    text: "I studied the race dynamics carefully. Waited for the right moment when everyone was committed elsewhere, then went.",
+    style: 'professional',
+    badge: '🎯 Professional',
+    personalityImpact: {
+      professionalism: 4,
+      confidence: 1
+    }
+  },
+
+  attack_instinct: {
+    id: 'attack_instinct',
+    text: "Sometimes you just feel it in your legs and see the opportunity. I trusted my instincts and it paid off.",
+    style: 'confident',
+    badge: '💪 Confident',
+    personalityImpact: {
+      confidence: 3,
+      aggression: 2
+    }
+  },
+
+  attack_opportunistic: {
+    id: 'attack_opportunistic',
+    text: "Racing is about seizing moments. I saw the opening, didn't overthink it, just attacked. Fortune favors the bold.",
+    style: 'aggressive',
+    badge: '😤 Aggressive',
+    personalityImpact: {
+      aggression: 4,
+      showmanship: 1
+    }
   }
 };
 

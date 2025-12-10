@@ -234,6 +234,11 @@ export async function saveInterviewResponse(db, userId, eventNumber, interviewDa
             console.log(`Calculated personality awards for Event ${eventNumber}:`, awardResults);
         }
 
+        // Track recent questions for repetition prevention (keep last 3)
+        const currentRecentQuestions = userData.interviewHistory?.recentQuestions || [];
+        const updatedRecentQuestions = [interviewData.questionId, ...currentRecentQuestions].slice(0, 3);
+        updateData['interviewHistory.recentQuestions'] = updatedRecentQuestions;
+
         // Update user document
         const responseStyle = selectedResponse.style;
         await updateDoc(userDocRef, updateData);

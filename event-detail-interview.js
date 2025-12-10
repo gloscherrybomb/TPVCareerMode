@@ -42,8 +42,11 @@ export async function displayPostRaceInterview(db, userId, eventNumber, userResu
         const seasonContext = calculateSeasonContext(userData, eventNumber);
         const raceContext = buildRaceContext(userResult, allResults, userData, seasonContext);
 
-        // Generate interview question and responses
-        currentInterview = generateInterview(raceContext);
+        // Get recent question history for repetition prevention (last 3 questions)
+        const recentQuestions = userData.interviewHistory?.recentQuestions || [];
+
+        // Generate interview question and responses (with repetition prevention)
+        currentInterview = generateInterview(raceContext, recentQuestions);
         currentInterview.db = db;
         currentInterview.userId = userId;
         currentInterview.eventNumber = eventNumber;

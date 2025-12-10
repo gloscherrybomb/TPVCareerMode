@@ -223,44 +223,95 @@ function findEligibleQuestions(context) {
  * 3. Performance questions
  * 4. Tactical questions
  * 5. Setback questions
+ *
+ * Now with smart repetition prevention and randomization
  */
-function selectBestQuestion(eligibleQuestions, context) {
+function selectBestQuestion(eligibleQuestions, context, recentQuestions = []) {
     if (eligibleQuestions.length === 0) {
         // Fallback to a generic question if no specific triggers match
         return INTERVIEW_QUESTIONS.performance.top_ten;
     }
 
-    // Priority order
-    const priorityOrder = [
+    // Filter out recently asked questions (last 3 questions)
+    let availableQuestions = eligibleQuestions;
+    if (recentQuestions.length > 0) {
+        const filteredQuestions = eligibleQuestions.filter(q => !recentQuestions.includes(q.id));
+
+        // Only apply filter if we have other options available
+        if (filteredQuestions.length > 0) {
+            availableQuestions = filteredQuestions;
+        }
+    }
+
+    // Priority order (milestones always take precedence)
+    const highPriorityOrder = [
         'first_win',
         'first_podium',
-        'season_finale',
-        'winning_streak',
-        'podium_streak',
-        'rival_first_encounter',
-        'rival_close_battle',
-        'rival_beat_them',
-        'rival_they_won',
-        'win_dominant',
-        'win_close',
-        'win_standard',
-        'podium_beat_prediction',
-        'beat_prediction_significantly',
-        'worse_than_predicted',
-        'bad_streak',
-        'back_of_pack'
+        'season_finale'
     ];
 
-    // Find highest priority question
-    for (const questionId of priorityOrder) {
-        const match = eligibleQuestions.find(q => q.id === questionId);
+    // Check high priority questions first (always show these, even if recent)
+    for (const questionId of highPriorityOrder) {
+        const match = availableQuestions.find(q => q.id === questionId);
         if (match) {
             return match;
         }
     }
 
-    // If no priority match, return first eligible
-    return eligibleQuestions[0];
+    // Medium priority questions (with randomization)
+    const mediumPriorityOrder = [
+        'winning_streak',
+        'podium_streak',
+        'rival_first_encounter',
+        'rival_close_battle',
+        'rival_beat_them',
+        'rival_they_won'
+    ];
+
+    // Collect all matching medium priority questions
+    const mediumMatches = [];
+    for (const questionId of mediumPriorityOrder) {
+        const match = availableQuestions.find(q => q.id === questionId);
+        if (match) {
+            mediumMatches.push(match);
+        }
+    }
+
+    // If we have medium priority matches, randomly select one
+    if (mediumMatches.length > 0) {
+        return mediumMatches[Math.floor(Math.random() * mediumMatches.length)];
+    }
+
+    // Low priority questions (performance-based, with randomization)
+    const lowPriorityOrder = [
+        'win_dominant',
+        'win_close',
+        'win_standard',
+        'podium_beat_prediction',
+        'podium_standard',
+        'beat_prediction_significantly',
+        'top_ten',
+        'worse_than_predicted',
+        'bad_streak',
+        'back_of_pack'
+    ];
+
+    // Collect all matching low priority questions
+    const lowMatches = [];
+    for (const questionId of lowPriorityOrder) {
+        const match = availableQuestions.find(q => q.id === questionId);
+        if (match) {
+            lowMatches.push(match);
+        }
+    }
+
+    // If we have multiple low priority matches, randomly select one
+    if (lowMatches.length > 0) {
+        return lowMatches[Math.floor(Math.random() * lowMatches.length)];
+    }
+
+    // Fallback: randomly select from any remaining eligible questions
+    return availableQuestions[Math.floor(Math.random() * availableQuestions.length)];
 }
 
 /**
@@ -333,12 +384,12 @@ function formatOrdinal(num) {
 /**
  * Generate interview question and response options based on race context
  */
-export function generateInterview(context) {
+export function generateInterview(context, recentQuestions = []) {
     // Find all eligible questions
     const eligibleQuestions = findEligibleQuestions(context);
 
-    // Select the best question
-    const selectedQuestion = selectBestQuestion(eligibleQuestions, context);
+    // Select the best question (with repetition prevention)
+    const selectedQuestion = selectBestQuestion(eligibleQuestions, context, recentQuestions);
 
     // Substitute variables in question text
     const questionText = substituteVariables(selectedQuestion.text, context);

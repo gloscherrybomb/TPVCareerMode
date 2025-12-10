@@ -272,6 +272,123 @@ const INTERVIEW_QUESTIONS = {
         isSeasonFinale: true
       },
       responses: ['finale_satisfied', 'finale_ambitious', 'finale_reflective']
+    },
+
+    milestone_fifth_win: {
+      id: 'milestone_fifth_win',
+      text: "That's your 5th career victory! You're really finding your rhythm. What's changed?",
+      triggers: {
+        position: 1,
+        careerWins: 5
+      },
+      responses: ['milestone_confident', 'milestone_humble', 'milestone_hungry']
+    },
+
+    milestone_tenth_podium: {
+      id: 'milestone_tenth_podium',
+      text: "Your 10th podium finish! The consistency is impressive. What's your secret?",
+      triggers: {
+        positionIn: [1, 2, 3],
+        careerPodiums: 10
+      },
+      responses: ['milestone_professional', 'milestone_grateful', 'milestone_ambitious']
+    },
+
+    mid_season_breakthrough: {
+      id: 'mid_season_breakthrough',
+      text: "Halfway through the season and you're finding your form. What's clicked for you?",
+      triggers: {
+        racesCompletedBetween: [7, 9],
+        positionIn: [1, 2, 3]
+      },
+      responses: ['breakthrough_confident', 'breakthrough_analytical', 'breakthrough_relieved']
+    }
+  },
+
+  // ===== CONSISTENCY QUESTIONS =====
+  consistency: {
+
+    consistency_top_five: {
+      id: 'consistency_top_five',
+      text: "Another top-5 finish. You're remarkably consistent this season. How do you maintain this level?",
+      triggers: {
+        positionBetween: [1, 5],
+        racesCompletedBetween: [5, 15]
+      },
+      responses: ['consistency_professional', 'consistency_humble', 'consistency_focused']
+    },
+
+    steady_progression: {
+      id: 'steady_progression',
+      text: "You're steadily climbing up the field race by race. What's the key to this progression?",
+      triggers: {
+        positionBetween: [4, 8],
+        beatPredictionBy: 3
+      },
+      responses: ['progression_patient', 'progression_confident', 'progression_tactical']
+    },
+
+    comeback_form: {
+      id: 'comeback_form',
+      text: "After a tough stretch, you're back on form with a strong finish. How did you bounce back?",
+      triggers: {
+        positionBetween: [1, 5],
+        recentRacesBelowExpectation: 2
+      },
+      responses: ['comeback_resilient', 'comeback_determined', 'comeback_learned']
+    },
+
+    mid_pack_grind: {
+      id: 'mid_pack_grind',
+      text: "Solid mid-pack finish today. These races can be tough. What's your mindset?",
+      triggers: {
+        positionBetween: [11, 20]
+      },
+      responses: ['midpack_realistic', 'midpack_motivated', 'midpack_tactical']
+    }
+  },
+
+  // ===== ENHANCED TACTICAL QUESTIONS =====
+  tactical: {
+
+    time_trial_personal_best: {
+      id: 'time_trial_personal_best',
+      text: "Strong time trial performance today. How did you approach the pacing strategy?",
+      triggers: {
+        eventType: 'time trial',
+        positionBetween: [1, 5]
+      },
+      responses: ['tt_analytical', 'tt_satisfied', 'tt_powerful']
+    },
+
+    sprint_positioning: {
+      id: 'sprint_positioning',
+      text: "You positioned yourself perfectly for that sprint finish. How did you read the race?",
+      triggers: {
+        eventType: 'criterium',
+        positionIn: [1, 2, 3]
+      },
+      responses: ['sprint_tactical', 'sprint_instinctive', 'sprint_aggressive']
+    },
+
+    climbing_dominance: {
+      id: 'climbing_dominance',
+      text: "You looked strong on those climbs. How do you feel about your form in the mountains?",
+      triggers: {
+        eventType: 'hill climb',
+        positionBetween: [1, 5]
+      },
+      responses: ['climb_strong', 'climb_suffering', 'climb_confident']
+    },
+
+    breakaway_timing: {
+      id: 'breakaway_timing',
+      text: "Perfect timing on that move. How did you know when to attack?",
+      triggers: {
+        eventType: 'road race',
+        positionIn: [1, 2]
+      },
+      responses: ['attack_calculated', 'attack_instinct', 'attack_opportunistic']
     }
   }
 };
