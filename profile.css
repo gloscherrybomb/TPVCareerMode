@@ -294,6 +294,35 @@
     -webkit-text-fill-color: transparent;
 }
 
+/* Personality Chart Tooltip */
+.personality-tooltip {
+    position: absolute;
+    background: linear-gradient(135deg, rgba(255, 27, 107, 0.95), rgba(69, 202, 255, 0.95));
+    border: 1px solid rgba(255, 27, 107, 0.4);
+    border-radius: 8px;
+    padding: 6px 10px;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    z-index: 1000;
+    white-space: nowrap;
+    font-size: 14px;
+    color: #fff;
+}
+
+.personality-tooltip.active {
+    opacity: 1;
+}
+
+.personality-tooltip .trait-name {
+    font-weight: 700;
+    margin-right: 6px;
+}
+
+.personality-tooltip .trait-value {
+    font-weight: 400;
+}
+
 /* Profile Sections */
 .profile-section {
     margin-bottom: 2rem;
