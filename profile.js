@@ -1732,14 +1732,15 @@ async function drawPersonalityTemplate(ctx, width, height) {
     // Draw personality spider chart (smaller)
     drawSpiderChartOnCanvas(ctx, width / 2, 1080, 300, data.personality);
 
-    // Stats at bottom (more spacing)
+    // Stats at bottom (adjusted spacing - rank needs more room)
     const statsY = 1560;
-    const statsSpacing = 220;
+    const leftSpacing = 200; // Tighter spacing for races, wins, podiums
+    const rankOffset = 280; // Extra space for rank (which has text like "#12/74")
 
-    drawStatBox(ctx, width / 2 - statsSpacing * 1.5, statsY, data.totalRaces, 'RACES', '#b06af3');
-    drawStatBox(ctx, width / 2 - statsSpacing * 0.5, statsY, data.totalWins, 'WINS', '#b06af3');
-    drawStatBox(ctx, width / 2 + statsSpacing * 0.5, statsY, data.totalPodiums, 'PODIUMS', '#b06af3');
-    drawStatBox(ctx, width / 2 + statsSpacing * 1.5, statsY, data.seasonRank, 'RANK', '#b06af3');
+    drawStatBox(ctx, width / 2 - leftSpacing * 1.8, statsY, data.totalRaces, 'RACES', '#b06af3');
+    drawStatBox(ctx, width / 2 - leftSpacing * 0.6, statsY, data.totalWins, 'WINS', '#b06af3');
+    drawStatBox(ctx, width / 2 + leftSpacing * 0.6, statsY, data.totalPodiums, 'PODIUMS', '#b06af3');
+    drawStatBox(ctx, width / 2 + rankOffset, statsY, data.seasonRank, 'RANK', '#b06af3');
 
     // Team car
     await drawTeamCar(ctx, width / 2, height - 200, 0.15);
