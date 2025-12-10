@@ -49,3 +49,15 @@ Bot ARR: 1306
 Bot Country: UKR
 Interesting Fact: Always attacks hard near the end of the race
 ================================================================================
+
+================================================================================
+Request submitted: 2025-12-10 16:53:21 UTC
+Firestore Document ID: Bot1154_1765385601599
+Submitted by User UID: Wtg1ptJIJzZViHQoOZR7EJIV1vH3
+Bot UID: Bot1154
+Bot Name: Edgars Krūmiņš
+Bot Team: Independent
+Bot ARR: 1375
+Bot Country: LAT
+Interesting Fact: Strong Rouleur and willing to put in a late attack to drop everyone. However, not a strong sprinter. Has a pony tail
+================================================================================
