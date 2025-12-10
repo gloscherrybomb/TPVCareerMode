@@ -351,7 +351,7 @@ function displayRecentResults(results) {
             bonusHTML += `<span class="medal-indicator close-call" title="Won by less than 0.5s">😅</span>`;
         }
         if (result.earnedPhotoFinish) {
-            bonusHTML += `<span class="medal-indicator photo-finish" title="Within 0.1s of winner">📸</span>`;
+            bonusHTML += `<span class="medal-indicator photo-finish" title="Within 0.2s of winner">📸</span>`;
         }
         if (result.earnedDarkHorse) {
             bonusHTML += `<span class="medal-indicator dark-horse" title="Won when predicted 15th+">🐴</span>`;
@@ -662,14 +662,14 @@ function displayAwards(awards) {
         `;
     }
     
-    // Photo Finish (within 0.1s of winner)
+    // Photo Finish (within 0.2s of winner)
     if (awards.photoFinish > 0) {
         html += `
             <div class="award-card photo-finish">
                 <div class="award-icon">📸</div>
                 <div class="award-count">${awards.photoFinish}x</div>
                 <div class="award-title">Photo Finish</div>
-                <div class="award-description">Within 0.1s of Winner</div>
+                <div class="award-description">Within 0.2s of Winner</div>
             </div>
         `;
     }
