@@ -785,7 +785,7 @@ async function loadEventResults() {
                 bonusHTML += `<span class="medal-icon close-call" title="Won by less than 0.5s">😅</span>`;
             }
             if (result.earnedPhotoFinish) {
-                bonusHTML += `<span class="medal-icon photo-finish" title="Within 0.1s of winner">📸</span>`;
+                bonusHTML += `<span class="medal-icon photo-finish" title="Within 0.2s of winner">📸</span>`;
             }
             if (result.earnedDarkHorse) {
                 bonusHTML += `<span class="medal-icon dark-horse" title="Won when predicted 15th+">🐴</span>`;
