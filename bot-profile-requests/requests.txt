@@ -37,3 +37,15 @@ Bot ARR: 1342
 Bot Country: FRA
 Interesting Fact: Smart tactically. Keeps up with lead group but doesn't sprint
 ================================================================================
+
+================================================================================
+Request submitted: 2025-12-10 16:24:08 UTC
+Firestore Document ID: Bot1312_1765383848611
+Submitted by User UID: wivyryjoQnP16Vt1D4gAqRHLEnT2
+Bot UID: Bot1312
+Bot Name: Borys Shvets
+Bot Team: Roklit
+Bot ARR: 1306
+Bot Country: UKR
+Interesting Fact: Always attacks hard near the end of the race
+================================================================================
