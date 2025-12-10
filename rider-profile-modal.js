@@ -2,6 +2,8 @@
 // Shows rider profile when clicking on a human rider name in global standings
 
 import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { drawPersonalityChart } from './profile-personality.js';
+import { getPersonaLabel } from './interview-engine.js';
 
 let db;
 let modalInitialized = false;
@@ -247,6 +249,56 @@ function initializeRiderModal() {
                 height: 100%;
                 transition: width 0.3s ease;
             }
+
+            /* Personality Section */
+            .profile-personality-section {
+                display: flex;
+                gap: 1.5rem;
+                padding: 1.5rem;
+                background: linear-gradient(135deg, rgba(255, 27, 107, 0.05), rgba(69, 202, 255, 0.05));
+                border: 1px solid rgba(255, 27, 107, 0.2);
+                border-radius: 16px;
+                margin-bottom: 1.5rem;
+                align-items: center;
+            }
+
+            .personality-chart-container {
+                flex-shrink: 0;
+            }
+
+            .personality-info {
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .personality-label {
+                font-size: 0.75rem;
+                color: var(--text-secondary);
+                text-transform: uppercase;
+                letter-spacing: 1px;
+            }
+
+            .personality-value {
+                font-size: 1.25rem;
+                font-weight: 700;
+                background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
+
+            .personality-meta {
+                font-size: 0.875rem;
+                color: var(--text-secondary);
+                opacity: 0.8;
+            }
+
+            @media (max-width: 600px) {
+                .profile-personality-section {
+                    flex-direction: column;
+                    text-align: center;
+                }
+            }
         `;
         document.head.appendChild(styles);
     }
@@ -296,7 +348,15 @@ async function openRiderProfile(riderUid, riderName) {
         // Build profile HTML (stats are now stored in user document)
         const profileHTML = buildRiderProfileHTML(riderData, riderName);
         modalBody.innerHTML = profileHTML;
-        
+
+        // Draw personality chart if user has interviews
+        if (riderData.personality && riderData.interviewHistory?.totalInterviews > 0) {
+            // Wait for DOM to render canvas
+            setTimeout(() => {
+                drawPersonalityChart('riderPersonalityChart', riderData.personality);
+            }, 50);
+        }
+
     } catch (error) {
         console.error('Error loading rider profile:', error);
         modalBody.innerHTML = `
@@ -456,7 +516,20 @@ function buildRiderProfileHTML(data, name) {
                 </div>
             </div>
         </div>
-        
+
+        ${data.personality && data.interviewHistory?.totalInterviews > 0 ? `
+        <div class="profile-personality-section">
+            <div class="personality-chart-container">
+                <canvas id="riderPersonalityChart" width="200" height="200"></canvas>
+            </div>
+            <div class="personality-info">
+                <div class="personality-label">Media Persona</div>
+                <div class="personality-value">"${getPersonaLabel(data.personality)}"</div>
+                <div class="personality-meta">${data.interviewHistory.totalInterviews} ${data.interviewHistory.totalInterviews === 1 ? 'interview' : 'interviews'}</div>
+            </div>
+        </div>
+        ` : ''}
+
         <div class="rider-stats-grid">
             <div class="rider-stat-card">
                 <div class="rider-stat-label">Total Points</div>
