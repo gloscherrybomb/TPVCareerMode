@@ -124,6 +124,9 @@ export async function saveInterviewResponse(db, userId, eventNumber, interviewDa
         // Calculate new personality
         const newPersonality = applyPersonalityChanges(currentPersonality, selectedResponse.personalityImpact);
 
+        // Get response style early (needed for updateData object)
+        const responseStyle = selectedResponse.style;
+
         // Create interview record
         const interviewRef = doc(db, 'interviews', `${userId}_${eventNumber}`);
         await setDoc(interviewRef, {
@@ -240,7 +243,6 @@ export async function saveInterviewResponse(db, userId, eventNumber, interviewDa
         updateData['interviewHistory.recentQuestions'] = updatedRecentQuestions;
 
         // Update user document
-        const responseStyle = selectedResponse.style;
         await updateDoc(userDocRef, updateData);
 
         console.log(`Interview saved for user ${userId}, event ${eventNumber}`);
