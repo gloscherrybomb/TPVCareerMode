@@ -822,6 +822,35 @@ function drawPersonalityChart(dataPoints) {
     const minEvent = Math.min(...sampledPoints.map(p => p.eventNumber));
     const maxEvent = Math.max(...sampledPoints.map(p => p.eventNumber));
 
+    // Find min and max values across all traits for dynamic Y-axis scaling
+    let minValue = 100;
+    let maxValue = 0;
+
+    traits.forEach(trait => {
+        sampledPoints.forEach(point => {
+            const value = point[trait.name] || 50;
+            minValue = Math.min(minValue, value);
+            maxValue = Math.max(maxValue, value);
+        });
+    });
+
+    // Add padding to Y-axis range (10% above and below)
+    const valueRange = maxValue - minValue;
+    const yPadding = Math.max(5, valueRange * 0.15); // At least 5 points padding
+    minValue = Math.max(0, minValue - yPadding);
+    maxValue = Math.min(100, maxValue + yPadding);
+
+    // Ensure minimum range of 20 points for readability
+    if (maxValue - minValue < 20) {
+        const midpoint = (maxValue + minValue) / 2;
+        minValue = Math.max(0, midpoint - 10);
+        maxValue = Math.min(100, midpoint + 10);
+    }
+
+    // Round to nice numbers
+    minValue = Math.floor(minValue / 5) * 5;
+    maxValue = Math.ceil(maxValue / 5) * 5;
+
     // Helper functions for coordinate conversion
     const xScale = (eventNum) => {
         if (maxEvent === minEvent) return padding.left + chartWidth / 2;
@@ -829,27 +858,29 @@ function drawPersonalityChart(dataPoints) {
     };
 
     const yScale = (value) => {
-        return padding.top + chartHeight - ((value / 100) * chartHeight);
+        return padding.top + chartHeight - (((value - minValue) / (maxValue - minValue)) * chartHeight);
     };
 
     // Draw background grid
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
     ctx.lineWidth = 1;
 
-    // Horizontal grid lines (every 25 points)
-    for (let i = 0; i <= 4; i++) {
-        const y = padding.top + (chartHeight / 4) * i;
+    // Horizontal grid lines (5 lines total)
+    const gridLines = 5;
+    for (let i = 0; i < gridLines; i++) {
+        const y = padding.top + (chartHeight / (gridLines - 1)) * i;
         ctx.beginPath();
         ctx.moveTo(padding.left, y);
         ctx.lineTo(padding.left + chartWidth, y);
         ctx.stroke();
 
-        // Y-axis labels
+        // Y-axis labels (show actual values based on dynamic scale)
+        const value = maxValue - ((maxValue - minValue) / (gridLines - 1)) * i;
         ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
         ctx.font = '12px Exo 2, sans-serif';
         ctx.textAlign = 'right';
         ctx.textBaseline = 'middle';
-        ctx.fillText((100 - i * 25).toString(), padding.left - 10, y);
+        ctx.fillText(Math.round(value).toString(), padding.left - 10, y);
     }
 
     // Vertical grid lines (events)
@@ -935,6 +966,13 @@ function drawPersonalityChart(dataPoints) {
     ctx.textAlign = 'center';
     ctx.textBaseline = 'bottom';
     ctx.fillText('Personality Trait Evolution', padding.left + chartWidth / 2, padding.top - 15);
+
+    // Y-axis range subtitle
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+    ctx.font = '11px Exo 2, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'top';
+    ctx.fillText(`(Scale: ${Math.round(minValue)}-${Math.round(maxValue)})`, padding.left + chartWidth / 2, padding.top - 5);
 }
 
 // Smart sampling of data points to avoid overcrowding
