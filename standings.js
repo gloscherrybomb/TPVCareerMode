@@ -477,8 +477,8 @@ async function renderGlobalRankings() {
                             <span class="rank-number ${rankClass}">${rank}</span>
                         </td>
                         <td class="name-cell">
-                            ${countryFlagHTML}
                             <span class="rider-name">${nameHTML}</span>
+                            ${countryFlagHTML}
                             ${racer.isCurrentUser ? '<span class="you-badge">YOU</span>' : ''}
                         </td>
                         <td class="season-cell">Season ${racer.season}</td>

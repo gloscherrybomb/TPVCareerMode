@@ -491,7 +491,7 @@ function buildRiderProfileHTML(data, name) {
                     ${photoURL ? `<img src="${photoURL}" alt="${displayName}">` : initials}
                 </div>
                 <div class="rider-profile-info">
-                    <h2 class="rider-profile-name">${countryFlagHTML}${displayName}</h2>
+                    <h2 class="rider-profile-name">${displayName} ${countryFlagHTML}</h2>
                     <div class="rider-profile-meta">
                         <div class="rider-profile-meta-item">
                             <span class="rider-profile-meta-label">ARR</span>
