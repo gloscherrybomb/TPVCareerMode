@@ -264,12 +264,15 @@ function initializeRiderModal() {
 
             .personality-chart-container {
                 flex-shrink: 0;
+                flex-basis: 260px;
             }
 
             .personality-info {
                 display: flex;
                 flex-direction: column;
                 gap: 0.5rem;
+                flex: 1;
+                min-width: 0;
             }
 
             .personality-label {
@@ -520,7 +523,7 @@ function buildRiderProfileHTML(data, name) {
         ${data.personality && data.interviewHistory?.totalInterviews > 0 ? `
         <div class="profile-personality-section">
             <div class="personality-chart-container">
-                <canvas id="riderPersonalityChart" width="200" height="200"></canvas>
+                <canvas id="riderPersonalityChart" width="260" height="220"></canvas>
             </div>
             <div class="personality-info">
                 <div class="personality-label">Media Persona</div>
