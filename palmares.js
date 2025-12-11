@@ -755,7 +755,7 @@ function displayPersonalityTimeline() {
         resilience: 50
     }];
 
-    // Add interview data points
+    // Add interview data points (these represent personality AFTER each event)
     interviewHistory.forEach(interview => {
         if (interview.personalityAfter) {
             dataPoints.push({
@@ -764,22 +764,6 @@ function displayPersonalityTimeline() {
             });
         }
     });
-
-    // Add current personality if different from last interview
-    if (dataPoints.length > 0) {
-        const lastPoint = dataPoints[dataPoints.length - 1];
-        const currentIsDifferent = Object.keys(currentPersonality).some(trait => {
-            return Math.round(currentPersonality[trait]) !== Math.round(lastPoint[trait]);
-        });
-
-        if (currentIsDifferent) {
-            const maxEventNum = Math.max(...interviewHistory.map(i => i.eventNumber), 0);
-            dataPoints.push({
-                eventNumber: maxEventNum + 1,
-                ...currentPersonality
-            });
-        }
-    }
 
     // Draw the chart
     drawPersonalityChart(dataPoints);
@@ -960,19 +944,6 @@ function drawPersonalityChart(dataPoints) {
         legendY += 25;
     });
 
-    // Chart title
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-    ctx.font = 'bold 14px Orbitron, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'bottom';
-    ctx.fillText('Personality Trait Evolution', padding.left + chartWidth / 2, padding.top - 15);
-
-    // Y-axis range subtitle
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-    ctx.font = '11px Exo 2, sans-serif';
-    ctx.textAlign = 'center';
-    ctx.textBaseline = 'top';
-    ctx.fillText(`(Scale: ${Math.round(minValue)}-${Math.round(maxValue)})`, padding.left + chartWidth / 2, padding.top - 5);
 }
 
 // Smart sampling of data points to avoid overcrowding
