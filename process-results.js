@@ -597,7 +597,7 @@ function updateRivalData(existingRivalData, encounters, eventNumber) {
 }
 
 /**
- * Identify top 3 rivals based on rivalry score
+ * Identify top 10 rivals based on rivalry score
  * Rivalry score = (number of races together) / (average gap + 1)
  * Higher score = closer racing more often = bigger rival
  */
@@ -618,10 +618,10 @@ function identifyTopRivals(rivalData) {
     };
   });
 
-  // Sort by rivalry score (descending) and return top 3 UIDs
+  // Sort by rivalry score (descending) and return top 10 UIDs
   const topRivals = rivalScores
     .sort((a, b) => b.score - a.score)
-    .slice(0, 3)
+    .slice(0, 10)
     .map(r => r.botUid);
 
   return topRivals;
@@ -1273,7 +1273,7 @@ async function processUserResult(uid, eventInfo, results) {
   const existingRivalData = userData.rivalData || null;
   const updatedRivalData = updateRivalData(existingRivalData, rivalEncounters, eventNumber);
 
-  // Identify top 3 rivals
+  // Identify top 10 rivals
   const topRivals = identifyTopRivals(updatedRivalData);
   updatedRivalData.topRivals = topRivals;
 
