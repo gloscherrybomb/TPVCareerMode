@@ -459,69 +459,42 @@
     font-family: 'Exo 2', sans-serif;
 }
 
-/* ===== PERSONALITY TIMELINE ===== */
-.personality-timeline {
+/* ===== PERSONALITY CHART ===== */
+.personality-chart-container {
     background: #141824;
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 8px;
     padding: 1.5rem;
 }
 
-.personality-snapshot {
+.current-persona {
+    text-align: center;
     margin-bottom: 1.5rem;
-    padding-bottom: 1.5rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 1rem;
+    background: rgba(69, 202, 255, 0.1);
+    border-radius: 6px;
 }
 
-.personality-snapshot:last-child {
-    margin-bottom: 0;
-    padding-bottom: 0;
-    border-bottom: none;
-}
-
-.snapshot-header {
+.current-persona .persona-label {
     font-family: 'Orbitron', sans-serif;
-    font-size: 0.9rem;
+    font-size: 1.2rem;
     font-weight: 700;
-    color: var(--text-primary, #ffffff);
+    color: var(--accent-blue, #45caff);
     margin-bottom: 0.5rem;
 }
 
-.snapshot-event {
+.current-persona .persona-subtitle {
     font-size: 0.85rem;
     color: var(--text-secondary, #a0a8c0);
-    margin-bottom: 0.75rem;
-}
-
-.trait-changes {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.trait-change {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.85rem;
     font-family: 'Exo 2', sans-serif;
 }
 
-.trait-name {
-    color: var(--text-secondary, #a0a8c0);
+#personalityChart {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 6px;
 }
-
-.trait-values {
-    font-family: 'Orbitron', sans-serif;
-    color: var(--text-primary, #ffffff);
-}
-
-.trait-diff {
-    margin-left: 0.5rem;
-    font-weight: 700;
-}
-
-.trait-diff.positive { color: #7fff7f; }
-.trait-diff.negative { color: #ff6b6b; }
 
 /* ===== RIVALS TABLE ===== */
 .rivals-table-wrapper {

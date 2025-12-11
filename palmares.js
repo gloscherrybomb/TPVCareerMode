@@ -6,7 +6,12 @@ import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/
 import {
     getFirestore,
     doc,
-    getDoc
+    getDoc,
+    collection,
+    query,
+    where,
+    orderBy,
+    getDocs
 } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import { getPersonaLabel } from './interview-engine.js';
@@ -20,6 +25,7 @@ let userData = null;
 let allResults = [];
 let filteredResults = [];
 let currentSort = { column: 'date', direction: 'desc' };
+let interviewHistory = [];
 
 // Event metadata
 const EVENT_DATA = {
@@ -78,6 +84,35 @@ function showContent() {
     document.getElementById('palmaresContent').style.display = 'block';
 }
 
+// Fetch interview history for personality chart
+async function fetchInterviewHistory(userId) {
+    try {
+        const interviewsRef = collection(db, 'interviews');
+        const q = query(
+            interviewsRef,
+            where('userId', '==', userId),
+            orderBy('eventNumber', 'asc')
+        );
+
+        const querySnapshot = await getDocs(q);
+        const interviews = [];
+
+        querySnapshot.forEach(doc => {
+            const data = doc.data();
+            interviews.push({
+                eventNumber: data.eventNumber,
+                personalityAfter: data.personalityAfter,
+                timestamp: data.timestamp
+            });
+        });
+
+        return interviews;
+    } catch (error) {
+        console.error('Error fetching interview history:', error);
+        return [];
+    }
+}
+
 // Load and display palmares
 async function loadPalmares(user) {
     showLoadingState();
@@ -92,6 +127,9 @@ async function loadPalmares(user) {
         }
 
         userData = userDoc.data();
+
+        // Fetch interview history for personality chart
+        interviewHistory = await fetchInterviewHistory(userData.uid);
 
         // Collect all event results
         allResults = [];
@@ -686,129 +724,234 @@ function displayAwardsTable() {
     });
 }
 
-// Display personality timeline
+// Display personality evolution chart
 function displayPersonalityTimeline() {
     const currentPersonality = userData.personality || {};
-    const snapshots = userData.personalitySnapshots || {};
 
-    // Hide section if no personality data at all
-    if (Object.keys(currentPersonality).length === 0) {
+    // Hide section if no personality data
+    if (interviewHistory.length === 0 && Object.keys(currentPersonality).length === 0) {
         document.getElementById('personalitySection').style.display = 'none';
         return;
     }
 
     document.getElementById('personalitySection').style.display = 'block';
 
-    const timeline = document.getElementById('personalityTimeline');
-    timeline.innerHTML = '';
-
-    // Show initial personality (baseline at 50)
-    const initialSnapshot = document.createElement('div');
-    initialSnapshot.className = 'personality-snapshot';
-    initialSnapshot.innerHTML = `
-        <div class="snapshot-header">Initial Personality (Career Start)</div>
-        <div class="trait-changes">
-            <div class="trait-change">
-                <span class="trait-name">Confidence:</span>
-                <span class="trait-values">50</span>
-            </div>
-            <div class="trait-change">
-                <span class="trait-name">Humility:</span>
-                <span class="trait-values">50</span>
-            </div>
-            <div class="trait-change">
-                <span class="trait-name">Aggression:</span>
-                <span class="trait-values">50</span>
-            </div>
-            <div class="trait-change">
-                <span class="trait-name">Professionalism:</span>
-                <span class="trait-values">50</span>
-            </div>
-            <div class="trait-change">
-                <span class="trait-name">Showmanship:</span>
-                <span class="trait-values">50</span>
-            </div>
-            <div class="trait-change">
-                <span class="trait-name">Resilience:</span>
-                <span class="trait-values">50</span>
-            </div>
-        </div>
+    // Display current persona
+    const personaDiv = document.getElementById('currentPersona');
+    const persona = getPersonaLabel(currentPersonality);
+    personaDiv.innerHTML = `
+        <div class="persona-label">${persona || 'The Rising Talent'}</div>
+        <div class="persona-subtitle">Current Personality Profile</div>
     `;
-    timeline.appendChild(initialSnapshot);
 
-    // Show snapshots at events 5, 8, 12, 15 if they exist
-    const snapshotEvents = [5, 8, 12, 15];
-    let previousSnapshot = { confidence: 50, humility: 50, aggression: 50, professionalism: 50, showmanship: 50, resilience: 50 };
+    // Build data points for chart (start at 50 for all traits)
+    const dataPoints = [{
+        eventNumber: 0,
+        confidence: 50,
+        humility: 50,
+        aggression: 50,
+        professionalism: 50,
+        showmanship: 50,
+        resilience: 50
+    }];
 
-    snapshotEvents.forEach(eventNum => {
-        const snapshot = snapshots[`event${eventNum}`];
-        if (snapshot) {
-            const changeDiv = document.createElement('div');
-            changeDiv.className = 'personality-snapshot';
-
-            // Calculate changes from previous
-            let changesHTML = '';
-            Object.keys(snapshot).forEach(trait => {
-                if (trait === 'lastUpdated' || trait === 'LastUpdated') return;
-
-                const oldVal = Math.round(previousSnapshot[trait] || 50);
-                const newVal = Math.round(snapshot[trait]);
-                const diff = newVal - oldVal;
-
-                if (diff !== 0) {
-                    const diffClass = diff > 0 ? 'positive' : 'negative';
-                    const diffText = diff > 0 ? `+${diff}` : diff;
-
-                    changesHTML += `
-                        <div class="trait-change">
-                            <span class="trait-name">${capitalize(trait)}:</span>
-                            <span class="trait-values">
-                                ${oldVal} → ${newVal}
-                                <span class="trait-diff ${diffClass}">(${diffText})</span>
-                            </span>
-                        </div>
-                    `;
-                }
+    // Add interview data points
+    interviewHistory.forEach(interview => {
+        if (interview.personalityAfter) {
+            dataPoints.push({
+                eventNumber: interview.eventNumber,
+                ...interview.personalityAfter
             });
-
-            // Calculate persona for this snapshot
-            const snapshotPersona = getPersonaLabel(snapshot);
-
-            changeDiv.innerHTML = `
-                <div class="snapshot-header">Event ${eventNum} Snapshot${snapshotPersona ? ` • ${snapshotPersona}` : ''}</div>
-                <div class="snapshot-event">${EVENT_DATA[eventNum]?.name || `Event ${eventNum}`}</div>
-                <div class="trait-changes">${changesHTML || '<div class="stat-row-text">No significant changes</div>'}</div>
-            `;
-
-            timeline.appendChild(changeDiv);
-            previousSnapshot = snapshot;
         }
     });
 
-    // Show current personality at the end
-    const currentDiv = document.createElement('div');
-    currentDiv.className = 'personality-snapshot';
+    // Add current personality if different from last interview
+    if (dataPoints.length > 0) {
+        const lastPoint = dataPoints[dataPoints.length - 1];
+        const currentIsDifferent = Object.keys(currentPersonality).some(trait => {
+            return Math.round(currentPersonality[trait]) !== Math.round(lastPoint[trait]);
+        });
 
-    // Valid personality traits
-    const validTraits = ['confidence', 'humility', 'aggression', 'professionalism', 'showmanship', 'resilience'];
-    const filteredTraits = Object.entries(currentPersonality)
-        .filter(([trait]) => validTraits.includes(trait.toLowerCase()));
+        if (currentIsDifferent) {
+            const maxEventNum = Math.max(...interviewHistory.map(i => i.eventNumber), 0);
+            dataPoints.push({
+                eventNumber: maxEventNum + 1,
+                ...currentPersonality
+            });
+        }
+    }
 
-    // Use the proper persona calculation
-    const persona = getPersonaLabel(currentPersonality);
+    // Draw the chart
+    drawPersonalityChart(dataPoints);
+}
 
-    currentDiv.innerHTML = `
-        <div class="snapshot-header">Current Personality${persona ? ` • ${persona}` : ''}</div>
-        <div class="trait-changes">
-            ${filteredTraits.map(([trait, value]) => `
-                <div class="trait-change">
-                    <span class="trait-name">${capitalize(trait)}:</span>
-                    <span class="trait-values">${Math.round(value)}</span>
-                </div>
-            `).join('')}
-        </div>
-    `;
-    timeline.appendChild(currentDiv);
+// Draw line chart showing personality evolution
+function drawPersonalityChart(dataPoints) {
+    const canvas = document.getElementById('personalityChart');
+    if (!canvas) return;
+
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width;
+    const height = canvas.height;
+
+    // Clear canvas
+    ctx.clearRect(0, 0, width, height);
+
+    // Chart configuration
+    const padding = { top: 40, right: 120, bottom: 50, left: 60 };
+    const chartWidth = width - padding.left - padding.right;
+    const chartHeight = height - padding.top - padding.bottom;
+
+    // Trait configuration with colors
+    const traits = [
+        { name: 'confidence', label: 'Confidence', color: '#ff1b6b' },
+        { name: 'humility', label: 'Humility', color: '#45caff' },
+        { name: 'aggression', label: 'Aggression', color: '#ff6b35' },
+        { name: 'professionalism', label: 'Professionalism', color: '#7fff7f' },
+        { name: 'showmanship', label: 'Showmanship', color: '#ffd700' },
+        { name: 'resilience', label: 'Resilience', color: '#9d4edd' }
+    ];
+
+    // Smart sampling based on data points
+    let sampledPoints = dataPoints;
+    if (dataPoints.length > 15) {
+        sampledPoints = sampleDataPoints(dataPoints, 15);
+    }
+
+    // Get min and max event numbers for X axis
+    const minEvent = Math.min(...sampledPoints.map(p => p.eventNumber));
+    const maxEvent = Math.max(...sampledPoints.map(p => p.eventNumber));
+
+    // Helper functions for coordinate conversion
+    const xScale = (eventNum) => {
+        if (maxEvent === minEvent) return padding.left + chartWidth / 2;
+        return padding.left + ((eventNum - minEvent) / (maxEvent - minEvent)) * chartWidth;
+    };
+
+    const yScale = (value) => {
+        return padding.top + chartHeight - ((value / 100) * chartHeight);
+    };
+
+    // Draw background grid
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+    ctx.lineWidth = 1;
+
+    // Horizontal grid lines (every 25 points)
+    for (let i = 0; i <= 4; i++) {
+        const y = padding.top + (chartHeight / 4) * i;
+        ctx.beginPath();
+        ctx.moveTo(padding.left, y);
+        ctx.lineTo(padding.left + chartWidth, y);
+        ctx.stroke();
+
+        // Y-axis labels
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+        ctx.font = '12px Exo 2, sans-serif';
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'middle';
+        ctx.fillText((100 - i * 25).toString(), padding.left - 10, y);
+    }
+
+    // Vertical grid lines (events)
+    const eventStep = Math.ceil((maxEvent - minEvent) / 10);
+    for (let event = minEvent; event <= maxEvent; event += eventStep) {
+        const x = xScale(event);
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+        ctx.beginPath();
+        ctx.moveTo(x, padding.top);
+        ctx.lineTo(x, padding.top + chartHeight);
+        ctx.stroke();
+
+        // X-axis labels
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+        ctx.font = '12px Exo 2, sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+        ctx.fillText(event === 0 ? 'Start' : `E${event}`, x, padding.top + chartHeight + 10);
+    }
+
+    // Draw axes
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(padding.left, padding.top);
+    ctx.lineTo(padding.left, padding.top + chartHeight);
+    ctx.lineTo(padding.left + chartWidth, padding.top + chartHeight);
+    ctx.stroke();
+
+    // Draw trait lines
+    traits.forEach(trait => {
+        ctx.strokeStyle = trait.color;
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+
+        sampledPoints.forEach((point, index) => {
+            const x = xScale(point.eventNumber);
+            const y = yScale(point[trait.name] || 50);
+
+            if (index === 0) {
+                ctx.moveTo(x, y);
+            } else {
+                ctx.lineTo(x, y);
+            }
+        });
+
+        ctx.stroke();
+
+        // Draw points
+        sampledPoints.forEach(point => {
+            const x = xScale(point.eventNumber);
+            const y = yScale(point[trait.name] || 50);
+
+            ctx.fillStyle = trait.color;
+            ctx.beginPath();
+            ctx.arc(x, y, 4, 0, Math.PI * 2);
+            ctx.fill();
+        });
+    });
+
+    // Draw legend
+    const legendX = padding.left + chartWidth + 20;
+    let legendY = padding.top + 20;
+
+    traits.forEach(trait => {
+        // Color swatch
+        ctx.fillStyle = trait.color;
+        ctx.fillRect(legendX, legendY - 6, 20, 12);
+
+        // Label
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+        ctx.font = '13px Exo 2, sans-serif';
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(trait.label, legendX + 28, legendY);
+
+        legendY += 25;
+    });
+
+    // Chart title
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+    ctx.font = 'bold 14px Orbitron, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'bottom';
+    ctx.fillText('Personality Trait Evolution', padding.left + chartWidth / 2, padding.top - 15);
+}
+
+// Smart sampling of data points to avoid overcrowding
+function sampleDataPoints(points, maxPoints) {
+    if (points.length <= maxPoints) return points;
+
+    // Always include first and last point
+    const sampled = [points[0]];
+    const step = (points.length - 2) / (maxPoints - 2);
+
+    for (let i = 1; i < maxPoints - 1; i++) {
+        const index = Math.round(i * step);
+        sampled.push(points[index]);
+    }
+
+    sampled.push(points[points.length - 1]);
+    return sampled;
 }
 
 // Display rivals table
