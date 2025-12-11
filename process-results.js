@@ -71,6 +71,131 @@ const STAGE_REQUIREMENTS = {
 
 const OPTIONAL_EVENTS = [6, 7, 8, 9, 10, 11, 12];
 
+// Event names for lifetime stats tracking
+const EVENT_NAMES = {
+  1: "Coast and Roast Crit", 2: "Island Classic", 3: "Track Showdown", 4: "City Sprint TT",
+  5: "The Capital Kermesse", 6: "Mt. Sterling TT", 7: "North Lake Points Race",
+  8: "Heartland Gran Fondo", 9: "Highland Loop", 10: "Riverside Time Trial",
+  11: "Southern Sky Twilight", 12: "Dirtroads and Glory", 13: "Heritage Highway",
+  14: "Mountain Shadow Classic", 15: "Bayview Breakaway Crit"
+};
+
+/**
+ * Calculate biggest giant beaten from race results
+ */
+function calculateBiggestGiant(results, userUid, userPosition, userARR, eventNumber, currentBiggest) {
+  if (!userARR) return currentBiggest;
+
+  // Find all opponents user beat (those with higher position number)
+  const beaten = results
+    .filter(r => {
+      const pos = parseInt(r.Position);
+      const arr = parseInt(r.ARR);
+      return r.UID !== userUid && !isNaN(pos) && pos > userPosition && arr > 0;
+    })
+    .map(r => ({
+      name: r.Name,
+      arr: parseInt(r.ARR),
+      uid: r.UID
+    }));
+
+  if (beaten.length === 0) return currentBiggest;
+
+  // Find opponent with highest ARR
+  const highestBeaten = beaten.reduce((max, rider) =>
+    rider.arr > max.arr ? rider : max
+  , beaten[0]);
+
+  // Only update if this is a bigger giant than previous record
+  if (!currentBiggest || highestBeaten.arr > currentBiggest.opponentARR) {
+    return {
+      opponentName: highestBeaten.name,
+      opponentARR: highestBeaten.arr,
+      eventNumber: eventNumber,
+      eventName: EVENT_NAMES[eventNumber] || `Event ${eventNumber}`,
+      date: new Date().toISOString(),
+      userARR: userARR,
+      arrDifference: highestBeaten.arr - userARR
+    };
+  }
+
+  return currentBiggest;
+}
+
+/**
+ * Calculate best prediction performance
+ */
+function calculateBestPrediction(eventResults, eventNumber, currentBest) {
+  if (!eventResults.predictedPosition) return currentBest;
+
+  const difference = eventResults.predictedPosition - eventResults.position;
+
+  // Only track positive differences (beat prediction)
+  if (difference > 0 && (!currentBest || difference > currentBest.difference)) {
+    return {
+      eventNumber: eventNumber,
+      eventName: EVENT_NAMES[eventNumber] || `Event ${eventNumber}`,
+      predicted: eventResults.predictedPosition,
+      actual: eventResults.position,
+      difference: difference,
+      date: new Date().toISOString()
+    };
+  }
+
+  return currentBest;
+}
+
+/**
+ * Calculate highest ARR achieved
+ */
+function calculateHighestARR(currentARR, eventNumber, existing) {
+  if (!currentARR) return existing;
+
+  if (!existing || currentARR > existing.value) {
+    return {
+      value: currentARR,
+      eventNumber: eventNumber,
+      eventName: EVENT_NAMES[eventNumber] || `Event ${eventNumber}`,
+      date: new Date().toISOString()
+    };
+  }
+
+  return existing;
+}
+
+/**
+ * Calculate biggest win margin
+ */
+function calculateBiggestWinMargin(position, results, eventNumber, currentBiggest) {
+  if (position !== 1) return currentBiggest;
+
+  // Find first and second place times
+  const sortedResults = results
+    .filter(r => !isNaN(parseFloat(r.Time)))
+    .map(r => ({
+      position: parseInt(r.Position),
+      time: parseFloat(r.Time)
+    }))
+    .sort((a, b) => a.position - b.position);
+
+  if (sortedResults.length < 2) return currentBiggest;
+
+  const winnerTime = sortedResults[0].time;
+  const secondTime = sortedResults[1].time;
+  const margin = secondTime - winnerTime;
+
+  if (!currentBiggest || margin > currentBiggest.marginSeconds) {
+    return {
+      eventNumber: eventNumber,
+      eventName: EVENT_NAMES[eventNumber] || `Event ${eventNumber}`,
+      marginSeconds: margin,
+      date: new Date().toISOString()
+    };
+  }
+
+  return currentBiggest;
+}
+
 /**
  * Check if an event is valid for a given stage
  */
@@ -1272,6 +1397,49 @@ async function processUserResult(uid, eventInfo, results) {
   tempUserData[`event${eventNumber}Results`] = eventResults;
   const careerStats = await calculateCareerStats(tempUserData);
 
+  // Event metadata for distance/climbing tracking
+  const eventMetadata = {
+    1: { distance: 23.4, climbing: 124 },
+    2: { distance: 36.5, climbing: 122 },
+    3: { distance: 10.0, climbing: 0 },
+    4: { distance: 10.7, climbing: 50 },
+    5: { distance: 19.6, climbing: 388 },
+    6: { distance: 9.6, climbing: 174 },
+    7: { distance: 25.7, climbing: 117 },
+    8: { distance: 52.6, climbing: 667 },
+    9: { distance: 25.9, climbing: 295 },
+    10: { distance: 25.3, climbing: 160 },
+    11: { distance: 21.8, climbing: 119 },
+    12: { distance: 38.0, climbing: 493 },
+    13: { distance: 35.2, climbing: 174 },
+    14: { distance: 27.3, climbing: 169 },
+    15: { distance: 28.1, climbing: 471 }
+  };
+
+  // Calculate lifetime statistics
+  const existingLifetime = userData.lifetimeStats || {};
+  const eventMeta = eventMetadata[eventNumber] || { distance: 0, climbing: 0 };
+
+  // Update cumulative totals
+  const newLifetimeStats = {
+    totalDistance: (existingLifetime.totalDistance || 0) + eventMeta.distance,
+    totalClimbing: (existingLifetime.totalClimbing || 0) + eventMeta.climbing,
+    totalRaceTime: (existingLifetime.totalRaceTime || 0) + (eventResults.time || 0),
+    totalDNFs: existingLifetime.totalDNFs || 0, // Will increment separately for DNFs
+
+    // Track biggest giant beaten
+    biggestGiantBeaten: calculateBiggestGiant(results, uid, position, eventResults.arr, eventNumber, existingLifetime.biggestGiantBeaten),
+
+    // Track best vs prediction
+    bestVsPrediction: calculateBestPrediction(eventResults, eventNumber, existingLifetime.bestVsPrediction),
+
+    // Track highest ARR
+    highestARR: calculateHighestARR(eventResults.arr, eventNumber, existingLifetime.highestARR),
+
+    // Track biggest win margin
+    biggestWin: calculateBiggestWinMargin(position, results, eventNumber, existingLifetime.biggestWin)
+  };
+
   // Update user document
   const updates = {
     [`event${eventNumber}Results`]: eventResults,
@@ -1295,6 +1463,7 @@ async function processUserResult(uid, eventInfo, results) {
     usedOptionalEvents: newUsedOptionalEvents,
     tourProgress: newTourProgress,
     rivalData: updatedRivalData, // Add rival data
+    lifetimeStats: newLifetimeStats, // Add lifetime statistics
     ...dnsFlags // Add DNS flags if any
   };
   

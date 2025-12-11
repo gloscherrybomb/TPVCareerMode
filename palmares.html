@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Palmares - TPV Career Mode</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="tpv-team-car.png">
+    <link rel="apple-touch-icon" href="tpv-team-car.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="palmares.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <div class="logo-text">TPV</div>
+                <div class="logo-subtitle">Career Mode</div>
+            </a>
+            <button class="nav-toggle" id="navToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="events.html" class="nav-link">Season</a>
+                <a href="standings.html" class="nav-link">Standings</a>
+                <a href="peloton.html" class="nav-link">Peloton</a>
+                <a href="profile.html" class="nav-link">Profile</a>
+                <a href="#" class="nav-link nav-login" id="loginBtn">Login</a>
+                <a href="#" class="nav-link nav-logout" id="logoutBtn" style="display: none;">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="palmares-page">
+        <!-- Loading State -->
+        <div id="loadingState" class="loading-state">
+            <div class="spinner"></div>
+            <p>Loading palmares...</p>
+        </div>
+
+        <!-- Login Prompt -->
+        <div id="loginPrompt" class="login-prompt" style="display: none;">
+            <div class="login-prompt-icon">🔒</div>
+            <h2>Please Log In</h2>
+            <p>You need to be logged in to view your palmares.</p>
+            <button class="btn btn-primary" onclick="document.getElementById('loginBtn').click()">
+                Log In
+            </button>
+        </div>
+
+        <!-- Palmares Content -->
+        <div id="palmaresContent" class="container" style="display: none;">
+            <!-- Compact Header -->
+            <div class="palmares-header">
+                <div class="header-left">
+                    <a href="profile.html" class="btn-back">← Back to Profile</a>
+                    <div class="header-breadcrumb">
+                        <span class="breadcrumb-item">Profile</span>
+                        <span class="breadcrumb-separator">›</span>
+                        <span class="breadcrumb-item">Palmares</span>
+                    </div>
+                </div>
+                <div class="header-identity">
+                    <img id="riderPhoto" src="" alt="Rider Photo" class="rider-photo-small">
+                    <div class="rider-name-block">
+                        <h1 class="rider-name" id="riderName">—</h1>
+                        <div class="rider-meta">
+                            <span id="riderTeam">—</span>
+                            <span class="separator">•</span>
+                            <span>ARR <span id="riderARR">—</span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="palmares-subtitle">
+                Career Record • Season <span id="currentSeason">1</span> • <span id="totalEvents">0</span> Events
+            </div>
+
+            <!-- Search & Filter Controls -->
+            <div class="palmares-controls">
+                <input type="text" id="searchFilter" placeholder="Search events, opponents..." class="control-search">
+                <select id="filterType" class="control-select">
+                    <option value="all">All Events</option>
+                    <option value="wins">Wins Only</option>
+                    <option value="podiums">Podiums</option>
+                    <option value="top10">Top 10</option>
+                    <option value="dnf">DNF</option>
+                </select>
+                <select id="filterCategory" class="control-select">
+                    <option value="all">All Types</option>
+                    <option value="criterium">Criteriums</option>
+                    <option value="time trial">Time Trials</option>
+                    <option value="road race">Road Races</option>
+                    <option value="track">Track</option>
+                    <option value="climbing">Climbing</option>
+                </select>
+                <div class="result-count">
+                    Showing <span id="resultCount">0</span> of <span id="totalResults">0</span>
+                </div>
+            </div>
+
+            <!-- Key Statistics Summary -->
+            <div class="key-stats-bar">
+                <div class="stat-item">
+                    <span class="stat-label">Races</span>
+                    <span class="stat-value" id="statRaces">0</span>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                    <span class="stat-label">Wins</span>
+                    <span class="stat-value" id="statWins">0</span>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                    <span class="stat-label">Podiums</span>
+                    <span class="stat-value" id="statPodiums">0</span>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                    <span class="stat-label">Top 10</span>
+                    <span class="stat-value" id="statTop10">0</span>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                    <span class="stat-label">DNF</span>
+                    <span class="stat-value" id="statDNF">0</span>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                    <span class="stat-label">Avg</span>
+                    <span class="stat-value" id="statAvg">0.0</span>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                    <span class="stat-label">Points</span>
+                    <span class="stat-value" id="statPoints">0</span>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                    <span class="stat-label">ARR</span>
+                    <span class="stat-value" id="statARR">0</span>
+                </div>
+            </div>
+
+            <!-- Key Achievements -->
+            <div class="key-achievements">
+                <div class="achievement-item" id="achievementBestPred">
+                    🏆 <span class="achievement-text">Best vs Expected: <strong>—</strong></span>
+                </div>
+                <div class="achievement-item" id="achievementBiggestWin">
+                    🥇 <span class="achievement-text">Biggest Win: <strong>—</strong></span>
+                </div>
+                <div class="achievement-item" id="achievementHighestARR">
+                    ⚡ <span class="achievement-text">Highest ARR: <strong>—</strong></span>
+                </div>
+                <div class="achievement-item" id="achievementBiggestGiant">
+                    ⚔️ <span class="achievement-text">Biggest Giant: <strong>—</strong></span>
+                </div>
+            </div>
+
+            <!-- Main Results Table -->
+            <div class="palmares-section">
+                <h2 class="section-heading">Complete Results History</h2>
+                <div class="results-table-wrapper">
+                    <table class="palmares-table" id="resultsTable">
+                        <thead>
+                            <tr>
+                                <th class="sortable" data-sort="date">Date <span class="sort-indicator"></span></th>
+                                <th class="sortable" data-sort="event">Event <span class="sort-indicator"></span></th>
+                                <th class="sortable" data-sort="position">Pos <span class="sort-indicator"></span></th>
+                                <th class="sortable" data-sort="vspred">vs Pred <span class="sort-indicator"></span></th>
+                                <th class="sortable" data-sort="arr">ARR <span class="sort-indicator"></span></th>
+                                <th class="sortable" data-sort="points">Points <span class="sort-indicator"></span></th>
+                                <th>Awards</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultsTableBody">
+                            <!-- Populated via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Detailed Statistics Sections -->
+            <div class="stats-grid">
+                <!-- Career Totals -->
+                <div class="palmares-section stat-section">
+                    <h2 class="section-heading">Career Totals</h2>
+                    <div class="stat-list">
+                        <div class="stat-row">
+                            <span class="stat-row-label">Total Distance:</span>
+                            <span class="stat-row-value" id="totalDistance">0 km</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-row-label">Total Climbing:</span>
+                            <span class="stat-row-value" id="totalClimbing">0 m</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-row-label">Total Race Time:</span>
+                            <span class="stat-row-value" id="totalRaceTime">0h 0m</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-row-label">Events Completed:</span>
+                            <span class="stat-row-value" id="eventsCompleted">0 / 0</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-row-label">Completion Rate:</span>
+                            <span class="stat-row-value" id="completionRate">100%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Performance Breakdown -->
+                <div class="palmares-section stat-section">
+                    <h2 class="section-heading">Performance</h2>
+                    <div class="stat-list">
+                        <div class="stat-row">
+                            <span class="stat-row-label">Wins:</span>
+                            <span class="stat-row-value" id="perfWins">0 (0%)</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-row-label">Podiums:</span>
+                            <span class="stat-row-value" id="perfPodiums">0 (0%)</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-row-label">Top 10 Finishes:</span>
+                            <span class="stat-row-value" id="perfTop10">0 (0%)</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-row-label">Average Finish:</span>
+                            <span class="stat-row-value" id="perfAvgFinish">0.0</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-row-label">Best Finish:</span>
+                            <span class="stat-row-value" id="perfBestFinish">—</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-row-label">Worst Finish:</span>
+                            <span class="stat-row-value" id="perfWorstFinish">—</span>
+                        </div>
+                    </div>
+                    <div class="stat-subsection">
+                        <h3 class="subsection-heading">Consistency</h3>
+                        <div class="stat-list">
+                            <div class="stat-row">
+                                <span class="stat-row-label">Longest Top-10 Streak:</span>
+                                <span class="stat-row-value" id="longestTop10Streak">0</span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-row-label">Longest Podium Streak:</span>
+                                <span class="stat-row-value" id="longestPodiumStreak">0</span>
+                            </div>
+                            <div class="stat-row">
+                                <span class="stat-row-label">Longest No-DNF Streak:</span>
+                                <span class="stat-row-value" id="longestNoDNFStreak">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Competition Analysis -->
+                <div class="palmares-section stat-section">
+                    <h2 class="section-heading">Competition</h2>
+                    <div class="stat-list">
+                        <div class="stat-row">
+                            <span class="stat-row-label">Avg Opponent ARR:</span>
+                            <span class="stat-row-value" id="avgOpponentARR">—</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-row-label">Races vs Stronger:</span>
+                            <span class="stat-row-value" id="racesVsStronger">0 (0%)</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-row-label">Win Rate vs Stronger:</span>
+                            <span class="stat-row-value" id="winRateVsStronger">0%</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-row-label">Win Rate vs Weaker:</span>
+                            <span class="stat-row-value" id="winRateVsWeaker">0%</span>
+                        </div>
+                    </div>
+                    <div class="stat-subsection">
+                        <h3 class="subsection-heading">Toughest Victory</h3>
+                        <div class="stat-list" id="toughestVictory">
+                            <div class="stat-row-text">No wins yet</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Specialty & Versatility -->
+                <div class="palmares-section stat-section">
+                    <h2 class="section-heading">Specialty</h2>
+                    <div class="stat-list">
+                        <div class="stat-row">
+                            <span class="stat-row-label">Best Race Type:</span>
+                            <span class="stat-row-value" id="bestRaceType">—</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-row-label">Versatility Score:</span>
+                            <span class="stat-row-value" id="versatilityScore">— / 10</span>
+                        </div>
+                    </div>
+                    <div class="stat-subsection">
+                        <h3 class="subsection-heading">Event Type Distribution</h3>
+                        <div class="stat-list" id="eventTypeDistribution">
+                            <!-- Populated via JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Awards Section -->
+            <div class="palmares-section">
+                <h2 class="section-heading">Awards & Achievements</h2>
+                <div class="awards-table-wrapper">
+                    <table class="awards-table">
+                        <thead>
+                            <tr>
+                                <th>Award</th>
+                                <th>Count</th>
+                            </tr>
+                        </thead>
+                        <tbody id="awardsTableBody">
+                            <!-- Populated via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Personality Evolution -->
+            <div class="palmares-section" id="personalitySection" style="display: none;">
+                <h2 class="section-heading">Personality Development</h2>
+                <div class="personality-timeline" id="personalityTimeline">
+                    <!-- Populated via JS -->
+                </div>
+            </div>
+
+            <!-- Head-to-Head Records -->
+            <div class="palmares-section" id="rivalsSection" style="display: none;">
+                <h2 class="section-heading">Head-to-Head Records</h2>
+                <div class="rivals-table-wrapper">
+                    <table class="rivals-table">
+                        <thead>
+                            <tr>
+                                <th>Opponent</th>
+                                <th>Races</th>
+                                <th>W-L</th>
+                                <th>Win %</th>
+                                <th>Their ARR</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rivalsTableBody">
+                            <!-- Populated via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Include Firebase and authentication -->
+    <script type="module" src="palmares.js"></script>
+</body>
+</html>

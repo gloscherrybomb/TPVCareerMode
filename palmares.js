@@ -1,0 +1,756 @@
+// Palmares Page Logic for TPV Career Mode
+
+import { firebaseConfig } from './firebase-config.js';
+import { formatTime, getOrdinalSuffix, formatDate } from './utils.js';
+import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+import {
+    getFirestore,
+    doc,
+    getDoc
+} from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let currentUser = null;
+let userData = null;
+let allResults = [];
+let filteredResults = [];
+let currentSort = { column: 'date', direction: 'desc' };
+
+// Event metadata
+const EVENT_DATA = {
+    1: { name: "Coast and Roast Crit", type: "criterium" },
+    2: { name: "Island Classic", type: "road race" },
+    3: { name: "Track Showdown", type: "track elimination" },
+    4: { name: "City Sprint TT", type: "time trial" },
+    5: { name: "The Capital Kermesse", type: "points race" },
+    6: { name: "Mt. Sterling TT", type: "hill climb" },
+    7: { name: "North Lake Points Race", type: "points race" },
+    8: { name: "Heartland Gran Fondo", type: "gran fondo" },
+    9: { name: "Highland Loop", type: "hill climb" },
+    10: { name: "Riverside Time Trial", type: "time trial" },
+    11: { name: "Southern Sky Twilight", type: "points race" },
+    12: { name: "Dirtroads and Glory", type: "gravel race" },
+    13: { name: "Heritage Highway", type: "road race" },
+    14: { name: "Mountain Shadow Classic", type: "road race" },
+    15: { name: "Bayview Breakaway Crit", type: "criterium" }
+};
+
+// Award display names
+const AWARD_NAMES = {
+    gold: "Gold Medal (1st)",
+    silver: "Silver Medal (2nd)",
+    bronze: "Bronze Medal (3rd)",
+    punchingMedal: "Punching Above Weight",
+    giantKiller: "Giant Killer",
+    bullseye: "Bullseye",
+    hotStreak: "Hot Streak",
+    domination: "Domination",
+    closeCall: "Close Call",
+    photoFinish: "Photo Finish",
+    darkHorse: "Dark Horse",
+    zeroToHero: "Zero to Hero",
+    gcGold: "GC Gold Trophy",
+    gcSilver: "GC Silver Trophy",
+    gcBronze: "GC Bronze Trophy"
+};
+
+// Show/hide sections
+function showLoadingState() {
+    document.getElementById('loadingState').style.display = 'flex';
+    document.getElementById('loginPrompt').style.display = 'none';
+    document.getElementById('palmaresContent').style.display = 'none';
+}
+
+function showLoginPrompt() {
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('loginPrompt').style.display = 'block';
+    document.getElementById('palmaresContent').style.display = 'none';
+}
+
+function showContent() {
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('loginPrompt').style.display = 'none';
+    document.getElementById('palmaresContent').style.display = 'block';
+}
+
+// Load and display palmares
+async function loadPalmares(user) {
+    showLoadingState();
+
+    try {
+        const userDocRef = doc(db, 'users', user.uid);
+        const userDoc = await getDoc(userDocRef);
+
+        if (!userDoc.exists()) {
+            showLoginPrompt();
+            return;
+        }
+
+        userData = userDoc.data();
+
+        // Collect all event results
+        allResults = [];
+        for (let i = 1; i <= 15; i++) {
+            const eventResults = userData[`event${i}Results`];
+            if (eventResults) {
+                allResults.push({
+                    eventNum: i,
+                    eventName: EVENT_DATA[i]?.name || `Event ${i}`,
+                    eventType: EVENT_DATA[i]?.type || 'unknown',
+                    position: eventResults.position,
+                    time: eventResults.time,
+                    arr: eventResults.arr,
+                    predictedPosition: eventResults.predictedPosition,
+                    points: eventResults.points || 0,
+                    bonusPoints: eventResults.bonusPoints || 0,
+                    earnedPunchingMedal: eventResults.earnedPunchingMedal,
+                    earnedGiantKillerMedal: eventResults.earnedGiantKillerMedal,
+                    earnedBullseyeMedal: eventResults.earnedBullseyeMedal,
+                    earnedHotStreakMedal: eventResults.earnedHotStreakMedal,
+                    earnedDomination: eventResults.earnedDomination,
+                    earnedCloseCall: eventResults.earnedCloseCall,
+                    earnedPhotoFinish: eventResults.earnedPhotoFinish,
+                    earnedDarkHorse: eventResults.earnedDarkHorse,
+                    earnedZeroToHero: eventResults.earnedZeroToHero,
+                    processedAt: eventResults.processedAt
+                });
+            }
+        }
+
+        // Display all sections
+        displayHeader();
+        displayKeyStats();
+        displayKeyAchievements();
+
+        // Apply default filter and display results
+        filteredResults = [...allResults];
+        applySort();
+        displayResultsTable();
+
+        displayDetailedStats();
+        displayAwardsTable();
+        displayPersonalityTimeline();
+        displayRivalsTable();
+
+        showContent();
+    } catch (error) {
+        console.error('Error loading palmares:', error);
+        showLoginPrompt();
+    }
+}
+
+// Display header
+function displayHeader() {
+    document.getElementById('riderName').textContent = userData.name || 'Unknown Rider';
+    document.getElementById('riderTeam').textContent = userData.team || 'No Team';
+    document.getElementById('riderARR').textContent = userData.arr || '—';
+    document.getElementById('currentSeason').textContent = '1';
+    document.getElementById('totalEvents').textContent = allResults.length;
+
+    // Set photo if available
+    if (userData.photoURL) {
+        const photo = document.getElementById('riderPhoto');
+        photo.src = userData.photoURL;
+        photo.style.display = 'block';
+    }
+}
+
+// Display key stats bar
+function displayKeyStats() {
+    const dnfCount = allResults.filter(r => r.position === 'DNF').length;
+    const completedResults = allResults.filter(r => r.position !== 'DNF');
+
+    document.getElementById('statRaces').textContent = allResults.length;
+    document.getElementById('statWins').textContent = userData.totalWins || 0;
+    document.getElementById('statPodiums').textContent = userData.totalPodiums || 0;
+    document.getElementById('statTop10').textContent = userData.totalTop10s || 0;
+    document.getElementById('statDNF').textContent = dnfCount;
+    document.getElementById('statAvg').textContent = userData.averageFinish?.toFixed(1) || '0.0';
+    document.getElementById('statPoints').textContent = userData.totalPoints || 0;
+    document.getElementById('statARR').textContent = userData.arr || 0;
+}
+
+// Display key achievements
+function displayKeyAchievements() {
+    const lifetime = userData.lifetimeStats || {};
+
+    // Best vs Expected
+    const bestPred = lifetime.bestVsPrediction;
+    if (bestPred) {
+        document.querySelector('#achievementBestPred .achievement-text').innerHTML =
+            `Best vs Expected: <strong>+${bestPred.difference} places</strong> (${bestPred.eventName})`;
+    } else {
+        document.querySelector('#achievementBestPred .achievement-text').innerHTML =
+            `Best vs Expected: <strong>—</strong>`;
+    }
+
+    // Biggest Win
+    const bigWin = lifetime.biggestWin;
+    if (bigWin) {
+        document.querySelector('#achievementBiggestWin .achievement-text').innerHTML =
+            `Biggest Win: <strong>${formatTime(bigWin.marginSeconds)} margin</strong> (${bigWin.eventName})`;
+    } else {
+        document.querySelector('#achievementBiggestWin .achievement-text').innerHTML =
+            `Biggest Win: <strong>—</strong>`;
+    }
+
+    // Highest ARR
+    const highARR = lifetime.highestARR;
+    if (highARR) {
+        document.querySelector('#achievementHighestARR .achievement-text').innerHTML =
+            `Highest ARR: <strong>${highARR.value}</strong> (${highARR.eventName})`;
+    } else {
+        document.querySelector('#achievementHighestARR .achievement-text').innerHTML =
+            `Highest ARR: <strong>—</strong>`;
+    }
+
+    // Biggest Giant
+    const giant = lifetime.biggestGiantBeaten;
+    if (giant) {
+        document.querySelector('#achievementBiggestGiant .achievement-text').innerHTML =
+            `Biggest Giant: <strong>Beat ARR ${giant.opponentARR}</strong> (${giant.opponentName})`;
+    } else {
+        document.querySelector('#achievementBiggestGiant .achievement-text').innerHTML =
+            `Biggest Giant: <strong>—</strong>`;
+    }
+}
+
+// Display results table
+function displayResultsTable() {
+    const tbody = document.getElementById('resultsTableBody');
+    tbody.innerHTML = '';
+
+    filteredResults.forEach(result => {
+        const row = document.createElement('tr');
+
+        // Date
+        const dateCell = document.createElement('td');
+        dateCell.textContent = result.processedAt ? formatDate(result.processedAt.toDate?.() || result.processedAt) : '—';
+        row.appendChild(dateCell);
+
+        // Event (clickable)
+        const eventCell = document.createElement('td');
+        const eventLink = document.createElement('a');
+        eventLink.href = `event-results.html?id=${result.eventNum}`;
+        eventLink.className = 'event-link';
+        eventLink.textContent = result.eventName;
+        eventCell.appendChild(eventLink);
+        row.appendChild(eventCell);
+
+        // Position
+        const posCell = document.createElement('td');
+        const pos = result.position;
+        let posClass = 'pos-cell';
+        let posText = '';
+
+        if (pos === 'DNF') {
+            posClass += ' pos-dnf';
+            posText = 'DNF';
+        } else {
+            if (pos === 1) posClass += ' pos-win';
+            else if (pos === 2) posClass += ' pos-silver';
+            else if (pos === 3) posClass += ' pos-bronze';
+            else if (pos <= 10) posClass += ' pos-top10';
+
+            posText = `${pos}${getOrdinalSuffix(pos)}`;
+        }
+
+        posCell.className = posClass;
+        posCell.textContent = posText;
+        row.appendChild(posCell);
+
+        // vs Predicted
+        const vsPredCell = document.createElement('td');
+        if (result.predictedPosition && pos !== 'DNF') {
+            const diff = result.predictedPosition - pos;
+            let vsPredClass = 'vs-pred-neutral';
+            let vsPredText = '0';
+
+            if (diff > 0) {
+                vsPredClass = 'vs-pred-positive';
+                vsPredText = `+${diff}`;
+            } else if (diff < 0) {
+                vsPredClass = 'vs-pred-negative';
+                vsPredText = `${diff}`;
+            }
+
+            vsPredCell.className = vsPredClass;
+            vsPredCell.textContent = vsPredText;
+        } else {
+            vsPredCell.textContent = '—';
+        }
+        row.appendChild(vsPredCell);
+
+        // ARR
+        const arrCell = document.createElement('td');
+        arrCell.className = 'stat-row-value';
+        arrCell.textContent = result.arr || '—';
+        row.appendChild(arrCell);
+
+        // Points
+        const pointsCell = document.createElement('td');
+        pointsCell.className = 'stat-row-value';
+        pointsCell.textContent = result.points + (result.bonusPoints || 0);
+        row.appendChild(pointsCell);
+
+        // Awards
+        const awardsCell = document.createElement('td');
+        awardsCell.className = 'awards-cell';
+        const medals = [];
+        if (result.earnedPunchingMedal) medals.push('🥊');
+        if (result.earnedGiantKillerMedal) medals.push('⚔️');
+        if (result.earnedBullseyeMedal) medals.push('🎯');
+        if (result.earnedHotStreakMedal) medals.push('🔥');
+        if (result.earnedDomination) medals.push('👑');
+        if (result.earnedCloseCall) medals.push('😰');
+        if (result.earnedPhotoFinish) medals.push('📸');
+        if (result.earnedDarkHorse) medals.push('🐴');
+        if (result.earnedZeroToHero) medals.push('🦸');
+        awardsCell.textContent = medals.join(' ');
+        row.appendChild(awardsCell);
+
+        tbody.appendChild(row);
+    });
+
+    // Update result count
+    document.getElementById('resultCount').textContent = filteredResults.length;
+    document.getElementById('totalResults').textContent = allResults.length;
+}
+
+// Apply filtering
+function applyFilters() {
+    const searchTerm = document.getElementById('searchFilter').value.toLowerCase();
+    const typeFilter = document.getElementById('filterType').value;
+    const categoryFilter = document.getElementById('filterCategory').value;
+
+    filteredResults = allResults.filter(result => {
+        // Search filter
+        if (searchTerm && !result.eventName.toLowerCase().includes(searchTerm)) {
+            return false;
+        }
+
+        // Type filter
+        if (typeFilter === 'wins' && result.position !== 1) return false;
+        if (typeFilter === 'podiums' && (result.position > 3 || result.position === 'DNF')) return false;
+        if (typeFilter === 'top10' && (result.position > 10 || result.position === 'DNF')) return false;
+        if (typeFilter === 'dnf' && result.position !== 'DNF') return false;
+
+        // Category filter
+        if (categoryFilter !== 'all' && result.eventType !== categoryFilter) return false;
+
+        return true;
+    });
+
+    applySort();
+    displayResultsTable();
+}
+
+// Apply sorting
+function applySort() {
+    const { column, direction } = currentSort;
+
+    filteredResults.sort((a, b) => {
+        let aVal, bVal;
+
+        switch (column) {
+            case 'date':
+                aVal = a.eventNum;
+                bVal = b.eventNum;
+                break;
+            case 'event':
+                aVal = a.eventName;
+                bVal = b.eventName;
+                break;
+            case 'position':
+                aVal = a.position === 'DNF' ? 999 : a.position;
+                bVal = b.position === 'DNF' ? 999 : b.position;
+                break;
+            case 'vspred':
+                aVal = a.predictedPosition ? (a.predictedPosition - (a.position === 'DNF' ? 0 : a.position)) : -999;
+                bVal = b.predictedPosition ? (b.predictedPosition - (b.position === 'DNF' ? 0 : b.position)) : -999;
+                break;
+            case 'arr':
+                aVal = a.arr || 0;
+                bVal = b.arr || 0;
+                break;
+            case 'points':
+                aVal = a.points + (a.bonusPoints || 0);
+                bVal = b.points + (b.bonusPoints || 0);
+                break;
+            default:
+                return 0;
+        }
+
+        if (typeof aVal === 'string') {
+            return direction === 'asc' ? aVal.localeCompare(bVal) : bVal.localeCompare(aVal);
+        } else {
+            return direction === 'asc' ? aVal - bVal : bVal - aVal;
+        }
+    });
+
+    // Update sort indicators
+    document.querySelectorAll('.palmares-table th').forEach(th => {
+        th.classList.remove('sort-asc', 'sort-desc');
+    });
+
+    const activeHeader = document.querySelector(`th[data-sort="${column}"]`);
+    if (activeHeader) {
+        activeHeader.classList.add(direction === 'asc' ? 'sort-asc' : 'sort-desc');
+    }
+}
+
+// Display detailed statistics
+function displayDetailedStats() {
+    const lifetime = userData.lifetimeStats || {};
+    const completedResults = allResults.filter(r => r.position !== 'DNF');
+    const dnfCount = allResults.length - completedResults.length;
+
+    // Career Totals
+    document.getElementById('totalDistance').textContent =
+        `${(lifetime.totalDistance || 0).toFixed(1)} km`;
+    document.getElementById('totalClimbing').textContent =
+        `${Math.round(lifetime.totalClimbing || 0)} m`;
+
+    const totalSeconds = lifetime.totalRaceTime || 0;
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    document.getElementById('totalRaceTime').textContent = `${hours}h ${minutes}m`;
+
+    document.getElementById('eventsCompleted').textContent =
+        `${completedResults.length} / ${allResults.length}`;
+    document.getElementById('completionRate').textContent =
+        `${allResults.length > 0 ? ((completedResults.length / allResults.length) * 100).toFixed(0) : 100}%`;
+
+    // Performance
+    const winRate = allResults.length > 0 ? ((userData.totalWins || 0) / completedResults.length * 100).toFixed(1) : 0;
+    const podiumRate = allResults.length > 0 ? ((userData.totalPodiums || 0) / completedResults.length * 100).toFixed(1) : 0;
+    const top10Rate = allResults.length > 0 ? ((userData.totalTop10s || 0) / completedResults.length * 100).toFixed(1) : 0;
+
+    document.getElementById('perfWins').textContent = `${userData.totalWins || 0} (${winRate}%)`;
+    document.getElementById('perfPodiums').textContent = `${userData.totalPodiums || 0} (${podiumRate}%)`;
+    document.getElementById('perfTop10').textContent = `${userData.totalTop10s || 0} (${top10Rate}%)`;
+    document.getElementById('perfAvgFinish').textContent = userData.averageFinish?.toFixed(1) || '0.0';
+
+    const bestFinish = userData.bestFinish || null;
+    document.getElementById('perfBestFinish').textContent = bestFinish ?
+        `${bestFinish}${getOrdinalSuffix(bestFinish)}` : '—';
+
+    const worstFinish = completedResults.length > 0 ?
+        Math.max(...completedResults.map(r => r.position)) : null;
+    document.getElementById('perfWorstFinish').textContent = worstFinish ?
+        `${worstFinish}${getOrdinalSuffix(worstFinish)}` : '—';
+
+    // Consistency - Calculate streaks
+    const streaks = calculateStreaks(completedResults);
+    document.getElementById('longestTop10Streak').textContent = streaks.top10;
+    document.getElementById('longestPodiumStreak').textContent = streaks.podium;
+    document.getElementById('longestNoDNFStreak').textContent = streaks.noDNF;
+
+    // Competition Analysis (placeholders for now)
+    document.getElementById('avgOpponentARR').textContent = '—';
+    document.getElementById('racesVsStronger').textContent = '— (—%)';
+    document.getElementById('winRateVsStronger').textContent = '—%';
+    document.getElementById('winRateVsWeaker').textContent = '—%';
+
+    // Specialty
+    const typeStats = calculateTypeStats(completedResults);
+    document.getElementById('bestRaceType').textContent = typeStats.bestType || '—';
+    document.getElementById('versatilityScore').textContent = `${typeStats.versatility} / 10`;
+
+    // Event type distribution
+    const distEl = document.getElementById('eventTypeDistribution');
+    distEl.innerHTML = '';
+    Object.entries(typeStats.distribution).forEach(([type, stats]) => {
+        const row = document.createElement('div');
+        row.className = 'stat-row';
+        row.innerHTML = `
+            <span class="stat-row-label">${capitalize(type)}:</span>
+            <span class="stat-row-value">${stats.total} races (${stats.wins}W, ${stats.podiums}P, ${stats.top10}T10)</span>
+        `;
+        distEl.appendChild(row);
+    });
+}
+
+// Calculate streaks
+function calculateStreaks(results) {
+    const sorted = [...results].sort((a, b) => a.eventNum - b.eventNum);
+
+    let top10Streak = 0, maxTop10 = 0;
+    let podiumStreak = 0, maxPodium = 0;
+    let noDNFStreak = allResults.length > 0 ? allResults.length - allResults.filter(r => r.position === 'DNF').length : 0;
+
+    sorted.forEach(result => {
+        if (result.position <= 10) {
+            top10Streak++;
+            maxTop10 = Math.max(maxTop10, top10Streak);
+        } else {
+            top10Streak = 0;
+        }
+
+        if (result.position <= 3) {
+            podiumStreak++;
+            maxPodium = Math.max(maxPodium, podiumStreak);
+        } else {
+            podiumStreak = 0;
+        }
+    });
+
+    return {
+        top10: maxTop10,
+        podium: maxPodium,
+        noDNF: noDNFStreak
+    };
+}
+
+// Calculate type statistics
+function calculateTypeStats(results) {
+    const distribution = {};
+    let totalTypes = 0;
+    let typesWithWins = 0;
+
+    results.forEach(result => {
+        const type = result.eventType;
+        if (!distribution[type]) {
+            distribution[type] = { total: 0, wins: 0, podiums: 0, top10: 0 };
+            totalTypes++;
+        }
+
+        distribution[type].total++;
+        if (result.position === 1) distribution[type].wins++;
+        if (result.position <= 3) distribution[type].podiums++;
+        if (result.position <= 10) distribution[type].top10++;
+    });
+
+    // Find best type by win rate
+    let bestType = null;
+    let bestWinRate = 0;
+
+    Object.entries(distribution).forEach(([type, stats]) => {
+        const winRate = stats.total > 0 ? stats.wins / stats.total : 0;
+        if (winRate > bestWinRate) {
+            bestWinRate = winRate;
+            bestType = `${capitalize(type)} (${(winRate * 100).toFixed(0)}% wins)`;
+        }
+        if (stats.wins > 0) typesWithWins++;
+    });
+
+    // Versatility score (0-10 based on variety of wins)
+    const versatility = totalTypes > 0 ? Math.round((typesWithWins / totalTypes) * 10) : 0;
+
+    return { distribution, bestType, versatility };
+}
+
+// Display awards table
+function displayAwardsTable() {
+    const awards = userData.awards || {};
+    const tbody = document.getElementById('awardsTableBody');
+    tbody.innerHTML = '';
+
+    // Filter out awards with 0 count and sort by count
+    const awardEntries = Object.entries(awards)
+        .filter(([key, count]) => count > 0)
+        .sort((a, b) => b[1] - a[1]);
+
+    if (awardEntries.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="2" style="text-align: center; color: var(--text-secondary);">No awards earned yet</td></tr>';
+        return;
+    }
+
+    awardEntries.forEach(([key, count]) => {
+        const row = document.createElement('tr');
+
+        const nameCell = document.createElement('td');
+        nameCell.textContent = AWARD_NAMES[key] || key;
+        row.appendChild(nameCell);
+
+        const countCell = document.createElement('td');
+        countCell.className = 'stat-row-value';
+        countCell.textContent = count;
+        row.appendChild(countCell);
+
+        tbody.appendChild(row);
+    });
+}
+
+// Display personality timeline
+function displayPersonalityTimeline() {
+    const personalityHistory = userData.personalityHistory || [];
+    const currentPersonality = userData.personality || {};
+
+    if (personalityHistory.length === 0 && Object.keys(currentPersonality).length === 0) {
+        document.getElementById('personalitySection').style.display = 'none';
+        return;
+    }
+
+    document.getElementById('personalitySection').style.display = 'block';
+
+    const timeline = document.getElementById('personalityTimeline');
+    timeline.innerHTML = '';
+
+    // Show initial personality if we have history
+    if (personalityHistory.length > 0) {
+        const initialSnapshot = document.createElement('div');
+        initialSnapshot.className = 'personality-snapshot';
+        initialSnapshot.innerHTML = `
+            <div class="snapshot-header">Initial Personality (Career Start)</div>
+            <div class="trait-changes">
+                <div class="trait-change">
+                    <span class="trait-name">Confidence:</span>
+                    <span class="trait-values">50</span>
+                </div>
+                <div class="trait-change">
+                    <span class="trait-name">Humility:</span>
+                    <span class="trait-values">50</span>
+                </div>
+                <div class="trait-change">
+                    <span class="trait-name">Aggression:</span>
+                    <span class="trait-values">50</span>
+                </div>
+                <div class="trait-change">
+                    <span class="trait-name">Professionalism:</span>
+                    <span class="trait-values">50</span>
+                </div>
+                <div class="trait-change">
+                    <span class="trait-name">Showmanship:</span>
+                    <span class="trait-values">50</span>
+                </div>
+                <div class="trait-change">
+                    <span class="trait-name">Resilience:</span>
+                    <span class="trait-values">50</span>
+                </div>
+            </div>
+        `;
+        timeline.appendChild(initialSnapshot);
+    }
+
+    // Show changes
+    personalityHistory.forEach((snapshot, index) => {
+        const prevSnapshot = index === 0 ?
+            { confidence: 50, humility: 50, aggression: 50, professionalism: 50, showmanship: 50, resilience: 50 } :
+            personalityHistory[index - 1].snapshot;
+
+        const changeDiv = document.createElement('div');
+        changeDiv.className = 'personality-snapshot';
+
+        let changesHTML = '';
+        Object.keys(snapshot.snapshot).forEach(trait => {
+            const oldVal = prevSnapshot[trait] || 50;
+            const newVal = snapshot.snapshot[trait];
+            const diff = newVal - oldVal;
+
+            if (diff !== 0) {
+                const diffClass = diff > 0 ? 'positive' : 'negative';
+                const diffText = diff > 0 ? `+${diff}` : diff;
+                changesHTML += `
+                    <div class="trait-change">
+                        <span class="trait-name">${capitalize(trait)}:</span>
+                        <span class="trait-values">
+                            ${oldVal} → ${newVal}
+                            <span class="trait-diff ${diffClass}">(${diffText})</span>
+                        </span>
+                    </div>
+                `;
+            }
+        });
+
+        changeDiv.innerHTML = `
+            <div class="snapshot-header">Event ${snapshot.eventNumber}</div>
+            <div class="snapshot-event">${EVENT_DATA[snapshot.eventNumber]?.name || 'Unknown Event'} • ${snapshot.reason || 'Change'}</div>
+            <div class="trait-changes">${changesHTML || '<div class="stat-row-text">No changes</div>'}</div>
+        `;
+
+        timeline.appendChild(changeDiv);
+    });
+
+    // Show current personality
+    if (Object.keys(currentPersonality).length > 0) {
+        const currentDiv = document.createElement('div');
+        currentDiv.className = 'personality-snapshot';
+        currentDiv.innerHTML = `
+            <div class="snapshot-header">Current Personality</div>
+            <div class="trait-changes">
+                ${Object.entries(currentPersonality).map(([trait, value]) => `
+                    <div class="trait-change">
+                        <span class="trait-name">${capitalize(trait)}:</span>
+                        <span class="trait-values">${value}</span>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+        timeline.appendChild(currentDiv);
+    }
+}
+
+// Display rivals table
+function displayRivalsTable() {
+    const rivalData = userData.rivalData || {};
+    const topRivals = rivalData.topRivals || [];
+    const encounters = rivalData.encounters || {};
+
+    if (topRivals.length === 0) {
+        document.getElementById('rivalsSection').style.display = 'none';
+        return;
+    }
+
+    document.getElementById('rivalsSection').style.display = 'block';
+
+    const tbody = document.getElementById('rivalsTableBody');
+    tbody.innerHTML = '';
+
+    topRivals.forEach(rival => {
+        const encounterData = encounters[rival.uid] || {};
+        const wins = encounterData.wins || 0;
+        const losses = encounterData.losses || 0;
+        const total = wins + losses;
+        const winPct = total > 0 ? ((wins / total) * 100).toFixed(1) : '0.0';
+
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${rival.name}</td>
+            <td>${total}</td>
+            <td>${wins}-${losses}</td>
+            <td>${winPct}%</td>
+            <td>${rival.arr || '—'}</td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+// Utility function
+function capitalize(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+// Event listeners
+onAuthStateChanged(auth, async (user) => {
+    currentUser = user;
+    if (user) {
+        await loadPalmares(user);
+    } else {
+        showLoginPrompt();
+    }
+});
+
+// Filter and sort event listeners
+document.getElementById('searchFilter')?.addEventListener('input', applyFilters);
+document.getElementById('filterType')?.addEventListener('change', applyFilters);
+document.getElementById('filterCategory')?.addEventListener('change', applyFilters);
+
+// Sortable table headers
+document.querySelectorAll('.palmares-table th.sortable').forEach(th => {
+    th.addEventListener('click', () => {
+        const column = th.dataset.sort;
+        if (currentSort.column === column) {
+            currentSort.direction = currentSort.direction === 'asc' ? 'desc' : 'asc';
+        } else {
+            currentSort.column = column;
+            currentSort.direction = 'desc';
+        }
+        applySort();
+        displayResultsTable();
+    });
+});
