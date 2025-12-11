@@ -357,7 +357,7 @@ function displayResultsTable() {
             else if (pos === 3) posClass += ' pos-bronze';
             else if (pos <= 10) posClass += ' pos-top10';
 
-            posText = `${pos}${getOrdinalSuffix(pos)}`;
+            posText = getOrdinalSuffix(pos);
         }
 
         posCell.className = posClass;
