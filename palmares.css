@@ -346,6 +346,22 @@
     text-decoration: underline;
 }
 
+/* Special event highlighting */
+.special-event-row {
+    background: rgba(255, 215, 0, 0.05); /* Subtle gold tint */
+    border-left: 3px solid rgba(255, 215, 0, 0.4); /* Gold accent bar */
+}
+
+.special-event-row:hover {
+    background: rgba(255, 215, 0, 0.1);
+}
+
+.special-event-marker {
+    color: rgba(255, 215, 0, 0.7);
+    font-style: italic;
+    font-weight: 600;
+}
+
 /* Awards cell */
 .awards-cell {
     display: flex;

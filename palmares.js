@@ -77,6 +77,28 @@ const AWARD_NAMES = {
     gcBronze: { name: "GC Bronze Trophy", icon: "🥉" }
 };
 
+// Helper function to get stage number for an event
+// Returns null for special events (6-12) which are optional choice events
+function getStageForEvent(eventNum) {
+    const stageMapping = {
+        1: 1,   // Stage 1: Event 1 (fixed)
+        2: 2,   // Stage 2: Event 2 (fixed)
+        3: 4,   // Stage 4: Event 3 (fixed)
+        4: 5,   // Stage 5: Event 4 (fixed)
+        5: 7,   // Stage 7: Event 5 (fixed)
+        13: 9,  // Stage 9: Event 13 (tour)
+        14: 9,  // Stage 9: Event 14 (tour)
+        15: 9   // Stage 9: Event 15 (tour)
+    };
+
+    return stageMapping[eventNum] || null; // Events 6-12 return null (special events)
+}
+
+// Helper function to check if an event is a special event
+function isSpecialEvent(eventNum) {
+    return eventNum >= 6 && eventNum <= 12;
+}
+
 // Show/hide sections
 function showLoadingState() {
     document.getElementById('loadingState').style.display = 'flex';
@@ -292,6 +314,33 @@ function displayResultsTable() {
         eventCell.appendChild(eventLink);
         row.appendChild(eventCell);
 
+        // Season
+        const seasonCell = document.createElement('td');
+        const isSpecial = isSpecialEvent(result.eventNum);
+        if (isSpecial) {
+            seasonCell.textContent = '—';
+            seasonCell.className = 'special-event-marker';
+        } else {
+            seasonCell.textContent = '1'; // Currently all events are in Season 1
+        }
+        row.appendChild(seasonCell);
+
+        // Stage
+        const stageCell = document.createElement('td');
+        const stageNum = getStageForEvent(result.eventNum);
+        if (stageNum !== null) {
+            stageCell.textContent = stageNum;
+        } else {
+            stageCell.textContent = '—';
+            stageCell.className = 'special-event-marker';
+        }
+        row.appendChild(stageCell);
+
+        // Mark the entire row as special event if applicable
+        if (isSpecial) {
+            row.classList.add('special-event-row');
+        }
+
         // Position
         const posCell = document.createElement('td');
         const pos = result.position;
@@ -422,6 +471,16 @@ function applySort() {
             case 'event':
                 aVal = a.eventName;
                 bVal = b.eventName;
+                break;
+            case 'season':
+                // Special events (6-12) sort last (using 999)
+                aVal = isSpecialEvent(a.eventNum) ? 999 : 1;
+                bVal = isSpecialEvent(b.eventNum) ? 999 : 1;
+                break;
+            case 'stage':
+                // Special events (6-12) sort last (using 999)
+                aVal = getStageForEvent(a.eventNum) || 999;
+                bVal = getStageForEvent(b.eventNum) || 999;
                 break;
             case 'position':
                 aVal = a.position === 'DNF' ? 999 : a.position;
