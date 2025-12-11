@@ -242,7 +242,7 @@ function displayKeyStats() {
     document.getElementById('statPodiums').textContent = userData.totalPodiums || 0;
     document.getElementById('statTop10').textContent = userData.totalTop10s || 0;
     document.getElementById('statDNF').textContent = dnfCount;
-    document.getElementById('statAvg').textContent = userData.averageFinish?.toFixed(1) || '0.0';
+    document.getElementById('statAvg').textContent = Math.round(userData.averageFinish) || '0';
     document.getElementById('statPoints').textContent = userData.totalPoints || 0;
     document.getElementById('statARR').textContent = userData.arr || 0;
 }
@@ -609,7 +609,7 @@ function displayDetailedStats() {
     document.getElementById('perfWins').textContent = `${userData.totalWins || 0} (${winRate}%)`;
     document.getElementById('perfPodiums').textContent = `${userData.totalPodiums || 0} (${podiumRate}%)`;
     document.getElementById('perfTop10').textContent = `${userData.totalTop10s || 0} (${top10Rate}%)`;
-    document.getElementById('perfAvgFinish').textContent = userData.averageFinish?.toFixed(1) || '0.0';
+    document.getElementById('perfAvgFinish').textContent = Math.round(userData.averageFinish) || '0';
 
     const bestFinish = userData.bestFinish || null;
     document.getElementById('perfBestFinish').textContent = bestFinish ?
@@ -1115,6 +1115,10 @@ function setupChartInteractivity() {
 
     // Change cursor over legend
     freshCanvas.addEventListener('mousemove', handleCursorChange);
+
+    // Hide tooltip on scroll or window events
+    window.addEventListener('scroll', hideTooltip, true);
+    window.addEventListener('resize', hideTooltip);
 }
 
 // Handle chart hover for tooltips
@@ -1252,6 +1256,13 @@ function hideTooltip() {
     const tooltip = document.getElementById('chartTooltip');
     if (tooltip) {
         tooltip.remove();
+    }
+    // Reset hover state and redraw chart
+    if (hoveredEventIndex !== null) {
+        hoveredEventIndex = null;
+        if (chartDataPoints && chartDataPoints.length > 0) {
+            drawPersonalityChart(chartDataPoints);
+        }
     }
 }
 
