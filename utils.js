@@ -36,9 +36,9 @@ export function formatTime(seconds) {
 }
 
 /**
- * Get ordinal suffix for a number (1st, 2nd, 3rd, 4th, etc.)
+ * Get ordinal suffix for a number (st, nd, rd, th)
  * @param {number} num - The number
- * @returns {string} Number with ordinal suffix
+ * @returns {string} Ordinal suffix only (not including the number)
  */
 export function getOrdinalSuffix(num) {
   if (!num) return '';
@@ -48,15 +48,15 @@ export function getOrdinalSuffix(num) {
 
   // Special cases: 11th, 12th, 13th
   if (lastTwoDigits >= 11 && lastTwoDigits <= 13) {
-    return n + 'th';
+    return 'th';
   }
 
   // Regular cases
   switch (lastDigit) {
-    case 1: return n + 'st';
-    case 2: return n + 'nd';
-    case 3: return n + 'rd';
-    default: return n + 'th';
+    case 1: return 'st';
+    case 2: return 'nd';
+    case 3: return 'rd';
+    default: return 'th';
   }
 }
 

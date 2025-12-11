@@ -273,7 +273,7 @@ function displayProfileInfo(user, userData, stats, seasonRanking, globalRanking)
     }
     
     document.getElementById('arrRating').textContent = stats.arr ? stats.arr : 'N/A';
-    document.getElementById('avgFinish').textContent = stats.averageFinish ? getOrdinalSuffix(stats.averageFinish) : 'N/A';
+    document.getElementById('avgFinish').textContent = stats.averageFinish ? Math.round(stats.averageFinish) + getOrdinalSuffix(stats.averageFinish) : 'N/A';
     document.getElementById('winRate').textContent = `${stats.winRate}%`;
     document.getElementById('podiumRate').textContent = `${stats.podiumRate}%`;
     
