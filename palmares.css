@@ -145,6 +145,12 @@
     border-color: var(--accent-blue, #45caff);
 }
 
+.control-select option {
+    background: #1a1f2e;
+    color: #ffffff;
+    padding: 0.5rem;
+}
+
 .result-count {
     font-size: 0.8rem;
     color: var(--text-secondary, #a0a8c0);
