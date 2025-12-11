@@ -181,6 +181,7 @@
     text-transform: uppercase;
     letter-spacing: 0.5px;
     font-family: 'Exo 2', sans-serif;
+    white-space: nowrap;
 }
 
 .stat-value {
