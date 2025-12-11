@@ -78,7 +78,7 @@ const AWARD_NAMES = {
 };
 
 // Helper function to get stage number for an event
-// Returns null for special events (6-12) which are optional choice events
+// Returns null for choice events (6-12) which don't have a fixed stage display
 function getStageForEvent(eventNum) {
     const stageMapping = {
         1: 1,   // Stage 1: Event 1 (fixed)
@@ -91,11 +91,11 @@ function getStageForEvent(eventNum) {
         15: 9   // Stage 9: Event 15 (tour)
     };
 
-    return stageMapping[eventNum] || null; // Events 6-12 return null (special events)
+    return stageMapping[eventNum] || null; // Events 6-12 return null (choice events)
 }
 
-// Helper function to check if an event is a special event
-function isSpecialEvent(eventNum) {
+// Helper function to check if an event is a choice event (stages 3, 6, or 8)
+function isChoiceEvent(eventNum) {
     return eventNum >= 6 && eventNum <= 12;
 }
 
@@ -316,10 +316,10 @@ function displayResultsTable() {
 
         // Season
         const seasonCell = document.createElement('td');
-        const isSpecial = isSpecialEvent(result.eventNum);
-        if (isSpecial) {
-            seasonCell.textContent = '—';
-            seasonCell.className = 'special-event-marker';
+        const isChoice = isChoiceEvent(result.eventNum);
+        if (isChoice) {
+            seasonCell.textContent = '1';
+            seasonCell.className = 'choice-event-marker';
         } else {
             seasonCell.textContent = '1'; // Currently all events are in Season 1
         }
@@ -331,14 +331,15 @@ function displayResultsTable() {
         if (stageNum !== null) {
             stageCell.textContent = stageNum;
         } else {
-            stageCell.textContent = '—';
-            stageCell.className = 'special-event-marker';
+            // Choice events show "Choice" instead of a stage number
+            stageCell.textContent = 'Choice';
+            stageCell.className = 'choice-event-marker';
         }
         row.appendChild(stageCell);
 
-        // Mark the entire row as special event if applicable
-        if (isSpecial) {
-            row.classList.add('special-event-row');
+        // Mark the entire row as choice event if applicable
+        if (isChoice) {
+            row.classList.add('choice-event-row');
         }
 
         // Position
@@ -473,12 +474,12 @@ function applySort() {
                 bVal = b.eventName;
                 break;
             case 'season':
-                // Special events (6-12) sort last (using 999)
-                aVal = isSpecialEvent(a.eventNum) ? 999 : 1;
-                bVal = isSpecialEvent(b.eventNum) ? 999 : 1;
+                // All events are currently in season 1, so sort by event number
+                aVal = a.eventNum;
+                bVal = b.eventNum;
                 break;
             case 'stage':
-                // Special events (6-12) sort last (using 999)
+                // Choice events (6-12) sort after numbered stages (using 999)
                 aVal = getStageForEvent(a.eventNum) || 999;
                 bVal = getStageForEvent(b.eventNum) || 999;
                 break;
