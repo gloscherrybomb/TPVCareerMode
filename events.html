@@ -1040,8 +1040,14 @@
                 
                 const userDoc = querySnapshot.docs[0];
                 const userDocRef = userDoc.ref;
-                const userUid = userDoc.data().uid;
-                
+                const userData = userDoc.data();
+                const userUid = userData.uid;
+
+                // Calculate new career points: remove season points, add 50 bonus
+                const currentCareerPoints = userData.careerPoints || 0;
+                const currentSeasonPoints = userData.totalPoints || 0;
+                const newCareerPoints = currentCareerPoints - currentSeasonPoints + 50;
+
                 // Delete all race result documents for this user (season1_event1_UID through season1_event15_UID)
                 const deletePromises = [];
                 for (let i = 1; i <= 15; i++) {
@@ -1064,6 +1070,7 @@
                 const resetData = {
                     currentStage: 1,
                     totalPoints: 0,
+                    careerPoints: newCareerPoints,
                     totalEvents: 0,
                     totalWins: 0,
                     totalPodiums: 0,
@@ -1080,6 +1087,7 @@
                     season1Rank: null,
                     localTourStatus: 'in_progress',
                     season1CelebrationViewed: false,
+                    gluttonForPunishmentAwarded: true,
                     awards: {
                         gold: 0,
                         silver: 0,
@@ -1099,7 +1107,8 @@
                         lanternRouge: 0,
                         seasonChampion: 0,
                         seasonRunnerUp: 0,
-                        seasonThirdPlace: 0
+                        seasonThirdPlace: 0,
+                        gluttonForPunishment: 1
                     }
                 };
                 

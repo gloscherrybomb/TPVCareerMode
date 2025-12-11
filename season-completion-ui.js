@@ -263,12 +263,9 @@ async function confirmSeasonReset() {
             // Close loading modal
             const loadingModal = document.getElementById('resetLoadingModal');
             if (loadingModal) loadingModal.remove();
-            
-            // Show success message
-            alert('Season 1 has been reset. Redirecting to events page...');
-            
-            // Reload page to show fresh state
-            window.location.reload();
+
+            // Show Glutton for Punishment award modal
+            showGluttonForPunishmentModal();
         } else {
             throw new Error('Reset function not found');
         }
@@ -280,6 +277,59 @@ async function confirmSeasonReset() {
         if (loadingModal) loadingModal.remove();
         
         alert('Error resetting season. Please try again or contact support.');
+    }
+}
+
+/**
+ * Show Glutton for Punishment award modal after season reset
+ */
+function showGluttonForPunishmentModal() {
+    const modalHTML = `
+        <div class="season-complete-modal" id="gluttonModal">
+            <div class="season-complete-content" style="text-align: center; max-width: 600px;">
+                <div style="font-size: 4rem; margin-bottom: 1rem;">🏅</div>
+                <h2 style="color: var(--accent-pink); margin-bottom: 1rem; font-family: 'Orbitron', sans-serif;">
+                    Special Award Unlocked!
+                </h2>
+                <div style="padding: 1.5rem; background: rgba(255, 27, 107, 0.1); border: 2px solid rgba(255, 27, 107, 0.3); border-radius: 8px; margin-bottom: 1.5rem;">
+                    <h3 style="color: var(--accent-pink); font-size: 1.5rem; margin-bottom: 0.5rem; font-family: 'Orbitron', sans-serif;">
+                        🎖️ Glutton for Punishment
+                    </h3>
+                    <p style="color: var(--text-primary); font-size: 1rem; margin-bottom: 1rem;">
+                        For those brave enough to do it all over again
+                    </p>
+                    <div style="font-size: 2rem; color: var(--accent-green); font-weight: bold; font-family: 'Orbitron', sans-serif;">
+                        +50 Career Points
+                    </div>
+                </div>
+                <p style="color: var(--text-secondary); margin-bottom: 1.5rem; line-height: 1.6;">
+                    Your season has been reset, but you've earned something special for your determination.
+                    These bonus points will count toward your global ranking as you embark on Season 1 once more.
+                </p>
+                <button class="btn btn-primary" onclick="closeGluttonModal()" style="font-size: 1.1rem; padding: 0.75rem 2rem;">
+                    Let's Go! 💪
+                </button>
+            </div>
+        </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+
+    // Add celebration confetti
+    createConfetti();
+}
+
+/**
+ * Close Glutton for Punishment modal and redirect
+ */
+function closeGluttonModal() {
+    const modal = document.getElementById('gluttonModal');
+    if (modal) {
+        modal.classList.add('hidden');
+        setTimeout(() => {
+            modal.remove();
+            window.location.reload();
+        }, 300);
     }
 }
 
@@ -317,13 +367,16 @@ if (typeof window !== 'undefined') {
         showResetConfirmation,
         closeResetConfirmation,
         confirmSeasonReset,
+        showGluttonForPunishmentModal,
+        closeGluttonModal,
         shouldShowCelebration,
         createConfetti
     };
-    
+
     // Make functions globally available for onclick handlers
     window.closeSeasonCompleteModal = closeSeasonCompleteModal;
     window.showResetConfirmation = showResetConfirmation;
     window.closeResetConfirmation = closeResetConfirmation;
     window.confirmSeasonReset = confirmSeasonReset;
+    window.closeGluttonModal = closeGluttonModal;
 }

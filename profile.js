@@ -434,24 +434,26 @@ function displayAwards(awards) {
         podiumStreak: awards.podiumStreak || 0,
         specialist: awards.specialist || 0,
         allRounder: awards.allRounder || 0,
-        comeback: awards.comeback || 0
+        comeback: awards.comeback || 0,
+        gluttonForPunishment: awards.gluttonForPunishment || 0
     };
 
     // Use mapped awards for the rest of the function
     awards = mappedAwards;
     
     // Check if user has any awards (include all award types)
-    const totalAwards = awards.goldMedals + awards.silverMedals + awards.bronzeMedals + 
+    const totalAwards = awards.goldMedals + awards.silverMedals + awards.bronzeMedals +
                         awards.lanternRouge + awards.punchingMedals + awards.giantKillerMedals +
                         awards.bullseyeMedals + awards.hotStreakMedals +
                         (awards.domination || 0) + (awards.closeCall || 0) + (awards.photoFinish || 0) +
                         (awards.overrated || 0) + (awards.darkHorse || 0) + (awards.backToBack || 0) +
-                        (awards.weekendWarrior || 0) + (awards.zeroToHero || 0) + 
+                        (awards.weekendWarrior || 0) + (awards.zeroToHero || 0) +
                         (awards.trophyCollector || 0) + (awards.technicalIssues || 0) +
                         (awards.gcGoldMedal || 0) + (awards.gcSilverMedal || 0) + (awards.gcBronzeMedal || 0) +
                         (awards.seasonChampion || 0) + (awards.seasonRunnerUp || 0) + (awards.seasonThirdPlace || 0) +
                         (awards.perfectSeason || 0) + (awards.podiumStreak || 0) +
-                        (awards.specialist || 0) + (awards.allRounder || 0) + (awards.comeback || 0);
+                        (awards.specialist || 0) + (awards.allRounder || 0) + (awards.comeback || 0) +
+                        (awards.gluttonForPunishment || 0);
     
     if (totalAwards === 0) {
         container.innerHTML = `
@@ -819,7 +821,19 @@ function displayAwards(awards) {
             </div>
         `;
     }
-    
+
+    // Glutton for Punishment (reset season and start over)
+    if (awards.gluttonForPunishment > 0) {
+        html += `
+            <div class="award-card glutton-for-punishment">
+                <div class="award-icon">🎖️</div>
+                <div class="award-count">${awards.gluttonForPunishment}x</div>
+                <div class="award-title">Glutton for Punishment</div>
+                <div class="award-description">Reset Season & Started Over</div>
+            </div>
+        `;
+    }
+
     html += '</div>';
     container.innerHTML = html;
 }

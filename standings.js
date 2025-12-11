@@ -391,13 +391,15 @@ async function renderGlobalRankings() {
         const rankings = [];
         usersSnapshot.forEach((doc) => {
             const data = doc.data();
+            // Use careerPoints for global rankings, fallback to totalPoints for backwards compatibility
+            const careerPoints = data.careerPoints !== undefined ? data.careerPoints : (data.totalPoints || 0);
             rankings.push({
                 uid: doc.id,
                 name: data.name || 'Unknown',
                 team: data.team || '',
                 season: data.currentSeason || 1,
                 events: data.totalEvents || (data.completedStages?.length || 0),
-                points: data.totalPoints || 0,
+                points: careerPoints,
                 gender: data.gender || null,
                 ageBand: data.ageBand || null,
                 country: data.country || null,

@@ -74,7 +74,8 @@ const AWARD_NAMES = {
     zeroToHero: { name: "Zero to Hero", icon: "🦸" },
     gcGold: { name: "GC Gold Trophy", icon: "🏆" },
     gcSilver: { name: "GC Silver Trophy", icon: "🥈" },
-    gcBronze: { name: "GC Bronze Trophy", icon: "🥉" }
+    gcBronze: { name: "GC Bronze Trophy", icon: "🥉" },
+    gluttonForPunishment: { name: "Glutton for Punishment", icon: "🎖️" }
 };
 
 // Helper function to get stage number for an event

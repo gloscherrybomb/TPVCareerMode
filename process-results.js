@@ -1457,6 +1457,7 @@ async function processUserResult(uid, eventInfo, results) {
     [`event${eventNumber}Results`]: eventResults,
     currentStage: nextStage,
     totalPoints: (userData.totalPoints || 0) + points,
+    careerPoints: (userData.careerPoints || 0) + points,
     totalEvents: (userData.totalEvents || 0) + 1,
     totalWins: careerStats.totalWins,
     totalPodiums: careerStats.totalPodiums,
