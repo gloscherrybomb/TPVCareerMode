@@ -670,10 +670,16 @@ function displayPersonalityTimeline() {
     if (Object.keys(currentPersonality).length > 0) {
         const currentDiv = document.createElement('div');
         currentDiv.className = 'personality-snapshot';
+
+        // Valid personality traits (exclude lastUpdated, LastUpdated, etc.)
+        const validTraits = ['confidence', 'humility', 'aggression', 'professionalism', 'showmanship', 'resilience'];
+        const filteredTraits = Object.entries(currentPersonality)
+            .filter(([trait]) => validTraits.includes(trait.toLowerCase()));
+
         currentDiv.innerHTML = `
             <div class="snapshot-header">Current Personality</div>
             <div class="trait-changes">
-                ${Object.entries(currentPersonality).map(([trait, value]) => `
+                ${filteredTraits.map(([trait, value]) => `
                     <div class="trait-change">
                         <span class="trait-name">${capitalize(trait)}:</span>
                         <span class="trait-values">${value}</span>
