@@ -166,12 +166,18 @@ class AchievementNotifications {
       return;
     }
 
-    console.log(`Displaying ${unshown.length} notification(s)`);
+    console.log(`[NOTIFICATION DEBUG] Displaying ${unshown.length} notification(s)`);
+    console.log('[NOTIFICATION DEBUG] Unshown notifications:', unshown);
 
     this.isDisplaying = true;
 
     // Group notifications
     this.groups = this.groupNotifications(unshown);
+
+    console.log(`[NOTIFICATION DEBUG] Created ${this.groups.length} group(s):`);
+    this.groups.forEach((g, i) => {
+      console.log(`  Group ${i + 1}: ${g.category} (${g.notifications.length} notification(s))`);
+    });
 
     // Display first group
     this.currentGroupIndex = 0;
@@ -216,12 +222,18 @@ class AchievementNotifications {
    * @param {Object} group - Group object containing category and notifications
    */
   showGroup(group) {
+    console.log(`[NOTIFICATION DEBUG] Showing group ${this.currentGroupIndex + 1}/${this.groups.length}: ${group.category}`);
+    console.log(`[NOTIFICATION DEBUG] Group contains ${group.notifications.length} notification(s):`, group.notifications.map(n => n.awardId));
+
     // Create overlay
     const overlay = this.createOverlay(group);
     document.body.appendChild(overlay);
 
     // Trigger animations
-    setTimeout(() => overlay.classList.add('active'), 50);
+    setTimeout(() => {
+      overlay.classList.add('active');
+      console.log(`[NOTIFICATION DEBUG] Overlay activated for ${group.category}`);
+    }, 50);
 
     // Play sound for group intensity
     const maxIntensity = this.getMaxIntensity(group.notifications);
@@ -235,7 +247,10 @@ class AchievementNotifications {
     }
 
     // Mark as shown
-    group.notifications.forEach(n => this.queue.markAsShown(n.id));
+    group.notifications.forEach(n => {
+      console.log(`[NOTIFICATION DEBUG] Marking as shown: ${n.awardId} (ID: ${n.id})`);
+      this.queue.markAsShown(n.id);
+    });
   }
 
   /**
@@ -314,22 +329,29 @@ class AchievementNotifications {
    * Dismiss current group and show next
    */
   dismiss() {
+    console.log(`[NOTIFICATION DEBUG] Dismiss called for group ${this.currentGroupIndex + 1}`);
+
     const overlay = document.getElementById('achievementOverlay');
     if (overlay) {
       overlay.classList.remove('active');
-      setTimeout(() => overlay.remove(), 400);
+      console.log('[NOTIFICATION DEBUG] Removed active class from overlay');
+      setTimeout(() => {
+        overlay.remove();
+        console.log('[NOTIFICATION DEBUG] Overlay removed from DOM');
+      }, 400);
     }
 
     // Show next group if available
     this.currentGroupIndex++;
     if (this.currentGroupIndex < this.groups.length) {
+      console.log(`[NOTIFICATION DEBUG] Scheduling next group (${this.currentGroupIndex + 1}/${this.groups.length}) in 600ms`);
       setTimeout(() => {
         this.showGroup(this.groups[this.currentGroupIndex]);
       }, 600);
     } else {
       // All groups shown
       this.isDisplaying = false;
-      console.log('All notifications shown');
+      console.log('[NOTIFICATION DEBUG] All notifications shown - display complete');
     }
   }
 

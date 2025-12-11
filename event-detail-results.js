@@ -654,11 +654,13 @@ async function loadEventResults() {
 
         // NEW: Check for earned awards and queue for notifications
         if (userEventResults && userEventResults.earnedAwards && userEventResults.earnedAwards.length > 0) {
-            console.log(`Found ${userEventResults.earnedAwards.length} earned award(s) for event ${eventNumber}`);
+            console.log(`[AWARD DEBUG] Found ${userEventResults.earnedAwards.length} earned award(s) for event ${eventNumber}`);
+            console.log('[AWARD DEBUG] Awards:', userEventResults.earnedAwards);
 
             // Queue each award for notification
             if (window.notificationQueue) {
                 userEventResults.earnedAwards.forEach(award => {
+                    console.log(`[AWARD DEBUG] Queueing award: ${award.awardId} (category: ${award.category})`);
                     window.notificationQueue.add({
                         awardId: award.awardId,
                         eventNumber: eventNumber,
@@ -669,6 +671,7 @@ async function loadEventResults() {
 
                 // Display notifications immediately
                 setTimeout(() => {
+                    console.log('[AWARD DEBUG] Triggering notification display...');
                     if (window.achievementNotifications) {
                         window.achievementNotifications.display();
                     }
