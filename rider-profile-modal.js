@@ -4,6 +4,7 @@
 import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 import { drawPersonalityChart } from './profile-personality.js';
 import { getPersonaLabel } from './interview-engine.js';
+import { getCountryCode2 } from './utils.js';
 
 let db;
 let modalInitialized = false;
@@ -475,7 +476,14 @@ function buildRiderProfileHTML(data, name) {
     const eventsPerSeason = 9; // 6 mandatory + 3 optional that must be completed
     const currentSeasonEvents = completedStages.length + completedOptionalEvents.length;
     const currentSeasonProgressPercent = Math.min((currentSeasonEvents / eventsPerSeason) * 100, 100);
-    
+
+    // Get country flag if available
+    const country = data.country || null;
+    const countryCode2 = country ? getCountryCode2(country) : null;
+    const countryFlagHTML = countryCode2
+        ? `<img src="assets/flags/${countryCode2}.svg" alt="${country}" class="country-flag-profile" title="${country}">`
+        : '';
+
     let html = `
         <div class="rider-profile-card">
             <div class="rider-profile-header">
@@ -483,7 +491,7 @@ function buildRiderProfileHTML(data, name) {
                     ${photoURL ? `<img src="${photoURL}" alt="${displayName}">` : initials}
                 </div>
                 <div class="rider-profile-info">
-                    <h2 class="rider-profile-name">${displayName}</h2>
+                    <h2 class="rider-profile-name">${countryFlagHTML}${displayName}</h2>
                     <div class="rider-profile-meta">
                         <div class="rider-profile-meta-item">
                             <span class="rider-profile-meta-label">ARR</span>

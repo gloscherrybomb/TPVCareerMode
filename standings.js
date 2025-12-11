@@ -1,7 +1,7 @@
 // Standings Page Logic for TPV Career Mode
 
 import { firebaseConfig } from './firebase-config.js';
-import { getARRBand } from './utils.js';
+import { getARRBand, getCountryCode2 } from './utils.js';
 import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 import { getFirestore, doc, getDoc, collection, getDocs, query, orderBy, limit } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
@@ -453,7 +453,7 @@ async function renderGlobalRankings() {
                 
                 // Determine if this is a bot or human rider
                 const isBot = racer.uid.startsWith('Bot');
-                
+
                 // Make name clickable with appropriate modal
                 let nameHTML;
                 if (isBot) {
@@ -461,13 +461,23 @@ async function renderGlobalRankings() {
                 } else {
                     nameHTML = makeRiderNameClickable(racer.name, racer.uid, false);
                 }
-                
+
+                // Get country flag for human riders
+                let countryFlagHTML = '';
+                if (!isBot && racer.country) {
+                    const countryCode2 = getCountryCode2(racer.country);
+                    if (countryCode2) {
+                        countryFlagHTML = `<img src="assets/flags/${countryCode2}.svg" alt="${racer.country}" class="country-flag-small" title="${racer.country}">`;
+                    }
+                }
+
                 tableHTML += `
                     <tr class="${rowClass}">
                         <td class="rank-cell">
                             <span class="rank-number ${rankClass}">${rank}</span>
                         </td>
                         <td class="name-cell">
+                            ${countryFlagHTML}
                             <span class="rider-name">${nameHTML}</span>
                             ${racer.isCurrentUser ? '<span class="you-badge">YOU</span>' : ''}
                         </td>

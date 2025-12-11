@@ -1225,3 +1225,14 @@ body {
         font-size: 0.7rem;
     }
 }
+
+/* Country Flags */
+.country-flag-profile {
+    width: 24px;
+    height: 18px;
+    object-fit: cover;
+    border-radius: 3px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    margin-right: 0.5rem;
+    vertical-align: middle;
+}
