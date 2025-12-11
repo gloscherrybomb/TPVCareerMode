@@ -375,7 +375,115 @@
         </div>
     </main>
 
+    <!-- Login Modal -->
+    <div class="modal" id="loginModal">
+        <div class="modal-overlay" id="modalOverlay"></div>
+        <div class="modal-content">
+            <button class="modal-close" id="modalClose">&times;</button>
+            <div class="modal-header">
+                <div class="modal-tabs">
+                    <button class="modal-tab active" data-tab="login">Login</button>
+                    <button class="modal-tab" data-tab="signup">Sign Up</button>
+                </div>
+            </div>
+            <div class="modal-body">
+                <!-- Login Tab -->
+                <div class="tab-content active" id="loginTab">
+                    <form id="loginForm">
+                        <div class="form-group">
+                            <label for="loginEmail">Email</label>
+                            <input type="email" id="loginEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="loginPassword">Password</label>
+                            <input type="password" id="loginPassword" required>
+                        </div>
+                        <div class="form-group checkbox-group">
+                            <input type="checkbox" id="rememberMe">
+                            <label for="rememberMe">Remember me</label>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-full">Login</button>
+                    </form>
+                    <div class="divider">
+                        <span>OR</span>
+                    </div>
+                    <button class="btn btn-google" id="googleLoginBtn">
+                        <svg width="18" height="18" viewBox="0 0 18 18">
+                            <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/>
+                            <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/>
+                            <path fill="#FBBC05" d="M3.964 10.71c-.18-.54-.282-1.117-.282-1.71s.102-1.17.282-1.71V4.958H.957C.347 6.173 0 7.548 0 9s.348 2.827.957 4.042l3.007-2.332z"/>
+                            <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/>
+                        </svg>
+                        Sign in with Google
+                    </button>
+                </div>
+
+                <!-- Sign Up Tab -->
+                <div class="tab-content" id="signupTab">
+                    <form id="signupForm">
+                        <div class="form-group">
+                            <label for="signupName">Full Name</label>
+                            <input type="text" id="signupName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="signupUID">
+                                TrainingPeaks Virtual UID
+                                <span class="form-help">16-character hex code from TPV</span>
+                            </label>
+                            <input type="text" id="signupUID" maxlength="16" pattern="[0-9A-Fa-f]{15,16}" required style="text-transform: uppercase;">
+                        </div>
+                        <div class="form-group">
+                            <label for="signupEmail">Email</label>
+                            <input type="email" id="signupEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="signupPassword">Password</label>
+                            <input type="password" id="signupPassword" required minlength="6">
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-full">Create Account</button>
+                    </form>
+                    <div class="divider">
+                        <span>OR</span>
+                    </div>
+                    <button class="btn btn-google" id="googleSignupBtn">
+                        <svg width="18" height="18" viewBox="0 0 18 18">
+                            <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/>
+                            <path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/>
+                            <path fill="#FBBC05" d="M3.964 10.71c-.18-.54-.282-1.117-.282-1.71s.102-1.17.282-1.71V4.958H.957C.347 6.173 0 7.548 0 9s.348 2.827.957 4.042l3.007-2.332z"/>
+                            <path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/>
+                        </svg>
+                        Sign up with Google
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- UID Modal for Google Users -->
+    <div class="modal" id="uidModal">
+        <div class="modal-overlay" id="uidModalOverlay"></div>
+        <div class="modal-content modal-small">
+            <div class="modal-header">
+                <h2>Enter Your TPV UID</h2>
+                <p class="modal-subtitle">We need your TrainingPeaks Virtual UID to track your race results</p>
+            </div>
+            <div class="modal-body">
+                <form id="uidForm">
+                    <div class="form-group">
+                        <label for="googleUID">
+                            TrainingPeaks Virtual UID
+                            <span class="form-help">16-character hex code from TPV (e.g., A1B2C3D4E5F67890)</span>
+                        </label>
+                        <input type="text" id="googleUID" maxlength="16" pattern="[0-9A-Fa-f]{15,16}" required style="text-transform: uppercase;" placeholder="Enter your UID">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full">Save UID</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <!-- Include Firebase and authentication -->
+    <script type="module" src="app.js"></script>
     <script type="module" src="palmares.js"></script>
 </body>
 </html>
