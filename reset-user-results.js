@@ -130,9 +130,15 @@ async function resetUserResults() {
         rivalLosses: admin.firestore.FieldValue.delete(),
         rivalData: admin.firestore.FieldValue.delete(),
 
-        // Personality and interview data
-        personality: admin.firestore.FieldValue.delete(),
-        interviewHistory: admin.firestore.FieldValue.delete()
+        // Lifetime stats (reset for palmares)
+        lifetimeStats: admin.firestore.FieldValue.delete(),
+        personalityHistory: admin.firestore.FieldValue.delete(),
+
+        // Personality awards (reset these too)
+        personalityAwards: admin.firestore.FieldValue.delete()
+
+        // NOTE: personality and interviewHistory are PRESERVED
+        // NOTE: interviews collection documents are PRESERVED
       });
     }
 
@@ -140,24 +146,8 @@ async function resetUserResults() {
     await batch.commit();
     console.log("✅ All user documents reset successfully!");
 
-    // Delete all interview documents for all users
-    console.log('Deleting interview documents...');
-    const interviewsSnapshot = await db.collection('interviews').get();
-
-    if (!interviewsSnapshot.empty) {
-      const interviewBatch = db.batch();
-      let interviewCount = 0;
-
-      interviewsSnapshot.docs.forEach(doc => {
-        interviewBatch.delete(doc.ref);
-        interviewCount++;
-      });
-
-      await interviewBatch.commit();
-      console.log(`✅ Deleted ${interviewCount} interview documents`);
-    } else {
-      console.log('No interview documents to delete');
-    }
+    // NOTE: Interview documents are PRESERVED - users won't need to re-answer questions
+    console.log('✅ Interview documents preserved - users can continue from existing personality profiles');
 
     // Delete narrative history for all riders
     console.log('Deleting narrative history...');

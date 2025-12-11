@@ -46,14 +46,15 @@ jobs:
           echo "**Retained:**" >> $GITHUB_STEP_SUMMARY
           echo "- uid, name, email, photoURL" >> $GITHUB_STEP_SUMMARY
           echo "- team, arr, gender, country, ageBand" >> $GITHUB_STEP_SUMMARY
+          echo "- **personality and interviewHistory (users won't need to re-answer questions)**" >> $GITHUB_STEP_SUMMARY
+          echo "- **All interview documents in interviews collection**" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Cleared:**" >> $GITHUB_STEP_SUMMARY
           echo "- All event results (1-15)" >> $GITHUB_STEP_SUMMARY
-          echo "- Points, wins, podiums" >> $GITHUB_STEP_SUMMARY
+          echo "- Points, wins, podiums, awards" >> $GITHUB_STEP_SUMMARY
           echo "- Season standings and completion data" >> $GITHUB_STEP_SUMMARY
-          echo "- All awards and trophies" >> $GITHUB_STEP_SUMMARY
           echo "- Tour progress and optional events" >> $GITHUB_STEP_SUMMARY
           echo "- Rival tracking data" >> $GITHUB_STEP_SUMMARY
-          echo "- Personality profiles and interview history" >> $GITHUB_STEP_SUMMARY
-          echo "- All interview documents" >> $GITHUB_STEP_SUMMARY
+          echo "- Lifetime stats and personality history" >> $GITHUB_STEP_SUMMARY
+          echo "- Personality awards (will be re-earned)" >> $GITHUB_STEP_SUMMARY
           echo "- Narrative history" >> $GITHUB_STEP_SUMMARY
