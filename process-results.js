@@ -1420,25 +1420,37 @@ async function processUserResult(uid, eventInfo, results) {
   const existingLifetime = userData.lifetimeStats || {};
   const eventMeta = eventMetadata[eventNumber] || { distance: 0, climbing: 0 };
 
-  // Update cumulative totals
+  // Update cumulative totals (always present)
   const newLifetimeStats = {
     totalDistance: (existingLifetime.totalDistance || 0) + eventMeta.distance,
     totalClimbing: (existingLifetime.totalClimbing || 0) + eventMeta.climbing,
     totalRaceTime: (existingLifetime.totalRaceTime || 0) + (eventResults.time || 0),
-    totalDNFs: existingLifetime.totalDNFs || 0, // Will increment separately for DNFs
-
-    // Track biggest giant beaten
-    biggestGiantBeaten: calculateBiggestGiant(results, uid, position, eventResults.arr, eventNumber, existingLifetime.biggestGiantBeaten),
-
-    // Track best vs prediction
-    bestVsPrediction: calculateBestPrediction(eventResults, eventNumber, existingLifetime.bestVsPrediction),
-
-    // Track highest ARR
-    highestARR: calculateHighestARR(eventResults.arr, eventNumber, existingLifetime.highestARR),
-
-    // Track biggest win margin
-    biggestWin: calculateBiggestWinMargin(position, results, eventNumber, existingLifetime.biggestWin)
+    totalDNFs: existingLifetime.totalDNFs || 0 // Will increment separately for DNFs
   };
+
+  // Track biggest giant beaten (only add if not undefined)
+  const biggestGiant = calculateBiggestGiant(results, uid, position, eventResults.arr, eventNumber, existingLifetime.biggestGiantBeaten);
+  if (biggestGiant !== undefined) {
+    newLifetimeStats.biggestGiantBeaten = biggestGiant;
+  }
+
+  // Track best vs prediction (only add if not undefined)
+  const bestPred = calculateBestPrediction(eventResults, eventNumber, existingLifetime.bestVsPrediction);
+  if (bestPred !== undefined) {
+    newLifetimeStats.bestVsPrediction = bestPred;
+  }
+
+  // Track highest ARR (only add if not undefined)
+  const highARR = calculateHighestARR(eventResults.arr, eventNumber, existingLifetime.highestARR);
+  if (highARR !== undefined) {
+    newLifetimeStats.highestARR = highARR;
+  }
+
+  // Track biggest win margin (only add if not undefined)
+  const bigWin = calculateBiggestWinMargin(position, results, eventNumber, existingLifetime.biggestWin);
+  if (bigWin !== undefined) {
+    newLifetimeStats.biggestWin = bigWin;
+  }
 
   // Update user document
   const updates = {
