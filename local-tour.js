@@ -81,7 +81,7 @@ async function loadStageCards() {
                         <div class="status-icon">⚠️</div>
                         <div class="status-text">
                             <strong>DNS</strong>
-                            <span class="status-reason">${dnsReason || 'Did not start within 24-hour window'}</span>
+                            <span class="status-reason">${dnsReason || 'Did not start within 36-hour window'}</span>
                         </div>
                     </div>
                 `;

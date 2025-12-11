@@ -194,7 +194,7 @@ async function displayTourOverview(eventNumber, userData, userUid) {
                         <div class="dns-icon">⚠️</div>
                         <div class="dns-text">
                             <strong>DNS</strong>
-                            <span class="dns-reason">${dnsReason || 'Did not start within 24-hour window'}</span>
+                            <span class="dns-reason">${dnsReason || 'Did not start within 36-hour window'}</span>
                         </div>
                     </div>
                 ` : isCompleted ? `
@@ -403,16 +403,16 @@ function formatGCTime(seconds) {
 }
 
 /**
- * Add 24-hour warning for multi-stage tour events
+ * Add 36-hour warning for multi-stage tour events
  */
 function addTourTimingWarning(eventNumber) {
     const tourEvents = [13, 14, 15];
     if (!tourEvents.includes(eventNumber)) return;
-    
+
     // Find the event CTA section
     const ctaSection = document.querySelector('.event-cta');
     if (!ctaSection) return;
-    
+
     // Create warning message
     const warningHTML = `
         <div class="tour-timing-warning">
@@ -421,8 +421,8 @@ function addTourTimingWarning(eventNumber) {
                 <h4>Multi-Stage Race Timing Requirements</h4>
                 <p><strong>Important:</strong> All tour stages must be completed within strict time windows:</p>
                 <ul>
-                    <li>Stage 2 must be completed within <strong>24 hours</strong> of completing Stage 1</li>
-                    <li>Stage 3 must be completed within <strong>24 hours</strong> of completing Stage 2</li>
+                    <li>Stage 2 must be completed within <strong>36 hours</strong> of completing Stage 1</li>
+                    <li>Stage 3 must be completed within <strong>36 hours</strong> of completing Stage 2</li>
                 </ul>
                 <p class="warning-note">Schedule your stages carefully to ensure you can complete all three within the required timeframes!</p>
             </div>
