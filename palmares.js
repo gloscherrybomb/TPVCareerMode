@@ -847,20 +847,21 @@ function displayRivalsTable() {
     const tbody = document.getElementById('rivalsTableBody');
     tbody.innerHTML = '';
 
-    topRivals.forEach(rival => {
-        const encounterData = encounters[rival.uid] || {};
-        const wins = encounterData.wins || 0;
-        const losses = encounterData.losses || 0;
-        const total = wins + losses;
+    // topRivals is an array of UIDs, not objects
+    topRivals.forEach(rivalUid => {
+        const encounterData = encounters[rivalUid] || {};
+        const wins = encounterData.userWins || 0;
+        const losses = encounterData.botWins || 0;
+        const total = encounterData.races || 0;
         const winPct = total > 0 ? ((wins / total) * 100).toFixed(1) : '0.0';
 
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td>${rival.name}</td>
+            <td>${encounterData.botName || 'Unknown'}</td>
             <td>${total}</td>
             <td>${wins}-${losses}</td>
             <td>${winPct}%</td>
-            <td>${rival.arr || '—'}</td>
+            <td>${encounterData.botArr || '—'}</td>
         `;
         tbody.appendChild(row);
     });
