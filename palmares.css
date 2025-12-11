@@ -621,28 +621,55 @@
     .key-stats-bar {
         overflow-x: scroll;
         justify-content: flex-start;
+        -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+        scrollbar-width: thin; /* Firefox */
     }
 
     .key-achievements {
         flex-direction: column;
     }
 
-    .palmares-table {
-        font-size: 0.75rem;
+    /* Make all table wrappers scrollable on mobile */
+    .results-table-wrapper,
+    .awards-table-wrapper,
+    .rivals-table-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+        scrollbar-width: thin; /* Firefox */
+        position: relative;
     }
 
+    /* Set minimum widths for tables to force scrolling instead of compression */
+    .palmares-table {
+        min-width: 800px; /* Ensures all columns remain visible and table scrolls */
+        font-size: 0.8rem;
+    }
+
+    .awards-table {
+        min-width: 400px;
+    }
+
+    .rivals-table {
+        min-width: 600px;
+    }
+
+    /* Maintain readable padding on mobile */
     .palmares-table th,
     .palmares-table td {
-        padding: 0.5rem 0.25rem;
+        padding: 0.6rem 0.4rem;
+        white-space: nowrap; /* Prevent text wrapping in cells */
     }
 
-    /* Hide less critical columns on mobile */
-    .palmares-table th:nth-child(4),
-    .palmares-table td:nth-child(4),
-    .palmares-table th:nth-child(5),
-    .palmares-table td:nth-child(5) {
-        display: none;
+    .awards-table th,
+    .awards-table td,
+    .rivals-table th,
+    .rivals-table td {
+        padding: 0.6rem 0.4rem;
+        white-space: nowrap;
     }
+
+    /* Keep all columns visible - no hiding on mobile */
+    /* Tables should scroll horizontally to show all data */
 
     .stats-grid {
         grid-template-columns: 1fr;
@@ -660,5 +687,21 @@
 
     .stat-divider {
         margin: 0 0.5rem;
+    }
+
+    /* Increase minimum widths on very small screens to ensure proper scrolling */
+    .palmares-table {
+        min-width: 900px; /* Even wider to prevent any compression */
+    }
+
+    .rivals-table {
+        min-width: 650px;
+    }
+
+    /* Slightly reduce font size on very small screens while keeping content readable */
+    .palmares-table,
+    .awards-table,
+    .rivals-table {
+        font-size: 0.75rem;
     }
 }
