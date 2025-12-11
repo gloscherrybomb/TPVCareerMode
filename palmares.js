@@ -208,14 +208,14 @@ function displayKeyAchievements() {
             `Highest ARR: <strong>—</strong>`;
     }
 
-    // Biggest Giant
+    // Biggest Giant Beaten
     const giant = lifetime.biggestGiantBeaten;
     if (giant) {
         document.querySelector('#achievementBiggestGiant .achievement-text').innerHTML =
-            `Biggest Giant: <strong>Beat ARR ${giant.opponentARR}</strong> (${giant.opponentName})`;
+            `Biggest Giant Beaten: <strong>Beat ARR ${giant.opponentARR}</strong> (${giant.opponentName})`;
     } else {
         document.querySelector('#achievementBiggestGiant .achievement-text').innerHTML =
-            `Biggest Giant: <strong>—</strong>`;
+            `Biggest Giant Beaten: <strong>—</strong>`;
     }
 }
 
