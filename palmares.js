@@ -27,6 +27,18 @@ let filteredResults = [];
 let currentSort = { column: 'date', direction: 'desc' };
 let interviewHistory = [];
 
+// Personality chart state
+let chartDataPoints = [];
+let visibleTraits = {
+    confidence: true,
+    humility: true,
+    aggression: true,
+    professionalism: true,
+    showmanship: true,
+    resilience: true
+};
+let hoveredEventIndex = null;
+
 // Event metadata
 const EVENT_DATA = {
     1: { name: "Coast and Roast Crit", type: "criterium" },
@@ -765,8 +777,12 @@ function displayPersonalityTimeline() {
         }
     });
 
+    // Store data points globally for interactivity
+    chartDataPoints = dataPoints;
+
     // Draw the chart
     drawPersonalityChart(dataPoints);
+    setupChartInteractivity();
 }
 
 // Draw line chart showing personality evolution
@@ -894,8 +910,10 @@ function drawPersonalityChart(dataPoints) {
     ctx.lineTo(padding.left + chartWidth, padding.top + chartHeight);
     ctx.stroke();
 
-    // Draw trait lines
+    // Draw trait lines (only visible traits)
     traits.forEach(trait => {
+        if (!visibleTraits[trait.name]) return; // Skip hidden traits
+
         ctx.strokeStyle = trait.color;
         ctx.lineWidth = 3;
         ctx.beginPath();
@@ -925,25 +943,80 @@ function drawPersonalityChart(dataPoints) {
         });
     });
 
-    // Draw legend
+    // Draw hover highlight if hovering
+    if (hoveredEventIndex !== null && hoveredEventIndex < sampledPoints.length) {
+        const hoveredPoint = sampledPoints[hoveredEventIndex];
+        const x = xScale(hoveredPoint.eventNumber);
+
+        // Draw vertical line at hovered event
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([5, 5]);
+        ctx.beginPath();
+        ctx.moveTo(x, padding.top);
+        ctx.lineTo(x, padding.top + chartHeight);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Highlight points at this event
+        traits.forEach(trait => {
+            if (!visibleTraits[trait.name]) return;
+
+            const y = yScale(hoveredPoint[trait.name] || 50);
+
+            // Draw larger highlight circle
+            ctx.strokeStyle = trait.color;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(x, y, 7, 0, Math.PI * 2);
+            ctx.stroke();
+
+            // Fill center
+            ctx.fillStyle = trait.color;
+            ctx.beginPath();
+            ctx.arc(x, y, 5, 0, Math.PI * 2);
+            ctx.fill();
+        });
+    }
+
+    // Draw legend (with clickable interaction hint)
     const legendX = padding.left + chartWidth + 20;
     let legendY = padding.top + 20;
 
     traits.forEach(trait => {
+        const isVisible = visibleTraits[trait.name];
+
         // Color swatch
-        ctx.fillStyle = trait.color;
+        ctx.fillStyle = isVisible ? trait.color : 'rgba(128, 128, 128, 0.3)';
         ctx.fillRect(legendX, legendY - 6, 20, 12);
 
+        // Add border to indicate clickable
+        ctx.strokeStyle = isVisible ? trait.color : 'rgba(128, 128, 128, 0.5)';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(legendX, legendY - 6, 20, 12);
+
         // Label
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
+        ctx.fillStyle = isVisible ? 'rgba(255, 255, 255, 0.9)' : 'rgba(255, 255, 255, 0.4)';
         ctx.font = '13px Exo 2, sans-serif';
         ctx.textAlign = 'left';
         ctx.textBaseline = 'middle';
-        ctx.fillText(trait.label, legendX + 28, legendY);
+        const labelText = isVisible ? trait.label : trait.label + ' (hidden)';
+        ctx.fillText(labelText, legendX + 28, legendY);
 
         legendY += 25;
     });
 
+    // Add "Click to toggle" hint at bottom of legend
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+    ctx.font = '10px Exo 2, sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText('Click to toggle', legendX, legendY + 10);
+
+    // Store legend bounds for click detection
+    canvas.dataset.legendX = legendX;
+    canvas.dataset.legendY = padding.top + 20;
+    canvas.dataset.legendWidth = 100;
+    canvas.dataset.legendItemHeight = 25;
 }
 
 // Smart sampling of data points to avoid overcrowding
@@ -961,6 +1034,231 @@ function sampleDataPoints(points, maxPoints) {
 
     sampled.push(points[points.length - 1]);
     return sampled;
+}
+
+// Setup chart interactivity (hover and click)
+function setupChartInteractivity() {
+    const canvas = document.getElementById('personalityChart');
+    if (!canvas) return;
+
+    // Remove existing listeners
+    const newCanvas = canvas.cloneNode(true);
+    canvas.parentNode.replaceChild(newCanvas, canvas);
+    const freshCanvas = document.getElementById('personalityChart');
+
+    // Mouse move for hover tooltips
+    freshCanvas.addEventListener('mousemove', handleChartHover);
+    freshCanvas.addEventListener('mouseleave', handleChartLeave);
+
+    // Click for legend toggle
+    freshCanvas.addEventListener('click', handleChartClick);
+
+    // Change cursor over legend
+    freshCanvas.addEventListener('mousemove', handleCursorChange);
+}
+
+// Handle chart hover for tooltips
+function handleChartHover(event) {
+    const canvas = event.target;
+    const rect = canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+
+    // Scale for canvas resolution
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const canvasX = x * scaleX;
+    const canvasY = y * scaleY;
+
+    // Chart dimensions (must match drawPersonalityChart)
+    const padding = { top: 40, right: 120, bottom: 50, left: 60 };
+    const chartWidth = canvas.width - padding.left - padding.right;
+
+    // Check if mouse is in chart area
+    if (canvasX < padding.left || canvasX > padding.left + chartWidth) {
+        if (hoveredEventIndex !== null) {
+            hoveredEventIndex = null;
+            drawPersonalityChart(chartDataPoints);
+        }
+        return;
+    }
+
+    // Find nearest event point
+    const sampledPoints = chartDataPoints.length > 15 ? sampleDataPoints(chartDataPoints, 15) : chartDataPoints;
+    const minEvent = Math.min(...sampledPoints.map(p => p.eventNumber));
+    const maxEvent = Math.max(...sampledPoints.map(p => p.eventNumber));
+
+    if (maxEvent === minEvent) return;
+
+    // Convert mouse X to event number
+    const eventProgress = (canvasX - padding.left) / chartWidth;
+    const eventNumber = minEvent + eventProgress * (maxEvent - minEvent);
+
+    // Find closest point
+    let closestIndex = 0;
+    let closestDistance = Infinity;
+
+    sampledPoints.forEach((point, index) => {
+        const distance = Math.abs(point.eventNumber - eventNumber);
+        if (distance < closestDistance) {
+            closestDistance = distance;
+            closestIndex = index;
+        }
+    });
+
+    // Update hover if changed
+    if (hoveredEventIndex !== closestIndex) {
+        hoveredEventIndex = closestIndex;
+        drawPersonalityChart(chartDataPoints);
+        showTooltip(event, sampledPoints[closestIndex]);
+    }
+}
+
+// Handle mouse leave chart
+function handleChartLeave() {
+    if (hoveredEventIndex !== null) {
+        hoveredEventIndex = null;
+        drawPersonalityChart(chartDataPoints);
+        hideTooltip();
+    }
+}
+
+// Show tooltip with event details
+function showTooltip(event, dataPoint) {
+    // Remove existing tooltip
+    hideTooltip();
+
+    // Create tooltip element
+    const tooltip = document.createElement('div');
+    tooltip.id = 'chartTooltip';
+    tooltip.style.position = 'fixed';
+    tooltip.style.background = 'rgba(20, 24, 36, 0.95)';
+    tooltip.style.border = '1px solid rgba(69, 202, 255, 0.5)';
+    tooltip.style.borderRadius = '6px';
+    tooltip.style.padding = '0.75rem';
+    tooltip.style.pointerEvents = 'none';
+    tooltip.style.zIndex = '10000';
+    tooltip.style.fontSize = '0.85rem';
+    tooltip.style.fontFamily = 'Exo 2, sans-serif';
+    tooltip.style.color = '#ffffff';
+    tooltip.style.minWidth = '200px';
+
+    // Build tooltip content
+    const eventName = EVENT_DATA[dataPoint.eventNumber]?.name || (dataPoint.eventNumber === 0 ? 'Career Start' : `Event ${dataPoint.eventNumber}`);
+
+    let content = `<div style="font-weight: 700; margin-bottom: 0.5rem; color: #45caff; font-family: Orbitron, sans-serif;">${eventName}</div>`;
+
+    const traits = [
+        { name: 'confidence', label: 'Confidence', color: '#ff1b6b' },
+        { name: 'humility', label: 'Humility', color: '#45caff' },
+        { name: 'aggression', label: 'Aggression', color: '#ff6b35' },
+        { name: 'professionalism', label: 'Professionalism', color: '#7fff7f' },
+        { name: 'showmanship', label: 'Showmanship', color: '#ffd700' },
+        { name: 'resilience', label: 'Resilience', color: '#9d4edd' }
+    ];
+
+    traits.forEach(trait => {
+        if (visibleTraits[trait.name]) {
+            const value = Math.round(dataPoint[trait.name] || 50);
+            content += `
+                <div style="display: flex; justify-content: space-between; margin-top: 0.25rem;">
+                    <span style="color: ${trait.color};">● ${trait.label}:</span>
+                    <span style="font-weight: 700;">${value}</span>
+                </div>
+            `;
+        }
+    });
+
+    tooltip.innerHTML = content;
+
+    // Position tooltip
+    tooltip.style.left = (event.clientX + 15) + 'px';
+    tooltip.style.top = (event.clientY - 10) + 'px';
+
+    document.body.appendChild(tooltip);
+
+    // Adjust if tooltip goes off screen
+    const tooltipRect = tooltip.getBoundingClientRect();
+    if (tooltipRect.right > window.innerWidth) {
+        tooltip.style.left = (event.clientX - tooltipRect.width - 15) + 'px';
+    }
+    if (tooltipRect.bottom > window.innerHeight) {
+        tooltip.style.top = (event.clientY - tooltipRect.height + 10) + 'px';
+    }
+}
+
+// Hide tooltip
+function hideTooltip() {
+    const tooltip = document.getElementById('chartTooltip');
+    if (tooltip) {
+        tooltip.remove();
+    }
+}
+
+// Handle chart clicks (for legend toggle)
+function handleChartClick(event) {
+    const canvas = event.target;
+    const rect = canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+
+    // Scale for canvas resolution
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const canvasX = x * scaleX;
+    const canvasY = y * scaleY;
+
+    // Get legend bounds
+    const legendX = parseFloat(canvas.dataset.legendX || 0);
+    const legendY = parseFloat(canvas.dataset.legendY || 0);
+    const legendWidth = parseFloat(canvas.dataset.legendWidth || 100);
+    const legendItemHeight = parseFloat(canvas.dataset.legendItemHeight || 25);
+
+    // Check if click is in legend area
+    if (canvasX >= legendX && canvasX <= legendX + legendWidth) {
+        const traits = ['confidence', 'humility', 'aggression', 'professionalism', 'showmanship', 'resilience'];
+
+        traits.forEach((trait, index) => {
+            const itemY = legendY + (index * legendItemHeight);
+            if (canvasY >= itemY - 12 && canvasY <= itemY + 12) {
+                // Toggle trait visibility
+                visibleTraits[trait] = !visibleTraits[trait];
+
+                // Ensure at least one trait is visible
+                const visibleCount = Object.values(visibleTraits).filter(v => v).length;
+                if (visibleCount === 0) {
+                    visibleTraits[trait] = true; // Restore the one we just tried to hide
+                }
+
+                // Redraw chart
+                drawPersonalityChart(chartDataPoints);
+            }
+        });
+    }
+}
+
+// Handle cursor change over legend
+function handleCursorChange(event) {
+    const canvas = event.target;
+    const rect = canvas.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const canvasX = x * scaleX;
+    const canvasY = y * scaleY;
+
+    const legendX = parseFloat(canvas.dataset.legendX || 0);
+    const legendY = parseFloat(canvas.dataset.legendY || 0);
+    const legendWidth = parseFloat(canvas.dataset.legendWidth || 100);
+    const legendItemHeight = parseFloat(canvas.dataset.legendItemHeight || 25);
+
+    // Check if hovering legend
+    const overLegend = canvasX >= legendX && canvasX <= legendX + legendWidth &&
+                       canvasY >= legendY - 12 && canvasY <= legendY + (6 * legendItemHeight);
+
+    canvas.style.cursor = overLegend ? 'pointer' : 'default';
 }
 
 // Display rivals table
