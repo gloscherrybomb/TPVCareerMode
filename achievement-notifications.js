@@ -259,6 +259,8 @@ class AchievementNotifications {
    * @returns {HTMLElement} - Overlay element
    */
   createOverlay(group) {
+    console.log(`[NOTIFICATION DEBUG] Creating overlay for category: ${group.category}`);
+
     const overlay = document.createElement('div');
     overlay.className = 'achievement-notification-overlay';
     overlay.id = 'achievementOverlay';
@@ -266,7 +268,10 @@ class AchievementNotifications {
     const groupTitle = this.getCategoryTitle(group.category, group.notifications.length);
     const groupIcon = this.getCategoryIcon(group.category);
 
+    console.log(`[NOTIFICATION DEBUG] Mapping ${group.notifications.length} notification(s) to cards...`);
     const cards = group.notifications.map((n, index) => this.createCard(n, index)).join('');
+    console.log(`[NOTIFICATION DEBUG] Total cards HTML length: ${cards.length} chars`);
+    console.log(`[NOTIFICATION DEBUG] Cards HTML:`, cards.substring(0, 200) + '...');
 
     const continueText = this.currentGroupIndex < this.groups.length - 1
       ? 'Continue'
@@ -290,9 +295,13 @@ class AchievementNotifications {
       </div>
     `;
 
+    console.log(`[NOTIFICATION DEBUG] Overlay HTML set (total: ${overlay.innerHTML.length} chars)`);
+
     // Add event listeners
     const dismissBtn = overlay.querySelector('#achievementDismissBtn');
     dismissBtn.addEventListener('click', () => this.dismiss());
+
+    console.log(`[NOTIFICATION DEBUG] Dismiss button found and event listener attached`);
 
     return overlay;
   }
@@ -304,16 +313,22 @@ class AchievementNotifications {
    * @returns {string} - Card HTML
    */
   createCard(notification, index) {
+    console.log(`[NOTIFICATION DEBUG] Creating card for: ${notification.awardId}`);
+    console.log(`[NOTIFICATION DEBUG] window.AWARD_DEFINITIONS exists:`, !!window.AWARD_DEFINITIONS);
+
     const award = window.AWARD_DEFINITIONS ? window.AWARD_DEFINITIONS[notification.awardId] : null;
 
     if (!award) {
-      console.warn(`Award definition not found for: ${notification.awardId}`);
+      console.warn(`[NOTIFICATION DEBUG] Award definition not found for: ${notification.awardId}`);
+      console.warn('[NOTIFICATION DEBUG] Available awards:', window.AWARD_DEFINITIONS ? Object.keys(window.AWARD_DEFINITIONS) : 'AWARD_DEFINITIONS not loaded');
       return '';
     }
 
+    console.log(`[NOTIFICATION DEBUG] Award found:`, award);
+
     const eventName = this.getEventName(notification.eventNumber);
 
-    return `
+    const cardHTML = `
       <div class="achievement-card" data-intensity="${notification.intensity}" style="animation-delay: ${index * 0.1}s">
         <div class="achievement-icon">${award.icon}</div>
         <div class="achievement-content">
@@ -323,6 +338,9 @@ class AchievementNotifications {
         </div>
       </div>
     `;
+
+    console.log(`[NOTIFICATION DEBUG] Card HTML created (${cardHTML.length} chars)`);
+    return cardHTML;
   }
 
   /**
