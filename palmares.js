@@ -39,23 +39,23 @@ const EVENT_DATA = {
     15: { name: "Bayview Breakaway Crit", type: "criterium" }
 };
 
-// Award display names
+// Award display names with icons
 const AWARD_NAMES = {
-    gold: "Gold Medal (1st)",
-    silver: "Silver Medal (2nd)",
-    bronze: "Bronze Medal (3rd)",
-    punchingMedal: "Punching Above Weight",
-    giantKiller: "Giant Killer",
-    bullseye: "Bullseye",
-    hotStreak: "Hot Streak",
-    domination: "Domination",
-    closeCall: "Close Call",
-    photoFinish: "Photo Finish",
-    darkHorse: "Dark Horse",
-    zeroToHero: "Zero to Hero",
-    gcGold: "GC Gold Trophy",
-    gcSilver: "GC Silver Trophy",
-    gcBronze: "GC Bronze Trophy"
+    gold: { name: "Gold Medal (1st)", icon: "🥇" },
+    silver: { name: "Silver Medal (2nd)", icon: "🥈" },
+    bronze: { name: "Bronze Medal (3rd)", icon: "🥉" },
+    punchingMedal: { name: "Punching Above Weight", icon: "🥊" },
+    giantKiller: { name: "Giant Killer", icon: "⚔️" },
+    bullseye: { name: "Bullseye", icon: "🎯" },
+    hotStreak: { name: "Hot Streak", icon: "🔥" },
+    domination: { name: "Domination", icon: "👑" },
+    closeCall: { name: "Close Call", icon: "😰" },
+    photoFinish: { name: "Photo Finish", icon: "📸" },
+    darkHorse: { name: "Dark Horse", icon: "🐴" },
+    zeroToHero: { name: "Zero to Hero", icon: "🦸" },
+    gcGold: { name: "GC Gold Trophy", icon: "🏆" },
+    gcSilver: { name: "GC Silver Trophy", icon: "🥈" },
+    gcBronze: { name: "GC Bronze Trophy", icon: "🥉" }
 };
 
 // Show/hide sections
@@ -301,6 +301,13 @@ function displayResultsTable() {
         const awardsCell = document.createElement('td');
         awardsCell.className = 'awards-cell';
         const medals = [];
+
+        // Add podium medals based on position
+        if (pos === 1) medals.push('🥇');
+        else if (pos === 2) medals.push('🥈');
+        else if (pos === 3) medals.push('🥉');
+
+        // Add special medals
         if (result.earnedPunchingMedal) medals.push('🥊');
         if (result.earnedGiantKillerMedal) medals.push('⚔️');
         if (result.earnedBullseyeMedal) medals.push('🎯');
@@ -403,6 +410,64 @@ function applySort() {
     }
 }
 
+// Calculate competition statistics from rival data and results
+function calculateCompetitionStats() {
+    const userARR = userData.arr || 0;
+    const rivalData = userData.rivalData || {};
+    const encounters = rivalData.encounters || {};
+
+    // If no rival data, return placeholders
+    if (Object.keys(encounters).length === 0) {
+        return {
+            avgOpponentARR: null,
+            racesVsStronger: '0 (0%)',
+            winRateVsStronger: '—',
+            winRateVsWeaker: '—'
+        };
+    }
+
+    // Calculate stats from rival encounters
+    let totalOpponentARR = 0;
+    let totalRaces = 0;
+    let racesVsStronger = 0;
+    let winsVsStronger = 0;
+    let racesVsWeaker = 0;
+    let winsVsWeaker = 0;
+
+    Object.values(encounters).forEach(rival => {
+        const opponentARR = rival.botArr || 0;
+        const races = rival.races || 0;
+        const wins = rival.userWins || 0;
+
+        if (opponentARR > 0 && races > 0) {
+            totalOpponentARR += opponentARR * races;
+            totalRaces += races;
+
+            // Check if opponent is stronger or weaker
+            if (opponentARR > userARR) {
+                racesVsStronger += races;
+                winsVsStronger += wins;
+            } else if (opponentARR < userARR) {
+                racesVsWeaker += races;
+                winsVsWeaker += wins;
+            }
+        }
+    });
+
+    // Calculate averages and percentages
+    const avgOpponentARR = totalRaces > 0 ? Math.round(totalOpponentARR / totalRaces) : null;
+    const pctVsStronger = totalRaces > 0 ? ((racesVsStronger / totalRaces) * 100).toFixed(0) : 0;
+    const winRateVsStronger = racesVsStronger > 0 ? ((winsVsStronger / racesVsStronger) * 100).toFixed(1) : '—';
+    const winRateVsWeaker = racesVsWeaker > 0 ? ((winsVsWeaker / racesVsWeaker) * 100).toFixed(1) : '—';
+
+    return {
+        avgOpponentARR: avgOpponentARR,
+        racesVsStronger: `${racesVsStronger} (${pctVsStronger}%)`,
+        winRateVsStronger: winRateVsStronger !== '—' ? `${winRateVsStronger}%` : '—',
+        winRateVsWeaker: winRateVsWeaker !== '—' ? `${winRateVsWeaker}%` : '—'
+    };
+}
+
 // Display detailed statistics
 function displayDetailedStats() {
     const lifetime = userData.lifetimeStats || {};
@@ -450,11 +515,12 @@ function displayDetailedStats() {
     document.getElementById('longestPodiumStreak').textContent = streaks.podium;
     document.getElementById('longestNoDNFStreak').textContent = streaks.noDNF;
 
-    // Competition Analysis (placeholders for now)
-    document.getElementById('avgOpponentARR').textContent = '—';
-    document.getElementById('racesVsStronger').textContent = '— (—%)';
-    document.getElementById('winRateVsStronger').textContent = '—%';
-    document.getElementById('winRateVsWeaker').textContent = '—%';
+    // Competition Analysis
+    const competitionStats = calculateCompetitionStats();
+    document.getElementById('avgOpponentARR').textContent = competitionStats.avgOpponentARR || '—';
+    document.getElementById('racesVsStronger').textContent = competitionStats.racesVsStronger;
+    document.getElementById('winRateVsStronger').textContent = competitionStats.winRateVsStronger;
+    document.getElementById('winRateVsWeaker').textContent = competitionStats.winRateVsWeaker;
 
     // Specialty
     const typeStats = calculateTypeStats(completedResults);
@@ -511,6 +577,7 @@ function calculateTypeStats(results) {
     const distribution = {};
     let totalTypes = 0;
     let typesWithWins = 0;
+    let typesWithPodiums = 0;
 
     results.forEach(result => {
         const type = result.eventType;
@@ -525,21 +592,58 @@ function calculateTypeStats(results) {
         if (result.position <= 10) distribution[type].top10++;
     });
 
-    // Find best type by win rate
+    // Find best type by win rate, fall back to podium rate, then top10 rate
     let bestType = null;
     let bestWinRate = 0;
+    let bestPodiumType = null;
+    let bestPodiumRate = 0;
+    let bestTop10Type = null;
+    let bestTop10Rate = 0;
 
     Object.entries(distribution).forEach(([type, stats]) => {
         const winRate = stats.total > 0 ? stats.wins / stats.total : 0;
-        if (winRate > bestWinRate) {
+        const podiumRate = stats.total > 0 ? stats.podiums / stats.total : 0;
+        const top10Rate = stats.total > 0 ? stats.top10 / stats.total : 0;
+
+        // Track best win rate
+        if (winRate > bestWinRate || (winRate === bestWinRate && winRate > 0 && !bestType)) {
             bestWinRate = winRate;
             bestType = `${capitalize(type)} (${(winRate * 100).toFixed(0)}% wins)`;
         }
+
+        // Track best podium rate
+        if (podiumRate > bestPodiumRate || (podiumRate === bestPodiumRate && podiumRate > 0 && !bestPodiumType)) {
+            bestPodiumRate = podiumRate;
+            bestPodiumType = `${capitalize(type)} (${(podiumRate * 100).toFixed(0)}% podiums)`;
+        }
+
+        // Track best top10 rate
+        if (top10Rate > bestTop10Rate || (top10Rate === bestTop10Rate && top10Rate > 0 && !bestTop10Type)) {
+            bestTop10Rate = top10Rate;
+            bestTop10Type = `${capitalize(type)} (${(top10Rate * 100).toFixed(0)}% top 10)`;
+        }
+
         if (stats.wins > 0) typesWithWins++;
+        if (stats.podiums > 0) typesWithPodiums++;
     });
 
-    // Versatility score (0-10 based on variety of wins)
-    const versatility = totalTypes > 0 ? Math.round((typesWithWins / totalTypes) * 10) : 0;
+    // Fallback hierarchy: wins -> podiums -> top10
+    if (!bestType && bestPodiumType) {
+        bestType = bestPodiumType;
+    }
+    if (!bestType && bestTop10Type) {
+        bestType = bestTop10Type;
+    }
+
+    // Versatility score: prioritize win variety, then podium variety, then event participation
+    let baseScore = typesWithWins;
+    if (typesWithWins === 0) {
+        baseScore = typesWithPodiums;
+    }
+    if (baseScore === 0) {
+        baseScore = Object.keys(distribution).length;
+    }
+    const versatility = totalTypes > 0 ? Math.round((baseScore / totalTypes) * 10) : 0;
 
     return { distribution, bestType, versatility };
 }
@@ -564,7 +668,12 @@ function displayAwardsTable() {
         const row = document.createElement('tr');
 
         const nameCell = document.createElement('td');
-        nameCell.textContent = AWARD_NAMES[key] || key;
+        const awardInfo = AWARD_NAMES[key];
+        if (awardInfo) {
+            nameCell.textContent = `${awardInfo.icon} ${awardInfo.name}`;
+        } else {
+            nameCell.textContent = key;
+        }
         row.appendChild(nameCell);
 
         const countCell = document.createElement('td');
@@ -676,8 +785,11 @@ function displayPersonalityTimeline() {
         const filteredTraits = Object.entries(currentPersonality)
             .filter(([trait]) => validTraits.includes(trait.toLowerCase()));
 
+        // Calculate persona based on dominant trait
+        const persona = calculatePersona(filteredTraits);
+
         currentDiv.innerHTML = `
-            <div class="snapshot-header">Current Personality</div>
+            <div class="snapshot-header">Current Personality ${persona ? `• ${persona}` : ''}</div>
             <div class="trait-changes">
                 ${filteredTraits.map(([trait, value]) => `
                     <div class="trait-change">
@@ -689,6 +801,34 @@ function displayPersonalityTimeline() {
         `;
         timeline.appendChild(currentDiv);
     }
+}
+
+// Calculate persona based on personality traits
+function calculatePersona(traits) {
+    if (traits.length === 0) return null;
+
+    // Find dominant trait
+    let maxValue = 0;
+    let dominantTrait = null;
+
+    traits.forEach(([trait, value]) => {
+        if (value > maxValue) {
+            maxValue = value;
+            dominantTrait = trait.toLowerCase();
+        }
+    });
+
+    // Map traits to personas (simplified version)
+    const personaMap = {
+        confidence: "The Bold Contender",
+        humility: "The Quiet Achiever",
+        aggression: "The Fierce Competitor",
+        professionalism: "The Disciplined Racer",
+        showmanship: "The Crowd Favorite",
+        resilience: "The Determined Fighter"
+    };
+
+    return personaMap[dominantTrait] || null;
 }
 
 // Display rivals table
