@@ -6,7 +6,12 @@ import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/
 import {
     getFirestore,
     doc,
-    getDoc
+    getDoc,
+    collection,
+    query,
+    where,
+    orderBy,
+    getDocs
 } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 
@@ -19,6 +24,7 @@ let userData = null;
 let allResults = [];
 let filteredResults = [];
 let currentSort = { column: 'date', direction: 'desc' };
+let interviewHistory = [];
 
 // Event metadata
 const EVENT_DATA = {
@@ -77,6 +83,38 @@ function showContent() {
     document.getElementById('palmaresContent').style.display = 'block';
 }
 
+// Fetch interview history for personality timeline
+async function fetchInterviewHistory(userId) {
+    try {
+        const interviewsRef = collection(db, 'interviews');
+        const q = query(
+            interviewsRef,
+            where('userId', '==', userId),
+            orderBy('eventNumber', 'asc')
+        );
+
+        const querySnapshot = await getDocs(q);
+        const interviews = [];
+
+        querySnapshot.forEach(doc => {
+            const data = doc.data();
+            interviews.push({
+                eventNumber: data.eventNumber,
+                personalityBefore: data.personalityBefore,
+                personalityAfter: data.personalityAfter,
+                personalityDelta: data.personalityDelta,
+                selectedResponse: data.selectedResponse,
+                timestamp: data.timestamp
+            });
+        });
+
+        return interviews;
+    } catch (error) {
+        console.error('Error fetching interview history:', error);
+        return [];
+    }
+}
+
 // Load and display palmares
 async function loadPalmares(user) {
     showLoadingState();
@@ -91,6 +129,9 @@ async function loadPalmares(user) {
         }
 
         userData = userDoc.data();
+
+        // Fetch interview history for personality timeline
+        interviewHistory = await fetchInterviewHistory(user.uid);
 
         // Collect all event results
         allResults = [];
@@ -687,10 +728,10 @@ function displayAwardsTable() {
 
 // Display personality timeline
 function displayPersonalityTimeline() {
-    const personalityHistory = userData.personalityHistory || [];
     const currentPersonality = userData.personality || {};
 
-    if (personalityHistory.length === 0 && Object.keys(currentPersonality).length === 0) {
+    // Hide section if no personality data at all
+    if (interviewHistory.length === 0 && Object.keys(currentPersonality).length === 0) {
         document.getElementById('personalitySection').style.display = 'none';
         return;
     }
@@ -700,60 +741,51 @@ function displayPersonalityTimeline() {
     const timeline = document.getElementById('personalityTimeline');
     timeline.innerHTML = '';
 
-    // Show initial personality if we have history
-    if (personalityHistory.length > 0) {
+    // Show initial personality if we have interview history
+    if (interviewHistory.length > 0) {
         const initialSnapshot = document.createElement('div');
         initialSnapshot.className = 'personality-snapshot';
+
+        // Get first interview's "before" state as initial
+        const firstInterview = interviewHistory[0];
+        const initialPersonality = firstInterview.personalityBefore || {
+            confidence: 50, humility: 50, aggression: 50,
+            professionalism: 50, showmanship: 50, resilience: 50
+        };
+
         initialSnapshot.innerHTML = `
             <div class="snapshot-header">Initial Personality (Career Start)</div>
             <div class="trait-changes">
-                <div class="trait-change">
-                    <span class="trait-name">Confidence:</span>
-                    <span class="trait-values">50</span>
-                </div>
-                <div class="trait-change">
-                    <span class="trait-name">Humility:</span>
-                    <span class="trait-values">50</span>
-                </div>
-                <div class="trait-change">
-                    <span class="trait-name">Aggression:</span>
-                    <span class="trait-values">50</span>
-                </div>
-                <div class="trait-change">
-                    <span class="trait-name">Professionalism:</span>
-                    <span class="trait-values">50</span>
-                </div>
-                <div class="trait-change">
-                    <span class="trait-name">Showmanship:</span>
-                    <span class="trait-values">50</span>
-                </div>
-                <div class="trait-change">
-                    <span class="trait-name">Resilience:</span>
-                    <span class="trait-values">50</span>
-                </div>
+                ${Object.entries(initialPersonality).map(([trait, value]) => `
+                    <div class="trait-change">
+                        <span class="trait-name">${capitalize(trait)}:</span>
+                        <span class="trait-values">${Math.round(value)}</span>
+                    </div>
+                `).join('')}
             </div>
         `;
         timeline.appendChild(initialSnapshot);
     }
 
-    // Show changes
-    personalityHistory.forEach((snapshot, index) => {
-        const prevSnapshot = index === 0 ?
-            { confidence: 50, humility: 50, aggression: 50, professionalism: 50, showmanship: 50, resilience: 50 } :
-            personalityHistory[index - 1].snapshot;
-
+    // Show each interview's personality change
+    interviewHistory.forEach((interview) => {
         const changeDiv = document.createElement('div');
         changeDiv.className = 'personality-snapshot';
 
-        let changesHTML = '';
-        Object.keys(snapshot.snapshot).forEach(trait => {
-            const oldVal = prevSnapshot[trait] || 50;
-            const newVal = snapshot.snapshot[trait];
-            const diff = newVal - oldVal;
+        const before = interview.personalityBefore || {};
+        const after = interview.personalityAfter || {};
+        const delta = interview.personalityDelta || {};
 
-            if (diff !== 0) {
-                const diffClass = diff > 0 ? 'positive' : 'negative';
-                const diffText = diff > 0 ? `+${diff}` : diff;
+        // Build changes HTML
+        let changesHTML = '';
+        Object.keys(delta).forEach(trait => {
+            const change = delta[trait];
+            if (change !== 0) {
+                const oldVal = Math.round(before[trait] || 50);
+                const newVal = Math.round(after[trait] || 50);
+                const diffClass = change > 0 ? 'positive' : 'negative';
+                const diffText = change > 0 ? `+${change}` : change;
+
                 changesHTML += `
                     <div class="trait-change">
                         <span class="trait-name">${capitalize(trait)}:</span>
@@ -766,21 +798,24 @@ function displayPersonalityTimeline() {
             }
         });
 
+        // Get response style/badge if available
+        const responseStyle = interview.selectedResponse?.badge || interview.selectedResponse?.style || '';
+
         changeDiv.innerHTML = `
-            <div class="snapshot-header">Event ${snapshot.eventNumber}</div>
-            <div class="snapshot-event">${EVENT_DATA[snapshot.eventNumber]?.name || 'Unknown Event'} • ${snapshot.reason || 'Change'}</div>
-            <div class="trait-changes">${changesHTML || '<div class="stat-row-text">No changes</div>'}</div>
+            <div class="snapshot-header">Event ${interview.eventNumber}</div>
+            <div class="snapshot-event">${EVENT_DATA[interview.eventNumber]?.name || 'Unknown Event'}${responseStyle ? ` • ${responseStyle}` : ''}</div>
+            <div class="trait-changes">${changesHTML || '<div class="stat-row-text">No significant changes</div>'}</div>
         `;
 
         timeline.appendChild(changeDiv);
     });
 
-    // Show current personality
+    // Show current personality at the end
     if (Object.keys(currentPersonality).length > 0) {
         const currentDiv = document.createElement('div');
         currentDiv.className = 'personality-snapshot';
 
-        // Valid personality traits (exclude lastUpdated, LastUpdated, etc.)
+        // Valid personality traits
         const validTraits = ['confidence', 'humility', 'aggression', 'professionalism', 'showmanship', 'resilience'];
         const filteredTraits = Object.entries(currentPersonality)
             .filter(([trait]) => validTraits.includes(trait.toLowerCase()));
@@ -794,7 +829,7 @@ function displayPersonalityTimeline() {
                 ${filteredTraits.map(([trait, value]) => `
                     <div class="trait-change">
                         <span class="trait-name">${capitalize(trait)}:</span>
-                        <span class="trait-values">${value}</span>
+                        <span class="trait-values">${Math.round(value)}</span>
                     </div>
                 `).join('')}
             </div>
