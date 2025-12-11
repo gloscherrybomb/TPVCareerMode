@@ -842,8 +842,9 @@ async function displayRivals(userData) {
 
     let html = '';
 
-    // Display each rival
-    for (let i = 0; i < topRivals.length; i++) {
+    // Display only top 3 rivals on profile page
+    const displayLimit = Math.min(3, topRivals.length);
+    for (let i = 0; i < displayLimit; i++) {
         const botUid = topRivals[i];
         const data = rivalData.encounters[botUid];
 
