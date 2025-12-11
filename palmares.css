@@ -3,7 +3,7 @@
 .palmares-page {
     background: var(--bg-color, #0a0e1a);
     min-height: 100vh;
-    padding: 2rem 0;
+    padding: 6rem 0 2rem 0; /* Extra top padding to account for fixed navbar */
 }
 
 .palmares-page .container {
