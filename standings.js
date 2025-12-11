@@ -225,9 +225,9 @@ async function calculateRealSeasonStandings(season = 1) {
 }
 
 // Render Season Standings
-async function renderSeasonStandings() {
+async function renderSeasonStandings(forceRefresh = false) {
     const seasonContent = document.getElementById('seasonStandings');
-    
+
     if (!currentUser) {
         // User not logged in
         seasonContent.innerHTML = `
@@ -243,10 +243,33 @@ async function renderSeasonStandings() {
         return;
     }
 
-    // Fetch user data
-    const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
-    const userData = userDoc.data();
-    
+    let standings = [];
+    let userData = null;
+
+    // Check cache first (unless force refresh)
+    if (!forceRefresh) {
+        const cachedData = localStorage.getItem(SEASON_STANDINGS_CACHE_KEY + '_' + currentUser.uid);
+        const cacheTimestamp = localStorage.getItem(SEASON_STANDINGS_TIMESTAMP_KEY + '_' + currentUser.uid);
+        const now = Date.now();
+
+        if (cachedData && cacheTimestamp) {
+            const cacheAge = now - parseInt(cacheTimestamp);
+            if (cacheAge < CACHE_DURATION) {
+                console.log(`📦 Using cached season standings (${Math.round(cacheAge / 1000)}s old)`);
+                const cached = JSON.parse(cachedData);
+                standings = cached.standings;
+                userData = cached.userData;
+
+                // Skip to rendering
+                renderSeasonStandingsTable(standings, userData, seasonContent);
+                return;
+            }
+        }
+    }
+
+    // Cache miss or expired - fetch from Firestore
+    console.log('🔄 Fetching fresh season standings from Firestore...');
+
     // Show loading state
     seasonContent.innerHTML = `
         <div style="text-align: center; padding: 3rem;">
@@ -254,19 +277,40 @@ async function renderSeasonStandings() {
             <p style="color: var(--text-secondary);">Loading season standings...</p>
         </div>
     `;
-    
+
+    // Fetch user data
+    const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
+    userData = userDoc.data();
+
     // Use stored season standings (includes backfilled bot results)
-    let standings = userData.season1Standings || [];
-    
+    standings = userData.season1Standings || [];
+
+    // Store in cache
+    localStorage.setItem(
+        SEASON_STANDINGS_CACHE_KEY + '_' + currentUser.uid,
+        JSON.stringify({ standings, userData })
+    );
+    localStorage.setItem(
+        SEASON_STANDINGS_TIMESTAMP_KEY + '_' + currentUser.uid,
+        Date.now().toString()
+    );
+    console.log(`✅ Cached season standings for user ${currentUser.uid}`);
+
+    // Render the table
+    renderSeasonStandingsTable(standings, userData, seasonContent);
+}
+
+// Separate function to render the season standings table
+function renderSeasonStandingsTable(standings, userData, seasonContent) {
     // Debug: Check if user's points in standings matches their totalPoints
     const userInStandings = standings.find(s => s.uid === currentUser.uid);
-    if (userInStandings) {
+    if (userInStandings && userData) {
         console.log('User points comparison:');
         console.log('  - In season1Standings:', userInStandings.points);
         console.log('  - totalPoints field:', userData.totalPoints);
         console.log('  - Match:', userInStandings.points === userData.totalPoints ? '✅' : '❌');
     }
-    
+
     // Clean up any malformed points data
     standings = standings.map(racer => {
         // Clean up any malformed points (convert "[object Object]41" to number)
@@ -379,16 +423,59 @@ async function renderSeasonStandings() {
     seasonContent.innerHTML = tableHTML;
 }
 
+// Cache configuration
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
+const GLOBAL_RANKINGS_CACHE_KEY = 'globalRankings';
+const GLOBAL_RANKINGS_TIMESTAMP_KEY = 'globalRankingsTimestamp';
+const SEASON_STANDINGS_CACHE_KEY = 'seasonStandings';
+const SEASON_STANDINGS_TIMESTAMP_KEY = 'seasonStandingsTimestamp';
+
 // Render Global Rankings
-async function renderGlobalRankings() {
+async function renderGlobalRankings(forceRefresh = false) {
     const globalContent = document.getElementById('individualRankings');
-    
+
     try {
-        // Fetch all users from Firestore
-        const usersQuery = query(collection(db, 'users'));
+        let rankings = [];
+
+        // Check cache first (unless force refresh)
+        if (!forceRefresh) {
+            const cachedData = localStorage.getItem(GLOBAL_RANKINGS_CACHE_KEY);
+            const cacheTimestamp = localStorage.getItem(GLOBAL_RANKINGS_TIMESTAMP_KEY);
+            const now = Date.now();
+
+            if (cachedData && cacheTimestamp) {
+                const cacheAge = now - parseInt(cacheTimestamp);
+                if (cacheAge < CACHE_DURATION) {
+                    console.log(`📦 Using cached global rankings (${Math.round(cacheAge / 1000)}s old)`);
+                    rankings = JSON.parse(cachedData);
+
+                    // Mark current user
+                    if (currentUser) {
+                        rankings = rankings.map(r => ({
+                            ...r,
+                            isCurrentUser: r.uid === currentUser.uid
+                        }));
+                    }
+
+                    // Skip to rendering
+                    renderGlobalRankingsTable(rankings, globalContent);
+                    return rankings;
+                }
+            }
+        }
+
+        // Cache miss or expired - fetch from Firestore
+        console.log('🔄 Fetching fresh global rankings from Firestore...');
+
+        // Fetch top 100 users by careerPoints (optimized query)
+        const usersQuery = query(
+            collection(db, 'users'),
+            orderBy('careerPoints', 'desc'),
+            limit(100)
+        );
         const usersSnapshot = await getDocs(usersQuery);
-        
-        const rankings = [];
+
+        rankings = [];
         usersSnapshot.forEach((doc) => {
             const data = doc.data();
             // Use careerPoints for global rankings, fallback to totalPoints for backwards compatibility
@@ -407,18 +494,39 @@ async function renderGlobalRankings() {
             });
         });
 
+        // Store in cache
+        localStorage.setItem(GLOBAL_RANKINGS_CACHE_KEY, JSON.stringify(rankings));
+        localStorage.setItem(GLOBAL_RANKINGS_TIMESTAMP_KEY, Date.now().toString());
+        console.log(`✅ Cached ${rankings.length} global rankings`);
+
         // Populate country filter with available countries
         populateCountryFilter(rankings);
 
-        // Apply filters
-        const filteredRankings = applyFilters(rankings);
+        // Render the table
+        renderGlobalRankingsTable(rankings, globalContent);
+        return rankings; // Return rankings for team calculations
+    } catch (error) {
+        console.error('Error loading global rankings:', error);
+        globalContent.innerHTML = `
+            <div class="error-state">
+                <p>Error loading rankings. Please try again later.</p>
+            </div>
+        `;
+        return [];
+    }
+}
 
-        // Sort by total points (descending)
-        filteredRankings.sort((a, b) => b.points - a.points);
+// Separate function to render the global rankings table
+function renderGlobalRankingsTable(rankings, globalContent) {
+    // Apply filters
+    const filteredRankings = applyFilters(rankings);
 
-        // Build table HTML
-        let tableHTML = `
-            <div class="standings-table-container">
+    // Sort by total points (descending)
+    filteredRankings.sort((a, b) => b.points - a.points);
+
+    // Build table HTML
+    let tableHTML = `
+        <div class="standings-table-container">
                 <div class="standings-table-wrapper">
                     <table class="standings-table">
                         <thead>
@@ -493,24 +601,14 @@ async function renderGlobalRankings() {
             });
         }
 
-        tableHTML += `
-                    </tbody>
-                </table>
-                </div>
+    tableHTML += `
+                </tbody>
+            </table>
             </div>
-        `;
+        </div>
+    `;
 
-        globalContent.innerHTML = tableHTML;
-        return rankings; // Return rankings for team calculations
-    } catch (error) {
-        console.error('Error loading global rankings:', error);
-        globalContent.innerHTML = `
-            <div class="error-state">
-                <p>Error loading rankings. Please try again later.</p>
-            </div>
-        `;
-        return [];
-    }
+    globalContent.innerHTML = tableHTML;
 }
 
 // Render team rankings (top 5 riders per team)
