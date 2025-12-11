@@ -1732,14 +1732,20 @@ async function drawPersonalityTemplate(ctx, width, height) {
     // Draw personality spider chart (smaller)
     drawSpiderChartOnCanvas(ctx, width / 2, 1080, 300, data.personality);
 
-    // Stats at bottom (races/wins/podiums close together, rank separated)
+    // Stats at bottom (races/wins/podiums left-aligned, rank right-aligned)
     const statsY = 1560;
     const tightSpacing = 150; // Tight spacing for races, wins, podiums
+    const edgeMargin = 100; // Margin from edges
 
-    drawStatBox(ctx, width / 2 - tightSpacing * 1.7, statsY, data.totalRaces, 'RACES', '#b06af3');
-    drawStatBox(ctx, width / 2 - tightSpacing * 0.5, statsY, data.totalWins, 'WINS', '#b06af3');
-    drawStatBox(ctx, width / 2 + tightSpacing * 0.7, statsY, data.totalPodiums, 'PODIUMS', '#b06af3');
-    drawStatBox(ctx, width / 2 + tightSpacing * 2.2, statsY, data.seasonRank, 'RANK', '#b06af3');
+    // Left group: Races, Wins, Podiums
+    const leftStartX = edgeMargin + tightSpacing; // Start position for left group
+    drawStatBox(ctx, leftStartX, statsY, data.totalRaces, 'RACES', '#b06af3');
+    drawStatBox(ctx, leftStartX + tightSpacing, statsY, data.totalWins, 'WINS', '#b06af3');
+    drawStatBox(ctx, leftStartX + tightSpacing * 2, statsY, data.totalPodiums, 'PODIUMS', '#b06af3');
+
+    // Right: Rank
+    const rightX = width - edgeMargin - tightSpacing; // Position from right edge
+    drawStatBox(ctx, rightX, statsY, data.seasonRank, 'RANK', '#b06af3');
 
     // Team car
     await drawTeamCar(ctx, width / 2, height - 200, 0.15);
