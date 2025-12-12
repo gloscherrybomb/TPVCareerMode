@@ -54,6 +54,7 @@ async function resetUserResults() {
         completedStages: [],
         usedOptionalEvents: [],
         totalPoints: 0,
+        careerPoints: 0,
         totalEvents: 0,
         totalWins: 0,
         totalPodiums: 0,
