@@ -318,21 +318,31 @@ function renderProfileCC() {
   if (!userDocData) return;
 
   const balance = userDocData.currency?.balance || 0;
+  const inventory = userDocData.unlocks?.inventory || [];
+  const slotCount = userDocData.unlocks?.slotCount || 1;
 
-  // Update button in profile header
-  const storeButton = document.getElementById('ccStoreButton');
-  const balanceDisplay = document.getElementById('ccBalanceDisplay');
-  if (storeButton && balanceDisplay) {
-    balanceDisplay.textContent = `${balance} CC`;
-    storeButton.style.display = 'inline-flex';
+  // Show the section
+  const section = document.getElementById('cadenceCreditsSection');
+  if (section) {
+    section.style.display = 'block';
   }
 
-  // Update stats card
-  const statCard = document.getElementById('ccStatCard');
-  const ccBalanceEl = document.getElementById('ccBalance');
-  if (statCard && ccBalanceEl) {
-    ccBalanceEl.textContent = `${balance} CC`;
-    statCard.style.display = 'block';
+  // Update balance
+  const balanceEl = document.getElementById('ccProfileBalance');
+  if (balanceEl) {
+    balanceEl.textContent = `${balance} CC`;
+  }
+
+  // Update unlocks owned
+  const unlocksEl = document.getElementById('ccUnlocksOwned');
+  if (unlocksEl) {
+    unlocksEl.textContent = inventory.length;
+  }
+
+  // Update slots unlocked
+  const slotsEl = document.getElementById('ccSlotsUnlocked');
+  if (slotsEl) {
+    slotsEl.textContent = slotCount;
   }
 }
 
