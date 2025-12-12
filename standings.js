@@ -448,6 +448,8 @@ async function renderGlobalRankings(forceRefresh = false) {
                 if (cacheAge < CACHE_DURATION) {
                     console.log(`📦 Using cached global rankings (${Math.round(cacheAge / 1000)}s old)`);
                     rankings = JSON.parse(cachedData);
+                    console.log('Global Rankings - Total racers:', rankings.length);
+                    console.log('Global Rankings - First racer:', rankings[0]);
 
                     // Mark current user
                     if (currentUser) {
@@ -518,8 +520,12 @@ async function renderGlobalRankings(forceRefresh = false) {
 
 // Separate function to render the global rankings table
 function renderGlobalRankingsTable(rankings, globalContent) {
+    console.log('renderGlobalRankingsTable - Input rankings:', rankings.length);
+    console.log('renderGlobalRankingsTable - Current filters:', filters);
+
     // Apply filters
     const filteredRankings = applyFilters(rankings);
+    console.log('renderGlobalRankingsTable - After filters:', filteredRankings.length);
 
     // Sort by total points (descending)
     filteredRankings.sort((a, b) => b.points - a.points);
