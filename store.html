@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadence Credits Store - TPV Career Mode</title>
+    <link rel="icon" type="image/png" href="tpv-team-car.png">
+    <link rel="apple-touch-icon" href="tpv-team-car.png">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="store.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">
+                <div class="logo-text">TPV</div>
+                <div class="logo-subtitle">Career Mode</div>
+            </a>
+            <button class="nav-toggle" id="navToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="events.html" class="nav-link">Season</a>
+                <a href="standings.html" class="nav-link">Standings</a>
+                <a href="peloton.html" class="nav-link">Peloton</a>
+                <a href="profile.html" class="nav-link">Profile</a>
+                <a href="#" class="nav-link nav-login" id="loginBtn">Login</a>
+                <a href="#" class="nav-link nav-logout" id="logoutBtn" style="display:none;">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="store-page">
+        <div class="container store-hero">
+            <div class="hero-card">
+                <div>
+                    <h1 style="margin:0;">Cadence Credits Store</h1>
+                    <p style="margin:0; color:var(--text-secondary);">Spend your CC on unlocks. Flagged preview users only.</p>
+                    <div class="store-warning" id="storeWarning" style="display:none;"></div>
+                </div>
+                <div class="balance" id="storeBalance">Balance: 0 CC</div>
+                <div class="slots" id="storeSlots"></div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="store-grid" id="storeGrid"></div>
+        </div>
+    </main>
+
+    <script src="unlock-config.js"></script>
+    <script src="currency-config.js"></script>
+    <script type="module" src="app.js"></script>
+    <script type="module" src="store.js"></script>
+</body>
+</html>

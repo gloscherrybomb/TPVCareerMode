@@ -249,9 +249,11 @@ function renderProfileButton() {
   if (!btn) {
     btn = document.createElement('button');
     btn.id = 'cc-profile-btn';
-    btn.className = 'btn btn-secondary cc-inline-button';
+    btn.className = 'btn cc-inline-button';
+    btn.style.background = 'linear-gradient(135deg, #00c878, #2dd195)';
+    btn.style.color = '#0b0f14';
     btn.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg><span>Cadence Credits</span>`;
-    btn.addEventListener('click', openModal);
+    btn.addEventListener('click', () => window.location.href = 'store.html');
     header.appendChild(btn);
   }
   btn.style.display = 'inline-flex';
@@ -288,7 +290,7 @@ function renderLoadoutPanel() {
   `;
 
   const manage = panel.querySelector('#cc-loadout-manage');
-  if (manage) manage.addEventListener('click', openModal);
+  if (manage) manage.addEventListener('click', () => window.location.href = 'store.html');
 }
 
 function maybeRenderEventLoadout() {
@@ -305,7 +307,7 @@ function maybeRenderEventLoadout() {
 
 function start() {
   injectStyles();
-  buildModal();
+  // Modal retained for compatibility, but primary flow links to store page.
 
   onAuthStateChanged(auth, async (user) => {
     if (!user) return;

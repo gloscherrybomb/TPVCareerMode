@@ -1,0 +1,144 @@
+/* store.css - Cadence Credits store page */
+
+body {
+  background: var(--dark-bg, #0b0f14);
+}
+
+.store-hero {
+  padding: 3rem 0 2rem;
+}
+
+.store-hero .hero-card {
+  background: linear-gradient(135deg, rgba(74,144,226,0.18), rgba(0,200,120,0.15));
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 16px;
+  padding: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 14px 40px rgba(0,0,0,0.3);
+}
+
+.store-hero .balance {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #c0ffda;
+}
+
+.store-hero .slots {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.store-hero .slot-pill {
+  padding: 0.45rem 0.75rem;
+  border-radius: 999px;
+  border: 1px dashed rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.04);
+  color: var(--text-primary, #f5f7fa);
+  font-weight: 600;
+}
+
+.store-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1rem;
+  margin: 1rem 0 2rem;
+}
+
+.store-card {
+  background: var(--dark-card, #101724);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 14px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+}
+
+.store-card .title {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  font-weight: 800;
+}
+
+.store-card .emoji {
+  font-size: 1.4rem;
+}
+
+.store-card .cost {
+  font-weight: 700;
+  color: #c0ffda;
+}
+
+.store-card .desc {
+  color: var(--text-secondary, #b7c6d8);
+  font-size: 0.95rem;
+}
+
+.store-card .meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  color: var(--text-secondary, #b7c6d8);
+}
+
+.store-card .actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: auto;
+}
+
+.store-card button {
+  border: none;
+  border-radius: 10px;
+  padding: 0.6rem 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.btn-buy {
+  background: linear-gradient(135deg, #00c878, #4a90e2);
+  color: #fff;
+}
+
+.btn-buy:disabled {
+  background: rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.5);
+  cursor: not-allowed;
+}
+
+.btn-owned {
+  background: rgba(255,255,255,0.08);
+  color: #c0cbe0;
+}
+
+.btn-equip {
+  background: var(--accent-pink, #ff1b6b);
+  color: #fff;
+}
+
+.tag-owned {
+  display: inline-block;
+  padding: 0.35rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(0,200,120,0.15);
+  border: 1px solid rgba(0,200,120,0.25);
+  color: #6fffc2;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+
+.store-warning {
+  background: rgba(255, 182, 72, 0.1);
+  border: 1px solid rgba(255, 182, 72, 0.3);
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  color: #ffd9a3;
+  margin-top: 1rem;
+}
