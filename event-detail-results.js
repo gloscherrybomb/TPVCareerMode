@@ -615,7 +615,10 @@ async function loadEventResults() {
         const resultsRef = doc(db, 'results', `season1_event${eventNumber}_${userUid}`);
         const resultsDoc = await getDoc(resultsRef);
 
-        if (!resultsDoc.exists()) {
+        const hasResults = resultsDoc.exists();
+        window.cadenceEventContext = { eventNumber, hasResults };
+
+        if (!hasResults) {
             // No results available yet - show pre-race sections with tour overview
             eventResultsSection.style.display = 'none';
             await showPreRaceSections(userData, userUid);

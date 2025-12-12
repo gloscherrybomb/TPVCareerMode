@@ -869,6 +869,22 @@
     font-weight: 700;
 }
 
+.event-loadout {
+    padding: 2rem 0;
+}
+
+.event-loadout .container {
+    max-width: 1000px;
+}
+
+.cc-loadout-panel {
+    background: var(--dark-card, #0f1623);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+}
+
 .no-bonus {
     color: var(--text-secondary);
     opacity: 0.5;
