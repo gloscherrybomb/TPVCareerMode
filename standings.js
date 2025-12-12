@@ -261,7 +261,7 @@ async function renderSeasonStandings(forceRefresh = false) {
                 userData = cached.userData;
 
                 // Skip to rendering
-                renderSeasonStandingsTable(standings, userData, seasonContent);
+                await renderSeasonStandingsTable(standings, userData, seasonContent);
                 return;
             }
         }
@@ -297,11 +297,11 @@ async function renderSeasonStandings(forceRefresh = false) {
     console.log(`✅ Cached season standings for user ${currentUser.uid}`);
 
     // Render the table
-    renderSeasonStandingsTable(standings, userData, seasonContent);
+    await renderSeasonStandingsTable(standings, userData, seasonContent);
 }
 
 // Separate function to render the season standings table
-function renderSeasonStandingsTable(standings, userData, seasonContent) {
+async function renderSeasonStandingsTable(standings, userData, seasonContent) {
     // Debug: Check if user's points in standings matches their totalPoints
     const userInStandings = standings.find(s => s.uid === currentUser.uid);
     if (userInStandings && userData) {
