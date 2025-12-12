@@ -159,7 +159,21 @@ function renderSlots() {
     slot.className = 'cc-slot';
     const equippedId = userDocData?.unlocks?.equipped?.[i];
     const equippedName = unlockCatalog.find(u => u.id === equippedId)?.name;
-    slot.textContent = i < slotCount ? `Slot ${i + 1}: ${equippedName || 'Empty'}` : `Slot ${i + 1}: Locked`;
+    if (i < slotCount) {
+      slot.textContent = `Slot ${i + 1}: ${equippedName || 'Empty'}`;
+
+      // Allow unequip directly from slot
+      if (equippedId) {
+        const btn = document.createElement('button');
+        btn.className = 'cc-equip';
+        btn.textContent = 'Unequip';
+        btn.style.marginLeft = '8px';
+        btn.addEventListener('click', () => equipItem(equippedId)); // toggles off
+        slot.appendChild(btn);
+      }
+    } else {
+      slot.textContent = `Slot ${i + 1}: Locked`;
+    }
     row.appendChild(slot);
   }
 
