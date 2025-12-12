@@ -448,6 +448,10 @@ async function renderGlobalRankings(forceRefresh = false) {
                 if (cacheAge < CACHE_DURATION) {
                     console.log(`📦 Using cached global rankings (${Math.round(cacheAge / 1000)}s old)`);
                     rankings = JSON.parse(cachedData);
+
+                    // Filter out bots from cached data (in case cache has old data with bots)
+                    rankings = rankings.filter(r => !r.uid.startsWith('Bot'));
+
                     console.log('Global Rankings - Total racers:', rankings.length);
                     console.log('Global Rankings - First racer:', rankings[0]);
 
@@ -469,11 +473,10 @@ async function renderGlobalRankings(forceRefresh = false) {
         // Cache miss or expired - fetch from Firestore
         console.log('🔄 Fetching fresh global rankings from Firestore...');
 
-        // Fetch top 100 users by totalPoints (careerPoints not yet implemented)
-        // TODO: Switch to careerPoints once all users have this field
+        // Fetch top 100 users by careerPoints (lifetime achievement across all seasons)
         const usersQuery = query(
             collection(db, 'users'),
-            orderBy('totalPoints', 'desc'),
+            orderBy('careerPoints', 'desc'),
             limit(100)
         );
         console.log('📡 Executing Firestore query...');
@@ -483,8 +486,14 @@ async function renderGlobalRankings(forceRefresh = false) {
         rankings = [];
         usersSnapshot.forEach((doc) => {
             const data = doc.data();
-            // Use totalPoints for now (careerPoints will be used once implemented)
-            const points = data.totalPoints || 0;
+
+            // Skip bots - global rankings are for human riders only
+            if (doc.id.startsWith('Bot')) {
+                return;
+            }
+
+            // Use careerPoints for global rankings (lifetime achievement)
+            const points = data.careerPoints || 0;
             rankings.push({
                 uid: doc.id,
                 name: data.name || 'Unknown',
