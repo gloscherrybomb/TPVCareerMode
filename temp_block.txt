@@ -1,0 +1,13 @@
+﻿    if (i < slotCount) {
+      const equippedId = equipped[i];
+      const unlock = unlockCatalog.find(u => u.id === equippedId);
+      const slotEquipped = document.createElement('div');
+      slotEquipped.className = 'slot-equipped';
+      slotEquipped.textContent = unlock ? `${unlock.emoji || 'ƒð?'} ${unlock.name}` : 'Empty';
+      slotInfo.appendChild(slotEquipped);
+    } else {
+      const lockedText = document.createElement('div');
+      lockedText.className = 'slot-locked-text';
+      lockedText.textContent = 'Locked';
+      slotInfo.appendChild(lockedText);
+    }

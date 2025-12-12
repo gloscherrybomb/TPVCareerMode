@@ -68,8 +68,20 @@ function renderSlots() {
       const unlock = unlockCatalog.find(u => u.id === equippedId);
       const slotEquipped = document.createElement('div');
       slotEquipped.className = 'slot-equipped';
-      slotEquipped.textContent = unlock ? `${unlock.emoji || '⭐'} ${unlock.name}` : 'Empty';
+      slotEquipped.textContent = unlock ? `${unlock.emoji || '🎯'} ${unlock.name}` : 'Empty';
       slotInfo.appendChild(slotEquipped);
+
+      // Allow unequip directly from slot
+      if (unlock) {
+        const slotActions = document.createElement('div');
+        slotActions.className = 'slot-actions';
+        const unequipBtn = document.createElement('button');
+        unequipBtn.className = 'btn-equip';
+        unequipBtn.textContent = 'Unequip';
+        unequipBtn.addEventListener('click', () => equipItem(equippedId));
+        slotActions.appendChild(unequipBtn);
+        slotItem.appendChild(slotActions);
+      }
     } else {
       const lockedText = document.createElement('div');
       lockedText.className = 'slot-locked-text';
@@ -190,13 +202,13 @@ function renderGrid() {
       if (owned) {
         const status = document.createElement('div');
         status.className = 'unlock-status';
-        status.textContent = '✓ Owned';
+        status.textContent = 'Owned';
         actions.appendChild(status);
 
         const equipBtn = document.createElement('button');
         equipBtn.className = 'btn-equip';
-        equipBtn.textContent = equippedHere ? '✓ Equipped' : 'Equip';
-        equipBtn.disabled = equippedHere || !meetsPersonalityReqs;
+        equipBtn.textContent = equippedHere ? 'Unequip' : 'Equip';
+        equipBtn.disabled = !meetsPersonalityReqs;
         if (!meetsPersonalityReqs) {
           equipBtn.title = 'Personality requirements not met';
         }
@@ -282,14 +294,18 @@ async function equipItem(itemId) {
     return;
   }
 
-  const next = current.slice(0, slotCount);
-  if (next.includes(itemId)) return;
+  let next = current.slice(0, slotCount);
 
-  if (next.length < slotCount) {
-    next.push(itemId);
+  // Toggle off if already equipped
+  if (next.includes(itemId)) {
+    next = next.filter(id => id !== itemId);
   } else {
-    // Replace first slot
-    next[0] = itemId;
+    if (next.length < slotCount) {
+      next.push(itemId);
+    } else {
+      // Replace first slot
+      next[0] = itemId;
+    }
   }
 
   try {
@@ -380,3 +396,12 @@ function start() {
 }
 
 document.addEventListener('DOMContentLoaded', start);
+
+
+
+
+
+
+
+
+
