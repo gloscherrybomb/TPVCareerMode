@@ -108,6 +108,13 @@
                             </svg>
                             View Full Palmares
                         </a>
+                        <a href="store.html" id="ccStoreButton" class="btn btn-primary" style="display: none; align-items: center; gap: 0.4rem; margin-top: 0.5rem; padding: 0.5rem 0.9rem; font-size: 0.85rem;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <path d="M12 6v6l4 2"></path>
+                            </svg>
+                            <span id="ccBalanceDisplay">0 CC</span>
+                        </a>
                     </div>
 
                     <!-- Media Personality Chart (Header) -->
@@ -185,6 +192,14 @@
                             <div class="stat-content">
                                 <div class="stat-label">Podium Rate</div>
                                 <div class="stat-value" id="podiumRate">0%</div>
+                            </div>
+                        </div>
+                        <div class="stat-card" id="ccStatCard" style="display: none;">
+                            <div class="stat-icon">⚡</div>
+                            <div class="stat-content">
+                                <div class="stat-label">Cadence Credits</div>
+                                <div class="stat-value" id="ccBalance">0 CC</div>
+                                <a href="store.html" style="color: var(--accent-blue); font-size: 0.85rem; text-decoration: none; margin-top: 0.25rem; display: inline-block;">Visit Store →</a>
                             </div>
                         </div>
                     </div>

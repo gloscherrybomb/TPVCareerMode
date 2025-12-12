@@ -85,6 +85,22 @@ function injectStyles() {
     .cc-selector-card.selected::before { content:'✓'; position:absolute; top:1rem; right:1rem; width:32px; height:32px; background:linear-gradient(135deg,var(--accent-pink),var(--accent-purple)); border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-weight:700; font-size:1.2rem; }
     .cc-selector-empty { text-align:center; padding:3rem; color:var(--text-secondary); }
     .cc-selector-action { text-align:center; margin-top:2rem; }
+    .cc-results-panel { background:var(--dark-card); border:2px solid rgba(255,255,255,0.05); border-radius:20px; padding:2rem; }
+    .cc-results-header { text-align:center; margin-bottom:2rem; }
+    .cc-results-title { font-family:'Orbitron',sans-serif; font-size:2rem; font-weight:900; background:linear-gradient(135deg,var(--accent-pink),var(--accent-blue)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-bottom:0.5rem; }
+    .cc-results-subtitle { color:var(--text-secondary); font-size:1rem; }
+    .cc-results-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:1.5rem; }
+    .cc-result-card { background:var(--dark-elevated); border:2px solid rgba(255,255,255,0.05); border-radius:16px; padding:1.75rem; text-align:center; transition:all 0.3s ease; position:relative; overflow:hidden; }
+    .cc-result-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:transparent; }
+    .cc-result-card.earned::before { background:linear-gradient(90deg,transparent,var(--success),transparent); }
+    .cc-result-card.applied::before { background:linear-gradient(90deg,transparent,var(--accent-blue),transparent); }
+    .cc-result-icon { font-size:3rem; margin-bottom:1rem; animation:float 3s ease-in-out infinite; }
+    .cc-result-amount { font-family:'Orbitron',sans-serif; font-size:2.5rem; font-weight:900; margin-bottom:0.5rem; }
+    .cc-result-amount.earned { background:linear-gradient(135deg,var(--success),#00cc88); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .cc-result-amount.applied { background:linear-gradient(135deg,var(--accent-blue),var(--accent-purple)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .cc-result-label { color:var(--text-secondary); font-size:0.95rem; font-weight:600; text-transform:uppercase; letter-spacing:1px; margin-bottom:1rem; }
+    .cc-result-detail { color:var(--text-secondary); font-size:0.9rem; line-height:1.5; }
+    .cc-result-badge { display:inline-block; padding:0.5rem 1rem; background:rgba(0,255,136,0.1); border:1px solid rgba(0,255,136,0.3); border-radius:50px; color:var(--success); font-weight:700; font-size:0.85rem; margin-top:0.75rem; }
   `;
   document.head.appendChild(style);
 }
@@ -286,6 +302,31 @@ function renderProfileButton() {
     header.appendChild(btn);
   }
   btn.style.display = 'inline-flex';
+
+  // Also render CC in profile page elements
+  renderProfileCC();
+}
+
+function renderProfileCC() {
+  if (!userDocData) return;
+
+  const balance = userDocData.currency?.balance || 0;
+
+  // Update button in profile header
+  const storeButton = document.getElementById('ccStoreButton');
+  const balanceDisplay = document.getElementById('ccBalanceDisplay');
+  if (storeButton && balanceDisplay) {
+    balanceDisplay.textContent = `${balance} CC`;
+    storeButton.style.display = 'inline-flex';
+  }
+
+  // Update stats card
+  const statCard = document.getElementById('ccStatCard');
+  const ccBalanceEl = document.getElementById('ccBalance');
+  if (statCard && ccBalanceEl) {
+    ccBalanceEl.textContent = `${balance} CC`;
+    statCard.style.display = 'block';
+  }
 }
 
 function renderLoadoutPanel() {
@@ -474,24 +515,89 @@ async function saveLoadout() {
   }
 }
 
+function renderCCResults(eventResults) {
+  const panel = document.getElementById('cc-results-panel');
+  if (!panel) return;
+
+  const earnedCC = eventResults.earnedCadenceCredits || 0;
+  const unlockBonuses = eventResults.unlockBonusesApplied || [];
+  const unlockPoints = eventResults.unlockBonusPoints || 0;
+  const newBalance = userDocData.currency?.balance || 0;
+
+  const hasEarned = earnedCC > 0;
+  const hasUnlock = unlockBonuses.length > 0;
+
+  if (!hasEarned && !hasUnlock) return; // Don't show if nothing to display
+
+  panel.innerHTML = `
+    <div class="cc-results-panel">
+      <div class="cc-results-header">
+        <div class="cc-results-title">Race Rewards</div>
+        <div class="cc-results-subtitle">Your Cadence Credits and unlock bonuses for this race</div>
+      </div>
+      <div class="cc-results-grid">
+        ${hasEarned ? `
+          <div class="cc-result-card earned">
+            <div class="cc-result-icon">⚡</div>
+            <div class="cc-result-amount earned">+${earnedCC}</div>
+            <div class="cc-result-label">Cadence Credits Earned</div>
+            <div class="cc-result-detail">From achievements and awards</div>
+            <div class="cc-result-badge">New balance: ${newBalance} CC</div>
+          </div>
+        ` : ''}
+        ${hasUnlock ? `
+          <div class="cc-result-card applied">
+            <div class="cc-result-icon">${unlockBonuses[0]?.emoji || '🎯'}</div>
+            <div class="cc-result-amount applied">+${unlockPoints}</div>
+            <div class="cc-result-label">Unlock Bonus Applied</div>
+            <div class="cc-result-detail">${unlockBonuses[0]?.name || 'Unlock'} triggered</div>
+            <div class="cc-result-badge">${unlockBonuses[0]?.reason || 'Condition met'}</div>
+          </div>
+        ` : ''}
+        ${!hasUnlock && hasEarned ? `
+          <div class="cc-result-card">
+            <div class="cc-result-icon">📦</div>
+            <div class="cc-result-amount" style="color:var(--text-secondary); font-size:1.5rem;">No Unlock Triggered</div>
+            <div class="cc-result-label">Race Performance</div>
+            <div class="cc-result-detail">None of your equipped unlocks met trigger conditions this race</div>
+            <button class="cc-manage-btn" style="margin-top:1rem;" onclick="window.location.href='store.html'">
+              <span>Manage Unlocks</span>
+            </button>
+          </div>
+        ` : ''}
+      </div>
+    </div>
+  `;
+
+  document.getElementById('eventCCResults')?.style.setProperty('display', 'block');
+}
+
 function maybeRenderEventLoadout() {
   if (eventLoadoutRendered) return;
   if (!userDocData || !window.cadenceEventContext) return;
   const ctx = window.cadenceEventContext;
-  if (ctx.hasResults) return; // Only show when event not yet completed
 
-  // Render unlock selector at top
-  const selectorMount = document.getElementById('cc-unlock-selector');
-  if (selectorMount) {
-    renderUnlockSelector();
-    document.getElementById('eventUnlockSelection')?.style.setProperty('display', 'block');
-  }
+  if (ctx.hasResults) {
+    // Show results
+    const eventNum = ctx.eventNumber;
+    const eventResults = userDocData[`event${eventNum}Results`];
+    if (eventResults) {
+      renderCCResults(eventResults);
+    }
+  } else {
+    // Show pre-race selector
+    const selectorMount = document.getElementById('cc-unlock-selector');
+    if (selectorMount) {
+      renderUnlockSelector();
+      document.getElementById('eventUnlockSelection')?.style.setProperty('display', 'block');
+    }
 
-  // Render loadout panel further down
-  const loadoutMount = document.getElementById('cc-loadout-panel');
-  if (loadoutMount) {
-    renderLoadoutPanel();
-    document.getElementById('eventLoadoutSection')?.style.setProperty('display', 'block');
+    // Render loadout panel further down
+    const loadoutMount = document.getElementById('cc-loadout-panel');
+    if (loadoutMount) {
+      renderLoadoutPanel();
+      document.getElementById('eventLoadoutSection')?.style.setProperty('display', 'block');
+    }
   }
 
   eventLoadoutRendered = true;

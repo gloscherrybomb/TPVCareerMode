@@ -1264,6 +1264,7 @@ async function processUserResult(uid, eventInfo, results) {
       unlockBonusesApplied.push({
         id: selectedUnlock.unlock.id,
         name: selectedUnlock.unlock.name,
+        emoji: selectedUnlock.unlock.emoji || '🎯',
         pointsAdded: unlockBonusPoints,
         reason: selectedUnlock.reason
       });
@@ -1539,6 +1540,9 @@ async function processUserResult(uid, eventInfo, results) {
       console.log(`   ÐY". Cadence Credits already awarded for event ${eventNumber}, skipping.`);
       earnedCadenceCredits = 0;
     }
+
+    // Add CC earned to event results for display
+    eventResults.earnedCadenceCredits = earnedCadenceCredits;
   }
 
   // Update user document
