@@ -862,6 +862,13 @@
     border: 1px solid rgba(138, 43, 226, 0.2);
 }
 
+.medal-icon.unlock-bonus {
+    background: rgba(0, 200, 120, 0.15);
+    border: 1px solid rgba(0, 200, 120, 0.25);
+    color: #6fffc2;
+    font-weight: 700;
+}
+
 .no-bonus {
     color: var(--text-secondary);
     opacity: 0.5;

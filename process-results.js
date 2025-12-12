@@ -6,6 +6,8 @@ const Papa = require('papaparse');
 const admin = require('firebase-admin');
 const awardsCalc = require('./awards-calculation');
 const storyGen = require('./story-generator');
+const { FEATURE_FLAG_KEY, AWARD_CREDIT_MAP, PER_EVENT_CREDIT_CAP } = require('./currency-config');
+const { UNLOCK_DEFINITIONS, getUnlockById } = require('./unlock-config');
 
 // Import narrative system modules
 const { NARRATIVE_DATABASE } = require('./narrative-database.js');
@@ -1225,6 +1227,59 @@ async function processUserResult(uid, eventInfo, results) {
   if (STAGE_REQUIREMENTS_MAP[nextStage]) {
     nextEventNumber = STAGE_REQUIREMENTS_MAP[nextStage];
   }
+
+  // Preview flag for Cadence Credits/Unlocks
+  const previewCadenceEnabled = userData[FEATURE_FLAG_KEY] === true;
+
+  // Apply unlock bonuses (one per race) if preview is enabled
+  let unlockBonusPoints = 0;
+  let unlockBonusesApplied = [];
+  const unlockCooldowns = { ...(userData.unlocks?.cooldowns || {}) };
+
+  if (previewCadenceEnabled) {
+    const equipped = Array.isArray(userData.unlocks?.equipped) ? userData.unlocks.equipped : [];
+    const slotCount = userData.unlocks?.slotCount || 1;
+    const equippedToUse = equipped.slice(0, slotCount).filter(Boolean);
+
+    const sanitizedResults = sortedResults.map(r => ({
+      position: parseInt(r.Position),
+      arr: parseInt(r.ARR) || 0
+    })).filter(r => !isNaN(r.position));
+
+    const unlockContext = {
+      position,
+      predictedPosition,
+      marginToWinner: position === 1 ? winMargin : marginToWinner,
+      gapToWinner: position === 1 ? 0 : marginToWinner,
+      eventCategory,
+      eventNumber,
+      totalFinishers: sortedResults.length,
+      userARR: parseInt(userResult.ARR) || 0,
+      results: sanitizedResults
+    };
+
+    const selectedUnlock = selectUnlockToApply(equippedToUse, unlockCooldowns, eventNumber, unlockContext);
+    if (selectedUnlock) {
+      unlockBonusPoints = selectedUnlock.unlock.pointsBonus || 0;
+      unlockBonusesApplied.push({
+        id: selectedUnlock.unlock.id,
+        name: selectedUnlock.unlock.name,
+        pointsAdded: unlockBonusPoints,
+        reason: selectedUnlock.reason
+      });
+      // Apply bonus to points/breakdown
+      points += unlockBonusPoints;
+      bonusPoints += unlockBonusPoints;
+      unlockCooldowns[selectedUnlock.unlock.id] = eventNumber;
+      console.log(`   ÐY"? Unlock applied (${selectedUnlock.unlock.name}): +${unlockBonusPoints} pts`);
+    }
+
+    // Attach to event results for display
+    eventResults.points = points;
+    eventResults.bonusPoints = bonusPoints;
+    eventResults.unlockBonusPoints = unlockBonusPoints;
+    eventResults.unlockBonusesApplied = unlockBonusesApplied;
+  }
   
   // After event 15, there is no next event - season is complete
   if (eventNumber === 15) {
@@ -1452,6 +1507,40 @@ async function processUserResult(uid, eventInfo, results) {
     newLifetimeStats.biggestWin = bigWin;
   }
 
+  // Ensure unlock fields present for compatibility
+  if (!previewCadenceEnabled) {
+    eventResults.unlockBonusPoints = eventResults.unlockBonusPoints || 0;
+    eventResults.unlockBonusesApplied = eventResults.unlockBonusesApplied || [];
+  }
+
+  // Calculate Cadence Credits from awards (preview users only)
+  let earnedCadenceCredits = 0;
+  let cadenceCreditTransaction = null;
+  const existingTransactions = userData.currency?.transactions || [];
+
+  if (previewCadenceEnabled) {
+    const awardIds = (eventResults.earnedAwards || []).map(a => a.awardId);
+    earnedCadenceCredits = calculateCadenceCreditsFromAwards(awardIds);
+
+    const txId = `cc_event_${eventNumber}`;
+    const alreadyProcessed = existingTransactions.some(t => t.id === txId);
+
+    if (!alreadyProcessed && earnedCadenceCredits > 0) {
+      cadenceCreditTransaction = {
+        id: txId,
+        type: 'earn',
+        delta: earnedCadenceCredits,
+        source: 'awards',
+        eventNumber: eventNumber,
+        awardIds: awardIds,
+        timestamp: admin.firestore.FieldValue.serverTimestamp()
+      };
+    } else if (alreadyProcessed) {
+      console.log(`   ÐY". Cadence Credits already awarded for event ${eventNumber}, skipping.`);
+      earnedCadenceCredits = 0;
+    }
+  }
+
   // Update user document
   const updates = {
     [`event${eventNumber}Results`]: eventResults,
@@ -1479,6 +1568,20 @@ async function processUserResult(uid, eventInfo, results) {
     lifetimeStats: newLifetimeStats, // Add lifetime statistics
     ...dnsFlags // Add DNS flags if any
   };
+
+  if (previewCadenceEnabled) {
+    // Currency updates
+    const currentBalance = userData.currency?.balance || 0;
+    if (earnedCadenceCredits > 0) {
+      updates['currency.balance'] = currentBalance + earnedCadenceCredits;
+    }
+    if (cadenceCreditTransaction) {
+      updates['currency.transactions'] = admin.firestore.FieldValue.arrayUnion(cadenceCreditTransaction);
+    }
+
+    // Unlock cooldowns
+    updates['unlocks.cooldowns'] = unlockCooldowns;
+  }
   
   // Track awards earned in THIS event specifically
   // We'll increment these in Firebase
@@ -1776,6 +1879,124 @@ function getSeededRandom(botName, eventNumber) {
   // Return a number between 0 and 1
   const x = Math.sin(Math.abs(hash)) * 10000;
   return x - Math.floor(x);
+}
+
+/**
+ * Calculate Cadence Credits from earned awards
+ */
+function calculateCadenceCreditsFromAwards(earnedAwardIds = []) {
+  const total = earnedAwardIds.reduce((sum, id) => {
+    const value = AWARD_CREDIT_MAP[id] || 0;
+    return sum + value;
+  }, 0);
+
+  return Math.min(total, PER_EVENT_CREDIT_CAP);
+}
+
+/**
+ * Evaluate whether a given unlock should trigger for this event
+ * Returns { triggered: boolean, reason: string }
+ */
+function evaluateUnlockTrigger(unlockId, context) {
+  const { position, predictedPosition, marginToWinner, gapToWinner, eventCategory, eventNumber, totalFinishers, userARR, results } = context;
+
+  switch (unlockId) {
+    case 'paceNotes':
+      if (!predictedPosition) return { triggered: false };
+      return {
+        triggered: Math.abs(predictedPosition - position) <= 1,
+        reason: 'Finished at predicted ±1 place'
+      };
+    case 'teamCarRecon':
+      return {
+        triggered: position <= 10 || (typeof marginToWinner === 'number' && marginToWinner < 45),
+        reason: 'Top 10 or close gap to winner'
+      };
+    case 'sprintPrimer':
+      return {
+        triggered: position <= 8,
+        reason: 'Strong sprint/segment or top 8 finish'
+      };
+    case 'aeroWheels':
+      if (!predictedPosition) return { triggered: false };
+      return {
+        triggered: predictedPosition - position >= 5,
+        reason: 'Beat prediction by 5+'
+      };
+    case 'cadenceNutrition':
+      return {
+        triggered: typeof gapToWinner === 'number' && gapToWinner <= 20,
+        reason: 'Within 20s of winner'
+      };
+    case 'soigneurSession':
+      if (!predictedPosition) return { triggered: false };
+      return {
+        triggered: predictedPosition <= 5 && position <= 5,
+        reason: 'Predicted and finished top 5'
+      };
+    case 'preRaceMassage':
+      if (!predictedPosition || !totalFinishers) return { triggered: false };
+      return {
+        triggered: predictedPosition <= Math.ceil(totalFinishers / 2) && position <= 3,
+        reason: 'Predicted top half and podium'
+      };
+    case 'climbingGears':
+      return {
+        triggered: eventCategory === 'climbing' && position <= 10,
+        reason: 'Climbing day success'
+      };
+    case 'aggroRaceKit':
+      return {
+        triggered: position <= 5 || (position <= 10 && typeof marginToWinner === 'number' && marginToWinner < 30),
+        reason: 'Aggressive racing payoff'
+      };
+    case 'domestiqueHelp': {
+      // Beat someone with higher ARR who finished behind you
+      const higherARRRider = results.find(r => r.arr > userARR && r.position > position);
+      return {
+        triggered: Boolean(higherARRRider),
+        reason: 'Beat highest ARR rider'
+      };
+    }
+    case 'recoveryBoots':
+      return {
+        triggered: eventNumber >= 13 && eventNumber <= 15 && position <= 8,
+        reason: 'Tour stage back-to-back performance'
+      };
+    case 'directorsTablet':
+      if (!predictedPosition) return { triggered: false };
+      return {
+        triggered: (predictedPosition - position >= 8) || (predictedPosition >= 10 && position <= 3),
+        reason: 'Big beat vs prediction or podium from deep prediction'
+      };
+    default:
+      return { triggered: false };
+  }
+}
+
+/**
+ * Determine which unlock to trigger (one per race) based on equipped order and cooldowns
+ */
+function selectUnlockToApply(equippedIds, cooldowns, eventNumber, context) {
+  for (const id of equippedIds) {
+    const unlock = getUnlockById(id);
+    if (!unlock) continue;
+
+    // 1-race cooldown: block if it triggered last event
+    if (cooldowns && cooldowns[id] && cooldowns[id] >= eventNumber) {
+      continue;
+    }
+
+    const result = evaluateUnlockTrigger(id, context);
+    if (result.triggered) {
+      return {
+        unlock,
+        reason: result.reason || unlock.description
+      };
+    }
+  }
+
+  return null;
 }
 
 /**

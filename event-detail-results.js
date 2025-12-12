@@ -770,7 +770,7 @@ async function loadEventResults() {
             // Build bonus cell content
             let bonusHTML = '';
             if (result.bonusPoints && result.bonusPoints > 0) {
-                bonusHTML += `<span class="bonus-points" title="Bonus for beating prediction">+${result.bonusPoints}</span>`;
+                bonusHTML += `<span class="bonus-points" title="Bonus for beating prediction and unlocks">+${result.bonusPoints}</span>`;
             }
             if (result.earnedPunchingMedal) {
                 bonusHTML += `<span class="medal-icon punching" title="Beat prediction by 10+ places">🥊</span>`;
@@ -795,6 +795,9 @@ async function loadEventResults() {
             }
             if (result.earnedZeroToHero) {
                 bonusHTML += `<span class="medal-icon zero-to-hero" title="Bottom 20% to top 20%">🚀</span>`;
+            }
+            if (result.unlockBonusPoints && result.unlockBonusPoints > 0) {
+                bonusHTML += `<span class="medal-icon unlock-bonus" title="Unlock bonus points applied">+${result.unlockBonusPoints} unlock</span>`;
             }
             if (!bonusHTML) {
                 bonusHTML = '<span class="no-bonus">—</span>';
