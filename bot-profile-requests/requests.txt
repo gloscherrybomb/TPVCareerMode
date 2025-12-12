@@ -73,3 +73,15 @@ Bot ARR: 1247
 Bot Country: FRA
 Interesting Fact: attacked hard with a lap to go from group behind
 ================================================================================
+
+================================================================================
+Request submitted: 2025-12-11 22:40:35 UTC
+Firestore Document ID: Bot6162_1765492835426
+Submitted by User UID: Wtg1ptJIJzZViHQoOZR7EJIV1vH3
+Bot UID: Bot6162
+Bot Name: Eric Lemoine
+Bot Team: Independent
+Bot ARR: 1381
+Bot Country: FRA
+Interesting Fact: Breakaway artist. Loves to be out in front
+================================================================================
