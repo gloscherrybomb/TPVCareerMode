@@ -231,8 +231,7 @@ function renderGrid() {
       actions.appendChild(ownedTag);
       const equip = document.createElement('button');
       equip.className = 'cc-equip';
-      equip.textContent = equippedHere ? 'Equipped' : 'Equip';
-      equip.disabled = equippedHere;
+      equip.textContent = equippedHere ? 'Unequip' : 'Equip';
       equip.addEventListener('click', () => equipItem(item.id));
       actions.appendChild(equip);
     }
@@ -267,12 +266,17 @@ async function equipItem(itemId) {
   try {
     const slotCount = userDocData?.unlocks?.slotCount || 1;
     const current = userDocData?.unlocks?.equipped || [];
-    const next = current.slice(0, slotCount);
-    if (next.includes(itemId)) return;
-    if (next.length < slotCount) {
-      next.push(itemId);
+    let next = current.slice(0, slotCount);
+
+    // Toggle: if already equipped, remove it
+    if (next.includes(itemId)) {
+      next = next.filter(id => id !== itemId);
     } else {
-      next[0] = itemId; // Simple replace policy
+      if (next.length < slotCount) {
+        next.push(itemId);
+      } else {
+        next[0] = itemId; // Simple replace policy
+      }
     }
     await updateDoc(userDocRef, { 'unlocks.equipped': next });
     await refreshUser();
