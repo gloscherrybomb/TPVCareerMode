@@ -136,7 +136,10 @@ function renderGrid() {
       );
 
       const card = document.createElement('div');
-      card.className = `unlock-card tier-${tier}`;
+      const canAfford = balance >= item.cost;
+      const isLocked = !owned && (!meetsPersonalityReqs || !canAfford);
+
+      card.className = `unlock-card tier-${tier} ${isLocked ? 'locked' : ''} ${owned ? 'owned' : ''}`;
 
       let personalityInfo = '';
       if (item.personalityBonus) {
@@ -157,11 +160,11 @@ function renderGrid() {
         <div class="unlock-header">
           <div class="unlock-emoji">${item.emoji || '⭐'}</div>
           <div class="unlock-title">
-            <div class="unlock-name">${item.name}</div>
+            <div class="unlock-name">${isLocked ? '???' : item.name}</div>
             <div class="unlock-cost">${item.cost} CC</div>
           </div>
         </div>
-        <div class="unlock-description">${item.description}</div>
+        <div class="unlock-description">${isLocked ? 'Unlock to reveal details' : item.description}</div>
         <div class="unlock-bonus">+${item.pointsBonus} pts</div>
         ${personalityInfo}
         <div class="unlock-actions"></div>

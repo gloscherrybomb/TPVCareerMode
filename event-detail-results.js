@@ -618,6 +618,9 @@ async function loadEventResults() {
         const hasResults = resultsDoc.exists();
         window.cadenceEventContext = { eventNumber, hasResults };
 
+        // Dispatch event for Cadence Credits to initialize
+        window.dispatchEvent(new CustomEvent('cadenceEventContextReady', { detail: { eventNumber, hasResults } }));
+
         if (!hasResults) {
             // No results available yet - show pre-race sections with tour overview
             eventResultsSection.style.display = 'none';

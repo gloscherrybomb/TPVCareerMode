@@ -1514,36 +1514,7 @@ async function processUserResult(uid, eventInfo, results) {
     eventResults.unlockBonusesApplied = eventResults.unlockBonusesApplied || [];
   }
 
-  // Calculate Cadence Credits from awards (preview users only)
-  let earnedCadenceCredits = 0;
-  let cadenceCreditTransaction = null;
-  const existingTransactions = userData.currency?.transactions || [];
-
-  if (previewCadenceEnabled) {
-    const awardIds = (eventResults.earnedAwards || []).map(a => a.awardId);
-    earnedCadenceCredits = calculateCadenceCreditsFromAwards(awardIds);
-
-    const txId = `cc_event_${eventNumber}`;
-    const alreadyProcessed = existingTransactions.some(t => t.id === txId);
-
-    if (!alreadyProcessed && earnedCadenceCredits > 0) {
-      cadenceCreditTransaction = {
-        id: txId,
-        type: 'earn',
-        delta: earnedCadenceCredits,
-        source: 'awards',
-        eventNumber: eventNumber,
-        awardIds: awardIds,
-        timestamp: admin.firestore.FieldValue.serverTimestamp()
-      };
-    } else if (alreadyProcessed) {
-      console.log(`   ÐY". Cadence Credits already awarded for event ${eventNumber}, skipping.`);
-      earnedCadenceCredits = 0;
-    }
-
-    // Add CC earned to event results for display
-    eventResults.earnedCadenceCredits = earnedCadenceCredits;
-  }
+  // NOTE: Cadence Credits calculation moved to AFTER awards are added (after line 1710+)
 
   // Update user document
   const updates = {
@@ -1574,17 +1545,9 @@ async function processUserResult(uid, eventInfo, results) {
   };
 
   if (previewCadenceEnabled) {
-    // Currency updates
-    const currentBalance = userData.currency?.balance || 0;
-    if (earnedCadenceCredits > 0) {
-      updates['currency.balance'] = currentBalance + earnedCadenceCredits;
-    }
-    if (cadenceCreditTransaction) {
-      updates['currency.transactions'] = admin.firestore.FieldValue.arrayUnion(cadenceCreditTransaction);
-    }
-
     // Unlock cooldowns
     updates['unlocks.cooldowns'] = unlockCooldowns;
+    // NOTE: Currency updates moved to AFTER awards are added (line 1724+)
   }
   
   // Track awards earned in THIS event specifically
@@ -1720,6 +1683,51 @@ async function processUserResult(uid, eventInfo, results) {
     console.log(`   Adding ${earnedSeasonAwards.length} season award(s) to event${eventNumber}Results`);
     eventResults.earnedAwards.push(...earnedSeasonAwards);
     // Update the eventResults in updates object to include season awards
+    updates[`event${eventNumber}Results`] = eventResults;
+  }
+
+  // Calculate Cadence Credits from awards (preview users only)
+  // MUST be done AFTER all awards are added to eventResults.earnedAwards
+  let earnedCadenceCredits = 0;
+  let cadenceCreditTransaction = null;
+  const existingTransactions = userData.currency?.transactions || [];
+
+  if (previewCadenceEnabled) {
+    const awardIds = (eventResults.earnedAwards || []).map(a => a.awardId);
+    earnedCadenceCredits = calculateCadenceCreditsFromAwards(awardIds);
+
+    const txId = `cc_event_${eventNumber}`;
+    const alreadyProcessed = existingTransactions.some(t => t.id === txId);
+
+    if (!alreadyProcessed && earnedCadenceCredits > 0) {
+      cadenceCreditTransaction = {
+        id: txId,
+        type: 'earn',
+        delta: earnedCadenceCredits,
+        source: 'awards',
+        eventNumber: eventNumber,
+        awardIds: awardIds,
+        timestamp: admin.firestore.FieldValue.serverTimestamp()
+      };
+    } else if (alreadyProcessed) {
+      console.log(`   ✓ Cadence Credits already awarded for event ${eventNumber}, skipping.`);
+      earnedCadenceCredits = 0;
+    }
+
+    // Add CC earned to event results for display
+    eventResults.earnedCadenceCredits = earnedCadenceCredits;
+
+    // Currency updates
+    const currentBalance = userData.currency?.balance || 0;
+    if (earnedCadenceCredits > 0) {
+      updates['currency.balance'] = currentBalance + earnedCadenceCredits;
+      console.log(`   💰 Awarding ${earnedCadenceCredits} CC from ${awardIds.length} awards (new balance: ${currentBalance + earnedCadenceCredits})`);
+    }
+    if (cadenceCreditTransaction) {
+      updates['currency.transactions'] = admin.firestore.FieldValue.arrayUnion(cadenceCreditTransaction);
+    }
+
+    // Update eventResults in updates object to include CC
     updates[`event${eventNumber}Results`] = eventResults;
   }
 

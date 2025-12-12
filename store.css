@@ -344,6 +344,54 @@ body {
     background: linear-gradient(90deg, transparent, var(--accent-purple), transparent);
 }
 
+/* Locked State - Obfuscated */
+.unlock-card.locked {
+    opacity: 0.6;
+    filter: blur(1px);
+    pointer-events: none;
+}
+
+.unlock-card.locked:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+.unlock-card.locked .unlock-emoji {
+    opacity: 0.3;
+}
+
+.unlock-card.locked .unlock-name,
+.unlock-card.locked .unlock-description {
+    filter: blur(3px);
+    user-select: none;
+}
+
+/* Owned State - Clear Visual Indicator */
+.unlock-card.owned {
+    background: linear-gradient(135deg, rgba(0, 255, 136, 0.05), rgba(69, 202, 255, 0.05));
+    border-color: rgba(0, 255, 136, 0.2);
+}
+
+.unlock-card.owned::after {
+    content: '✓ OWNED';
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    padding: 0.25rem 0.75rem;
+    background: rgba(0, 255, 136, 0.2);
+    border: 1px solid rgba(0, 255, 136, 0.4);
+    border-radius: 50px;
+    color: var(--success);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.unlock-card.owned:hover {
+    border-color: rgba(0, 255, 136, 0.4);
+    box-shadow: 0 15px 40px rgba(0, 255, 136, 0.2);
+}
+
 .unlock-header {
     display: flex;
     align-items: center;

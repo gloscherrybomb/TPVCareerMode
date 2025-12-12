@@ -626,6 +626,12 @@ function start() {
   injectStyles();
   // Modal retained for compatibility, but primary flow links to store page.
 
+  // Listen for event context ready event
+  window.addEventListener('cadenceEventContextReady', () => {
+    console.log('[CC] Event context ready, rendering event loadout...');
+    maybeRenderEventLoadout();
+  });
+
   onAuthStateChanged(auth, async (user) => {
     if (!user) {
       console.log('[CC] No user logged in');
@@ -650,6 +656,7 @@ function start() {
     console.log('[CC] Currency balance:', data.currency?.balance || 0);
     console.log('[CC] Unlocks owned:', data.unlocks?.inventory?.length || 0);
     renderProfileButton();
+    // Try rendering now (in case context already exists)
     maybeRenderEventLoadout();
     console.log('[CC] Rendering complete');
   });
