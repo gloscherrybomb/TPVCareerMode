@@ -1924,8 +1924,8 @@ function evaluateUnlockTrigger(unlockId, context) {
     case 'paceNotes':
       if (!predictedPosition) return { triggered: false };
       return {
-        triggered: Math.abs(predictedPosition - position) <= 1,
-        reason: 'Finished at predicted ±1 place'
+        triggered: Math.abs(predictedPosition - position) <= 5,
+        reason: 'Finished within +/-5 places of prediction'
       };
     case 'teamCarRecon':
       return {

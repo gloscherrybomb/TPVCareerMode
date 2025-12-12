@@ -2,15 +2,15 @@
 // Shared unlock catalog for Cadence Credits preview
 
 const UNLOCK_DEFINITIONS = [
-  // Tier 120
+  // Tier 100
   {
     id: 'paceNotes',
     name: 'Pace Notes Earbud',
-    cost: 120,
-    tier: 120,
+    cost: 100,
+    tier: 100,
     pointsBonus: 3,
-    trigger: 'predictedWithinOne',
-    description: 'Finish at predicted ±1 place',
+    trigger: 'predictedWithinFive',
+    description: 'Finish within +/-5 places of prediction',
     emoji: '🗒️'
   },
   {
