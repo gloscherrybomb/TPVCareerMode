@@ -303,6 +303,8 @@ function renderProfileCC() {
   const balance = userDocData.currency?.balance || 0;
   const inventory = userDocData.unlocks?.inventory || [];
   const slotCount = userDocData.unlocks?.slotCount || 1;
+  const equipped = userDocData.unlocks?.equipped || [];
+  const cooldowns = userDocData.unlocks?.cooldowns || {};
 
   // Show the section
   const section = document.getElementById('cadenceCreditsSection');
@@ -326,6 +328,38 @@ function renderProfileCC() {
   const slotsEl = document.getElementById('ccSlotsUnlocked');
   if (slotsEl) {
     slotsEl.textContent = slotCount;
+  }
+
+  // Render active upgrades
+  const activeEl = document.getElementById('ccActiveUpgrades');
+  if (activeEl) {
+    const equippedUnlocks = equipped
+      .slice(0, slotCount)
+      .map(id => unlockCatalog.find(u => u.id === id))
+      .filter(Boolean);
+
+    if (equippedUnlocks.length > 0) {
+      activeEl.innerHTML = `
+        <div class="cc-active-title">Active Upgrades</div>
+        <div class="cc-active-list">
+          ${equippedUnlocks.map(unlock => {
+            const isOnCooldown = cooldowns[unlock.id] > 0;
+            return `
+              <div class="cc-active-item ${isOnCooldown ? 'on-cooldown' : ''}">
+                <span class="cc-active-emoji">${unlock.emoji || '⭐'}</span>
+                <span class="cc-active-name">${unlock.name}</span>
+                ${isOnCooldown ? `<span class="cc-active-cooldown">⏱️ Resting</span>` : ''}
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
+    } else {
+      activeEl.innerHTML = `
+        <div class="cc-active-title">Active Upgrades</div>
+        <div class="cc-active-empty">No upgrades equipped</div>
+      `;
+    }
   }
 }
 
@@ -385,11 +419,11 @@ function renderLoadoutPanel() {
         <div class="cc-event-empty">
           <div class="cc-event-empty-icon">📦</div>
           <div style="font-weight:600; margin-bottom:0.5rem; font-size:1.1rem;">No Upgrades Equipped</div>
-          <div style="font-size:0.95rem; max-width:400px; margin:0 auto;">Visit the Cadence Credits store to purchase and equip upgrades. Only one can trigger per race, and they add bonus points when conditions are met.</div>
+          <div style="font-size:0.95rem; max-width:400px; margin:0 auto;">Visit the Cadence Credits store to purchase and equip upgrades. All equipped upgrades can trigger in one race if conditions are met.</div>
         </div>
       `}
       <div style="margin-top:1rem; padding-top:1rem; border-top:1px solid rgba(255,255,255,0.05); font-size:0.85rem; color:var(--text-secondary); text-align:center;">
-        💡 Only one upgrade triggers per race, then rests for one race. Bonuses add race points only.
+        💡 All upgrades can trigger in one race if conditions are met. Upgrades that trigger rest for one race. Bonuses add race points only.
       </div>
     </div>
   `;
@@ -418,7 +452,7 @@ function renderEquippedDisplay() {
     <div class="cc-selector-panel">
       <div class="cc-selector-header">
         <div class="cc-selector-title">Your Active Upgrades</div>
-        <div class="cc-selector-subtitle">These upgrades are equipped for this race. Only one can trigger per race.</div>
+        <div class="cc-selector-subtitle">These upgrades are equipped for this race. All can trigger if conditions are met.</div>
       </div>
       ${hasEquipped ? `
         <div class="cc-selector-grid">
@@ -450,7 +484,7 @@ function renderEquippedDisplay() {
         <div class="cc-selector-empty">
           <div class="cc-event-empty-icon">📦</div>
           <div style="font-weight:600; margin-bottom:0.5rem; font-size:1.2rem;">No Upgrades Equipped</div>
-          <div style="font-size:1rem; max-width:500px; margin:0 auto 1.5rem;">Purchase and equip upgrades from the Cadence Credits store to boost your race performance.</div>
+          <div style="font-size:1rem; max-width:500px; margin:0 auto 1.5rem;">Purchase and equip upgrades from the Cadence Credits store to boost your race performance. All equipped upgrades can trigger in one race if conditions are met.</div>
         </div>
       `}
       <div class="cc-selector-action">

@@ -1258,21 +1258,26 @@ async function processUserResult(uid, eventInfo, results) {
       results: sanitizedResults
     };
 
-    const selectedUnlock = selectUnlockToApply(equippedToUse, unlockCooldowns, eventNumber, unlockContext);
-    if (selectedUnlock) {
-      unlockBonusPoints = selectedUnlock.unlock.pointsBonus || 0;
-      unlockBonusesApplied.push({
-        id: selectedUnlock.unlock.id,
-        name: selectedUnlock.unlock.name,
-        emoji: selectedUnlock.unlock.emoji || '🎯',
-        pointsAdded: unlockBonusPoints,
-        reason: selectedUnlock.reason
+    const triggeredUnlocks = selectUnlocksToApply(equippedToUse, unlockCooldowns, eventNumber, unlockContext);
+    if (triggeredUnlocks.length > 0) {
+      triggeredUnlocks.forEach(selectedUnlock => {
+        const unlockPoints = selectedUnlock.unlock.pointsBonus || 0;
+        unlockBonusPoints += unlockPoints;
+        unlockBonusesApplied.push({
+          id: selectedUnlock.unlock.id,
+          name: selectedUnlock.unlock.name,
+          emoji: selectedUnlock.unlock.emoji || '🎯',
+          pointsAdded: unlockPoints,
+          reason: selectedUnlock.reason
+        });
+        // Set cooldown for this unlock
+        unlockCooldowns[selectedUnlock.unlock.id] = eventNumber;
+        console.log(`   💎 Unlock applied (${selectedUnlock.unlock.name}): +${unlockPoints} pts`);
       });
-      // Apply bonus to points/breakdown
+
+      // Apply total bonus to points/breakdown
       points += unlockBonusPoints;
       bonusPoints += unlockBonusPoints;
-      unlockCooldowns[selectedUnlock.unlock.id] = eventNumber;
-      console.log(`   ÐY"? Unlock applied (${selectedUnlock.unlock.name}): +${unlockBonusPoints} pts`);
     }
 
     // Attach to event results for display
@@ -2055,9 +2060,11 @@ function evaluateUnlockTrigger(unlockId, context) {
 }
 
 /**
- * Determine which unlock to trigger (one per race) based on equipped order and cooldowns
+ * Determine which unlocks to trigger (all that meet conditions) based on equipped and cooldowns
  */
-function selectUnlockToApply(equippedIds, cooldowns, eventNumber, context) {
+function selectUnlocksToApply(equippedIds, cooldowns, eventNumber, context) {
+  const triggered = [];
+
   for (const id of equippedIds) {
     const unlock = getUnlockById(id);
     if (!unlock) continue;
@@ -2069,14 +2076,14 @@ function selectUnlockToApply(equippedIds, cooldowns, eventNumber, context) {
 
     const result = evaluateUnlockTrigger(id, context);
     if (result.triggered) {
-      return {
+      triggered.push({
         unlock,
         reason: result.reason || unlock.description
-      };
+      });
     }
   }
 
-  return null;
+  return triggered;
 }
 
 /**
