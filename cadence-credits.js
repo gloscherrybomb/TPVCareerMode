@@ -21,8 +21,15 @@ const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+console.log('[CC] Checking config availability...');
+console.log('[CC] window.currencyConfig:', window.currencyConfig);
+console.log('[CC] window.unlockConfig:', window.unlockConfig);
+
 const FEATURE_FLAG_KEY = (window.currencyConfig && window.currencyConfig.FEATURE_FLAG_KEY) || 'previewCadenceCredits';
 const unlockCatalog = (window.unlockConfig && window.unlockConfig.UNLOCK_DEFINITIONS) || [];
+
+console.log('[CC] Feature flag key resolved to:', FEATURE_FLAG_KEY);
+console.log('[CC] Unlock catalog loaded:', unlockCatalog.length, 'items');
 
 let userDocData = null;
 let userDocRef = null;
@@ -434,7 +441,7 @@ function renderUnlockSelector() {
                 </div>
                 <div class="cc-event-desc">${unlock.description}</div>
                 <div class="cc-event-bonus">+${unlock.pointsBonus} pts bonus</div>
-                ${isOnCooldown ? '<div style="margin-top:0.75rem; color:var(--warning); font-size:0.85rem; font-weight:600;">⏱️ Resting (${cooldowns[unlock.id]} race${cooldowns[unlock.id] > 1 ? 's' : ''})</div>' : ''}
+                ${isOnCooldown ? `<div style="margin-top:0.75rem; color:var(--warning); font-size:0.85rem; font-weight:600;">⏱️ Resting (${cooldowns[unlock.id]} race${cooldowns[unlock.id] > 1 ? 's' : ''})</div>` : ''}
                 ${isEquipped ? `<div style="margin-top:0.75rem; color:var(--accent-blue); font-size:0.85rem; font-weight:600;">Slot ${slotIndex + 1}</div>` : ''}
               </div>
             `;
