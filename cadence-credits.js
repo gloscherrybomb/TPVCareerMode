@@ -293,24 +293,7 @@ async function refreshUser() {
 }
 
 function renderProfileButton() {
-  const header = document.querySelector('.profile-header .profile-photo-section');
-  if (!header) return;
-  let btn = document.getElementById('cc-profile-btn');
-  if (!btn) {
-    btn = document.createElement('button');
-    btn.id = 'cc-profile-btn';
-    btn.className = 'btn cc-inline-button';
-    btn.style.background = 'linear-gradient(135deg, #00c878, #2dd195)';
-    btn.style.color = '#0b0f14';
-    btn.style.padding = '8px 12px';
-    btn.style.fontSize = '0.9rem';
-    btn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg><span>Cadence Credits</span>`;
-    btn.addEventListener('click', () => window.location.href = 'store.html');
-    header.appendChild(btn);
-  }
-  btn.style.display = 'inline-flex';
-
-  // Also render CC in profile page elements
+  // Render CC in profile page elements (button removed from header)
   renderProfileCC();
 }
 

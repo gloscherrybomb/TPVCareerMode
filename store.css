@@ -347,7 +347,6 @@ body {
 /* Locked State - Obfuscated */
 .unlock-card.locked {
     opacity: 0.6;
-    filter: blur(1px);
     pointer-events: none;
 }
 
@@ -358,12 +357,21 @@ body {
 
 .unlock-card.locked .unlock-emoji {
     opacity: 0.3;
+    filter: blur(2px);
 }
 
 .unlock-card.locked .unlock-name,
 .unlock-card.locked .unlock-description {
     filter: blur(3px);
     user-select: none;
+}
+
+/* Keep cost and personality requirements visible */
+.unlock-card.locked .unlock-cost,
+.unlock-card.locked .unlock-bonus,
+.unlock-card.locked .unlock-personality-locked {
+    filter: none;
+    opacity: 1;
 }
 
 /* Owned State - Clear Visual Indicator */
