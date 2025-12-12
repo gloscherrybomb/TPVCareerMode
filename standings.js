@@ -469,10 +469,11 @@ async function renderGlobalRankings(forceRefresh = false) {
         // Cache miss or expired - fetch from Firestore
         console.log('🔄 Fetching fresh global rankings from Firestore...');
 
-        // Fetch top 100 users by careerPoints (optimized query)
+        // Fetch top 100 users by totalPoints (careerPoints not yet implemented)
+        // TODO: Switch to careerPoints once all users have this field
         const usersQuery = query(
             collection(db, 'users'),
-            orderBy('careerPoints', 'desc'),
+            orderBy('totalPoints', 'desc'),
             limit(100)
         );
         console.log('📡 Executing Firestore query...');
@@ -482,15 +483,15 @@ async function renderGlobalRankings(forceRefresh = false) {
         rankings = [];
         usersSnapshot.forEach((doc) => {
             const data = doc.data();
-            // Use careerPoints for global rankings, fallback to totalPoints for backwards compatibility
-            const careerPoints = data.careerPoints !== undefined ? data.careerPoints : (data.totalPoints || 0);
+            // Use totalPoints for now (careerPoints will be used once implemented)
+            const points = data.totalPoints || 0;
             rankings.push({
                 uid: doc.id,
                 name: data.name || 'Unknown',
                 team: data.team || '',
                 season: data.currentSeason || 1,
                 events: data.totalEvents || (data.completedStages?.length || 0),
-                points: careerPoints,
+                points: points,
                 gender: data.gender || null,
                 ageBand: data.ageBand || null,
                 country: data.country || null,
