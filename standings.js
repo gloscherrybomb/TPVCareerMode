@@ -829,7 +829,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initSubTabs();
     initFilters();
     renderSeasonStandings();
-    renderGlobalRankings();
+    renderGlobalRankings().catch(err => console.error('Error rendering global rankings:', err));
     renderTeamRankings();
 });
 
@@ -843,21 +843,21 @@ function initFilters() {
     // Gender filter change
     genderFilter.addEventListener('change', () => {
         filters.gender = genderFilter.value;
-        renderGlobalRankings();
+        renderGlobalRankings().catch(err => console.error('Error rendering global rankings:', err));
     });
-    
+
     // Age group filter change
     ageGroupFilter.addEventListener('change', () => {
         filters.ageGroup = ageGroupFilter.value;
-        renderGlobalRankings();
+        renderGlobalRankings().catch(err => console.error('Error rendering global rankings:', err));
     });
-    
+
     // Country filter change
     countryFilter.addEventListener('change', () => {
         filters.country = countryFilter.value;
-        renderGlobalRankings();
+        renderGlobalRankings().catch(err => console.error('Error rendering global rankings:', err));
     });
-    
+
     // Clear all filters
     clearButton.addEventListener('click', () => {
         filters = {
@@ -868,7 +868,7 @@ function initFilters() {
         genderFilter.value = 'all';
         ageGroupFilter.value = 'all';
         countryFilter.value = 'all';
-        renderGlobalRankings();
+        renderGlobalRankings().catch(err => console.error('Error rendering global rankings:', err));
     });
 }
 
