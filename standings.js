@@ -475,7 +475,9 @@ async function renderGlobalRankings(forceRefresh = false) {
             orderBy('careerPoints', 'desc'),
             limit(100)
         );
+        console.log('📡 Executing Firestore query...');
         const usersSnapshot = await getDocs(usersQuery);
+        console.log(`📊 Firestore returned ${usersSnapshot.size} documents`);
 
         rankings = [];
         usersSnapshot.forEach((doc) => {
@@ -495,11 +497,16 @@ async function renderGlobalRankings(forceRefresh = false) {
                 isCurrentUser: currentUser && doc.id === currentUser.uid
             });
         });
+        console.log(`✅ Processed ${rankings.length} rankings from Firestore`);
 
-        // Store in cache
-        localStorage.setItem(GLOBAL_RANKINGS_CACHE_KEY, JSON.stringify(rankings));
-        localStorage.setItem(GLOBAL_RANKINGS_TIMESTAMP_KEY, Date.now().toString());
-        console.log(`✅ Cached ${rankings.length} global rankings`);
+        // Store in cache only if we have data
+        if (rankings.length > 0) {
+            localStorage.setItem(GLOBAL_RANKINGS_CACHE_KEY, JSON.stringify(rankings));
+            localStorage.setItem(GLOBAL_RANKINGS_TIMESTAMP_KEY, Date.now().toString());
+            console.log(`✅ Cached ${rankings.length} global rankings`);
+        } else {
+            console.warn('⚠️ Not caching global rankings - no data returned from Firestore');
+        }
 
         // Populate country filter with available countries
         populateCountryFilter(rankings);
