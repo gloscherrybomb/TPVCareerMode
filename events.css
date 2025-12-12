@@ -324,15 +324,15 @@
 
 .cyclist-icon {
     display: block;
-    width: 80px;
+    width: 100px;
     height: auto;
     filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.5));
-    animation: carBounce 1s ease-in-out infinite;
+    animation: carBounce 2s ease-in-out infinite;
 }
 
 @keyframes carBounce {
     0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-8px); }
+    50% { transform: translateY(-4px); }
 }
 
 .timeline-legend {
