@@ -131,9 +131,20 @@ function renderGrid() {
 
       // Check personality requirements
       const personality = userData.personality || {};
-      const meetsPersonalityReqs = !item.requiredPersonality || Object.entries(item.requiredPersonality).every(
-        ([trait, required]) => (personality[trait] || 0) >= required
-      );
+
+      // Check balanced requirement (all traits 45-65)
+      let meetsPersonalityReqs = true;
+      if (item.requiredBalanced) {
+        const traits = ['confidence', 'humility', 'aggression', 'professionalism', 'showmanship', 'resilience'];
+        meetsPersonalityReqs = traits.every(trait => {
+          const value = personality[trait] || 50;
+          return value >= 45 && value <= 65;
+        });
+      } else if (item.requiredPersonality) {
+        meetsPersonalityReqs = Object.entries(item.requiredPersonality).every(
+          ([trait, required]) => (personality[trait] || 0) >= required
+        );
+      }
 
       const card = document.createElement('div');
       const canAfford = balance >= item.cost;
@@ -148,12 +159,16 @@ function renderGrid() {
         ).join(', ');
         personalityInfo = `<div class="unlock-personality-bonus">✨ ${bonuses}</div>`;
       }
-      if (item.requiredPersonality && !meetsPersonalityReqs) {
+      if (item.requiredBalanced && !meetsPersonalityReqs) {
+        personalityInfo = `<div class="unlock-personality-locked">🔒 Requires: Balanced personality (all traits 45-65)</div>`;
+      } else if (item.requiredPersonality && !meetsPersonalityReqs) {
         const reqs = Object.entries(item.requiredPersonality).map(([trait, val]) => {
           const current = personality[trait] || 0;
           return `${trait.charAt(0).toUpperCase() + trait.slice(1)}: ${current}/${val}`;
         }).join(', ');
         personalityInfo = `<div class="unlock-personality-locked">🔒 Requires: ${reqs}</div>`;
+      } else if (item.requiredBalanced && meetsPersonalityReqs) {
+        personalityInfo = `<div class="unlock-personality-bonus">⚖️ Balanced Personality</div>`;
       }
 
       card.innerHTML = `

@@ -1981,6 +1981,74 @@ function evaluateUnlockTrigger(unlockId, context) {
         triggered: (predictedPosition - position >= 8) || (predictedPosition >= 10 && position <= 3),
         reason: 'Big beat vs prediction or podium from deep prediction'
       };
+
+    // Personality-based unlocks
+    case 'beatPredictionByAny':
+      if (!predictedPosition) return { triggered: false };
+      return {
+        triggered: predictedPosition - position > 0,
+        reason: 'Beat prediction'
+      };
+    case 'winSprint':
+      // No sprint data available, use win as proxy
+      return {
+        triggered: position === 1,
+        reason: 'Won the race'
+      };
+    case 'finishTop10':
+      return {
+        triggered: position <= 10,
+        reason: 'Finished in top 10'
+      };
+    case 'completeRace':
+      return {
+        triggered: position !== 'DNF' && typeof position === 'number',
+        reason: 'Completed the race'
+      };
+    case 'podiumFinish':
+      return {
+        triggered: position <= 3,
+        reason: 'Podium finish'
+      };
+    case 'winOrBeatBy5':
+      if (!predictedPosition) {
+        return {
+          triggered: position === 1,
+          reason: 'Won the race'
+        };
+      }
+      return {
+        triggered: position === 1 || (predictedPosition - position >= 5),
+        reason: 'Win or aggressive beat of prediction'
+      };
+    case 'top15Finish':
+      return {
+        triggered: position <= 15,
+        reason: 'Consistent top 15 finish'
+      };
+    case 'withinPrediction':
+      if (!predictedPosition) return { triggered: false };
+      return {
+        triggered: Math.abs(predictedPosition - position) <= 3,
+        reason: 'Finished within 3 places of prediction'
+      };
+    case 'win':
+      return {
+        triggered: position === 1,
+        reason: 'Won the race'
+      };
+    case 'beatPrediction3':
+      if (!predictedPosition) return { triggered: false };
+      return {
+        triggered: predictedPosition - position >= 3,
+        reason: 'Beat prediction by 3+'
+      };
+    case 'top10':
+      return {
+        triggered: position <= 10,
+        reason: 'Finished top 10'
+      };
+
     default:
       return { triggered: false };
   }

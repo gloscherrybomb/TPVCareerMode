@@ -1652,8 +1652,8 @@
 .cc-profile-card {
     background: linear-gradient(135deg, rgba(255, 27, 107, 0.1), rgba(69, 202, 255, 0.1));
     border: 2px solid rgba(255, 255, 255, 0.1);
-    border-radius: 20px;
-    padding: 2rem;
+    border-radius: 16px;
+    padding: 1.25rem;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
     transition: all 0.3s ease;
 }
@@ -1687,6 +1687,8 @@
     stroke: var(--accent-blue);
     stroke-width: 2;
     fill: none;
+    width: 40px;
+    height: 40px;
 }
 
 @keyframes float {
@@ -1709,14 +1711,14 @@
 
 .cc-profile-amount {
     font-family: 'Orbitron', sans-serif;
-    font-size: 2.5rem;
+    font-size: 1.8rem;
     font-weight: 900;
     background: linear-gradient(135deg, var(--accent-pink), var(--accent-blue));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     line-height: 1;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.35rem;
 }
 
 .cc-profile-subtitle {
@@ -1768,7 +1770,7 @@
 
 .cc-profile-stat-value {
     font-family: 'Orbitron', sans-serif;
-    font-size: 1.8rem;
+    font-size: 1.4rem;
     font-weight: 700;
     color: var(--text-primary);
 }

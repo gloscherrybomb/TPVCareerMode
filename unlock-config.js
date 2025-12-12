@@ -156,9 +156,9 @@ const UNLOCK_DEFINITIONS = [
     tier: 200,
     pointsBonus: 5,
     trigger: 'finishTop10',
-    description: 'Finish top 10 → +5 pts & +5 Teamwork',
+    description: 'Finish top 10 → +5 pts & +5 Professionalism',
     emoji: '📻',
-    personalityBonus: { teamwork: 5 }
+    personalityBonus: { professionalism: 5 }
   },
   {
     id: 'professionalAttitude',
@@ -188,8 +188,8 @@ const UNLOCK_DEFINITIONS = [
     cost: 350,
     tier: 300,
     pointsBonus: 8,
-    trigger: 'attackEarly',
-    description: 'Requires 70+ Aggression. Attack early → +8 pts',
+    trigger: 'winOrBeatBy5',
+    description: 'Requires 70+ Aggression. Win or beat prediction by 5+ → +8 pts',
     emoji: '⚔️',
     requiredPersonality: { aggression: 70 }
   },
@@ -199,10 +199,10 @@ const UNLOCK_DEFINITIONS = [
     cost: 350,
     tier: 300,
     pointsBonus: 7,
-    trigger: 'helpTeammate',
-    description: 'Requires 70+ Teamwork. Help teammate → +7 pts',
+    trigger: 'top15Finish',
+    description: 'Requires 70+ Professionalism. Finish top 15 → +7 pts',
     emoji: '🤝',
-    requiredPersonality: { teamwork: 70 }
+    requiredPersonality: { professionalism: 70 }
   },
   {
     id: 'calmAnalyst',
@@ -210,10 +210,55 @@ const UNLOCK_DEFINITIONS = [
     cost: 350,
     tier: 300,
     pointsBonus: 7,
-    trigger: 'paceYourself',
-    description: 'Requires 70+ Professionalism. Pace well → +7 pts',
+    trigger: 'withinPrediction',
+    description: 'Requires 70+ Professionalism. Finish within 3 of prediction → +7 pts',
     emoji: '🎯',
     requiredPersonality: { professionalism: 70 }
+  },
+  // New personality unlocks
+  {
+    id: 'humbleChampion',
+    name: 'Humble Champion\'s Kit',
+    cost: 350,
+    tier: 300,
+    pointsBonus: 7,
+    trigger: 'podiumFinish',
+    description: 'Requires 70+ Humility. Podium finish → +7 pts',
+    emoji: '🙏',
+    requiredPersonality: { humility: 70 }
+  },
+  {
+    id: 'showmanGear',
+    name: 'Showman\'s Performance Kit',
+    cost: 350,
+    tier: 300,
+    pointsBonus: 10,
+    trigger: 'win',
+    description: 'Requires 70+ Showmanship. Win → +10 pts',
+    emoji: '🎭',
+    requiredPersonality: { showmanship: 70 }
+  },
+  {
+    id: 'comebackKing',
+    name: 'Comeback King\'s Badge',
+    cost: 350,
+    tier: 300,
+    pointsBonus: 8,
+    trigger: 'beatPrediction3',
+    description: 'Requires 70+ Resilience. Beat prediction by 3+ → +8 pts',
+    emoji: '💪',
+    requiredPersonality: { resilience: 70 }
+  },
+  {
+    id: 'balancedApproach',
+    name: 'Balanced Approach Module',
+    cost: 500,
+    tier: 400,
+    pointsBonus: 6,
+    trigger: 'top10',
+    description: 'Requires balanced personality (all traits 45-65). Finish top 10 → +6 pts',
+    emoji: '⚖️',
+    requiredBalanced: true
   }
 ];
 

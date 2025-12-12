@@ -415,36 +415,34 @@ function renderLoadoutPanel() {
   if (manage) manage.addEventListener('click', () => window.location.href = 'store.html');
 }
 
-function renderUnlockSelector() {
+function renderEquippedDisplay() {
   const panel = document.getElementById('cc-unlock-selector');
   if (!panel) return;
 
   const slotCount = userDocData?.unlocks?.slotCount || 1;
   const equipped = userDocData?.unlocks?.equipped || [];
-  const inventory = userDocData?.unlocks?.inventory || [];
   const cooldowns = userDocData?.unlocks?.cooldowns || {};
 
-  // Get owned unlocks with full details
-  const ownedUnlocks = inventory
+  // Get equipped unlocks with full details
+  const equippedUnlocks = equipped
+    .slice(0, slotCount)
     .map(id => unlockCatalog.find(u => u.id === id))
     .filter(Boolean);
 
-  const hasOwned = ownedUnlocks.length > 0;
+  const hasEquipped = equippedUnlocks.length > 0;
 
   panel.innerHTML = `
     <div class="cc-selector-panel">
       <div class="cc-selector-header">
-        <div class="cc-selector-title">Choose Your Race Upgrades</div>
-        <div class="cc-selector-subtitle">Select up to ${slotCount} upgrade${slotCount > 1 ? 's' : ''} to equip for this race. Only one can trigger per race.</div>
+        <div class="cc-selector-title">Your Active Upgrades</div>
+        <div class="cc-selector-subtitle">These upgrades are equipped for this race. Only one can trigger per race.</div>
       </div>
-      ${hasOwned ? `
+      ${hasEquipped ? `
         <div class="cc-selector-grid">
-          ${ownedUnlocks.map(unlock => {
-            const isEquipped = equipped.includes(unlock.id);
+          ${equippedUnlocks.map(unlock => {
             const isOnCooldown = cooldowns[unlock.id] > 0;
-            const slotIndex = equipped.indexOf(unlock.id);
             return `
-              <div class="cc-selector-card ${isEquipped ? 'selected' : ''}" data-unlock-id="${unlock.id}">
+              <div class="cc-selector-card">
                 <div class="cc-event-card-header">
                   <div class="cc-event-emoji">${unlock.emoji || '⭐'}</div>
                   <div class="cc-event-name">${unlock.name}</div>
@@ -452,84 +450,37 @@ function renderUnlockSelector() {
                 <div class="cc-event-desc">${unlock.description}</div>
                 <div class="cc-event-bonus">+${unlock.pointsBonus} pts bonus</div>
                 ${isOnCooldown ? `<div style="margin-top:0.75rem; color:var(--warning); font-size:0.85rem; font-weight:600;">⏱️ Resting (${cooldowns[unlock.id]} race${cooldowns[unlock.id] > 1 ? 's' : ''})</div>` : ''}
-                ${isEquipped ? `<div style="margin-top:0.75rem; color:var(--accent-blue); font-size:0.85rem; font-weight:600;">Slot ${slotIndex + 1}</div>` : ''}
               </div>
             `;
           }).join('')}
-        </div>
-        <div class="cc-selector-action">
-          <button class="cc-manage-btn" id="cc-save-loadout">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <polyline points="20 6 9 17 4 12"></polyline>
-            </svg>
-            <span>Save Loadout</span>
-          </button>
+          ${slotCount > equippedUnlocks.length ? `
+            <div class="cc-selector-card" style="opacity: 0.5;">
+              <div class="cc-event-empty">
+                <div class="cc-event-empty-icon">📦</div>
+                <div style="font-weight:600; margin-bottom:0.5rem;">Empty Slot</div>
+                <div style="font-size:0.85rem;">Equip more unlocks in the store</div>
+              </div>
+            </div>
+          ` : ''}
         </div>
       ` : `
         <div class="cc-selector-empty">
-          <div class="cc-event-empty-icon">🔒</div>
-          <div style="font-weight:600; margin-bottom:0.5rem; font-size:1.2rem;">No Upgrades Owned</div>
-          <div style="font-size:1rem; max-width:500px; margin:0 auto 1.5rem;">Purchase upgrades from the Cadence Credits store to boost your race performance.</div>
-          <button class="cc-manage-btn" onclick="window.location.href='store.html'">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <circle cx="12" cy="12" r="10"></circle>
-              <path d="M12 6v6l4 2"></path>
-            </svg>
-            <span>Visit Store</span>
-          </button>
+          <div class="cc-event-empty-icon">📦</div>
+          <div style="font-weight:600; margin-bottom:0.5rem; font-size:1.2rem;">No Upgrades Equipped</div>
+          <div style="font-size:1rem; max-width:500px; margin:0 auto 1.5rem;">Purchase and equip upgrades from the Cadence Credits store to boost your race performance.</div>
         </div>
       `}
+      <div class="cc-selector-action">
+        <a href="store.html" class="cc-manage-btn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+          <span>Manage Unlocks in Store</span>
+        </a>
+      </div>
     </div>
   `;
-
-  // Add click handlers for selection
-  const cards = panel.querySelectorAll('.cc-selector-card');
-  cards.forEach(card => {
-    card.addEventListener('click', () => toggleUnlockSelection(card.dataset.unlockId));
-  });
-
-  const saveBtn = panel.querySelector('#cc-save-loadout');
-  if (saveBtn) {
-    saveBtn.addEventListener('click', saveLoadout);
-  }
-}
-
-let pendingEquipped = [];
-
-function toggleUnlockSelection(unlockId) {
-  const slotCount = userDocData?.unlocks?.slotCount || 1;
-  const current = [...(pendingEquipped.length > 0 ? pendingEquipped : (userDocData?.unlocks?.equipped || []))];
-
-  const idx = current.indexOf(unlockId);
-  if (idx >= 0) {
-    // Unequip
-    current.splice(idx, 1);
-  } else {
-    // Equip
-    if (current.length >= slotCount) {
-      // Replace last slot
-      current[slotCount - 1] = unlockId;
-    } else {
-      current.push(unlockId);
-    }
-  }
-
-  pendingEquipped = current;
-  renderUnlockSelector();
-}
-
-async function saveLoadout() {
-  if (!userDocRef || pendingEquipped.length === 0) return;
-  try {
-    await updateDoc(userDocRef, { 'unlocks.equipped': pendingEquipped });
-    userDocData.unlocks.equipped = pendingEquipped;
-    pendingEquipped = [];
-    renderUnlockSelector();
-    alert('✓ Loadout saved successfully!');
-  } catch (err) {
-    console.error('Save loadout failed:', err);
-    alert('Failed to save loadout: ' + err.message);
-  }
 }
 
 function renderCCResults(eventResults) {
@@ -602,10 +553,10 @@ function maybeRenderEventLoadout() {
       renderCCResults(eventResults);
     }
   } else {
-    // Show pre-race selector
+    // Show pre-race equipped display
     const selectorMount = document.getElementById('cc-unlock-selector');
     if (selectorMount) {
-      renderUnlockSelector();
+      renderEquippedDisplay();
       document.getElementById('eventUnlockSelection')?.style.setProperty('display', 'block');
     }
 
