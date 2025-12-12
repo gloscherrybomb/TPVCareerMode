@@ -657,7 +657,7 @@ async function renderTeamRankings() {
                 uid: doc.id,
                 name: data.name || 'Unknown',
                 team: team,
-                points: data.totalPoints || 0,
+                points: data.careerPoints || 0,
                 isCurrentUser: currentUser && doc.id === currentUser.uid
             });
         });
