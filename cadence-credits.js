@@ -58,6 +58,23 @@ function injectStyles() {
     .cc-loadout-header { display:flex; justify-content:space-between; align-items:center; gap:10px; }
     .cc-loadout-slots { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
     .cc-loadout-slot { background:rgba(255,255,255,0.04); border:1px dashed rgba(255,255,255,0.1); padding:8px 10px; border-radius:10px; }
+    .cc-event-loadout { background:var(--dark-card,#141824); border:2px solid rgba(255,255,255,0.05); border-radius:16px; padding:1.5rem; }
+    .cc-event-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; flex-wrap:wrap; gap:1rem; }
+    .cc-event-title { font-family:'Orbitron',sans-serif; font-size:1.5rem; font-weight:700; color:var(--text-primary); margin-bottom:0.25rem; }
+    .cc-event-subtitle { font-size:0.9rem; color:var(--text-secondary); }
+    .cc-event-balance { font-family:'Orbitron',sans-serif; font-size:1.2rem; font-weight:700; background:linear-gradient(135deg,var(--accent-pink),var(--accent-blue)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
+    .cc-event-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:1rem; margin-top:1rem; }
+    .cc-event-card { background:var(--dark-elevated,#1a1f2e); border:2px solid rgba(255,255,255,0.05); border-radius:12px; padding:1.25rem; transition:all 0.3s ease; }
+    .cc-event-card:hover { border-color:rgba(69,202,255,0.3); transform:translateY(-2px); }
+    .cc-event-card-header { display:flex; align-items:center; gap:0.75rem; margin-bottom:0.75rem; }
+    .cc-event-emoji { font-size:1.8rem; }
+    .cc-event-name { font-weight:700; font-size:1.05rem; color:var(--text-primary); }
+    .cc-event-desc { font-size:0.9rem; color:var(--text-secondary); line-height:1.5; margin-bottom:0.75rem; }
+    .cc-event-bonus { display:inline-block; padding:0.35rem 0.75rem; background:rgba(0,255,136,0.1); border:1px solid rgba(0,255,136,0.3); border-radius:50px; color:var(--success); font-weight:700; font-size:0.85rem; }
+    .cc-event-empty { text-align:center; padding:2rem; color:var(--text-secondary); }
+    .cc-event-empty-icon { font-size:3rem; opacity:0.3; margin-bottom:1rem; }
+    .cc-manage-btn { padding:0.75rem 1.5rem; background:linear-gradient(135deg,var(--accent-pink),var(--accent-purple)); color:white; border:none; border-radius:10px; font-weight:700; font-size:0.95rem; cursor:pointer; transition:all 0.3s ease; display:inline-flex; align-items:center; gap:0.5rem; }
+    .cc-manage-btn:hover { transform:translateY(-2px); box-shadow:0 10px 30px rgba(255,27,107,0.4); }
   `;
   document.head.appendChild(style);
 }
@@ -268,25 +285,60 @@ function renderLoadoutPanel() {
   const equipped = userDocData?.unlocks?.equipped || [];
   const balance = userDocData?.currency?.balance || 0;
 
+  // Get equipped unlocks with full details
+  const equippedUnlocks = equipped
+    .slice(0, slotCount)
+    .map(id => unlockCatalog.find(u => u.id === id))
+    .filter(Boolean);
+
+  const hasEquipped = equippedUnlocks.length > 0;
+
   panel.innerHTML = `
-    <div class="cc-loadout-panel">
-      <div class="cc-loadout-header">
+    <div class="cc-event-loadout">
+      <div class="cc-event-header">
         <div>
-          <div style="font-weight:700;">Race Loadout</div>
-          <div style="font-size:13px; opacity:0.8;">Balance: ${formatBalance(balance)}</div>
+          <div class="cc-event-title">Race Loadout</div>
+          <div class="cc-event-subtitle">Your equipped upgrades for this race • Balance: <span class="cc-event-balance">${formatBalance(balance)}</span></div>
         </div>
-        <button class="btn btn-primary cc-inline-button" type="button" id="cc-loadout-manage">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg>
+        <button class="cc-manage-btn" type="button" id="cc-loadout-manage">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
           <span>Manage Unlocks</span>
         </button>
       </div>
-      <div class="cc-loadout-slots">
-        ${Array.from({ length: 3 }).map((_, i) => {
-          const equippedId = equipped[i];
-          const name = unlockCatalog.find(u => u.id === equippedId)?.name;
-          const content = i < slotCount ? (name || 'Empty') : 'Locked';
-          return `<div class="cc-loadout-slot">Slot ${i + 1}: ${content}</div>`;
-        }).join('')}
+      ${hasEquipped ? `
+        <div class="cc-event-grid">
+          ${equippedUnlocks.map(unlock => `
+            <div class="cc-event-card">
+              <div class="cc-event-card-header">
+                <div class="cc-event-emoji">${unlock.emoji || '⭐'}</div>
+                <div class="cc-event-name">${unlock.name}</div>
+              </div>
+              <div class="cc-event-desc">${unlock.description}</div>
+              <div class="cc-event-bonus">+${unlock.pointsBonus} pts bonus</div>
+            </div>
+          `).join('')}
+          ${slotCount > equippedUnlocks.length ? `
+            <div class="cc-event-card">
+              <div class="cc-event-empty">
+                <div class="cc-event-empty-icon">📦</div>
+                <div style="font-weight:600; margin-bottom:0.5rem;">Empty Slot</div>
+                <div style="font-size:0.85rem;">Visit the store to equip more unlocks</div>
+              </div>
+            </div>
+          ` : ''}
+        </div>
+      ` : `
+        <div class="cc-event-empty">
+          <div class="cc-event-empty-icon">📦</div>
+          <div style="font-weight:600; margin-bottom:0.5rem; font-size:1.1rem;">No Upgrades Equipped</div>
+          <div style="font-size:0.95rem; max-width:400px; margin:0 auto;">Visit the Cadence Credits store to purchase and equip upgrades. Only one can trigger per race, and they add bonus points when conditions are met.</div>
+        </div>
+      `}
+      <div style="margin-top:1rem; padding-top:1rem; border-top:1px solid rgba(255,255,255,0.05); font-size:0.85rem; color:var(--text-secondary); text-align:center;">
+        💡 Only one upgrade triggers per race, then rests for one race. Bonuses add race points only.
       </div>
     </div>
   `;

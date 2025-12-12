@@ -6,6 +6,9 @@
     <title>Cadence Credits Store - TPV Career Mode</title>
     <link rel="icon" type="image/png" href="tpv-team-car.png">
     <link rel="apple-touch-icon" href="tpv-team-car.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="store.css">
 </head>
@@ -33,41 +36,148 @@
         </div>
     </nav>
 
-    <main class="store-page">
-        <div class="page-header">
-            <div class="container">
-                <div class="header-content">
-                    <div class="breadcrumb">
-                        <a href="index.html">Home</a> / Cadence Credits Store
-                    </div>
-                    <h1 class="page-title">Cadence Credits Store</h1>
-                    <p class="page-subtitle">Spend your CC on unlocks. Preview users only.</p>
+    <div class="page-header">
+        <div class="container">
+            <div class="header-content">
+                <div class="breadcrumb">
+                    <a href="index.html">Home</a> / Cadence Credits Store
                 </div>
+                <h1 class="page-title">Cadence Credits</h1>
+                <p class="page-subtitle">Unlock performance upgrades earned through your achievements</p>
             </div>
         </div>
+    </div>
 
-        <section class="store-hero">
-            <div class="container">
-                <div class="hero-card">
-                    <div>
-                        <h2 style="margin:0;">Your Balance</h2>
-                        <p style="margin:0; color:var(--text-secondary);">Use credits earned from awards to gear up.</p>
-                        <div class="store-warning" id="storeWarning" style="display:none;"></div>
-                    </div>
-                    <div class="balance" id="storeBalance">Balance: 0 CC</div>
-                    <div class="slots" id="storeSlots"></div>
+    <main class="store-content">
+        <div class="container">
+            <!-- Warning Message (hidden until shown by JS) -->
+            <div class="store-alert" id="storeWarning" style="display:none;">
+                <div class="alert-icon">⚠️</div>
+                <div class="alert-content">
+                    <div class="alert-title">Access Required</div>
+                    <div class="alert-message" id="warningMessage"></div>
                 </div>
             </div>
-        </section>
 
-        <section class="store-section">
-            <div class="container">
-                <h3 class="section-title-medium" style="margin-bottom: 0.5rem;">Unlock Catalog</h3>
-                <p class="section-subtitle" style="color: var(--text-secondary); margin-bottom: 1rem;">Pick your upgrades. One can trigger per race; bonuses add points only.</p>
-                <div class="store-grid" id="storeGrid"></div>
-            </div>
-        </section>
+            <!-- Balance & Slots Section -->
+            <section class="balance-section">
+                <div class="balance-card">
+                    <div class="balance-header">
+                        <div class="balance-info">
+                            <div class="balance-label">Your Balance</div>
+                            <div class="balance-amount" id="storeBalance">0 CC</div>
+                            <div class="balance-description">Earn CC through podiums, special achievements, and season awards</div>
+                        </div>
+                        <div class="balance-icon">
+                            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <path d="M12 6v6l4 2"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="slots-card">
+                    <div class="slots-header">
+                        <h3>Equipment Slots</h3>
+                        <p>Equip upgrades to boost your race points</p>
+                    </div>
+                    <div class="slots-grid" id="storeSlots">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Unlock Store Section -->
+            <section class="store-section">
+                <div class="section-header">
+                    <div>
+                        <h2 class="section-title-medium">Unlock Store</h2>
+                        <p class="section-subtitle">Purchase upgrades with Cadence Credits. One upgrade can trigger per race.</p>
+                    </div>
+                </div>
+
+                <div class="tier-section" data-tier="120">
+                    <div class="tier-header">
+                        <div class="tier-badge tier-120">Starter Tier</div>
+                        <div class="tier-cost">120 CC</div>
+                    </div>
+                    <div class="store-grid" id="tier-120">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <div class="tier-section" data-tier="200">
+                    <div class="tier-header">
+                        <div class="tier-badge tier-200">Advanced Tier</div>
+                        <div class="tier-cost">200 CC</div>
+                    </div>
+                    <div class="store-grid" id="tier-200">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <div class="tier-section" data-tier="300">
+                    <div class="tier-header">
+                        <div class="tier-badge tier-300">Expert Tier</div>
+                        <div class="tier-cost">300 CC</div>
+                    </div>
+                    <div class="store-grid" id="tier-300">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <div class="tier-section" data-tier="400">
+                    <div class="tier-header">
+                        <div class="tier-badge tier-400">Elite Tier</div>
+                        <div class="tier-cost">400 CC</div>
+                    </div>
+                    <div class="store-grid" id="tier-400">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- Info Section -->
+            <section class="info-section">
+                <div class="info-card">
+                    <div class="info-icon">ℹ️</div>
+                    <div class="info-content">
+                        <h3>How It Works</h3>
+                        <ul>
+                            <li><strong>Earn:</strong> Get Cadence Credits from awards (podiums, special feats, GC/season awards)</li>
+                            <li><strong>Unlock:</strong> Purchase upgrades from four tiers (120/200/300/400 CC)</li>
+                            <li><strong>Equip:</strong> Fit up to 3 slots (buy additional slots with CC)</li>
+                            <li><strong>Trigger:</strong> Only one upgrade activates per race, then rests for one race</li>
+                            <li><strong>Bonus:</strong> Upgrades add race points only—never affect time, position, or ARR</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+        </div>
     </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="footer-logo">TPV Career Mode</div>
+                    <p>Virtual cycling career progression</p>
+                </div>
+                <div class="footer-links">
+                    <a href="index.html">Home</a>
+                    <a href="events.html">Season</a>
+                    <a href="standings.html">Standings</a>
+                    <a href="peloton.html">Peloton</a>
+                    <a href="about.html">About</a>
+                    <a href="privacy.html">Privacy</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 TPV Career Mode. TPV Career Mode is a community effort completely independent from TrainingPeaks and TrainingPeaks Virtual.</p>
+            </div>
+        </div>
+    </footer>
 
     <script src="unlock-config.js"></script>
     <script src="currency-config.js"></script>

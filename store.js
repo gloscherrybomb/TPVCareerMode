@@ -28,90 +28,148 @@ let userDocRef = null;
 let userData = null;
 
 function renderWarning(msg) {
-  const w = document.getElementById('storeWarning');
-  if (!w) return;
-  w.textContent = msg;
-  w.style.display = 'block';
+  const warningEl = document.getElementById('storeWarning');
+  const messageEl = document.getElementById('warningMessage');
+  if (!warningEl || !messageEl) return;
+  messageEl.textContent = msg;
+  warningEl.style.display = 'flex';
 }
 
 function renderBalance() {
   const el = document.getElementById('storeBalance');
   if (!el || !userData) return;
   const balance = userData.currency?.balance || 0;
-  el.textContent = `Balance: ${balance} CC`;
+  el.textContent = `${balance.toLocaleString()} CC`;
 }
 
 function renderSlots() {
   const wrap = document.getElementById('storeSlots');
   if (!wrap || !userData) return;
   wrap.innerHTML = '';
+
   const slotCount = userData.unlocks?.slotCount || 1;
   const equipped = userData.unlocks?.equipped || [];
+  const balance = userData.currency?.balance || 0;
+
   for (let i = 0; i < 3; i++) {
-    const pill = document.createElement('div');
-    pill.className = 'slot-pill';
-    const equippedId = equipped[i];
-    const name = unlockCatalog.find(u => u.id === equippedId)?.name;
-    pill.textContent = i < slotCount ? `Slot ${i + 1}: ${name || 'Empty'}` : `Slot ${i + 1}: Locked`;
-    wrap.appendChild(pill);
-  }
-  if (slotCount < 3) {
-    const cost = slotCount === 1 ? 400 : 1200;
-    const btn = document.createElement('button');
-    btn.className = 'btn btn-primary';
-    btn.textContent = `Buy Slot ${slotCount + 1} (${cost} CC)`;
-    btn.disabled = (userData.currency?.balance || 0) < cost;
-    btn.addEventListener('click', () => purchaseSlot(cost));
-    wrap.appendChild(btn);
+    const slotItem = document.createElement('div');
+    slotItem.className = `slot-item ${i >= slotCount ? 'slot-locked' : ''}`;
+
+    const slotInfo = document.createElement('div');
+    slotInfo.className = 'slot-info';
+
+    const slotNumber = document.createElement('div');
+    slotNumber.className = 'slot-number';
+    slotNumber.textContent = `Slot ${i + 1}`;
+    slotInfo.appendChild(slotNumber);
+
+    if (i < slotCount) {
+      const equippedId = equipped[i];
+      const unlock = unlockCatalog.find(u => u.id === equippedId);
+      const slotEquipped = document.createElement('div');
+      slotEquipped.className = 'slot-equipped';
+      slotEquipped.textContent = unlock ? `${unlock.emoji || '⭐'} ${unlock.name}` : 'Empty';
+      slotInfo.appendChild(slotEquipped);
+    } else {
+      const lockedText = document.createElement('div');
+      lockedText.className = 'slot-locked-text';
+      lockedText.textContent = 'Locked';
+      slotInfo.appendChild(lockedText);
+    }
+
+    slotItem.appendChild(slotInfo);
+
+    // Add unlock button if slot is locked
+    if (i >= slotCount && slotCount < 3) {
+      const cost = slotCount === 1 ? 400 : 1200;
+      const actions = document.createElement('div');
+      actions.className = 'slot-actions';
+
+      const btn = document.createElement('button');
+      btn.className = 'btn-unlock-slot';
+      btn.textContent = `Unlock for ${cost} CC`;
+      btn.disabled = balance < cost;
+      btn.addEventListener('click', () => purchaseSlot(cost));
+      actions.appendChild(btn);
+      slotItem.appendChild(actions);
+    }
+
+    wrap.appendChild(slotItem);
   }
 }
 
 function renderGrid() {
-  const grid = document.getElementById('storeGrid');
-  if (!grid || !userData) return;
+  if (!userData) return;
+
   const balance = userData.currency?.balance || 0;
   const inventory = userData.unlocks?.inventory || [];
   const equipped = userData.unlocks?.equipped || [];
-  grid.innerHTML = '';
+
+  // Group unlocks by tier
+  const tiers = {
+    120: [],
+    200: [],
+    300: [],
+    400: []
+  };
 
   unlockCatalog.forEach(item => {
-    const owned = inventory.includes(item.id);
-    const equippedHere = equipped.includes(item.id);
-    const locked = balance < item.cost && !owned;
-    const card = document.createElement('div');
-    card.className = 'store-card';
-    card.innerHTML = `
-      <div class="title"><span class="emoji">${item.emoji || '⭐'}</span> <span>${item.name}</span></div>
-      <div class="cost">${item.cost} CC • +${item.pointsBonus} pts</div>
-      <div class="desc">${item.description}</div>
-      <div class="meta">
-        <span>Tier: ${item.tier}</span>
-        <span>${item.trigger}</span>
-      </div>
-      <div class="actions"></div>
-    `;
-    const actions = card.querySelector('.actions');
-    if (owned) {
-      const ownedTag = document.createElement('span');
-      ownedTag.className = 'tag-owned';
-      ownedTag.textContent = 'Owned';
-      actions.appendChild(ownedTag);
-
-      const equipBtn = document.createElement('button');
-      equipBtn.className = 'btn-equip';
-      equipBtn.textContent = equippedHere ? 'Equipped' : 'Equip';
-      equipBtn.disabled = equippedHere;
-      equipBtn.addEventListener('click', () => equipItem(item.id));
-      actions.appendChild(equipBtn);
-    } else {
-      const buyBtn = document.createElement('button');
-      buyBtn.className = 'btn-buy';
-      buyBtn.textContent = locked ? 'Not enough CC' : 'Buy';
-      buyBtn.disabled = locked;
-      buyBtn.addEventListener('click', () => purchaseItem(item));
-      actions.appendChild(buyBtn);
+    if (tiers[item.tier]) {
+      tiers[item.tier].push(item);
     }
-    grid.appendChild(card);
+  });
+
+  // Render each tier
+  Object.keys(tiers).forEach(tier => {
+    const gridEl = document.getElementById(`tier-${tier}`);
+    if (!gridEl) return;
+    gridEl.innerHTML = '';
+
+    tiers[tier].forEach(item => {
+      const owned = inventory.includes(item.id);
+      const equippedHere = equipped.includes(item.id);
+
+      const card = document.createElement('div');
+      card.className = `unlock-card tier-${tier}`;
+
+      card.innerHTML = `
+        <div class="unlock-header">
+          <div class="unlock-emoji">${item.emoji || '⭐'}</div>
+          <div class="unlock-title">
+            <div class="unlock-name">${item.name}</div>
+            <div class="unlock-cost">${item.cost} CC</div>
+          </div>
+        </div>
+        <div class="unlock-description">${item.description}</div>
+        <div class="unlock-bonus">+${item.pointsBonus} pts</div>
+        <div class="unlock-actions"></div>
+      `;
+
+      const actions = card.querySelector('.unlock-actions');
+
+      if (owned) {
+        const status = document.createElement('div');
+        status.className = 'unlock-status';
+        status.textContent = '✓ Owned';
+        actions.appendChild(status);
+
+        const equipBtn = document.createElement('button');
+        equipBtn.className = 'btn-equip';
+        equipBtn.textContent = equippedHere ? '✓ Equipped' : 'Equip';
+        equipBtn.disabled = equippedHere;
+        equipBtn.addEventListener('click', () => equipItem(item.id));
+        actions.appendChild(equipBtn);
+      } else {
+        const buyBtn = document.createElement('button');
+        buyBtn.className = 'btn-buy';
+        buyBtn.textContent = balance >= item.cost ? 'Purchase' : `Need ${item.cost - balance} more CC`;
+        buyBtn.disabled = balance < item.cost;
+        buyBtn.addEventListener('click', () => purchaseItem(item));
+        actions.appendChild(buyBtn);
+      }
+
+      gridEl.appendChild(card);
+    });
   });
 }
 
@@ -133,6 +191,7 @@ async function purchaseSlot(cost) {
     });
     await refresh();
   } catch (err) {
+    console.error('Slot purchase failed:', err);
     alert(err.message);
   }
 }
@@ -154,6 +213,7 @@ async function purchaseItem(item) {
     });
     await refresh();
   } catch (err) {
+    console.error('Purchase failed:', err);
     alert(err.message);
   }
 }
@@ -162,17 +222,32 @@ async function equipItem(itemId) {
   if (!userDocRef) return;
   const slotCount = userData.unlocks?.slotCount || 1;
   const current = userData.unlocks?.equipped || [];
+  const inventory = userData.unlocks?.inventory || [];
+
+  if (!inventory.includes(itemId)) {
+    alert('You must own this item to equip it');
+    return;
+  }
+
   const next = current.slice(0, slotCount);
   if (next.includes(itemId)) return;
+
   if (next.length < slotCount) {
     next.push(itemId);
   } else {
+    // Replace first slot
     next[0] = itemId;
   }
-  await runTransaction(db, async (tx) => {
-    tx.update(userDocRef, { 'unlocks.equipped': next });
-  });
-  await refresh();
+
+  try {
+    await runTransaction(db, async (tx) => {
+      tx.update(userDocRef, { 'unlocks.equipped': next });
+    });
+    await refresh();
+  } catch (err) {
+    console.error('Equip failed:', err);
+    alert(err.message);
+  }
 }
 
 async function refresh() {
@@ -190,7 +265,7 @@ function initAuthUI() {
   if (loginBtn) {
     loginBtn.addEventListener('click', (e) => {
       e.preventDefault();
-      alert('Please log in from the main site to use the store.');
+      window.location.href = 'index.html';
     });
   }
   if (logoutBtn) {
@@ -205,21 +280,33 @@ function initAuthUI() {
 function start() {
   initAuthUI();
   onAuthStateChanged(auth, async (user) => {
+    const loginBtn = document.getElementById('loginBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+
     if (!user) {
-      renderWarning('Please log in to use the store.');
+      if (loginBtn) loginBtn.style.display = 'block';
+      if (logoutBtn) logoutBtn.style.display = 'none';
+      renderWarning('Please log in to access the Cadence Credits store.');
       return;
     }
+
+    if (loginBtn) loginBtn.style.display = 'none';
+    if (logoutBtn) logoutBtn.style.display = 'block';
+
     userDocRef = doc(db, 'users', user.uid);
     const snap = await getDoc(userDocRef);
+
     if (!snap.exists()) {
-      renderWarning('User not found.');
+      renderWarning('User profile not found.');
       return;
     }
+
     const data = snap.data();
     if (!data[FEATURE_FLAG_KEY]) {
-      renderWarning('Cadence Credits preview not enabled for this account.');
+      renderWarning('Cadence Credits preview is not enabled for your account. This feature is currently in testing.');
       return;
     }
+
     userData = data;
     renderBalance();
     renderSlots();
