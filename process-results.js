@@ -1704,6 +1704,9 @@ async function processUserResult(uid, eventInfo, results) {
     const txId = `cc_event_${eventNumber}`;
     const alreadyProcessed = existingTransactions.some(t => t.id === txId);
 
+    // Firestore doesn't allow serverTimestamp() inside arrayUnion payloads; capture a concrete Timestamp instead.
+    const txTimestamp = admin.firestore.Timestamp.now();
+
     if (!alreadyProcessed && earnedCadenceCredits > 0) {
       cadenceCreditTransaction = {
         id: txId,
@@ -1712,7 +1715,7 @@ async function processUserResult(uid, eventInfo, results) {
         source: 'awards',
         eventNumber: eventNumber,
         awardIds: awardIds,
-        timestamp: admin.firestore.FieldValue.serverTimestamp()
+        timestamp: txTimestamp
       };
     } else if (alreadyProcessed) {
       console.log(`   ✓ Cadence Credits already awarded for event ${eventNumber}, skipping.`);
