@@ -792,11 +792,37 @@ body {
     font-size: 2rem;
     color: var(--text-secondary);
     cursor: pointer;
-    transition: color 0.3s ease;
+    transition: all 0.3s ease;
+    /* Ensure minimum tap target size */
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1001;
 }
 
 .modal-close:hover {
     color: var(--text-primary);
+}
+
+/* Mobile-specific improvements for modal close button */
+@media (max-width: 768px) {
+    .modal-close {
+        font-size: 2.5rem;
+        min-width: 50px;
+        min-height: 50px;
+        top: 1rem;
+        right: 1rem;
+        background: rgba(0, 0, 0, 0.5);
+        border-radius: 50%;
+        color: var(--text-primary);
+    }
+
+    .modal-close:active {
+        background: rgba(0, 0, 0, 0.7);
+        transform: scale(0.95);
+    }
 }
 
 .modal-title {
@@ -1139,6 +1165,13 @@ body {
         width: 95%;
     }
 
+    /* Profile modals should be smaller to leave space for clicking off */
+    .profile-modal-content {
+        width: 85%;
+        max-width: 85%;
+        max-height: 85vh;
+    }
+
     .auth-form {
         gap: 1rem;
     }
@@ -1158,6 +1191,13 @@ body {
     .modal-content {
         padding: 1.75rem 1.25rem;
         width: 98%;
+    }
+
+    /* Profile modals should be smaller to leave space for clicking off */
+    .profile-modal-content {
+        width: 90%;
+        max-width: 90%;
+        max-height: 90vh;
     }
 
     .btn-google {
@@ -1187,6 +1227,13 @@ body {
         padding: 1.5rem 1rem;
         max-width: calc(100vw - 20px);
         margin: 0 10px;
+    }
+
+    /* Profile modals should still leave some space even on very small screens */
+    .profile-modal-content {
+        width: 95%;
+        max-width: 95%;
+        max-height: 92vh;
     }
 
     .modal-title {
