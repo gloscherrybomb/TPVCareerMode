@@ -604,20 +604,37 @@ function maybeRenderEventLoadout() {
 }
 
 function start() {
+  console.log('[CC] Cadence Credits script starting...');
+  console.log('[CC] Feature flag key:', FEATURE_FLAG_KEY);
   injectStyles();
   // Modal retained for compatibility, but primary flow links to store page.
 
   onAuthStateChanged(auth, async (user) => {
-    if (!user) return;
+    if (!user) {
+      console.log('[CC] No user logged in');
+      return;
+    }
+    console.log('[CC] User logged in:', user.uid);
     const ref = doc(db, 'users', user.uid);
     const snap = await getDoc(ref);
-    if (!snap.exists()) return;
+    if (!snap.exists()) {
+      console.log('[CC] User document not found');
+      return;
+    }
     const data = snap.data();
-    if (!data[FEATURE_FLAG_KEY]) return;
+    console.log('[CC] User data loaded. Checking feature flag:', FEATURE_FLAG_KEY, '=', data[FEATURE_FLAG_KEY]);
+    if (!data[FEATURE_FLAG_KEY]) {
+      console.log('[CC] Feature flag not enabled for this user');
+      return;
+    }
+    console.log('[CC] Feature flag enabled! Initializing Cadence Credits...');
     userDocData = data;
     userDocRef = ref;
+    console.log('[CC] Currency balance:', data.currency?.balance || 0);
+    console.log('[CC] Unlocks owned:', data.unlocks?.inventory?.length || 0);
     renderProfileButton();
     maybeRenderEventLoadout();
+    console.log('[CC] Rendering complete');
   });
 }
 

@@ -313,18 +313,22 @@ function initAuthUI() {
 }
 
 function start() {
+  console.log('[Store] Cadence Credits store initializing...');
+  console.log('[Store] Feature flag key:', FEATURE_FLAG_KEY);
   initAuthUI();
   onAuthStateChanged(auth, async (user) => {
     const loginBtn = document.getElementById('loginBtn');
     const logoutBtn = document.getElementById('logoutBtn');
 
     if (!user) {
+      console.log('[Store] No user logged in');
       if (loginBtn) loginBtn.style.display = 'block';
       if (logoutBtn) logoutBtn.style.display = 'none';
       renderWarning('Please log in to access the Cadence Credits store.');
       return;
     }
 
+    console.log('[Store] User logged in:', user.uid);
     if (loginBtn) loginBtn.style.display = 'none';
     if (logoutBtn) logoutBtn.style.display = 'block';
 
@@ -332,20 +336,28 @@ function start() {
     const snap = await getDoc(userDocRef);
 
     if (!snap.exists()) {
+      console.log('[Store] User document not found');
       renderWarning('User profile not found.');
       return;
     }
 
     const data = snap.data();
+    console.log('[Store] User data loaded. Checking feature flag:', FEATURE_FLAG_KEY, '=', data[FEATURE_FLAG_KEY]);
     if (!data[FEATURE_FLAG_KEY]) {
+      console.log('[Store] Feature flag not enabled for this user');
       renderWarning('Cadence Credits preview is not enabled for your account. This feature is currently in testing.');
       return;
     }
 
+    console.log('[Store] Feature flag enabled! Loading store...');
     userData = data;
+    console.log('[Store] Balance:', data.currency?.balance || 0);
+    console.log('[Store] Slots:', data.unlocks?.slotCount || 1);
+    console.log('[Store] Inventory:', data.unlocks?.inventory?.length || 0);
     renderBalance();
     renderSlots();
     renderGrid();
+    console.log('[Store] Store loaded successfully');
   });
 }
 
