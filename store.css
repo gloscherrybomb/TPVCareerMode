@@ -99,6 +99,7 @@ body {
 
 .balance-icon {
     opacity: 0.3;
+    animation: float 3s ease-in-out infinite;
 }
 
 .balance-icon svg {
@@ -191,17 +192,19 @@ body {
     cursor: pointer;
     transition: all 0.3s ease;
     white-space: nowrap;
+    box-shadow: 0 10px 30px rgba(255, 27, 107, 0.3);
 }
 
 .btn-unlock-slot:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 30px rgba(255, 27, 107, 0.4);
+    transform: translateY(-3px);
+    box-shadow: 0 15px 40px rgba(255, 27, 107, 0.5);
 }
 
 .btn-unlock-slot:disabled {
     background: rgba(255, 255, 255, 0.1);
     color: rgba(255, 255, 255, 0.4);
     cursor: not-allowed;
+    box-shadow: none;
 }
 
 /* Store Section */
@@ -281,7 +284,10 @@ body {
     font-family: 'Orbitron', sans-serif;
     font-weight: 700;
     font-size: 1.2rem;
-    color: var(--text-secondary);
+    background: linear-gradient(135deg, var(--accent-pink), var(--accent-blue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 /* Store Grid */
@@ -347,6 +353,12 @@ body {
 .unlock-emoji {
     font-size: 2rem;
     line-height: 1;
+    animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
 }
 
 .unlock-title {
@@ -363,7 +375,10 @@ body {
 .unlock-cost {
     font-weight: 700;
     font-size: 0.9rem;
-    color: var(--accent-blue);
+    background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
 }
 
 .unlock-description {
@@ -382,6 +397,30 @@ body {
     color: var(--success);
     font-weight: 700;
     font-size: 0.85rem;
+}
+
+.unlock-personality-bonus {
+    display: inline-block;
+    padding: 0.35rem 0.75rem;
+    background: rgba(69, 202, 255, 0.1);
+    border: 1px solid rgba(69, 202, 255, 0.3);
+    border-radius: 50px;
+    color: var(--accent-blue);
+    font-weight: 700;
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+}
+
+.unlock-personality-locked {
+    display: inline-block;
+    padding: 0.35rem 0.75rem;
+    background: rgba(255, 170, 0, 0.1);
+    border: 1px solid rgba(255, 170, 0, 0.3);
+    border-radius: 50px;
+    color: var(--warning);
+    font-weight: 700;
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
 }
 
 .unlock-actions {
@@ -417,17 +456,19 @@ body {
 .btn-buy {
     background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
     color: white;
+    box-shadow: 0 10px 30px rgba(255, 27, 107, 0.3);
 }
 
 .btn-buy:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 30px rgba(255, 27, 107, 0.4);
+    transform: translateY(-3px);
+    box-shadow: 0 15px 40px rgba(255, 27, 107, 0.5);
 }
 
 .btn-buy:disabled {
     background: rgba(255, 255, 255, 0.05);
     color: rgba(255, 255, 255, 0.3);
     cursor: not-allowed;
+    box-shadow: none;
 }
 
 .btn-equip {
@@ -467,6 +508,7 @@ body {
     font-size: 3rem;
     line-height: 1;
     opacity: 0.3;
+    animation: float 3s ease-in-out infinite;
 }
 
 .info-content {

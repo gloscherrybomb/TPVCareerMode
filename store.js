@@ -129,8 +129,29 @@ function renderGrid() {
       const owned = inventory.includes(item.id);
       const equippedHere = equipped.includes(item.id);
 
+      // Check personality requirements
+      const personality = userData.personality || {};
+      const meetsPersonalityReqs = !item.requiredPersonality || Object.entries(item.requiredPersonality).every(
+        ([trait, required]) => (personality[trait] || 0) >= required
+      );
+
       const card = document.createElement('div');
       card.className = `unlock-card tier-${tier}`;
+
+      let personalityInfo = '';
+      if (item.personalityBonus) {
+        const bonuses = Object.entries(item.personalityBonus).map(([trait, val]) =>
+          `+${val} ${trait.charAt(0).toUpperCase() + trait.slice(1)}`
+        ).join(', ');
+        personalityInfo = `<div class="unlock-personality-bonus">✨ ${bonuses}</div>`;
+      }
+      if (item.requiredPersonality && !meetsPersonalityReqs) {
+        const reqs = Object.entries(item.requiredPersonality).map(([trait, val]) => {
+          const current = personality[trait] || 0;
+          return `${trait.charAt(0).toUpperCase() + trait.slice(1)}: ${current}/${val}`;
+        }).join(', ');
+        personalityInfo = `<div class="unlock-personality-locked">🔒 Requires: ${reqs}</div>`;
+      }
 
       card.innerHTML = `
         <div class="unlock-header">
@@ -142,6 +163,7 @@ function renderGrid() {
         </div>
         <div class="unlock-description">${item.description}</div>
         <div class="unlock-bonus">+${item.pointsBonus} pts</div>
+        ${personalityInfo}
         <div class="unlock-actions"></div>
       `;
 
@@ -156,15 +178,28 @@ function renderGrid() {
         const equipBtn = document.createElement('button');
         equipBtn.className = 'btn-equip';
         equipBtn.textContent = equippedHere ? '✓ Equipped' : 'Equip';
-        equipBtn.disabled = equippedHere;
+        equipBtn.disabled = equippedHere || !meetsPersonalityReqs;
+        if (!meetsPersonalityReqs) {
+          equipBtn.title = 'Personality requirements not met';
+        }
         equipBtn.addEventListener('click', () => equipItem(item.id));
         actions.appendChild(equipBtn);
       } else {
         const buyBtn = document.createElement('button');
         buyBtn.className = 'btn-buy';
-        buyBtn.textContent = balance >= item.cost ? 'Purchase' : `Need ${item.cost - balance} more CC`;
-        buyBtn.disabled = balance < item.cost;
-        buyBtn.addEventListener('click', () => purchaseItem(item));
+        if (!meetsPersonalityReqs) {
+          buyBtn.textContent = 'Personality Locked';
+          buyBtn.disabled = true;
+        } else if (balance >= item.cost) {
+          buyBtn.textContent = 'Purchase';
+          buyBtn.disabled = false;
+        } else {
+          buyBtn.textContent = `Need ${item.cost - balance} more CC`;
+          buyBtn.disabled = true;
+        }
+        if (!buyBtn.disabled) {
+          buyBtn.addEventListener('click', () => purchaseItem(item));
+        }
         actions.appendChild(buyBtn);
       }
 

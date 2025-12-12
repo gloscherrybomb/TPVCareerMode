@@ -14,7 +14,6 @@ import {
   getFirestore,
   doc,
   getDoc,
-  runTransaction,
   updateDoc
 } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
@@ -75,6 +74,17 @@ function injectStyles() {
     .cc-event-empty-icon { font-size:3rem; opacity:0.3; margin-bottom:1rem; }
     .cc-manage-btn { padding:0.75rem 1.5rem; background:linear-gradient(135deg,var(--accent-pink),var(--accent-purple)); color:white; border:none; border-radius:10px; font-weight:700; font-size:0.95rem; cursor:pointer; transition:all 0.3s ease; display:inline-flex; align-items:center; gap:0.5rem; }
     .cc-manage-btn:hover { transform:translateY(-2px); box-shadow:0 10px 30px rgba(255,27,107,0.4); }
+    .cc-selector-panel { background:linear-gradient(135deg,rgba(255,27,107,0.1),rgba(69,202,255,0.1)); border:2px solid rgba(255,255,255,0.1); border-radius:20px; padding:2rem; margin:2rem 0; }
+    .cc-selector-header { text-align:center; margin-bottom:2rem; }
+    .cc-selector-title { font-family:'Orbitron',sans-serif; font-size:2rem; font-weight:900; background:linear-gradient(135deg,var(--accent-pink),var(--accent-blue)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-bottom:0.5rem; }
+    .cc-selector-subtitle { color:var(--text-secondary); font-size:1rem; }
+    .cc-selector-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:1.5rem; margin-top:1.5rem; }
+    .cc-selector-card { background:var(--dark-card); border:2px solid rgba(255,255,255,0.05); border-radius:16px; padding:1.5rem; cursor:pointer; transition:all 0.3s ease; position:relative; }
+    .cc-selector-card:hover { border-color:rgba(69,202,255,0.3); transform:translateY(-5px); box-shadow:0 15px 40px rgba(0,0,0,0.4); }
+    .cc-selector-card.selected { border-color:var(--accent-pink); background:linear-gradient(135deg,rgba(255,27,107,0.1),rgba(199,26,229,0.1)); box-shadow:0 0 30px rgba(255,27,107,0.3); }
+    .cc-selector-card.selected::before { content:'✓'; position:absolute; top:1rem; right:1rem; width:32px; height:32px; background:linear-gradient(135deg,var(--accent-pink),var(--accent-purple)); border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-weight:700; font-size:1.2rem; }
+    .cc-selector-empty { text-align:center; padding:3rem; color:var(--text-secondary); }
+    .cc-selector-action { text-align:center; margin-top:2rem; }
   `;
   document.head.appendChild(style);
 }
@@ -347,15 +357,143 @@ function renderLoadoutPanel() {
   if (manage) manage.addEventListener('click', () => window.location.href = 'store.html');
 }
 
+function renderUnlockSelector() {
+  const panel = document.getElementById('cc-unlock-selector');
+  if (!panel) return;
+
+  const slotCount = userDocData?.unlocks?.slotCount || 1;
+  const equipped = userDocData?.unlocks?.equipped || [];
+  const inventory = userDocData?.unlocks?.inventory || [];
+  const cooldowns = userDocData?.unlocks?.cooldowns || {};
+
+  // Get owned unlocks with full details
+  const ownedUnlocks = inventory
+    .map(id => unlockCatalog.find(u => u.id === id))
+    .filter(Boolean);
+
+  const hasOwned = ownedUnlocks.length > 0;
+
+  panel.innerHTML = `
+    <div class="cc-selector-panel">
+      <div class="cc-selector-header">
+        <div class="cc-selector-title">Choose Your Race Upgrades</div>
+        <div class="cc-selector-subtitle">Select up to ${slotCount} upgrade${slotCount > 1 ? 's' : ''} to equip for this race. Only one can trigger per race.</div>
+      </div>
+      ${hasOwned ? `
+        <div class="cc-selector-grid">
+          ${ownedUnlocks.map(unlock => {
+            const isEquipped = equipped.includes(unlock.id);
+            const isOnCooldown = cooldowns[unlock.id] > 0;
+            const slotIndex = equipped.indexOf(unlock.id);
+            return `
+              <div class="cc-selector-card ${isEquipped ? 'selected' : ''}" data-unlock-id="${unlock.id}">
+                <div class="cc-event-card-header">
+                  <div class="cc-event-emoji">${unlock.emoji || '⭐'}</div>
+                  <div class="cc-event-name">${unlock.name}</div>
+                </div>
+                <div class="cc-event-desc">${unlock.description}</div>
+                <div class="cc-event-bonus">+${unlock.pointsBonus} pts bonus</div>
+                ${isOnCooldown ? '<div style="margin-top:0.75rem; color:var(--warning); font-size:0.85rem; font-weight:600;">⏱️ Resting (${cooldowns[unlock.id]} race${cooldowns[unlock.id] > 1 ? 's' : ''})</div>' : ''}
+                ${isEquipped ? `<div style="margin-top:0.75rem; color:var(--accent-blue); font-size:0.85rem; font-weight:600;">Slot ${slotIndex + 1}</div>` : ''}
+              </div>
+            `;
+          }).join('')}
+        </div>
+        <div class="cc-selector-action">
+          <button class="cc-manage-btn" id="cc-save-loadout">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span>Save Loadout</span>
+          </button>
+        </div>
+      ` : `
+        <div class="cc-selector-empty">
+          <div class="cc-event-empty-icon">🔒</div>
+          <div style="font-weight:600; margin-bottom:0.5rem; font-size:1.2rem;">No Upgrades Owned</div>
+          <div style="font-size:1rem; max-width:500px; margin:0 auto 1.5rem;">Purchase upgrades from the Cadence Credits store to boost your race performance.</div>
+          <button class="cc-manage-btn" onclick="window.location.href='store.html'">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M12 6v6l4 2"></path>
+            </svg>
+            <span>Visit Store</span>
+          </button>
+        </div>
+      `}
+    </div>
+  `;
+
+  // Add click handlers for selection
+  const cards = panel.querySelectorAll('.cc-selector-card');
+  cards.forEach(card => {
+    card.addEventListener('click', () => toggleUnlockSelection(card.dataset.unlockId));
+  });
+
+  const saveBtn = panel.querySelector('#cc-save-loadout');
+  if (saveBtn) {
+    saveBtn.addEventListener('click', saveLoadout);
+  }
+}
+
+let pendingEquipped = [];
+
+function toggleUnlockSelection(unlockId) {
+  const slotCount = userDocData?.unlocks?.slotCount || 1;
+  const current = [...(pendingEquipped.length > 0 ? pendingEquipped : (userDocData?.unlocks?.equipped || []))];
+
+  const idx = current.indexOf(unlockId);
+  if (idx >= 0) {
+    // Unequip
+    current.splice(idx, 1);
+  } else {
+    // Equip
+    if (current.length >= slotCount) {
+      // Replace last slot
+      current[slotCount - 1] = unlockId;
+    } else {
+      current.push(unlockId);
+    }
+  }
+
+  pendingEquipped = current;
+  renderUnlockSelector();
+}
+
+async function saveLoadout() {
+  if (!userDocRef || pendingEquipped.length === 0) return;
+  try {
+    await updateDoc(userDocRef, { 'unlocks.equipped': pendingEquipped });
+    userDocData.unlocks.equipped = pendingEquipped;
+    pendingEquipped = [];
+    renderUnlockSelector();
+    alert('✓ Loadout saved successfully!');
+  } catch (err) {
+    console.error('Save loadout failed:', err);
+    alert('Failed to save loadout: ' + err.message);
+  }
+}
+
 function maybeRenderEventLoadout() {
   if (eventLoadoutRendered) return;
   if (!userDocData || !window.cadenceEventContext) return;
   const ctx = window.cadenceEventContext;
   if (ctx.hasResults) return; // Only show when event not yet completed
-  const mount = document.getElementById('cc-loadout-panel');
-  if (!mount) return;
-  renderLoadoutPanel();
-  document.getElementById('eventLoadoutSection')?.style.setProperty('display', 'block');
+
+  // Render unlock selector at top
+  const selectorMount = document.getElementById('cc-unlock-selector');
+  if (selectorMount) {
+    renderUnlockSelector();
+    document.getElementById('eventUnlockSelection')?.style.setProperty('display', 'block');
+  }
+
+  // Render loadout panel further down
+  const loadoutMount = document.getElementById('cc-loadout-panel');
+  if (loadoutMount) {
+    renderLoadoutPanel();
+    document.getElementById('eventLoadoutSection')?.style.setProperty('display', 'block');
+  }
+
   eventLoadoutRendered = true;
 }
 

@@ -125,6 +125,95 @@ const UNLOCK_DEFINITIONS = [
     trigger: 'beatPrediction8OrPodiumFrom10th',
     description: 'Beat prediction by 8+ or podium when predicted 10th+',
     emoji: '📋'
+  },
+  // Personality-Based Unlocks
+  {
+    id: 'mentalCoach',
+    name: 'Mental Coach Session',
+    cost: 250,
+    tier: 200,
+    pointsBonus: 5,
+    trigger: 'beatPredictionByAny',
+    description: 'Beat prediction → +6 pts & +5 Confidence',
+    emoji: '🧠',
+    personalityBonus: { confidence: 5 }
+  },
+  {
+    id: 'aggressionKit',
+    name: 'Aggression Training Kit',
+    cost: 250,
+    tier: 200,
+    pointsBonus: 6,
+    trigger: 'winSprint',
+    description: 'Win a sprint → +6 pts & +5 Aggression',
+    emoji: '💪',
+    personalityBonus: { aggression: 5 }
+  },
+  {
+    id: 'tacticalRadio',
+    name: 'Tactical Team Radio',
+    cost: 250,
+    tier: 200,
+    pointsBonus: 5,
+    trigger: 'finishTop10',
+    description: 'Finish top 10 → +5 pts & +5 Teamwork',
+    emoji: '📻',
+    personalityBonus: { teamwork: 5 }
+  },
+  {
+    id: 'professionalAttitude',
+    name: 'Professional Mindset Course',
+    cost: 250,
+    tier: 200,
+    pointsBonus: 5,
+    trigger: 'completeRace',
+    description: 'Complete race → +5 pts & +5 Professionalism',
+    emoji: '👔',
+    personalityBonus: { professionalism: 5 }
+  },
+  {
+    id: 'confidenceBooster',
+    name: 'Champion\'s Mindset',
+    cost: 350,
+    tier: 300,
+    pointsBonus: 8,
+    trigger: 'podiumFinish',
+    description: 'Requires 70+ Confidence. Podium → +8 pts',
+    emoji: '👑',
+    requiredPersonality: { confidence: 70 }
+  },
+  {
+    id: 'aggressorHelmet',
+    name: 'Aggressor\'s Helmet',
+    cost: 350,
+    tier: 300,
+    pointsBonus: 8,
+    trigger: 'attackEarly',
+    description: 'Requires 70+ Aggression. Attack early → +8 pts',
+    emoji: '⚔️',
+    requiredPersonality: { aggression: 70 }
+  },
+  {
+    id: 'teamLeaderJersey',
+    name: 'Team Leader\'s Jersey',
+    cost: 350,
+    tier: 300,
+    pointsBonus: 7,
+    trigger: 'helpTeammate',
+    description: 'Requires 70+ Teamwork. Help teammate → +7 pts',
+    emoji: '🤝',
+    requiredPersonality: { teamwork: 70 }
+  },
+  {
+    id: 'calmAnalyst',
+    name: 'Calm Analyst System',
+    cost: 350,
+    tier: 300,
+    pointsBonus: 7,
+    trigger: 'paceYourself',
+    description: 'Requires 70+ Professionalism. Pace well → +7 pts',
+    emoji: '🎯',
+    requiredPersonality: { professionalism: 70 }
   }
 ];
 
