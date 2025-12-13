@@ -86,6 +86,7 @@ async function calculateUserStats(userUID, userData) {
                 time: eventResults.time || 'N/A',
                 points: eventResults.points || 0,
                 bonusPoints: eventResults.bonusPoints || 0,
+                unlockBonusPoints: eventResults.unlockBonusPoints || 0,
                 predictedPosition: eventResults.predictedPosition || null,
                 earnedPunchingMedal: eventResults.earnedPunchingMedal || false,
                 earnedGiantKillerMedal: eventResults.earnedGiantKillerMedal || false,
@@ -329,8 +330,14 @@ function displayRecentResults(results) {
         
         // Build bonus/medal indicators
         let bonusHTML = '';
-        if (result.bonusPoints > 0) {
-            bonusHTML += `<span class="bonus-indicator" title="Bonus points for beating prediction">+${result.bonusPoints} bonus</span>`;
+        const unlockBonus = result.unlockBonusPoints || 0;
+        const predictionBonus = (result.bonusPoints || 0) - unlockBonus;
+
+        if (predictionBonus > 0) {
+            bonusHTML += `<span class="bonus-indicator" title="Bonus points for beating prediction">+${predictionBonus} bonus</span>`;
+        }
+        if (unlockBonus > 0) {
+            bonusHTML += `<span class="bonus-indicator unlock-bonus" title="Bonus from triggered unlocks">+${unlockBonus} unlock</span>`;
         }
         if (result.earnedPunchingMedal) {
             bonusHTML += `<span class="medal-indicator punching" title="Beat prediction by 10+ places">🥊</span>`;

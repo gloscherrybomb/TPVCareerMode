@@ -843,6 +843,12 @@
     margin-right: 0.25rem;
 }
 
+.bonus-points.unlock-bonus {
+    background: rgba(0, 200, 120, 0.15);
+    border: 1px solid rgba(0, 200, 120, 0.3);
+    color: rgb(111, 255, 194);
+}
+
 .medal-icon {
     display: inline-block;
     font-size: 1.1rem;

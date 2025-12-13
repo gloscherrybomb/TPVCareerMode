@@ -775,8 +775,14 @@ async function loadEventResults() {
             
             // Build bonus cell content
             let bonusHTML = '';
-            if (result.bonusPoints && result.bonusPoints > 0) {
-                bonusHTML += `<span class="bonus-points" title="Bonus for beating prediction and unlocks">+${result.bonusPoints}</span>`;
+            const unlockBonus = result.unlockBonusPoints || 0;
+            const predictionBonus = (result.bonusPoints || 0) - unlockBonus;
+
+            if (predictionBonus > 0) {
+                bonusHTML += `<span class="bonus-points" title="Bonus for beating prediction">+${predictionBonus}</span>`;
+            }
+            if (unlockBonus > 0) {
+                bonusHTML += `<span class="bonus-points unlock-bonus" title="Bonus from triggered unlocks">+${unlockBonus}</span>`;
             }
             if (result.earnedPunchingMedal) {
                 bonusHTML += `<span class="medal-icon punching" title="Beat prediction by 10+ places">🥊</span>`;
