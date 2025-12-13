@@ -1743,7 +1743,9 @@ async function processUserResult(uid, eventInfo, results) {
     // Currency updates
     const currentBalance = userData.currency?.balance || 0;
     if (earnedCadenceCredits > 0) {
-      updates['currency.balance'] = currentBalance + earnedCadenceCredits;\n      const currentTotalEarned = userData.currency?.totalEarned || 0;\n      updates['currency.totalEarned'] = currentTotalEarned + earnedCadenceCredits;
+      updates['currency.balance'] = currentBalance + earnedCadenceCredits;
+      const currentTotalEarned = userData.currency?.totalEarned || 0;
+      updates['currency.totalEarned'] = currentTotalEarned + earnedCadenceCredits;
       console.log(`   💰 Awarding ${earnedCadenceCredits} CC from ${awardIds.length} awards (new balance: ${currentBalance + earnedCadenceCredits})`);
     }
     if (cadenceCreditTransaction) {
@@ -1985,7 +1987,15 @@ function evaluateUnlockTrigger(unlockId, context) {
         triggered: position <= 5 || (position <= 10 && typeof marginToWinner === 'number' && marginToWinner < 20),
         reason: 'Top 5, or top 10 within 20s'
       };
-    case 'tightPackWin': {\n      const top10 = (results || []).slice(0, 10).map(r => parseFloat(r.Time)).filter(t => !isNaN(t));\n      const tight = top10.length === 10 && (Math.max(...top10) - Math.min(...top10)) <= 5;\n      return {\n        triggered: position === 1 && tight,\n        reason: 'Won in a tight 5s top-10 finish'\n      };\n    }\n    case 'domestiqueHelp': {
+    case 'tightPackWin': {
+      const top10 = (results || []).slice(0, 10).map(r => parseFloat(r.Time)).filter(t => !isNaN(t));
+      const tight = top10.length === 10 && (Math.max(...top10) - Math.min(...top10)) <= 5;
+      return {
+        triggered: position === 1 && tight,
+        reason: 'Won in a tight 5s top-10 finish'
+      };
+    }
+    case 'domestiqueHelp': {
       // Beat someone with higher ARR who finished behind you
       const higherARRRider = results.find(r => r.arr > userARR && r.position > position);
       return {
