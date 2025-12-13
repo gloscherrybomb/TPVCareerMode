@@ -136,7 +136,22 @@ async function resetUserResults() {
         personalityHistory: admin.firestore.FieldValue.delete(),
 
         // Personality awards (reset these too)
-        personalityAwards: admin.firestore.FieldValue.delete()
+        personalityAwards: admin.firestore.FieldValue.delete(),
+
+        // Cadence Credits currency
+        currency: {
+          balance: 0,
+          totalEarned: 0,
+          transactions: []
+        },
+
+        // Cadence Credits unlocks
+        unlocks: {
+          inventory: [],
+          equipped: [],
+          slotCount: 1,
+          cooldowns: {}
+        }
 
         // NOTE: personality and interviewHistory are PRESERVED
         // NOTE: interviews collection documents are PRESERVED
