@@ -1728,7 +1728,7 @@ async function processUserResult(uid, eventInfo, results) {
     // Currency updates
     const currentBalance = userData.currency?.balance || 0;
     if (earnedCadenceCredits > 0) {
-      updates['currency.balance'] = currentBalance + earnedCadenceCredits;
+      updates['currency.balance'] = currentBalance + earnedCadenceCredits;\n      const currentTotalEarned = userData.currency?.totalEarned || 0;\n      updates['currency.totalEarned'] = currentTotalEarned + earnedCadenceCredits;
       console.log(`   💰 Awarding ${earnedCadenceCredits} CC from ${awardIds.length} awards (new balance: ${currentBalance + earnedCadenceCredits})`);
     }
     if (cadenceCreditTransaction) {
@@ -2903,4 +2903,5 @@ Interesting Fact: ${request.interestFact}
 
 module.exports = { processResults, calculatePoints };
 \nfunction hasBackToBackTourPodiums(results, uid, eventNumber) {\n  if (!results || eventNumber < 14) return false;\n  const prevEvent = eventNumber - 1;\n  const prev = results.find(r => parseInt(r.Event) === prevEvent || r.eventNumber === prevEvent);\n  const prevPos = prev ? parseInt(prev.Position) : null;\n  return prevPos !== null && !isNaN(prevPos) && prevPos <= 3;\n}\n\nfunction getTopRivalForUser(uid, results, predictedPosition) {\n  if (!results || !predictedPosition) return null;\n  const ahead = results\n    .filter(r => r.UID !== uid && r.PredictedPosition && parseInt(r.PredictedPosition) < predictedPosition)\n    .sort((a,b) => parseInt(a.PredictedPosition) - parseInt(b.PredictedPosition));\n  if (!ahead.length) return null;\n  return { uid: ahead[0].UID, name: ahead[0].Name, predicted: parseInt(ahead[0].PredictedPosition) };\n}\n
+
 
