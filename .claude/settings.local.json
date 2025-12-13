@@ -14,7 +14,9 @@
       "Bash(git pull:*)",
       "Bash(sort:*)",
       "Bash(git restore:*)",
-      "Bash(git rm:*)"
+      "Bash(git rm:*)",
+      "Bash(git checkout:*)",
+      "Bash(unexpected token\" and preventing the palmares page from loading.\n\nRestored clean version from commit 0526a4d.\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>\nEOF\n)\")"
     ]
   }
 }
