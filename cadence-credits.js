@@ -270,7 +270,7 @@ function renderProfileCC() {
     slotsEl.textContent = slotCount;
   }
 
-  // Render active upgrades
+  // Render active upgrades (collapsible)
   const activeEl = document.getElementById('ccActiveUpgrades');
   if (activeEl) {
     const equippedUnlocks = equipped
@@ -278,27 +278,48 @@ function renderProfileCC() {
       .map(id => unlockCatalog.find(u => u.id === id))
       .filter(Boolean);
 
-    if (equippedUnlocks.length > 0) {
-      activeEl.innerHTML = `
-        <div class="cc-active-title">Active Upgrades</div>
-        <div class="cc-active-list">
-          ${equippedUnlocks.map(unlock => {
-            const isOnCooldown = cooldowns[unlock.id] > 0;
-            return `
-              <div class="cc-active-item ${isOnCooldown ? 'on-cooldown' : ''}">
-                <span class="cc-active-emoji">${unlock.emoji || '⭐'}</span>
-                <span class="cc-active-name">${unlock.name}</span>
-                ${isOnCooldown ? `<span class="cc-active-cooldown">⏱️ Resting</span>` : ''}
-              </div>
-            `;
-          }).join('')}
-        </div>
-      `;
-    } else {
-      activeEl.innerHTML = `
-        <div class="cc-active-title">Active Upgrades</div>
-        <div class="cc-active-empty">No upgrades equipped</div>
-      `;
+    const hasEquipped = equippedUnlocks.length > 0;
+    const count = hasEquipped ? equippedUnlocks.length : 0;
+
+    activeEl.innerHTML = `
+      <div class="cc-active-header" id="ccActiveHeader">
+        <div class="cc-active-title">Active Upgrades <span class="cc-active-count">(${count})</span></div>
+        <button class="cc-active-toggle" id="ccActiveToggle" aria-label="Toggle active upgrades">
+          <span class="cc-toggle-icon">▼</span>
+        </button>
+      </div>
+      <div class="cc-active-content collapsed" id="ccActiveContent">
+        ${hasEquipped ? `
+          <div class="cc-active-list">
+            ${equippedUnlocks.map(unlock => {
+              const isOnCooldown = cooldowns[unlock.id] > 0;
+              return `
+                <div class="cc-active-item ${isOnCooldown ? 'on-cooldown' : ''}">
+                  <span class="cc-active-emoji">${unlock.emoji || '⭐'}</span>
+                  <span class="cc-active-name">${unlock.name}</span>
+                  ${isOnCooldown ? `<span class="cc-active-cooldown">⏱️ Resting</span>` : ''}
+                </div>
+              `;
+            }).join('')}
+          </div>
+        ` : `
+          <div class="cc-active-empty">No upgrades equipped</div>
+        `}
+      </div>
+    `;
+
+    // Add toggle functionality
+    const toggleBtn = document.getElementById('ccActiveToggle');
+    const content = document.getElementById('ccActiveContent');
+    const toggleIcon = toggleBtn?.querySelector('.cc-toggle-icon');
+
+    if (toggleBtn && content) {
+      toggleBtn.addEventListener('click', () => {
+        const isCollapsed = content.classList.toggle('collapsed');
+        if (toggleIcon) {
+          toggleIcon.textContent = isCollapsed ? '▼' : '▲';
+        }
+      });
     }
   }
 }
