@@ -21,7 +21,6 @@ const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-const FEATURE_FLAG_KEY = (window.currencyConfig && window.currencyConfig.FEATURE_FLAG_KEY) || 'previewCadenceCredits';
 const unlockCatalog = (window.unlockConfig && window.unlockConfig.UNLOCK_DEFINITIONS) || [];
 
 let userDocRef = null;
@@ -548,7 +547,6 @@ function initAuthUI() {
 
 function start() {
   console.log('[Store] Cadence Credits store initializing...');
-  console.log('[Store] Feature flag key:', FEATURE_FLAG_KEY);
   initAuthUI();
   onAuthStateChanged(auth, async (user) => {
     const loginBtn = document.getElementById('loginBtn');
@@ -576,14 +574,7 @@ function start() {
     }
 
     const data = snap.data();
-    console.log('[Store] User data loaded. Checking feature flag:', FEATURE_FLAG_KEY, '=', data[FEATURE_FLAG_KEY]);
-    if (!data[FEATURE_FLAG_KEY]) {
-      console.log('[Store] Feature flag not enabled for this user');
-      renderWarning('Cadence Credits preview is not enabled for your account. This feature is currently in testing.');
-      return;
-    }
-
-    console.log('[Store] Feature flag enabled! Loading store...');
+    console.log('[Store] User data loaded. Loading store...');
     userData = data;
     console.log('[Store] Balance:', data.currency?.balance || 0);
     console.log('[Store] Slots:', data.unlocks?.slotCount || 1);

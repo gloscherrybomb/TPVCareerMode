@@ -26,10 +26,8 @@ console.log('[CC] Checking config availability...');
 console.log('[CC] window.currencyConfig:', window.currencyConfig);
 console.log('[CC] window.unlockConfig:', window.unlockConfig);
 
-const FEATURE_FLAG_KEY = (window.currencyConfig && window.currencyConfig.FEATURE_FLAG_KEY) || 'previewCadenceCredits';
 const unlockCatalog = (window.unlockConfig && window.unlockConfig.UNLOCK_DEFINITIONS) || [];
 
-console.log('[CC] Feature flag key resolved to:', FEATURE_FLAG_KEY);
 console.log('[CC] Unlock catalog loaded:', unlockCatalog.length, 'items');
 
 let userDocData = null;
@@ -732,7 +730,6 @@ function initManageLoadoutButton() {
 
 function start() {
   console.log('[CC] Cadence Credits script starting...');
-  console.log('[CC] Feature flag key:', FEATURE_FLAG_KEY);
   // Modal retained for compatibility, but primary flow links to store page.
 
   // Listen for event context ready event
@@ -754,12 +751,7 @@ function start() {
       return;
     }
     const data = snap.data();
-    console.log('[CC] User data loaded. Checking feature flag:', FEATURE_FLAG_KEY, '=', data[FEATURE_FLAG_KEY]);
-    if (!data[FEATURE_FLAG_KEY]) {
-      console.log('[CC] Feature flag not enabled for this user');
-      return;
-    }
-    console.log('[CC] Feature flag enabled! Initializing Cadence Credits...');
+    console.log('[CC] User data loaded. Initializing Cadence Credits...');
     userDocData = data;
     userDocRef = ref;
     console.log('[CC] Currency balance:', data.currency?.balance || 0);
