@@ -549,7 +549,50 @@ function maybeRenderEventLoadout() {
     }
   }
 
+  // Show the unified CC section
+  const ccSection = document.getElementById('eventCCSection');
+  if (ccSection) {
+    ccSection.style.display = 'block';
+    initCCToggle();
+    initManageLoadoutButton();
+  }
+
   eventLoadoutRendered = true;
+}
+
+function initCCToggle() {
+  const toggleBtn = document.getElementById('ccSectionToggle');
+  const ccSection = document.getElementById('eventCCSection');
+  const toggleText = toggleBtn?.querySelector('.cc-toggle-text');
+
+  if (!toggleBtn || !ccSection) return;
+
+  // Load collapse state from localStorage
+  const eventNum = window.cadenceEventContext?.eventNumber;
+  const storageKey = `cc-section-collapsed-event${eventNum}`;
+  const isCollapsed = localStorage.getItem(storageKey) === 'true';
+
+  if (isCollapsed) {
+    ccSection.classList.add('cc-collapsed');
+    if (toggleText) toggleText.textContent = 'Show';
+  }
+
+  // Handle toggle clicks
+  toggleBtn.addEventListener('click', () => {
+    const collapsed = ccSection.classList.toggle('cc-collapsed');
+    if (toggleText) toggleText.textContent = collapsed ? 'Show' : 'Hide';
+    localStorage.setItem(storageKey, collapsed);
+  });
+}
+
+function initManageLoadoutButton() {
+  const btn = document.getElementById('ccEditLoadoutBtn');
+  if (!btn) return;
+
+  btn.addEventListener('click', () => {
+    buildModal();
+    openModal();
+  });
 }
 
 function start() {
