@@ -10,8 +10,8 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 2rem;
-    margin-top: 1rem;
+    gap: 1.5rem;
+    margin-top: 0;
 }
 
 .cc-header-icon {
