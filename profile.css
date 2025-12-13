@@ -1650,17 +1650,37 @@
    ============================================ */
 
 .cc-profile-card {
-    background: linear-gradient(135deg, rgba(255, 27, 107, 0.1), rgba(69, 202, 255, 0.1));
+    background: linear-gradient(135deg, rgba(255, 27, 107, 0.08), rgba(69, 202, 255, 0.08));
     border: 2px solid rgba(255, 255, 255, 0.1);
-    border-radius: 16px;
-    padding: 1.25rem;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow:
+        0 10px 40px rgba(0, 0, 0, 0.3),
+        0 4px 16px rgba(255, 27, 107, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
     transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.cc-profile-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--accent-pink), var(--accent-purple), var(--accent-blue));
+    box-shadow: 0 0 16px rgba(255, 27, 107, 0.4);
 }
 
 .cc-profile-card:hover {
     border-color: rgba(255, 27, 107, 0.3);
-    box-shadow: 0 15px 50px rgba(255, 27, 107, 0.2);
+    box-shadow:
+        0 15px 50px rgba(255, 27, 107, 0.2),
+        0 8px 24px rgba(69, 202, 255, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
 }
 
 .cc-profile-content {
@@ -1678,17 +1698,32 @@
 }
 
 .cc-profile-icon {
-    opacity: 0.3;
-    animation: float 3s ease-in-out infinite;
+    background: linear-gradient(135deg, rgba(69, 202, 255, 0.1), rgba(255, 27, 107, 0.1));
+    border: 2px solid rgba(69, 202, 255, 0.2);
+    border-radius: 16px;
+    padding: 1rem;
+    animation: float 3s ease-in-out infinite, iconPulse 3s ease-in-out infinite;
     flex-shrink: 0;
+    transition: all 0.3s ease;
+}
+
+.cc-profile-card:hover .cc-profile-icon {
+    border-color: rgba(69, 202, 255, 0.4);
+    box-shadow: 0 0 20px rgba(69, 202, 255, 0.2);
 }
 
 .cc-profile-icon svg {
     stroke: var(--accent-blue);
-    stroke-width: 2;
+    stroke-width: 2.5;
     fill: none;
-    width: 40px;
-    height: 40px;
+    width: 48px;
+    height: 48px;
+    filter: drop-shadow(0 0 8px rgba(69, 202, 255, 0.3));
+}
+
+@keyframes iconPulse {
+    0%, 100% { opacity: 0.8; }
+    50% { opacity: 1; }
 }
 
 @keyframes float {
@@ -1766,21 +1801,161 @@
 
 .cc-profile-stat {
     text-align: center;
+    background: rgba(69, 202, 255, 0.05);
+    border: 2px solid rgba(69, 202, 255, 0.15);
+    border-radius: 12px;
+    padding: 0.85rem 1.25rem;
+    transition: all 0.3s ease;
+}
+
+.cc-profile-stat:hover {
+    background: rgba(69, 202, 255, 0.1);
+    border-color: rgba(69, 202, 255, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(69, 202, 255, 0.2);
 }
 
 .cc-profile-stat-value {
     font-family: 'Orbitron', sans-serif;
-    font-size: 1.4rem;
-    font-weight: 700;
-    color: var(--text-primary);
+    font-size: 1.6rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.2;
 }
 
 .cc-profile-stat-label {
     color: var(--text-secondary);
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     text-transform: uppercase;
     letter-spacing: 1px;
-    margin-top: 0.25rem;
+    margin-top: 0.4rem;
+    font-weight: 600;
+}
+
+/* Active Upgrades Section */
+.cc-active-upgrades {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 2px solid rgba(255, 255, 255, 0.05);
+}
+
+.cc-active-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 1.25rem;
+    background: linear-gradient(135deg, var(--accent-pink), var(--accent-blue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.cc-active-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+}
+
+.cc-active-item {
+    background: linear-gradient(135deg, rgba(69, 202, 255, 0.05), rgba(255, 27, 107, 0.05));
+    border: 2px solid rgba(69, 202, 255, 0.2);
+    border-radius: 14px;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.cc-active-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent-blue), var(--accent-pink));
+    opacity: 0.6;
+}
+
+.cc-active-item:hover {
+    transform: translateY(-4px);
+    border-color: rgba(69, 202, 255, 0.4);
+    box-shadow: 0 8px 24px rgba(69, 202, 255, 0.2);
+}
+
+.cc-active-item.on-cooldown {
+    background: linear-gradient(135deg, rgba(255, 170, 0, 0.05), rgba(255, 170, 0, 0.03));
+    border-color: rgba(255, 170, 0, 0.2);
+    opacity: 0.7;
+}
+
+.cc-active-item.on-cooldown::before {
+    background: linear-gradient(90deg, var(--warning), rgba(255, 170, 0, 0.5));
+}
+
+.cc-active-item.on-cooldown:hover {
+    border-color: rgba(255, 170, 0, 0.4);
+    box-shadow: 0 8px 24px rgba(255, 170, 0, 0.1);
+}
+
+.cc-active-emoji {
+    font-size: 2.5rem;
+    line-height: 1;
+}
+
+.cc-active-name {
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--text-primary);
+    text-align: center;
+}
+
+.cc-active-cooldown {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.4rem 0.8rem;
+    background: rgba(255, 170, 0, 0.1);
+    border: 1px solid rgba(255, 170, 0, 0.3);
+    border-radius: 50px;
+    color: var(--warning);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.cc-active-empty {
+    text-align: center;
+    padding: 3rem 2rem;
+    background: rgba(255, 255, 255, 0.02);
+    border: 2px dashed rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    color: var(--text-secondary);
+}
+
+.cc-active-empty::before {
+    content: '📦';
+    display: block;
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.3;
+}
+
+.cc-active-empty::after {
+    content: 'Visit the store to purchase and equip upgrades';
+    display: block;
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    opacity: 0.7;
 }
 
 /* Responsive for CC card */
@@ -1810,6 +1985,18 @@
     .cc-profile-amount {
         font-size: 2rem;
     }
+
+    .cc-active-list {
+        grid-template-columns: 1fr;
+    }
+
+    .cc-active-item {
+        padding: 1rem;
+    }
+
+    .cc-active-emoji {
+        font-size: 2rem;
+    }
 }
 
 @media (max-width: 480px) {
@@ -1823,6 +2010,16 @@
 
     .cc-profile-stat-value {
         font-size: 1.5rem;
+    }
+
+    .cc-profile-icon svg {
+        width: 40px;
+        height: 40px;
+    }
+
+    .cc-active-upgrades {
+        padding-top: 1.5rem;
+        margin-top: 1.5rem;
     }
 }
 
