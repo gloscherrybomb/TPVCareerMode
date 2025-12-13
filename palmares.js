@@ -602,6 +602,9 @@ function displayDetailedStats() {
     document.getElementById('completionRate').textContent =
         `${allResults.length > 0 ? ((completedResults.length / allResults.length) * 100).toFixed(0) : 100}%`;
 
+    const totalCareerCC = userData.currency?.totalEarned || 0;
+    document.getElementById('totalCareerCC').textContent = `${totalCareerCC.toLocaleString()} CC`;
+
     // Performance
     const winRate = allResults.length > 0 ? ((userData.totalWins || 0) / completedResults.length * 100).toFixed(1) : 0;
     const podiumRate = allResults.length > 0 ? ((userData.totalPodiums || 0) / completedResults.length * 100).toFixed(1) : 0;
