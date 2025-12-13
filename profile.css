@@ -1658,8 +1658,8 @@
 .cc-profile-card {
     background: linear-gradient(135deg, rgba(255, 27, 107, 0.08), rgba(69, 202, 255, 0.08));
     border: 2px solid rgba(255, 255, 255, 0.1);
-    border-radius: 20px;
-    padding: 2rem;
+    border-radius: 16px;
+    padding: 1.25rem;
     box-shadow:
         0 10px 40px rgba(0, 0, 0, 0.3),
         0 4px 16px rgba(255, 27, 107, 0.1),
@@ -1693,21 +1693,21 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 2rem;
+    gap: 1.5rem;
 }
 
 .cc-profile-left {
     display: flex;
     align-items: center;
-    gap: 1.5rem;
+    gap: 1rem;
     flex: 1;
 }
 
 .cc-profile-icon {
     background: linear-gradient(135deg, rgba(69, 202, 255, 0.1), rgba(255, 27, 107, 0.1));
     border: 2px solid rgba(69, 202, 255, 0.2);
-    border-radius: 16px;
-    padding: 1rem;
+    border-radius: 12px;
+    padding: 0.75rem;
     animation: float 3s ease-in-out infinite, iconPulse 3s ease-in-out infinite;
     flex-shrink: 0;
     transition: all 0.3s ease;
@@ -1722,8 +1722,8 @@
     stroke: var(--accent-blue);
     stroke-width: 2.5;
     fill: none;
-    width: 48px;
-    height: 48px;
+    width: 36px;
+    height: 36px;
     filter: drop-shadow(0 0 8px rgba(69, 202, 255, 0.3));
 }
 
@@ -1742,28 +1742,28 @@
 }
 
 .cc-profile-label {
-    font-size: 0.85rem;
+    font-size: 0.75rem;
     color: var(--text-secondary);
     text-transform: uppercase;
     letter-spacing: 1px;
     font-weight: 600;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.25rem;
 }
 
 .cc-profile-amount {
     font-family: 'Orbitron', sans-serif;
-    font-size: 1.8rem;
+    font-size: 1.4rem;
     font-weight: 900;
     background: linear-gradient(135deg, var(--accent-pink), var(--accent-blue));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     line-height: 1;
-    margin-bottom: 0.35rem;
+    margin-bottom: 0.25rem;
 }
 
 .cc-profile-subtitle {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     color: var(--text-secondary);
 }
 
@@ -1802,15 +1802,15 @@
 
 .cc-profile-stats {
     display: flex;
-    gap: 2rem;
+    gap: 0.75rem;
 }
 
 .cc-profile-stat {
     text-align: center;
     background: rgba(69, 202, 255, 0.05);
     border: 2px solid rgba(69, 202, 255, 0.15);
-    border-radius: 12px;
-    padding: 0.85rem 1.25rem;
+    border-radius: 10px;
+    padding: 0.6rem 0.9rem;
     transition: all 0.3s ease;
 }
 
@@ -1823,7 +1823,7 @@
 
 .cc-profile-stat-value {
     font-family: 'Orbitron', sans-serif;
-    font-size: 1.6rem;
+    font-size: 1.3rem;
     font-weight: 900;
     background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
     -webkit-background-clip: text;
@@ -1834,17 +1834,17 @@
 
 .cc-profile-stat-label {
     color: var(--text-secondary);
-    font-size: 0.8rem;
+    font-size: 0.7rem;
     text-transform: uppercase;
     letter-spacing: 1px;
-    margin-top: 0.4rem;
+    margin-top: 0.3rem;
     font-weight: 600;
 }
 
 /* Active Upgrades Section */
 .cc-active-upgrades {
-    margin-top: 2rem;
-    padding-top: 2rem;
+    margin-top: 1.25rem;
+    padding-top: 1.25rem;
     border-top: 2px solid rgba(255, 255, 255, 0.05);
 }
 
