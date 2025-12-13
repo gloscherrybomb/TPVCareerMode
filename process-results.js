@@ -2951,6 +2951,23 @@ Interesting Fact: ${request.interestFact}
 })();
 
 module.exports = { processResults, calculatePoints };
-\nfunction hasBackToBackTourPodiums(results, uid, eventNumber) {\n  if (!results || eventNumber < 14) return false;\n  const prevEvent = eventNumber - 1;\n  const prev = results.find(r => parseInt(r.Event) === prevEvent || r.eventNumber === prevEvent);\n  const prevPos = prev ? parseInt(prev.Position) : null;\n  return prevPos !== null && !isNaN(prevPos) && prevPos <= 3;\n}\n\nfunction getTopRivalForUser(uid, results, predictedPosition) {\n  if (!results || !predictedPosition) return null;\n  const ahead = results\n    .filter(r => r.UID !== uid && r.PredictedPosition && parseInt(r.PredictedPosition) < predictedPosition)\n    .sort((a,b) => parseInt(a.PredictedPosition) - parseInt(b.PredictedPosition));\n  if (!ahead.length) return null;\n  return { uid: ahead[0].UID, name: ahead[0].Name, predicted: parseInt(ahead[0].PredictedPosition) };\n}\n
+
+function hasBackToBackTourPodiums(results, uid, eventNumber) {
+  if (!results || eventNumber < 14) return false;
+  const prevEvent = eventNumber - 1;
+  const prev = results.find(r => parseInt(r.Event) === prevEvent || r.eventNumber === prevEvent);
+  const prevPos = prev ? parseInt(prev.Position) : null;
+  return prevPos !== null && !isNaN(prevPos) && prevPos <= 3;
+}
+
+function getTopRivalForUser(uid, results, predictedPosition) {
+  if (!results || !predictedPosition) return null;
+  const ahead = results
+    .filter(r => r.UID !== uid && r.PredictedPosition && parseInt(r.PredictedPosition) < predictedPosition)
+    .sort((a,b) => parseInt(a.PredictedPosition) - parseInt(b.PredictedPosition));
+  if (!ahead.length) return null;
+  return { uid: ahead[0].UID, name: ahead[0].Name, predicted: parseInt(ahead[0].PredictedPosition) };
+}
+
 
 
