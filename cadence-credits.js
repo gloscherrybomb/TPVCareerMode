@@ -552,7 +552,10 @@ function maybeRenderEventLoadout() {
   if (ccSection) {
     ccSection.style.display = 'block';
     initCCToggle();
-    initManageLoadoutButton();
+    // Only show manage loadout button pre-race
+    if (!ctx.hasResults) {
+      initManageLoadoutButton();
+    }
   }
 
   eventLoadoutRendered = true;

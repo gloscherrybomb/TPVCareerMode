@@ -808,9 +808,6 @@ async function loadEventResults() {
             if (result.earnedZeroToHero) {
                 bonusHTML += `<span class="medal-icon zero-to-hero" title="Bottom 20% to top 20%">🚀</span>`;
             }
-            if (result.unlockBonusPoints && result.unlockBonusPoints > 0) {
-                bonusHTML += `<span class="medal-icon unlock-bonus" title="Unlock bonus points applied">+${result.unlockBonusPoints} unlock</span>`;
-            }
             if (!bonusHTML) {
                 bonusHTML = '<span class="no-bonus">—</span>';
             }
