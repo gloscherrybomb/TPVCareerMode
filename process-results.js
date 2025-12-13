@@ -6,7 +6,7 @@ const Papa = require('papaparse');
 const admin = require('firebase-admin');
 const awardsCalc = require('./awards-calculation');
 const storyGen = require('./story-generator');
-const { FEATURE_FLAG_KEY, AWARD_CREDIT_MAP, PER_EVENT_CREDIT_CAP } = require('./currency-config');
+const { AWARD_CREDIT_MAP, PER_EVENT_CREDIT_CAP } = require('./currency-config');
 const { UNLOCK_DEFINITIONS, getUnlockById } = require('./unlock-config');
 
 // Import narrative system modules
@@ -1228,10 +1228,10 @@ async function processUserResult(uid, eventInfo, results) {
     nextEventNumber = STAGE_REQUIREMENTS_MAP[nextStage];
   }
 
-  // Preview flag for Cadence Credits/Unlocks
-  const previewCadenceEnabled = userData[FEATURE_FLAG_KEY] === true;
+  // Cadence Credits/Unlocks enabled for all users
+  const previewCadenceEnabled = true;
 
-  // Apply unlock bonuses (one per race) if preview is enabled
+  // Apply unlock bonuses (one per race)
   let unlockBonusPoints = 0;
   let unlockBonusesApplied = [];
   const unlockCooldowns = { ...(userData.unlocks?.cooldowns || {}) };
@@ -1706,7 +1706,7 @@ async function processUserResult(uid, eventInfo, results) {
     updates[`event${eventNumber}Results`] = eventResults;
   }
 
-  // Calculate Cadence Credits from awards (preview users only)
+  // Calculate Cadence Credits from awards
   // MUST be done AFTER all awards are added to eventResults.earnedAwards
   let earnedCadenceCredits = 0;
   let cadenceCreditTransaction = null;
