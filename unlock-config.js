@@ -33,15 +33,15 @@ const UNLOCK_DEFINITIONS = [
     description: 'Win a sprint/segment or finish top 8',
     emoji: 'üí®'
   },
-  // Tier 200
+  // Tier 200 (moderate)
   {
     id: 'aeroWheels',
     name: 'Aero Wheels',
     cost: 200,
     tier: 200,
     pointsBonus: 6,
-    trigger: 'beatPrediction5Top15',
-    description: 'Beat prediction by 5+ and finish top 15',
+    trigger: 'beatPrediction5Top10',
+    description: 'Beat prediction by 5+ and finish top 10',
     emoji: 'üõû'
   },
   {
@@ -50,8 +50,8 @@ const UNLOCK_DEFINITIONS = [
     cost: 200,
     tier: 200,
     pointsBonus: 5,
-    trigger: 'gapUnder20',
-    description: 'Finish within 20s of winner',
+    trigger: 'gapUnder15',
+    description: 'Finish within 15s of winner',
     emoji: 'ü•§'
   },
   {
@@ -61,18 +61,18 @@ const UNLOCK_DEFINITIONS = [
     tier: 200,
     pointsBonus: 5,
     trigger: 'predictedTop5AndFinishTop5',
-    description: 'Predicted top 5 and finish top 5',
+    description: 'Predicted top 5 and finish top 3',
     emoji: 'üíÜ'
   },
-  // Tier 300
+  // Tier 300 (hard)
   {
     id: 'preRaceMassage',
     name: 'Pre-Race Massage',
     cost: 300,
     tier: 300,
     pointsBonus: 7,
-    trigger: 'predictedTop10AndPodium',
-    description: 'Predicted top 10 and finish on the podium',
+    trigger: 'predictedTop8AndPodium',
+    description: 'Predicted top 8 and finish on the podium',
     emoji: 'üëê'
   },
   {
@@ -81,8 +81,8 @@ const UNLOCK_DEFINITIONS = [
     cost: 300,
     tier: 300,
     pointsBonus: 8,
-    trigger: 'climbTop5',
-    description: 'Climbing event and finish top 5',
+    trigger: 'climbTop3',
+    description: 'Climbing event and finish top 3',
     emoji: 'üßó'
   },
   {
@@ -91,19 +91,28 @@ const UNLOCK_DEFINITIONS = [
     cost: 300,
     tier: 300,
     pointsBonus: 7,
-    trigger: 'top5OrTop10Gap20',
-    description: 'Finish top 5, or top 10 within 20s of winner',
+    trigger: 'top5OrTop10Gap10',
+    description: 'finish top 3, or top 10 within 10s of winner',
     emoji: 'üî•'
   },
-  // Tier 400
+    {
+    id: 'tightPackWin',
+    name: 'Tight Pack Victory',
+    cost: 300,
+    tier: 300,
+    pointsBonus: 8,
+    trigger: 'winTightField',
+    description: 'Win when top 10 finish within 5s',
+    emoji: 'Ésˇã˜?'
+  },  // Tier 400
   {
     id: 'domestiqueHelp',
     name: 'Domestique Help',
     cost: 400,
     tier: 400,
     pointsBonus: 10,
-    trigger: 'beatHighestARRAndTop5',
-    description: 'Beat highest ARR rider and finish top 5',
+    trigger: 'beatHighestARRAndPodium',
+    description: 'Beat highest ARR rider and finish top 3',
     emoji: 'ü´°'
   },
   {
@@ -112,19 +121,20 @@ const UNLOCK_DEFINITIONS = [
     cost: 400,
     tier: 400,
     pointsBonus: 8,
-    trigger: 'tourTop5',
-    description: 'Tour stage and finish top 5',
+    trigger: 'tourBackToBackPodiums',
+    description: 'Tour stage and finish top 3',
     emoji: 'üß¶'
   },
+  
   {
-    id: 'directorsTablet',
-    name: "Director's Tactics Tablet",
+    id: 'rivalSlayer',
+    name: 'Rival Slayer',
     cost: 400,
     tier: 400,
-    pointsBonus: 9,
-    trigger: 'beatPrediction8OrPodiumFrom10th',
-    description: 'Beat prediction by 8+ or podium when predicted 10th+',
-    emoji: 'üìã'
+    pointsBonus: 10,
+    trigger: 'beatTopRival',
+    description: 'Beat your top rival when they are predicted ahead',
+    emoji: '–Yœ?'
   },
   // Personality-Based Unlocks
   {
@@ -279,5 +289,10 @@ if (typeof window !== 'undefined') {
     getUnlockById
   };
 }
+
+
+
+
+
 
 

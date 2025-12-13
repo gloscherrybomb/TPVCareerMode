@@ -1970,7 +1970,7 @@ function evaluateUnlockTrigger(unlockId, context) {
         triggered: position <= 5 || (position <= 10 && typeof marginToWinner === 'number' && marginToWinner < 20),
         reason: 'Top 5, or top 10 within 20s'
       };
-    case 'domestiqueHelp': {
+    case 'tightPackWin': {\n      const top10 = (results || []).slice(0, 10).map(r => parseFloat(r.Time)).filter(t => !isNaN(t));\n      const tight = top10.length === 10 && (Math.max(...top10) - Math.min(...top10)) <= 5;\n      return {\n        triggered: position === 1 && tight,\n        reason: 'Won in a tight 5s top-10 finish'\n      };\n    }\n    case 'domestiqueHelp': {
       // Beat someone with higher ARR who finished behind you
       const higherARRRider = results.find(r => r.arr > userARR && r.position > position);
       return {
@@ -2899,3 +2899,6 @@ Interesting Fact: ${request.interestFact}
 })();
 
 module.exports = { processResults, calculatePoints };
+\nfunction hasBackToBackTourPodiums(results, uid, eventNumber) {\n  if (!results || eventNumber < 14) return false;\n  const prevEvent = eventNumber - 1;\n  const prev = results.find(r => parseInt(r.Event) === prevEvent || r.eventNumber === prevEvent);\n  const prevPos = prev ? parseInt(prev.Position) : null;\n  return prevPos !== null && !isNaN(prevPos) && prevPos <= 3;\n}\n\nfunction getTopRivalForUser(uid, results, predictedPosition) {\n  if (!results || !predictedPosition) return null;\n  const ahead = results\n    .filter(r => r.UID !== uid && r.PredictedPosition && parseInt(r.PredictedPosition) < predictedPosition)\n    .sort((a,b) => parseInt(a.PredictedPosition) - parseInt(b.PredictedPosition));\n  if (!ahead.length) return null;\n  return { uid: ahead[0].UID, name: ahead[0].Name, predicted: parseInt(ahead[0].PredictedPosition) };\n}\n
+
+
