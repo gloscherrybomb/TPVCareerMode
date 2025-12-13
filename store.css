@@ -5,6 +5,62 @@ body {
     padding-top: 80px;
 }
 
+/* Store Header with Icon */
+.header-title-with-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 1rem;
+}
+
+.cc-header-icon {
+    width: 120px;
+    height: 120px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 20px rgba(255, 27, 107, 0.4));
+    animation: iconFloat 3s ease-in-out infinite;
+}
+
+@keyframes iconFloat {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.header-text-group {
+    text-align: left;
+}
+
+.header-text-group .page-title {
+    margin-bottom: 0.5rem;
+}
+
+.header-text-group .page-subtitle {
+    margin: 0;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+    .header-title-with-icon {
+        flex-direction: column;
+        gap: 1.5rem;
+        text-align: center;
+    }
+
+    .cc-header-icon {
+        width: 100px;
+        height: 100px;
+    }
+
+    .header-text-group {
+        text-align: center;
+    }
+}
+
 /* Store Content */
 .store-content {
     padding: 3rem 0 4rem;
