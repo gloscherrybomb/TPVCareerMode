@@ -60,29 +60,13 @@
             </div>
 
             <!-- Balance & Slots Section -->
-            <section class="balance-section">
-                <div class="balance-card">
-                    <div class="balance-header">
-                        <div class="balance-info">
-                            <div class="balance-label">Your Balance</div>
-                            <div class="balance-amount" id="storeBalance">0 CC</div>
-                            <div class="balance-description">Earn CC through podiums, special achievements, and season awards</div>
-                        </div>
-                        <div class="balance-icon">
-                            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="10"></circle>
-                                <path d="M12 6v6l4 2"></path>
-                            </svg>
-                        </div>
+            <section class="balance-section-compact">
+                <div class="balance-bar">
+                    <div class="balance-info-compact">
+                        <div class="balance-label-compact">Balance</div>
+                        <div class="balance-amount-compact" id="storeBalance">0 CC</div>
                     </div>
-                </div>
-
-                <div class="slots-card">
-                    <div class="slots-header">
-                        <h3>Equipment Slots</h3>
-                        <p>Equip upgrades to boost your race points</p>
-                    </div>
-                    <div class="slots-grid" id="storeSlots">
+                    <div class="slots-inline" id="storeSlots">
                         <!-- Populated by JS -->
                     </div>
                 </div>
@@ -97,10 +81,47 @@
                     </div>
                 </div>
 
+                <!-- Filter & Sort Controls -->
+                <div class="store-controls">
+                    <div class="control-group">
+                        <label for="storeFilter">Filter:</label>
+                        <select id="storeFilter" class="control-select">
+                            <option value="all">All Items</option>
+                            <option value="owned">Owned</option>
+                            <option value="unowned">Not Owned</option>
+                            <option value="affordable">Can Afford</option>
+                            <option value="locked">Locked</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label for="storeSort">Sort:</label>
+                        <select id="storeSort" class="control-select">
+                            <option value="tier">Tier (Default)</option>
+                            <option value="cost-asc">Cost: Low to High</option>
+                            <option value="cost-desc">Cost: High to Low</option>
+                            <option value="bonus-asc">Bonus: Low to High</option>
+                            <option value="bonus-desc">Bonus: High to Low</option>
+                            <option value="name">Name (A-Z)</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label for="storeSearch">Search:</label>
+                        <input type="text" id="storeSearch" class="control-input" placeholder="Search by name...">
+                    </div>
+                </div>
+
                 <div class="tier-section" data-tier="120">
-                    <div class="tier-header">
-                        <div class="tier-badge tier-120">Starter Tier</div>
-                        <div class="tier-cost">120 CC</div>
+                    <div class="tier-header" data-tier-toggle="120">
+                        <div class="tier-header-left">
+                            <div class="tier-badge tier-120">Starter Tier</div>
+                            <div class="tier-progress" id="tier-progress-120">0/0</div>
+                        </div>
+                        <div class="tier-header-right">
+                            <div class="tier-cost">120 CC</div>
+                            <button class="tier-collapse-btn" aria-label="Toggle tier">
+                                <span class="tier-collapse-icon">▼</span>
+                            </button>
+                        </div>
                     </div>
                     <div class="store-grid" id="tier-120">
                         <!-- Populated by JS -->
@@ -108,9 +129,17 @@
                 </div>
 
                 <div class="tier-section" data-tier="200">
-                    <div class="tier-header">
-                        <div class="tier-badge tier-200">Advanced Tier</div>
-                        <div class="tier-cost">200 CC</div>
+                    <div class="tier-header" data-tier-toggle="200">
+                        <div class="tier-header-left">
+                            <div class="tier-badge tier-200">Advanced Tier</div>
+                            <div class="tier-progress" id="tier-progress-200">0/0</div>
+                        </div>
+                        <div class="tier-header-right">
+                            <div class="tier-cost">200 CC</div>
+                            <button class="tier-collapse-btn" aria-label="Toggle tier">
+                                <span class="tier-collapse-icon">▼</span>
+                            </button>
+                        </div>
                     </div>
                     <div class="store-grid" id="tier-200">
                         <!-- Populated by JS -->
@@ -118,9 +147,17 @@
                 </div>
 
                 <div class="tier-section" data-tier="300">
-                    <div class="tier-header">
-                        <div class="tier-badge tier-300">Expert Tier</div>
-                        <div class="tier-cost">300 CC</div>
+                    <div class="tier-header" data-tier-toggle="300">
+                        <div class="tier-header-left">
+                            <div class="tier-badge tier-300">Expert Tier</div>
+                            <div class="tier-progress" id="tier-progress-300">0/0</div>
+                        </div>
+                        <div class="tier-header-right">
+                            <div class="tier-cost">300 CC</div>
+                            <button class="tier-collapse-btn" aria-label="Toggle tier">
+                                <span class="tier-collapse-icon">▼</span>
+                            </button>
+                        </div>
                     </div>
                     <div class="store-grid" id="tier-300">
                         <!-- Populated by JS -->
@@ -128,9 +165,17 @@
                 </div>
 
                 <div class="tier-section" data-tier="400">
-                    <div class="tier-header">
-                        <div class="tier-badge tier-400">Elite Tier</div>
-                        <div class="tier-cost">400 CC</div>
+                    <div class="tier-header" data-tier-toggle="400">
+                        <div class="tier-header-left">
+                            <div class="tier-badge tier-400">Elite Tier</div>
+                            <div class="tier-progress" id="tier-progress-400">0/0</div>
+                        </div>
+                        <div class="tier-header-right">
+                            <div class="tier-cost">400 CC</div>
+                            <button class="tier-collapse-btn" aria-label="Toggle tier">
+                                <span class="tier-collapse-icon">▼</span>
+                            </button>
+                        </div>
                     </div>
                     <div class="store-grid" id="tier-400">
                         <!-- Populated by JS -->

@@ -26,6 +26,9 @@ const unlockCatalog = (window.unlockConfig && window.unlockConfig.UNLOCK_DEFINIT
 
 let userDocRef = null;
 let userData = null;
+let currentFilter = 'all';
+let currentSort = 'tier';
+let currentSearch = '';
 
 function renderWarning(msg) {
   const warningEl = document.getElementById('storeWarning');
@@ -52,61 +55,116 @@ function renderSlots() {
   const balance = userData.currency?.balance || 0;
 
   for (let i = 0; i < 3; i++) {
-    const slotItem = document.createElement('div');
-    slotItem.className = `slot-item ${i >= slotCount ? 'slot-locked' : ''}`;
-
-    const slotInfo = document.createElement('div');
-    slotInfo.className = 'slot-info';
-
-    const slotNumber = document.createElement('div');
-    slotNumber.className = 'slot-number';
-    slotNumber.textContent = `Slot ${i + 1}`;
-    slotInfo.appendChild(slotNumber);
+    const slotChip = document.createElement('div');
+    slotChip.className = `slot-chip ${i >= slotCount ? 'slot-chip-locked' : ''}`;
 
     if (i < slotCount) {
       const equippedId = equipped[i];
       const unlock = unlockCatalog.find(u => u.id === equippedId);
-      const slotEquipped = document.createElement('div');
-      slotEquipped.className = 'slot-equipped';
-      slotEquipped.textContent = unlock ? `${unlock.emoji || '🎯'} ${unlock.name}` : 'Empty';
-      slotInfo.appendChild(slotEquipped);
+
+      const slotLabel = document.createElement('span');
+      slotLabel.className = 'slot-chip-label';
+      slotLabel.textContent = `Slot ${i + 1}:`;
+      slotChip.appendChild(slotLabel);
+
+      const slotContent = document.createElement('span');
+      slotContent.className = 'slot-chip-content';
+      slotContent.textContent = unlock ? `${unlock.emoji || '🎯'} ${unlock.name}` : 'Empty';
+      slotChip.appendChild(slotContent);
 
       // Allow unequip directly from slot
       if (unlock) {
-        const slotActions = document.createElement('div');
-        slotActions.className = 'slot-actions';
         const unequipBtn = document.createElement('button');
-        unequipBtn.className = 'btn-equip';
-        unequipBtn.textContent = 'Unequip';
+        unequipBtn.className = 'slot-chip-unequip';
+        unequipBtn.textContent = '×';
+        unequipBtn.title = 'Unequip';
         unequipBtn.addEventListener('click', () => equipItem(equippedId));
-        slotActions.appendChild(unequipBtn);
-        slotItem.appendChild(slotActions);
+        slotChip.appendChild(unequipBtn);
       }
     } else {
-      const lockedText = document.createElement('div');
-      lockedText.className = 'slot-locked-text';
+      const slotLabel = document.createElement('span');
+      slotLabel.className = 'slot-chip-label';
+      slotLabel.textContent = `Slot ${i + 1}:`;
+      slotChip.appendChild(slotLabel);
+
+      const lockedText = document.createElement('span');
+      lockedText.className = 'slot-chip-locked-text';
       lockedText.textContent = 'Locked';
-      slotInfo.appendChild(lockedText);
+      slotChip.appendChild(lockedText);
+
+      // Add unlock button next to locked slot
+      if (i >= slotCount && slotCount < 3) {
+        const cost = slotCount === 1 ? 400 : 1200;
+        const btn = document.createElement('button');
+        btn.className = 'slot-chip-unlock-btn';
+        btn.textContent = `Unlock ${cost} CC`;
+        btn.disabled = balance < cost;
+        btn.addEventListener('click', () => purchaseSlot(cost));
+        slotChip.appendChild(btn);
+      }
     }
 
-    slotItem.appendChild(slotInfo);
+    wrap.appendChild(slotChip);
+  }
+}
 
-    // Add unlock button if slot is locked
-    if (i >= slotCount && slotCount < 3) {
-      const cost = slotCount === 1 ? 400 : 1200;
-      const actions = document.createElement('div');
-      actions.className = 'slot-actions';
+function initTierCollapse() {
+  const tierToggles = document.querySelectorAll('[data-tier-toggle]');
 
-      const btn = document.createElement('button');
-      btn.className = 'btn-unlock-slot';
-      btn.textContent = `Unlock for ${cost} CC`;
-      btn.disabled = balance < cost;
-      btn.addEventListener('click', () => purchaseSlot(cost));
-      actions.appendChild(btn);
-      slotItem.appendChild(actions);
-    }
+  tierToggles.forEach(toggle => {
+    toggle.addEventListener('click', () => {
+      const tier = toggle.getAttribute('data-tier-toggle');
+      const section = document.querySelector(`.tier-section[data-tier="${tier}"]`);
+      const icon = toggle.querySelector('.tier-collapse-icon');
 
-    wrap.appendChild(slotItem);
+      if (section) {
+        const isCollapsed = section.classList.contains('tier-collapsed');
+
+        if (isCollapsed) {
+          section.classList.remove('tier-collapsed');
+          icon.textContent = '▼';
+        } else {
+          section.classList.add('tier-collapsed');
+          icon.textContent = '▶';
+        }
+
+        // Save state to localStorage
+        const collapseState = JSON.parse(localStorage.getItem('tierCollapseState') || '{}');
+        collapseState[tier] = !isCollapsed;
+        localStorage.setItem('tierCollapseState', JSON.stringify(collapseState));
+      }
+    });
+  });
+}
+
+function initStoreControls() {
+  const filterSelect = document.getElementById('storeFilter');
+  const sortSelect = document.getElementById('storeSort');
+  const searchInput = document.getElementById('storeSearch');
+
+  if (filterSelect) {
+    filterSelect.addEventListener('change', (e) => {
+      currentFilter = e.target.value;
+      renderGrid();
+    });
+  }
+
+  if (sortSelect) {
+    sortSelect.addEventListener('change', (e) => {
+      currentSort = e.target.value;
+      renderGrid();
+    });
+  }
+
+  if (searchInput) {
+    let searchTimeout;
+    searchInput.addEventListener('input', (e) => {
+      clearTimeout(searchTimeout);
+      searchTimeout = setTimeout(() => {
+        currentSearch = e.target.value;
+        renderGrid();
+      }, 300); // Debounce for 300ms
+    });
   }
 }
 
@@ -125,17 +183,116 @@ function renderGrid() {
     400: []
   };
 
-  unlockCatalog.forEach(item => {
+  // Apply filtering and sorting
+  let filteredCatalog = unlockCatalog.filter(item => {
+    // Apply search filter
+    if (currentSearch && !item.name.toLowerCase().includes(currentSearch.toLowerCase())) {
+      return false;
+    }
+
+    // Apply category filter
+    const owned = inventory.includes(item.id);
+    const canAfford = balance >= item.cost;
+
+    // Check personality requirements
+    let meetsPersonality = true;
+    if (item.requiredBalanced) {
+      const traits = ['confidence', 'humility', 'aggression', 'professionalism', 'showmanship', 'resilience'];
+      meetsPersonality = traits.every(trait => {
+        const value = personality[trait] || 50;
+        return value >= 45 && value <= 65;
+      });
+    } else if (item.requiredPersonality) {
+      meetsPersonality = Object.entries(item.requiredPersonality).every(
+        ([trait, required]) => (personality[trait] || 0) >= required
+      );
+    }
+
+    const isLocked = !owned && (!meetsPersonality || !canAfford);
+
+    switch (currentFilter) {
+      case 'owned':
+        return owned;
+      case 'unowned':
+        return !owned;
+      case 'affordable':
+        return !owned && canAfford && meetsPersonality;
+      case 'locked':
+        return isLocked;
+      default:
+        return true;
+    }
+  });
+
+  // Apply sorting
+  filteredCatalog.sort((a, b) => {
+    switch (currentSort) {
+      case 'cost-asc':
+        return a.cost - b.cost;
+      case 'cost-desc':
+        return b.cost - a.cost;
+      case 'bonus-asc':
+        return a.pointsBonus - b.pointsBonus;
+      case 'bonus-desc':
+        return b.pointsBonus - a.pointsBonus;
+      case 'name':
+        return a.name.localeCompare(b.name);
+      case 'tier':
+      default:
+        return a.tier - b.tier;
+    }
+  });
+
+  filteredCatalog.forEach(item => {
     if (tiers[item.tier]) {
       tiers[item.tier].push(item);
     }
   });
+
+  // Load collapse state from localStorage
+  const collapseState = JSON.parse(localStorage.getItem('tierCollapseState') || '{}');
 
   // Render each tier
   Object.keys(tiers).forEach(tier => {
     const gridEl = document.getElementById(`tier-${tier}`);
     if (!gridEl) return;
     gridEl.innerHTML = '';
+
+    // Calculate progress
+    const totalItems = tiers[tier].length;
+    const ownedItems = tiers[tier].filter(item => inventory.includes(item.id)).length;
+    const progressEl = document.getElementById(`tier-progress-${tier}`);
+    if (progressEl) {
+      progressEl.textContent = `${ownedItems}/${totalItems} owned`;
+      progressEl.className = `tier-progress ${ownedItems === totalItems ? 'tier-progress-complete' : ''}`;
+    }
+
+    // Determine default collapse state (collapse if all owned, expand otherwise)
+    const section = document.querySelector(`.tier-section[data-tier="${tier}"]`);
+    const toggle = document.querySelector(`[data-tier-toggle="${tier}"]`);
+    const icon = toggle?.querySelector('.tier-collapse-icon');
+
+    if (section) {
+      // Check if we have a saved state, otherwise use default logic
+      if (collapseState.hasOwnProperty(tier)) {
+        if (collapseState[tier]) {
+          section.classList.add('tier-collapsed');
+          if (icon) icon.textContent = '▶';
+        } else {
+          section.classList.remove('tier-collapsed');
+          if (icon) icon.textContent = '▼';
+        }
+      } else {
+        // Default: collapse if all owned
+        if (ownedItems === totalItems && totalItems > 0) {
+          section.classList.add('tier-collapsed');
+          if (icon) icon.textContent = '▶';
+        } else {
+          section.classList.remove('tier-collapsed');
+          if (icon) icon.textContent = '▼';
+        }
+      }
+    }
 
     tiers[tier].forEach(item => {
       const owned = inventory.includes(item.id);
@@ -163,6 +320,27 @@ function renderGrid() {
       const isLocked = !owned && (!meetsPersonalityReqs || !canAfford);
 
       card.className = `unlock-card tier-${tier} ${isLocked ? 'locked' : ''} ${owned ? 'owned' : ''}`;
+
+      // Add tooltip for locked cards
+      if (isLocked) {
+        const reasons = [];
+        if (!canAfford) {
+          const needed = item.cost - balance;
+          reasons.push(`Need ${needed} more CC`);
+        }
+        if (!meetsPersonalityReqs) {
+          if (item.requiredBalanced) {
+            reasons.push('Requires balanced personality (all traits 45-65)');
+          } else if (item.requiredPersonality) {
+            const reqs = Object.entries(item.requiredPersonality).map(([trait, val]) => {
+              const current = personality[trait] || 0;
+              return `${trait.charAt(0).toUpperCase() + trait.slice(1)}: ${current}/${val}`;
+            }).join(', ');
+            reasons.push(`Requires: ${reqs}`);
+          }
+        }
+        card.title = reasons.join(' • ');
+      }
 
       let personalityInfo = '';
       if (item.personalityBonus) {
@@ -391,6 +569,8 @@ function start() {
     renderBalance();
     renderSlots();
     renderGrid();
+    initTierCollapse();
+    initStoreControls();
     console.log('[Store] Store loaded successfully');
   });
 }

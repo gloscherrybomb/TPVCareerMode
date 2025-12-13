@@ -103,7 +103,7 @@ const UNLOCK_DEFINITIONS = [
     pointsBonus: 8,
     trigger: 'winTightField',
     description: 'Win when top 10 finish within 5s',
-    emoji: 'ƒsÿ‹÷?'
+    emoji: 'ğŸ'
   },  // Tier 400
   {
     id: 'domestiqueHelp',
@@ -134,7 +134,7 @@ const UNLOCK_DEFINITIONS = [
     pointsBonus: 10,
     trigger: 'beatTopRival',
     description: 'Beat your top rival when they are predicted ahead',
-    emoji: 'ĞYÏ?'
+    emoji: 'âš”ï¸'
   },
   // Personality-Based Unlocks
   {

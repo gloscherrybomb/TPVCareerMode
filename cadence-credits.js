@@ -14,7 +14,8 @@ import {
   getFirestore,
   doc,
   getDoc,
-  updateDoc
+  updateDoc,
+  runTransaction
 } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
 const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
@@ -34,83 +35,6 @@ console.log('[CC] Unlock catalog loaded:', unlockCatalog.length, 'items');
 let userDocData = null;
 let userDocRef = null;
 let eventLoadoutRendered = false;
-
-function injectStyles() {
-  if (document.getElementById('cc-preview-styles')) return;
-  const style = document.createElement('style');
-  style.id = 'cc-preview-styles';
-  style.textContent = `
-    .cc-modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.5); display:none; align-items:center; justify-content:center; z-index:9999; }
-    .cc-modal { background:#0b0f14; color:#f5f7fa; width:90%; max-width:960px; border-radius:12px; padding:20px; box-shadow:0 12px 40px rgba(0,0,0,0.35); font-family: 'Exo 2', sans-serif; }
-    .cc-modal h2 { margin:0 0 8px; display:flex; align-items:center; gap:8px; }
-    .cc-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:12px; margin-top:12px; }
-    .cc-card { background:var(--dark-card, #121822); border:1px solid #1f2a3a; border-radius:10px; padding:12px; display:flex; flex-direction:column; gap:6px; }
-    .cc-card h4 { margin:0; font-size:15px; }
-    .cc-tier-120 { border-color:#4a90e2; }
-    .cc-tier-200 { border-color:#3fb27f; }
-    .cc-tier-300 { border-color:#f2a950; }
-    .cc-tier-400 { border-color:#c77dff; }
-    .cc-cost { font-weight:700; }
-    .cc-actions button { padding:8px 10px; border:none; border-radius:8px; cursor:pointer; font-weight:700; }
-    .cc-buy { background:var(--accent-blue, #4a90e2); color:#fff; }
-    .cc-owned { background:#243040; color:#b7c6d8; }
-    .cc-equip { background:var(--accent-pink, #ff1b6b); color:#fff; }
-    .cc-close { float:right; background:transparent; border:none; color:#fff; font-size:18px; cursor:pointer; }
-    .cc-slot-row { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:8px; }
-    .cc-slot { background:#121822; border:1px dashed #1f2a3a; padding:6px 10px; border-radius:8px; }
-    .cc-inline-button { display:inline-flex; align-items:center; gap:8px; }
-    .cc-inline-button svg { opacity:0.9; }
-    .cc-loadout-panel { background:var(--dark-card,#0f1623); border:1px solid rgba(255,255,255,0.06); border-radius:12px; padding:16px; margin:12px 0; }
-    .cc-loadout-header { display:flex; justify-content:space-between; align-items:center; gap:10px; }
-    .cc-loadout-slots { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
-    .cc-loadout-slot { background:rgba(255,255,255,0.04); border:1px dashed rgba(255,255,255,0.1); padding:8px 10px; border-radius:10px; }
-    .cc-event-loadout { background:var(--dark-card,#141824); border:2px solid rgba(255,255,255,0.05); border-radius:16px; padding:1.5rem; }
-    .cc-event-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; flex-wrap:wrap; gap:1rem; }
-    .cc-event-title { font-family:'Orbitron',sans-serif; font-size:1.5rem; font-weight:700; color:var(--text-primary); margin-bottom:0.25rem; }
-    .cc-event-subtitle { font-size:0.9rem; color:var(--text-secondary); }
-    .cc-event-balance { font-family:'Orbitron',sans-serif; font-size:1.2rem; font-weight:700; background:linear-gradient(135deg,var(--accent-pink),var(--accent-blue)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-    .cc-event-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:1rem; margin-top:1rem; }
-    .cc-event-card { background:var(--dark-elevated,#1a1f2e); border:2px solid rgba(255,255,255,0.05); border-radius:12px; padding:1.25rem; transition:all 0.3s ease; }
-    .cc-event-card:hover { border-color:rgba(69,202,255,0.3); transform:translateY(-2px); }
-    .cc-event-card-header { display:flex; align-items:center; gap:0.75rem; margin-bottom:0.75rem; }
-    .cc-event-emoji { font-size:1.8rem; }
-    .cc-event-name { font-weight:700; font-size:1.05rem; color:var(--text-primary); }
-    .cc-event-desc { font-size:0.9rem; color:var(--text-secondary); line-height:1.5; margin-bottom:0.75rem; }
-    .cc-event-bonus { display:inline-block; padding:0.35rem 0.75rem; background:rgba(0,255,136,0.1); border:1px solid rgba(0,255,136,0.3); border-radius:50px; color:var(--success); font-weight:700; font-size:0.85rem; }
-    .cc-event-empty { text-align:center; padding:2rem; color:var(--text-secondary); }
-    .cc-event-empty-icon { font-size:3rem; opacity:0.3; margin-bottom:1rem; }
-    .cc-manage-btn { padding:0.75rem 1.5rem; background:linear-gradient(135deg,var(--accent-pink),var(--accent-purple)); color:white; border:none; border-radius:10px; font-weight:700; font-size:0.95rem; cursor:pointer; transition:all 0.3s ease; display:inline-flex; align-items:center; gap:0.5rem; }
-    .cc-manage-btn:hover { transform:translateY(-2px); box-shadow:0 10px 30px rgba(255,27,107,0.4); }
-    .cc-selector-panel { background:linear-gradient(135deg,rgba(255,27,107,0.1),rgba(69,202,255,0.1)); border:2px solid rgba(255,255,255,0.1); border-radius:20px; padding:2rem; margin:2rem 0; }
-    .cc-selector-header { text-align:center; margin-bottom:2rem; }
-    .cc-selector-title { font-family:'Orbitron',sans-serif; font-size:2rem; font-weight:900; background:linear-gradient(135deg,var(--accent-pink),var(--accent-blue)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-bottom:0.5rem; }
-    .cc-selector-subtitle { color:var(--text-secondary); font-size:1rem; }
-    .cc-selector-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:1.5rem; margin-top:1.5rem; }
-    .cc-selector-card { background:var(--dark-card); border:2px solid rgba(255,255,255,0.05); border-radius:16px; padding:1.5rem; cursor:pointer; transition:all 0.3s ease; position:relative; }
-    .cc-selector-card:hover { border-color:rgba(69,202,255,0.3); transform:translateY(-5px); box-shadow:0 15px 40px rgba(0,0,0,0.4); }
-    .cc-selector-card.selected { border-color:var(--accent-pink); background:linear-gradient(135deg,rgba(255,27,107,0.1),rgba(199,26,229,0.1)); box-shadow:0 0 30px rgba(255,27,107,0.3); }
-    .cc-selector-card.selected::before { content:'✓'; position:absolute; top:1rem; right:1rem; width:32px; height:32px; background:linear-gradient(135deg,var(--accent-pink),var(--accent-purple)); border-radius:50%; display:flex; align-items:center; justify-content:center; color:white; font-weight:700; font-size:1.2rem; }
-    .cc-selector-empty { text-align:center; padding:3rem; color:var(--text-secondary); }
-    .cc-selector-action { text-align:center; margin-top:2rem; }
-    .cc-results-panel { background:var(--dark-card); border:2px solid rgba(255,255,255,0.05); border-radius:20px; padding:2rem; }
-    .cc-results-header { text-align:center; margin-bottom:2rem; }
-    .cc-results-title { font-family:'Orbitron',sans-serif; font-size:2rem; font-weight:900; background:linear-gradient(135deg,var(--accent-pink),var(--accent-blue)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; margin-bottom:0.5rem; }
-    .cc-results-subtitle { color:var(--text-secondary); font-size:1rem; }
-    .cc-results-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:1.5rem; }
-    .cc-result-card { background:var(--dark-elevated); border:2px solid rgba(255,255,255,0.05); border-radius:16px; padding:1.75rem; text-align:center; transition:all 0.3s ease; position:relative; overflow:hidden; }
-    .cc-result-card::before { content:''; position:absolute; top:0; left:0; right:0; height:3px; background:transparent; }
-    .cc-result-card.earned::before { background:linear-gradient(90deg,transparent,var(--success),transparent); }
-    .cc-result-card.applied::before { background:linear-gradient(90deg,transparent,var(--accent-blue),transparent); }
-    .cc-result-icon { font-size:3rem; margin-bottom:1rem; animation:float 3s ease-in-out infinite; }
-    .cc-result-amount { font-family:'Orbitron',sans-serif; font-size:2.5rem; font-weight:900; margin-bottom:0.5rem; }
-    .cc-result-amount.earned { background:linear-gradient(135deg,var(--success),#00cc88); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-    .cc-result-amount.applied { background:linear-gradient(135deg,var(--accent-blue),var(--accent-purple)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text; }
-    .cc-result-label { color:var(--text-secondary); font-size:0.95rem; font-weight:600; text-transform:uppercase; letter-spacing:1px; margin-bottom:1rem; }
-    .cc-result-detail { color:var(--text-secondary); font-size:0.9rem; line-height:1.5; }
-    .cc-result-badge { display:inline-block; padding:0.5rem 1rem; background:rgba(0,255,136,0.1); border:1px solid rgba(0,255,136,0.3); border-radius:50px; color:var(--success); font-weight:700; font-size:0.85rem; margin-top:0.75rem; }
-  `;
-  document.head.appendChild(style);
-}
 
 function formatBalance(balance) {
   return `${balance || 0} CC`;
@@ -437,7 +361,29 @@ function renderLoadoutPanel() {
         <div class="cc-event-empty">
           <div class="cc-event-empty-icon">📦</div>
           <div style="font-weight:600; margin-bottom:0.5rem; font-size:1.1rem;">No Upgrades Equipped</div>
-          <div style="font-size:0.95rem; max-width:400px; margin:0 auto;">Visit the Cadence Credits store to purchase and equip upgrades. All equipped upgrades can trigger in one race if conditions are met.</div>
+          <div class="cc-empty-quickstart">
+            <div class="cc-quickstart-title">Quick Start</div>
+            <div class="cc-quickstart-steps">
+              <div class="cc-quickstart-step">
+                <div class="cc-quickstart-number">1</div>
+                <div class="cc-quickstart-text"><strong>Earn CC</strong><br>Win races and earn awards to get Cadence Credits</div>
+              </div>
+              <div class="cc-quickstart-step">
+                <div class="cc-quickstart-number">2</div>
+                <div class="cc-quickstart-text"><strong>Buy Unlocks</strong><br>Purchase upgrades from the store with your CC</div>
+              </div>
+              <div class="cc-quickstart-step">
+                <div class="cc-quickstart-number">3</div>
+                <div class="cc-quickstart-text"><strong>Equip & Race</strong><br>Equip up to 3 unlocks and trigger them in races</div>
+              </div>
+            </div>
+            <a href="store.html" class="cc-empty-cta">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
+              </svg>
+              <span>Visit Store</span>
+            </a>
+          </div>
         </div>
       `}
       <div style="margin-top:1rem; padding-top:1rem; border-top:1px solid rgba(255,255,255,0.05); font-size:0.85rem; color:var(--text-secondary); text-align:center;">
@@ -609,7 +555,6 @@ function maybeRenderEventLoadout() {
 function start() {
   console.log('[CC] Cadence Credits script starting...');
   console.log('[CC] Feature flag key:', FEATURE_FLAG_KEY);
-  injectStyles();
   // Modal retained for compatibility, but primary flow links to store page.
 
   // Listen for event context ready event

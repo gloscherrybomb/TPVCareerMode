@@ -43,164 +43,138 @@ body {
     line-height: 1.5;
 }
 
-/* Balance Section */
-.balance-section {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2rem;
-    margin-bottom: 3rem;
+/* Balance Section - Compact */
+.balance-section-compact {
+    margin-bottom: 2rem;
 }
 
-.balance-card {
+.balance-bar {
     background: linear-gradient(135deg, rgba(255, 27, 107, 0.1), rgba(69, 202, 255, 0.1));
     border: 2px solid rgba(255, 255, 255, 0.1);
-    border-radius: 20px;
-    padding: 2rem;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-}
-
-.balance-header {
+    border-radius: 16px;
+    padding: 1.25rem 1.75rem;
     display: flex;
-    justify-content: space-between;
     align-items: center;
     gap: 2rem;
+    flex-wrap: wrap;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
 }
 
-.balance-info {
-    flex: 1;
+.balance-info-compact {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-shrink: 0;
 }
 
-.balance-label {
-    font-size: 0.9rem;
+.balance-label-compact {
+    font-size: 0.85rem;
     color: var(--text-secondary);
     text-transform: uppercase;
-    letter-spacing: 2px;
-    margin-bottom: 0.5rem;
+    letter-spacing: 1.5px;
     font-weight: 600;
 }
 
-.balance-amount {
+.balance-amount-compact {
     font-family: 'Orbitron', sans-serif;
-    font-size: 3rem;
+    font-size: 1.8rem;
     font-weight: 900;
     background: linear-gradient(135deg, var(--accent-pink), var(--accent-blue));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    margin-bottom: 0.5rem;
-    line-height: 1.2;
+    line-height: 1;
 }
 
-.balance-description {
-    font-size: 0.9rem;
-    color: var(--text-secondary);
-    line-height: 1.5;
-}
-
-.balance-icon {
-    opacity: 0.3;
-    animation: float 3s ease-in-out infinite;
-}
-
-.balance-icon svg {
-    stroke: var(--accent-blue);
-}
-
-/* Slots Card */
-.slots-card {
-    background: var(--dark-card);
-    border: 2px solid rgba(255, 255, 255, 0.05);
-    border-radius: 20px;
-    padding: 2rem;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-}
-
-.slots-header {
-    margin-bottom: 1.5rem;
-}
-
-.slots-header h3 {
-    font-family: 'Orbitron', sans-serif;
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin-bottom: 0.5rem;
-}
-
-.slots-header p {
-    color: var(--text-secondary);
-    font-size: 0.9rem;
-}
-
-.slots-grid {
+.slots-inline {
     display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.slot-item {
-    background: var(--dark-elevated);
-    border: 2px solid rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
-    padding: 1rem 1.25rem;
-    display: flex;
-    justify-content: space-between;
     align-items: center;
-    gap: 1rem;
-    transition: all 0.3s ease;
-}
-
-.slot-item.slot-locked {
-    opacity: 0.5;
-    border-style: dashed;
-}
-
-.slot-info {
+    gap: 0.75rem;
+    flex-wrap: wrap;
     flex: 1;
 }
 
-.slot-number {
-    font-weight: 700;
-    color: var(--text-primary);
-    font-size: 0.95rem;
-}
-
-.slot-equipped {
-    color: var(--accent-blue);
-    font-size: 0.85rem;
-    margin-top: 0.25rem;
-}
-
-.slot-locked-text {
-    color: var(--text-muted);
-    font-size: 0.85rem;
-}
-
-.slot-actions {
-    display: flex;
+.slot-chip {
+    background: var(--dark-elevated, #1a1f2e);
+    border: 2px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    padding: 0.6rem 1rem;
+    display: inline-flex;
+    align-items: center;
     gap: 0.5rem;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
 }
 
-.btn-unlock-slot {
-    padding: 0.6rem 1.2rem;
+.slot-chip:hover {
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.slot-chip-locked {
+    opacity: 0.6;
+    border-style: dashed;
+}
+
+.slot-chip-label {
+    font-weight: 700;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+.slot-chip-content {
+    color: var(--accent-blue);
+    font-weight: 600;
+}
+
+.slot-chip-locked-text {
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+.slot-chip-unequip {
+    background: rgba(255, 27, 107, 0.2);
+    border: 1px solid rgba(255, 27, 107, 0.3);
+    color: var(--accent-pink);
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    transition: all 0.2s ease;
+}
+
+.slot-chip-unequip:hover {
+    background: var(--accent-pink);
+    color: white;
+    transform: scale(1.1);
+}
+
+.slot-chip-unlock-btn {
+    padding: 0.4rem 0.9rem;
     background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
     color: white;
     border: none;
-    border-radius: 10px;
+    border-radius: 8px;
     font-weight: 700;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     cursor: pointer;
     transition: all 0.3s ease;
     white-space: nowrap;
-    box-shadow: 0 10px 30px rgba(255, 27, 107, 0.3);
+    box-shadow: 0 6px 20px rgba(255, 27, 107, 0.3);
 }
 
-.btn-unlock-slot:hover:not(:disabled) {
-    transform: translateY(-3px);
-    box-shadow: 0 15px 40px rgba(255, 27, 107, 0.5);
+.slot-chip-unlock-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(255, 27, 107, 0.5);
 }
 
-.btn-unlock-slot:disabled {
+.slot-chip-unlock-btn:disabled {
     background: rgba(255, 255, 255, 0.1);
     color: rgba(255, 255, 255, 0.4);
     cursor: not-allowed;
@@ -232,9 +206,73 @@ body {
     font-size: 1rem;
 }
 
+/* Store Controls */
+.store-controls {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+    padding: 1.25rem;
+    background: var(--dark-elevated, #1a1f2e);
+    border: 2px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+}
+
+.control-group {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.control-group label {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    white-space: nowrap;
+}
+
+.control-select,
+.control-input {
+    padding: 0.65rem 1rem;
+    background: var(--dark-card, #0f1623);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.control-select:hover,
+.control-input:hover {
+    border-color: rgba(69, 202, 255, 0.3);
+}
+
+.control-select:focus,
+.control-input:focus {
+    outline: none;
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 3px rgba(69, 202, 255, 0.1);
+}
+
+.control-input {
+    cursor: text;
+    min-width: 200px;
+}
+
+.control-input::placeholder {
+    color: var(--text-muted);
+}
+
 /* Tier Section */
 .tier-section {
     margin-bottom: 3rem;
+    transition: all 0.3s ease;
+}
+
+.tier-section.tier-collapsed .store-grid {
+    display: none;
 }
 
 .tier-header {
@@ -244,6 +282,26 @@ body {
     margin-bottom: 1.5rem;
     padding-bottom: 1rem;
     border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.2s ease;
+}
+
+.tier-header:hover {
+    border-bottom-color: rgba(255, 255, 255, 0.2);
+}
+
+.tier-header-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.tier-header-right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
 }
 
 .tier-badge {
@@ -280,6 +338,44 @@ body {
     color: var(--accent-purple);
 }
 
+.tier-progress {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+    padding: 0.35rem 0.85rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 50px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tier-progress-complete {
+    background: rgba(0, 255, 136, 0.1);
+    border-color: rgba(0, 255, 136, 0.3);
+    color: var(--success);
+}
+
+.tier-collapse-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    font-size: 1.2rem;
+}
+
+.tier-collapse-btn:hover {
+    color: var(--text-primary);
+    transform: scale(1.1);
+}
+
+.tier-collapse-icon {
+    transition: transform 0.3s ease;
+}
+
 .tier-cost {
     font-family: 'Orbitron', sans-serif;
     font-weight: 700;
@@ -293,7 +389,7 @@ body {
 /* Store Grid */
 .store-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
     gap: 1.5rem;
 }
 
@@ -347,12 +443,12 @@ body {
 /* Locked State - Obfuscated */
 .unlock-card.locked {
     opacity: 0.6;
-    pointer-events: none;
+    cursor: help;
 }
 
 .unlock-card.locked:hover {
-    transform: none;
-    box-shadow: none;
+    opacity: 0.75;
+    border-color: rgba(255, 170, 0, 0.2);
 }
 
 .unlock-card.locked .unlock-emoji {
@@ -607,24 +703,50 @@ body {
 }
 
 /* Responsive Design */
-@media (max-width: 1024px) {
-    .balance-section {
-        grid-template-columns: 1fr;
+/* Tablet (768px - 1024px) */
+@media (max-width: 1024px) and (min-width: 769px) {
+    .store-grid {
+        grid-template-columns: repeat(2, 1fr);
     }
 
+    .balance-bar {
+        gap: 1.5rem;
+    }
+
+    .tier-header-left,
+    .tier-header-right {
+        gap: 0.75rem;
+    }
+}
+
+/* Small Tablet (Under 1024px) */
+@media (max-width: 1024px) {
     .store-grid {
         grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     }
 }
 
+/* Mobile (Under 768px) */
 @media (max-width: 768px) {
-    .balance-header {
+    .balance-bar {
         flex-direction: column;
         align-items: flex-start;
+        gap: 1rem;
     }
 
-    .balance-amount {
-        font-size: 2.5rem;
+    .balance-amount-compact {
+        font-size: 1.5rem;
+    }
+
+    .slots-inline {
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .slot-chip {
+        width: 100%;
+        justify-content: space-between;
     }
 
     .store-grid {
@@ -640,18 +762,5 @@ body {
     .info-card {
         flex-direction: column;
         gap: 1rem;
-    }
-
-    .slot-item {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .slot-actions {
-        width: 100%;
-    }
-
-    .btn-unlock-slot {
-        width: 100%;
     }
 }
