@@ -585,13 +585,148 @@ function initCCToggle() {
   });
 }
 
+function buildEventLoadoutModal() {
+  if (document.getElementById('cc-event-loadout-overlay')) return;
+
+  const overlay = document.createElement('div');
+  overlay.id = 'cc-event-loadout-overlay';
+  overlay.className = 'cc-modal-overlay';
+  overlay.innerHTML = `
+    <div class="cc-event-loadout-modal">
+      <div class="cc-loadout-modal-header">
+        <h2>Manage Loadout</h2>
+        <button class="cc-close" aria-label="Close">&times;</button>
+      </div>
+      <div class="cc-loadout-modal-slots" id="cc-event-slots"></div>
+      <div class="cc-loadout-modal-content">
+        <h3>Your Unlocks <span class="unlock-count" id="cc-unlock-count"></span></h3>
+        <div class="cc-loadout-list" id="cc-event-loadout-list"></div>
+      </div>
+      <div class="cc-loadout-modal-footer">
+        <a href="store.html" class="cc-store-link">View Full Store →</a>
+      </div>
+    </div>
+  `;
+
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) {
+      overlay.style.display = 'none';
+    }
+  });
+
+  overlay.querySelector('.cc-close').addEventListener('click', () => {
+    overlay.style.display = 'none';
+  });
+
+  document.body.appendChild(overlay);
+}
+
+function renderEventLoadoutModal() {
+  const list = document.getElementById('cc-event-loadout-list');
+  const slotsContainer = document.getElementById('cc-event-slots');
+  const countSpan = document.getElementById('cc-unlock-count');
+
+  if (!list || !slotsContainer || !countSpan) return;
+
+  const inventory = userDocData?.unlocks?.inventory || [];
+  const equipped = userDocData?.unlocks?.equipped || [];
+  const slotCount = userDocData?.unlocks?.slotCount || 1;
+  const cooldowns = userDocData?.unlocks?.cooldowns || {};
+  const eventNum = window.cadenceEventContext?.eventNumber;
+
+  // Render slots
+  slotsContainer.innerHTML = '';
+  for (let i = 0; i < slotCount; i++) {
+    const slotDiv = document.createElement('div');
+    slotDiv.className = 'cc-loadout-slot';
+
+    const equippedId = equipped[i];
+    if (equippedId) {
+      const unlock = unlockCatalog.find(u => u.id === equippedId);
+      const onCooldown = cooldowns[equippedId] && cooldowns[equippedId] >= eventNum;
+
+      slotDiv.innerHTML = `
+        <div class="slot-label">Slot ${i + 1}</div>
+        <div class="slot-unlock ${onCooldown ? 'cooldown' : ''}">
+          <span class="slot-emoji">${unlock?.emoji || '🎯'}</span>
+          <span class="slot-name">${unlock?.name || 'Unknown'}</span>
+          ${onCooldown ? '<span class="cooldown-badge">Cooldown</span>' : ''}
+        </div>
+      `;
+    } else {
+      slotDiv.innerHTML = `
+        <div class="slot-label">Slot ${i + 1}</div>
+        <div class="slot-unlock empty">
+          <span class="slot-emoji">📦</span>
+          <span class="slot-name">Empty</span>
+        </div>
+      `;
+    }
+
+    slotsContainer.appendChild(slotDiv);
+  }
+
+  // Render owned unlocks list
+  const ownedUnlocks = unlockCatalog.filter(u => inventory.includes(u.id));
+  countSpan.textContent = `(${ownedUnlocks.length})`;
+
+  list.innerHTML = '';
+
+  if (ownedUnlocks.length === 0) {
+    list.innerHTML = `
+      <div class="cc-loadout-empty">
+        <div class="empty-icon">📦</div>
+        <div class="empty-text">No unlocks purchased yet</div>
+        <a href="store.html" class="cc-btn-primary">Visit Store</a>
+      </div>
+    `;
+    return;
+  }
+
+  ownedUnlocks.forEach(unlock => {
+    const isEquipped = equipped.includes(unlock.id);
+    const onCooldown = cooldowns[unlock.id] && cooldowns[unlock.id] >= eventNum;
+
+    const item = document.createElement('div');
+    item.className = `cc-loadout-item ${isEquipped ? 'equipped' : ''} ${onCooldown ? 'cooldown' : ''}`;
+
+    item.innerHTML = `
+      <div class="loadout-item-icon">${unlock.emoji || '🎯'}</div>
+      <div class="loadout-item-info">
+        <div class="loadout-item-name">${unlock.name}</div>
+        <div class="loadout-item-bonus">+${unlock.pointsBonus} points • ${unlock.description}</div>
+        ${onCooldown ? '<div class="loadout-item-cooldown">⏱️ On cooldown this race</div>' : ''}
+      </div>
+      <button class="loadout-item-btn ${isEquipped ? 'unequip' : 'equip'}" data-unlock-id="${unlock.id}">
+        ${isEquipped ? 'Unequip' : 'Equip'}
+      </button>
+    `;
+
+    const btn = item.querySelector('.loadout-item-btn');
+    btn.addEventListener('click', async () => {
+      await equipItem(unlock.id);
+      renderEventLoadoutModal(); // Re-render after equip/unequip
+    });
+
+    list.appendChild(item);
+  });
+}
+
+function openEventLoadoutModal() {
+  const overlay = document.getElementById('cc-event-loadout-overlay');
+  if (!overlay) return;
+
+  renderEventLoadoutModal();
+  overlay.style.display = 'flex';
+}
+
 function initManageLoadoutButton() {
   const btn = document.getElementById('ccEditLoadoutBtn');
   if (!btn) return;
 
   btn.addEventListener('click', () => {
-    buildModal();
-    openModal();
+    buildEventLoadoutModal();
+    openEventLoadoutModal();
   });
 }
 
