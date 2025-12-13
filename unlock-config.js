@@ -40,8 +40,8 @@ const UNLOCK_DEFINITIONS = [
     cost: 200,
     tier: 200,
     pointsBonus: 6,
-    trigger: 'beatPrediction5',
-    description: 'Beat prediction by 5+ places',
+    trigger: 'beatPrediction5Top15',
+    description: 'Beat prediction by 5+ and finish top 15',
     emoji: '🛞'
   },
   {
@@ -71,8 +71,8 @@ const UNLOCK_DEFINITIONS = [
     cost: 300,
     tier: 300,
     pointsBonus: 7,
-    trigger: 'predictedTopHalfAndPodium',
-    description: 'Predicted top half and podium',
+    trigger: 'predictedTop10AndPodium',
+    description: 'Predicted top 10 and finish on the podium',
     emoji: '👐'
   },
   {
@@ -81,8 +81,8 @@ const UNLOCK_DEFINITIONS = [
     cost: 300,
     tier: 300,
     pointsBonus: 8,
-    trigger: 'climbBeatBestClimber',
-    description: 'Climbing event and beat top climber',
+    trigger: 'climbTop5',
+    description: 'Climbing event and finish top 5',
     emoji: '🧗'
   },
   {
@@ -91,8 +91,8 @@ const UNLOCK_DEFINITIONS = [
     cost: 300,
     tier: 300,
     pointsBonus: 7,
-    trigger: 'top5OrSprintAndTop10',
-    description: 'Finish top 5 or win sprint and top 10',
+    trigger: 'top5OrTop10Gap20',
+    description: 'Finish top 5, or top 10 within 20s of winner',
     emoji: '🔥'
   },
   // Tier 400
@@ -102,8 +102,8 @@ const UNLOCK_DEFINITIONS = [
     cost: 400,
     tier: 400,
     pointsBonus: 10,
-    trigger: 'beatHighestARR',
-    description: 'Beat highest ARR rider',
+    trigger: 'beatHighestARRAndTop5',
+    description: 'Beat highest ARR rider and finish top 5',
     emoji: '🫡'
   },
   {
@@ -112,8 +112,8 @@ const UNLOCK_DEFINITIONS = [
     cost: 400,
     tier: 400,
     pointsBonus: 8,
-    trigger: 'tourBackToBackTop8',
-    description: 'Tour stage, top 8 on back-to-back',
+    trigger: 'tourTop5',
+    description: 'Tour stage and finish top 5',
     emoji: '🧦'
   },
   {
@@ -279,3 +279,5 @@ if (typeof window !== 'undefined') {
     getUnlockById
   };
 }
+
+

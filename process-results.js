@@ -1940,8 +1940,8 @@ function evaluateUnlockTrigger(unlockId, context) {
     case 'aeroWheels':
       if (!predictedPosition) return { triggered: false };
       return {
-        triggered: predictedPosition - position >= 5,
-        reason: 'Beat prediction by 5+'
+        triggered: (predictedPosition - position >= 5) && position <= 15,
+        reason: 'Beat prediction by 5+ and finish top 15'
       };
     case 'cadenceNutrition':
       return {
@@ -1955,33 +1955,33 @@ function evaluateUnlockTrigger(unlockId, context) {
         reason: 'Predicted and finished top 5'
       };
     case 'preRaceMassage':
-      if (!predictedPosition || !totalFinishers) return { triggered: false };
+      if (!predictedPosition) return { triggered: false };
       return {
-        triggered: predictedPosition <= Math.ceil(totalFinishers / 2) && position <= 3,
-        reason: 'Predicted top half and podium'
+        triggered: predictedPosition <= 10 && position <= 3,
+        reason: 'Predicted top 10 and podium'
       };
     case 'climbingGears':
       return {
-        triggered: eventCategory === 'climbing' && position <= 10,
-        reason: 'Climbing day success'
+        triggered: eventCategory === 'climbing' && position <= 5,
+        reason: 'Climbing day top 5'
       };
     case 'aggroRaceKit':
       return {
-        triggered: position <= 5 || (position <= 10 && typeof marginToWinner === 'number' && marginToWinner < 30),
-        reason: 'Aggressive racing payoff'
+        triggered: position <= 5 || (position <= 10 && typeof marginToWinner === 'number' && marginToWinner < 20),
+        reason: 'Top 5, or top 10 within 20s'
       };
     case 'domestiqueHelp': {
       // Beat someone with higher ARR who finished behind you
       const higherARRRider = results.find(r => r.arr > userARR && r.position > position);
       return {
-        triggered: Boolean(higherARRRider),
-        reason: 'Beat highest ARR rider'
+        triggered: Boolean(higherARRRider) && position <= 5,
+        reason: 'Beat highest ARR rider and top 5'
       };
     }
     case 'recoveryBoots':
       return {
-        triggered: eventNumber >= 13 && eventNumber <= 15 && position <= 8,
-        reason: 'Tour stage back-to-back performance'
+        triggered: eventNumber >= 13 && eventNumber <= 15 && position <= 5,
+        reason: 'Tour stage top 5'
       };
     case 'directorsTablet':
       if (!predictedPosition) return { triggered: false };
