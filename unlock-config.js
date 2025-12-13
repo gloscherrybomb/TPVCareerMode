@@ -133,7 +133,7 @@ const UNLOCK_DEFINITIONS = [
     tier: 400,
     pointsBonus: 10,
     trigger: 'beatTopRival',
-    description: 'Beat your top rival when they are predicted ahead',
+    description: 'Beat any of your top 3 rivals',
     emoji: '⚔️'
   },
   // Personality-Based Unlocks

@@ -1243,8 +1243,21 @@ async function processUserResult(uid, eventInfo, results) {
 
     const sanitizedResults = sortedResults.map(r => ({
       position: parseInt(r.Position),
-      arr: parseInt(r.ARR) || 0
+      arr: parseInt(r.ARR) || 0,
+      uid: r.UID,
+      name: r.Name
     })).filter(r => !isNaN(r.position));
+
+    // Calculate rival data for unlock triggers
+    const rivalEncountersForUnlocks = calculateRivalEncounters(
+      results,
+      uid,
+      position,
+      parseFloat(userResult.Time) || 0
+    );
+    const existingRivalDataForUnlocks = userData.rivalData || null;
+    const updatedRivalDataForUnlocks = updateRivalData(existingRivalDataForUnlocks, rivalEncountersForUnlocks, eventNumber);
+    const topRivalsForUnlocks = identifyTopRivals(updatedRivalDataForUnlocks);
 
     const unlockContext = {
       position,
@@ -1255,7 +1268,9 @@ async function processUserResult(uid, eventInfo, results) {
       eventNumber,
       totalFinishers: sortedResults.length,
       userARR: parseInt(userResult.ARR) || 0,
-      results: sanitizedResults
+      results: sanitizedResults,
+      topRivals: topRivalsForUnlocks,
+      rivalEncounters: rivalEncountersForUnlocks
     };
 
     const triggeredUnlocks = selectUnlocksToApply(equippedToUse, unlockCooldowns, eventNumber, unlockContext);
@@ -1918,7 +1933,7 @@ function calculateCadenceCreditsFromAwards(earnedAwardIds = []) {
  * Returns { triggered: boolean, reason: string }
  */
 function evaluateUnlockTrigger(unlockId, context) {
-  const { position, predictedPosition, marginToWinner, gapToWinner, eventCategory, eventNumber, totalFinishers, userARR, results } = context;
+  const { position, predictedPosition, marginToWinner, gapToWinner, eventCategory, eventNumber, totalFinishers, userARR, results, topRivals, rivalEncounters } = context;
 
   switch (unlockId) {
     case 'paceNotes':
@@ -2056,6 +2071,30 @@ function evaluateUnlockTrigger(unlockId, context) {
         triggered: position <= 10,
         reason: 'Finished top 10'
       };
+    case 'beatTopRival': {
+      // Beat any of the top 3 rivals
+      if (!topRivals || topRivals.length === 0 || !results) {
+        return { triggered: false };
+      }
+
+      // Get top 3 rival UIDs
+      const top3RivalUids = topRivals.slice(0, 3).map(r => r.botUid);
+
+      // Check if any of the top 3 rivals finished behind the user
+      const beatRival = results.find(r => {
+        return top3RivalUids.includes(r.uid) && r.position > position;
+      });
+
+      if (beatRival) {
+        const rivalName = beatRival.name || 'rival';
+        return {
+          triggered: true,
+          reason: `Beat top rival ${rivalName}`
+        };
+      }
+
+      return { triggered: false };
+    }
 
     default:
       return { triggered: false };
