@@ -428,33 +428,22 @@ function maybeRenderEventLoadout() {
   // Show/hide pre-race vs post-race content
   const preRaceContent = document.getElementById('ccPreRaceContent');
   const postRaceContent = document.getElementById('ccPostRaceContent');
+  const ccSection = document.getElementById('eventCCSection');
 
   if (ctx.hasResults) {
-    // Hide pre-race content (equipped display and manage button)
-    if (preRaceContent) preRaceContent.style.display = 'none';
-
-    // Show results
-    const eventNum = ctx.eventNumber;
-    const eventResults = userDocData[`event${eventNum}Results`];
-    if (eventResults) {
-      renderCCResults(eventResults);
-      if (postRaceContent) postRaceContent.style.display = 'block';
-    }
+    // Hide entire CC section when results exist
+    // Unlock bonuses will be shown in the main results table instead
+    if (ccSection) ccSection.style.display = 'none';
   } else {
-    // Hide post-race content
-    if (postRaceContent) postRaceContent.style.display = 'none';
-
     // Show pre-race equipped display
+    if (postRaceContent) postRaceContent.style.display = 'none';
     if (preRaceContent) preRaceContent.style.display = 'block';
+    if (ccSection) {
+      ccSection.style.display = 'block';
+      initCCToggle();
+    }
     renderEquippedDisplay();
     initManageLoadoutButton();
-  }
-
-  // Show the unified CC section
-  const ccSection = document.getElementById('eventCCSection');
-  if (ccSection) {
-    ccSection.style.display = 'block';
-    initCCToggle();
   }
 
   eventLoadoutRendered = true;
