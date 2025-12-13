@@ -176,8 +176,8 @@ const UNLOCK_DEFINITIONS = [
     cost: 250,
     tier: 200,
     pointsBonus: 5,
-    trigger: 'completeRace',
-    description: 'Complete race → +5 pts & +5 Professionalism',
+    trigger: 'withinPrediction',
+    description: 'Finish within ±3 of prediction → +5 pts & +5 Professionalism',
     emoji: '👔',
     personalityBonus: { professionalism: 5 }
   },
