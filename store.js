@@ -307,7 +307,7 @@ function renderGrid() {
       }
     }
 
-    tiers[tier].forEach(item => {
+    tiers[tier].forEach((item, index) => {
       const owned = inventory.includes(item.id);
       const equippedHere = equipped.includes(item.id);
 
@@ -331,6 +331,9 @@ function renderGrid() {
       const isLocked = !owned && (!meetsPersonalityReqs || !canAfford);
 
       card.className = `unlock-card tier-${tier} ${isLocked ? 'locked' : ''} ${owned ? 'owned' : ''}`;
+
+      // Add animation delay based on card index
+      card.style.setProperty('--card-index', index);
 
       // Add tooltip for locked cards
       if (isLocked) {
@@ -420,6 +423,14 @@ function renderGrid() {
           buyBtn.addEventListener('click', () => purchaseItem(item));
         }
         actions.appendChild(buyBtn);
+      }
+
+      // Add lock icon for locked cards
+      if (isLocked) {
+        const lockIcon = document.createElement('div');
+        lockIcon.className = 'unlock-lock-icon';
+        lockIcon.textContent = '🔒';
+        card.appendChild(lockIcon);
       }
 
       gridEl.appendChild(card);

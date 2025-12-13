@@ -393,10 +393,49 @@ body {
     gap: 1.5rem;
 }
 
+/* ===== UNLOCK CARD ANIMATIONS ===== */
+@keyframes cardEnter {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes emojiFloat {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-4px); }
+}
+
+@keyframes badgePulse {
+    0%, 100% {
+        box-shadow: 0 0 8px rgba(0, 255, 136, 0.3),
+                    inset 0 0 8px rgba(0, 255, 136, 0.1);
+    }
+    50% {
+        box-shadow: 0 0 16px rgba(0, 255, 136, 0.5),
+                    inset 0 0 12px rgba(0, 255, 136, 0.2);
+    }
+}
+
+@keyframes lockShake {
+    0%, 100% { transform: rotate(0deg); }
+    25% { transform: rotate(-3deg); }
+    75% { transform: rotate(3deg); }
+}
+
+@keyframes buttonShimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
 /* Unlock Card */
 .unlock-card {
-    background: var(--dark-card);
-    border: 2px solid rgba(255, 255, 255, 0.05);
+    background: linear-gradient(135deg, rgba(20, 24, 36, 0.8), rgba(20, 24, 36, 0.6));
+    border: 2px solid rgba(255, 255, 255, 0.08);
     border-radius: 16px;
     padding: 1.5rem;
     display: flex;
@@ -405,50 +444,165 @@ body {
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
+    box-shadow:
+        0 2px 8px rgba(0, 0, 0, 0.3),
+        0 8px 16px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    animation: cardEnter 0.5s ease-out backwards;
+    animation-delay: calc(var(--card-index, 0) * 0.05s);
 }
 
+/* Tier accent bar at top of card */
 .unlock-card::before {
     content: '';
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
-    height: 3px;
+    height: 4px;
     background: transparent;
-    transition: background 0.3s ease;
+    transition: all 0.3s ease;
 }
 
 .unlock-card:hover {
-    transform: translateY(-5px);
+    transform: translateY(-5px) scale(1.02);
     border-color: rgba(255, 255, 255, 0.15);
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+}
+
+/* Tier-specific backgrounds and accent bars */
+.unlock-card.tier-120 {
+    background: linear-gradient(135deg, rgba(69, 202, 255, 0.03) 0%, rgba(20, 24, 36, 0.8) 100%);
+}
+
+.unlock-card.tier-120::before {
+    background: linear-gradient(90deg, var(--accent-blue), rgba(69, 202, 255, 0.5));
+    box-shadow: 0 0 12px rgba(69, 202, 255, 0.3);
+}
+
+.unlock-card.tier-120:hover {
+    box-shadow:
+        0 8px 32px rgba(69, 202, 255, 0.15),
+        0 2px 8px rgba(0, 0, 0, 0.3),
+        0 8px 16px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(69, 202, 255, 0.1);
 }
 
 .unlock-card.tier-120:hover::before {
-    background: linear-gradient(90deg, transparent, var(--accent-blue), transparent);
+    height: 5px;
+    box-shadow: 0 0 20px rgba(69, 202, 255, 0.6);
+}
+
+.unlock-card.tier-200 {
+    background: linear-gradient(135deg, rgba(0, 255, 136, 0.03) 0%, rgba(20, 24, 36, 0.8) 100%);
+}
+
+.unlock-card.tier-200::before {
+    background: linear-gradient(90deg, var(--success), rgba(0, 255, 136, 0.5));
+    box-shadow: 0 0 12px rgba(0, 255, 136, 0.3);
+}
+
+.unlock-card.tier-200:hover {
+    box-shadow:
+        0 8px 32px rgba(0, 255, 136, 0.15),
+        0 2px 8px rgba(0, 0, 0, 0.3),
+        0 8px 16px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(0, 255, 136, 0.1);
 }
 
 .unlock-card.tier-200:hover::before {
-    background: linear-gradient(90deg, transparent, var(--success), transparent);
+    height: 5px;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.6);
+}
+
+.unlock-card.tier-300 {
+    background: linear-gradient(135deg, rgba(255, 170, 0, 0.03) 0%, rgba(20, 24, 36, 0.8) 100%);
+}
+
+.unlock-card.tier-300::before {
+    background: linear-gradient(90deg, var(--warning), rgba(255, 170, 0, 0.5));
+    box-shadow: 0 0 12px rgba(255, 170, 0, 0.3);
+}
+
+.unlock-card.tier-300:hover {
+    box-shadow:
+        0 8px 32px rgba(255, 170, 0, 0.15),
+        0 2px 8px rgba(0, 0, 0, 0.3),
+        0 8px 16px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(255, 170, 0, 0.1);
 }
 
 .unlock-card.tier-300:hover::before {
-    background: linear-gradient(90deg, transparent, var(--warning), transparent);
+    height: 5px;
+    box-shadow: 0 0 20px rgba(255, 170, 0, 0.6);
+}
+
+.unlock-card.tier-400 {
+    background: linear-gradient(135deg, rgba(199, 26, 229, 0.03) 0%, rgba(20, 24, 36, 0.8) 100%);
+}
+
+.unlock-card.tier-400::before {
+    background: linear-gradient(90deg, var(--accent-purple), rgba(199, 26, 229, 0.5));
+    box-shadow: 0 0 12px rgba(199, 26, 229, 0.3);
+}
+
+.unlock-card.tier-400:hover {
+    box-shadow:
+        0 8px 32px rgba(199, 26, 229, 0.15),
+        0 2px 8px rgba(0, 0, 0, 0.3),
+        0 8px 16px rgba(0, 0, 0, 0.2),
+        inset 0 1px 0 rgba(199, 26, 229, 0.1);
 }
 
 .unlock-card.tier-400:hover::before {
-    background: linear-gradient(90deg, transparent, var(--accent-purple), transparent);
+    height: 5px;
+    box-shadow: 0 0 20px rgba(199, 26, 229, 0.6);
 }
 
-/* Locked State - Obfuscated */
+/* Locked State - Enhanced */
 .unlock-card.locked {
-    opacity: 0.6;
+    opacity: 0.65;
     cursor: help;
+    background: linear-gradient(135deg, rgba(255, 170, 0, 0.02) 0%, rgba(20, 24, 36, 0.8) 100%);
+    border-color: rgba(255, 170, 0, 0.15);
+    position: relative;
+}
+
+.unlock-card.locked::before {
+    background: transparent;
+}
+
+.unlock-card.locked::after {
+    content: '🔒';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 3rem;
+    opacity: 0.15;
+    pointer-events: none;
 }
 
 .unlock-card.locked:hover {
-    opacity: 0.75;
-    border-color: rgba(255, 170, 0, 0.2);
+    opacity: 0.8;
+    border-color: rgba(255, 170, 0, 0.3);
+    box-shadow: 0 10px 30px rgba(255, 170, 0, 0.1);
+}
+
+.unlock-card.locked:hover .unlock-lock-icon {
+    animation: lockShake 0.5s ease-in-out;
+}
+
+.unlock-lock-icon {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    font-size: 1.5rem;
+    opacity: 0.5;
+    transition: all 0.3s ease;
+}
+
+.unlock-card.locked:hover .unlock-lock-icon {
+    opacity: 0.8;
 }
 
 .unlock-card.locked .unlock-emoji {
@@ -457,7 +611,7 @@ body {
 
 .unlock-card.locked .unlock-name,
 .unlock-card.locked .unlock-description {
-    filter: blur(3px);
+    filter: blur(2px);
     user-select: none;
 }
 
@@ -469,25 +623,27 @@ body {
     opacity: 1;
 }
 
-/* Owned State - Clear Visual Indicator */
+/* Owned State - Enhanced Visual Indicator */
 .unlock-card.owned {
     background: linear-gradient(135deg, rgba(0, 255, 136, 0.05), rgba(69, 202, 255, 0.05));
     border-color: rgba(0, 255, 136, 0.2);
 }
 
 .unlock-card.owned::after {
-    content: '✓ OWNED';
+    content: '⭐ OWNED';
     position: absolute;
     top: 1rem;
     right: 1rem;
-    padding: 0.25rem 0.75rem;
-    background: rgba(0, 255, 136, 0.2);
-    border: 1px solid rgba(0, 255, 136, 0.4);
+    padding: 0.4rem 0.95rem;
+    background: linear-gradient(135deg, rgba(0, 255, 136, 0.25) 0%, rgba(0, 255, 136, 0.15) 100%);
+    border: 2px solid rgba(0, 255, 136, 0.4);
     border-radius: 50px;
     color: var(--success);
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 1px;
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    animation: badgePulse 2s ease-in-out infinite;
+    backdrop-filter: blur(10px);
 }
 
 .unlock-card.owned:hover {
@@ -507,8 +663,18 @@ body {
 
 .unlock-header {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 0.75rem;
+}
+
+/* Enhanced Emoji with Tier-Colored Container */
+.unlock-emoji {
+    font-size: 2rem;
+    transition: all 0.3s ease;
+}
+
+.unlock-card:hover .unlock-emoji {
+    animation: emojiFloat 0.6s ease-in-out;
 }
 
 .unlock-title {
@@ -523,12 +689,15 @@ body {
 }
 
 .unlock-cost {
-    font-weight: 700;
-    font-size: 0.9rem;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 900;
     background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    text-shadow: 0 0 20px rgba(255, 27, 107, 0.2);
+    letter-spacing: 1px;
 }
 
 .unlock-description {
@@ -538,35 +707,57 @@ body {
     flex: 1;
 }
 
+/* Enhanced Bonus Badge */
 .unlock-bonus {
     display: inline-block;
-    padding: 0.35rem 0.75rem;
-    background: rgba(0, 255, 136, 0.1);
-    border: 1px solid rgba(0, 255, 136, 0.3);
-    border-radius: 50px;
+    padding: 0.5rem 1rem;
+    background: linear-gradient(135deg, rgba(0, 255, 136, 0.15) 0%, rgba(0, 255, 136, 0.08) 100%);
+    border: 2px solid rgba(0, 255, 136, 0.3);
+    border-radius: 8px;
     color: var(--success);
-    font-weight: 700;
-    font-size: 0.85rem;
+    font-weight: 900;
+    font-size: 0.95rem;
+    font-family: 'Orbitron', sans-serif;
+    transition: all 0.3s ease;
 }
 
+.unlock-card:hover .unlock-bonus {
+    background: linear-gradient(135deg, rgba(0, 255, 136, 0.25) 0%, rgba(0, 255, 136, 0.15) 100%);
+    border-color: rgba(0, 255, 136, 0.5);
+    box-shadow: 0 0 16px rgba(0, 255, 136, 0.2);
+    transform: scale(1.05);
+}
+
+/* Enhanced Personality Badges */
 .unlock-personality-bonus {
-    display: inline-block;
-    padding: 0.35rem 0.75rem;
-    background: rgba(69, 202, 255, 0.1);
-    border: 1px solid rgba(69, 202, 255, 0.3);
-    border-radius: 50px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.85rem;
+    background: linear-gradient(135deg, rgba(69, 202, 255, 0.12) 0%, rgba(69, 202, 255, 0.06) 100%);
+    border: 2px solid rgba(69, 202, 255, 0.25);
+    border-radius: 8px;
     color: var(--accent-blue);
     font-weight: 700;
     font-size: 0.85rem;
+    transition: all 0.3s ease;
     margin-top: 0.5rem;
 }
 
+.unlock-card:hover .unlock-personality-bonus {
+    background: linear-gradient(135deg, rgba(69, 202, 255, 0.2) 0%, rgba(69, 202, 255, 0.1) 100%);
+    border-color: rgba(69, 202, 255, 0.4);
+    box-shadow: 0 0 12px rgba(69, 202, 255, 0.15);
+}
+
 .unlock-personality-locked {
-    display: inline-block;
-    padding: 0.35rem 0.75rem;
-    background: rgba(255, 170, 0, 0.1);
-    border: 1px solid rgba(255, 170, 0, 0.3);
-    border-radius: 50px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 0.85rem;
+    background: linear-gradient(135deg, rgba(255, 170, 0, 0.12) 0%, rgba(255, 170, 0, 0.06) 100%);
+    border: 2px solid rgba(255, 170, 0, 0.25);
+    border-radius: 8px;
     color: var(--warning);
     font-weight: 700;
     font-size: 0.85rem;
@@ -591,27 +782,52 @@ body {
     font-size: 0.85rem;
 }
 
+/* Enhanced Buttons */
 .btn-buy,
 .btn-equip {
     flex: 1;
     padding: 0.75rem;
-    border: none;
     border-radius: 10px;
-    font-weight: 700;
+    font-weight: 800;
     font-size: 0.9rem;
     cursor: pointer;
     transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .btn-buy {
     background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
     color: white;
     box-shadow: 0 10px 30px rgba(255, 27, 107, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: none;
+}
+
+.btn-buy::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.btn-buy:hover:not(:disabled)::before {
+    left: 100%;
 }
 
 .btn-buy:hover:not(:disabled) {
     transform: translateY(-3px);
-    box-shadow: 0 15px 40px rgba(255, 27, 107, 0.5);
+    box-shadow: 0 15px 45px rgba(255, 27, 107, 0.6);
+}
+
+.btn-buy:active:not(:disabled) {
+    transform: translateY(-1px);
 }
 
 .btn-buy:disabled {
@@ -619,24 +835,27 @@ body {
     color: rgba(255, 255, 255, 0.3);
     cursor: not-allowed;
     box-shadow: none;
+    border-color: rgba(255, 255, 255, 0.05);
 }
 
 .btn-equip {
-    background: rgba(69, 202, 255, 0.2);
+    background: rgba(69, 202, 255, 0.15);
     border: 2px solid var(--accent-blue);
     color: var(--accent-blue);
 }
 
 .btn-equip:hover:not(:disabled) {
-    background: var(--accent-blue);
-    color: var(--dark-bg);
+    background: rgba(69, 202, 255, 0.25);
+    border-color: var(--accent-blue);
+    color: var(--accent-blue);
+    box-shadow: 0 0 20px rgba(69, 202, 255, 0.3);
     transform: translateY(-2px);
 }
 
 .btn-equip:disabled {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.1);
-    color: rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.25);
     cursor: not-allowed;
 }
 
@@ -751,6 +970,35 @@ body {
 
     .store-grid {
         grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    /* Optimize animations for mobile performance */
+    .unlock-card {
+        animation: none;
+    }
+
+    .unlock-card:hover {
+        animation: none;
+        transform: translateY(-2px);
+    }
+
+    .unlock-emoji {
+        font-size: 1.8rem;
+    }
+
+    .unlock-card:hover .unlock-emoji {
+        animation: none;
+    }
+
+    .unlock-card:active {
+        transform: translateY(-2px) scale(0.98);
+    }
+
+    .btn-buy,
+    .btn-equip {
+        min-height: 44px;
+        font-size: 0.85rem;
     }
 
     .tier-header {
