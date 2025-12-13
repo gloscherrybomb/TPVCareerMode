@@ -303,97 +303,6 @@ function renderProfileCC() {
   }
 }
 
-function renderLoadoutPanel() {
-  const panel = document.getElementById('cc-loadout-panel');
-  if (!panel) return;
-  const slotCount = userDocData?.unlocks?.slotCount || 1;
-  const equipped = userDocData?.unlocks?.equipped || [];
-  const balance = userDocData?.currency?.balance || 0;
-
-  // Get equipped unlocks with full details
-  const equippedUnlocks = equipped
-    .slice(0, slotCount)
-    .map(id => unlockCatalog.find(u => u.id === id))
-    .filter(Boolean);
-
-  const hasEquipped = equippedUnlocks.length > 0;
-
-  panel.innerHTML = `
-    <div class="cc-event-loadout">
-      <div class="cc-event-header">
-        <div>
-          <div class="cc-event-title">Race Loadout</div>
-          <div class="cc-event-subtitle">Your equipped upgrades for this race • Balance: <span class="cc-event-balance">${formatBalance(balance)}</span></div>
-        </div>
-        <button class="cc-manage-btn" type="button" id="cc-loadout-manage">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
-            <circle cx="12" cy="12" r="3"></circle>
-          </svg>
-          <span>Manage Unlocks</span>
-        </button>
-      </div>
-      ${hasEquipped ? `
-        <div class="cc-event-grid">
-          ${equippedUnlocks.map(unlock => `
-            <div class="cc-event-card">
-              <div class="cc-event-card-header">
-                <div class="cc-event-emoji">${unlock.emoji || '⭐'}</div>
-                <div class="cc-event-name">${unlock.name}</div>
-              </div>
-              <div class="cc-event-desc">${unlock.description}</div>
-              <div class="cc-event-bonus">+${unlock.pointsBonus} pts bonus</div>
-            </div>
-          `).join('')}
-          ${slotCount > equippedUnlocks.length ? `
-            <div class="cc-event-card">
-              <div class="cc-event-empty">
-                <div class="cc-event-empty-icon">📦</div>
-                <div style="font-weight:600; margin-bottom:0.5rem;">Empty Slot</div>
-                <div style="font-size:0.85rem;">Visit the store to equip more unlocks</div>
-              </div>
-            </div>
-          ` : ''}
-        </div>
-      ` : `
-        <div class="cc-event-empty">
-          <div class="cc-event-empty-icon">📦</div>
-          <div style="font-weight:600; margin-bottom:0.5rem; font-size:1.1rem;">No Upgrades Equipped</div>
-          <div class="cc-empty-quickstart">
-            <div class="cc-quickstart-title">Quick Start</div>
-            <div class="cc-quickstart-steps">
-              <div class="cc-quickstart-step">
-                <div class="cc-quickstart-number">1</div>
-                <div class="cc-quickstart-text"><strong>Earn CC</strong><br>Win races and earn awards to get Cadence Credits</div>
-              </div>
-              <div class="cc-quickstart-step">
-                <div class="cc-quickstart-number">2</div>
-                <div class="cc-quickstart-text"><strong>Buy Unlocks</strong><br>Purchase upgrades from the store with your CC</div>
-              </div>
-              <div class="cc-quickstart-step">
-                <div class="cc-quickstart-number">3</div>
-                <div class="cc-quickstart-text"><strong>Equip & Race</strong><br>Equip up to 3 unlocks and trigger them in races</div>
-              </div>
-            </div>
-            <a href="store.html" class="cc-empty-cta">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"></path>
-              </svg>
-              <span>Visit Store</span>
-            </a>
-          </div>
-        </div>
-      `}
-      <div style="margin-top:1rem; padding-top:1rem; border-top:1px solid rgba(255,255,255,0.05); font-size:0.85rem; color:var(--text-secondary); text-align:center;">
-        💡 Up to 2 upgrades can trigger per race (highest bonuses win). Only triggered upgrades rest next race. Bonuses add race points only.
-      </div>
-    </div>
-  `;
-
-  const manage = panel.querySelector('#cc-loadout-manage');
-  if (manage) manage.addEventListener('click', () => window.location.href = 'store.html');
-}
-
 function renderEquippedDisplay() {
   const panel = document.getElementById('cc-unlock-selector');
   if (!panel) return;
@@ -401,6 +310,7 @@ function renderEquippedDisplay() {
   const slotCount = userDocData?.unlocks?.slotCount || 1;
   const equipped = userDocData?.unlocks?.equipped || [];
   const cooldowns = userDocData?.unlocks?.cooldowns || {};
+  const balance = userDocData?.currency?.balance || 0;
 
   // Get equipped unlocks with full details
   const equippedUnlocks = equipped
@@ -414,7 +324,7 @@ function renderEquippedDisplay() {
     <div class="cc-selector-panel">
       <div class="cc-selector-header">
         <div class="cc-selector-title">Your Active Upgrades</div>
-        <div class="cc-selector-subtitle">These upgrades are equipped for this race. Up to 2 can trigger if conditions are met. Only triggered upgrades rest next race.</div>
+        <div class="cc-selector-subtitle">These upgrades are equipped for this race • Balance: <span class="cc-balance-highlight">${formatBalance(balance)}</span></div>
       </div>
       ${hasEquipped ? `
         <div class="cc-selector-grid">
@@ -449,15 +359,6 @@ function renderEquippedDisplay() {
           <div style="font-size:1rem; max-width:500px; margin:0 auto 1.5rem;">Purchase and equip upgrades from the Cadence Credits store to boost your race performance. All equipped upgrades can trigger in one race if conditions are met.</div>
         </div>
       `}
-      <div class="cc-selector-action">
-        <a href="store.html" class="cc-manage-btn">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
-            <circle cx="12" cy="12" r="3"></circle>
-          </svg>
-          <span>Manage Unlocks in Store</span>
-        </a>
-      </div>
     </div>
   `;
 }
@@ -524,27 +425,29 @@ function maybeRenderEventLoadout() {
   if (!userDocData || !window.cadenceEventContext) return;
   const ctx = window.cadenceEventContext;
 
+  // Show/hide pre-race vs post-race content
+  const preRaceContent = document.getElementById('ccPreRaceContent');
+  const postRaceContent = document.getElementById('ccPostRaceContent');
+
   if (ctx.hasResults) {
+    // Hide pre-race content (equipped display and manage button)
+    if (preRaceContent) preRaceContent.style.display = 'none';
+
     // Show results
     const eventNum = ctx.eventNumber;
     const eventResults = userDocData[`event${eventNum}Results`];
     if (eventResults) {
       renderCCResults(eventResults);
+      if (postRaceContent) postRaceContent.style.display = 'block';
     }
   } else {
-    // Show pre-race equipped display
-    const selectorMount = document.getElementById('cc-unlock-selector');
-    if (selectorMount) {
-      renderEquippedDisplay();
-      document.getElementById('eventUnlockSelection')?.style.setProperty('display', 'block');
-    }
+    // Hide post-race content
+    if (postRaceContent) postRaceContent.style.display = 'none';
 
-    // Render loadout panel further down
-    const loadoutMount = document.getElementById('cc-loadout-panel');
-    if (loadoutMount) {
-      renderLoadoutPanel();
-      document.getElementById('eventLoadoutSection')?.style.setProperty('display', 'block');
-    }
+    // Show pre-race equipped display
+    if (preRaceContent) preRaceContent.style.display = 'block';
+    renderEquippedDisplay();
+    initManageLoadoutButton();
   }
 
   // Show the unified CC section
@@ -552,10 +455,6 @@ function maybeRenderEventLoadout() {
   if (ccSection) {
     ccSection.style.display = 'block';
     initCCToggle();
-    // Only show manage loadout button pre-race
-    if (!ctx.hasResults) {
-      initManageLoadoutButton();
-    }
   }
 
   eventLoadoutRendered = true;
