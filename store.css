@@ -623,32 +623,60 @@ body {
     opacity: 1;
 }
 
-/* Owned State - Enhanced Visual Indicator */
+/* Owned State - Subtle Visual Indicator */
 .unlock-card.owned {
     background: linear-gradient(135deg, rgba(0, 255, 136, 0.05), rgba(69, 202, 255, 0.05));
     border-color: rgba(0, 255, 136, 0.2);
 }
 
-.unlock-card.owned::after {
-    content: '⭐ OWNED';
+.unlock-card.owned:hover {
+    border-color: rgba(0, 255, 136, 0.4);
+    box-shadow: 0 15px 40px rgba(0, 255, 136, 0.2);
+}
+
+/* Equipped State - Clear Visual Indicator */
+.unlock-card.equipped {
+    background: linear-gradient(135deg, rgba(255, 27, 107, 0.08), rgba(199, 26, 229, 0.08));
+    border-color: rgba(255, 27, 107, 0.4);
+    position: relative;
+}
+
+.unlock-card.equipped::after {
+    content: '⚡ EQUIPPED';
     position: absolute;
-    top: 1rem;
-    right: 1rem;
-    padding: 0.4rem 0.95rem;
-    background: linear-gradient(135deg, rgba(0, 255, 136, 0.25) 0%, rgba(0, 255, 136, 0.15) 100%);
-    border: 2px solid rgba(0, 255, 136, 0.4);
+    top: 0.75rem;
+    right: 0.75rem;
+    padding: 0.35rem 0.85rem;
+    background: linear-gradient(135deg, rgba(255, 27, 107, 0.25) 0%, rgba(199, 26, 229, 0.25) 100%);
+    border: 2px solid rgba(255, 27, 107, 0.5);
     border-radius: 50px;
-    color: var(--success);
-    font-size: 0.8rem;
+    color: var(--accent-pink);
+    font-size: 0.75rem;
     font-weight: 800;
     letter-spacing: 1.5px;
     animation: badgePulse 2s ease-in-out infinite;
     backdrop-filter: blur(10px);
+    box-shadow: 0 0 12px rgba(255, 27, 107, 0.3);
 }
 
-.unlock-card.owned:hover {
-    border-color: rgba(0, 255, 136, 0.4);
-    box-shadow: 0 15px 40px rgba(0, 255, 136, 0.2);
+.unlock-card.equipped:hover {
+    border-color: rgba(255, 27, 107, 0.6);
+    box-shadow: 0 15px 40px rgba(255, 27, 107, 0.3);
+}
+
+.unlock-card.equipped::before {
+    background: linear-gradient(90deg, var(--accent-pink), var(--accent-purple));
+    box-shadow: 0 0 16px rgba(255, 27, 107, 0.5);
+}
+
+.unlock-card.equipped:hover::before {
+    height: 5px;
+    box-shadow: 0 0 24px rgba(255, 27, 107, 0.7);
+}
+
+/* Don't show equipped badge on locked cards (shouldn't happen but for safety) */
+.unlock-card.locked.equipped::after {
+    display: none;
 }
 
 .unlock-image {

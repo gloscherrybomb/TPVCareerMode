@@ -330,7 +330,7 @@ function renderGrid() {
       const canAfford = balance >= item.cost;
       const isLocked = !owned && (!meetsPersonalityReqs || !canAfford);
 
-      card.className = `unlock-card tier-${tier} ${isLocked ? 'locked' : ''} ${owned ? 'owned' : ''}`;
+      card.className = `unlock-card tier-${tier} ${isLocked ? 'locked' : ''} ${owned ? 'owned' : ''} ${equippedHere ? 'equipped' : ''}`;
 
       // Add animation delay based on card index
       card.style.setProperty('--card-index', index);
