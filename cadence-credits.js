@@ -441,7 +441,7 @@ function renderLoadoutPanel() {
         </div>
       `}
       <div style="margin-top:1rem; padding-top:1rem; border-top:1px solid rgba(255,255,255,0.05); font-size:0.85rem; color:var(--text-secondary); text-align:center;">
-        💡 All upgrades can trigger in one race if conditions are met. Upgrades that trigger rest for one race. Bonuses add race points only.
+        💡 Up to 2 upgrades can trigger per race (highest bonuses win). Only triggered upgrades rest next race. Bonuses add race points only.
       </div>
     </div>
   `;
@@ -470,7 +470,7 @@ function renderEquippedDisplay() {
     <div class="cc-selector-panel">
       <div class="cc-selector-header">
         <div class="cc-selector-title">Your Active Upgrades</div>
-        <div class="cc-selector-subtitle">These upgrades are equipped for this race. All can trigger if conditions are met.</div>
+        <div class="cc-selector-subtitle">These upgrades are equipped for this race. Up to 2 can trigger if conditions are met. Only triggered upgrades rest next race.</div>
       </div>
       ${hasEquipped ? `
         <div class="cc-selector-grid">
@@ -649,3 +649,4 @@ function start() {
 }
 
 document.addEventListener('DOMContentLoaded', start);
+
