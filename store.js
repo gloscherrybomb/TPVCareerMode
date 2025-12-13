@@ -109,31 +109,42 @@ function renderSlots() {
 }
 
 function initTierCollapse() {
-  const tierToggles = document.querySelectorAll('[data-tier-toggle]');
+  // Attach click handlers to each tier section
+  const tierSections = document.querySelectorAll('.tier-section');
 
-  tierToggles.forEach(toggle => {
-    toggle.addEventListener('click', () => {
-      const tier = toggle.getAttribute('data-tier-toggle');
-      const section = document.querySelector(`.tier-section[data-tier="${tier}"]`);
-      const icon = toggle.querySelector('.tier-collapse-icon');
+  tierSections.forEach(tierSection => {
+    const tier = tierSection.getAttribute('data-tier');
+    const collapseBtn = tierSection.querySelector('.tier-collapse-btn');
+    const icon = tierSection.querySelector('.tier-collapse-icon');
 
-      if (section) {
-        const isCollapsed = section.classList.contains('tier-collapsed');
+    if (collapseBtn && icon) {
+      // Remove existing listener by cloning
+      const newBtn = collapseBtn.cloneNode(true);
+      collapseBtn.replaceWith(newBtn);
+
+      // Re-query icon after cloning
+      const newIcon = tierSection.querySelector('.tier-collapse-icon');
+
+      newBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const isCollapsed = tierSection.classList.contains('tier-collapsed');
 
         if (isCollapsed) {
-          section.classList.remove('tier-collapsed');
-          icon.textContent = '▼';
+          tierSection.classList.remove('tier-collapsed');
+          if (newIcon) newIcon.textContent = '▼';
         } else {
-          section.classList.add('tier-collapsed');
-          icon.textContent = '▶';
+          tierSection.classList.add('tier-collapsed');
+          if (newIcon) newIcon.textContent = '▶';
         }
 
         // Save state to localStorage
         const collapseState = JSON.parse(localStorage.getItem('tierCollapseState') || '{}');
         collapseState[tier] = !isCollapsed;
         localStorage.setItem('tierCollapseState', JSON.stringify(collapseState));
-      }
-    });
+      });
+    }
   });
 }
 
@@ -174,6 +185,7 @@ function renderGrid() {
   const balance = userData.currency?.balance || 0;
   const inventory = userData.unlocks?.inventory || [];
   const equipped = userData.unlocks?.equipped || [];
+  const personality = userData.personality || {};
 
   // Group unlocks by tier
   const tiers = {
@@ -258,13 +270,14 @@ function renderGrid() {
     if (!gridEl) return;
     gridEl.innerHTML = '';
 
-    // Calculate progress
-    const totalItems = tiers[tier].length;
-    const ownedItems = tiers[tier].filter(item => inventory.includes(item.id)).length;
+    // Calculate progress based on full catalog, not filtered view
+    const allItemsInTier = unlockCatalog.filter(item => item.tier === parseInt(tier));
+    const totalItems = allItemsInTier.length;
+    const ownedItems = allItemsInTier.filter(item => inventory.includes(item.id)).length;
     const progressEl = document.getElementById(`tier-progress-${tier}`);
     if (progressEl) {
       progressEl.textContent = `${ownedItems}/${totalItems} owned`;
-      progressEl.className = `tier-progress ${ownedItems === totalItems ? 'tier-progress-complete' : ''}`;
+      progressEl.className = `tier-progress ${ownedItems === totalItems && totalItems > 0 ? 'tier-progress-complete' : ''}`;
     }
 
     // Determine default collapse state (collapse if all owned, expand otherwise)
@@ -299,8 +312,6 @@ function renderGrid() {
       const equippedHere = equipped.includes(item.id);
 
       // Check personality requirements
-      const personality = userData.personality || {};
-
       // Check balanced requirement (all traits 45-65)
       let meetsPersonalityReqs = true;
       if (item.requiredBalanced) {
