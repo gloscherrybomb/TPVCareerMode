@@ -181,6 +181,7 @@ async function loadPalmares(user) {
                     predictedPosition: eventResults.predictedPosition,
                     points: eventResults.points || 0,
                     bonusPoints: eventResults.bonusPoints || 0,
+                    earnedCadenceCredits: eventResults.earnedCadenceCredits || 0,
                     earnedPunchingMedal: eventResults.earnedPunchingMedal,
                     earnedGiantKillerMedal: eventResults.earnedGiantKillerMedal,
                     earnedBullseyeMedal: eventResults.earnedBullseyeMedal,
@@ -423,6 +424,12 @@ function displayResultsTable() {
         awardsCell.textContent = medals.join(' ');
         row.appendChild(awardsCell);
 
+        // Cadence Coins
+        const ccCell = document.createElement('td');
+        ccCell.className = 'cc-cell stat-row-value';
+        ccCell.textContent = result.earnedCadenceCredits || 0;
+        row.appendChild(ccCell);
+
         tbody.appendChild(row);
     });
 
@@ -500,6 +507,10 @@ function applySort() {
             case 'points':
                 aVal = a.points + (a.bonusPoints || 0);
                 bVal = b.points + (b.bonusPoints || 0);
+                break;
+            case 'cc':
+                aVal = a.earnedCadenceCredits || 0;
+                bVal = b.earnedCadenceCredits || 0;
                 break;
             default:
                 return 0;

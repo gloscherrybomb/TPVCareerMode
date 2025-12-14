@@ -87,6 +87,7 @@ async function calculateUserStats(userUID, userData) {
                 points: eventResults.points || 0,
                 bonusPoints: eventResults.bonusPoints || 0,
                 unlockBonusPoints: eventResults.unlockBonusPoints || 0,
+                earnedCadenceCredits: eventResults.earnedCadenceCredits || 0,
                 predictedPosition: eventResults.predictedPosition || null,
                 earnedPunchingMedal: eventResults.earnedPunchingMedal || false,
                 earnedGiantKillerMedal: eventResults.earnedGiantKillerMedal || false,
@@ -366,7 +367,12 @@ function displayRecentResults(results) {
         if (result.earnedZeroToHero) {
             bonusHTML += `<span class="medal-indicator zero-to-hero" title="Bottom 20% to top 20%">🚀</span>`;
         }
-        
+
+        // Add Cadence Coins earned
+        if (result.earnedCadenceCredits > 0) {
+            bonusHTML += `<span class="cc-earned" title="Cadence Credits earned">⚡${result.earnedCadenceCredits} CC</span>`;
+        }
+
         // Format predicted position if available
         let predictionHTML = '';
         if (result.predictedPosition) {
@@ -375,10 +381,10 @@ function displayRecentResults(results) {
                 predictionHTML = `<div class="result-prediction">Predicted ${result.predictedPosition}th (+${placesBeaten})</div>`;
             }
         }
-        
+
         // Format date using shared utility function
         const formattedDate = formatDate(result.date);
-        
+
         html += `
             <a href="event-detail.html?id=${result.eventNum}" class="result-card-link">
                 <div class="result-card">

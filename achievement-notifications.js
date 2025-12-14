@@ -328,11 +328,14 @@ class AchievementNotifications {
 
     const eventName = this.getEventName(notification.eventNumber);
 
+    // Get Cadence Credits value for this award
+    const ccValue = window.currencyConfig?.AWARD_CREDIT_MAP?.[notification.awardId] || 0;
+
     const cardHTML = `
       <div class="achievement-card" data-intensity="${notification.intensity}" style="animation-delay: ${index * 0.1}s">
         <div class="achievement-icon">${award.icon}</div>
         <div class="achievement-content">
-          <h4 class="achievement-title">${award.title}</h4>
+          <h4 class="achievement-title">${award.title}${ccValue > 0 ? ` <span class="achievement-cc">⚡${ccValue} CC</span>` : ''}</h4>
           <p class="achievement-description">${award.description}</p>
           <p class="achievement-event">Event ${notification.eventNumber}: ${eventName}</p>
         </div>

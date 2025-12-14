@@ -741,9 +741,30 @@ async function loadEventResults() {
         if (eventNumber === 15 && userEventResults?.gcResults) {
             tableHTML += generateTourCompletionStory(userData, userEventResults.gcResults);
         }
-        
+
         // Add regular race story
-        tableHTML += storyHTML + `
+        tableHTML += storyHTML;
+
+        // Add Cadence Coins earned summary
+        const earnedCC = userEventResults?.earnedCadenceCredits || 0;
+        if (earnedCC > 0) {
+            tableHTML += `
+                <div class="race-rewards-summary">
+                    <div class="rewards-header">
+                        <span class="rewards-icon">⚡</span>
+                        <span class="rewards-title">Race Rewards</span>
+                    </div>
+                    <div class="rewards-content">
+                        <div class="rewards-item cc-earned">
+                            <span class="rewards-label">Cadence Credits Earned:</span>
+                            <span class="rewards-value">+${earnedCC} CC</span>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        tableHTML += `
             <div class="results-table-container">
                 <div class="results-table-wrapper">
                     <table class="results-table">
