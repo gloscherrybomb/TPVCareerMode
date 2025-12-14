@@ -831,6 +831,10 @@
 
 /* Responsive Design */
 @media (max-width: 768px) {
+    .page-header {
+        padding: 7.5rem 0 3rem;
+    }
+
     .page-title {
         font-size: 2.5rem;
     }
@@ -909,7 +913,7 @@
 
 @media (max-width: 480px) {
     .page-header {
-        padding: 6rem 0 3rem;
+        padding: 7.5rem 0 3rem;
     }
 
     .page-title {
