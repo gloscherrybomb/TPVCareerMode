@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Beginner's Guide - TPV Career Mode</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="tpv-team-car.png">
+    <link rel="apple-touch-icon" href="tpv-team-car.png">
+
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <span class="logo-text">TPV</span>
+                <span class="logo-subtitle">Career Mode</span>
+            </div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="events.html" class="nav-link">Season</a>
+                <a href="standings.html" class="nav-link">Standings</a>
+                <a href="peloton.html" class="nav-link">Peloton</a>
+                <a href="profile.html" class="nav-link">Profile</a>
+                <a href="#" class="nav-link nav-login" id="loginBtn">Login</a>
+                <a href="#" class="nav-link nav-logout" id="logoutBtn" style="display: none;">Logout</a>
+            </div>
+            <button class="nav-toggle" id="navToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <div class="page-header">
+        <div class="container">
+            <h1 class="page-title">Beginner's Guide</h1>
+            <p class="page-subtitle">Everything you need to start your virtual cycling career</p>
+        </div>
+    </div>
+
+    <div class="container" style="padding: 3rem 1rem;">
+        <div class="content-section">
+            <h2>What is TPV Career Mode?</h2>
+            <p>TPV Career Mode is a web-based virtual cycling career game that transforms your TrainingPeaks Virtual (TPV) race results into an immersive progression experience. Think of it as a career mode for virtual cycling - you'll advance through stages, earn awards, develop your personality as a racer, and compete against a diverse AI peloton while racing real events on TPV.</p>
+        </div>
+
+        <div class="content-section">
+            <h2>Getting Started</h2>
+
+            <h3>1. Sign Up & Link Your Account</h3>
+            <ul>
+                <li>Visit the TPV Career Mode website and create an account</li>
+                <li>You'll need your TPV User ID (UID) to link your race results</li>
+                <li>Your UID can be found in your TPV profile or race results</li>
+            </ul>
+
+            <h3>2. Understanding the Season Structure</h3>
+            <p>Season 1 consists of <strong>9 stages</strong> that you'll complete sequentially:</p>
+            <ul>
+                <li><strong>5 mandatory stages</strong> - specific events you must complete</li>
+                <li><strong>3 choice stages</strong> - you pick from a pool of optional events (but can only use each once!)</li>
+                <li><strong>1 final stage</strong> - a special finale to cap off your season</li>
+            </ul>
+            <p>You must complete Stage 1 to unlock Stage 2, Stage 2 to unlock Stage 3, and so on.</p>
+        </div>
+
+        <div class="content-section">
+            <h2>Core Features</h2>
+
+            <h3>🏁 Race & Progress</h3>
+            <p><strong>How Racing Works:</strong></p>
+            <ol>
+                <li>Complete races on TrainingPeaks Virtual as normal</li>
+                <li>Your results are automatically processed and added to Career Mode</li>
+                <li>You earn points based on your finishing position</li>
+                <li>Complete the stage to unlock the next one</li>
+            </ol>
+
+            <p><strong>Points System:</strong></p>
+            <ul>
+                <li>Higher finishing positions = more points</li>
+                <li>Beat your predicted position? Earn <strong>bonus points</strong>! (1-5 extra points)</li>
+                <li>Points accumulate throughout the season for overall standings</li>
+            </ul>
+
+            <p><strong>Predictions:</strong></p>
+            <p>The game analyzes the field's ratings to predict where you'll finish. If you perform better than expected, you'll earn bonus points. Example:</p>
+            <ul>
+                <li>Predicted: 15th place</li>
+                <li>Actual: 8th place</li>
+                <li>Result: +3 bonus points!</li>
+            </ul>
+        </div>
+
+        <div class="content-section">
+            <h3>🎯 Awards & Achievements</h3>
+            <p>Earn awards for exceptional performances:</p>
+
+            <p><strong>Race Performance Awards:</strong></p>
+            <ul>
+                <li><strong>Medals</strong> - Podium finishes (Gold/Silver/Bronze)</li>
+                <li><strong>Punching Above</strong> - Beat your prediction by 10+ places</li>
+                <li><strong>Giant Killer</strong> - Defeat the highest-rated rider in your race</li>
+                <li><strong>Bullseye</strong> - Finish exactly at your predicted position</li>
+                <li><strong>Hot Streak</strong> - Beat predictions multiple races in a row</li>
+                <li>Many more based on specific accomplishments</li>
+            </ul>
+            <p>Check your <strong>Trophy Cabinet</strong> (Palmares page) to see all your awards!</p>
+        </div>
+
+        <div class="content-section">
+            <h3>🎤 Post-Race Interviews & Personality</h3>
+            <p>After each race, you'll face a post-race interview with 3 response options. Your choices shape your <strong>Media Personality</strong> across 6 traits:</p>
+            <ul>
+                <li><strong>Confidence</strong> - Bold vs. Modest</li>
+                <li><strong>Humility</strong> - Gracious vs. Self-focused</li>
+                <li><strong>Aggression</strong> - Attacking vs. Conservative</li>
+                <li><strong>Professionalism</strong> - Diplomatic vs. Candid</li>
+                <li><strong>Showmanship</strong> - Entertaining vs. Reserved</li>
+                <li><strong>Resilience</strong> - Determined vs. Reflective</li>
+            </ul>
+
+            <p><strong>Why does this matter?</strong></p>
+            <ul>
+                <li>Your personality influences race narratives and stories</li>
+                <li>Unlocks personality-specific upgrades in the store</li>
+                <li>Earns you a dynamic persona label (e.g., "The Bold Competitor", "The Quiet Professional")</li>
+                <li>Makes your career unique to how you want to "role-play" your racer</li>
+            </ul>
+
+            <p><strong>Interview Tips:</strong></p>
+            <ul>
+                <li>Questions adapt to your race performance (wins, setbacks, rivalries)</li>
+                <li>Each response affects different personality traits</li>
+                <li>Be consistent to develop a strong personality in certain traits (70+)</li>
+                <li>No "wrong" answers - just shape your character how you want!</li>
+            </ul>
+        </div>
+
+        <div class="content-section">
+            <h3>💰 Cadence Credits & The Store</h3>
+            <p><strong>Earning Cadence Credits (CC):</strong></p>
+            <ul>
+                <li>Win awards to earn Cadence Credits</li>
+                <li>Different awards grant different amounts of CC</li>
+            </ul>
+
+            <p><strong>The Store:</strong></p>
+            <ul>
+                <li>Purchase upgrades using your Cadence Credits</li>
+                <li>Upgrades provide <strong>conditional bonus points</strong> in races</li>
+                <li>Example: "Aero Wheels" - Get +6 points if you beat prediction by 5+ AND finish top 10</li>
+                <li>Example: "Pace Notes Earbud" - Get +3 points if you finish within ±5 places of prediction</li>
+                <li><strong>3 equipment slots</strong> - choose which upgrades to equip for each race</li>
+            </ul>
+
+            <p><strong>Upgrade Tiers:</strong></p>
+            <ul>
+                <li>120 CC upgrades (basic)</li>
+                <li>200 CC upgrades (intermediate)</li>
+                <li>300 CC upgrades (advanced)</li>
+                <li>400 CC upgrades (elite, some require high personality stats)</li>
+            </ul>
+
+            <p><strong>Strategy Tip:</strong> Save CC for upgrades that match your racing style!</p>
+        </div>
+
+        <div class="content-section">
+            <h3>📊 Standings & Competition</h3>
+            <p><strong>Who are you racing against?</strong></p>
+            <ul>
+                <li>Real players like yourself</li>
+                <li>Hundreds of AI bot riders with unique profiles, backstories, and racing strengths</li>
+                <li>All riders compete in all events (bots are simulated fairly)</li>
+            </ul>
+
+            <p><strong>Leaderboard Features:</strong></p>
+            <ul>
+                <li>Filter by gender, age group, or country</li>
+                <li>See everyone's total points and events completed</li>
+                <li>Click on riders to view their full profiles</li>
+                <li>Track your rank throughout the season</li>
+            </ul>
+        </div>
+
+        <div class="content-section">
+            <h3>🏆 Profile & Stats</h3>
+            <p>Your profile page is your career dashboard:</p>
+
+            <p><strong>Statistics Tracked:</strong></p>
+            <ul>
+                <li>Total points, events completed</li>
+                <li>Wins, podiums, top 10 finishes</li>
+                <li>Best finish, average finish</li>
+                <li>Win rate, podium rate</li>
+                <li>Recent results with predictions</li>
+            </ul>
+
+            <p><strong>Media Personality Dashboard:</strong></p>
+            <ul>
+                <li>Visual radar chart showing your 6 personality traits</li>
+                <li>Your dynamic persona label</li>
+                <li>Interview count</li>
+            </ul>
+
+            <p><strong>Trophy Cabinet:</strong></p>
+            <ul>
+                <li>All awards you've earned displayed</li>
+                <li>Awards you've won multiple times show counts</li>
+            </ul>
+        </div>
+
+        <div class="content-section">
+            <h2>Key Pages Guide</h2>
+            <ul>
+                <li><strong>Events</strong> - Your season hub, see all stages and your progression</li>
+                <li><strong>Event Detail</strong> - Race info, results, your race story, and interviews</li>
+                <li><strong>Standings</strong> - Season leaderboard with all racers</li>
+                <li><strong>Profile</strong> - Your career dashboard and statistics</li>
+                <li><strong>Palmares</strong> - Your trophy cabinet</li>
+                <li><strong>Store</strong> - Browse and purchase upgrades</li>
+                <li><strong>Peloton</strong> - View all bot competitor profiles</li>
+                <li><strong>About</strong> - Detailed explanation of how everything works</li>
+            </ul>
+        </div>
+
+        <div class="content-section">
+            <h2>Tips for Success</h2>
+
+            <h3>1. Strategic Event Selection</h3>
+            <p>For your 3 choice stages, pick events that:</p>
+            <ul>
+                <li>Match your strengths (climbing, sprinting, time trials, etc.)</li>
+                <li>Give you the best chance for strong finishes and awards</li>
+                <li>Help you earn Cadence Credits for store upgrades</li>
+            </ul>
+
+            <h3>2. Maximize Bonus Points</h3>
+            <ul>
+                <li>Study your prediction each race</li>
+                <li>Target finishing better than predicted for those crucial bonus points</li>
+                <li>A few bonus points per race adds up over a season!</li>
+            </ul>
+
+            <h3>3. Develop Your Personality Consistently</h3>
+            <ul>
+                <li>If you want to unlock personality-specific store items (70+ trait required), be consistent in your interview responses</li>
+                <li>Or, create a balanced all-rounder persona by varying your responses</li>
+                <li>Your personality makes your race narratives more immersive!</li>
+            </ul>
+
+            <h3>4. Smart Store Strategy</h3>
+            <ul>
+                <li>Don't spend all your CC immediately</li>
+                <li>Save for higher-tier upgrades that match your racing style</li>
+                <li>Read the conditional bonuses carefully - pick upgrades you can actually trigger</li>
+                <li>You only have 3 equipment slots, so choose wisely</li>
+            </ul>
+
+            <h3>5. Check Your Awards</h3>
+            <ul>
+                <li>Review your Trophy Cabinet regularly</li>
+                <li>Identify which awards you're close to earning</li>
+                <li>Target specific awards by adjusting your racing approach</li>
+            </ul>
+
+            <h3>6. Explore the Peloton</h3>
+            <ul>
+                <li>Check out your bot competitors' profiles</li>
+                <li>Learn their strengths and weaknesses</li>
+                <li>It adds to the immersion when you recognize "rivals"!</li>
+            </ul>
+        </div>
+
+        <div class="content-section">
+            <h2>Understanding Your Results</h2>
+            <p>When you complete a race, you'll see:</p>
+
+            <p><strong>Results Table:</strong></p>
+            <ul>
+                <li>Your position in the field</li>
+                <li>Your time</li>
+                <li>Points earned</li>
+                <li>Predicted position</li>
+                <li>Bonus points (if you beat prediction)</li>
+            </ul>
+
+            <p><strong>Race Story:</strong></p>
+            <p>After a few interviews, you'll get personalized race narratives based on:</p>
+            <ul>
+                <li>Your performance in that race</li>
+                <li>Your personality traits</li>
+                <li>The type of event</li>
+                <li>Your career context</li>
+            </ul>
+
+            <p><strong>Post-Race Interview:</strong></p>
+            <ul>
+                <li>One question with 3 response options</li>
+                <li>Shapes your personality over time</li>
+                <li>No pressure - just role-play how you want!</li>
+            </ul>
+        </div>
+
+        <div class="content-section">
+            <h2>Frequently Asked Questions</h2>
+
+            <p><strong>Q: Can I go back and redo events?</strong></p>
+            <p>A: No, once you complete an event, it's locked in. This ensures fair competition and progression.</p>
+
+            <p><strong>Q: What happens if I miss a stage?</strong></p>
+            <p>A: For mandatory stages, you must complete them to progress. Some stages may have timing requirements, so check the event details carefully.</p>
+
+            <p><strong>Q: Do I have to use all my Cadence Credits?</strong></p>
+            <p>A: No! Save them for upgrades you really want. Your CC balance carries through the season.</p>
+
+            <p><strong>Q: Can I change my equipped upgrades between races?</strong></p>
+            <p>A: Yes! Visit the store and adjust your equipped items before each race.</p>
+
+            <p><strong>Q: How are predictions calculated?</strong></p>
+            <p>A: Based on the field's Event Ratings (ARR). Higher-rated riders are predicted to finish better.</p>
+
+            <p><strong>Q: What's ARR?</strong></p>
+            <p>A: Athlete Race Rating - a measure of a rider's ability in the TPV system. Career Mode uses this for predictions.</p>
+
+            <p><strong>Q: Is this affiliated with TrainingPeaks Virtual?</strong></p>
+            <p>A: No, TPV Career Mode is an independent community project that uses publicly available race results.</p>
+        </div>
+
+        <div class="content-section" style="text-align: center; padding: 3rem 0; border-top: 1px solid rgba(255, 255, 255, 0.1); margin-top: 3rem;">
+            <h2>Ready to Start Your Career?</h2>
+            <p style="font-size: 1.1rem; margin-bottom: 1.5rem;">You now have everything you need to begin your journey from Local Amateur to cycling legend! Remember:</p>
+            <ul style="list-style: none; padding: 0; margin-bottom: 2rem;">
+                <li style="margin: 0.5rem 0;">✅ Complete races on TrainingPeaks Virtual</li>
+                <li style="margin: 0.5rem 0;">✅ Check Career Mode for your results and progression</li>
+                <li style="margin: 0.5rem 0;">✅ Answer post-race interviews to develop your personality</li>
+                <li style="margin: 0.5rem 0;">✅ Earn awards and Cadence Credits</li>
+                <li style="margin: 0.5rem 0;">✅ Purchase strategic upgrades</li>
+                <li style="margin: 0.5rem 0;">✅ Compete for the top of the season standings</li>
+                <li style="margin: 0.5rem 0;">✅ Complete all 9 stages to finish your season</li>
+            </ul>
+            <p style="font-size: 1.2rem; margin-bottom: 2rem;"><strong>Good luck, and see you on the virtual roads!</strong></p>
+            <a href="index.html" class="btn btn-primary btn-large">Get Started</a>
+        </div>
+
+        <div class="content-section" style="padding-top: 2rem;">
+            <p style="text-align: center; font-style: italic;">Have questions? Check the <a href="about.html" style="color: #00d4ff;">About page</a> for more detailed information about how everything works.</p>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="footer-logo">TPV Career Mode</div>
+                    <p>Virtual cycling career progression</p>
+                </div>
+                <div class="footer-links">
+                    <a href="index.html">Home</a>
+                    <a href="events.html">Season</a>
+                    <a href="standings.html">Standings</a>
+                    <a href="peloton.html">Peloton</a>
+                    <a href="beginners-guide.html">Beginner's Guide</a>
+                    <a href="about.html">About</a>
+                    <a href="privacy.html">Privacy</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 TPV Career Mode. TPV Career Mode is a community effort completely independent from TrainingPeaks and TrainingPeaks Virtual.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>
