@@ -77,6 +77,7 @@ function applyPersonalityChanges(currentPersonality, personalityDelta) {
 
 /**
  * Recalculate personality for a single user from their interviews
+ * Also updates the personalityAfter field in each interview document
  */
 async function recalculateUserPersonality(userId) {
   // Query all interviews for this user, ordered by event number
@@ -94,12 +95,17 @@ async function recalculateUserPersonality(userId) {
   let personality = getDefaultPersonality();
   let interviewCount = 0;
   let lastEventNumber = null;
+  const interviewUpdates = [];
 
   // Apply each interview's personality delta in order
-  interviewsSnapshot.docs.forEach(doc => {
+  for (const doc of interviewsSnapshot.docs) {
     const interview = doc.data();
 
     if (interview.personalityDelta) {
+      // Store personality before this interview
+      const personalityBefore = { ...personality };
+
+      // Apply the delta
       personality = applyPersonalityChanges(personality, interview.personalityDelta);
       interviewCount++;
       lastEventNumber = interview.eventNumber;
@@ -108,8 +114,26 @@ async function recalculateUserPersonality(userId) {
         `C:${Math.round(personality.confidence)} H:${Math.round(personality.humility)} ` +
         `A:${Math.round(personality.aggression)} P:${Math.round(personality.professionalism)} ` +
         `S:${Math.round(personality.showmanship)} R:${Math.round(personality.resilience)}`);
+
+      // Queue update for this interview document
+      interviewUpdates.push({
+        ref: doc.ref,
+        eventNumber: interview.eventNumber,
+        personalityBefore: personalityBefore,
+        personalityAfter: { ...personality }
+      });
     }
-  });
+  }
+
+  // Update all interview documents with corrected personalityBefore and personalityAfter
+  console.log(`   Updating ${interviewUpdates.length} interview documents...`);
+  for (const update of interviewUpdates) {
+    await update.ref.update({
+      personalityBefore: update.personalityBefore,
+      personalityAfter: update.personalityAfter
+    });
+    console.log(`   ✓ Updated interview for event ${update.eventNumber}`);
+  }
 
   return {
     personality,
