@@ -574,18 +574,27 @@ function updateRivalData(existingRivalData, encounters, eventNumber) {
 
     const botData = rivalData.encounters[botUid];
 
-    // Update stats
-    botData.races += 1;
-    botData.totalGap += encounter.timeGap;
+    // Check if this event has already been counted for this rival
+    const isNewRace = botData.lastRace !== eventNumber;
+
+    // Update stats (only increment race count if this is a new race)
+    if (isNewRace) {
+      botData.races += 1;
+    }
+
+    // Always update these stats in case we're reprocessing with corrected data
+    botData.totalGap = isNewRace ? botData.totalGap + encounter.timeGap : (botData.totalGap - (botData.totalGap / botData.races)) + encounter.timeGap;
     botData.avgGap = botData.totalGap / botData.races;
     botData.closestGap = Math.min(botData.closestGap, encounter.timeGap);
     botData.lastRace = eventNumber;
 
-    // Update wins/losses
-    if (encounter.userFinishedAhead) {
-      botData.userWins += 1;
-    } else {
-      botData.botWins += 1;
+    // Update wins/losses (only if new race)
+    if (isNewRace) {
+      if (encounter.userFinishedAhead) {
+        botData.userWins += 1;
+      } else {
+        botData.botWins += 1;
+      }
     }
 
     // Update bot info (in case it changed)

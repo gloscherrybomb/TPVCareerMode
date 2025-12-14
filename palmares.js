@@ -43,19 +43,19 @@ let hoveredEventIndex = null;
 const EVENT_DATA = {
     1: { name: "Coast and Roast Crit", type: "criterium" },
     2: { name: "Island Classic", type: "road race" },
-    3: { name: "Track Showdown", type: "track elimination" },
-    4: { name: "City Sprint TT", type: "time trial" },
-    5: { name: "The Capital Kermesse", type: "points race" },
-    6: { name: "Mt. Sterling TT", type: "hill climb" },
-    7: { name: "North Lake Points Race", type: "points race" },
-    8: { name: "Heartland Gran Fondo", type: "gran fondo" },
-    9: { name: "Highland Loop", type: "hill climb" },
-    10: { name: "Riverside Time Trial", type: "time trial" },
-    11: { name: "Southern Sky Twilight", type: "points race" },
-    12: { name: "Dirtroads and Glory", type: "gravel race" },
-    13: { name: "Heritage Highway", type: "road race" },
-    14: { name: "Mountain Shadow Classic", type: "road race" },
-    15: { name: "Bayview Breakaway Crit", type: "criterium" }
+    3: { name: "The Forest Velodrome Elimination", type: "track elimination" },
+    4: { name: "Coastal Loop Time Challenge", type: "time trial" },
+    5: { name: "North Lake Points Race", type: "points race" },
+    6: { name: "Easy Hill Climb", type: "hill climb" },
+    7: { name: "Flat Eight Criterium", type: "criterium" },
+    8: { name: "The Grand Gilbert Fondo", type: "gran fondo" },
+    9: { name: "Base Camp Classic", type: "road race" },
+    10: { name: "Beach and Pine TT", type: "time trial" },
+    11: { name: "South Lake Points Race", type: "points race" },
+    12: { name: "Unbound - Little Egypt", type: "gravel race" },
+    13: { name: "Local Tour Stage 1", type: "stage race" },
+    14: { name: "Local Tour Stage 2", type: "stage race" },
+    15: { name: "Local Tour Stage 3", type: "stage race" }
 };
 
 // Award display names with icons
@@ -245,6 +245,7 @@ function displayKeyStats() {
     document.getElementById('statDNF').textContent = dnfCount;
     document.getElementById('statAvg').textContent = Math.round(userData.averageFinish) || '0';
     document.getElementById('statPoints').textContent = userData.totalPoints || 0;
+    document.getElementById('statCadenceCoins').textContent = userData.currency?.totalEarned || 0;
     document.getElementById('statARR').textContent = userData.arr || 0;
 }
 
@@ -844,9 +845,11 @@ function displayPersonalityTimeline() {
     // Store data points globally for interactivity
     chartDataPoints = dataPoints;
 
-    // Draw the chart
-    drawPersonalityChart(dataPoints);
+    // Setup interactivity first (which clones the canvas)
     setupChartInteractivity();
+
+    // Then draw the chart on the fresh canvas
+    drawPersonalityChart(dataPoints);
 }
 
 // Draw line chart showing personality evolution
