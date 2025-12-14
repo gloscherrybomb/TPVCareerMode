@@ -555,53 +555,54 @@ function updateRivalData(existingRivalData, encounters, eventNumber) {
   encounters.forEach(encounter => {
     const botUid = encounter.botUid;
 
-    // Initialize bot encounter data if doesn't exist
+    // Initialize bot encounter data if doesn't exist (first encounter with this rival)
     if (!rivalData.encounters[botUid]) {
       rivalData.encounters[botUid] = {
         botName: encounter.botName,
         botTeam: encounter.botTeam,
         botCountry: encounter.botCountry,
         botArr: encounter.botArr,
-        races: 0,
-        userWins: 0,
-        botWins: 0,
-        totalGap: 0,
-        avgGap: 0,
-        closestGap: Infinity,
+        races: 1,  // This IS a race, so start at 1
+        userWins: encounter.userFinishedAhead ? 1 : 0,
+        botWins: encounter.userFinishedAhead ? 0 : 1,
+        totalGap: encounter.timeGap,
+        avgGap: encounter.timeGap,
+        closestGap: encounter.timeGap,
         lastRace: eventNumber
       };
-    }
+    } else {
+      // Entry already exists - check if this is a new race or reprocessing the same race
+      const botData = rivalData.encounters[botUid];
+      const isNewRace = botData.lastRace !== eventNumber;
 
-    const botData = rivalData.encounters[botUid];
+      if (isNewRace) {
+        // This is a new race with this rival - increment counters
+        botData.races += 1;
+        botData.totalGap += encounter.timeGap;
 
-    // Check if this event has already been counted for this rival
-    const isNewRace = botData.lastRace !== eventNumber;
-
-    // Update stats (only increment race count if this is a new race)
-    if (isNewRace) {
-      botData.races += 1;
-    }
-
-    // Always update these stats in case we're reprocessing with corrected data
-    botData.totalGap = isNewRace ? botData.totalGap + encounter.timeGap : (botData.totalGap - (botData.totalGap / botData.races)) + encounter.timeGap;
-    botData.avgGap = botData.totalGap / botData.races;
-    botData.closestGap = Math.min(botData.closestGap, encounter.timeGap);
-    botData.lastRace = eventNumber;
-
-    // Update wins/losses (only if new race)
-    if (isNewRace) {
-      if (encounter.userFinishedAhead) {
-        botData.userWins += 1;
+        if (encounter.userFinishedAhead) {
+          botData.userWins += 1;
+        } else {
+          botData.botWins += 1;
+        }
       } else {
-        botData.botWins += 1;
+        // Reprocessing same event - recalculate the gap for this race
+        // Remove old contribution and add new one
+        const oldContribution = botData.totalGap / botData.races;
+        botData.totalGap = botData.totalGap - oldContribution + encounter.timeGap;
       }
-    }
 
-    // Update bot info (in case it changed)
-    botData.botName = encounter.botName;
-    botData.botTeam = encounter.botTeam;
-    botData.botCountry = encounter.botCountry;
-    botData.botArr = encounter.botArr;
+      // Update derived stats and metadata
+      botData.avgGap = botData.totalGap / botData.races;
+      botData.closestGap = Math.min(botData.closestGap, encounter.timeGap);
+      botData.lastRace = eventNumber;
+
+      // Update bot info (in case it changed)
+      botData.botName = encounter.botName;
+      botData.botTeam = encounter.botTeam;
+      botData.botCountry = encounter.botCountry;
+      botData.botArr = encounter.botArr;
+    }
   });
 
   return rivalData;
