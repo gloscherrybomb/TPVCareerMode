@@ -645,7 +645,6 @@ function displayDetailedStats() {
     // Competition Analysis
     const competitionStats = calculateCompetitionStats();
     document.getElementById('avgOpponentARR').textContent = competitionStats.avgOpponentARR || '—';
-    document.getElementById('racesVsStronger').textContent = competitionStats.racesVsStronger;
     document.getElementById('winRateVsStronger').textContent = competitionStats.winRateVsStronger;
     document.getElementById('winRateVsWeaker').textContent = competitionStats.winRateVsWeaker;
 
