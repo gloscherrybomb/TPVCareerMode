@@ -383,6 +383,7 @@ function renderGrid() {
           </div>
         </div>
         <div class="unlock-description">${isLocked ? 'Unlock to reveal details' : item.description}</div>
+        ${!isLocked && item.narrative ? `<div class="unlock-narrative">${item.narrative}</div>` : ''}
         <div class="unlock-bonus">+${item.pointsBonus} pts</div>
         ${personalityInfo}
         <div class="unlock-actions"></div>

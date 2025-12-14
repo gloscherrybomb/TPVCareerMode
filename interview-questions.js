@@ -70,6 +70,44 @@ const INTERVIEW_QUESTIONS = {
         beatPredictionBy: 8
       },
       responses: ['beat_pred_confident', 'beat_pred_humble', 'beat_pred_surprised']
+    },
+
+    win_unexpected: {
+      id: 'win_unexpected',
+      text: "You weren't predicted to win today, but here you are. How did you pull that off?",
+      triggers: {
+        position: 1,
+        beatPredictionBy: 3
+      },
+      responses: ['win_standard_confident', 'win_standard_humble', 'beat_pred_surprised']
+    },
+
+    podium_climb: {
+      id: 'podium_climb',
+      text: "You climbed through the field to finish {position}. What changed during the race?",
+      triggers: {
+        positionIn: [1, 2, 3],
+        beatPredictionBy: 4
+      },
+      responses: ['podium_beat_confident', 'podium_beat_professional', 'beat_pred_confident']
+    },
+
+    strong_finish: {
+      id: 'strong_finish',
+      text: "A strong top-10 finish today. What was working for you out there?",
+      triggers: {
+        positionBetween: [1, 10]
+      },
+      responses: ['top_ten_positive', 'top_ten_analytical', 'win_standard_professional']
+    },
+
+    race_effort: {
+      id: 'race_effort',
+      text: "Talk us through your race today. What was the game plan?",
+      triggers: {
+        positionBetween: [1, 30]
+      },
+      responses: ['top_ten_analytical', 'win_standard_professional', 'midpack_tactical']
     }
   },
 
@@ -171,48 +209,6 @@ const INTERVIEW_QUESTIONS = {
     }
   },
 
-  // ===== TACTICAL QUESTIONS =====
-  tactical: {
-
-    time_trial_strategy: {
-      id: 'time_trial_strategy',
-      text: "Time trials are all about pacing. What was your strategy today?",
-      triggers: {
-        eventType: 'time trial'
-      },
-      responses: ['tt_professional', 'tt_confident', 'tt_humble']
-    },
-
-    sprint_finish: {
-      id: 'sprint_finish',
-      text: "The sprint came down to positioning. Were you where you wanted to be?",
-      triggers: {
-        eventCategory: 'criterium',
-        finishType: 'bunch_sprint'
-      },
-      responses: ['sprint_professional', 'sprint_confident', 'sprint_learning']
-    },
-
-    climbing_performance: {
-      id: 'climbing_performance',
-      text: "That climb was brutal. How did you manage the gradient and pace yourself?",
-      triggers: {
-        eventType: 'hill climb',
-        positionLessThan: 10
-      },
-      responses: ['climb_professional', 'climb_confident', 'climb_humble']
-    },
-
-    breakaway_success: {
-      id: 'breakaway_success',
-      text: "You made the break and it stuck. Was that part of the plan?",
-      triggers: {
-        position: 1,
-        raceType: 'road race'
-      },
-      responses: ['break_tactical', 'break_confident', 'break_opportunistic']
-    }
-  },
 
   // ===== SEASON PROGRESS QUESTIONS =====
   season: {
@@ -302,6 +298,33 @@ const INTERVIEW_QUESTIONS = {
         positionIn: [1, 2, 3]
       },
       responses: ['breakthrough_confident', 'breakthrough_analytical', 'breakthrough_relieved']
+    },
+
+    early_season_form: {
+      id: 'early_season_form',
+      text: "Still early in the season. How are you feeling about your form so far?",
+      triggers: {
+        racesCompletedBetween: [1, 4]
+      },
+      responses: ['mid_season_confident', 'mid_season_humble', 'mid_season_analytical']
+    },
+
+    building_momentum: {
+      id: 'building_momentum',
+      text: "You seem to be improving race by race. Is the progression going to plan?",
+      triggers: {
+        beatPredictionBy: 2
+      },
+      responses: ['progression_confident', 'progression_patient', 'mid_season_analytical']
+    },
+
+    season_opener: {
+      id: 'season_opener',
+      text: "Your first race of the season. How does it feel to be back in competition?",
+      triggers: {
+        racesCompletedBetween: [1, 1]
+      },
+      responses: ['mid_season_confident', 'breakthrough_relieved', 'first_podium_excited']
     }
   },
 
@@ -345,10 +368,38 @@ const INTERVIEW_QUESTIONS = {
         positionBetween: [11, 20]
       },
       responses: ['midpack_realistic', 'midpack_motivated', 'midpack_tactical']
+    },
+
+    solid_performance: {
+      id: 'solid_performance',
+      text: "A solid performance today. How satisfied are you with that result?",
+      triggers: {
+        positionBetween: [1, 15]
+      },
+      responses: ['progression_patient', 'consistency_professional', 'top_ten_positive']
+    },
+
+    meeting_expectations: {
+      id: 'meeting_expectations',
+      text: "You finished close to your prediction today. Is that where you expected to be?",
+      triggers: {
+        worseThanPredictionBy: 2,
+        beatPredictionBy: 2
+      },
+      responses: ['consistency_professional', 'midpack_realistic', 'progression_patient']
+    },
+
+    learning_experience: {
+      id: 'learning_experience',
+      text: "Every race is a learning experience. What did you take away from today?",
+      triggers: {
+        positionBetween: [1, 40]
+      },
+      responses: ['progression_tactical', 'midpack_motivated', 'back_learning']
     }
   },
 
-  // ===== ENHANCED TACTICAL QUESTIONS =====
+  // ===== TACTICAL QUESTIONS =====
   tactical: {
 
     time_trial_personal_best: {
@@ -361,6 +412,15 @@ const INTERVIEW_QUESTIONS = {
       responses: ['tt_analytical', 'tt_satisfied', 'tt_powerful']
     },
 
+    time_trial_strategy: {
+      id: 'time_trial_strategy',
+      text: "Time trials are all about pacing. What was your strategy today?",
+      triggers: {
+        eventType: 'time trial'
+      },
+      responses: ['tt_professional', 'tt_confident', 'tt_humble']
+    },
+
     sprint_positioning: {
       id: 'sprint_positioning',
       text: "You positioned yourself perfectly for that sprint finish. How did you read the race?",
@@ -369,6 +429,16 @@ const INTERVIEW_QUESTIONS = {
         positionIn: [1, 2, 3]
       },
       responses: ['sprint_tactical', 'sprint_instinctive', 'sprint_aggressive']
+    },
+
+    sprint_finish: {
+      id: 'sprint_finish',
+      text: "The sprint came down to positioning. Were you where you wanted to be?",
+      triggers: {
+        eventCategory: 'criterium',
+        finishType: 'bunch_sprint'
+      },
+      responses: ['sprint_professional', 'sprint_confident', 'sprint_learning']
     },
 
     climbing_dominance: {
@@ -381,6 +451,16 @@ const INTERVIEW_QUESTIONS = {
       responses: ['climb_strong', 'climb_suffering', 'climb_confident']
     },
 
+    climbing_performance: {
+      id: 'climbing_performance',
+      text: "That climb was brutal. How did you manage the gradient and pace yourself?",
+      triggers: {
+        eventType: 'hill climb',
+        positionLessThan: 10
+      },
+      responses: ['climb_professional', 'climb_confident', 'climb_humble']
+    },
+
     breakaway_timing: {
       id: 'breakaway_timing',
       text: "Perfect timing on that move. How did you know when to attack?",
@@ -389,6 +469,83 @@ const INTERVIEW_QUESTIONS = {
         positionIn: [1, 2]
       },
       responses: ['attack_calculated', 'attack_instinct', 'attack_opportunistic']
+    },
+
+    breakaway_success: {
+      id: 'breakaway_success',
+      text: "You made the break and it stuck. Was that part of the plan?",
+      triggers: {
+        position: 1,
+        raceType: 'road race'
+      },
+      responses: ['break_tactical', 'break_confident', 'break_opportunistic']
+    },
+
+    first_race_nerves: {
+      id: 'first_race_nerves',
+      text: "First race of the season can be nerve-wracking. How did you handle the pressure?",
+      triggers: {
+        racesCompletedBetween: [1, 1]
+      },
+      responses: ['win_standard_professional', 'comeback_determined', 'progression_patient']
+    },
+
+    race_tactics_general: {
+      id: 'race_tactics_general',
+      text: "What was your tactical approach going into this race?",
+      triggers: {
+        positionBetween: [1, 20]
+      },
+      responses: ['progression_tactical', 'win_standard_professional', 'midpack_tactical']
+    },
+
+    positioning_battle: {
+      id: 'positioning_battle',
+      text: "The mid-pack can be chaotic. How did you navigate the positioning battles today?",
+      triggers: {
+        positionBetween: [8, 25]
+      },
+      responses: ['midpack_tactical', 'progression_tactical', 'sprint_tactical']
+    }
+  },
+
+  // ===== GENERAL QUESTIONS =====
+  general: {
+
+    race_reflection: {
+      id: 'race_reflection',
+      text: "How did you feel about your race today overall?",
+      triggers: {
+        positionBetween: [1, 50]
+      },
+      responses: ['progression_patient', 'consistency_professional', 'midpack_realistic']
+    },
+
+    next_race_preview: {
+      id: 'next_race_preview',
+      text: "Looking ahead, what are your goals for the next race?",
+      triggers: {
+        racesCompletedBetween: [1, 14]
+      },
+      responses: ['midpack_motivated', 'progression_confident', 'milestone_ambitious']
+    },
+
+    current_form: {
+      id: 'current_form',
+      text: "How would you assess your current form?",
+      triggers: {
+        racesCompletedBetween: [2, 15]
+      },
+      responses: ['mid_season_analytical', 'progression_patient', 'consistency_focused']
+    },
+
+    team_dynamics: {
+      id: 'team_dynamics',
+      text: "How's the communication with your team been during races?",
+      triggers: {
+        positionBetween: [1, 30]
+      },
+      responses: ['win_standard_professional', 'consistency_professional', 'progression_tactical']
     }
   }
 };
