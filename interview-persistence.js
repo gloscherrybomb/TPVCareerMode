@@ -74,6 +74,16 @@ export async function initializePersonalityIfNeeded(db, userDocRef) {
 
         // Only initialize if personality doesn't exist
         if (!userData.personality) {
+            // DEFENSIVE CHECK: If user has interview history but no personality,
+            // something is wrong - don't reset their data, log error instead
+            const existingInterviews = userData.interviewHistory?.totalInterviews || 0;
+            if (existingInterviews > 0) {
+                console.error('DATA INTEGRITY WARNING: User has', existingInterviews,
+                    'interviews but no personality data. Not resetting to avoid data loss.',
+                    'User:', userData.uid || userDoc.id);
+                return;
+            }
+
             const defaultPersonality = getDefaultPersonality();
 
             await updateDoc(userDocRef, {
@@ -94,7 +104,7 @@ export async function initializePersonalityIfNeeded(db, userDocRef) {
                 }
             });
 
-            console.log('Initialized personality for user');
+            console.log('Initialized personality for user:', userData.uid || userDoc.id);
         }
     } catch (error) {
         console.error('Error initializing personality:', error);
@@ -118,11 +128,50 @@ export async function saveInterviewResponse(db, userId, eventNumber, interviewDa
         const userDocRef = querySnapshot.docs[0].ref;
         const userData = querySnapshot.docs[0].data();
 
-        // Get current personality
-        const currentPersonality = userData.personality || getDefaultPersonality();
+        // Get current personality with fallback and integrity check
+        let currentPersonality = userData.personality;
+
+        // INTEGRITY CHECK: If personality is missing but interviews exist, try to reconstruct
+        if (!currentPersonality) {
+            const existingInterviews = userData.interviewHistory?.totalInterviews || 0;
+            if (existingInterviews > 0) {
+                console.warn('PERSONALITY RECOVERY: User has', existingInterviews,
+                    'interviews but no personality. Attempting to reconstruct from interview history.',
+                    'User:', userId);
+
+                // Try to get the last interview to recover personality
+                const lastEventNum = userData.interviewHistory?.lastInterviewEventNumber;
+                if (lastEventNum) {
+                    try {
+                        const lastInterviewRef = doc(db, 'interviews', `${userId}_${lastEventNum}`);
+                        const lastInterviewDoc = await getDoc(lastInterviewRef);
+                        if (lastInterviewDoc.exists()) {
+                            const lastInterview = lastInterviewDoc.data();
+                            if (lastInterview.personalityAfter) {
+                                currentPersonality = lastInterview.personalityAfter;
+                                console.log('PERSONALITY RECOVERED from interview', lastEventNum, ':', currentPersonality);
+                            }
+                        }
+                    } catch (err) {
+                        console.error('Failed to recover personality from interview history:', err);
+                    }
+                }
+            }
+
+            // If still no personality, use default
+            if (!currentPersonality) {
+                currentPersonality = getDefaultPersonality();
+                console.log('Using default personality for user:', userId);
+            }
+        }
 
         // Calculate new personality
         const newPersonality = applyPersonalityChanges(currentPersonality, selectedResponse.personalityImpact);
+
+        console.log('Personality update for user', userId, 'event', eventNumber,
+            '- Before:', JSON.stringify(currentPersonality),
+            '- Delta:', JSON.stringify(selectedResponse.personalityImpact),
+            '- After:', JSON.stringify(newPersonality));
 
         // Get response style early (needed for updateData object)
         const responseStyle = selectedResponse.style;

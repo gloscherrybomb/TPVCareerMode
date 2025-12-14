@@ -28,6 +28,68 @@ narrativeSelector.initialize(NARRATIVE_DATABASE);
 console.log('📖 Narrative system initialized');
 
 /**
+ * Recover personality from interview history if missing from user document.
+ * This handles cases where user data was reset but interview records remain.
+ * @param {string} userId - The TPV UID of the user
+ * @param {Object} userData - Current user data from Firestore
+ * @param {FirebaseFirestore.DocumentReference} userRef - Reference to user document
+ * @returns {Object} - The recovered/existing personality object
+ */
+async function recoverPersonalityIfNeeded(userId, userData, userRef) {
+  // If personality exists, return it
+  if (userData.personality) {
+    return userData.personality;
+  }
+
+  console.log(`   ⚠️ Personality missing for user ${userId}, checking interview history...`);
+
+  // Check if user has interview history
+  const interviewHistory = userData.interviewHistory;
+  if (!interviewHistory || !interviewHistory.totalInterviews || interviewHistory.totalInterviews === 0) {
+    console.log(`   ℹ️ No interview history found, using default personality`);
+    return null;
+  }
+
+  // Try to recover from interview documents
+  const lastEventNum = interviewHistory.lastInterviewEventNumber;
+  if (!lastEventNum) {
+    console.log(`   ⚠️ Interview history exists but no lastInterviewEventNumber`);
+    return null;
+  }
+
+  try {
+    // Query interviews for this user, ordered by event number descending
+    const interviewsSnapshot = await db.collection('interviews')
+      .where('userId', '==', userId)
+      .orderBy('eventNumber', 'desc')
+      .limit(1)
+      .get();
+
+    if (interviewsSnapshot.empty) {
+      console.log(`   ⚠️ No interview documents found for user ${userId}`);
+      return null;
+    }
+
+    const latestInterview = interviewsSnapshot.docs[0].data();
+    if (latestInterview.personalityAfter) {
+      console.log(`   ✅ RECOVERED personality from interview for event ${latestInterview.eventNumber}`);
+
+      // Update user document with recovered personality
+      await userRef.update({
+        personality: latestInterview.personalityAfter
+      });
+      console.log(`   ✅ Saved recovered personality to user document`);
+
+      return latestInterview.personalityAfter;
+    }
+  } catch (error) {
+    console.error(`   ❌ Error recovering personality:`, error.message);
+  }
+
+  return null;
+}
+
+/**
  * Determine performance tier from position
  */
 function determinePerformanceTier(position) {
@@ -989,8 +1051,14 @@ async function processUserResult(uid, eventInfo, results) {
   const userDoc = usersQuery.docs[0];
   const userRef = userDoc.ref;
   const userData = userDoc.data();
-  
+
   console.log(`   Found user: ${userData.name || uid} (Document ID: ${userDoc.id})`);
+
+  // Recover personality from interview history if missing (handles post-reset scenarios)
+  const recoveredPersonality = await recoverPersonalityIfNeeded(uid, userData, userRef);
+  if (recoveredPersonality && !userData.personality) {
+    userData.personality = recoveredPersonality;
+  }
   
   // Get user's current stage and used optional events
   const currentStage = userData.currentStage || 1;

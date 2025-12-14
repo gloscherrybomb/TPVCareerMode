@@ -31,7 +31,7 @@ async function resetUserResults() {
 
       const userRef = db.collection('users').doc(userDoc.id);
 
-      // Fields to KEEP (core profile info)
+      // Fields to KEEP (core profile info + personality data)
       const fieldsToKeep = {
         name: userData.name || "",
         email: userData.email || "",
@@ -43,6 +43,10 @@ async function resetUserResults() {
         ageBand: userData.ageBand || null,
         photoURL: userData.photoURL || null,
         arr: userData.arr || null,
+        // PRESERVE personality and interview data
+        personality: userData.personality || null,
+        interviewHistory: userData.interviewHistory || null,
+        personalitySnapshots: userData.personalitySnapshots || null,
       };
 
       // UPDATE the user, deleting and replacing fields
