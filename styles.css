@@ -61,6 +61,11 @@ body {
     display: flex;
     flex-direction: column;
     gap: 0.1rem;
+    text-decoration: none;
+}
+
+.nav-logo * {
+    text-decoration: none;
 }
 
 .logo-text {
@@ -154,7 +159,7 @@ body {
 
 /* Page Header (for pages with breadcrumbs) */
 .page-header {
-    padding: 4rem 0 2rem;
+    padding: 6rem 0 2rem;
     background: linear-gradient(135deg, rgba(255, 27, 107, 0.1), rgba(69, 202, 255, 0.1));
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
