@@ -1426,8 +1426,8 @@ function createHoverTooltip() {
     tooltip.id = 'personalityHoverTooltip';
     tooltip.style.cssText = `
         position: fixed;
-        background: linear-gradient(135deg, rgba(255, 27, 107, 0.95), rgba(69, 202, 255, 0.95));
-        border: 1px solid rgba(255, 27, 107, 0.4);
+        background: rgba(20, 24, 36, 0.98);
+        border: 2px solid rgba(69, 202, 255, 0.8);
         border-radius: 8px;
         padding: 8px 12px;
         pointer-events: none;
@@ -1438,7 +1438,7 @@ function createHoverTooltip() {
         font-size: 13px;
         font-family: 'Exo 2', sans-serif;
         color: #fff;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
     `;
 
     document.body.appendChild(tooltip);
