@@ -1,0 +1,55 @@
+name: Recalculate Personality
+
+on:
+  workflow_dispatch:  # Manual trigger only
+    inputs:
+      confirm:
+        description: 'Type "RECALCULATE" to confirm'
+        required: true
+        type: string
+
+jobs:
+  recalculate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Verify confirmation
+        run: |
+          if [ "${{ github.event.inputs.confirm }}" != "RECALCULATE" ]; then
+            echo "❌ Confirmation failed. You must type 'RECALCULATE' to proceed."
+            exit 1
+          fi
+          echo "✅ Confirmation verified"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install firebase-admin
+
+      - name: Recalculate personality from interviews
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: node recalculate-personality.js
+
+      - name: Summary
+        run: |
+          echo "## Personality Recalculation Complete ✅" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "All user personalities have been recalculated from their stored interview data." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**What was done:**" >> $GITHUB_STEP_SUMMARY
+          echo "- Queried all interview documents for each user" >> $GITHUB_STEP_SUMMARY
+          echo "- Applied personality deltas in chronological order (by event number)" >> $GITHUB_STEP_SUMMARY
+          echo "- Updated user personality field with recalculated values" >> $GITHUB_STEP_SUMMARY
+          echo "- Updated interviewHistory with correct counts" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Note:** This uses the same diminishing returns logic as the live system:" >> $GITHUB_STEP_SUMMARY
+          echo "- Full effect below 70" >> $GITHUB_STEP_SUMMARY
+          echo "- 75% effect at 70-79" >> $GITHUB_STEP_SUMMARY
+          echo "- 50% effect at 80+" >> $GITHUB_STEP_SUMMARY
