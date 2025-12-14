@@ -156,6 +156,9 @@ async function recalculateAllPersonalities() {
         // Update user document with recalculated personality
         const userRef = db.collection('users').doc(userDoc.id);
 
+        console.log(`   Updating document ID: ${userDoc.id}`);
+        console.log(`   New personality values:`, JSON.stringify(result.personality));
+
         await userRef.update({
           personality: result.personality,
           'interviewHistory.totalInterviews': result.interviewCount,
@@ -163,7 +166,23 @@ async function recalculateAllPersonalities() {
           'interviewHistory.lastInterviewTimestamp': admin.firestore.FieldValue.serverTimestamp()
         });
 
-        console.log(`   ✅ Updated personality (${result.interviewCount} interviews processed)`);
+        // Verify the update by reading back
+        const verifyDoc = await userRef.get();
+        const verifyData = verifyDoc.data();
+        console.log(`   ✅ VERIFIED - Personality in Firestore:`, JSON.stringify(verifyData.personality));
+
+        // Check if values match
+        const mismatch = Object.keys(result.personality).some(key => {
+          if (key === 'lastUpdated') return false;
+          return Math.round(result.personality[key]) !== Math.round(verifyData.personality[key] || 0);
+        });
+
+        if (mismatch) {
+          console.log(`   ⚠️ WARNING: Personality values don't match after update!`);
+          console.log(`   Expected:`, JSON.stringify(result.personality));
+          console.log(`   Got:`, JSON.stringify(verifyData.personality));
+        }
+
         usersUpdated++;
       } else {
         console.log(`   ⏭️ Skipped (no interviews)`);
