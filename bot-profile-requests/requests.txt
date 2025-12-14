@@ -15,3 +15,15 @@ Bot ARR: 1381
 Bot Country: FRA
 Interesting Fact: Breakaway artist. Loves to be out in front
 ================================================================================
+
+================================================================================
+Request submitted: 2025-12-14 18:07:25 UTC
+Firestore Document ID: Bot386_1765735645402
+Submitted by User UID: wivyryjoQnP16Vt1D4gAqRHLEnT2
+Bot UID: Bot386
+Bot Name: Julian Simon
+Bot Team: Independent
+Bot ARR: 1203
+Bot Country: BEL
+Interesting Fact: All rounder, can take a turn on the flat but no slouch on the medium climbs
+================================================================================
