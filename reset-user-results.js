@@ -142,23 +142,29 @@ async function resetUserResults() {
         // Personality awards (reset these too)
         personalityAwards: admin.firestore.FieldValue.delete(),
 
-        // Cadence Credits currency
-        currency: {
-          balance: 0,
-          totalEarned: 0,
-          transactions: []
-        },
+        // Cadence Credits currency - preserve spend transactions, reset earnings
+        // Calculate total spent so balance accounts for purchases when re-earning
+        currency: (() => {
+          const spendTransactions = (userData.currency?.transactions || []).filter(t => t.type === 'spend');
+          const totalSpent = spendTransactions.reduce((sum, t) => sum + (t.amount || 0), 0);
+          return {
+            balance: -totalSpent,  // Negative balance = amount owed from purchases
+            totalEarned: 0,        // Will re-earn from events
+            transactions: spendTransactions  // Keep purchase history
+          };
+        })(),
 
-        // Cadence Credits unlocks
+        // Cadence Credits unlocks - PRESERVE all shop state
         unlocks: {
-          inventory: [],
-          equipped: [],
-          slotCount: 1,
-          cooldowns: {}
+          inventory: userData.unlocks?.inventory || [],  // Keep purchased items
+          equipped: userData.unlocks?.equipped || [],    // Keep equipped items
+          slotCount: userData.unlocks?.slotCount || 1,   // Keep purchased slots
+          cooldowns: userData.unlocks?.cooldowns || {}   // Keep cooldowns
         }
 
         // NOTE: personality and interviewHistory are PRESERVED
         // NOTE: interviews collection documents are PRESERVED
+        // NOTE: Purchased shop items (unlocks) are PRESERVED
       });
     }
 
