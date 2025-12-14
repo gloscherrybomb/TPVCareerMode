@@ -38,6 +38,23 @@ let visibleTraits = {
     resilience: true
 };
 let hoveredEventIndex = null;
+let clickedEventIndex = null;
+
+// Event sequence for mapping event numbers to stage numbers
+// Total: 11 stages (Stage 9 has 3 sub-stages for the Local Tour)
+const EVENT_SEQUENCE = [
+    { stage: 1, eventId: 1 },
+    { stage: 2, eventId: 2 },
+    { stage: 3, eventId: null }, // choice
+    { stage: 4, eventId: 3 },
+    { stage: 5, eventId: 4 },
+    { stage: 6, eventId: null }, // choice
+    { stage: 7, eventId: 5 },
+    { stage: 8, eventId: null }, // choice
+    { stage: 9, eventId: 13 },  // Local Tour Stage 1
+    { stage: 10, eventId: 14 }, // Local Tour Stage 2
+    { stage: 11, eventId: 15 }  // Local Tour Stage 3
+];
 
 // Event metadata
 const EVENT_DATA = {
@@ -811,6 +828,35 @@ function displayAwardsTable() {
     });
 }
 
+// Map event number to stage number based on user's choice selections
+function mapEventToStage(eventNumber, choiceSelections) {
+    // Handle starting point
+    if (eventNumber === 0) return 0;
+
+    // Convert to number for consistent comparison
+    const eventNum = parseInt(eventNumber);
+
+    // Check mandatory stages (including Local Tour stages 9-11)
+    for (const seq of EVENT_SEQUENCE) {
+        if (seq.eventId === eventNum) {
+            return seq.stage;
+        }
+    }
+
+    // Check choice stages (stages 3, 6, 8)
+    for (const [stageNum, eventId] of Object.entries(choiceSelections)) {
+        // Convert both to numbers for comparison
+        if (parseInt(eventId) === eventNum) {
+            console.log(`Mapped event ${eventNum} to stage ${stageNum} via choiceSelections`);
+            return parseInt(stageNum);
+        }
+    }
+
+    // Fallback - couldn't find mapping
+    console.warn(`Could not map event ${eventNum} to a stage. choiceSelections:`, choiceSelections);
+    return eventNum; // Use event number as fallback
+}
+
 // Display personality evolution chart
 function displayPersonalityTimeline() {
     const currentPersonality = userData.personality || {};
@@ -831,9 +877,28 @@ function displayPersonalityTimeline() {
         <div class="persona-subtitle">Current Personality Profile</div>
     `;
 
+    // Get user's choice selections
+    // choiceSelections maps stage number -> event ID for choice stages
+    // usedOptionalEvents is an array where index 0 -> stage 3, index 1 -> stage 6, index 2 -> stage 8
+    let choiceSelections = userData.choiceSelections || {};
+    const usedOptionalEvents = userData.usedOptionalEvents || [];
+
+    // Build choiceSelections from usedOptionalEvents if needed
+    if (Object.keys(choiceSelections).length === 0 && usedOptionalEvents.length > 0) {
+        const choiceStages = [3, 6, 8];
+        usedOptionalEvents.forEach((eventId, index) => {
+            if (index < choiceStages.length) {
+                choiceSelections[choiceStages[index]] = eventId;
+            }
+        });
+    }
+
+    console.log('Choice selections for personality chart:', choiceSelections);
+
     // Build data points for chart (start at 50 for all traits)
     const dataPoints = [{
         eventNumber: 0,
+        stageNumber: 0,
         confidence: 50,
         humility: 50,
         aggression: 50,
@@ -845,8 +910,10 @@ function displayPersonalityTimeline() {
     // Add interview data points (these represent personality AFTER each event)
     interviewHistory.forEach(interview => {
         if (interview.personalityAfter) {
+            const stageNumber = mapEventToStage(interview.eventNumber, choiceSelections);
             dataPoints.push({
                 eventNumber: interview.eventNumber,
+                stageNumber: stageNumber,
                 ...interview.personalityAfter
             });
         }
@@ -895,9 +962,9 @@ function drawPersonalityChart(dataPoints) {
         sampledPoints = sampleDataPoints(dataPoints, 15);
     }
 
-    // Get min and max event numbers for X axis
-    const minEvent = Math.min(...sampledPoints.map(p => p.eventNumber));
-    const maxEvent = Math.max(...sampledPoints.map(p => p.eventNumber));
+    // Get min and max stage numbers for X axis
+    const minStage = Math.min(...sampledPoints.map(p => p.stageNumber));
+    const maxStage = Math.max(...sampledPoints.map(p => p.stageNumber));
 
     // Find min and max values across all traits for dynamic Y-axis scaling
     let minValue = 100;
@@ -929,9 +996,9 @@ function drawPersonalityChart(dataPoints) {
     maxValue = Math.ceil(maxValue / 5) * 5;
 
     // Helper functions for coordinate conversion
-    const xScale = (eventNum) => {
-        if (maxEvent === minEvent) return padding.left + chartWidth / 2;
-        return padding.left + ((eventNum - minEvent) / (maxEvent - minEvent)) * chartWidth;
+    const xScale = (stageNum) => {
+        if (maxStage === minStage) return padding.left + chartWidth / 2;
+        return padding.left + ((stageNum - minStage) / (maxStage - minStage)) * chartWidth;
     };
 
     const yScale = (value) => {
@@ -960,10 +1027,10 @@ function drawPersonalityChart(dataPoints) {
         ctx.fillText(Math.round(value).toString(), padding.left - 10, y);
     }
 
-    // Vertical grid lines (events)
-    const eventStep = Math.ceil((maxEvent - minEvent) / 10);
-    for (let event = minEvent; event <= maxEvent; event += eventStep) {
-        const x = xScale(event);
+    // Vertical grid lines (stages)
+    const stageStep = Math.max(1, Math.ceil((maxStage - minStage) / 10));
+    for (let stage = minStage; stage <= maxStage; stage += stageStep) {
+        const x = xScale(stage);
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
         ctx.beginPath();
         ctx.moveTo(x, padding.top);
@@ -975,7 +1042,7 @@ function drawPersonalityChart(dataPoints) {
         ctx.font = '12px Exo 2, sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'top';
-        ctx.fillText(event === 0 ? 'Start' : `E${event}`, x, padding.top + chartHeight + 10);
+        ctx.fillText(stage === 0 ? 'Start' : `Stage ${stage}`, x, padding.top + chartHeight + 10);
     }
 
     // Draw axes
@@ -996,7 +1063,7 @@ function drawPersonalityChart(dataPoints) {
         ctx.beginPath();
 
         sampledPoints.forEach((point, index) => {
-            const x = xScale(point.eventNumber);
+            const x = xScale(point.stageNumber);
             const y = yScale(point[trait.name] || 50);
 
             if (index === 0) {
@@ -1010,7 +1077,7 @@ function drawPersonalityChart(dataPoints) {
 
         // Draw points
         sampledPoints.forEach(point => {
-            const x = xScale(point.eventNumber);
+            const x = xScale(point.stageNumber);
             const y = yScale(point[trait.name] || 50);
 
             ctx.fillStyle = trait.color;
@@ -1020,10 +1087,11 @@ function drawPersonalityChart(dataPoints) {
         });
     });
 
-    // Draw hover highlight if hovering
-    if (hoveredEventIndex !== null && hoveredEventIndex < sampledPoints.length) {
-        const hoveredPoint = sampledPoints[hoveredEventIndex];
-        const x = xScale(hoveredPoint.eventNumber);
+    // Draw hover highlight if hovering (or clicked)
+    const highlightIndex = clickedEventIndex !== null ? clickedEventIndex : hoveredEventIndex;
+    if (highlightIndex !== null && highlightIndex < sampledPoints.length) {
+        const hoveredPoint = sampledPoints[highlightIndex];
+        const x = xScale(hoveredPoint.stageNumber);
 
         // Draw vertical line at hovered event
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
@@ -1113,7 +1181,7 @@ function sampleDataPoints(points, maxPoints) {
     return sampled;
 }
 
-// Setup chart interactivity (hover and click)
+// Setup chart interactivity (click for tooltips, legend toggle)
 function setupChartInteractivity() {
     const canvas = document.getElementById('personalityChart');
     if (!canvas) return;
@@ -1123,14 +1191,10 @@ function setupChartInteractivity() {
     canvas.parentNode.replaceChild(newCanvas, canvas);
     const freshCanvas = document.getElementById('personalityChart');
 
-    // Mouse move for hover tooltips
-    freshCanvas.addEventListener('mousemove', handleChartHover);
-    freshCanvas.addEventListener('mouseleave', handleChartLeave);
-
-    // Click for legend toggle
+    // Click for tooltips and legend toggle
     freshCanvas.addEventListener('click', handleChartClick);
 
-    // Change cursor over legend
+    // Change cursor over data points and legend
     freshCanvas.addEventListener('mousemove', handleCursorChange);
 
     // Hide tooltip on scroll or window events
@@ -1138,74 +1202,52 @@ function setupChartInteractivity() {
     window.addEventListener('resize', hideTooltip);
 }
 
-// Handle chart hover for tooltips
-function handleChartHover(event) {
-    const canvas = event.target;
-    const rect = canvas.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
-
-    // Scale for canvas resolution
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
-    const canvasX = x * scaleX;
-    const canvasY = y * scaleY;
-
-    // Chart dimensions (must match drawPersonalityChart)
+// Find the data point index near the click position
+function findDataPointAtPosition(canvasX, canvasY, canvas) {
     const padding = { top: 40, right: 120, bottom: 50, left: 60 };
     const chartWidth = canvas.width - padding.left - padding.right;
+    const chartHeight = canvas.height - padding.top - padding.bottom;
 
-    // Check if mouse is in chart area
-    if (canvasX < padding.left || canvasX > padding.left + chartWidth) {
-        if (hoveredEventIndex !== null) {
-            hoveredEventIndex = null;
-            drawPersonalityChart(chartDataPoints);
-        }
-        return;
+    // Check if click is in chart area
+    if (canvasX < padding.left || canvasX > padding.left + chartWidth ||
+        canvasY < padding.top || canvasY > padding.top + chartHeight) {
+        return null;
     }
 
-    // Find nearest event point
+    // Find nearest stage point
     const sampledPoints = chartDataPoints.length > 15 ? sampleDataPoints(chartDataPoints, 15) : chartDataPoints;
-    const minEvent = Math.min(...sampledPoints.map(p => p.eventNumber));
-    const maxEvent = Math.max(...sampledPoints.map(p => p.eventNumber));
+    const minStage = Math.min(...sampledPoints.map(p => p.stageNumber));
+    const maxStage = Math.max(...sampledPoints.map(p => p.stageNumber));
 
-    if (maxEvent === minEvent) return;
+    if (maxStage === minStage) return null;
 
-    // Convert mouse X to event number
-    const eventProgress = (canvasX - padding.left) / chartWidth;
-    const eventNumber = minEvent + eventProgress * (maxEvent - minEvent);
+    // Convert mouse X to stage number
+    const stageProgress = (canvasX - padding.left) / chartWidth;
+    const stageNumber = minStage + stageProgress * (maxStage - minStage);
 
     // Find closest point
     let closestIndex = 0;
     let closestDistance = Infinity;
 
     sampledPoints.forEach((point, index) => {
-        const distance = Math.abs(point.eventNumber - eventNumber);
+        const distance = Math.abs(point.stageNumber - stageNumber);
         if (distance < closestDistance) {
             closestDistance = distance;
             closestIndex = index;
         }
     });
 
-    // Update hover if changed
-    if (hoveredEventIndex !== closestIndex) {
-        hoveredEventIndex = closestIndex;
-        drawPersonalityChart(chartDataPoints);
-        showTooltip(event, sampledPoints[closestIndex]);
+    // Only return if click is reasonably close (within 5% of chart width)
+    const threshold = (maxStage - minStage) * 0.05;
+    if (closestDistance < threshold) {
+        return closestIndex;
     }
+
+    return null;
 }
 
-// Handle mouse leave chart
-function handleChartLeave() {
-    if (hoveredEventIndex !== null) {
-        hoveredEventIndex = null;
-        drawPersonalityChart(chartDataPoints);
-        hideTooltip();
-    }
-}
-
-// Show tooltip with event details
-function showTooltip(event, dataPoint) {
+// Show tooltip with event details (static position)
+function showTooltip(dataPoint, canvas) {
     // Remove existing tooltip
     hideTooltip();
 
@@ -1213,21 +1255,31 @@ function showTooltip(event, dataPoint) {
     const tooltip = document.createElement('div');
     tooltip.id = 'chartTooltip';
     tooltip.style.position = 'fixed';
-    tooltip.style.background = 'rgba(20, 24, 36, 0.95)';
-    tooltip.style.border = '1px solid rgba(69, 202, 255, 0.5)';
-    tooltip.style.borderRadius = '6px';
-    tooltip.style.padding = '0.75rem';
-    tooltip.style.pointerEvents = 'none';
+    tooltip.style.background = 'rgba(20, 24, 36, 0.98)';
+    tooltip.style.border = '2px solid rgba(69, 202, 255, 0.8)';
+    tooltip.style.borderRadius = '8px';
+    tooltip.style.padding = '1rem';
+    tooltip.style.pointerEvents = 'auto';
     tooltip.style.zIndex = '10000';
-    tooltip.style.fontSize = '0.85rem';
+    tooltip.style.fontSize = '0.9rem';
     tooltip.style.fontFamily = 'Exo 2, sans-serif';
     tooltip.style.color = '#ffffff';
-    tooltip.style.minWidth = '200px';
+    tooltip.style.minWidth = '220px';
+    tooltip.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.5)';
 
     // Build tooltip content
     const eventName = EVENT_DATA[dataPoint.eventNumber]?.name || (dataPoint.eventNumber === 0 ? 'Career Start' : `Event ${dataPoint.eventNumber}`);
+    const stageLabel = dataPoint.stageNumber === 0 ? 'Career Start' : `Stage ${dataPoint.stageNumber}`;
 
-    let content = `<div style="font-weight: 700; margin-bottom: 0.5rem; color: #45caff; font-family: Orbitron, sans-serif;">${eventName}</div>`;
+    let content = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+            <div>
+                <div style="font-weight: 700; color: #45caff; font-family: Orbitron, sans-serif; font-size: 1rem;">${eventName}</div>
+                <div style="font-size: 0.8rem; color: rgba(255, 255, 255, 0.7); margin-top: 0.25rem;">${stageLabel}</div>
+            </div>
+            <button id="closeTooltip" style="background: none; border: none; color: #45caff; font-size: 1.5rem; cursor: pointer; padding: 0; width: 24px; height: 24px; line-height: 1;">&times;</button>
+        </div>
+    `;
 
     const traits = [
         { name: 'confidence', label: 'Confidence', color: '#ff1b6b' },
@@ -1242,7 +1294,7 @@ function showTooltip(event, dataPoint) {
         if (visibleTraits[trait.name]) {
             const value = Math.round(dataPoint[trait.name] || 50);
             content += `
-                <div style="display: flex; justify-content: space-between; margin-top: 0.25rem;">
+                <div style="display: flex; justify-content: space-between; margin-top: 0.4rem;">
                     <span style="color: ${trait.color};">● ${trait.label}:</span>
                     <span style="font-weight: 700;">${value}</span>
                 </div>
@@ -1252,20 +1304,19 @@ function showTooltip(event, dataPoint) {
 
     tooltip.innerHTML = content;
 
-    // Position tooltip
-    tooltip.style.left = (event.clientX + 15) + 'px';
-    tooltip.style.top = (event.clientY - 10) + 'px';
-
+    // Position tooltip in center of screen
     document.body.appendChild(tooltip);
-
-    // Adjust if tooltip goes off screen
     const tooltipRect = tooltip.getBoundingClientRect();
-    if (tooltipRect.right > window.innerWidth) {
-        tooltip.style.left = (event.clientX - tooltipRect.width - 15) + 'px';
-    }
-    if (tooltipRect.bottom > window.innerHeight) {
-        tooltip.style.top = (event.clientY - tooltipRect.height + 10) + 'px';
-    }
+    tooltip.style.left = `${(window.innerWidth - tooltipRect.width) / 2}px`;
+    tooltip.style.top = `${Math.max(100, (window.innerHeight - tooltipRect.height) / 2)}px`;
+
+    // Add close button event listener
+    document.getElementById('closeTooltip').addEventListener('click', hideTooltip);
+
+    // Close on click outside
+    setTimeout(() => {
+        document.addEventListener('click', handleTooltipClickAway, true);
+    }, 100);
 }
 
 // Hide tooltip
@@ -1274,16 +1325,27 @@ function hideTooltip() {
     if (tooltip) {
         tooltip.remove();
     }
-    // Reset hover state and redraw chart
-    if (hoveredEventIndex !== null) {
-        hoveredEventIndex = null;
+    // Remove click-away listener
+    document.removeEventListener('click', handleTooltipClickAway, true);
+
+    // Reset clicked state and redraw chart
+    if (clickedEventIndex !== null) {
+        clickedEventIndex = null;
         if (chartDataPoints && chartDataPoints.length > 0) {
             drawPersonalityChart(chartDataPoints);
         }
     }
 }
 
-// Handle chart clicks (for legend toggle)
+// Handle clicks away from tooltip
+function handleTooltipClickAway(event) {
+    const tooltip = document.getElementById('chartTooltip');
+    if (tooltip && !tooltip.contains(event.target)) {
+        hideTooltip();
+    }
+}
+
+// Handle chart clicks (for data points and legend toggle)
 function handleChartClick(event) {
     const canvas = event.target;
     const rect = canvas.getBoundingClientRect();
@@ -1322,6 +1384,21 @@ function handleChartClick(event) {
                 drawPersonalityChart(chartDataPoints);
             }
         });
+        return; // Don't check for data point clicks if we clicked legend
+    }
+
+    // Check if click is on a data point
+    const dataPointIndex = findDataPointAtPosition(canvasX, canvasY, canvas);
+    if (dataPointIndex !== null) {
+        const sampledPoints = chartDataPoints.length > 15 ? sampleDataPoints(chartDataPoints, 15) : chartDataPoints;
+        clickedEventIndex = dataPointIndex;
+        drawPersonalityChart(chartDataPoints);
+        showTooltip(sampledPoints[dataPointIndex], canvas);
+    } else {
+        // Click on empty space - hide tooltip if showing
+        if (clickedEventIndex !== null) {
+            hideTooltip();
+        }
     }
 }
 
