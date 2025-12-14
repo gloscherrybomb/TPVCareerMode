@@ -39,6 +39,7 @@ let visibleTraits = {
 };
 let hoveredEventIndex = null;
 let clickedEventIndex = null;
+let hoverTooltipElement = null;
 
 // Event sequence for mapping event numbers to stage numbers
 // Total: 11 stages (Stage 9 has 3 sub-stages for the Local Tour)
@@ -1181,7 +1182,7 @@ function sampleDataPoints(points, maxPoints) {
     return sampled;
 }
 
-// Setup chart interactivity (click for tooltips, legend toggle)
+// Setup chart interactivity (click for tooltips, legend toggle, hover)
 function setupChartInteractivity() {
     const canvas = document.getElementById('personalityChart');
     if (!canvas) return;
@@ -1191,15 +1192,30 @@ function setupChartInteractivity() {
     canvas.parentNode.replaceChild(newCanvas, canvas);
     const freshCanvas = document.getElementById('personalityChart');
 
-    // Click for tooltips and legend toggle
+    // Click for detailed tooltips and legend toggle
     freshCanvas.addEventListener('click', handleChartClick);
 
-    // Change cursor over data points and legend
+    // Mouse move for hover tooltips and cursor change
     freshCanvas.addEventListener('mousemove', handleCursorChange);
 
-    // Hide tooltip on scroll or window events
-    window.addEventListener('scroll', hideTooltip, true);
-    window.addEventListener('resize', hideTooltip);
+    // Hide hover tooltip when leaving canvas
+    freshCanvas.addEventListener('mouseleave', () => {
+        hideHoverTooltip();
+        if (clickedEventIndex === null && hoveredEventIndex !== null) {
+            hoveredEventIndex = null;
+            drawPersonalityChart(chartDataPoints);
+        }
+    });
+
+    // Hide tooltips on scroll or window events
+    window.addEventListener('scroll', () => {
+        hideTooltip();
+        hideHoverTooltip();
+    }, true);
+    window.addEventListener('resize', () => {
+        hideTooltip();
+        hideHoverTooltip();
+    });
 }
 
 // Find the data point index near the click position
@@ -1402,7 +1418,94 @@ function handleChartClick(event) {
     }
 }
 
-// Handle cursor change over legend
+// Create hover tooltip element for displaying trait values on hover
+function createHoverTooltip() {
+    if (hoverTooltipElement) return hoverTooltipElement;
+
+    const tooltip = document.createElement('div');
+    tooltip.id = 'personalityHoverTooltip';
+    tooltip.style.cssText = `
+        position: fixed;
+        background: linear-gradient(135deg, rgba(255, 27, 107, 0.95), rgba(69, 202, 255, 0.95));
+        border: 1px solid rgba(255, 27, 107, 0.4);
+        border-radius: 8px;
+        padding: 8px 12px;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.15s ease;
+        z-index: 10000;
+        white-space: nowrap;
+        font-size: 13px;
+        font-family: 'Exo 2', sans-serif;
+        color: #fff;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    `;
+
+    document.body.appendChild(tooltip);
+    hoverTooltipElement = tooltip;
+    return tooltip;
+}
+
+// Show hover tooltip with trait values
+function showHoverTooltip(dataPoint, mouseX, mouseY) {
+    const tooltip = createHoverTooltip();
+
+    const traits = [
+        { name: 'confidence', label: 'Confidence', color: '#ff1b6b' },
+        { name: 'humility', label: 'Humility', color: '#45caff' },
+        { name: 'aggression', label: 'Aggression', color: '#ffc107' },
+        { name: 'professionalism', label: 'Professionalism', color: '#00e676' },
+        { name: 'showmanship', label: 'Showmanship', color: '#e040fb' },
+        { name: 'resilience', label: 'Resilience', color: '#ff5722' }
+    ];
+
+    const stageLabel = dataPoint.stageNumber === 0 ? 'Start' : `Stage ${dataPoint.stageNumber}`;
+
+    let content = `<div style="font-weight: 700; margin-bottom: 6px; font-size: 14px;">${stageLabel}</div>`;
+    content += '<div style="display: grid; grid-template-columns: 1fr auto; gap: 2px 12px;">';
+
+    traits.forEach(trait => {
+        if (visibleTraits[trait.name]) {
+            const value = Math.round(dataPoint[trait.name] || 50);
+            content += `
+                <span style="color: ${trait.color}; font-weight: 600;">${trait.label}:</span>
+                <span style="font-weight: 400;">${value}</span>
+            `;
+        }
+    });
+
+    content += '</div>';
+    tooltip.innerHTML = content;
+
+    // Position tooltip near cursor
+    const tooltipRect = tooltip.getBoundingClientRect();
+    let left = mouseX + 15;
+    let top = mouseY - 10;
+
+    // Boundary detection
+    if (left + 200 > window.innerWidth) {
+        left = mouseX - 200 - 15;
+    }
+    if (top + 150 > window.innerHeight) {
+        top = mouseY - 150;
+    }
+    if (top < 10) {
+        top = 10;
+    }
+
+    tooltip.style.left = `${left}px`;
+    tooltip.style.top = `${top}px`;
+    tooltip.style.opacity = '1';
+}
+
+// Hide hover tooltip
+function hideHoverTooltip() {
+    if (hoverTooltipElement) {
+        hoverTooltipElement.style.opacity = '0';
+    }
+}
+
+// Handle mouse movement over chart (cursor change and hover tooltip)
 function handleCursorChange(event) {
     const canvas = event.target;
     const rect = canvas.getBoundingClientRect();
@@ -1423,7 +1526,41 @@ function handleCursorChange(event) {
     const overLegend = canvasX >= legendX && canvasX <= legendX + legendWidth &&
                        canvasY >= legendY - 12 && canvasY <= legendY + (6 * legendItemHeight);
 
-    canvas.style.cursor = overLegend ? 'pointer' : 'default';
+    // Check if hovering over a data point
+    const dataPointIndex = findDataPointAtPosition(canvasX, canvasY, canvas);
+
+    if (overLegend) {
+        canvas.style.cursor = 'pointer';
+        hideHoverTooltip();
+        // Clear hover highlight if not clicked
+        if (clickedEventIndex === null && hoveredEventIndex !== null) {
+            hoveredEventIndex = null;
+            drawPersonalityChart(chartDataPoints);
+        }
+    } else if (dataPointIndex !== null) {
+        canvas.style.cursor = 'pointer';
+
+        // Update hover state and show tooltip
+        if (hoveredEventIndex !== dataPointIndex) {
+            hoveredEventIndex = dataPointIndex;
+            // Only redraw if not showing a clicked tooltip
+            if (clickedEventIndex === null) {
+                drawPersonalityChart(chartDataPoints);
+            }
+        }
+
+        // Show hover tooltip
+        const sampledPoints = chartDataPoints.length > 15 ? sampleDataPoints(chartDataPoints, 15) : chartDataPoints;
+        showHoverTooltip(sampledPoints[dataPointIndex], event.clientX, event.clientY);
+    } else {
+        canvas.style.cursor = 'default';
+        hideHoverTooltip();
+        // Clear hover highlight if not clicked
+        if (clickedEventIndex === null && hoveredEventIndex !== null) {
+            hoveredEventIndex = null;
+            drawPersonalityChart(chartDataPoints);
+        }
+    }
 }
 
 // Display rivals table
