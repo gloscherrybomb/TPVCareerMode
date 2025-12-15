@@ -1616,11 +1616,9 @@ async function processUserResult(uid, eventInfo, results) {
     newLifetimeStats.biggestWin = bigWin;
   }
 
-  // Ensure unlock fields present for compatibility
-  if (!previewCadenceEnabled) {
-    eventResults.unlockBonusPoints = eventResults.unlockBonusPoints || 0;
-    eventResults.unlockBonusesApplied = eventResults.unlockBonusesApplied || [];
-  }
+  // Ensure unlock fields present for compatibility (always set defaults if not already set)
+  eventResults.unlockBonusPoints = eventResults.unlockBonusPoints || 0;
+  eventResults.unlockBonusesApplied = eventResults.unlockBonusesApplied || [];
 
   // NOTE: Cadence Credits calculation moved to AFTER awards are added (after line 1710+)
 
