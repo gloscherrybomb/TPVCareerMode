@@ -37,13 +37,13 @@ async function createUnlockCard(unlock, options = {}) {
     card.addEventListener('click', onClick);
   }
 
-  // Try to load image, fallback to emoji
-  const imageSrc = await loadUnlockImage(unlock.id);
+  // Try to load image, fallback to emoji (skip for locked cards)
+  const imageSrc = isLocked ? null : await loadUnlockImage(unlock.id);
 
   // Build card HTML
   card.innerHTML = `
-    ${createImageArea(unlock, imageSrc, size)}
-    ${createCardBody(unlock, size, showTrigger, showNarrative, showCost)}
+    ${createImageArea(unlock, imageSrc, size, isLocked)}
+    ${createCardBody(unlock, size, showTrigger, showNarrative, showCost, isLocked)}
   `;
 
   // Add cooldown indicator if resting
@@ -60,8 +60,16 @@ async function createUnlockCard(unlock, options = {}) {
 /**
  * Creates the image area of the card
  */
-function createImageArea(unlock, imageSrc, size) {
-  const pointsSize = size === 'badge' ? 'small' : 'normal';
+function createImageArea(unlock, imageSrc, size, isLocked = false) {
+  // For locked cards, show mystery icon
+  if (isLocked) {
+    return `
+      <div class="card-image-area locked-image-area">
+        <span class="card-emoji locked-emoji">🔒</span>
+        <span class="points-badge locked-badge">?</span>
+      </div>
+    `;
+  }
 
   const imageContent = imageSrc
     ? `<img class="card-image" src="${imageSrc}" alt="${unlock.name}">`
@@ -78,7 +86,7 @@ function createImageArea(unlock, imageSrc, size) {
 /**
  * Creates the body content of the card
  */
-function createCardBody(unlock, size, showTrigger, showNarrative, showCost) {
+function createCardBody(unlock, size, showTrigger, showNarrative, showCost, isLocked = false) {
   const personalityTag = unlock.personality
     ? `<span class="personality-tag">+${unlock.personality}</span>`
     : (unlock.requires
@@ -90,14 +98,40 @@ function createCardBody(unlock, size, showTrigger, showNarrative, showCost) {
     return `
       <div class="card-body">
         <div class="card-header">
-          <span class="card-name">${unlock.name}</span>
+          <span class="card-name">${isLocked ? '???' : unlock.name}</span>
           <span class="tier-indicator tier-${unlock.tier}">T${unlock.tier}</span>
         </div>
       </div>
     `;
   }
 
-  // For full and compact sizes
+  // For locked cards, obscure details but show cost
+  if (isLocked) {
+    return `
+      <div class="card-body">
+        <div class="card-header">
+          <span class="card-name locked-name">???</span>
+          <span class="tier-indicator tier-${unlock.tier}">T${unlock.tier}</span>
+        </div>
+        ${showTrigger ? `
+          <div class="trigger-box locked-trigger">
+            <div class="trigger-label">Trigger Condition</div>
+            <div class="trigger-text">Purchase to reveal</div>
+          </div>
+        ` : ''}
+        ${showNarrative ? `
+          <p class="card-narrative locked-narrative">This upgrade's details are hidden until purchased.</p>
+        ` : ''}
+        ${showCost ? `
+          <div class="card-footer">
+            <span class="cost-display">${unlock.cost} CC</span>
+          </div>
+        ` : ''}
+      </div>
+    `;
+  }
+
+  // For full and compact sizes (unlocked)
   return `
     <div class="card-body">
       <div class="card-header">
@@ -157,10 +191,10 @@ function createUnlockCardSync(unlock, options = {}) {
     card.addEventListener('click', onClick);
   }
 
-  // Start with emoji, load image in background
+  // Start with emoji, load image in background (skip image loading for locked cards)
   card.innerHTML = `
-    ${createImageArea(unlock, null, size)}
-    ${createCardBody(unlock, size, showTrigger, showNarrative, showCost)}
+    ${createImageArea(unlock, null, size, isLocked)}
+    ${createCardBody(unlock, size, showTrigger, showNarrative, showCost, isLocked)}
   `;
 
   // Add cooldown indicator if resting
@@ -171,25 +205,27 @@ function createUnlockCardSync(unlock, options = {}) {
     card.querySelector('.card-image-area').appendChild(cooldownBadge);
   }
 
-  // Load image asynchronously and update
-  loadUnlockImage(unlock.id).then(imageSrc => {
-    if (imageSrc) {
-      const imageArea = card.querySelector('.card-image-area');
-      const emoji = imageArea.querySelector('.card-emoji');
+  // Load image asynchronously and update (only for unlocked cards)
+  if (!isLocked) {
+    loadUnlockImage(unlock.id).then(imageSrc => {
+      if (imageSrc) {
+        const imageArea = card.querySelector('.card-image-area');
+        const emoji = imageArea.querySelector('.card-emoji');
 
-      if (emoji) {
-        const img = document.createElement('img');
-        img.className = 'card-image';
-        img.src = imageSrc;
-        img.alt = unlock.name;
+        if (emoji) {
+          const img = document.createElement('img');
+          img.className = 'card-image';
+          img.src = imageSrc;
+          img.alt = unlock.name;
 
-        // Replace emoji with image
-        emoji.replaceWith(img);
+          // Replace emoji with image
+          emoji.replaceWith(img);
+        }
       }
-    }
-  }).catch(() => {
-    // Image load failed, keep emoji
-  });
+    }).catch(() => {
+      // Image load failed, keep emoji
+    });
+  }
 
   return card;
 }
