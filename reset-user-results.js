@@ -142,15 +142,34 @@ async function resetUserResults() {
         // Personality awards (reset these too)
         personalityAwards: admin.firestore.FieldValue.delete(),
 
-        // Cadence Credits currency - preserve spend transactions, reset earnings
-        // Calculate total spent so balance accounts for purchases when re-earning
+        // Cadence Credits currency - calculate spent from inventory + slots
+        // Note: Store doesn't record spend transactions, so we calculate from owned items
         currency: (() => {
-          const spendTransactions = (userData.currency?.transactions || []).filter(t => t.type === 'spend');
-          const totalSpent = spendTransactions.reduce((sum, t) => sum + (t.amount || 0), 0);
+          // Item costs lookup
+          const ITEM_COSTS = {
+            paceNotes: 100, teamCarRecon: 120, sprintPrimer: 120,
+            aeroWheels: 200, cadenceNutrition: 200, soigneurSession: 200,
+            preRaceMassage: 300, windTunnel: 300, altitudeAcclim: 300,
+            signatureMove: 500, contractBonus: 500, fanFavorite: 500
+          };
+
+          // Calculate spent on inventory items
+          const inventory = userData.unlocks?.inventory || [];
+          const itemSpent = inventory.reduce((sum, itemId) => sum + (ITEM_COSTS[itemId] || 0), 0);
+
+          // Calculate spent on extra slots (slot 2 = 400, slot 3 = 1200)
+          const slotCount = userData.unlocks?.slotCount || 1;
+          let slotSpent = 0;
+          if (slotCount >= 2) slotSpent += 400;
+          if (slotCount >= 3) slotSpent += 1200;
+
+          const totalSpent = itemSpent + slotSpent;
+          console.log(`   User ${userData.name}: inventory spent=${itemSpent}, slots spent=${slotSpent}, total=${totalSpent}`);
+
           return {
             balance: -totalSpent,  // Negative balance = amount owed from purchases
             totalEarned: 0,        // Will re-earn from events
-            transactions: spendTransactions  // Keep purchase history
+            transactions: []       // Clear transactions (not reliably recorded)
           };
         })(),
 
