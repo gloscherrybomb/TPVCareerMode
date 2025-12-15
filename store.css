@@ -445,8 +445,9 @@ body {
 /* Store Grid */
 .store-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 1.5rem;
+    align-items: stretch;
 }
 
 /* ===== UNLOCK CARD ANIMATIONS ===== */
@@ -488,166 +489,16 @@ body {
     100% { left: 100%; }
 }
 
-/* Unlock Card */
-.unlock-card {
-    background: linear-gradient(135deg, rgba(20, 24, 36, 0.8), rgba(20, 24, 36, 0.6));
-    border: 2px solid rgba(255, 255, 255, 0.08);
-    border-radius: 16px;
-    padding: 1.5rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-    box-shadow:
-        0 2px 8px rgba(0, 0, 0, 0.3),
-        0 8px 16px rgba(0, 0, 0, 0.2),
-        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+/* Unlock Card - Store-specific overrides */
+/* Base styles now in unlock-card.css */
+
+/* Entry animation for store cards */
+.store-grid .unlock-card {
     animation: cardEnter 0.5s ease-out backwards;
     animation-delay: calc(var(--card-index, 0) * 0.05s);
 }
 
-/* Tier accent bar at top of card */
-.unlock-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: transparent;
-    transition: all 0.3s ease;
-}
-
-.unlock-card:hover {
-    transform: translateY(-5px) scale(1.02);
-    border-color: rgba(255, 255, 255, 0.15);
-}
-
-/* Tier-specific backgrounds and accent bars */
-.unlock-card.tier-120 {
-    background: linear-gradient(135deg, rgba(69, 202, 255, 0.03) 0%, rgba(20, 24, 36, 0.8) 100%);
-}
-
-.unlock-card.tier-120::before {
-    background: linear-gradient(90deg, var(--accent-blue), rgba(69, 202, 255, 0.5));
-    box-shadow: 0 0 12px rgba(69, 202, 255, 0.3);
-}
-
-.unlock-card.tier-120:hover {
-    box-shadow:
-        0 8px 32px rgba(69, 202, 255, 0.15),
-        0 2px 8px rgba(0, 0, 0, 0.3),
-        0 8px 16px rgba(0, 0, 0, 0.2),
-        inset 0 1px 0 rgba(69, 202, 255, 0.1);
-}
-
-.unlock-card.tier-120:hover::before {
-    height: 5px;
-    box-shadow: 0 0 20px rgba(69, 202, 255, 0.6);
-}
-
-.unlock-card.tier-200 {
-    background: linear-gradient(135deg, rgba(0, 255, 136, 0.03) 0%, rgba(20, 24, 36, 0.8) 100%);
-}
-
-.unlock-card.tier-200::before {
-    background: linear-gradient(90deg, var(--success), rgba(0, 255, 136, 0.5));
-    box-shadow: 0 0 12px rgba(0, 255, 136, 0.3);
-}
-
-.unlock-card.tier-200:hover {
-    box-shadow:
-        0 8px 32px rgba(0, 255, 136, 0.15),
-        0 2px 8px rgba(0, 0, 0, 0.3),
-        0 8px 16px rgba(0, 0, 0, 0.2),
-        inset 0 1px 0 rgba(0, 255, 136, 0.1);
-}
-
-.unlock-card.tier-200:hover::before {
-    height: 5px;
-    box-shadow: 0 0 20px rgba(0, 255, 136, 0.6);
-}
-
-.unlock-card.tier-300 {
-    background: linear-gradient(135deg, rgba(255, 170, 0, 0.03) 0%, rgba(20, 24, 36, 0.8) 100%);
-}
-
-.unlock-card.tier-300::before {
-    background: linear-gradient(90deg, var(--warning), rgba(255, 170, 0, 0.5));
-    box-shadow: 0 0 12px rgba(255, 170, 0, 0.3);
-}
-
-.unlock-card.tier-300:hover {
-    box-shadow:
-        0 8px 32px rgba(255, 170, 0, 0.15),
-        0 2px 8px rgba(0, 0, 0, 0.3),
-        0 8px 16px rgba(0, 0, 0, 0.2),
-        inset 0 1px 0 rgba(255, 170, 0, 0.1);
-}
-
-.unlock-card.tier-300:hover::before {
-    height: 5px;
-    box-shadow: 0 0 20px rgba(255, 170, 0, 0.6);
-}
-
-.unlock-card.tier-400 {
-    background: linear-gradient(135deg, rgba(199, 26, 229, 0.03) 0%, rgba(20, 24, 36, 0.8) 100%);
-}
-
-.unlock-card.tier-400::before {
-    background: linear-gradient(90deg, var(--accent-purple), rgba(199, 26, 229, 0.5));
-    box-shadow: 0 0 12px rgba(199, 26, 229, 0.3);
-}
-
-.unlock-card.tier-400:hover {
-    box-shadow:
-        0 8px 32px rgba(199, 26, 229, 0.15),
-        0 2px 8px rgba(0, 0, 0, 0.3),
-        0 8px 16px rgba(0, 0, 0, 0.2),
-        inset 0 1px 0 rgba(199, 26, 229, 0.1);
-}
-
-.unlock-card.tier-400:hover::before {
-    height: 5px;
-    box-shadow: 0 0 20px rgba(199, 26, 229, 0.6);
-}
-
-/* Locked State - Enhanced */
-.unlock-card.locked {
-    opacity: 0.65;
-    cursor: help;
-    background: linear-gradient(135deg, rgba(255, 170, 0, 0.02) 0%, rgba(20, 24, 36, 0.8) 100%);
-    border-color: rgba(255, 170, 0, 0.15);
-    position: relative;
-}
-
-.unlock-card.locked::before {
-    background: transparent;
-}
-
-.unlock-card.locked::after {
-    content: '🔒';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 3rem;
-    opacity: 0.15;
-    pointer-events: none;
-}
-
-.unlock-card.locked:hover {
-    opacity: 0.8;
-    border-color: rgba(255, 170, 0, 0.3);
-    box-shadow: 0 10px 30px rgba(255, 170, 0, 0.1);
-}
-
-.unlock-card.locked:hover .unlock-lock-icon {
-    animation: lockShake 0.5s ease-in-out;
-}
-
+/* Lock icon for store */
 .unlock-lock-icon {
     position: absolute;
     top: 1rem;
@@ -659,80 +510,7 @@ body {
 
 .unlock-card.locked:hover .unlock-lock-icon {
     opacity: 0.8;
-}
-
-.unlock-card.locked .unlock-emoji {
-    display: none;
-}
-
-.unlock-card.locked .unlock-name,
-.unlock-card.locked .unlock-description {
-    filter: blur(2px);
-    user-select: none;
-}
-
-/* Keep cost and personality requirements visible */
-.unlock-card.locked .unlock-cost,
-.unlock-card.locked .unlock-bonus,
-.unlock-card.locked .unlock-personality-locked {
-    filter: none;
-    opacity: 1;
-}
-
-/* Owned State - Subtle Visual Indicator */
-.unlock-card.owned {
-    background: linear-gradient(135deg, rgba(0, 255, 136, 0.05), rgba(69, 202, 255, 0.05));
-    border-color: rgba(0, 255, 136, 0.2);
-}
-
-.unlock-card.owned:hover {
-    border-color: rgba(0, 255, 136, 0.4);
-    box-shadow: 0 15px 40px rgba(0, 255, 136, 0.2);
-}
-
-/* Equipped State - Clear Visual Indicator */
-.unlock-card.equipped {
-    background: linear-gradient(135deg, rgba(255, 27, 107, 0.08), rgba(199, 26, 229, 0.08));
-    border-color: rgba(255, 27, 107, 0.4);
-    position: relative;
-}
-
-.unlock-card.equipped::after {
-    content: '⚡ EQUIPPED';
-    position: absolute;
-    top: 0.5rem;
-    left: 0.5rem;
-    padding: 0.25rem 0.6rem;
-    background: linear-gradient(135deg, rgba(255, 27, 107, 0.9) 0%, rgba(199, 26, 229, 0.9) 100%);
-    border: none;
-    border-radius: 4px;
-    color: #fff;
-    font-size: 0.65rem;
-    font-weight: 800;
-    letter-spacing: 1px;
-    animation: badgePulse 2s ease-in-out infinite;
-    box-shadow: 0 2px 8px rgba(255, 27, 107, 0.4);
-    z-index: 10;
-}
-
-.unlock-card.equipped:hover {
-    border-color: rgba(255, 27, 107, 0.6);
-    box-shadow: 0 15px 40px rgba(255, 27, 107, 0.3);
-}
-
-.unlock-card.equipped::before {
-    background: linear-gradient(90deg, var(--accent-pink), var(--accent-purple));
-    box-shadow: 0 0 16px rgba(255, 27, 107, 0.5);
-}
-
-.unlock-card.equipped:hover::before {
-    height: 5px;
-    box-shadow: 0 0 24px rgba(255, 27, 107, 0.7);
-}
-
-/* Don't show equipped badge on locked cards (shouldn't happen but for safety) */
-.unlock-card.locked.equipped::after {
-    display: none;
+    animation: lockShake 0.5s ease-in-out;
 }
 
 .unlock-image {

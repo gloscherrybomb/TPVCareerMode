@@ -318,8 +318,9 @@
    VARIANT: FULL (Store Page)
 ======================================== */
 .unlock-card-full {
-  width: 280px;
-  min-height: 400px;
+  width: 100%;
+  min-height: 420px;
+  height: 100%;
 }
 
 .unlock-card-full .card-image-area {
