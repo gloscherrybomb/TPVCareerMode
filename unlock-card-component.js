@@ -75,10 +75,13 @@ function createImageArea(unlock, imageSrc, size, isLocked = false) {
     ? `<img class="card-image" src="${imageSrc}" alt="${unlock.name}">`
     : `<span class="card-emoji">${unlock.emoji}</span>`;
 
+  // Hide points badge on badge size (profile page)
+  const showPointsBadge = size !== 'badge';
+
   return `
     <div class="card-image-area">
       ${imageContent}
-      <span class="points-badge">+${unlock.pointsBonus}</span>
+      ${showPointsBadge ? `<span class="points-badge">+${unlock.pointsBonus}</span>` : ''}
     </div>
   `;
 }
@@ -93,25 +96,34 @@ function createCardBody(unlock, size, showTrigger, showNarrative, showCost, isLo
       ? `<span class="personality-tag">${unlock.requires}</span>`
       : '');
 
-  // For badge size, simplified layout
+  // For badge size (profile page), just show name
   if (size === 'badge') {
     return `
       <div class="card-body">
         <div class="card-header">
           <span class="card-name">${isLocked ? '???' : unlock.name}</span>
-          <span class="tier-indicator tier-${unlock.tier}">T${unlock.tier}</span>
         </div>
       </div>
     `;
   }
 
-  // For locked cards, obscure details but show cost
+  // For compact size (event-detail loadout), just show name
+  if (size === 'compact') {
+    return `
+      <div class="card-body">
+        <div class="card-header">
+          <span class="card-name">${isLocked ? '???' : unlock.name}</span>
+        </div>
+      </div>
+    `;
+  }
+
+  // For locked cards (full size), obscure details but show cost
   if (isLocked) {
     return `
       <div class="card-body">
         <div class="card-header">
           <span class="card-name locked-name">???</span>
-          <span class="tier-indicator tier-${unlock.tier}">T${unlock.tier}</span>
         </div>
         ${showTrigger ? `
           <div class="trigger-box locked-trigger">
@@ -131,12 +143,11 @@ function createCardBody(unlock, size, showTrigger, showNarrative, showCost, isLo
     `;
   }
 
-  // For full and compact sizes (unlocked)
+  // For full size (unlocked)
   return `
     <div class="card-body">
       <div class="card-header">
         <span class="card-name">${unlock.name}</span>
-        <span class="tier-indicator tier-${unlock.tier}">T${unlock.tier}</span>
       </div>
       ${showTrigger ? `
         <div class="trigger-box">

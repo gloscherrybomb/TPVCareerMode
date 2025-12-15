@@ -90,7 +90,7 @@
   border-color: rgba(255, 27, 107, 0.4);
 }
 
-.unlock-card.equipped::after {
+.unlock-card-full.equipped::after {
   content: '⚡ EQUIPPED';
   position: absolute;
   top: 8px;
@@ -104,6 +104,12 @@
   letter-spacing: 1px;
   box-shadow: 0 2px 8px rgba(255, 27, 107, 0.4);
   z-index: 10;
+}
+
+/* Hide equipped badge on compact and badge sizes */
+.unlock-card-compact.equipped::after,
+.unlock-card-badge.equipped::after {
+  display: none;
 }
 
 .unlock-card.locked {
