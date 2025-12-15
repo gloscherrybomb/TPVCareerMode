@@ -107,7 +107,7 @@ function createCardBody(unlock, size, showTrigger, showNarrative, showCost, isLo
     `;
   }
 
-  // For compact size (profile & event-detail), show mini card with trigger + narrative
+  // For compact size (profile & event-detail), show mini card with trigger only
   if (size === 'compact') {
     if (isLocked) {
       return `
@@ -131,7 +131,6 @@ function createCardBody(unlock, size, showTrigger, showNarrative, showCost, isLo
           <div class="trigger-label">Trigger Condition</div>
           <div class="trigger-text">${unlock.description}</div>
         </div>
-        <p class="card-narrative">${unlock.narrative}</p>
       </div>
     `;
   }

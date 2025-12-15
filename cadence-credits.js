@@ -435,13 +435,7 @@ function renderEquippedDisplay() {
   const panelDiv = document.createElement('div');
   panelDiv.className = 'cc-selector-panel';
 
-  // Add header
-  panelDiv.innerHTML = `
-    <div class="cc-selector-header">
-      <div class="cc-selector-title">Upgrades</div>
-      <div class="cc-selector-subtitle">Equipped for this race • Balance: <span class="cc-balance-highlight">${formatBalance(balance)}</span></div>
-    </div>
-  `;
+  // No header - section title "Unlocks" is already shown above
 
   if (hasEquipped) {
     // Create grid container

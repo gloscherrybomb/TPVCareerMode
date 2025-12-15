@@ -423,10 +423,8 @@
 }
 
 .unlock-card-compact .trigger-text {
-  font-size: 0.75rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  font-size: 0.8rem;
+  line-height: 1.4;
 }
 
 .unlock-card-compact .card-narrative {
