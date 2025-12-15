@@ -122,66 +122,94 @@ function renderSlots() {
   const balance = userData.currency?.balance || 0;
 
   for (let i = 0; i < 3; i++) {
-    const slotChip = document.createElement('div');
-    slotChip.className = `slot-chip ${i >= slotCount ? 'slot-chip-locked' : ''}`;
+    const slotCard = document.createElement('div');
+    slotCard.className = `store-slot-card ${i >= slotCount ? 'store-slot-locked' : ''}`;
+
+    // Slot label
+    const slotLabel = document.createElement('div');
+    slotLabel.className = 'store-slot-label';
+    slotLabel.textContent = `Slot ${i + 1}`;
+    slotCard.appendChild(slotLabel);
 
     if (i < slotCount) {
       const equippedId = equipped[i];
       const unlock = unlockCatalog.find(u => u.id === equippedId);
       const isOnCooldown = unlock && cooldowns[equippedId] === true;
 
-      const slotLabel = document.createElement('span');
-      slotLabel.className = 'slot-chip-label';
-      slotLabel.textContent = `Slot ${i + 1}:`;
-      slotChip.appendChild(slotLabel);
-
-      const slotContent = document.createElement('span');
-      slotContent.className = 'slot-chip-content';
-      slotContent.textContent = unlock ? `${getItemEmoji(unlock)} ${unlock.name}` : 'Empty';
-      slotChip.appendChild(slotContent);
-
-      // Show resting indicator if on cooldown
-      if (isOnCooldown) {
-        const restingBadge = document.createElement('span');
-        restingBadge.className = 'slot-chip-resting';
-        restingBadge.textContent = '⏱️ Resting';
-        restingBadge.title = 'This upgrade triggered last race and is resting for 1 race';
-        slotChip.appendChild(restingBadge);
-      }
-
-      // Allow unequip directly from slot
       if (unlock) {
+        // Card content wrapper
+        const content = document.createElement('div');
+        content.className = 'store-slot-content';
+
+        // Image area
+        const imageArea = document.createElement('div');
+        imageArea.className = 'store-slot-image';
+        imageArea.innerHTML = `<span class="store-slot-emoji">${unlock.emoji}</span>`;
+        content.appendChild(imageArea);
+
+        // Load image asynchronously
+        loadUnlockImage(unlock.id).then(imageSrc => {
+          if (imageSrc) {
+            const img = document.createElement('img');
+            img.src = imageSrc;
+            img.alt = unlock.name;
+            img.className = 'store-slot-img';
+            imageArea.innerHTML = '';
+            imageArea.appendChild(img);
+          }
+        }).catch(() => {});
+
+        // Name
+        const name = document.createElement('div');
+        name.className = 'store-slot-name';
+        name.textContent = unlock.name;
+        content.appendChild(name);
+
+        slotCard.appendChild(content);
+
+        // Show resting indicator if on cooldown
+        if (isOnCooldown) {
+          const restingBadge = document.createElement('span');
+          restingBadge.className = 'store-slot-resting';
+          restingBadge.textContent = 'Resting';
+          restingBadge.title = 'This upgrade triggered last race and is resting for 1 race';
+          slotCard.appendChild(restingBadge);
+        }
+
+        // Unequip button
         const unequipBtn = document.createElement('button');
-        unequipBtn.className = 'slot-chip-unequip';
+        unequipBtn.className = 'store-slot-unequip';
         unequipBtn.textContent = '×';
         unequipBtn.title = 'Unequip';
         unequipBtn.addEventListener('click', () => equipItem(equippedId));
-        slotChip.appendChild(unequipBtn);
+        slotCard.appendChild(unequipBtn);
+      } else {
+        // Empty slot
+        const emptyContent = document.createElement('div');
+        emptyContent.className = 'store-slot-empty';
+        emptyContent.textContent = 'Empty';
+        slotCard.appendChild(emptyContent);
       }
     } else {
-      const slotLabel = document.createElement('span');
-      slotLabel.className = 'slot-chip-label';
-      slotLabel.textContent = `Slot ${i + 1}:`;
-      slotChip.appendChild(slotLabel);
+      // Locked slot
+      const lockedContent = document.createElement('div');
+      lockedContent.className = 'store-slot-locked-content';
+      lockedContent.innerHTML = '<span class="store-slot-lock-icon">🔒</span>';
+      slotCard.appendChild(lockedContent);
 
-      const lockedText = document.createElement('span');
-      lockedText.className = 'slot-chip-locked-text';
-      lockedText.textContent = 'Locked';
-      slotChip.appendChild(lockedText);
-
-      // Add unlock button next to locked slot
-      if (i >= slotCount && slotCount < 3) {
+      // Add unlock button
+      if (slotCount < 3) {
         const cost = slotCount === 1 ? 400 : 1200;
         const btn = document.createElement('button');
-        btn.className = 'slot-chip-unlock-btn';
-        btn.textContent = `Unlock ${cost} CC`;
+        btn.className = 'store-slot-unlock-btn';
+        btn.textContent = `${cost} CC`;
         btn.disabled = balance < cost;
         btn.addEventListener('click', () => purchaseSlot(cost));
-        slotChip.appendChild(btn);
+        slotCard.appendChild(btn);
       }
     }
 
-    wrap.appendChild(slotChip);
+    wrap.appendChild(slotCard);
   }
 }
 
