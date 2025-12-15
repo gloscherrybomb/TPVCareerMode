@@ -585,6 +585,13 @@
     font-size: 1.5rem;
 }
 
+.slot-image {
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    object-fit: cover;
+}
+
 .slot-name {
     font-weight: 600;
     font-size: 0.9rem;

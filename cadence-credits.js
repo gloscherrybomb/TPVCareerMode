@@ -660,11 +660,29 @@ function renderEventLoadoutModal() {
       slotDiv.innerHTML = `
         <div class="slot-label">Slot ${i + 1}</div>
         <div class="slot-unlock ${onCooldown ? 'cooldown' : ''}">
-          <span class="slot-emoji">${getItemEmoji(unlock)}</span>
+          <span class="slot-emoji">${unlock?.emoji || '❓'}</span>
           <span class="slot-name">${unlock?.name || 'Unknown'}</span>
           ${onCooldown ? '<span class="cooldown-badge">Cooldown</span>' : ''}
         </div>
       `;
+
+      // Load image asynchronously and replace emoji
+      if (unlock) {
+        loadUnlockImage(unlock.id).then(imageSrc => {
+          if (imageSrc) {
+            const emojiEl = slotDiv.querySelector('.slot-emoji');
+            if (emojiEl) {
+              const img = document.createElement('img');
+              img.className = 'slot-image';
+              img.src = imageSrc;
+              img.alt = unlock.name;
+              emojiEl.replaceWith(img);
+            }
+          }
+        }).catch(() => {
+          // Image load failed, keep emoji
+        });
+      }
     } else {
       slotDiv.innerHTML = `
         <div class="slot-label">Slot ${i + 1}</div>
@@ -700,28 +718,32 @@ function renderEventLoadoutModal() {
     // Simple boolean cooldown: true = resting for next race
     const onCooldown = cooldowns[unlock.id] === true;
 
-    const item = document.createElement('div');
-    item.className = `cc-loadout-item ${isEquipped ? 'equipped' : ''} ${onCooldown ? 'cooldown' : ''}`;
+    // Create wrapper for card + button
+    const wrapper = document.createElement('div');
+    wrapper.className = 'loadout-card-wrapper';
 
-    item.innerHTML = `
-      <div class="loadout-item-icon">${getItemEmoji(unlock)}</div>
-      <div class="loadout-item-info">
-        <div class="loadout-item-name">${unlock.name}</div>
-        <div class="loadout-item-bonus">+${unlock.pointsBonus} points • ${unlock.description}</div>
-        ${onCooldown ? '<div class="loadout-item-cooldown">⏱️ On cooldown this race</div>' : ''}
-      </div>
-      <button class="loadout-item-btn ${isEquipped ? 'unequip' : 'equip'}" data-unlock-id="${unlock.id}">
-        ${isEquipped ? 'Unequip' : 'Equip'}
-      </button>
-    `;
+    // Create the loadout card using the component
+    const card = createUnlockCardSync(unlock, {
+      size: 'loadout',
+      isOwned: true,
+      isEquipped: isEquipped,
+      isResting: onCooldown
+    });
 
-    const btn = item.querySelector('.loadout-item-btn');
+    // Create equip/unequip button
+    const btn = document.createElement('button');
+    btn.className = `loadout-btn ${isEquipped ? 'unequip' : 'equip'}`;
+    btn.dataset.unlockId = unlock.id;
+    btn.textContent = isEquipped ? 'Unequip' : 'Equip';
+
     btn.addEventListener('click', async () => {
       await equipItem(unlock.id);
       renderEventLoadoutModal(); // Re-render after equip/unequip
     });
 
-    list.appendChild(item);
+    wrapper.appendChild(card);
+    wrapper.appendChild(btn);
+    list.appendChild(wrapper);
   });
 }
 

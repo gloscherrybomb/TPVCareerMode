@@ -9,10 +9,10 @@
  */
 async function createUnlockCard(unlock, options = {}) {
   const {
-    size = 'full',              // 'full' | 'compact' | 'badge'
+    size = 'full',              // 'full' | 'compact' | 'badge' | 'loadout'
     showNarrative = size === 'full',
-    showTrigger = size !== 'badge',
-    showCost = size !== 'compact',
+    showTrigger = size !== 'badge' && size !== 'loadout',
+    showCost = size !== 'compact' && size !== 'loadout',
     clickable = false,
     onClick = null,
     isOwned = false,
@@ -75,8 +75,8 @@ function createImageArea(unlock, imageSrc, size, isLocked = false) {
     ? `<img class="card-image" src="${imageSrc}" alt="${unlock.name}">`
     : `<span class="card-emoji">${unlock.emoji}</span>`;
 
-  // Hide points badge on badge size (profile page)
-  const showPointsBadge = size !== 'badge';
+  // Hide points badge on badge and loadout sizes
+  const showPointsBadge = size !== 'badge' && size !== 'loadout';
 
   return `
     <div class="card-image-area">
@@ -103,6 +103,19 @@ function createCardBody(unlock, size, showTrigger, showNarrative, showCost, isLo
         <div class="card-header">
           <span class="card-name">${isLocked ? '???' : unlock.name}</span>
         </div>
+      </div>
+    `;
+  }
+
+  // For loadout size (manage loadout modal), horizontal layout with name and trigger
+  if (size === 'loadout') {
+    return `
+      <div class="card-body">
+        <div class="card-header">
+          <span class="card-name">${unlock.name}</span>
+          <span class="loadout-points">+${unlock.pointsBonus} pts</span>
+        </div>
+        <div class="loadout-trigger">${unlock.description}</div>
       </div>
     `;
   }
@@ -193,8 +206,8 @@ function createUnlockCardSync(unlock, options = {}) {
   const {
     size = 'full',
     showNarrative = size === 'full',
-    showTrigger = size !== 'badge',
-    showCost = size !== 'compact',
+    showTrigger = size !== 'badge' && size !== 'loadout',
+    showCost = size !== 'compact' && size !== 'loadout',
     clickable = false,
     onClick = null,
     isOwned = false,

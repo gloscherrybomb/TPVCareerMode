@@ -535,6 +535,145 @@
 }
 
 /* ========================================
+   VARIANT: LOADOUT (Manage Loadout Modal)
+======================================== */
+.unlock-card-loadout {
+  width: 100%;
+  min-height: 80px;
+  flex-direction: row;
+  padding: 12px;
+  gap: 14px;
+  align-items: center;
+}
+
+.unlock-card-loadout::before {
+  display: none; /* No accent bar on loadout items */
+}
+
+.unlock-card-loadout:hover {
+  transform: translateY(-2px);
+}
+
+.unlock-card-loadout .card-image-area {
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  background: linear-gradient(135deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.3) 100%);
+}
+
+.unlock-card-loadout .card-image-area::after {
+  display: none; /* No gradient overlay */
+}
+
+.unlock-card-loadout .card-image {
+  object-fit: cover;
+}
+
+.unlock-card-loadout .card-emoji {
+  font-size: 2rem;
+}
+
+.unlock-card-loadout .card-body {
+  padding: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  min-width: 0;
+}
+
+.unlock-card-loadout .card-header {
+  margin-bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.unlock-card-loadout .card-name {
+  font-size: 0.9rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  flex: 1;
+  min-width: 0;
+}
+
+.unlock-card-loadout .loadout-points {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--success);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.unlock-card-loadout .loadout-trigger {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.unlock-card-loadout .cooldown-indicator {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  font-size: 0.6rem;
+  padding: 3px 8px;
+}
+
+/* Loadout item button area */
+.loadout-card-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.loadout-card-wrapper .unlock-card-loadout {
+  flex: 1;
+}
+
+.loadout-card-wrapper .loadout-btn {
+  flex-shrink: 0;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.loadout-card-wrapper .loadout-btn.equip {
+  background: linear-gradient(135deg, var(--success), rgba(0, 200, 100, 0.9));
+  color: #000;
+}
+
+.loadout-card-wrapper .loadout-btn.equip:hover {
+  box-shadow: 0 4px 15px rgba(0, 255, 136, 0.4);
+  transform: translateY(-1px);
+}
+
+.loadout-card-wrapper .loadout-btn.unequip {
+  background: linear-gradient(135deg, rgba(255, 87, 87, 0.9), rgba(200, 50, 50, 0.9));
+  color: #fff;
+}
+
+.loadout-card-wrapper .loadout-btn.unequip:hover {
+  box-shadow: 0 4px 15px rgba(255, 87, 87, 0.4);
+  transform: translateY(-1px);
+}
+
+/* ========================================
    RESPONSIVE
 ======================================== */
 @media (max-width: 768px) {
@@ -575,6 +714,29 @@
 
   .unlock-card-badge .points-badge {
     margin-left: auto;
+  }
+
+  .unlock-card-loadout {
+    padding: 10px;
+    gap: 10px;
+  }
+
+  .unlock-card-loadout .card-image-area {
+    width: 48px;
+    height: 48px;
+  }
+
+  .unlock-card-loadout .card-name {
+    font-size: 0.85rem;
+  }
+
+  .loadout-card-wrapper {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .loadout-card-wrapper .loadout-btn {
+    width: 100%;
   }
 }
 
