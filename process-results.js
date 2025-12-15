@@ -1236,7 +1236,8 @@ async function processUserResult(uid, eventInfo, results) {
   };
   
   // Build season standings with all racers from CSV
-  const seasonStandings = await buildSeasonStandings(results, userData, eventNumber, uid);
+  // Pass user's actual points (including bonus) to ensure standings match totalPoints
+  const seasonStandings = await buildSeasonStandings(results, userData, eventNumber, uid, points);
   
   // Track if this is an optional event
   const newUsedOptionalEvents = [...usedOptionalEvents];
@@ -2291,8 +2292,13 @@ async function getAllPreviousEventResults(season, currentEvent, userUid) {
  * Build season standings including all racers from CSV
  * Now includes simulated results for bots to keep standings competitive
  * Only simulates events that the user has actually completed (not all events up to current number)
+ * @param {Array} results - CSV results for current event
+ * @param {Object} userData - User's Firestore document data
+ * @param {number} eventNumber - Current event number
+ * @param {string} currentUid - Current user's UID
+ * @param {number} userActualPoints - User's actual points for this event (including bonus points)
  */
-async function buildSeasonStandings(results, userData, eventNumber, currentUid) {
+async function buildSeasonStandings(results, userData, eventNumber, currentUid, userActualPoints) {
   const season = 1;
   const existingStandings = userData[`season${season}Standings`] || [];
   
@@ -2310,7 +2316,20 @@ async function buildSeasonStandings(results, userData, eventNumber, currentUid) 
   completedEventNumbers.sort((a, b) => a - b);
   
   console.log(`   User has completed events: [${completedEventNumbers.join(', ')}]`);
-  
+
+  // Calculate user's correct total points from stored event results (includes bonus points)
+  // This fixes any accumulated discrepancy from past events
+  let userCorrectPreviousPoints = 0;
+  for (let i = 1; i <= 15; i++) {
+    // Skip current event - that will be added separately with userActualPoints
+    if (i === eventNumber) continue;
+    const eventResults = userData[`event${i}Results`];
+    if (eventResults && typeof eventResults.points === 'number') {
+      userCorrectPreviousPoints += eventResults.points;
+    }
+  }
+  console.log(`   User's correct points from previous events: ${userCorrectPreviousPoints}`);
+
   // Create a map of existing racers
   const standingsMap = new Map();
   existingStandings.forEach(racer => {
@@ -2346,19 +2365,35 @@ async function buildSeasonStandings(results, userData, eventNumber, currentUid) 
     }
     
     const pointsResult = calculatePoints(position, eventNumber);
-    const points = pointsResult.points; // Extract numeric value
+    let points = pointsResult.points; // Extract numeric value
     const arr = parseInt(result.ARR) || 0;
     const team = result.Team || '';
     const isBotRacer = isBot(uid, result.Gender);
-    
+    const isCurrentUserResult = uid === currentUid;
+
+    // For current user, use actual points (including bonus) instead of calculated base points
+    if (isCurrentUserResult && userActualPoints !== undefined) {
+      points = userActualPoints;
+      console.log(`   💰 Using user's actual points for current event (including bonus): ${points}`);
+    }
+
     // Use UID for humans, name for bots (bots may not have persistent UIDs)
     const key = isBotRacer ? name : uid;
-    
+
     if (standingsMap.has(key)) {
       // Update existing racer
       const racer = standingsMap.get(key);
-      racer.points = (racer.points || 0) + points;
-      racer.events = (racer.events || 0) + 1;
+
+      // For current user, reset to correct total from stored event results
+      // This fixes any accumulated discrepancy from past events
+      if (isCurrentUserResult) {
+        racer.points = userCorrectPreviousPoints + points;
+        racer.events = completedEventNumbers.length; // Correct events count from stored results
+        console.log(`   ✅ User standings points corrected: ${userCorrectPreviousPoints} (previous) + ${points} (current) = ${racer.points} (${racer.events} events)`);
+      } else {
+        racer.points = (racer.points || 0) + points;
+        racer.events = (racer.events || 0) + 1;
+      }
       racer.arr = arr; // Update to most recent ARR
       racer.team = team || racer.team; // Keep team if exists
       
@@ -2372,15 +2407,25 @@ async function buildSeasonStandings(results, userData, eventNumber, currentUid) 
       if (isBotRacer) {
         console.log(`  ➕ Adding new bot to standings: ${name} with UID: ${uid}`);
       }
+
+      // For current user, include points from ALL stored event results
+      let totalPoints = points;
+      let eventCount = 1;
+      if (isCurrentUserResult) {
+        totalPoints = userCorrectPreviousPoints + points;
+        eventCount = completedEventNumbers.length;
+        console.log(`   ✅ New user entry with correct points: ${userCorrectPreviousPoints} (previous) + ${points} (current) = ${totalPoints} (${eventCount} events)`);
+      }
+
       standingsMap.set(key, {
         name: name,
         uid: uid, // Use actual UID from CSV
         arr: arr,
         team: team,
-        events: 1,
-        points: points,
+        events: eventCount,
+        points: totalPoints,
         isBot: isBotRacer,
-        isCurrentUser: uid === currentUid
+        isCurrentUser: isCurrentUserResult
       });
     }
   });
