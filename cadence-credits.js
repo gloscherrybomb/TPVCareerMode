@@ -292,7 +292,8 @@ function renderProfileCC() {
         ${hasEquipped ? `
           <div class="cc-active-list">
             ${equippedUnlocks.map(unlock => {
-              const isOnCooldown = cooldowns[unlock.id] > 0;
+              // Simple boolean cooldown: true = resting for next race
+              const isOnCooldown = cooldowns[unlock.id] === true;
               return `
                 <div class="cc-active-item ${isOnCooldown ? 'on-cooldown' : ''}">
                   <span class="cc-active-emoji">${unlock.emoji || '⭐'}</span>
@@ -350,7 +351,8 @@ function renderEquippedDisplay() {
       ${hasEquipped ? `
         <div class="cc-selector-grid">
           ${equippedUnlocks.map(unlock => {
-            const isOnCooldown = cooldowns[unlock.id] > 0;
+            // Simple boolean cooldown: true = resting for next race
+            const isOnCooldown = cooldowns[unlock.id] === true;
             return `
               <div class="cc-selector-card">
                 <div class="cc-event-card-header">
@@ -359,7 +361,7 @@ function renderEquippedDisplay() {
                 </div>
                 <div class="cc-event-desc">${unlock.description}</div>
                 <div class="cc-event-bonus">+${unlock.pointsBonus} pts bonus</div>
-                ${isOnCooldown ? `<div style="margin-top:0.75rem; color:var(--warning); font-size:0.85rem; font-weight:600;">⏱️ Resting (${cooldowns[unlock.id]} race${cooldowns[unlock.id] > 1 ? 's' : ''})</div>` : ''}
+                ${isOnCooldown ? `<div style="margin-top:0.75rem; color:var(--warning); font-size:0.85rem; font-weight:600;">⏱️ Resting (1 race)</div>` : ''}
               </div>
             `;
           }).join('')}
@@ -542,7 +544,6 @@ function renderEventLoadoutModal() {
   const equipped = userDocData?.unlocks?.equipped || [];
   const slotCount = userDocData?.unlocks?.slotCount || 1;
   const cooldowns = userDocData?.unlocks?.cooldowns || {};
-  const eventNum = window.cadenceEventContext?.eventNumber;
 
   // Render slots
   slotsContainer.innerHTML = '';
@@ -553,7 +554,8 @@ function renderEventLoadoutModal() {
     const equippedId = equipped[i];
     if (equippedId) {
       const unlock = unlockCatalog.find(u => u.id === equippedId);
-      const onCooldown = cooldowns[equippedId] && cooldowns[equippedId] >= eventNum;
+      // Simple boolean cooldown: true = resting for next race
+      const onCooldown = cooldowns[equippedId] === true;
 
       slotDiv.innerHTML = `
         <div class="slot-label">Slot ${i + 1}</div>
@@ -595,7 +597,8 @@ function renderEventLoadoutModal() {
 
   ownedUnlocks.forEach(unlock => {
     const isEquipped = equipped.includes(unlock.id);
-    const onCooldown = cooldowns[unlock.id] && cooldowns[unlock.id] >= eventNum;
+    // Simple boolean cooldown: true = resting for next race
+    const onCooldown = cooldowns[unlock.id] === true;
 
     const item = document.createElement('div');
     item.className = `cc-loadout-item ${isEquipped ? 'equipped' : ''} ${onCooldown ? 'cooldown' : ''}`;

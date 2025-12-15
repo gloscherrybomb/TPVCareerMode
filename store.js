@@ -29,6 +29,73 @@ let currentFilter = 'all';
 let currentSort = 'tier';
 let currentSearch = '';
 
+// Emoji support detection cache
+const emojiSupportCache = {};
+
+/**
+ * Check if an emoji is supported by the browser
+ * Uses canvas rendering to detect if emoji displays correctly
+ */
+function isEmojiSupported(emoji) {
+  if (emojiSupportCache[emoji] !== undefined) {
+    return emojiSupportCache[emoji];
+  }
+
+  const canvas = document.createElement('canvas');
+  canvas.width = 20;
+  canvas.height = 20;
+  const ctx = canvas.getContext('2d');
+
+  // Draw the emoji
+  ctx.textBaseline = 'top';
+  ctx.font = '16px Arial';
+  ctx.fillText(emoji, 0, 0);
+
+  // Get pixel data - unsupported emojis render as blank or tofu boxes
+  const imageData = ctx.getImageData(0, 0, 20, 20).data;
+
+  // Check if any non-transparent pixels exist
+  let hasPixels = false;
+  for (let i = 3; i < imageData.length; i += 4) {
+    if (imageData[i] > 0) {
+      hasPixels = true;
+      break;
+    }
+  }
+
+  // Additional check: compare against a known-unsupported character
+  // Some systems render a box for unsupported chars which still has pixels
+  if (hasPixels) {
+    ctx.clearRect(0, 0, 20, 20);
+    ctx.fillText('\uFFFF', 0, 0); // Known unsupported char
+    const unsupportedData = ctx.getImageData(0, 0, 20, 20).data;
+
+    // Compare pixel patterns - if identical, emoji likely not supported
+    let identical = true;
+    for (let i = 0; i < imageData.length; i++) {
+      if (Math.abs(imageData[i] - unsupportedData[i]) > 10) {
+        identical = false;
+        break;
+      }
+    }
+    if (identical) hasPixels = false;
+  }
+
+  emojiSupportCache[emoji] = hasPixels;
+  return hasPixels;
+}
+
+/**
+ * Get the emoji for an unlock item, using fallback if needed
+ */
+function getItemEmoji(item) {
+  if (!item.emoji) return '⭐';
+  if (item.emojiFallback && !isEmojiSupported(item.emoji)) {
+    return item.emojiFallback;
+  }
+  return item.emoji;
+}
+
 function renderWarning(msg) {
   const warningEl = document.getElementById('storeWarning');
   const messageEl = document.getElementById('warningMessage');
@@ -51,6 +118,7 @@ function renderSlots() {
 
   const slotCount = userData.unlocks?.slotCount || 1;
   const equipped = userData.unlocks?.equipped || [];
+  const cooldowns = userData.unlocks?.cooldowns || {};
   const balance = userData.currency?.balance || 0;
 
   for (let i = 0; i < 3; i++) {
@@ -60,6 +128,7 @@ function renderSlots() {
     if (i < slotCount) {
       const equippedId = equipped[i];
       const unlock = unlockCatalog.find(u => u.id === equippedId);
+      const isOnCooldown = unlock && cooldowns[equippedId] === true;
 
       const slotLabel = document.createElement('span');
       slotLabel.className = 'slot-chip-label';
@@ -68,8 +137,17 @@ function renderSlots() {
 
       const slotContent = document.createElement('span');
       slotContent.className = 'slot-chip-content';
-      slotContent.textContent = unlock ? `${unlock.emoji || '🎯'} ${unlock.name}` : 'Empty';
+      slotContent.textContent = unlock ? `${getItemEmoji(unlock)} ${unlock.name}` : 'Empty';
       slotChip.appendChild(slotContent);
+
+      // Show resting indicator if on cooldown
+      if (isOnCooldown) {
+        const restingBadge = document.createElement('span');
+        restingBadge.className = 'slot-chip-resting';
+        restingBadge.textContent = '⏱️ Resting';
+        restingBadge.title = 'This upgrade triggered last race and is resting for 1 race';
+        slotChip.appendChild(restingBadge);
+      }
 
       // Allow unequip directly from slot
       if (unlock) {
@@ -376,7 +454,7 @@ function renderGrid() {
 
       card.innerHTML = `
         <div class="unlock-header">
-          <div class="unlock-emoji">${item.emoji || '⭐'}</div>
+          <div class="unlock-emoji">${getItemEmoji(item)}</div>
           <div class="unlock-title">
             <div class="unlock-name">${isLocked ? '???' : item.name}</div>
             <div class="unlock-cost">${item.cost} CC</div>

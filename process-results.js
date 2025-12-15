@@ -1312,7 +1312,9 @@ async function processUserResult(uid, eventInfo, results) {
   // Apply unlock bonuses (one per race)
   let unlockBonusPoints = 0;
   let unlockBonusesApplied = [];
-  const unlockCooldowns = { ...(userData.unlocks?.cooldowns || {}) };
+  // Cooldowns use simple boolean: true = resting this race, cleared after race completes
+  const previousCooldowns = { ...(userData.unlocks?.cooldowns || {}) };
+  const newCooldowns = {}; // Start fresh - only triggered unlocks will be set to true
 
   if (previewCadenceEnabled) {
     const equipped = Array.isArray(userData.unlocks?.equipped) ? userData.unlocks.equipped : [];
@@ -1351,7 +1353,8 @@ async function processUserResult(uid, eventInfo, results) {
       rivalEncounters: rivalEncountersForUnlocks
     };
 
-    const triggeredUnlocks = selectUnlocksToApply(equippedToUse, unlockCooldowns, eventNumber, unlockContext);
+    // Check triggers - pass previousCooldowns to exclude resting unlocks
+    const triggeredUnlocks = selectUnlocksToApply(equippedToUse, previousCooldowns, unlockContext);
     if (triggeredUnlocks.length > 0) {
       triggeredUnlocks.forEach(selectedUnlock => {
         const unlockPoints = selectedUnlock.unlock.pointsBonus || 0;
@@ -1363,8 +1366,8 @@ async function processUserResult(uid, eventInfo, results) {
           pointsAdded: unlockPoints,
           reason: selectedUnlock.reason
         });
-        // Set cooldown for this unlock
-        unlockCooldowns[selectedUnlock.unlock.id] = eventNumber;
+        // Set cooldown for this unlock (simple boolean - resting for next race)
+        newCooldowns[selectedUnlock.unlock.id] = true;
         console.log(`   💎 Unlock applied (${selectedUnlock.unlock.name}): +${unlockPoints} pts`);
       });
 
@@ -1644,7 +1647,8 @@ async function processUserResult(uid, eventInfo, results) {
 
   if (previewCadenceEnabled) {
     // Unlock cooldowns
-    updates['unlocks.cooldowns'] = unlockCooldowns;
+    // Save new cooldowns (only triggered unlocks are set to true, others are cleared)
+    updates['unlocks.cooldowns'] = newCooldowns;
     // NOTE: Currency updates moved to AFTER awards are added (line 1724+)
   }
   
@@ -2191,16 +2195,19 @@ function evaluateUnlockTrigger(unlockId, context) {
 
 /**
  * Determine which unlocks to trigger (all that meet conditions) based on equipped and cooldowns
+ * @param {string[]} equippedIds - IDs of equipped unlocks
+ * @param {Object} cooldowns - Map of unlock ID to boolean (true = resting this race)
+ * @param {Object} context - Race context for evaluating triggers
  */
-function selectUnlocksToApply(equippedIds, cooldowns, eventNumber, context) {
+function selectUnlocksToApply(equippedIds, cooldowns, context) {
   const triggered = [];
 
   for (const id of equippedIds) {
     const unlock = getUnlockById(id);
     if (!unlock) continue;
 
-    // 1-race cooldown: block if it triggered last event
-    if (cooldowns && cooldowns[id] && cooldowns[id] >= eventNumber) {
+    // Simple boolean cooldown: skip if resting (triggered last race)
+    if (cooldowns && cooldowns[id] === true) {
       continue;
     }
 

@@ -46,7 +46,8 @@ const UNLOCK_DEFINITIONS = [
     trigger: 'beatPrediction5Top10',
     description: 'Beat prediction by 5+ and finish top 10',
     narrative: 'Carbon fiber spins smooth and silent, slicing through air like a hot knife through butter. When you exceed expectations and crack the top 10, these wheels pay dividends.',
-    emoji: '🛞'
+    emoji: '🛞',
+    emojiFallback: '⚙️'
   },
   {
     id: 'cadenceNutrition',

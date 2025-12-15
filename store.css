@@ -200,6 +200,17 @@ body {
     transform: scale(1.1);
 }
 
+.slot-chip-resting {
+    background: rgba(255, 193, 7, 0.15);
+    border: 1px solid rgba(255, 193, 7, 0.3);
+    color: #ffc107;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
 .slot-chip-unlock-btn {
     padding: 0.4rem 0.9rem;
     background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
