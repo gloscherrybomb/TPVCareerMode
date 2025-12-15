@@ -689,7 +689,7 @@ body {
 .unlock-card.equipped::after {
     content: '⚡ EQUIPPED';
     position: absolute;
-    top: 0.75rem;
+    bottom: 0.75rem;
     right: 0.75rem;
     padding: 0.35rem 0.85rem;
     background: linear-gradient(135deg, rgba(255, 27, 107, 0.25) 0%, rgba(199, 26, 229, 0.25) 100%);
