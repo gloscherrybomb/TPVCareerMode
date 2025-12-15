@@ -1203,56 +1203,65 @@
     }
 
     .result-card {
-        display: block;
+        display: grid;
+        grid-template-columns: auto 1fr;
+        grid-template-rows: auto auto;
+        gap: 0.5rem 0.75rem;
         padding: 1rem;
+        align-items: start;
     }
 
     .result-position {
-        float: left;
-        margin-right: 1rem;
-        min-width: 2.5rem;
-        font-size: 1.5rem;
+        grid-row: 1;
+        grid-column: 1;
+        font-size: 1.25rem;
+        min-width: auto;
+        text-align: left;
     }
 
     .result-info {
-        overflow: hidden;
-        margin-bottom: 0.75rem;
+        grid-row: 1;
+        grid-column: 2;
     }
 
     .result-event {
-        font-size: 1rem;
-        margin-bottom: 0.25rem;
+        font-size: 0.95rem;
+        margin-bottom: 0.2rem;
+    }
+
+    .result-prediction {
+        font-size: 0.75rem;
+    }
+
+    .result-date {
+        font-size: 0.8rem;
     }
 
     .result-stats {
-        clear: both;
+        grid-row: 2;
+        grid-column: 1 / -1;
         display: flex;
-        flex-direction: row !important;
+        flex-direction: row;
         flex-wrap: wrap;
-        align-items: baseline !important;
+        align-items: center;
         justify-content: flex-start;
-        gap: 0.5rem 1rem;
-    }
-
-    .result-time,
-    .result-points {
-        display: inline;
+        gap: 0.5rem 0.75rem;
+        margin-top: 0.25rem;
     }
 
     .result-time {
-        font-size: 1rem;
+        font-size: 0.95rem;
     }
 
     .result-points {
-        font-size: 1.1rem;
+        font-size: 1rem;
     }
 
     .result-bonuses {
-        width: 100%;
         display: flex;
         flex-wrap: wrap;
         gap: 0.4rem;
-        margin-top: 0.25rem;
+        align-items: center;
     }
 }
 
@@ -1287,22 +1296,31 @@
     }
 
     .result-position {
-        font-size: 1.25rem;
-        min-width: 2rem;
+        font-size: 1.1rem;
+    }
+
+    .result-event {
+        font-size: 0.9rem;
+    }
+
+    .result-time,
+    .result-points {
+        font-size: 0.9rem;
     }
 
     .bonus-indicator {
-        font-size: 0.65rem;
-        padding: 0.15rem 0.4rem;
+        font-size: 0.6rem;
+        padding: 0.15rem 0.35rem;
     }
 
     .medal-indicator {
-        font-size: 1rem;
-        padding: 0.15rem 0.3rem;
+        font-size: 0.9rem;
+        padding: 0.1rem 0.25rem;
     }
 
     .cc-earned {
-        font-size: 0.65rem;
+        font-size: 0.6rem;
+        padding: 0.15rem 0.35rem;
     }
 }
 
