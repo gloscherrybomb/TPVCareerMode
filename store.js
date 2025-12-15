@@ -403,11 +403,19 @@ function renderGrid() {
         );
       }
 
-      const card = document.createElement('div');
       const canAfford = balance >= item.cost;
       const isLocked = !owned && (!meetsPersonalityReqs || !canAfford);
 
-      card.className = `unlock-card tier-${tier} ${isLocked ? 'locked' : ''} ${owned ? 'owned' : ''} ${equippedHere ? 'equipped' : ''}`;
+      // Use new card component system
+      const card = createUnlockCardSync(item, {
+        size: 'full',
+        showNarrative: !isLocked,
+        showTrigger: true,
+        showCost: true,
+        isOwned: owned,
+        isEquipped: equippedHere,
+        isLocked: isLocked
+      });
 
       // Add animation delay based on card index
       card.style.setProperty('--card-index', index);
@@ -433,47 +441,19 @@ function renderGrid() {
         card.title = reasons.join(' • ');
       }
 
-      let personalityInfo = '';
-      if (item.personalityBonus) {
-        const bonuses = Object.entries(item.personalityBonus).map(([trait, val]) =>
-          `+${val} ${trait.charAt(0).toUpperCase() + trait.slice(1)}`
-        ).join(', ');
-        personalityInfo = `<div class="unlock-personality-bonus">✨ ${bonuses}</div>`;
-      }
-      if (item.requiredBalanced && !meetsPersonalityReqs) {
-        personalityInfo = `<div class="unlock-personality-locked">🔒 Requires: Balanced personality (all traits 45-65)</div>`;
-      } else if (item.requiredPersonality && !meetsPersonalityReqs) {
-        const reqs = Object.entries(item.requiredPersonality).map(([trait, val]) => {
-          const current = personality[trait] || 0;
-          return `${trait.charAt(0).toUpperCase() + trait.slice(1)}: ${current}/${val}`;
-        }).join(', ');
-        personalityInfo = `<div class="unlock-personality-locked">🔒 Requires: ${reqs}</div>`;
-      } else if (item.requiredBalanced && meetsPersonalityReqs) {
-        personalityInfo = `<div class="unlock-personality-bonus">⚖️ Balanced Personality</div>`;
-      }
-
-      card.innerHTML = `
-        <div class="unlock-header">
-          <div class="unlock-emoji">${getItemEmoji(item)}</div>
-          <div class="unlock-title">
-            <div class="unlock-name">${isLocked ? '???' : item.name}</div>
-            <div class="unlock-cost">${item.cost} CC</div>
-          </div>
-        </div>
-        <div class="unlock-description">${isLocked ? 'Unlock to reveal details' : item.description}</div>
-        ${!isLocked && item.narrative ? `<div class="unlock-narrative">${item.narrative}</div>` : ''}
-        <div class="unlock-bonus">+${item.pointsBonus} pts</div>
-        ${personalityInfo}
-        <div class="unlock-actions"></div>
-      `;
-
-      const actions = card.querySelector('.unlock-actions');
+      // Add action buttons to card footer
+      const cardBody = card.querySelector('.card-body');
+      const actionsDiv = document.createElement('div');
+      actionsDiv.className = 'unlock-actions';
+      actionsDiv.style.marginTop = '0.75rem';
+      actionsDiv.style.display = 'flex';
+      actionsDiv.style.gap = '0.75rem';
 
       if (owned) {
         const status = document.createElement('div');
         status.className = 'unlock-status';
         status.textContent = 'Owned';
-        actions.appendChild(status);
+        actionsDiv.appendChild(status);
 
         const equipBtn = document.createElement('button');
         equipBtn.className = 'btn-equip';
@@ -483,7 +463,7 @@ function renderGrid() {
           equipBtn.title = 'Personality requirements not met';
         }
         equipBtn.addEventListener('click', () => equipItem(item.id));
-        actions.appendChild(equipBtn);
+        actionsDiv.appendChild(equipBtn);
       } else {
         const buyBtn = document.createElement('button');
         buyBtn.className = 'btn-buy';
@@ -500,8 +480,10 @@ function renderGrid() {
         if (!buyBtn.disabled) {
           buyBtn.addEventListener('click', () => purchaseItem(item));
         }
-        actions.appendChild(buyBtn);
+        actionsDiv.appendChild(buyBtn);
       }
+
+      cardBody.appendChild(actionsDiv);
 
       // Add lock icon for locked cards
       if (isLocked) {

@@ -1,0 +1,564 @@
+/* Unlock Card Component Styles - Top Trumps Design System */
+/* Supports three variants: full, compact, badge */
+
+/* ===== BASE CARD STRUCTURE ===== */
+.unlock-card {
+  background: linear-gradient(135deg, rgba(20, 24, 36, 0.9), rgba(20, 24, 36, 0.7));
+  border: 2px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  overflow: hidden;
+  position: relative;
+  transition: all 0.3s ease;
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.3),
+    0 8px 16px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Tier accent bar at top */
+.unlock-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  transition: all 0.3s ease;
+  z-index: 1;
+}
+
+.unlock-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* ===== TIER-SPECIFIC STYLES ===== */
+.unlock-card.tier-120 {
+  background: linear-gradient(135deg, rgba(69, 202, 255, 0.05) 0%, rgba(20, 24, 36, 0.9) 100%);
+}
+.unlock-card.tier-120::before {
+  background: linear-gradient(90deg, var(--accent-blue), rgba(69, 202, 255, 0.5));
+  box-shadow: 0 0 12px rgba(69, 202, 255, 0.3);
+}
+.unlock-card.tier-120:hover {
+  box-shadow: 0 12px 40px rgba(69, 202, 255, 0.2);
+}
+
+.unlock-card.tier-200 {
+  background: linear-gradient(135deg, rgba(0, 255, 136, 0.05) 0%, rgba(20, 24, 36, 0.9) 100%);
+}
+.unlock-card.tier-200::before {
+  background: linear-gradient(90deg, var(--success), rgba(0, 255, 136, 0.5));
+  box-shadow: 0 0 12px rgba(0, 255, 136, 0.3);
+}
+.unlock-card.tier-200:hover {
+  box-shadow: 0 12px 40px rgba(0, 255, 136, 0.2);
+}
+
+.unlock-card.tier-300 {
+  background: linear-gradient(135deg, rgba(255, 170, 0, 0.05) 0%, rgba(20, 24, 36, 0.9) 100%);
+}
+.unlock-card.tier-300::before {
+  background: linear-gradient(90deg, var(--warning), rgba(255, 170, 0, 0.5));
+  box-shadow: 0 0 12px rgba(255, 170, 0, 0.3);
+}
+.unlock-card.tier-300:hover {
+  box-shadow: 0 12px 40px rgba(255, 170, 0, 0.2);
+}
+
+.unlock-card.tier-400 {
+  background: linear-gradient(135deg, rgba(199, 26, 229, 0.05) 0%, rgba(20, 24, 36, 0.9) 100%);
+}
+.unlock-card.tier-400::before {
+  background: linear-gradient(90deg, var(--accent-purple), rgba(199, 26, 229, 0.5));
+  box-shadow: 0 0 12px rgba(199, 26, 229, 0.3);
+}
+.unlock-card.tier-400:hover {
+  box-shadow: 0 12px 40px rgba(199, 26, 229, 0.2);
+}
+
+/* ===== STATE STYLES ===== */
+.unlock-card.owned {
+  background: linear-gradient(135deg, rgba(0, 255, 136, 0.05), rgba(69, 202, 255, 0.05));
+  border-color: rgba(0, 255, 136, 0.2);
+}
+
+.unlock-card.equipped {
+  background: linear-gradient(135deg, rgba(255, 27, 107, 0.08), rgba(199, 26, 229, 0.08));
+  border-color: rgba(255, 27, 107, 0.4);
+}
+
+.unlock-card.equipped::after {
+  content: '⚡ EQUIPPED';
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  padding: 4px 10px;
+  background: linear-gradient(135deg, rgba(255, 27, 107, 0.9) 0%, rgba(199, 26, 229, 0.9) 100%);
+  border-radius: 6px;
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  box-shadow: 0 2px 8px rgba(255, 27, 107, 0.4);
+  z-index: 10;
+}
+
+.unlock-card.locked {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.unlock-card.resting {
+  opacity: 0.7;
+}
+
+.unlock-card.resting .card-image-area::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 193, 7, 0.15);
+  backdrop-filter: blur(2px);
+}
+
+/* ===== IMAGE AREA ===== */
+.card-image-area {
+  width: 100%;
+  background: linear-gradient(135deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.2) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.card-image-area::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: linear-gradient(0deg, var(--dark-card) 0%, transparent 100%);
+  pointer-events: none;
+}
+
+.card-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.unlock-card:hover .card-image {
+  transform: scale(1.05);
+}
+
+.card-emoji {
+  font-size: 4rem;
+  z-index: 1;
+  filter: drop-shadow(0 4px 12px rgba(0,0,0,0.5));
+  transition: transform 0.3s ease;
+}
+
+.unlock-card:hover .card-emoji {
+  transform: scale(1.1);
+}
+
+/* ===== POINTS BADGE ===== */
+.points-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: linear-gradient(135deg, rgba(0, 255, 136, 0.9), rgba(0, 200, 100, 0.9));
+  color: #000;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 900;
+  font-size: 1rem;
+  padding: 6px 12px;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 255, 136, 0.4);
+  z-index: 3;
+}
+
+.points-badge::after {
+  content: ' PTS';
+  font-size: 0.6rem;
+  font-weight: 700;
+}
+
+/* ===== CARD BODY ===== */
+.card-body {
+  padding: 1rem 1.25rem 1.25rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+}
+
+.card-name {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.2;
+  flex: 1;
+  padding-right: 0.5rem;
+}
+
+.tier-indicator {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.tier-indicator.tier-120 { background: rgba(69, 202, 255, 0.2); color: var(--accent-blue); }
+.tier-indicator.tier-200 { background: rgba(0, 255, 136, 0.2); color: var(--success); }
+.tier-indicator.tier-300 { background: rgba(255, 170, 0, 0.2); color: var(--warning); }
+.tier-indicator.tier-400 { background: rgba(199, 26, 229, 0.2); color: var(--accent-purple); }
+
+/* ===== TRIGGER BOX ===== */
+.trigger-box {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 8px;
+  padding: 0.65rem 0.85rem;
+  margin-bottom: 0.75rem;
+  border-left: 3px solid var(--accent-pink);
+}
+
+.trigger-label {
+  font-size: 0.6rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 2px;
+}
+
+.trigger-text {
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* ===== NARRATIVE ===== */
+.card-narrative {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.5;
+  font-style: italic;
+  margin-bottom: 0.75rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ===== CARD FOOTER ===== */
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  margin-top: auto;
+}
+
+.cost-display {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1rem;
+  font-weight: 900;
+  background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.personality-tag {
+  font-size: 0.65rem;
+  font-weight: 700;
+  background: rgba(199, 26, 229, 0.2);
+  color: #ce93d8;
+  padding: 4px 10px;
+  border-radius: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ===== COOLDOWN INDICATOR ===== */
+.cooldown-indicator {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background: rgba(255, 193, 7, 0.9);
+  color: #000;
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  z-index: 3;
+}
+
+/* ========================================
+   VARIANT: FULL (Store Page)
+======================================== */
+.unlock-card-full {
+  width: 280px;
+  min-height: 400px;
+}
+
+.unlock-card-full .card-image-area {
+  height: 160px;
+}
+
+.unlock-card-full .card-emoji {
+  font-size: 4rem;
+}
+
+.unlock-card-full .card-narrative {
+  display: -webkit-box;
+}
+
+/* ========================================
+   VARIANT: COMPACT (Event Detail Loadout)
+======================================== */
+.unlock-card-compact {
+  width: 180px;
+  min-height: 240px;
+}
+
+.unlock-card-compact .card-image-area {
+  height: 100px;
+}
+
+.unlock-card-compact .card-emoji {
+  font-size: 2.5rem;
+}
+
+.unlock-card-compact .card-body {
+  padding: 0.75rem 1rem 1rem;
+}
+
+.unlock-card-compact .card-name {
+  font-size: 0.85rem;
+}
+
+.unlock-card-compact .trigger-box {
+  padding: 0.5rem 0.7rem;
+  margin-bottom: 0.5rem;
+}
+
+.unlock-card-compact .trigger-label {
+  font-size: 0.55rem;
+}
+
+.unlock-card-compact .trigger-text {
+  font-size: 0.75rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.unlock-card-compact .card-narrative {
+  display: none; /* Hide narrative in compact view */
+}
+
+.unlock-card-compact .card-footer {
+  display: none; /* Hide footer in compact view */
+}
+
+.unlock-card-compact .points-badge {
+  font-size: 0.85rem;
+  padding: 4px 10px;
+}
+
+.unlock-card-compact:hover {
+  transform: translateY(-3px);
+}
+
+/* ========================================
+   VARIANT: BADGE (Profile Page)
+======================================== */
+.unlock-card-badge {
+  width: auto;
+  min-width: 200px;
+  max-width: 100%;
+  height: 60px;
+  flex-direction: row;
+  padding: 8px 12px;
+  gap: 12px;
+  align-items: center;
+}
+
+.unlock-card-badge::before {
+  display: none; /* No accent bar on badges */
+}
+
+.unlock-card-badge .card-image-area {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  background: linear-gradient(135deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.3) 100%);
+}
+
+.unlock-card-badge .card-image-area::after {
+  display: none; /* No gradient overlay */
+}
+
+.unlock-card-badge .card-image {
+  object-fit: cover;
+}
+
+.unlock-card-badge .card-emoji {
+  font-size: 1.8rem;
+}
+
+.unlock-card-badge .card-body {
+  padding: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.unlock-card-badge .card-header {
+  margin-bottom: 0;
+  flex: 1;
+  min-width: 0;
+}
+
+.unlock-card-badge .card-name {
+  font-size: 0.85rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding-right: 0;
+}
+
+.unlock-card-badge .tier-indicator {
+  display: none; /* Hide tier in badge view */
+}
+
+.unlock-card-badge .points-badge {
+  position: static;
+  font-size: 0.75rem;
+  padding: 4px 8px;
+  box-shadow: none;
+}
+
+.unlock-card-badge .trigger-box,
+.unlock-card-badge .card-narrative,
+.unlock-card-badge .card-footer {
+  display: none; /* Hide extra details in badge view */
+}
+
+.unlock-card-badge:hover {
+  transform: translateY(-2px);
+}
+
+.unlock-card-badge .cooldown-indicator {
+  position: static;
+  margin-left: auto;
+  font-size: 0.6rem;
+  padding: 3px 8px;
+}
+
+/* ========================================
+   RESPONSIVE
+======================================== */
+@media (max-width: 768px) {
+  .unlock-card-full {
+    width: 100%;
+    max-width: 320px;
+  }
+
+  .unlock-card-compact {
+    width: 160px;
+    min-height: 220px;
+  }
+
+  .unlock-card-badge {
+    min-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .unlock-card-full {
+    max-width: 100%;
+  }
+
+  .unlock-card-compact {
+    width: 100%;
+    max-width: 200px;
+  }
+
+  .unlock-card-badge {
+    height: auto;
+    min-height: 60px;
+    padding: 10px;
+  }
+
+  .unlock-card-badge .card-body {
+    flex-wrap: wrap;
+  }
+
+  .unlock-card-badge .points-badge {
+    margin-left: auto;
+  }
+}
+
+/* ========================================
+   GRID LAYOUTS
+======================================== */
+.unlock-cards-grid-full {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.unlock-cards-grid-compact {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 1rem;
+}
+
+.unlock-cards-grid-badge {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+@media (max-width: 768px) {
+  .unlock-cards-grid-full {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  }
+
+  .unlock-cards-grid-compact {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .unlock-cards-grid-full,
+  .unlock-cards-grid-compact {
+    grid-template-columns: 1fr;
+  }
+}

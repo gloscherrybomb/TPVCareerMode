@@ -349,37 +349,58 @@ function renderProfileCC() {
     const hasEquipped = equippedUnlocks.length > 0;
     const count = hasEquipped ? equippedUnlocks.length : 0;
 
-    activeEl.innerHTML = `
-      <div class="cc-active-header" id="ccActiveHeader">
-        <div class="cc-active-title">Active Upgrades <span class="cc-active-count">(${count})</span></div>
-        <button class="cc-active-toggle" id="ccActiveToggle" aria-label="Toggle active upgrades">
-          <span class="cc-toggle-icon">▼</span>
-        </button>
-      </div>
-      <div class="cc-active-content collapsed" id="ccActiveContent">
-        ${hasEquipped ? `
-          <div class="cc-active-list">
-            ${equippedUnlocks.map(unlock => {
-              // Simple boolean cooldown: true = resting for next race
-              const isOnCooldown = cooldowns[unlock.id] === true;
-              return `
-                <div class="cc-active-item ${isOnCooldown ? 'on-cooldown' : ''}">
-                  <span class="cc-active-emoji">${getItemEmoji(unlock)}</span>
-                  <span class="cc-active-name">${unlock.name}</span>
-                  ${isOnCooldown ? `<span class="cc-active-cooldown">⏱️ Resting</span>` : ''}
-                </div>
-              `;
-            }).join('')}
-          </div>
-        ` : `
-          <div class="cc-active-empty">No upgrades equipped</div>
-        `}
-      </div>
+    // Clear container
+    activeEl.innerHTML = '';
+
+    // Create header
+    const header = document.createElement('div');
+    header.className = 'cc-active-header';
+    header.id = 'ccActiveHeader';
+    header.innerHTML = `
+      <div class="cc-active-title">Active Upgrades <span class="cc-active-count">(${count})</span></div>
+      <button class="cc-active-toggle" id="ccActiveToggle" aria-label="Toggle active upgrades">
+        <span class="cc-toggle-icon">▼</span>
+      </button>
     `;
+    activeEl.appendChild(header);
+
+    // Create content container
+    const content = document.createElement('div');
+    content.className = 'cc-active-content collapsed';
+    content.id = 'ccActiveContent';
+
+    if (hasEquipped) {
+      // Create list container with badge-style cards
+      const list = document.createElement('div');
+      list.className = 'cc-active-list';
+
+      equippedUnlocks.forEach(unlock => {
+        const isOnCooldown = cooldowns[unlock.id] === true;
+        const badge = createUnlockCardSync(unlock, {
+          size: 'badge',
+          showNarrative: false,
+          showTrigger: false,
+          showCost: false,
+          isOwned: true,
+          isEquipped: true,
+          isResting: isOnCooldown
+        });
+        list.appendChild(badge);
+      });
+
+      content.appendChild(list);
+    } else {
+      // Empty state
+      const emptyDiv = document.createElement('div');
+      emptyDiv.className = 'cc-active-empty';
+      emptyDiv.textContent = 'No upgrades equipped';
+      content.appendChild(emptyDiv);
+    }
+
+    activeEl.appendChild(content);
 
     // Add toggle functionality
     const toggleBtn = document.getElementById('ccActiveToggle');
-    const content = document.getElementById('ccActiveContent');
     const toggleIcon = toggleBtn?.querySelector('.cc-toggle-icon');
 
     if (toggleBtn && content) {
@@ -410,48 +431,71 @@ function renderEquippedDisplay() {
 
   const hasEquipped = equippedUnlocks.length > 0;
 
-  panel.innerHTML = `
-    <div class="cc-selector-panel">
-      <div class="cc-selector-header">
-        <div class="cc-selector-title">Your Active Upgrades</div>
-        <div class="cc-selector-subtitle">These upgrades are equipped for this race • Balance: <span class="cc-balance-highlight">${formatBalance(balance)}</span></div>
-      </div>
-      ${hasEquipped ? `
-        <div class="cc-selector-grid">
-          ${equippedUnlocks.map(unlock => {
-            // Simple boolean cooldown: true = resting for next race
-            const isOnCooldown = cooldowns[unlock.id] === true;
-            return `
-              <div class="cc-selector-card">
-                <div class="cc-event-card-header">
-                  <div class="cc-event-emoji">${getItemEmoji(unlock)}</div>
-                  <div class="cc-event-name">${unlock.name}</div>
-                </div>
-                <div class="cc-event-desc">${unlock.description}</div>
-                <div class="cc-event-bonus">+${unlock.pointsBonus} pts bonus</div>
-                ${isOnCooldown ? `<div style="margin-top:0.75rem; color:var(--warning); font-size:0.85rem; font-weight:600;">⏱️ Resting (1 race)</div>` : ''}
-              </div>
-            `;
-          }).join('')}
-          ${slotCount > equippedUnlocks.length ? `
-            <div class="cc-selector-card" style="opacity: 0.5;">
-              <div class="cc-event-empty">
-                <div class="cc-event-empty-icon">📦</div>
-                <div style="font-weight:600; margin-bottom:0.5rem;">Empty Slot</div>
-                <div style="font-size:0.85rem;">Equip more unlocks in the store</div>
-              </div>
-            </div>
-          ` : ''}
-        </div>
-      ` : `
-        <div class="cc-selector-empty">
-          <div class="cc-event-empty-icon">📦</div>
-          <div style="font-weight:600; margin-bottom:0.5rem; font-size:1.2rem;">No Upgrades Equipped</div>
-          <div style="font-size:1rem; max-width:500px; margin:0 auto 1.5rem;">Purchase and equip upgrades from the Cadence Credits store to boost your race performance. All equipped upgrades can trigger in one race if conditions are met.</div>
-        </div>
-      `}
+  // Clear panel
+  panel.innerHTML = '';
+
+  // Create panel container
+  const panelDiv = document.createElement('div');
+  panelDiv.className = 'cc-selector-panel';
+
+  // Add header
+  panelDiv.innerHTML = `
+    <div class="cc-selector-header">
+      <div class="cc-selector-title">Your Active Upgrades</div>
+      <div class="cc-selector-subtitle">These upgrades are equipped for this race • Balance: <span class="cc-balance-highlight">${formatBalance(balance)}</span></div>
     </div>
   `;
+
+  if (hasEquipped) {
+    // Create grid container
+    const grid = document.createElement('div');
+    grid.className = 'cc-selector-grid';
+
+    // Add equipped unlock cards
+    equippedUnlocks.forEach(unlock => {
+      const isOnCooldown = cooldowns[unlock.id] === true;
+      const card = createUnlockCardSync(unlock, {
+        size: 'compact',
+        showNarrative: false,
+        showTrigger: true,
+        showCost: false,
+        isOwned: true,
+        isEquipped: true,
+        isResting: isOnCooldown
+      });
+      grid.appendChild(card);
+    });
+
+    // Add empty slots
+    const emptySlotCount = slotCount - equippedUnlocks.length;
+    for (let i = 0; i < emptySlotCount; i++) {
+      const emptySlot = document.createElement('div');
+      emptySlot.className = 'cc-selector-card';
+      emptySlot.style.opacity = '0.5';
+      emptySlot.innerHTML = `
+        <div class="cc-event-empty">
+          <div class="cc-event-empty-icon">📦</div>
+          <div style="font-weight:600; margin-bottom:0.5rem;">Empty Slot</div>
+          <div style="font-size:0.85rem;">Equip more unlocks in the store</div>
+        </div>
+      `;
+      grid.appendChild(emptySlot);
+    }
+
+    panelDiv.appendChild(grid);
+  } else {
+    // Empty state
+    const emptyDiv = document.createElement('div');
+    emptyDiv.className = 'cc-selector-empty';
+    emptyDiv.innerHTML = `
+      <div class="cc-event-empty-icon">📦</div>
+      <div style="font-weight:600; margin-bottom:0.5rem; font-size:1.2rem;">No Upgrades Equipped</div>
+      <div style="font-size:1rem; max-width:500px; margin:0 auto 1.5rem;">Purchase and equip upgrades from the Cadence Credits store to boost your race performance. All equipped upgrades can trigger in one race if conditions are met.</div>
+    `;
+    panelDiv.appendChild(emptyDiv);
+  }
+
+  panel.appendChild(panelDiv);
 }
 
 function renderCCResults(eventResults) {
