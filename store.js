@@ -357,13 +357,13 @@ function renderGrid() {
       progressEl.className = `tier-progress ${ownedItems === totalItems && totalItems > 0 ? 'tier-progress-complete' : ''}`;
     }
 
-    // Determine default collapse state (collapse if all owned, expand otherwise)
+    // Determine collapse state
     const section = document.querySelector(`.tier-section[data-tier="${tier}"]`);
     const toggle = document.querySelector(`[data-tier-toggle="${tier}"]`);
     const icon = toggle?.querySelector('.tier-collapse-icon');
 
     if (section) {
-      // Check if we have a saved state, otherwise use default logic
+      // Check if we have a saved state, otherwise collapse by default
       if (collapseState.hasOwnProperty(tier)) {
         if (collapseState[tier]) {
           section.classList.add('tier-collapsed');
@@ -373,14 +373,9 @@ function renderGrid() {
           if (icon) icon.textContent = '▼';
         }
       } else {
-        // Default: collapse if all owned
-        if (ownedItems === totalItems && totalItems > 0) {
-          section.classList.add('tier-collapsed');
-          if (icon) icon.textContent = '▶';
-        } else {
-          section.classList.remove('tier-collapsed');
-          if (icon) icon.textContent = '▼';
-        }
+        // Default: collapsed
+        section.classList.add('tier-collapsed');
+        if (icon) icon.textContent = '▶';
       }
     }
 
