@@ -10,6 +10,11 @@ on:
         description: 'Path to CSV file (e.g., race_results/season_1/event_1/results.csv)'
         required: false
         default: ''
+      skip_unlocks:
+        description: 'Skip unlock processing (use when re-processing after reset)'
+        required: false
+        default: false
+        type: boolean
 
 jobs:
   process-results:
@@ -47,7 +52,11 @@ jobs:
       - name: Process race results
         env:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          SKIP_UNLOCKS: ${{ inputs.skip_unlocks == true && 'true' || 'false' }}
         run: |
+          if [ "$SKIP_UNLOCKS" == "true" ]; then
+            echo "⏭️ Unlock processing will be skipped"
+          fi
           node process-results.js '${{ steps.changed-files.outputs.files }}'
       
       - name: Commit renamed CSV files and bot profile requests

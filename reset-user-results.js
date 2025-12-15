@@ -178,7 +178,7 @@ async function resetUserResults() {
           inventory: userData.unlocks?.inventory || [],  // Keep purchased items
           equipped: userData.unlocks?.equipped || [],    // Keep equipped items
           slotCount: userData.unlocks?.slotCount || 1,   // Keep purchased slots
-          cooldowns: userData.unlocks?.cooldowns || {}   // Keep cooldowns
+          cooldowns: {}   // Clear cooldowns on reset (no races completed yet)
         }
 
         // NOTE: personality and interviewHistory are PRESERVED

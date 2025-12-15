@@ -1307,7 +1307,13 @@ async function processUserResult(uid, eventInfo, results) {
   }
 
   // Cadence Credits/Unlocks enabled for all users
-  const previewCadenceEnabled = true;
+  // Skip unlock processing if SKIP_UNLOCKS env var is set (useful when re-processing after reset)
+  const skipUnlocks = process.env.SKIP_UNLOCKS === 'true';
+  const previewCadenceEnabled = !skipUnlocks;
+
+  if (skipUnlocks) {
+    console.log(`   ⏭️ Skipping unlock processing (SKIP_UNLOCKS=true)`);
+  }
 
   // Apply unlock bonuses (one per race)
   let unlockBonusPoints = 0;
