@@ -370,25 +370,22 @@ function renderProfileCC() {
     content.id = 'ccActiveContent';
 
     if (hasEquipped) {
-      // Create list container with badge-style cards
-      const list = document.createElement('div');
-      list.className = 'cc-active-list';
+      // Create grid container with compact cards
+      const grid = document.createElement('div');
+      grid.className = 'cc-active-grid';
 
       equippedUnlocks.forEach(unlock => {
         const isOnCooldown = cooldowns[unlock.id] === true;
-        const badge = createUnlockCardSync(unlock, {
-          size: 'badge',
-          showNarrative: false,
-          showTrigger: false,
-          showCost: false,
+        const card = createUnlockCardSync(unlock, {
+          size: 'compact',
           isOwned: true,
           isEquipped: true,
           isResting: isOnCooldown
         });
-        list.appendChild(badge);
+        grid.appendChild(card);
       });
 
-      content.appendChild(list);
+      content.appendChild(grid);
     } else {
       // Empty state
       const emptyDiv = document.createElement('div');
@@ -441,8 +438,8 @@ function renderEquippedDisplay() {
   // Add header
   panelDiv.innerHTML = `
     <div class="cc-selector-header">
-      <div class="cc-selector-title">Your Active Upgrades</div>
-      <div class="cc-selector-subtitle">These upgrades are equipped for this race • Balance: <span class="cc-balance-highlight">${formatBalance(balance)}</span></div>
+      <div class="cc-selector-title">Upgrades</div>
+      <div class="cc-selector-subtitle">Equipped for this race • Balance: <span class="cc-balance-highlight">${formatBalance(balance)}</span></div>
     </div>
   `;
 
@@ -456,9 +453,6 @@ function renderEquippedDisplay() {
       const isOnCooldown = cooldowns[unlock.id] === true;
       const card = createUnlockCardSync(unlock, {
         size: 'compact',
-        showNarrative: false,
-        showTrigger: true,
-        showCost: false,
         isOwned: true,
         isEquipped: true,
         isResting: isOnCooldown

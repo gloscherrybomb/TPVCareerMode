@@ -96,7 +96,7 @@ function createCardBody(unlock, size, showTrigger, showNarrative, showCost, isLo
       ? `<span class="personality-tag">${unlock.requires}</span>`
       : '');
 
-  // For badge size (profile page), just show name
+  // For badge size, just show name (minimal)
   if (size === 'badge') {
     return `
       <div class="card-body">
@@ -107,13 +107,31 @@ function createCardBody(unlock, size, showTrigger, showNarrative, showCost, isLo
     `;
   }
 
-  // For compact size (event-detail loadout), just show name
+  // For compact size (profile & event-detail), show mini card with trigger + narrative
   if (size === 'compact') {
+    if (isLocked) {
+      return `
+        <div class="card-body">
+          <div class="card-header">
+            <span class="card-name locked-name">???</span>
+          </div>
+          <div class="trigger-box locked-trigger">
+            <div class="trigger-label">Trigger Condition</div>
+            <div class="trigger-text">Purchase to reveal</div>
+          </div>
+        </div>
+      `;
+    }
     return `
       <div class="card-body">
         <div class="card-header">
-          <span class="card-name">${isLocked ? '???' : unlock.name}</span>
+          <span class="card-name">${unlock.name}</span>
         </div>
+        <div class="trigger-box">
+          <div class="trigger-label">Trigger Condition</div>
+          <div class="trigger-text">${unlock.description}</div>
+        </div>
+        <p class="card-narrative">${unlock.narrative}</p>
       </div>
     `;
   }

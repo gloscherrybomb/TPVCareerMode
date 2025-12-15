@@ -1918,6 +1918,13 @@
     gap: 1rem;
 }
 
+.cc-active-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 1.25rem;
+    padding: 0.5rem 0;
+}
+
 .cc-active-item {
     background: linear-gradient(135deg, rgba(69, 202, 255, 0.05), rgba(255, 27, 107, 0.05));
     border: 2px solid rgba(69, 202, 255, 0.2);
