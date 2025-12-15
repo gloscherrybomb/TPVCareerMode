@@ -142,12 +142,41 @@ async function resetUserResults() {
         // Personality awards (reset these too)
         personalityAwards: admin.firestore.FieldValue.delete(),
 
-        // Cadence Credits currency - reset to 0, purchased items are kept as permanent unlocks
-        currency: {
-          balance: 0,
-          totalEarned: 0,
-          transactions: []
-        },
+        // Cadence Credits currency - calculate spent from inventory + slots
+        // Balance starts negative to account for purchases, CC earned during re-processing will add to it
+        currency: (() => {
+          // Item costs lookup
+          const ITEM_COSTS = {
+            paceNotes: 100, teamCarRecon: 120, sprintPrimer: 120,
+            aeroWheels: 200, cadenceNutrition: 200, soigneurSession: 200,
+            preRaceMassage: 300, windTunnel: 300, altitudeAcclim: 300,
+            signatureMove: 500, contractBonus: 500, fanFavorite: 500,
+            climbingGears: 300, aggroRaceKit: 300, tightPackWin: 300,
+            domestiqueHelp: 400, recoveryBoots: 400, rivalSlayer: 400,
+            mentalCoach: 250, aggressionKit: 250, tacticalRadio: 250, professionalAttitude: 250,
+            confidenceBooster: 350, aggressorHelmet: 350, teamLeaderJersey: 350, calmAnalyst: 350,
+            humbleChampion: 350, showmanGear: 350, comebackKing: 350, balancedApproach: 500
+          };
+
+          // Calculate spent on inventory items
+          const inventory = userData.unlocks?.inventory || [];
+          const itemSpent = inventory.reduce((sum, itemId) => sum + (ITEM_COSTS[itemId] || 0), 0);
+
+          // Calculate spent on extra slots (slot 2 = 400, slot 3 = 1200)
+          const slotCount = userData.unlocks?.slotCount || 1;
+          let slotSpent = 0;
+          if (slotCount >= 2) slotSpent += 400;
+          if (slotCount >= 3) slotSpent += 1200;
+
+          const totalSpent = itemSpent + slotSpent;
+          console.log(`   User ${userData.name}: inventory spent=${itemSpent}, slots spent=${slotSpent}, total=${totalSpent}`);
+
+          return {
+            balance: -totalSpent,  // Negative balance, will be offset by CC earned during re-processing
+            totalEarned: 0,
+            transactions: []
+          };
+        })(),
 
         // Cadence Credits unlocks - PRESERVE all shop state
         unlocks: {

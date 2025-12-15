@@ -1306,23 +1306,24 @@ async function processUserResult(uid, eventInfo, results) {
     nextEventNumber = STAGE_REQUIREMENTS_MAP[nextStage];
   }
 
-  // Cadence Credits/Unlocks enabled for all users
-  // Skip unlock processing if SKIP_UNLOCKS env var is set (useful when re-processing after reset)
+  // Cadence Credits system enabled for all users
+  // SKIP_UNLOCKS only skips unlock trigger processing (bonus points from equipped items)
+  // CC earning from awards always happens regardless of SKIP_UNLOCKS
   const skipUnlocks = process.env.SKIP_UNLOCKS === 'true';
-  const previewCadenceEnabled = !skipUnlocks;
 
   if (skipUnlocks) {
-    console.log(`   ⏭️ Skipping unlock processing (SKIP_UNLOCKS=true)`);
+    console.log(`   ⏭️ Skipping unlock trigger processing (SKIP_UNLOCKS=true)`);
+    console.log(`   💰 CC earning from awards will still be processed`);
   }
 
-  // Apply unlock bonuses (one per race)
+  // Apply unlock bonuses (one per race) - only if not skipping
   let unlockBonusPoints = 0;
   let unlockBonusesApplied = [];
   // Cooldowns use simple boolean: true = resting this race, cleared after race completes
   const previousCooldowns = { ...(userData.unlocks?.cooldowns || {}) };
   const newCooldowns = {}; // Start fresh - only triggered unlocks will be set to true
 
-  if (previewCadenceEnabled) {
+  if (!skipUnlocks) {
     const equipped = Array.isArray(userData.unlocks?.equipped) ? userData.unlocks.equipped : [];
     const slotCount = userData.unlocks?.slotCount || 1;
     const equippedToUse = equipped.slice(0, slotCount).filter(Boolean);
@@ -1651,12 +1652,12 @@ async function processUserResult(uid, eventInfo, results) {
     ...dnsFlags // Add DNS flags if any
   };
 
-  if (previewCadenceEnabled) {
-    // Unlock cooldowns
+  if (!skipUnlocks) {
+    // Unlock cooldowns - only update when processing unlocks
     // Save new cooldowns (only triggered unlocks are set to true, others are cleared)
     updates['unlocks.cooldowns'] = newCooldowns;
-    // NOTE: Currency updates moved to AFTER awards are added (line 1724+)
   }
+  // NOTE: Currency updates happen AFTER awards are added (around line 1800+)
   
   // Track awards earned in THIS event specifically
   // We'll increment these in Firebase
@@ -1796,53 +1797,52 @@ async function processUserResult(uid, eventInfo, results) {
 
   // Calculate Cadence Credits from awards
   // MUST be done AFTER all awards are added to eventResults.earnedAwards
+  // CC earning always happens regardless of SKIP_UNLOCKS
   let earnedCadenceCredits = 0;
   let cadenceCreditTransaction = null;
   const existingTransactions = userData.currency?.transactions || [];
 
-  if (previewCadenceEnabled) {
-    const awardIds = (eventResults.earnedAwards || []).map(a => a.awardId);
-    earnedCadenceCredits = calculateCadenceCreditsFromAwards(awardIds);
+  const awardIds = (eventResults.earnedAwards || []).map(a => a.awardId);
+  earnedCadenceCredits = calculateCadenceCreditsFromAwards(awardIds);
 
-    const txId = `cc_event_${eventNumber}`;
-    const alreadyProcessed = existingTransactions.some(t => t.id === txId);
+  const txId = `cc_event_${eventNumber}`;
+  const alreadyProcessed = existingTransactions.some(t => t.id === txId);
 
-    // Firestore doesn't allow serverTimestamp() inside arrayUnion payloads; capture a concrete Timestamp instead.
-    const txTimestamp = admin.firestore.Timestamp.now();
+  // Firestore doesn't allow serverTimestamp() inside arrayUnion payloads; capture a concrete Timestamp instead.
+  const txTimestamp = admin.firestore.Timestamp.now();
 
-    if (!alreadyProcessed && earnedCadenceCredits > 0) {
-      cadenceCreditTransaction = {
-        id: txId,
-        type: 'earn',
-        delta: earnedCadenceCredits,
-        source: 'awards',
-        eventNumber: eventNumber,
-        awardIds: awardIds,
-        timestamp: txTimestamp
-      };
-    } else if (alreadyProcessed) {
-      console.log(`   ✓ Cadence Credits already awarded for event ${eventNumber}, skipping.`);
-      earnedCadenceCredits = 0;
-    }
-
-    // Add CC earned to event results for display
-    eventResults.earnedCadenceCredits = earnedCadenceCredits;
-
-    // Currency updates
-    const currentBalance = userData.currency?.balance || 0;
-    if (earnedCadenceCredits > 0) {
-      updates['currency.balance'] = currentBalance + earnedCadenceCredits;
-      const currentTotalEarned = userData.currency?.totalEarned || 0;
-      updates['currency.totalEarned'] = currentTotalEarned + earnedCadenceCredits;
-      console.log(`   💰 Awarding ${earnedCadenceCredits} CC from ${awardIds.length} awards (new balance: ${currentBalance + earnedCadenceCredits})`);
-    }
-    if (cadenceCreditTransaction) {
-      updates['currency.transactions'] = admin.firestore.FieldValue.arrayUnion(cadenceCreditTransaction);
-    }
-
-    // Update eventResults in updates object to include CC
-    updates[`event${eventNumber}Results`] = eventResults;
+  if (!alreadyProcessed && earnedCadenceCredits > 0) {
+    cadenceCreditTransaction = {
+      id: txId,
+      type: 'earn',
+      delta: earnedCadenceCredits,
+      source: 'awards',
+      eventNumber: eventNumber,
+      awardIds: awardIds,
+      timestamp: txTimestamp
+    };
+  } else if (alreadyProcessed) {
+    console.log(`   ✓ Cadence Credits already awarded for event ${eventNumber}, skipping.`);
+    earnedCadenceCredits = 0;
   }
+
+  // Add CC earned to event results for display
+  eventResults.earnedCadenceCredits = earnedCadenceCredits;
+
+  // Currency updates
+  const currentBalance = userData.currency?.balance || 0;
+  if (earnedCadenceCredits > 0) {
+    updates['currency.balance'] = currentBalance + earnedCadenceCredits;
+    const currentTotalEarned = userData.currency?.totalEarned || 0;
+    updates['currency.totalEarned'] = currentTotalEarned + earnedCadenceCredits;
+    console.log(`   💰 Awarding ${earnedCadenceCredits} CC from ${awardIds.length} awards (new balance: ${currentBalance + earnedCadenceCredits})`);
+  }
+  if (cadenceCreditTransaction) {
+    updates['currency.transactions'] = admin.firestore.FieldValue.arrayUnion(cadenceCreditTransaction);
+  }
+
+  // Update eventResults in updates object to include CC
+  updates[`event${eventNumber}Results`] = eventResults;
 
   await userRef.update(updates);
 
