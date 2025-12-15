@@ -329,7 +329,7 @@ function displayResultsTable() {
         // Event (clickable)
         const eventCell = document.createElement('td');
         const eventLink = document.createElement('a');
-        eventLink.href = `event-results.html?id=${result.eventNum}`;
+        eventLink.href = `event-detail.html?id=${result.eventNum}`;
         eventLink.className = 'event-link';
         eventLink.textContent = result.eventName;
         eventCell.appendChild(eventLink);
