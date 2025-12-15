@@ -1,7 +1,7 @@
 // Palmares Page Logic for TPV Career Mode
 
 import { firebaseConfig } from './firebase-config.js';
-import { formatTime, getOrdinalSuffix, formatDate } from './utils.js';
+import { formatTime, getOrdinalSuffix, formatDate, getHighResPhotoURL } from './utils.js';
 import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 import {
     getFirestore,
@@ -244,10 +244,10 @@ function displayHeader() {
     document.getElementById('currentSeason').textContent = '1';
     document.getElementById('totalEvents').textContent = allResults.length;
 
-    // Set photo if available
+    // Set photo if available (use high-res version for Google photos)
     if (userData.photoURL) {
         const photo = document.getElementById('riderPhoto');
-        photo.src = userData.photoURL;
+        photo.src = getHighResPhotoURL(userData.photoURL, 400);
         photo.style.display = 'block';
     }
 }

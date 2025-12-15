@@ -4,7 +4,7 @@
 import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 import { drawPersonalityChart } from './profile-personality.js';
 import { getPersonaLabel } from './interview-engine.js';
-import { getCountryCode2 } from './utils.js';
+import { getCountryCode2, getHighResPhotoURL } from './utils.js';
 
 let db;
 let modalInitialized = false;
@@ -407,8 +407,8 @@ function buildRiderProfileHTML(data, name) {
     // Get initials for avatar placeholder
     const initials = displayName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
     
-    // Get profile photo URL if exists
-    const photoURL = data.photoURL || null;
+    // Get profile photo URL if exists (use high-res version for Google photos)
+    const photoURL = getHighResPhotoURL(data.photoURL, 300);
     
     // Use stored average finish (already calculated and stored)
     const avgFinish = data.averageFinish ? Math.round(data.averageFinish) : 'N/A';

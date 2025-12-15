@@ -180,3 +180,25 @@ export function getCountryCode2(countryCode3) {
 
   return codeMap[code] || null;
 }
+
+/**
+ * Get high-resolution version of a profile photo URL
+ * Google profile photos have a size parameter that can be modified
+ * @param {string} photoURL - The original photo URL
+ * @param {number} size - Desired size in pixels (default 400)
+ * @returns {string} Modified URL with higher resolution
+ */
+export function getHighResPhotoURL(photoURL, size = 400) {
+  if (!photoURL) return null;
+
+  // Check if it's a Google profile photo (googleusercontent.com)
+  if (photoURL.includes('googleusercontent.com')) {
+    // Remove any existing size parameter and add new one
+    // Google photos end with =s96-c or similar
+    const baseURL = photoURL.replace(/=s\d+-c.*$/, '');
+    return `${baseURL}=s${size}-c`;
+  }
+
+  // For other URLs (like Firebase Storage), return as-is
+  return photoURL;
+}

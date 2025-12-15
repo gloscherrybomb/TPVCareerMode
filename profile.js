@@ -1,7 +1,7 @@
 // Profile Page Logic for TPV Career Mode
 
 import { firebaseConfig } from './firebase-config.js';
-import { getInitials, formatTime, getOrdinalSuffix, getARRBand, formatDate, getCountryCode2 } from './utils.js';
+import { getInitials, formatTime, getOrdinalSuffix, getARRBand, formatDate, getCountryCode2, getHighResPhotoURL } from './utils.js';
 import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 import { displayPersonality } from './profile-personality.js';
 import { displayPersonalityAwards } from './personality-awards-display.js';
@@ -247,7 +247,8 @@ function displayProfileInfo(user, userData, stats, seasonRanking, globalRanking)
     initialsSpan.textContent = getInitials(userData.name || user.displayName);
     
     if (userData.photoURL) {
-        profilePhoto.src = userData.photoURL;
+        // Use high-res version of Google profile photos (400px)
+        profilePhoto.src = getHighResPhotoURL(userData.photoURL, 400);
         profilePhoto.classList.add('active');
         profilePlaceholder.classList.add('hide');
     } else {
