@@ -413,10 +413,10 @@ function displayResultsTable() {
         arrCell.textContent = result.arr || '—';
         row.appendChild(arrCell);
 
-        // Points
+        // Points (result.points already includes all bonuses)
         const pointsCell = document.createElement('td');
         pointsCell.className = 'stat-row-value';
-        pointsCell.textContent = result.points + (result.bonusPoints || 0);
+        pointsCell.textContent = result.points;
         row.appendChild(pointsCell);
 
         // Awards
@@ -523,8 +523,8 @@ function applySort() {
                 bVal = b.arr || 0;
                 break;
             case 'points':
-                aVal = a.points + (a.bonusPoints || 0);
-                bVal = b.points + (b.bonusPoints || 0);
+                aVal = a.points || 0;
+                bVal = b.points || 0;
                 break;
             case 'cc':
                 aVal = a.earnedCadenceCredits || 0;
