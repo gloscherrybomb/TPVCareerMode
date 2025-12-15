@@ -72,8 +72,8 @@ export function buildRaceContext(userResult, allResults, userData, seasonData) {
 
         // Season context
         racesCompleted: seasonData?.racesCompleted || 1,
-        careerWins: userData?.stats?.wins || 0,
-        careerPodiums: userData?.stats?.podiums || 0,
+        careerWins: userData?.totalWins || 0,
+        careerPodiums: userData?.totalPodiums || 0,
         consecutiveWins: seasonData?.consecutiveWins || 0,
         consecutivePodiums: seasonData?.consecutivePodiums || 0,
         recentRacesBelowExpectation: seasonData?.recentBelowExpectation || 0,
