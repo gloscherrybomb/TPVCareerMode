@@ -38,6 +38,74 @@ function formatBalance(balance) {
   return `${balance || 0} CC`;
 }
 
+// Emoji support detection cache
+const emojiSupportCache = {};
+
+/**
+ * Check if an emoji is supported by the browser
+ * Uses canvas rendering to detect if emoji displays correctly
+ */
+function isEmojiSupported(emoji) {
+  if (emojiSupportCache[emoji] !== undefined) {
+    return emojiSupportCache[emoji];
+  }
+
+  const canvas = document.createElement('canvas');
+  canvas.width = 20;
+  canvas.height = 20;
+  const ctx = canvas.getContext('2d');
+
+  // Draw the emoji
+  ctx.textBaseline = 'top';
+  ctx.font = '16px Arial';
+  ctx.fillText(emoji, 0, 0);
+
+  // Get pixel data - unsupported emojis render as blank or tofu boxes
+  const imageData = ctx.getImageData(0, 0, 20, 20).data;
+
+  // Check if any non-transparent pixels exist
+  let hasPixels = false;
+  for (let i = 3; i < imageData.length; i += 4) {
+    if (imageData[i] > 0) {
+      hasPixels = true;
+      break;
+    }
+  }
+
+  // Additional check: compare against a known-unsupported character
+  // Some systems render a box for unsupported chars which still has pixels
+  if (hasPixels) {
+    ctx.clearRect(0, 0, 20, 20);
+    ctx.fillText('\uFFFF', 0, 0); // Known unsupported char
+    const unsupportedData = ctx.getImageData(0, 0, 20, 20).data;
+
+    // Compare pixel patterns - if identical, emoji likely not supported
+    let identical = true;
+    for (let i = 0; i < imageData.length; i++) {
+      if (Math.abs(imageData[i] - unsupportedData[i]) > 10) {
+        identical = false;
+        break;
+      }
+    }
+    if (identical) hasPixels = false;
+  }
+
+  emojiSupportCache[emoji] = hasPixels;
+  return hasPixels;
+}
+
+/**
+ * Get the emoji for an unlock item, using fallback if needed
+ */
+function getItemEmoji(item) {
+  if (!item) return '⭐';
+  if (!item.emoji) return '⭐';
+  if (item.emojiFallback && !isEmojiSupported(item.emoji)) {
+    return item.emojiFallback;
+  }
+  return item.emoji;
+}
+
 function buildModal() {
   if (document.getElementById('cc-modal-overlay')) return;
   const overlay = document.createElement('div');
@@ -296,7 +364,7 @@ function renderProfileCC() {
               const isOnCooldown = cooldowns[unlock.id] === true;
               return `
                 <div class="cc-active-item ${isOnCooldown ? 'on-cooldown' : ''}">
-                  <span class="cc-active-emoji">${unlock.emoji || '⭐'}</span>
+                  <span class="cc-active-emoji">${getItemEmoji(unlock)}</span>
                   <span class="cc-active-name">${unlock.name}</span>
                   ${isOnCooldown ? `<span class="cc-active-cooldown">⏱️ Resting</span>` : ''}
                 </div>
@@ -356,7 +424,7 @@ function renderEquippedDisplay() {
             return `
               <div class="cc-selector-card">
                 <div class="cc-event-card-header">
-                  <div class="cc-event-emoji">${unlock.emoji || '⭐'}</div>
+                  <div class="cc-event-emoji">${getItemEmoji(unlock)}</div>
                   <div class="cc-event-name">${unlock.name}</div>
                 </div>
                 <div class="cc-event-desc">${unlock.description}</div>
@@ -418,7 +486,7 @@ function renderCCResults(eventResults) {
         ` : ''}
         ${hasUnlock ? `
           <div class="cc-result-card applied">
-            <div class="cc-result-icon">${unlockBonuses[0]?.emoji || '🎯'}</div>
+            <div class="cc-result-icon">${getItemEmoji(unlockCatalog.find(u => u.id === unlockBonuses[0]?.id) || unlockBonuses[0])}</div>
             <div class="cc-result-amount applied">+${unlockPoints}</div>
             <div class="cc-result-label">Unlock Bonus Applied</div>
             <div class="cc-result-detail">${unlockBonuses[0]?.name || 'Unlock'} triggered</div>
@@ -560,7 +628,7 @@ function renderEventLoadoutModal() {
       slotDiv.innerHTML = `
         <div class="slot-label">Slot ${i + 1}</div>
         <div class="slot-unlock ${onCooldown ? 'cooldown' : ''}">
-          <span class="slot-emoji">${unlock?.emoji || '🎯'}</span>
+          <span class="slot-emoji">${getItemEmoji(unlock)}</span>
           <span class="slot-name">${unlock?.name || 'Unknown'}</span>
           ${onCooldown ? '<span class="cooldown-badge">Cooldown</span>' : ''}
         </div>
@@ -604,7 +672,7 @@ function renderEventLoadoutModal() {
     item.className = `cc-loadout-item ${isEquipped ? 'equipped' : ''} ${onCooldown ? 'cooldown' : ''}`;
 
     item.innerHTML = `
-      <div class="loadout-item-icon">${unlock.emoji || '🎯'}</div>
+      <div class="loadout-item-icon">${getItemEmoji(unlock)}</div>
       <div class="loadout-item-info">
         <div class="loadout-item-name">${unlock.name}</div>
         <div class="loadout-item-bonus">+${unlock.pointsBonus} points • ${unlock.description}</div>

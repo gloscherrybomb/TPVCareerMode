@@ -1370,6 +1370,7 @@ async function processUserResult(uid, eventInfo, results) {
           id: selectedUnlock.unlock.id,
           name: selectedUnlock.unlock.name,
           emoji: selectedUnlock.unlock.emoji || '🎯',
+          emojiFallback: selectedUnlock.unlock.emojiFallback || null,
           pointsAdded: unlockPoints,
           reason: selectedUnlock.reason
         });
