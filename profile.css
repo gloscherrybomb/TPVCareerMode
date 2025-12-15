@@ -1227,9 +1227,16 @@
     .result-stats {
         clear: both;
         display: flex;
+        flex-direction: row !important;
         flex-wrap: wrap;
-        align-items: center;
+        align-items: baseline !important;
+        justify-content: flex-start;
         gap: 0.5rem 1rem;
+    }
+
+    .result-time,
+    .result-points {
+        display: inline;
     }
 
     .result-time {
@@ -1245,7 +1252,7 @@
         display: flex;
         flex-wrap: wrap;
         gap: 0.4rem;
-        margin-top: 0.5rem;
+        margin-top: 0.25rem;
     }
 }
 
