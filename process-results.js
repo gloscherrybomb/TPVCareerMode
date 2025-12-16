@@ -1251,11 +1251,10 @@ async function processUserResult(uid, eventInfo, results) {
     earnedAwards: [], // NEW: Track awards for notification system
     processedAt: admin.firestore.FieldValue.serverTimestamp()
   };
-  
-  // Build season standings with all racers from CSV
-  // Pass user's actual points (including bonus) to ensure standings match totalPoints
-  const seasonStandings = await buildSeasonStandings(results, userData, eventNumber, uid, points);
-  
+
+  // NOTE: buildSeasonStandings() moved to after unlock processing (around line 1415)
+  // to ensure points includes unlock bonus
+
   // Track if this is an optional event
   const newUsedOptionalEvents = [...usedOptionalEvents];
   if (OPTIONAL_EVENTS.includes(eventNumber) && !usedOptionalEvents.includes(eventNumber)) {
@@ -1408,7 +1407,11 @@ async function processUserResult(uid, eventInfo, results) {
     eventResults.unlockBonusPoints = unlockBonusPoints;
     eventResults.unlockBonusesApplied = unlockBonusesApplied;
   }
-  
+
+  // Build season standings with all racers from CSV
+  // IMPORTANT: This must be after unlock processing so points includes unlock bonus
+  const seasonStandings = await buildSeasonStandings(results, userData, eventNumber, uid, points);
+
   // After event 15, there is no next event - season is complete
   if (eventNumber === 15) {
     nextEventNumber = null;
@@ -1871,7 +1874,8 @@ async function processUserResult(uid, eventInfo, results) {
   console.log(`   Stage ${currentStage} complete -> Stage ${nextStage}`);
   
   // Update results summary collection (per-user)
-  await updateResultsSummary(season, eventNumber, results, uid);
+  // Pass unlock bonus data so user's result includes unlock points
+  await updateResultsSummary(season, eventNumber, results, uid, unlockBonusPoints, unlockBonusesApplied);
 }
 
 /**
@@ -2625,8 +2629,10 @@ async function updateBotARRs(season, event, results) {
 /**
  * Update results summary collection (for quick access to full results)
  * Each user gets their own results document
+ * @param {number} unlockBonusPoints - Bonus points from triggered unlocks (for current user only)
+ * @param {Array} unlockBonusesApplied - Array of unlock bonus details (for current user only)
  */
-async function updateResultsSummary(season, event, results, userUid) {
+async function updateResultsSummary(season, event, results, userUid, unlockBonusPoints = 0, unlockBonusesApplied = []) {
   // Store results per-user, not shared
   const summaryRef = db.collection('results').doc(`season${season}_event${event}_${userUid}`);
   
@@ -2701,7 +2707,11 @@ async function updateResultsSummary(season, event, results, userUid) {
       const earnedPhotoFinish = isTimeChallenge ? false : awardsCalc.checkPhotoFinish(position, times.userTime, times.winnerTime);
       
       const earnedDarkHorse = awardsCalc.checkDarkHorse(position, predictedPosition);
-      
+
+      // For current user, include unlock bonus points
+      const isCurrentUser = r.UID === userUid;
+      const userUnlockBonus = isCurrentUser ? unlockBonusPoints : 0;
+
       return {
         position: position,
         name: r.Name,
@@ -2712,8 +2722,10 @@ async function updateResultsSummary(season, event, results, userUid) {
         eventRating: parseInt(r.EventRating) || null,
         predictedPosition: predictedPosition,
         time: parseFloat(r.Time) || 0,
-        points: points,
-        bonusPoints: bonusPoints,
+        points: points + userUnlockBonus,
+        bonusPoints: bonusPoints + userUnlockBonus,
+        unlockBonusPoints: userUnlockBonus,
+        unlockBonusesApplied: isCurrentUser ? unlockBonusesApplied : [],
         earnedPunchingMedal: earnedPunchingMedal,
         earnedGiantKillerMedal: earnedGiantKillerMedal,
         earnedDomination: earnedDomination,
