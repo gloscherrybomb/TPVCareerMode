@@ -917,9 +917,9 @@
         padding: 0.75rem 0.5rem;
     }
 
-    /* Hide team and gap on mobile */
+    /* Hide team and ARR on mobile */
     .team-cell,
-    .gap-cell,
+    .arr-cell,
     .results-table th:nth-child(3),
     .results-table th:nth-child(5) {
         display: none;
