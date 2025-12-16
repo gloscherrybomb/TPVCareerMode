@@ -2261,6 +2261,41 @@ const NARRATIVE_DATABASE = {
       triggers: { performanceTier: ["win", "podium"], personalityMin: { showmanship: 65, confidence: 65 } },
       weight: 0.6
     }
+  ],
+
+  // ===== CONTRIBUTOR EXCLUSIVE STORIES =====
+  // These stories only appear for users who have supported TPV Career Mode
+  contributorExclusive: [
+    {
+      id: "contributor_inner_circle",
+      text: "As you warm up, a familiar face from the supporter community waves from the barriers. It's a reminder that you're not just racing for yourself—you're part of something bigger, a community that believes in what TPV Career Mode represents. That golden star next to your name isn't just decoration; it's a badge of belonging.",
+      triggers: { requiresContributor: true, performanceTier: "any" },
+      weight: 0.7
+    },
+    {
+      id: "contributor_behind_scenes",
+      text: "The night before the race, you received a message from the dev team—a thank you for your support and a hint at upcoming features being worked on. Being part of the contributor circle has its perks, including the knowledge that your support directly fuels these innovations. You clip in feeling like an insider.",
+      triggers: { requiresContributor: true, raceNumber: [3, 6, 9, 12] },
+      weight: 0.6
+    },
+    {
+      id: "contributor_legacy",
+      text: "Your contribution to TPV Career Mode isn't just financial—it's a vote of confidence in the virtual cycling community. As you prepare to race, that golden star next to your name reminds you: you're helping build something that will outlast any single race result. Win or lose today, you've already won something bigger.",
+      triggers: { requiresContributor: true, performanceTier: ["win", "podium"] },
+      weight: 0.8
+    },
+    {
+      id: "contributor_pioneer",
+      text: "You were one of the early believers, one of the riders who saw the potential in TPV Career Mode before it was proven. That pioneering spirit carries over to your racing—you don't just follow the pack, you help shape what's possible. Today's race is another chapter in a story you're helping to write.",
+      triggers: { requiresContributor: true, minRacesCompleted: 5 },
+      weight: 0.6
+    },
+    {
+      id: "contributor_gratitude",
+      text: "Between races, you sometimes forget the contributor badge exists—until you see that star gleaming next to your name in the standings. It's not about recognition; it's about being part of the solution, part of the community that keeps this virtual peloton rolling forward. Every race you complete, every story that unfolds, exists partly because of supporters like you.",
+      triggers: { requiresContributor: true },
+      weight: 0.5
+    }
   ]
 };
 // Export for use in other modules

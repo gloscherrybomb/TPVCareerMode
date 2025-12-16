@@ -235,6 +235,13 @@ class StorySelector {
       }
     }
 
+    // Check contributor status (for contributor-exclusive content)
+    if (triggers.requiresContributor !== undefined) {
+      if (triggers.requiresContributor && !context.isContributor) {
+        return false;
+      }
+    }
+
     return true;
   }
 
@@ -347,6 +354,11 @@ class StorySelector {
           categories.push('personalityDriven');
         }
       }
+    }
+
+    // CONTRIBUTOR EXCLUSIVE: 20% chance for contributors to get exclusive story
+    if (context.isContributor && Math.random() < 0.2) {
+      categories.unshift('contributorExclusive');
     }
 
     // Early career stories for events 2-5

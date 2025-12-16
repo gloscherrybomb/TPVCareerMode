@@ -152,6 +152,52 @@ if (uidModalOverlay) {
   });
 }
 
+// Support Modal functionality
+const supportModal = document.getElementById('supportModal');
+const supportBtn = document.getElementById('supportBtn');
+const supportModalOverlay = document.getElementById('supportModalOverlay');
+const supportModalClose = document.getElementById('supportModalClose');
+const kofiBtn = document.getElementById('kofiBtn');
+
+function openSupportModal() {
+  if (supportModal) {
+    supportModal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+}
+
+function closeSupportModal() {
+  if (supportModal) {
+    supportModal.classList.remove('active');
+    document.body.style.overflow = 'auto';
+  }
+}
+
+if (supportBtn) {
+  supportBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    openSupportModal();
+  });
+}
+
+if (supportModalOverlay) {
+  supportModalOverlay.addEventListener('click', closeSupportModal);
+}
+
+if (supportModalClose) {
+  supportModalClose.addEventListener('click', closeSupportModal);
+}
+
+// Check for #support hash on page load to auto-open modal
+if (window.location.hash === '#support') {
+  // Wait a bit for auth to initialize
+  setTimeout(() => {
+    if (auth.currentUser) {
+      openSupportModal();
+    }
+  }, 500);
+}
+
 // Tab switching
 modalTabs.forEach(tab => {
   tab.addEventListener('click', () => {
@@ -465,11 +511,12 @@ if (uidForm) {
 }
 
 // Auth state observer
-onAuthStateChanged(auth, (user) => {
+onAuthStateChanged(auth, async (user) => {
   const loginBtn = document.getElementById('loginBtn');
   const logoutBtn = document.getElementById('logoutBtn');
+  const supportBtn = document.getElementById('supportBtn');
   const ctaSection = document.getElementById('ctaSection');
-  const loginPrompt = document.querySelector('.login-prompt'); // 👈 NEW
+  const loginPrompt = document.querySelector('.login-prompt');
 
   if (user) {
     // User is signed in
@@ -479,11 +526,39 @@ onAuthStateChanged(auth, (user) => {
     if (logoutBtn) {
       logoutBtn.style.display = 'inline-block';
     }
+    if (supportBtn) {
+      supportBtn.style.display = 'inline-block';
+    }
     if (ctaSection) {
       ctaSection.style.display = 'none'; // Hide signup CTA when logged in
     }
     if (loginPrompt) {
-      loginPrompt.style.display = 'none'; // 👈 Hide "Track Your Progress" prompt when logged in
+      loginPrompt.style.display = 'none';
+    }
+
+    // Check contributor status and set up Ko-fi link
+    try {
+      const userDoc = await getDoc(doc(db, 'users', user.uid));
+      if (userDoc.exists()) {
+        const userData = userDoc.data();
+
+        // Update contributor star style
+        if (supportBtn && userData.isContributor) {
+          supportBtn.classList.add('is-contributor');
+          supportBtn.title = 'Thank you for being a contributor!';
+        }
+
+        // Set Ko-fi link with user's UID pre-filled
+        if (kofiBtn) {
+          const tpvUid = userData.uid || 'Unknown';
+          const userName = userData.name || 'Anonymous';
+          const kofiMessage = encodeURIComponent(`TPV UID: ${tpvUid} | Name: ${userName}`);
+          // Replace YOUR_KOFI_USERNAME with your actual Ko-fi username
+          kofiBtn.href = `https://ko-fi.com/jeastwood?message=${kofiMessage}`;
+        }
+      }
+    } catch (error) {
+      console.error('Error checking contributor status:', error);
     }
   } else {
     // User is signed out
@@ -494,11 +569,15 @@ onAuthStateChanged(auth, (user) => {
     if (logoutBtn) {
       logoutBtn.style.display = 'none';
     }
+    if (supportBtn) {
+      supportBtn.style.display = 'none';
+      supportBtn.classList.remove('is-contributor');
+    }
     if (ctaSection) {
       ctaSection.style.display = 'block'; // Show signup CTA when logged out
     }
     if (loginPrompt) {
-      loginPrompt.style.display = 'block'; // 👈 Show prompt again when logged out
+      loginPrompt.style.display = 'block';
     }
   }
 });

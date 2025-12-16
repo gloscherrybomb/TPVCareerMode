@@ -217,7 +217,7 @@ async function generateIntroParagraph(raceData, seasonData, riderId, narrativeSe
         eventName: raceData.eventName,
         position: raceData.position,
         predictedPosition: raceData.predictedPosition,
-        performanceTier: raceData.position === 1 ? 'win' : 
+        performanceTier: raceData.position === 1 ? 'win' :
                         raceData.position <= 3 ? 'podium' :
                         raceData.position <= 10 ? 'top10' :
                         raceData.position <= 20 ? 'midpack' : 'back',
@@ -226,7 +226,8 @@ async function generateIntroParagraph(raceData, seasonData, riderId, narrativeSe
         recentResults: seasonData.recentResults || [],
         isFirstWin: raceData.position === 1 && seasonData.totalWins === 1,
         isWorseResult: raceData.position > raceData.predictedPosition + 3,
-        raceType: EVENT_TYPES[raceData.eventNumber]
+        raceType: EVENT_TYPES[raceData.eventNumber],
+        isContributor: seasonData.isContributor || false
       };
       
       const introMoment = await narrativeSelector.generateIntroStory(

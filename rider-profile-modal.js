@@ -303,6 +303,67 @@ function initializeRiderModal() {
                     text-align: center;
                 }
             }
+
+            /* Contributor Profile Styles */
+            .rider-profile-card.contributor-profile {
+                position: relative;
+                border: 2px solid rgba(255, 215, 0, 0.5);
+            }
+
+            .rider-profile-card.contributor-profile::before {
+                content: '';
+                position: absolute;
+                top: -2px;
+                left: -2px;
+                right: -2px;
+                bottom: -2px;
+                background: linear-gradient(45deg,
+                    rgba(255, 215, 0, 0.3),
+                    rgba(255, 170, 0, 0.1),
+                    rgba(255, 215, 0, 0.3),
+                    rgba(255, 170, 0, 0.1)
+                );
+                background-size: 300% 300%;
+                border-radius: 14px;
+                z-index: -1;
+                animation: contributorGlow 4s ease infinite;
+            }
+
+            @keyframes contributorGlow {
+                0%, 100% { background-position: 0% 50%; }
+                50% { background-position: 100% 50%; }
+            }
+
+            .contributor-profile .rider-profile-header::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: -100%;
+                width: 100%;
+                height: 100%;
+                background: linear-gradient(90deg, transparent, rgba(255, 215, 0, 0.15), transparent);
+                animation: contributorShimmer 3s ease-in-out infinite;
+                pointer-events: none;
+            }
+
+            @keyframes contributorShimmer {
+                0% { left: -100%; }
+                100% { left: 200%; }
+            }
+
+            .contributor-profile .rider-profile-header {
+                position: relative;
+                overflow: hidden;
+            }
+
+            .contributor-star-badge {
+                display: inline-block;
+                margin-left: 0.5rem;
+                font-size: 1.2rem;
+                color: #ffd700;
+                filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.8));
+                vertical-align: middle;
+            }
         `;
         document.head.appendChild(styles);
     }
@@ -484,14 +545,19 @@ function buildRiderProfileHTML(data, name) {
         ? `<img src="assets/flags/${countryCode2}.svg" alt="${country}" class="country-flag-profile" title="${country}">`
         : '';
 
+    // Check contributor status
+    const isContributor = data.isContributor || false;
+    const contributorClass = isContributor ? ' contributor-profile' : '';
+    const contributorBadge = isContributor ? '<span class="contributor-star-badge" title="TPV Contributor">&#9733;</span>' : '';
+
     let html = `
-        <div class="rider-profile-card">
+        <div class="rider-profile-card${contributorClass}">
             <div class="rider-profile-header">
                 <div class="rider-profile-avatar">
                     ${photoURL ? `<img src="${photoURL}" alt="${displayName}">` : initials}
                 </div>
                 <div class="rider-profile-info">
-                    <h2 class="rider-profile-name">${displayName} ${countryFlagHTML}</h2>
+                    <h2 class="rider-profile-name">${displayName}${contributorBadge} ${countryFlagHTML}</h2>
                     <div class="rider-profile-meta">
                         <div class="rider-profile-meta-item">
                             <span class="rider-profile-meta-label">ARR</span>

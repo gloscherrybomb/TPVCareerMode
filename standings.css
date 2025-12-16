@@ -315,6 +315,26 @@
     letter-spacing: 1px;
 }
 
+/* Contributor Badge */
+.contributor-badge {
+    display: inline-block;
+    margin-left: 0.5rem;
+    font-size: 1rem;
+    color: #ffd700;
+    filter: drop-shadow(0 0 3px rgba(255, 215, 0, 0.6));
+    vertical-align: middle;
+    animation: contributorStarGlow 2s ease-in-out infinite;
+}
+
+@keyframes contributorStarGlow {
+    0%, 100% {
+        filter: drop-shadow(0 0 3px rgba(255, 215, 0, 0.6));
+    }
+    50% {
+        filter: drop-shadow(0 0 8px rgba(255, 215, 0, 1));
+    }
+}
+
 /* Team Cell */
 .team-cell {
     color: var(--text-secondary);
