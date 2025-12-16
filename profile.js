@@ -1464,17 +1464,15 @@ async function drawSeasonTemplate(ctx, width, height) {
     // Profile photo (small, circular)
     await drawProfilePhoto(ctx, width / 2, 320, 100);
     
-    // Player name
+    // Player name (fitted to max width)
     ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 52px "Exo 2", sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText(data.name.toUpperCase(), width / 2, 480);
-    
-    // Team
+    drawFittedText(ctx, data.name.toUpperCase(), width / 2, 480, 1000, 52, 32, 'bold', '"Exo 2", sans-serif');
+
+    // Team (fitted to max width)
     if (data.team) {
         ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
-        ctx.font = '32px "Exo 2", sans-serif';
-        ctx.fillText(data.team, width / 2, 530);
+        drawFittedText(ctx, data.team, width / 2, 530, 900, 32, 22, '600', '"Exo 2", sans-serif');
     }
     
     // Season rank highlight
@@ -1562,38 +1560,37 @@ async function drawTrophyTemplate(ctx, width, height) {
     ctx.font = 'bold 48px "Exo 2", sans-serif';
     ctx.fillText('TROPHY CABINET', width / 2, 420);
     
-    // Player name
+    // Player name (fitted to max width)
     ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-    ctx.font = '600 36px "Exo 2", sans-serif';
-    ctx.fillText(data.name.toUpperCase(), width / 2, 490);
-    
+    ctx.textAlign = 'center';
+    drawFittedText(ctx, data.name.toUpperCase(), width / 2, 490, 1000, 36, 28, '600', '"Exo 2", sans-serif');
+
     // Awards grid
     if (data.awards.length > 0) {
         const startY = 620;
         const rowHeight = 200;
         const cols = 3;
         const colWidth = width / (cols + 1);
-        
+
         data.awards.forEach((award, i) => {
             const col = i % cols;
             const row = Math.floor(i / cols);
             const x = colWidth + col * colWidth;
             const y = startY + row * rowHeight;
-            
+
             // Award icon
             ctx.font = '80px sans-serif';
             ctx.textAlign = 'center';
             ctx.fillText(award.icon, x, y);
-            
+
             // Count
             ctx.fillStyle = '#8a2be2';
             ctx.font = 'bold 36px Orbitron, sans-serif';
             ctx.fillText(award.count, x, y + 60);
-            
-            // Title
+
+            // Title (fitted to column width)
             ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
-            ctx.font = '600 22px "Exo 2", sans-serif';
-            ctx.fillText(award.title.toUpperCase(), x, y + 100);
+            drawFittedText(ctx, award.title.toUpperCase(), x, y + 100, 240, 20, 14, '600', '"Exo 2", sans-serif');
         });
     } else {
         ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
@@ -1649,10 +1646,10 @@ async function drawChampionTemplate(ctx, width, height) {
     // Profile photo (larger for champion)
     await drawProfilePhoto(ctx, width / 2, 380, 140);
     
-    // Player name
+    // Player name (fitted to max width)
     ctx.fillStyle = '#ffd700';
-    ctx.font = 'bold 56px "Exo 2", sans-serif';
-    ctx.fillText(data.name.toUpperCase(), width / 2, 590);
+    ctx.textAlign = 'center';
+    drawFittedText(ctx, data.name.toUpperCase(), width / 2, 590, 1000, 56, 36, 'bold', '"Exo 2", sans-serif');
     
     // Champion text
     ctx.fillStyle = '#ffffff';
@@ -1743,25 +1740,23 @@ async function drawPersonalityTemplate(ctx, width, height) {
     // Profile photo
     await drawProfilePhoto(ctx, width / 2, 320, 100);
 
-    // Player name
+    // Player name (fitted to max width)
     ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 52px "Exo 2", sans-serif';
-    ctx.fillText(data.name.toUpperCase(), width / 2, 480);
+    ctx.textAlign = 'center';
+    drawFittedText(ctx, data.name.toUpperCase(), width / 2, 480, 1000, 52, 32, 'bold', '"Exo 2", sans-serif');
 
-    // Team
+    // Team (fitted to max width)
     if (data.team) {
         ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
-        ctx.font = '32px "Exo 2", sans-serif';
-        ctx.fillText(data.team, width / 2, 530);
+        drawFittedText(ctx, data.team, width / 2, 530, 900, 32, 22, '600', '"Exo 2", sans-serif');
     }
 
-    // Persona label with purple gradient
+    // Persona label with purple gradient (fitted to max width)
     const personaGradient = ctx.createLinearGradient(0, 620, 0, 680);
     personaGradient.addColorStop(0, '#b06af3');
     personaGradient.addColorStop(1, '#ff1b6b');
     ctx.fillStyle = personaGradient;
-    ctx.font = 'bold 64px Orbitron, sans-serif';
-    ctx.fillText(`"${data.persona}"`, width / 2, 680);
+    drawFittedText(ctx, `"${data.persona}"`, width / 2, 680, 950, 64, 40, 'bold', 'Orbitron, sans-serif');
 
     // Draw personality spider chart (smaller)
     drawSpiderChartOnCanvas(ctx, width / 2, 1080, 300, data.personality);
@@ -1828,7 +1823,7 @@ function drawSpiderChartOnCanvas(ctx, centerX, centerY, maxRadius, personality) 
         const labelY = centerY + (maxRadius + 60) * Math.sin(trait.angle - Math.PI / 2);
 
         ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-        ctx.font = 'bold 28px Orbitron, sans-serif';
+        ctx.font = 'bold 24px Orbitron, sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
         ctx.fillText(trait.name, labelX, labelY);
@@ -1895,13 +1890,45 @@ function drawPolygonOnCanvas(ctx, centerX, centerY, radius, sides, rotation = 0)
     ctx.stroke();
 }
 
-function drawStatBox(ctx, x, y, value, label, accentColor = '#ff0080') {
-    // Value
+// Helper function to draw text that fits within a max width
+function drawFittedText(ctx, text, x, y, maxWidth, initialFontSize, minFontSize = 24, fontWeight = 'bold', fontFamily = '"Exo 2", sans-serif') {
+    let fontSize = initialFontSize;
+    ctx.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
+
+    // Reduce font size until text fits or min size reached
+    while (ctx.measureText(text).width > maxWidth && fontSize > minFontSize) {
+        fontSize -= 2;
+        ctx.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
+    }
+
+    // If still too wide, truncate with ellipsis
+    let displayText = text;
+    if (ctx.measureText(text).width > maxWidth) {
+        while (ctx.measureText(displayText + '...').width > maxWidth && displayText.length > 0) {
+            displayText = displayText.slice(0, -1);
+        }
+        displayText += '...';
+    }
+
+    ctx.fillText(displayText, x, y);
+    return fontSize;
+}
+
+function drawStatBox(ctx, x, y, value, label, accentColor = '#ff0080', maxWidth = 160) {
+    // Value - scale font if needed
     ctx.fillStyle = accentColor;
-    ctx.font = 'bold 56px Orbitron, sans-serif';
+    let valueFontSize = 56;
+    ctx.font = `bold ${valueFontSize}px Orbitron, sans-serif`;
     ctx.textAlign = 'center';
-    ctx.fillText(value, x, y);
-    
+
+    // Check if value fits, reduce font if needed
+    const valueStr = String(value);
+    while (ctx.measureText(valueStr).width > maxWidth && valueFontSize > 32) {
+        valueFontSize -= 4;
+        ctx.font = `bold ${valueFontSize}px Orbitron, sans-serif`;
+    }
+    ctx.fillText(valueStr, x, y);
+
     // Label
     ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
     ctx.font = '600 22px "Exo 2", sans-serif';
