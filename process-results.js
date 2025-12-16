@@ -672,8 +672,11 @@ function updateRivalData(existingRivalData, encounters, eventNumber) {
 
 /**
  * Identify top 10 rivals based on rivalry score
- * Rivalry score = (number of races together) / (average gap + 1)
- * Higher score = closer racing more often = bigger rival
+ * Rivalry score considers:
+ * - Number of races (weighted with power function for repeated encounters)
+ * - Average time gap (closer = better)
+ * - Head-to-head competitiveness (50-50 win ratio = stronger rivalry)
+ * Higher score = closer racing more often with competitive results = bigger rival
  */
 function identifyTopRivals(rivalData) {
   if (!rivalData || !rivalData.encounters) {
@@ -683,8 +686,22 @@ function identifyTopRivals(rivalData) {
   // Calculate rivalry score for each bot
   const rivalScores = Object.keys(rivalData.encounters).map(botUid => {
     const data = rivalData.encounters[botUid];
-    // Score favors more races and closer gaps
-    const rivalryScore = data.races / (data.avgGap + 1);
+
+    // Base score: more races (weighted heavily) and closer gaps = higher
+    // Using races^1.5 to strongly favor repeated encounters
+    const baseScore = Math.pow(data.races, 1.5) / (data.avgGap + 1);
+
+    // Competitiveness bonus: closer head-to-head record = stronger rivalry
+    // winRatio of 0.5 = perfectly competitive, 0 or 1 = one-sided
+    const winRatio = data.userWins / data.races;
+    const competitiveness = 1 - Math.abs(winRatio - 0.5) * 2; // 0 to 1 scale
+
+    // Apply competitiveness as a bonus multiplier (1x to 1.5x)
+    // A 50-50 rivalry gets 50% bonus, one-sided rivalry gets no bonus
+    const competitivenessMultiplier = 1 + competitiveness * 0.5;
+
+    const rivalryScore = baseScore * competitivenessMultiplier;
+
     return {
       botUid: botUid,
       score: rivalryScore,
