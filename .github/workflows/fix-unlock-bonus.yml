@@ -1,0 +1,108 @@
+name: Fix Unlock Bonus
+
+on:
+  workflow_dispatch:
+    inputs:
+      userUid:
+        description: 'User UID (e.g., 2FDBB5DD4345DCB5)'
+        required: true
+        type: string
+      eventNumber:
+        description: 'Event number (1-15)'
+        required: true
+        type: string
+      unlockId:
+        description: 'Unlock ID (e.g., teamCarRecon, paceNotes, aeroWheels)'
+        required: true
+        type: choice
+        options:
+          - teamCarRecon
+          - paceNotes
+          - sprintPrimer
+          - aeroWheels
+          - cadenceNutrition
+          - soigneurSession
+          - preRaceMassage
+          - windTunnel
+          - altitudeAcclim
+          - signatureMove
+          - contractBonus
+          - fanFavorite
+          - climbingGears
+          - aggroRaceKit
+          - tightPackWin
+          - domestiqueHelp
+          - recoveryBoots
+          - rivalSlayer
+          - mentalCoach
+          - aggressionKit
+          - tacticalRadio
+          - professionalAttitude
+          - confidenceBooster
+          - aggressorHelmet
+          - teamLeaderJersey
+          - calmAnalyst
+          - humbleChampion
+          - showmanGear
+          - comebackKing
+          - balancedApproach
+      reason:
+        description: 'Trigger reason (optional)'
+        required: false
+        type: string
+        default: 'Manual fix via GitHub Action'
+
+jobs:
+  fix-unlock:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Validate inputs
+        run: |
+          EVENT="${{ github.event.inputs.eventNumber }}"
+          if ! [[ "$EVENT" =~ ^[0-9]+$ ]] || [ "$EVENT" -lt 1 ] || [ "$EVENT" -gt 15 ]; then
+            echo "❌ Event number must be between 1 and 15"
+            exit 1
+          fi
+          echo "✅ Inputs validated"
+          echo "   User: ${{ github.event.inputs.userUid }}"
+          echo "   Event: ${{ github.event.inputs.eventNumber }}"
+          echo "   Unlock: ${{ github.event.inputs.unlockId }}"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install firebase-admin
+
+      - name: Fix unlock bonus
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          node fix-unlock-bonus.js \
+            "${{ github.event.inputs.userUid }}" \
+            "${{ github.event.inputs.eventNumber }}" \
+            "${{ github.event.inputs.unlockId }}" \
+            "${{ github.event.inputs.reason }}"
+
+      - name: Summary
+        run: |
+          echo "## Unlock Bonus Fix Complete ✅" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Field | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| User UID | \`${{ github.event.inputs.userUid }}\` |" >> $GITHUB_STEP_SUMMARY
+          echo "| Event | ${{ github.event.inputs.eventNumber }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Unlock | ${{ github.event.inputs.unlockId }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Reason | ${{ github.event.inputs.reason }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Updated:**" >> $GITHUB_STEP_SUMMARY
+          echo "- Event results (points, bonusPoints, unlockBonusPoints)" >> $GITHUB_STEP_SUMMARY
+          echo "- User totalPoints and careerPoints" >> $GITHUB_STEP_SUMMARY
+          echo "- Season standings" >> $GITHUB_STEP_SUMMARY
+          echo "- Results summary document" >> $GITHUB_STEP_SUMMARY
