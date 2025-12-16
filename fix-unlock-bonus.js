@@ -97,13 +97,23 @@ async function fixUnlockBonus() {
     console.log(`   Bonus points: +${unlockBonusPoints}`);
     console.log(`   Reason: ${reason}\n`);
 
-    // Get user document
-    const userRef = db.collection('users').doc(userUid);
-    const userDoc = await userRef.get();
+    // Try to get user document by document ID first
+    let userRef = db.collection('users').doc(userUid);
+    let userDoc = await userRef.get();
 
+    // If not found by document ID, search by uid field
     if (!userDoc.exists) {
-      console.error(`❌ User ${userUid} not found`);
-      process.exit(1);
+      console.log(`   Document ID ${userUid} not found, searching by uid field...`);
+      const querySnapshot = await db.collection('users').where('uid', '==', userUid).limit(1).get();
+
+      if (querySnapshot.empty) {
+        console.error(`❌ User ${userUid} not found (tried both document ID and uid field)`);
+        process.exit(1);
+      }
+
+      userDoc = querySnapshot.docs[0];
+      userRef = userDoc.ref;
+      console.log(`   Found user by uid field, document ID: ${userDoc.id}`);
     }
 
     const userData = userDoc.data();
