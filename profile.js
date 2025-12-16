@@ -231,7 +231,12 @@ async function loadProfile(user) {
 // Display profile information
 function displayProfileInfo(user, userData, stats, seasonRanking, globalRanking) {
     // Profile header
-    document.getElementById('profileName').textContent = userData.name || user.displayName || 'Unknown';
+    const profileNameEl = document.getElementById('profileName');
+    const displayName = userData.name || user.displayName || 'Unknown';
+    const contributorBadge = userData.isContributor
+        ? ' <span class="profile-contributor-badge" title="Thank you for your contribution to support TPV Career Mode">&#9733;</span>'
+        : '';
+    profileNameEl.innerHTML = displayName + contributorBadge;
     document.getElementById('profileUID').textContent = userData.uid || 'No UID';
     document.getElementById('profileTeam').textContent = userData.team || 'No Team';
     
