@@ -159,10 +159,32 @@ const supportModalOverlay = document.getElementById('supportModalOverlay');
 const supportModalClose = document.getElementById('supportModalClose');
 const kofiBtn = document.getElementById('kofiBtn');
 
-function openSupportModal() {
+async function openSupportModal() {
   if (supportModal) {
     supportModal.classList.add('active');
     document.body.style.overflow = 'hidden';
+
+    // Set Ko-fi link dynamically when modal opens
+    const kofiButton = document.getElementById('kofiBtn');
+    if (kofiButton && auth.currentUser) {
+      try {
+        const userDoc = await getDoc(doc(db, 'users', auth.currentUser.uid));
+        if (userDoc.exists()) {
+          const userData = userDoc.data();
+          const tpvUid = userData.uid || 'Unknown';
+          const userName = userData.name || 'Anonymous';
+          const kofiMessage = encodeURIComponent(`TPV UID: ${tpvUid} | Name: ${userName}`);
+          kofiButton.href = `https://ko-fi.com/jeastwood?message=${kofiMessage}`;
+        }
+      } catch (error) {
+        console.error('Error setting Ko-fi link:', error);
+        // Fallback: set basic link without user info
+        kofiButton.href = 'https://ko-fi.com/jeastwood';
+      }
+    } else if (kofiButton) {
+      // Fallback if no user logged in
+      kofiButton.href = 'https://ko-fi.com/jeastwood';
+    }
   }
 }
 
@@ -176,7 +198,13 @@ function closeSupportModal() {
 if (supportBtn) {
   supportBtn.addEventListener('click', (e) => {
     e.preventDefault();
-    openSupportModal();
+    // If modal exists on this page, open it directly
+    if (supportModal) {
+      openSupportModal();
+    } else {
+      // Redirect to home page with #support hash to open modal there
+      window.location.href = 'index.html#support';
+    }
   });
 }
 
@@ -186,6 +214,37 @@ if (supportModalOverlay) {
 
 if (supportModalClose) {
   supportModalClose.addEventListener('click', closeSupportModal);
+}
+
+// Safety click handler for Ko-fi button in case href wasn't set
+if (kofiBtn) {
+  kofiBtn.addEventListener('click', async (e) => {
+    // If href is still "#", prevent default and handle manually
+    if (kofiBtn.href.endsWith('#') || kofiBtn.href === '#') {
+      e.preventDefault();
+
+      // Try to build the URL
+      if (auth.currentUser) {
+        try {
+          const userDoc = await getDoc(doc(db, 'users', auth.currentUser.uid));
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            const tpvUid = userData.uid || 'Unknown';
+            const userName = userData.name || 'Anonymous';
+            const kofiMessage = encodeURIComponent(`TPV UID: ${tpvUid} | Name: ${userName}`);
+            window.open(`https://ko-fi.com/jeastwood?message=${kofiMessage}`, '_blank');
+            return;
+          }
+        } catch (error) {
+          console.error('Error getting user data for Ko-fi:', error);
+        }
+      }
+
+      // Fallback: open Ko-fi without user info
+      window.open('https://ko-fi.com/jeastwood', '_blank');
+    }
+    // If href is properly set, let the default <a> behavior handle it
+  });
 }
 
 // Check for #support hash on page load to auto-open modal
