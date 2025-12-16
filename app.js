@@ -579,9 +579,6 @@ onAuthStateChanged(auth, async (user) => {
     if (logoutBtn) {
       logoutBtn.style.display = 'inline-block';
     }
-    if (supportBtn) {
-      supportBtn.style.display = 'inline-block';
-    }
     if (ctaSection) {
       ctaSection.style.display = 'none'; // Hide signup CTA when logged in
     }
@@ -595,13 +592,17 @@ onAuthStateChanged(auth, async (user) => {
       if (userDoc.exists()) {
         const userData = userDoc.data();
 
-        // Update contributor star style
-        if (supportBtn && userData.isContributor) {
-          supportBtn.classList.add('is-contributor');
-          supportBtn.title = 'Thank you for being a contributor!';
+        // Hide support star for contributors (they've already donated)
+        // Show it only for non-contributors
+        if (supportBtn) {
+          if (userData.isContributor) {
+            supportBtn.style.display = 'none';
+          } else {
+            supportBtn.style.display = 'inline-block';
+          }
         }
 
-        // Set Ko-fi link with user's UID pre-filled
+        // Set Ko-fi link with user's UID pre-filled (only needed for non-contributors)
         if (kofiBtn) {
           const tpvUid = userData.uid || 'Unknown';
           const userName = userData.name || 'Anonymous';
@@ -624,7 +625,6 @@ onAuthStateChanged(auth, async (user) => {
     }
     if (supportBtn) {
       supportBtn.style.display = 'none';
-      supportBtn.classList.remove('is-contributor');
     }
     if (ctaSection) {
       ctaSection.style.display = 'block'; // Show signup CTA when logged out
