@@ -198,13 +198,7 @@ function closeSupportModal() {
 if (supportBtn) {
   supportBtn.addEventListener('click', (e) => {
     e.preventDefault();
-    // If modal exists on this page, open it directly
-    if (supportModal) {
-      openSupportModal();
-    } else {
-      // Redirect to home page with #support hash to open modal there
-      window.location.href = 'index.html#support';
-    }
+    openSupportModal();
   });
 }
 
