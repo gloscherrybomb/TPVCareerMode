@@ -253,7 +253,7 @@ function generateProfileSeasonReview(userData) {
     }
     
     if (totalWins > 1) {
-        review += `**Multiple Wins:** You didn't just win once—you won ${totalWins} times this season, demonstrating consistency at the highest level.\n\n`;
+        review += `**${totalWins} Wins:** You didn't just win once—you won ${totalWins} times this season, demonstrating consistency at the highest level.\n\n`;
     }
     
     if (totalPodiums >= 5) {

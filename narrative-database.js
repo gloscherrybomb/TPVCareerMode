@@ -157,7 +157,7 @@ const NARRATIVE_DATABASE = {
     {
       id: "early_imposter_syndrome",
       text: "Every race, you feel like someone's going to tap you on the shoulder and tell you that you don't belong here. That feeling of being an imposter never quite goes away, even when your results say otherwise. You look at the riders around you and assume they all know something you don't, have some secret knowledge that makes racing easier for them.",
-      triggers: { raceNumber: [2, 3, 4, 5], performanceTier: ["any"] },
+      triggers: { raceNumber: [2, 3, 4, 5], performanceTier: ["top10", "podium", "midpack"] },
       weight: 0.5
     },
     {
@@ -211,8 +211,20 @@ const NARRATIVE_DATABASE = {
     {
       id: "early_tactical_awakening",
       text: "You used to think racing was just about being the strongest. Then you watched a rider half your power output beat you through better tactics—sitting in, conserving energy, attacking at exactly the right moment. Now you're studying race tactics like you're cramming for an exam, learning that bike racing is as much chess as it is physical.",
-      triggers: { raceNumber: [4, 5], performanceTier: ["any"] },
+      triggers: { raceNumber: [4, 5], performanceTier: ["top10", "midpack", "podium"] },
       weight: 0.7
+    },
+    {
+      id: "early_first_podium_hunger",
+      text: "You've tasted the podium once now, and it's changed everything. That single top-three finish proved you can compete at the front—now you're hungry to prove it wasn't a fluke. The other riders don't look as intimidating anymore. You belong up there.",
+      triggers: { raceNumber: [3, 4, 5], totalPodiums: [1], performanceTier: ["top10", "midpack"] },
+      weight: 0.9
+    },
+    {
+      id: "early_second_podium_pattern",
+      text: "Two podiums now. One could have been luck, but two? Two suggests something real is happening. You're starting to believe this isn't a phase or a fortunate streak—you might actually be good at this.",
+      triggers: { raceNumber: [4, 5], totalPodiums: [2], performanceTier: ["podium", "top10"] },
+      weight: 0.9
     },
     {
       id: "early_bike_handling",
@@ -427,6 +439,36 @@ const NARRATIVE_DATABASE = {
       text: "Your racing social media has grown organically. People follow your journey, comment on your progress, share in your successes and setbacks. You're not an influencer, but you've built a small community of supporters who care about your racing. That accountability and encouragement matters more than you expected.",
       triggers: { raceNumber: [7, 8, 9, 10], performanceTier: ["any"] },
       weight: 0.3
+    },
+    {
+      id: "mid_first_win_afterglow",
+      text: "The afterglow of your first victory hasn't faded yet. You won. Actually won. Crossed the line first, stood on the top step, heard your name announced as the winner. That moment changed something inside you—you're not just racing to compete anymore, you're racing to win again.",
+      triggers: { raceNumber: [6, 7, 8, 9, 10], totalWins: [1], performanceTier: ["top10", "podium", "midpack"] },
+      weight: 0.95
+    },
+    {
+      id: "mid_multi_winner_confidence",
+      text: "{totalWins} wins this season. That's not a fluke, that's a pattern. You've proven repeatedly that when the race reaches its critical moment, you have what it takes to cross the line first. The competition knows your name now—they mark you, watch you, respect you.",
+      triggers: { raceNumber: [7, 8, 9, 10], totalWins: [2, 3, 4, 5], performanceTier: ["win", "podium", "top10"] },
+      weight: 0.95
+    },
+    {
+      id: "mid_exceeded_predictions_momentum",
+      text: "You keep outperforming what everyone expects. Race after race, the predictions say one thing and you deliver something better. It's not luck at this point—something's clicking, and you're riding better than anyone gave you credit for.",
+      triggers: { raceNumber: [6, 7, 8, 9], improvementFromPrediction: 3, performanceTier: ["top10", "podium", "win"] },
+      weight: 0.85
+    },
+    {
+      id: "mid_struggling_below_expectations",
+      text: "The season hasn't unfolded the way you hoped. The predictions suggested you'd be higher in the standings by now, but results haven't cooperated. It's frustrating—you know you're capable of more, but translating that capability into results remains elusive.",
+      triggers: { raceNumber: [6, 7, 8, 9], performanceTier: ["midpack", "back"], isWorseResult: true },
+      weight: 0.8
+    },
+    {
+      id: "mid_podium_consistency",
+      text: "{totalPodiums} podiums across the season establishes you as one of the most consistent front-runners in the field. You're not a one-hit wonder—you're a genuine threat every time you pin on a number.",
+      triggers: { raceNumber: [7, 8, 9, 10], totalPodiums: [3, 4, 5], performanceTier: ["win", "podium", "top10"] },
+      weight: 0.9
     }
   ],
 
@@ -1961,7 +2003,7 @@ const NARRATIVE_DATABASE = {
     },
     {
       id: "form_podium_regular",
-      text: "Multiple podiums don't happen by accident. You've proven you can compete at the front, and that's the foundation everything else builds on. Stay hungry.",
+      text: "{totalPodiums} podiums don't happen by accident. You've proven you can compete at the front, and that's the foundation everything else builds on. Stay hungry.",
       triggers: { totalPodiums: [3, 4, 5, 6, 7, 8], stagesCompleted: [4, 5, 6, 7, 8] },
       weight: 0.8
     },

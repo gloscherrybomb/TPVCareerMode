@@ -223,11 +223,18 @@ async function generateIntroParagraph(raceData, seasonData, riderId, narrativeSe
                         raceData.position <= 20 ? 'midpack' : 'back',
         totalPoints: seasonData.totalPoints,
         totalWins: seasonData.totalWins,
+        totalPodiums: seasonData.totalPodiums || 0,
         recentResults: seasonData.recentResults || [],
         isFirstWin: raceData.position === 1 && seasonData.totalWins === 1,
         isWorseResult: raceData.position > raceData.predictedPosition + 3,
         raceType: EVENT_TYPES[raceData.eventNumber],
-        isContributor: seasonData.isContributor || false
+        isContributor: seasonData.isContributor || false,
+        // Additional context for improved story selection
+        racesCompleted: seasonData.stagesCompleted || 1,
+        stagesCompleted: seasonData.stagesCompleted || 1,
+        personality: seasonData.personality || null,
+        topRivals: seasonData.topRivals || [],
+        seasonRank: seasonData.seasonPosition || null
       };
       
       const introMoment = await narrativeSelector.generateIntroStory(
@@ -781,9 +788,13 @@ function generateSeasonContext(data) {
       context += `Your recent win has given you confidence and momentum. `;
     }
   } else if (totalPodiums >= 5) {
-    context += `Multiple trips to the podium have defined your season—five or more top-three finishes is the hallmark of genuine consistency. You've proven you can compete at the front across different types of events and conditions. That kind of reliability is what builds successful campaigns. `;
+    context += `${totalPodiums} podium finishes have defined your season—that many top-three results is the hallmark of genuine consistency. You've proven you can compete at the front across different types of events and conditions. That kind of reliability is what builds successful campaigns. `;
   } else if (totalPodiums >= 3) {
-    context += `Several podium finishes have given your season real substance. You're not just making up the numbers—you're competing for the top spots more often than not. `;
+    context += `${totalPodiums} podium finishes have given your season real substance. You're not just making up the numbers—you're competing for the top spots more often than not. `;
+  } else if (totalPodiums === 2) {
+    context += `Two podium finishes so far show you can compete at the front when it matters. You're knocking on the door of consistency—one more top-three result and you'll have established yourself as a genuine contender. `;
+  } else if (totalPodiums === 1) {
+    context += `Your podium finish earlier in the season proved you can compete with the best. Now the challenge is replicating that result and showing it wasn't a one-off. `;
   } else if (recentResults && recentResults.length >= 2) {
     const lastTwo = recentResults.slice(0, 2);
     const improving = lastTwo[0] < lastTwo[1];

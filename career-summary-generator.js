@@ -243,7 +243,7 @@ function getResultsSummary(performanceLevel, totalPoints, totalWins, totalPodium
     const options = [
       `You've established yourself among the elite tier—not always victorious, but consistently dangerous, regularly finishing on podiums and proving you belong in any conversation about the fastest riders.`,
       `The career arc shows a rider who wins races and challenges for podiums with genuine regularity, someone who enters each event as a legitimate threat rather than an outside hope.`,
-      `Your racing produces the kind of results that define elite competitors: multiple victories scattered across your career, regular podium appearances, and consistent front-running performances.`,
+      `Your racing produces the kind of results that define elite competitors: ${totalWins} ${totalWins === 1 ? 'victory' : 'victories'} and ${totalPodiums} ${totalPodiums === 1 ? 'podium' : 'podiums'} scattered across your career, with consistent front-running performances.`,
       `You race at a level where winning is realistic, podiums are regular, and top-tier performances have become your standard rather than your exception.`,
       `The results sheet consistently places you among the fastest finishers—victories when everything aligns, podiums when you're competitive, always near the front when the race reaches its conclusion.`,
       `You've carved out a reputation as someone genuinely capable of winning any race you start, backed by a career full of podium finishes and front-running performances that validate that status.`,
@@ -311,13 +311,13 @@ function getSignatureMoment(careerBest, totalWins, totalPodiums, totalAwards, pe
   
   if (performanceLevel === 'dominant' && totalWins >= 5) {
     const options = [
-      `With multiple victories under your belt, it's hard to pick a single defining moment—but the sheer consistency of winning is perhaps the greatest achievement of all.`,
-      `Victory has become almost expected rather than exceptional, and that dominance—that ability to win repeatedly across different events—is what sets you apart.`,
-      `The highlight reel is long, filled with wins and dominant performances, each adding to a reputation built on sustained excellence rather than single moments.`,
-      `Rather than one signature win, you have a collection of them—multiple victories that establish you as someone who knows how to cross the line first.`,
-      `Your career defining achievement isn't a single race but a pattern: winning regularly, dominating consistently, and making victory look routine.`,
-      `The best moment? Take your pick from multiple wins—each impressive, each meaningful, collectively defining you as one of the peloton's most successful racers.`,
-      `With victories stacking up, the signature becomes the sustained excellence—race after race, season after season, winning when it matters and delivering when expectations are high.`
+      `With ${totalWins} victories under your belt, it's hard to pick a single defining moment—but the sheer consistency of winning is perhaps the greatest achievement of all.`,
+      `Victory has become almost expected rather than exceptional, and that dominance—${totalWins} wins so far—is what sets you apart.`,
+      `The highlight reel is long, filled with ${totalWins} wins and dominant performances, each adding to a reputation built on sustained excellence rather than single moments.`,
+      `Rather than one signature win, you have a collection of them—${totalWins} victories that establish you as someone who knows how to cross the line first.`,
+      `Your career defining achievement isn't a single race but a pattern: ${totalWins} wins, consistent dominance, and making victory look routine.`,
+      `The best moment? Take your pick from ${totalWins} wins—each impressive, each meaningful, collectively defining you as one of the peloton's most successful racers.`,
+      `With ${totalWins} victories stacking up, the signature becomes the sustained excellence—race after race, winning when it matters and delivering when expectations are high.`
     ];
     return options[Math.floor(Math.random() * options.length)];
   }
