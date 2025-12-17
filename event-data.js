@@ -118,7 +118,7 @@ Nail the pacing and you'll set a personal best that becomes your calling card. T
             difficulty: "Pure FTP test",
             finish: "Maximum distance in 20 minutes"
         },
-        scheduleUrl: "https://tpvirtualhub.com/clone?o=eyJzY2hlZHVsZUtleSI6NTI0NTcsImFjY2Vzc0NvZGUiOjE4NjA2MCwicmVxdWlyZUFjY2Vzc0NvZGUiOnRydWUsInRpdGxlVGVtcGxhdGUiOiJDb2FzdGFsIExvb3AgVGltZSBDaGFsbGVuZ2UgLSBUUFYgQ2FyZWVyIE1vZGUifQ=="
+        scheduleUrl: "https://tpvirtualhub.com/clone?o=eyJzY2hlZHVsZUtleSI6NTI0OTQsImFjY2Vzc0NvZGUiOjE4NjA2MCwicmVxdWlyZUFjY2Vzc0NvZGUiOnRydWUsInRpdGxlVGVtcGxhdGUiOiJDb2FzdGFsIExvb3AgVGltZSBDaGFsbGVuZ2UgLSBUUFYgQ2FyZWVyIE1vZGUifQ=="
     },
     5: {
         number: "05",
@@ -363,7 +363,8 @@ This is your first taste of multi-day stage racing. Focus on clean execution and
         },
         isStageRace: true,
         tourStage: 1,
-        tourEvent: "Local Tour"
+        tourEvent: "Local Tour",
+        scheduleUrl: "https://tpvirtualhub.com/clone?o=eyJzY2hlZHVsZUtleSI6NTI0OTcsImFjY2Vzc0NvZGUiOjE4NjA2MCwicmVxdWlyZUFjY2Vzc0NvZGUiOnRydWUsInRpdGxlVGVtcGxhdGUiOiJMb2NhbCBUb3VyIFN0YWdlIDEgLSBUUFYgQ2FyZWVyIE1vZGUifQ=="
     },
     14: {
         number: "14",
@@ -392,7 +393,8 @@ Time bonuses are available for stage placings, and every second counts in the ov
         },
         isStageRace: true,
         tourStage: 2,
-        tourEvent: "Local Tour"
+        tourEvent: "Local Tour",
+        scheduleUrl: "https://tpvirtualhub.com/clone?o=eyJzY2hlZHVsZUtleSI6NTI0OTgsImFjY2Vzc0NvZGUiOjE4NjA2MCwicmVxdWlyZUFjY2Vzc0NvZGUiOnRydWUsInRpdGxlVGVtcGxhdGUiOiJMb2NhbCBUb3VyIFN0YWdlIDIgLSBUUFYgQ2FyZWVyIE1vZGUifQ=="
     },
     15: {
         number: "15",
@@ -421,7 +423,8 @@ If you're in GC contention, this is where you make your move. If you're behind, 
         },
         isStageRace: true,
         tourStage: 3,
-        tourEvent: "Local Tour"
+        tourEvent: "Local Tour",
+        scheduleUrl: "https://tpvirtualhub.com/clone?o=eyJzY2hlZHVsZUtleSI6NTI0OTksImFjY2Vzc0NvZGUiOjE4NjA2MCwicmVxdWlyZUFjY2Vzc0NvZGUiOnRydWUsInRpdGxlVGVtcGxhdGUiOiJMb2NhbCBUb3VyIFN0YWdlIDMgLSBUUFYgQ2FyZWVyIE1vZGUifQ=="
     }
 };
 
