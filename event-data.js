@@ -104,7 +104,8 @@ Nail the pacing and you'll set a personal best that becomes your calling card. T
             keyPoint: "Flat, exposed terrain",
             difficulty: "Pure FTP test",
             finish: "Maximum distance in 20 minutes"
-        }
+        },
+        scheduleUrl: "https://tpvirtualhub.com/clone?o=eyJzY2hlZHVsZUtleSI6NTI0NTcsImFjY2Vzc0NvZGUiOjE4NjA2MCwicmVxdWlyZUFjY2Vzc0NvZGUiOnRydWUsInRpdGxlVGVtcGxhdGUiOiJDb2FzdGFsIExvb3AgVGltZSBDaGFsbGVuZ2UgLSBUUFYgQ2FyZWVyIE1vZGUifQ=="
     },
     5: {
         number: "05",
@@ -130,7 +131,8 @@ This race rewards riders who can produce power repeatedly under fatigue—exactl
             keyPoint: "Rolling climbs with points banners",
             difficulty: "Relentlessly challenging",
             finish: "Most points wins"
-        }
+        },
+        scheduleUrl: "https://tpvirtualhub.com/clone?o=eyJzY2hlZHVsZUtleSI6NTI0NjAsImFjY2Vzc0NvZGUiOjE4NjA2MCwicmVxdWlyZUFjY2Vzc0NvZGUiOnRydWUsInRpdGxlVGVtcGxhdGUiOiJOb3J0aCBMYWtlIFBvaW50cyBSYWNlIC0gVFBWIENhcmVlciBNb2RlIn0="
     },
     6: {
         number: "06",
@@ -156,7 +158,8 @@ It's a clean, controlled time trial that rewards discipline over explosiveness�
             keyPoint: "Transition to 3-4% climb",
             difficulty: "Pacing discipline required",
             finish: "Top of steady climb"
-        }
+        },
+        scheduleUrl: "https://tpvirtualhub.com/clone?o=eyJzY2hlZHVsZUtleSI6NTI0NjIsInJlcXVpcmVBY2Nlc3NDb2RlIjp0cnVlLCJ0aXRsZVRlbXBsYXRlIjoiRWFzeSBIaWxsIENsaW1iIC0gVFBWIENhcmVlciBNb2RlIn0="
     },
     7: {
         number: "07",
@@ -182,7 +185,8 @@ It's a straightforward but energetic crit—an ideal proving ground for riders l
             keyPoint: "Multiple corners per lap",
             difficulty: "Pack dynamics and accelerations",
             finish: "Sprint finish expected"
-        }
+        },
+        scheduleUrl: "https://tpvirtualhub.com/clone?o=eyJzY2hlZHVsZUtleSI6NTI0NjMsImFjY2Vzc0NvZGUiOjE4NjA2MCwicmVxdWlyZUFjY2Vzc0NvZGUiOnRydWUsInRpdGxlVGVtcGxhdGUiOiJGbGF0IEVpZ2h0IENyaXRlcml1bSAtIFRQViBDYXJlZXIgTW9kZSJ9"
     },
     8: {
         number: "08",
@@ -208,7 +212,8 @@ It's the kind of event where pacing matters just as much as strength, and finish
             keyPoint: "Multiple sustained climbs",
             difficulty: "Long endurance challenge",
             finish: "Gilbert Island"
-        }
+        },
+        scheduleUrl: "https://tpvirtualhub.com/clone?o=eyJzY2hlZHVsZUtleSI6NTI0NjQsImFjY2Vzc0NvZGUiOjE4NjA2MCwicmVxdWlyZUFjY2Vzc0NvZGUiOnRydWUsInRpdGxlVGVtcGxhdGUiOiJHcmFuZCBHaWxiZXJ0IEZvbmRvIC0gVFBWIENhcmVlciBNb2RlIn0="
     },
     9: {
         number: "09",
@@ -234,7 +239,8 @@ For riders looking to prove their climbing potential early in their career, the 
             keyPoint: "Continuous climbing efforts",
             difficulty: "Climbing-specific",
             finish: "Final summit"
-        }
+        },
+        scheduleUrl: "https://tpvirtualhub.com/clone?o=eyJzY2hlZHVsZUtleSI6NTE2MDEsImFjY2Vzc0NvZGUiOjE4NjA2MCwicmVxdWlyZUFjY2Vzc0NvZGUiOnRydWUsInRpdGxlVGVtcGxhdGUiOiJCYXNlIENhbXAgQ2xhc3NpYyAtIFRQViBDYXJlZXIgTW9kZSBDaG9pY2UgRXZlbnQifQ=="
     },
     10: {
         number: "10",
@@ -260,7 +266,8 @@ With no climbs or technical turns to hide behind, it's a pure test of sustained 
             keyPoint: "Exposed and sheltered sections",
             difficulty: "Sustained power test",
             finish: "Big Loop completion"
-        }
+        },
+        scheduleUrl: "https://tpvirtualhub.com/clone?o=eyJzY2hlZHVsZUtleSI6NTI0NjUsImFjY2Vzc0NvZGUiOjE4NjA2MCwicmVxdWlyZUFjY2Vzc0NvZGUiOnRydWUsInRpdGxlVGVtcGxhdGUiOiJCZWFjaCBhbmQgUGluZSBUVCAtIFRQViBDYXJlZXIgTW9kZSJ9"
     },
     11: {
         number: "11",
@@ -286,7 +293,8 @@ With points awarded at regular sprint laps, the pace surges constantly, making t
             keyPoint: "Punchy climbs and tight corner",
             difficulty: "Tactical points racing",
             finish: "Most points after 8 laps"
-        }
+        },
+        scheduleUrl: "https://tpvirtualhub.com/clone?o=eyJzY2hlZHVsZUtleSI6NTI0NjYsImFjY2Vzc0NvZGUiOjE4NjA2MCwicmVxdWlyZUFjY2Vzc0NvZGUiOnRydWUsInRpdGxlVGVtcGxhdGUiOiJTb3V0aCBMYWtlIFBvaW50cyBSYWNlIC0gVFBWIENhcmVlciBNb2RlIn0="
     },
     12: {
         number: "12",
@@ -312,7 +320,8 @@ For many newcomers, this race carries personal meaning. In your case, your famil
             keyPoint: "Technical gravel climbs",
             difficulty: "Rugged and demanding",
             finish: "Little Egypt endpoint"
-        }
+        },
+        scheduleUrl: "https://tpvirtualhub.com/clone?o=eyJzY2hlZHVsZUtleSI6NTI0NTgsImFjY2Vzc0NvZGUiOjE4NjA2MCwicmVxdWlyZUFjY2Vzc0NvZGUiOnRydWUsInRpdGxlVGVtcGxhdGUiOiJVbmJvdW5kIExpdHRsZSBFZ3lwdCAtIFRQViBDYXJlZXIgTW9kZSJ9"
     },
     13: {
         number: "13",
