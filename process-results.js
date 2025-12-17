@@ -1116,13 +1116,14 @@ async function processUserResult(uid, eventInfo, results) {
     position = null; // Use null for DNF position in calculations
   }
 
-  // Calculate predicted position and points (0 for DNF)
-  let predictedPosition = null;
+  // Calculate predicted position (based on EventRating, available even for DNF)
+  const predictedPosition = calculatePredictedPosition(results, uid);
+
+  // Calculate points (0 for DNF)
   let points = 0;
   let bonusPoints = 0;
 
   if (!isDNF) {
-    predictedPosition = calculatePredictedPosition(results, uid);
     const pointsResult = calculatePoints(position, eventNumber, predictedPosition);
     points = pointsResult.points;
     bonusPoints = pointsResult.bonusPoints;
