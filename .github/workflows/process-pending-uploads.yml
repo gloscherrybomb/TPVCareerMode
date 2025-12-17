@@ -29,6 +29,7 @@ jobs:
         run: node .github/scripts/process-pending-uploads.js
 
       - name: Commit and push new CSV files
+        id: commit
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
@@ -36,11 +37,27 @@ jobs:
           # Add any new CSV files
           git add race_results/**/*.csv || true
 
+          # Capture the list of staged CSV files before committing
+          STAGED_FILES=$(git diff --cached --name-only | grep '\.csv$' || true)
+          echo "staged_files<<EOF" >> $GITHUB_OUTPUT
+          echo "$STAGED_FILES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
           # Check if there are staged changes
           if git diff --cached --quiet; then
             echo "ℹ️  No new uploads to commit"
+            echo "has_changes=false" >> $GITHUB_OUTPUT
           else
             git commit -m "Auto: Add user-uploaded race results"
             git push
             echo "✅ Committed uploaded results"
+            echo "has_changes=true" >> $GITHUB_OUTPUT
           fi
+
+      - name: Trigger process-results workflow
+        if: steps.commit.outputs.has_changes == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "🚀 Triggering process-results workflow for uploaded files..."
+          gh workflow run process-results.yml
