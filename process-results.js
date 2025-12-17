@@ -1108,74 +1108,79 @@ async function processUserResult(uid, eventInfo, results) {
     return;
   }
   
-  const position = parseInt(userResult.Position);
-  if (isNaN(position) || userResult.Position === 'DNF') {
+  let position = parseInt(userResult.Position);
+  const isDNF = isNaN(position) || userResult.Position === 'DNF';
+
+  if (isDNF) {
     console.log(`User ${uid} has DNF or invalid position, awarding 0 points`);
-    // Store DNF result but don't award points
-    await userRef.update({
-      [`event${eventNumber}Results`]: {
-        position: 'DNF',
-        time: parseFloat(userResult.Time) || 0,
-        arr: parseInt(userResult.ARR) || 0,
-        points: 0,
-        distance: parseFloat(userResult.Distance) || 0,
-        processedAt: admin.firestore.FieldValue.serverTimestamp()
-      },
-      team: userResult.Team || '' // Update team even on DNF
-    });
-    return;
+    position = null; // Use null for DNF position in calculations
+  }
+
+  // Calculate predicted position and points (0 for DNF)
+  let predictedPosition = null;
+  let points = 0;
+  let bonusPoints = 0;
+
+  if (!isDNF) {
+    predictedPosition = calculatePredictedPosition(results, uid);
+    const pointsResult = calculatePoints(position, eventNumber, predictedPosition);
+    points = pointsResult.points;
+    bonusPoints = pointsResult.bonusPoints;
   }
   
-  // Calculate predicted position based on EventRating
-  const predictedPosition = calculatePredictedPosition(results, uid);
-  
-  // Calculate points (including bonus points)
-  const pointsResult = calculatePoints(position, eventNumber, predictedPosition);
-  let { points, bonusPoints } = pointsResult;
-  
-  // Check if earned punching medal (beat prediction by 10+ places)
+  // Initialize award flags (all false for DNF)
   let earnedPunchingMedal = false;
-  if (predictedPosition) {
-    const placesBeaten = predictedPosition - position;
-    earnedPunchingMedal = placesBeaten >= 10;
-  }
-  
-  // Check if earned Giant Killer medal (beat highest-rated rider)
-  const earnedGiantKillerMedal = checkGiantKiller(results, uid);
-  
-  // NEW AWARDS CALCULATIONS
-  // Get times for margin-based awards
-  const times = awardsCalc.getTimesFromResults(
-    results.map(r => ({
-      position: parseInt(r.Position),
-      time: parseFloat(r.Time)
-    })).filter(r => !isNaN(r.position)),
-    position
-  );
-  
-  // Check margin-based awards
-  const earnedDomination = awardsCalc.checkDomination(position, times.winnerTime, times.secondPlaceTime);
-  const earnedCloseCall = awardsCalc.checkCloseCall(position, times.winnerTime, times.secondPlaceTime);
-  
-  // Photo Finish should not be awarded for time challenge events (where everyone does the same time)
-  // Event 4 is Coastal Loop Time Challenge (20 minutes)
-  const isTimeChallenge = eventNumber === 4;
-  const earnedPhotoFinish = isTimeChallenge ? false : awardsCalc.checkPhotoFinish(position, times.userTime, times.winnerTime);
-  
-  const earnedDarkHorse = awardsCalc.checkDarkHorse(position, predictedPosition);
-  
-  // Zero to Hero requires previous event data
+  let earnedGiantKillerMedal = false;
+  let earnedDomination = false;
+  let earnedCloseCall = false;
+  let earnedPhotoFinish = false;
+  let earnedDarkHorse = false;
   let earnedZeroToHero = false;
-  if (eventNumber > 1) {
-    const prevEventResults = userData[`event${eventNumber - 1}Results`];
-    if (prevEventResults && prevEventResults.position && prevEventResults.position !== 'DNF') {
-      // Get total finishers for both events from results
-      const currentFinishers = results.filter(r => r.Position !== 'DNF' && !isNaN(parseInt(r.Position))).length;
-      // We need previous event's total finishers - we'll approximate from standings or use null
-      earnedZeroToHero = awardsCalc.checkZeroToHero(
-        { position: prevEventResults.position, totalFinishers: 50 }, // Approximate
-        { position: position, totalFinishers: currentFinishers }
-      );
+
+  // Only calculate awards for non-DNF results
+  if (!isDNF) {
+    // Check if earned punching medal (beat prediction by 10+ places)
+    if (predictedPosition) {
+      const placesBeaten = predictedPosition - position;
+      earnedPunchingMedal = placesBeaten >= 10;
+    }
+
+    // Check if earned Giant Killer medal (beat highest-rated rider)
+    earnedGiantKillerMedal = checkGiantKiller(results, uid);
+
+    // NEW AWARDS CALCULATIONS
+    // Get times for margin-based awards
+    const times = awardsCalc.getTimesFromResults(
+      results.map(r => ({
+        position: parseInt(r.Position),
+        time: parseFloat(r.Time)
+      })).filter(r => !isNaN(r.position)),
+      position
+    );
+
+    // Check margin-based awards
+    earnedDomination = awardsCalc.checkDomination(position, times.winnerTime, times.secondPlaceTime);
+    earnedCloseCall = awardsCalc.checkCloseCall(position, times.winnerTime, times.secondPlaceTime);
+
+    // Photo Finish should not be awarded for time challenge events (where everyone does the same time)
+    // Event 4 is Coastal Loop Time Challenge (20 minutes)
+    const isTimeChallenge = eventNumber === 4;
+    earnedPhotoFinish = isTimeChallenge ? false : awardsCalc.checkPhotoFinish(position, times.userTime, times.winnerTime);
+
+    earnedDarkHorse = awardsCalc.checkDarkHorse(position, predictedPosition);
+
+    // Zero to Hero requires previous event data
+    if (eventNumber > 1) {
+      const prevEventResults = userData[`event${eventNumber - 1}Results`];
+      if (prevEventResults && prevEventResults.position && prevEventResults.position !== 'DNF') {
+        // Get total finishers for both events from results
+        const currentFinishers = results.filter(r => r.Position !== 'DNF' && !isNaN(parseInt(r.Position))).length;
+        // We need previous event's total finishers - we'll approximate from standings or use null
+        earnedZeroToHero = awardsCalc.checkZeroToHero(
+          { position: prevEventResults.position, totalFinishers: 50 }, // Approximate
+          { position: position, totalFinishers: currentFinishers }
+        );
+      }
     }
   }
   
@@ -1191,9 +1196,10 @@ async function processUserResult(uid, eventInfo, results) {
   // MUST happen BEFORE creating eventResults so gcAwards are set correctly
   let gcResults = null;
   
-  if (validation.isTour) {
+  if (validation.isTour && !isDNF) {
     console.log('   🏁 Tour stage complete - calculating current GC...');
     // Pass current user's result so they're included in GC even before data is stored
+    // Note: DNF results skip GC calculation as they don't have a valid position
     const currentUserResult = {
       name: userResult.Name,
       team: userResult.Team || '',
@@ -1224,7 +1230,8 @@ async function processUserResult(uid, eventInfo, results) {
   const eventCategory = getEventCategory(eventType);
 
   const eventResults = {
-    position: position,
+    position: isDNF ? 'DNF' : position,
+    isDNF: isDNF,
     time: parseFloat(userResult.Time) || 0,
     arr: parseInt(userResult.ARR) || 0,
     arrBand: userResult.ARRBand || '',
@@ -1340,7 +1347,8 @@ async function processUserResult(uid, eventInfo, results) {
   const previousCooldowns = { ...(userData.unlocks?.cooldowns || {}) };
   const newCooldowns = {}; // Start fresh - only triggered unlocks will be set to true
 
-  if (!skipUnlocks) {
+  if (!skipUnlocks && !isDNF) {
+    // Skip unlocks for DNF results - no bonus points awarded
     const equipped = Array.isArray(userData.unlocks?.equipped) ? userData.unlocks.equipped : [];
     const slotCount = userData.unlocks?.slotCount || 1;
     const equippedToUse = equipped.slice(0, slotCount).filter(Boolean);
