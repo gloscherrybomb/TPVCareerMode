@@ -1000,6 +1000,18 @@
     margin-bottom: 0.2rem;
 }
 
+.result-prediction.beat {
+    color: var(--accent-blue);
+}
+
+.result-prediction.exact {
+    color: var(--accent-green);
+}
+
+.result-prediction.missed {
+    color: var(--text-secondary);
+}
+
 .result-date {
     font-size: 0.85rem;
     color: var(--text-secondary);

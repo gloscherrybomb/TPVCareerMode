@@ -383,8 +383,14 @@ function displayRecentResults(results) {
         let predictionHTML = '';
         if (result.predictedPosition) {
             const placesBeaten = result.predictedPosition - result.position;
+            const ordinal = getOrdinalSuffix(result.predictedPosition);
+
             if (placesBeaten > 0) {
-                predictionHTML = `<div class="result-prediction">Predicted ${result.predictedPosition}th (+${placesBeaten})</div>`;
+                predictionHTML = `<div class="result-prediction beat">Predicted ${result.predictedPosition}${ordinal} (+${placesBeaten})</div>`;
+            } else if (placesBeaten === 0) {
+                predictionHTML = `<div class="result-prediction exact">Predicted ${result.predictedPosition}${ordinal} (=)</div>`;
+            } else {
+                predictionHTML = `<div class="result-prediction missed">Predicted ${result.predictedPosition}${ordinal} (${placesBeaten})</div>`;
             }
         }
 
@@ -394,7 +400,7 @@ function displayRecentResults(results) {
         html += `
             <a href="event-detail.html?id=${result.eventNum}" class="result-card-link">
                 <div class="result-card">
-                    <div class="result-position ${positionClass}">${result.position}</div>
+                    <div class="result-position ${positionClass}">${result.position}${getOrdinalSuffix(result.position)}</div>
                     <div class="result-info">
                         <div class="result-event">${result.eventName}</div>
                         ${predictionHTML}
