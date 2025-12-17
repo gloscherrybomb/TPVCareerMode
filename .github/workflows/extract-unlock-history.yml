@@ -1,0 +1,46 @@
+name: Extract Unlock History
+
+on:
+  workflow_dispatch:
+    inputs:
+      user_uid:
+        description: 'User UID (leave empty for all users)'
+        required: false
+        default: ''
+
+jobs:
+  extract:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install firebase-admin
+
+      - name: Extract unlock history
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          if [ -n "${{ github.event.inputs.user_uid }}" ]; then
+            node extract-unlock-history.js unlock-history.json "${{ github.event.inputs.user_uid }}"
+          else
+            node extract-unlock-history.js unlock-history.json
+          fi
+
+      - name: Upload unlock history artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: unlock-history
+          path: unlock-history.json
+          retention-days: 30
+
+      - name: Display extracted data
+        run: |
+          echo "=== Unlock History File Contents ==="
+          cat unlock-history.json

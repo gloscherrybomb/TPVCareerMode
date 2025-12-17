@@ -1,0 +1,75 @@
+name: Batch Fix Unlock Bonus
+
+on:
+  workflow_dispatch:
+    inputs:
+      unlock_history_json:
+        description: 'Unlock history JSON content (paste the entire JSON)'
+        required: true
+        type: string
+      dry_run:
+        description: 'Dry run (preview only, no changes)'
+        required: true
+        type: boolean
+        default: true
+      user_uid:
+        description: 'User UID (leave empty for all users in the JSON)'
+        required: false
+        default: ''
+
+jobs:
+  batch-fix:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install firebase-admin
+
+      - name: Create unlock history file
+        run: |
+          cat << 'EOF' > unlock-history.json
+          ${{ github.event.inputs.unlock_history_json }}
+          EOF
+
+      - name: Validate JSON
+        run: |
+          echo "Validating JSON..."
+          node -e "JSON.parse(require('fs').readFileSync('unlock-history.json', 'utf8')); console.log('✅ JSON is valid')"
+
+      - name: Display input summary
+        run: |
+          echo "=== Input Summary ==="
+          echo "Dry run: ${{ github.event.inputs.dry_run }}"
+          echo "User filter: ${{ github.event.inputs.user_uid || 'All users' }}"
+          echo ""
+          echo "=== Unlock History Preview ==="
+          node -e "
+            const data = JSON.parse(require('fs').readFileSync('unlock-history.json', 'utf8'));
+            console.log('Extracted at:', data.extractedAt);
+            console.log('Total users:', data.totalUsers);
+            console.log('Total unlock applications:', data.totalUnlockApplications);
+          "
+
+      - name: Run batch fix
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          ARGS="unlock-history.json"
+
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            ARGS="$ARGS --dry-run"
+          fi
+
+          if [ -n "${{ github.event.inputs.user_uid }}" ]; then
+            ARGS="$ARGS --user=${{ github.event.inputs.user_uid }}"
+          fi
+
+          echo "Running: node batch-fix-unlock-bonus.js $ARGS"
+          node batch-fix-unlock-bonus.js $ARGS
