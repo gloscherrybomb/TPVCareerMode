@@ -561,6 +561,41 @@ const INTERVIEW_RESPONSES = {
     }
   },
 
+  // DNF Responses
+  dnf_resilient: {
+    id: 'dnf_resilient',
+    text: "It's disappointing, no doubt about it. But a DNF doesn't define me. I'll learn from what went wrong, recover properly, and come back stronger for the next one.",
+    style: 'resilient',
+    badge: '💚 Resilient',
+    personalityImpact: {
+      resilience: 5,
+      professionalism: 2
+    }
+  },
+
+  dnf_frustrated: {
+    id: 'dnf_frustrated',
+    text: "I'm gutted, honestly. You put in all that training, all that preparation, and then it ends like this. It's hard not to feel frustrated when things go wrong through no fault of your own.",
+    style: 'honest',
+    badge: '😔 Honest',
+    personalityImpact: {
+      humility: 2,
+      resilience: -1,
+      professionalism: -1
+    }
+  },
+
+  dnf_analytical: {
+    id: 'dnf_analytical',
+    text: "We need to analyze exactly what happened and make sure it doesn't happen again. A DNF is a data point—an expensive one—but still something to learn from. I'll work with the team to understand it and move forward.",
+    style: 'professional',
+    badge: '🎯 Professional',
+    personalityImpact: {
+      professionalism: 4,
+      resilience: 2
+    }
+  },
+
   // ===== TACTICAL RESPONSES =====
 
   tt_professional: {

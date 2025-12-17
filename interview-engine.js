@@ -48,12 +48,14 @@ export function getDefaultPersonality() {
  * Build race context from event results for interview question selection
  */
 export function buildRaceContext(userResult, allResults, userData, seasonData) {
+    const isDNF = userResult.position === 'DNF';
     const context = {
         position: userResult.position,
+        isDNF: isDNF,
         totalRiders: allResults.length,
         predicted: userResult.predicted || null,
-        beatPredictionBy: userResult.predicted ? (userResult.predicted - userResult.position) : 0,
-        worseThanPredictionBy: userResult.predicted ? (userResult.position - userResult.predicted) : 0,
+        beatPredictionBy: !isDNF && userResult.predicted ? (userResult.predicted - userResult.position) : 0,
+        worseThanPredictionBy: !isDNF && userResult.predicted ? (userResult.position - userResult.predicted) : 0,
 
         // Time gaps
         winMargin: userResult.position === 1 && allResults[1] ?
@@ -214,6 +216,10 @@ function checkQuestionTriggers(questionTriggers, context) {
             return context.recentRacesBelowExpectation >= trigger;
         }
 
+        if (key === 'isDNF') {
+            return context.isDNF === trigger;
+        }
+
         // Default: check direct context value match
         const contextValue = context[key];
         return checkTrigger(trigger, contextValue, context);
@@ -269,8 +275,9 @@ function selectBestQuestion(eligibleQuestions, context, recentQuestions = []) {
         }
     }
 
-    // Priority order (milestones always take precedence)
+    // Priority order (milestones and DNF always take precedence)
     const highPriorityOrder = [
+        'dnf',
         'first_win',
         'first_podium',
         'season_finale'

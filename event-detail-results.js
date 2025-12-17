@@ -785,73 +785,85 @@ async function loadEventResults() {
 
         results.forEach((result) => {
             const isCurrentUser = result.uid === userUid;
-            const rowClass = isCurrentUser ? 'current-user-row' : '';
+            const isDNF = result.position === 'DNF';
+            const rowClass = isCurrentUser ? 'current-user-row' : (isDNF ? 'dnf-row' : '');
             const teamDisplay = result.team || '<span class="no-team">—</span>';
 
-            // Podium class for top 3
+            // Podium class for top 3 (not for DNF)
             let rankClass = '';
-            if (result.position === 1) rankClass = 'rank-gold';
-            else if (result.position === 2) rankClass = 'rank-silver';
-            else if (result.position === 3) rankClass = 'rank-bronze';
-            
-            // Build bonus cell content
-            let bonusHTML = '';
-            const unlockBonus = result.unlockBonusPoints || 0;
-            const predictionBonus = (result.bonusPoints || 0) - unlockBonus;
+            if (!isDNF) {
+                if (result.position === 1) rankClass = 'rank-gold';
+                else if (result.position === 2) rankClass = 'rank-silver';
+                else if (result.position === 3) rankClass = 'rank-bronze';
+            } else {
+                rankClass = 'rank-dnf';
+            }
 
-            if (predictionBonus > 0) {
-                bonusHTML += `<span class="bonus-points" title="Bonus for beating prediction">+${predictionBonus}</span>`;
-            }
-            if (unlockBonus > 0) {
-                bonusHTML += `<span class="bonus-points unlock-bonus" title="Bonus from triggered unlocks">+${unlockBonus}</span>`;
-            }
-            if (result.earnedPunchingMedal) {
-                bonusHTML += `<span class="medal-icon punching" title="Beat prediction by 10+ places">🥊</span>`;
-            }
-            if (result.earnedGiantKillerMedal) {
-                bonusHTML += `<span class="medal-icon giant-killer" title="Beat highest-rated rider">⚔️</span>`;
-            }
-            if (result.earnedBullseyeMedal) {
-                bonusHTML += `<span class="medal-icon bullseye" title="Finished exactly as predicted">🎯</span>`;
-            }
-            if (result.earnedDomination) {
-                bonusHTML += `<span class="medal-icon domination" title="Won by 60+ seconds">💪</span>`;
-            }
-            if (result.earnedCloseCall) {
-                bonusHTML += `<span class="medal-icon close-call" title="Won by less than 0.5s">😅</span>`;
-            }
-            if (result.earnedPhotoFinish) {
-                bonusHTML += `<span class="medal-icon photo-finish" title="Within 0.2s of winner">📸</span>`;
-            }
-            if (result.earnedDarkHorse) {
-                bonusHTML += `<span class="medal-icon dark-horse" title="Won when predicted 15th+">🐴</span>`;
-            }
-            if (result.earnedZeroToHero) {
-                bonusHTML += `<span class="medal-icon zero-to-hero" title="Bottom 20% to top 20%">🚀</span>`;
+            // Build bonus cell content (empty for DNF)
+            let bonusHTML = '';
+            if (!isDNF) {
+                const unlockBonus = result.unlockBonusPoints || 0;
+                const predictionBonus = (result.bonusPoints || 0) - unlockBonus;
+
+                if (predictionBonus > 0) {
+                    bonusHTML += `<span class="bonus-points" title="Bonus for beating prediction">+${predictionBonus}</span>`;
+                }
+                if (unlockBonus > 0) {
+                    bonusHTML += `<span class="bonus-points unlock-bonus" title="Bonus from triggered unlocks">+${unlockBonus}</span>`;
+                }
+                if (result.earnedPunchingMedal) {
+                    bonusHTML += `<span class="medal-icon punching" title="Beat prediction by 10+ places">🥊</span>`;
+                }
+                if (result.earnedGiantKillerMedal) {
+                    bonusHTML += `<span class="medal-icon giant-killer" title="Beat highest-rated rider">⚔️</span>`;
+                }
+                if (result.earnedBullseyeMedal) {
+                    bonusHTML += `<span class="medal-icon bullseye" title="Finished exactly as predicted">🎯</span>`;
+                }
+                if (result.earnedDomination) {
+                    bonusHTML += `<span class="medal-icon domination" title="Won by 60+ seconds">💪</span>`;
+                }
+                if (result.earnedCloseCall) {
+                    bonusHTML += `<span class="medal-icon close-call" title="Won by less than 0.5s">😅</span>`;
+                }
+                if (result.earnedPhotoFinish) {
+                    bonusHTML += `<span class="medal-icon photo-finish" title="Within 0.2s of winner">📸</span>`;
+                }
+                if (result.earnedDarkHorse) {
+                    bonusHTML += `<span class="medal-icon dark-horse" title="Won when predicted 15th+">🐴</span>`;
+                }
+                if (result.earnedZeroToHero) {
+                    bonusHTML += `<span class="medal-icon zero-to-hero" title="Bottom 20% to top 20%">🚀</span>`;
+                }
             }
             if (!bonusHTML) {
                 bonusHTML = '<span class="no-bonus">—</span>';
             }
 
+            // Display values for DNF vs finished riders
+            const positionDisplay = isDNF ? 'DNF' : result.position;
+            const timeDisplay = isDNF ? '—' : formatTime(result.time);
+            const pointsDisplay = isDNF ? '0' : result.points;
+
             tableHTML += `
                 <tr class="${rowClass}">
                     <td class="rank-cell">
-                        <span class="rank-number ${rankClass}">${result.position}</span>
+                        <span class="rank-number ${rankClass}">${positionDisplay}</span>
                     </td>
                     <td class="name-cell">
                         <span class="rider-name">${makeNameClickable(result.name, result.uid)}</span>
                         ${isCurrentUser ? '<span class="you-badge">YOU</span>' : ''}
                     </td>
                     <td class="team-cell">${teamDisplay}</td>
-                    <td class="time-cell">${formatTime(result.time)}</td>
+                    <td class="time-cell">${timeDisplay}</td>
                     <td class="arr-cell">
                         <span class="arr-value">${result.arr}</span>
                         <span class="arr-band">${result.arrBand || getARRBand(result.arr)}</span>
                     </td>
                     <td class="points-cell">
-                        <span class="points-value">${result.points}</span>
+                        <span class="points-value">${pointsDisplay}</span>
                     </td>
-                    ${result.eventPoints != null ? `<td class="event-points-cell">${result.eventPoints}</td>` : ''}
+                    ${result.eventPoints != null ? `<td class="event-points-cell">${isDNF ? '—' : result.eventPoints}</td>` : ''}
                     <td class="bonus-cell">${bonusHTML}</td>
                 </tr>
             `;
@@ -880,8 +892,8 @@ async function loadEventResults() {
 
         eventResultsContent.innerHTML = tableHTML;
 
-        // Display post-race interview if user has results
-        if (userEventResults && userEventResults.position) {
+        // Display post-race interview if user has results (including DNF)
+        if (userEventResults && (userEventResults.position || userEventResults.position === 'DNF')) {
             const userResult = {
                 position: userEventResults.position,
                 predicted: userEventResults.predictedPosition,

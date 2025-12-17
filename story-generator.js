@@ -314,11 +314,26 @@ function generateRaceRecap(data) {
   } = data;
 
   const eventType = EVENT_TYPES[eventNumber];
+  const isDNF = position === 'DNF';
+
+  // Handle DNF case first
+  if (isDNF) {
+    const dnfVariants = [
+      `${eventName} ended before you wanted it to. A DNF is never part of the plan—nobody lines up hoping to abandon—but racing is unforgiving and sometimes your day ends prematurely. Whether it was mechanical issues, physical problems, or circumstances beyond your control, the result is the same: zero points, a blank space in the standings, and the frustrating knowledge that all your preparation led to nothing today. The only consolation is that every rider experiences this at some point. It's part of the sport's brutal honesty. What matters now is how you respond—whether you let this define you or treat it as a temporary setback on a longer journey.`,
+
+      `The race slipped away from you at ${eventName}. A DNF isn't something you ever plan for, but cycling has a way of delivering harsh lessons when you least expect them. Maybe the body wasn't cooperating, maybe the equipment failed, maybe circumstances simply conspired against you. Whatever the cause, you found yourself unable to finish—crossing no line, earning no points, having nothing to show for the effort you put into getting here. It stings. It's supposed to sting. But every professional rider knows this feeling, knows the hollow disappointment of a race that ended too soon. The measure of a competitor isn't avoiding these moments—it's coming back from them.`,
+
+      `Not every race has a finish line moment, and ${eventName} was one of those days. A DNF sits heavy—no position, no points, just the quiet acknowledgment that today wasn't your day. The reasons almost don't matter in the immediate aftermath. What matters is the emptiness of effort unrewarded, of training and preparation that led to nothing tangible. You'll process the specifics later, figure out what went wrong, implement changes to prevent it happening again. For now, it's just disappointment, the universal experience of every athlete who's ever had to stop before the end. It happens. It hurts. You'll move forward.`
+    ];
+
+    return dnfVariants[Math.floor(Math.random() * dnfVariants.length)];
+  }
+
   const placeDiff = predictedPosition - position;
   const dynamics = analyzeRaceDynamics(data);
   const hasWinnerName = winnerName && winnerName !== 'the winner';
   const winnerText = hasWinnerName ? winnerName : 'the winner';
-  
+
   // Determine performance tier
   let tier;
   if (position === 1) tier = 'win';

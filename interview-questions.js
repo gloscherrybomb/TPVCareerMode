@@ -206,6 +206,15 @@ const INTERVIEW_QUESTIONS = {
         recentRacesBelowExpectation: 3
       },
       responses: ['streak_resilient', 'streak_determined', 'streak_honest']
+    },
+
+    dnf: {
+      id: 'dnf',
+      text: "A DNF is always tough to process. What happened out there?",
+      triggers: {
+        isDNF: true
+      },
+      responses: ['dnf_resilient', 'dnf_frustrated', 'dnf_analytical']
     }
   },
 

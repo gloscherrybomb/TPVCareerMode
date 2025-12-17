@@ -744,6 +744,23 @@
     box-shadow: 0 4px 15px rgba(205, 127, 50, 0.3);
 }
 
+.rank-dnf {
+    background: rgba(255, 152, 0, 0.2);
+    color: #ff9800;
+    font-weight: 700;
+    border: 1px solid rgba(255, 152, 0, 0.4);
+}
+
+/* DNF Row Styling */
+.dnf-row {
+    opacity: 0.7;
+}
+
+.dnf-row .time-cell,
+.dnf-row .points-cell {
+    color: var(--text-secondary);
+}
+
 /* Name Cell */
 .name-cell {
     font-weight: 600;

@@ -2681,23 +2681,23 @@ async function updateResultsSummary(season, event, results, userUid, unlockBonus
     return position < giantPosition;
   };
   
-  // Filter valid results (no DNFs for summary)
-  const validResults = results
+  // Filter valid results (include DNFs at the end)
+  const finishedResults = results
     .filter(r => r.Position !== 'DNF' && !isNaN(parseInt(r.Position)))
     .map(r => {
       const position = parseInt(r.Position);
       const predictedPosition = calculatePredictedPositionForResult(r.UID);
       const pointsResult = calculatePoints(position, event, predictedPosition);
       const { points, bonusPoints } = pointsResult;
-      
+
       let earnedPunchingMedal = false;
       if (predictedPosition) {
         const placesBeaten = predictedPosition - position;
         earnedPunchingMedal = placesBeaten >= 10;
       }
-      
+
       const earnedGiantKillerMedal = checkGiantKillerForResult(r.UID, position);
-      
+
       // Calculate new awards
       const times = awardsCalc.getTimesFromResults(
         results.map(r => ({
@@ -2706,15 +2706,15 @@ async function updateResultsSummary(season, event, results, userUid, unlockBonus
         })).filter(r => !isNaN(r.position)),
         position
       );
-      
+
       const earnedDomination = awardsCalc.checkDomination(position, times.winnerTime, times.secondPlaceTime);
       const earnedCloseCall = awardsCalc.checkCloseCall(position, times.winnerTime, times.secondPlaceTime);
-      
+
       // Photo Finish should not be awarded for time challenge events (where everyone does the same time)
       // Event 4 is Coastal Loop Time Challenge (20 minutes)
       const isTimeChallenge = event === 4;
       const earnedPhotoFinish = isTimeChallenge ? false : awardsCalc.checkPhotoFinish(position, times.userTime, times.winnerTime);
-      
+
       const earnedDarkHorse = awardsCalc.checkDarkHorse(position, predictedPosition);
 
       // For current user, include unlock bonus points
@@ -2745,12 +2745,47 @@ async function updateResultsSummary(season, event, results, userUid, unlockBonus
         isBot: isBot(r.UID, r.Gender)
       };
     });
+
+  // Include DNF results at the end
+  const dnfResults = results
+    .filter(r => r.Position === 'DNF')
+    .map(r => {
+      const isCurrentUser = r.UID === userUid;
+      return {
+        position: 'DNF',
+        name: r.Name,
+        uid: r.UID,
+        team: r.Team || '',
+        arr: parseInt(r.ARR) || 0,
+        arrBand: r.ARRBand || '',
+        eventRating: parseInt(r.EventRating) || null,
+        predictedPosition: null,
+        time: null,
+        points: 0,
+        bonusPoints: 0,
+        unlockBonusPoints: 0,
+        unlockBonusesApplied: [],
+        earnedPunchingMedal: false,
+        earnedGiantKillerMedal: false,
+        earnedDomination: false,
+        earnedCloseCall: false,
+        earnedPhotoFinish: false,
+        earnedDarkHorse: false,
+        eventPoints: null,
+        isBot: isBot(r.UID, r.Gender),
+        isDNF: true
+      };
+    });
+
+  // Combine finishers and DNFs (DNFs at end)
+  const validResults = [...finishedResults, ...dnfResults];
   
   await summaryRef.set({
     season: season,
     event: event,
     userUid: userUid,
-    totalParticipants: validResults.length,
+    totalParticipants: finishedResults.length,
+    totalDNFs: dnfResults.length,
     processedAt: admin.firestore.FieldValue.serverTimestamp(),
     results: validResults
   });
