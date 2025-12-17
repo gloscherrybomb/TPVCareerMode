@@ -79,7 +79,19 @@ This makes it a key early test for any rider entering the local racing scene—y
             difficulty: "Tactical and intense",
             finish: "Last rider standing wins"
         },
-        scheduleUrl: "https://tpvirtualhub.com/clone?o=eyJzY2hlZHVsZUtleSI6NTI0NzcsImFjY2Vzc0NvZGUiOjE4NjA2MCwicmVxdWlyZUFjY2Vzc0NvZGUiOnRydWUsInRpdGxlVGVtcGxhdGUiOiJGb3Jlc3QgVmVsb2Ryb21lIEVsaW1pbmF0aW9uIC0gVFBWIENhcmVlciBNb2RlIn0="
+        scheduleUrl: "https://tpvirtualhub.com/clone?o=eyJzY2hlZHVsZUtleSI6NTI0NzcsImFjY2Vzc0NvZGUiOjE4NjA2MCwicmVxdWlyZUFjY2Vzc0NvZGUiOnRydWUsInRpdGxlVGVtcGxhdGUiOiJGb3Jlc3QgVmVsb2Ryb21lIEVsaW1pbmF0aW9uIC0gVFBWIENhcmVlciBNb2RlIn0=",
+        // Custom scoring for 20-participant elimination race
+        customScoring: [
+            { rank: '1st', points: 50 },
+            { rank: '2nd', points: 46 },
+            { rank: '3rd', points: 43 },
+            { rank: '4th', points: 39 },
+            { rank: '5th', points: 38 },
+            { rank: '6th-10th', points: '36-28' },
+            { rank: '11th-15th', points: '27-19' },
+            { rank: '16th-20th', points: '17-10' }
+        ],
+        scoringNote: "Points awarded based on finishing position (top 20 only)."
     },
     4: {
         number: "04",

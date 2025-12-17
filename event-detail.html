@@ -623,7 +623,8 @@
             // Update scoring section
             const scoringGrid = document.querySelector('.scoring-grid');
             if (scoringGrid) {
-                const points = calculatePoints(event.maxPoints);
+                // Use custom scoring if available, otherwise calculate
+                const points = event.customScoring || calculatePoints(event.maxPoints);
                 scoringGrid.innerHTML = points.map(p => `
                     <div class="scoring-card">
                         <div class="scoring-rank">${p.rank}</div>
@@ -635,7 +636,9 @@
             // Update course name in breadcrumb callout
             const scoringNote = document.querySelector('.scoring-note');
             if (scoringNote) {
-                scoringNote.textContent = `Points are awarded based on finishing position (top 40 only). Course: ${event.course}`;
+                // Use custom scoring note if available
+                const noteText = event.scoringNote || `Points are awarded based on finishing position (top 40 only).`;
+                scoringNote.textContent = `${noteText} Course: ${event.course}`;
             }
             
             // Handle stage races vs single events

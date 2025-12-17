@@ -442,13 +442,44 @@ function calculatePoints(position, eventNumber, predictedPosition) {
     console.warn(`No max points defined for event ${eventNumber}, using 100`);
     return { points: Math.max(0, 100 - (position - 1) * 2), bonusPoints: 0 }; // Fallback
   }
-  
-  // Only positions 1-40 score points
+
+  // Event 3 special case: 20-participant elimination race
+  // Linear scaling from 50 (1st) to 10 (20th) with podium bonuses
+  if (eventNumber === 3) {
+    if (position > 20) {
+      return { points: 0, bonusPoints: 0 };
+    }
+
+    // Base points: linear from 45 (pos 1) to 10 (pos 20)
+    const basePoints = 45 - (position - 1) * (35 / 19);
+
+    // Podium bonus
+    let podiumBonus = 0;
+    if (position === 1) podiumBonus = 5;
+    else if (position === 2) podiumBonus = 3;
+    else if (position === 3) podiumBonus = 2;
+
+    // Calculate bonus points for beating prediction
+    let bonusPoints = 0;
+    if (predictedPosition) {
+      const placesBeaten = predictedPosition - position;
+      if (placesBeaten >= 9) bonusPoints = 5;
+      else if (placesBeaten >= 7) bonusPoints = 4;
+      else if (placesBeaten >= 5) bonusPoints = 3;
+      else if (placesBeaten >= 3) bonusPoints = 2;
+      else if (placesBeaten >= 1) bonusPoints = 1;
+    }
+
+    const totalPoints = Math.round(basePoints + podiumBonus + bonusPoints);
+    return { points: totalPoints, bonusPoints };
+  }
+
+  // Only positions 1-40 score points (standard events)
   if (position > 40) {
     return { points: 0, bonusPoints: 0 };
   }
-  
-  // Calculate base points
+
+  // Calculate base points (standard formula)
   const basePoints = (maxPoints / 2) + (40 - position) * ((maxPoints - 10) / 78);
   
   // Calculate podium bonus
