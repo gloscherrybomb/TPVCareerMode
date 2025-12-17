@@ -10,6 +10,13 @@ let tooltipElement = null;
 let canvasElement = null;
 
 /**
+ * Check if viewport is mobile width
+ */
+function isMobileViewport() {
+    return window.innerWidth <= 768;
+}
+
+/**
  * Draw personality spider/radar chart on canvas
  */
 export function drawPersonalityChart(canvasId, personalityData) {
@@ -67,7 +74,16 @@ export function drawPersonalityChart(canvasId, personalityData) {
         ctx.font = 'bold 12px Orbitron, sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText(trait.name, labelX, labelY);
+
+        if (isMobileViewport()) {
+            // Mobile: Show trait name and value on two lines
+            ctx.fillText(trait.name, labelX, labelY - 8);
+            ctx.font = '11px Orbitron, sans-serif';
+            ctx.fillText(Math.round(trait.value).toString(), labelX, labelY + 8);
+        } else {
+            // Desktop: Show trait name only
+            ctx.fillText(trait.name, labelX, labelY);
+        }
     });
 
     // Draw data polygon
@@ -346,8 +362,10 @@ export function displayPersonality(userData) {
     // Draw spider chart in header
     drawPersonalityChart('personalityChart', userData.personality);
 
-    // Initialize chart interactivity (hover tooltips)
-    initializeChartInteractivity('personalityChart');
+    // Initialize chart interactivity only on desktop (hover tooltips don't work on touch)
+    if (!isMobileViewport()) {
+        initializeChartInteractivity('personalityChart');
+    }
 
     // Update persona label in header
     const persona = getPersonaLabel(userData.personality);
