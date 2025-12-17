@@ -1519,7 +1519,7 @@ async function processUserResult(uid, eventInfo, results) {
   const storyResult = await storyGen.generateRaceStory(
     {
       eventNumber: eventNumber,
-      position: position,
+      position: isDNF ? 'DNF' : position,
       predictedPosition: predictedPosition,
       winMargin: winMargin,
       lossMargin: marginToWinner,
