@@ -78,7 +78,8 @@ This makes it a key early test for any rider entering the local racing scene—y
             keyPoint: "Elimination every lap",
             difficulty: "Tactical and intense",
             finish: "Last rider standing wins"
-        }
+        },
+        scheduleUrl: "https://tpvirtualhub.com/clone?o=eyJzY2hlZHVsZUtleSI6NTI0NzcsImFjY2Vzc0NvZGUiOjE4NjA2MCwicmVxdWlyZUFjY2Vzc0NvZGUiOnRydWUsInRpdGxlVGVtcGxhdGUiOiJGb3Jlc3QgVmVsb2Ryb21lIEVsaW1pbmF0aW9uIC0gVFBWIENhcmVlciBNb2RlIn0="
     },
     4: {
         number: "04",
