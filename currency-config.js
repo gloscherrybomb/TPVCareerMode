@@ -36,7 +36,7 @@ const AWARD_CREDIT_MAP = {
 };
 
 // Safety cap per event to avoid runaway stacking in preview
-const PER_EVENT_CREDIT_CAP = 200;
+const PER_EVENT_CREDIT_CAP = 150;
 
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
