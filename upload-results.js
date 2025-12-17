@@ -1,15 +1,13 @@
 // Upload Results Page Logic
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-functions.js';
+import { getFirestore, doc, getDoc, collection, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 import { firebaseConfig } from './firebase-config.js';
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-const functions = getFunctions(app);
 
 // Stage requirements (mirror from process-results.js)
 const STAGE_REQUIREMENTS = {
@@ -567,29 +565,33 @@ async function handleUpload() {
         // Generate filename for upload
         const uploadFilename = `TPVirtual-Results-Event${eventKey}-Pen${pen}.csv`;
 
-        // Call Firebase Cloud Function
-        const uploadResultsFn = httpsCallable(functions, 'uploadResults');
-        const result = await uploadResultsFn({
+        // Save to Firestore pendingUploads collection
+        // A GitHub Action will pick this up and commit it to the repo
+        const pendingUpload = {
             csvContent: parsedCSV.rawText,
             eventNumber: selectedEventNumber,
-            filename: uploadFilename
-        });
+            filename: uploadFilename,
+            originalFilename: selectedFile.name,
+            userCareerUID: userData.uid,
+            userFirebaseUID: currentUser.uid,
+            userName: userData.name || 'Unknown',
+            currentStage: userData.currentStage || 1,
+            status: 'pending',
+            uploadedAt: serverTimestamp()
+        };
 
-        if (result.data.success) {
-            showStatus('success', 'Upload Successful!',
-                `Your results have been uploaded and will be processed shortly. Check your profile in a few minutes.`);
-            clearFile();
-        } else {
-            throw new Error('Upload failed');
-        }
+        await addDoc(collection(db, 'pendingUploads'), pendingUpload);
+
+        showStatus('success', 'Upload Successful!',
+            `Your results have been submitted and will be processed within a few minutes. Check your profile shortly.`);
+        clearFile();
+
     } catch (error) {
         console.error('Upload error:', error);
         let errorMessage = 'An error occurred while uploading. Please try again.';
 
-        if (error.code === 'functions/unauthenticated') {
-            errorMessage = 'You must be logged in to upload results.';
-        } else if (error.code === 'functions/failed-precondition') {
-            errorMessage = error.message || 'This event is not valid for your current stage.';
+        if (error.code === 'permission-denied') {
+            errorMessage = 'You do not have permission to upload. Please ensure you are logged in.';
         } else if (error.message) {
             errorMessage = error.message;
         }
