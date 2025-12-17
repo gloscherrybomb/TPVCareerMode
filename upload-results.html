@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Results - TPV Career Mode</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="tpv-team-car.png">
+    <link rel="apple-touch-icon" href="tpv-team-car.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="upload-results.css">
+</head>
+<body>
+    <!-- Navigation (minimal - page not in nav) -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <span class="logo-text">TPV</span>
+                <span class="logo-subtitle">Career Mode</span>
+            </div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="events.html" class="nav-link">Season</a>
+                <a href="standings.html" class="nav-link">Standings</a>
+                <a href="peloton.html" class="nav-link">Peloton</a>
+                <a href="profile.html" class="nav-link">Profile</a>
+                <a href="#" class="nav-link nav-login" id="loginBtn">Login</a>
+                <a href="#" class="nav-link nav-logout" id="logoutBtn" style="display: none;">Logout</a>
+            </div>
+            <button class="nav-toggle" id="navToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="upload-page">
+        <div class="container">
+            <!-- Loading State -->
+            <div id="loadingState" class="loading-state">
+                <div class="spinner"></div>
+                <p>Loading...</p>
+            </div>
+
+            <!-- Login Prompt -->
+            <div id="loginPrompt" class="login-prompt" style="display: none;">
+                <div class="login-prompt-icon">🔒</div>
+                <h2>Please Log In</h2>
+                <p>You need to be logged in to upload results.</p>
+                <button class="btn btn-primary" onclick="document.getElementById('loginBtn').click()">
+                    Log In
+                </button>
+            </div>
+
+            <!-- Upload Content -->
+            <div id="uploadContent" style="display: none;">
+                <div class="upload-header">
+                    <h1>Upload Race Results</h1>
+                    <p class="upload-subtitle">Submit your results CSV file for processing</p>
+                </div>
+
+                <!-- Stage Info -->
+                <div class="stage-info-card">
+                    <div class="stage-info-header">
+                        <h2>Your Current Progress</h2>
+                    </div>
+                    <div class="stage-info-content">
+                        <div class="stage-badge">
+                            <span class="stage-label">Stage</span>
+                            <span class="stage-number" id="currentStage">-</span>
+                        </div>
+                        <div class="valid-events">
+                            <h3>Valid Event(s) for Upload:</h3>
+                            <div id="validEventsList" class="valid-events-list">
+                                <!-- Populated by JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Event Selection (for choice stages) -->
+                <div id="eventSelectionSection" class="event-selection-section" style="display: none;">
+                    <label for="eventSelect">Select Event:</label>
+                    <select id="eventSelect" class="event-select">
+                        <!-- Populated by JS -->
+                    </select>
+                </div>
+
+                <!-- File Upload Area -->
+                <div class="upload-area" id="uploadArea">
+                    <div class="upload-dropzone" id="dropzone">
+                        <div class="dropzone-icon">📁</div>
+                        <p class="dropzone-text">Drag and drop your CSV file here</p>
+                        <p class="dropzone-subtext">or</p>
+                        <label class="btn btn-secondary upload-browse-btn">
+                            Browse Files
+                            <input type="file" id="fileInput" accept=".csv" style="display: none;">
+                        </label>
+                    </div>
+                    <p class="upload-hint">Only .csv files from TPVirtual are accepted</p>
+                </div>
+
+                <!-- Selected File Info -->
+                <div id="fileInfo" class="file-info" style="display: none;">
+                    <div class="file-info-header">
+                        <span class="file-icon">📄</span>
+                        <span class="file-name" id="fileName"></span>
+                        <button class="btn-clear-file" id="clearFile" title="Remove file">✕</button>
+                    </div>
+                </div>
+
+                <!-- Validation Results -->
+                <div id="validationResults" class="validation-results" style="display: none;">
+                    <h3>Validation Results</h3>
+                    <div class="validation-items" id="validationItems">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Upload Button -->
+                <div class="upload-actions">
+                    <button id="uploadBtn" class="btn btn-primary btn-upload" disabled>
+                        <span class="btn-text">Upload Results</span>
+                        <span class="btn-loading" style="display: none;">
+                            <span class="spinner-small"></span>
+                            Uploading...
+                        </span>
+                    </button>
+                </div>
+
+                <!-- Status Messages -->
+                <div id="statusMessage" class="status-message" style="display: none;">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="container">
+            <p>&copy; 2024 TPV Career Mode. Beta Access.</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="event-data.js"></script>
+    <script type="module" src="upload-results.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
