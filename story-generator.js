@@ -97,9 +97,9 @@ function formatGapText(seconds, context = 'neutral') {
   if (!seconds || seconds === 0) return '';
   
   // Very close finishes
-  if (seconds < 0.3) return 'by inches';
-  if (seconds < 0.5) return 'by a bike throw';
-  if (seconds < 1) return 'by less than a second';
+  if (seconds < 0.3) return 'inches';
+  if (seconds < 0.5) return 'a bike throw';
+  if (seconds < 1) return 'less than a second';
   
   // Small gaps - use exact seconds for sprint contexts
   if (seconds < 5) {
