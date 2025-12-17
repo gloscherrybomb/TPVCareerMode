@@ -920,13 +920,30 @@ document.addEventListener('DOMContentLoaded', () => {
     // Listen for auth changes
     onAuthStateChanged(auth, async (user) => {
         currentUser = user;
-        
-        // Update schedule button based on login state
+
+        // Update schedule button based on login state and beta access
         const scheduleButton = document.getElementById('scheduleButton');
         if (scheduleButton) {
             if (user) {
                 scheduleButton.textContent = 'Schedule Event';
-                scheduleButton.onclick = null; // Will be handled by event scheduling logic
+
+                // Fetch user doc to check beta_access
+                const userDoc = await getDoc(doc(db, 'users', user.uid));
+                const userData = userDoc.exists() ? userDoc.data() : {};
+                const hasBetaAccess = userData.beta_access === true;
+
+                // Get current event's schedule URL
+                const event = getEvent(eventNumber);
+                const scheduleUrl = event?.scheduleUrl;
+
+                scheduleButton.onclick = (e) => {
+                    e.preventDefault();
+                    if (hasBetaAccess && scheduleUrl) {
+                        window.open(scheduleUrl, '_blank');
+                    } else {
+                        alert('Coming Soon');
+                    }
+                };
             } else {
                 scheduleButton.textContent = 'Login to Schedule';
                 scheduleButton.onclick = (e) => {

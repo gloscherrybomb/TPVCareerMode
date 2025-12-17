@@ -24,7 +24,8 @@ It's a straightforward but energetic event—an ideal early-season chance to tes
             keyPoint: "Coastal Bend (technical section)",
             difficulty: "Fast pace, technical corners",
             finish: "Georgetown Waterfront"
-        }
+        },
+        scheduleUrl: "https://tpvirtualhub.com/clone?o=eyJzY2hlZHVsZUtleSI6NTI0MzEsImFjY2Vzc0NvZGUiOjE4NjA2MCwicmVxdWlyZUFjY2Vzc0NvZGUiOnRydWUsInRpdGxlVGVtcGxhdGUiOiJDb2FzdCBhbmQgUm9hc3QgQ3JpdCAtIFRQViBDYXJlZXIgTW9kZSBTdGFnZSAxIn0="
     },
     2: {
         number: "02",
@@ -50,7 +51,8 @@ It's the kind of race where experience counts, but raw talent can still shine th
             keyPoint: "Rolling sections (constant pace changes)",
             difficulty: "Deceptively challenging",
             finish: "Island Circuit"
-        }
+        },
+        scheduleUrl: "https://tpvirtualhub.com/clone?o=eyJzY2hlZHVsZUtleSI6NTExMzksInJlcXVpcmVBY2Nlc3NDb2RlIjp0cnVlLCJ0aXRsZVRlbXBsYXRlIjoiSXNsYW5kIENsYXNzaWMgLSBUUFYgQ2FyZWVyIE1vZGUgU3RhZ2UgMiJ9"
     },
     3: {
         number: "03",
