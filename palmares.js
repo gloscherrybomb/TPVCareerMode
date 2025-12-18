@@ -286,8 +286,15 @@ function displayKeyAchievements() {
     // Biggest Win
     const bigWin = lifetime.biggestWin;
     if (bigWin) {
-        document.querySelector('#achievementBiggestWin .achievement-text').innerHTML =
-            `Biggest Win: <strong>${formatTime(bigWin.marginSeconds)} margin</strong> (${bigWin.eventName})`;
+        // For elimination races (event 3) and time trials (event 4), margin isn't meaningful
+        const isTimeIrrelevant = bigWin.eventNumber === 3 || bigWin.eventNumber === 4;
+        if (isTimeIrrelevant) {
+            document.querySelector('#achievementBiggestWin .achievement-text').innerHTML =
+                `Biggest Win: <strong>${bigWin.eventName}</strong>`;
+        } else {
+            document.querySelector('#achievementBiggestWin .achievement-text').innerHTML =
+                `Biggest Win: <strong>${formatTime(bigWin.marginSeconds)} margin</strong> (${bigWin.eventName})`;
+        }
     } else {
         document.querySelector('#achievementBiggestWin .achievement-text').innerHTML =
             `Biggest Win: <strong>—</strong>`;

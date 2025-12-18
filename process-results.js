@@ -204,9 +204,28 @@ function calculateHighestARR(currentARR, eventNumber, existing) {
 
 /**
  * Calculate biggest win margin
+ * For elimination races (event 3) and time trials (event 4), margin isn't meaningful
+ * so we store 0 margin - they'll only show as biggest win if no other wins exist
  */
 function calculateBiggestWinMargin(position, results, eventNumber, currentBiggest) {
   if (position !== 1) return currentBiggest;
+
+  // For elimination races and time trials, margin isn't meaningful
+  // Store with 0 margin so they don't compete with real margin-based wins
+  const isTimeIrrelevant = eventNumber === 3 || eventNumber === 4;
+
+  if (isTimeIrrelevant) {
+    // Only use this win if there's no current biggest win
+    if (!currentBiggest) {
+      return {
+        eventNumber: eventNumber,
+        eventName: EVENT_NAMES[eventNumber] || `Event ${eventNumber}`,
+        marginSeconds: 0,
+        date: new Date().toISOString()
+      };
+    }
+    return currentBiggest;
+  }
 
   // Find first and second place times
   const sortedResults = results
