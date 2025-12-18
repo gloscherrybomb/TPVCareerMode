@@ -2407,13 +2407,18 @@ async function buildSeasonStandings(results, userData, eventNumber, currentUid, 
     }
     // Ensure points is a number
     racer.points = Number(racer.points) || 0;
-    
+
+    // Sanitize uid: convert undefined to null for Firestore compatibility
+    if (racer.uid === undefined) {
+      racer.uid = null;
+    }
+
     standingsMap.set(racer.uid || racer.name, racer);
   });
   
   // Process all racers from CURRENT event CSV
   results.forEach(result => {
-    const uid = result.UID;
+    const uid = result.UID || null;  // Convert undefined to null for Firestore compatibility
     const name = result.Name;
     const position = parseInt(result.Position);
     
@@ -2606,7 +2611,17 @@ async function buildSeasonStandings(results, userData, eventNumber, currentUid, 
   // Convert back to array and sort by points
   const standings = Array.from(standingsMap.values());
   standings.sort((a, b) => b.points - a.points);
-  
+
+  // Final sanitization: ensure no undefined values for Firestore compatibility
+  standings.forEach(racer => {
+    if (racer.uid === undefined) racer.uid = null;
+    if (racer.name === undefined) racer.name = null;
+    if (racer.team === undefined) racer.team = '';
+    if (racer.arr === undefined) racer.arr = 0;
+    if (racer.points === undefined) racer.points = 0;
+    if (racer.events === undefined) racer.events = 0;
+  });
+
   return standings;
 }
 
