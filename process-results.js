@@ -1274,6 +1274,7 @@ async function processUserResult(uid, eventInfo, results) {
   const eventResults = {
     position: isDNF ? 'DNF' : position,
     isDNF: isDNF,
+    stageNumber: currentStage, // Track which stage this was completed as
     time: parseFloat(userResult.Time) || 0,
     arr: parseInt(userResult.ARR) || 0,
     arrBand: userResult.ARRBand || '',

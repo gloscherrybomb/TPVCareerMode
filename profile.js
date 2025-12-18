@@ -81,6 +81,7 @@ async function calculateUserStats(userUID, userData) {
             // Add to recent results
             stats.recentResults.push({
                 eventNum: eventNum,
+                stageNumber: eventResults.stageNumber || null, // Stage when this event was completed
                 eventName: window.eventData?.[eventNum]?.name || `Event ${eventNum}`,
                 position: position,
                 time: eventResults.time || 'N/A',
@@ -103,8 +104,14 @@ async function calculateUserStats(userUID, userData) {
         }
     }
     
-    // Sort recent results by event number (descending)
-    stats.recentResults.sort((a, b) => b.eventNum - a.eventNum);
+    // Sort recent results by stage number (most recent stage first)
+    // This ensures results appear in stage completion order, not event number order
+    // Falls back to eventNum for legacy data without stageNumber
+    stats.recentResults.sort((a, b) => {
+        const stageA = a.stageNumber || a.eventNum;
+        const stageB = b.stageNumber || b.eventNum;
+        return stageB - stageA;
+    });
 
     return stats;
 }
