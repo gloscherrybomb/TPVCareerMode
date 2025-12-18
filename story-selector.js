@@ -699,6 +699,38 @@ class StorySelector {
   }
 
   /**
+   * Select a post-race transition moment from the database
+   * Returns a short transition phrase or empty string
+   * Used in the two-part narrative structure
+   */
+  async selectTransitionMoment(riderId, context, db) {
+    // Skip transition for first race (let intro carry the weight)
+    if (context.stagesCompleted <= 1) {
+      return '';
+    }
+
+    // Try to select from postRaceTransitions category
+    const transition = this.selectFromCategory(riderId, 'postRaceTransitions', context, 10);
+
+    if (!transition) {
+      // Fallback: return a generic transition based on performance
+      const tier = context.performanceTier || 'midpack';
+      const fallbacks = {
+        win: "you found yourself replaying the winning moment",
+        podium: "the podium finish still felt fresh in your mind",
+        top10: "you processed the solid result",
+        midpack: "you reflected on what worked and what didn't",
+        back: "you looked for the lessons in the tough day"
+      };
+      return fallbacks[tier] || fallbacks.midpack;
+    }
+
+    // Mark as used and apply variable substitution
+    await this.markStoryUsed(riderId, transition.id, context.eventNumber, db);
+    return this.applyVariableSubstitution(transition.text, context);
+  }
+
+  /**
    * Apply variable substitution to story text
    */
   applyVariableSubstitution(text, context) {

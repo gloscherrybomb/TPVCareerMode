@@ -2305,6 +2305,203 @@ const NARRATIVE_DATABASE = {
     }
   ],
 
+  // ===== POST-RACE TRANSITIONS =====
+  // Short transition moments (1-2 sentences) that bridge race completion to forward outlook
+  // These add human moments and connective tissue between race story and season context
+  postRaceTransitions: [
+    // RECOVERY-THEMED
+    {
+      id: "trans_coffee_debrief",
+      text: "you sat at the local cafe, still in race kit, coffee cooling as you processed what just happened.",
+      triggers: { performanceTier: ["any"], stagesCompleted: [2, 3, 4, 5, 6] },
+      weight: 0.6
+    },
+    {
+      id: "trans_foam_roller",
+      text: "you worked through a recovery routine, foam roller finding every knot from the day's effort.",
+      triggers: { performanceTier: ["any"], stagesCompleted: [3, 4, 5, 6, 7] },
+      weight: 0.5
+    },
+    {
+      id: "trans_ice_bath",
+      text: "you sat in an ice bath, the cold sharp enough to distract from analyzing every tactical decision.",
+      triggers: { performanceTier: ["midpack", "back"], stagesCompleted: [4, 5, 6, 7] },
+      weight: 0.5
+    },
+    {
+      id: "trans_stretching_routine",
+      text: "you stretched out tight muscles, mentally replaying the key moments while your body recovered.",
+      triggers: { performanceTier: ["any"], stagesCompleted: [3, 4, 5, 6, 7, 8] },
+      weight: 0.5
+    },
+    {
+      id: "trans_recovery_shake",
+      text: "you mixed a recovery shake, the post-race ritual giving structure to the mental processing.",
+      triggers: { performanceTier: ["any"], stagesCompleted: [2, 3, 4, 5] },
+      weight: 0.4
+    },
+    {
+      id: "trans_legs_elevated",
+      text: "you lay with legs elevated against the wall, staring at the ceiling and letting the race replay itself.",
+      triggers: { performanceTier: ["podium", "top10"], stagesCompleted: [4, 5, 6, 7, 8] },
+      weight: 0.5
+    },
+
+    // LIFESTYLE-THEMED
+    {
+      id: "trans_family_dinner",
+      text: "you found yourself at dinner, explaining the race to people who understood the effort if not the tactics.",
+      triggers: { performanceTier: ["any"], stagesCompleted: [5, 6, 7, 8] },
+      weight: 0.6
+    },
+    {
+      id: "trans_partner_support",
+      text: "your partner listened patiently to the race replay, asking questions that showed they cared even without fully understanding.",
+      triggers: { performanceTier: ["podium", "win"], stagesCompleted: [4, 5, 6, 7, 8] },
+      weight: 0.5
+    },
+    {
+      id: "trans_quiet_evening",
+      text: "you ended up on the couch, legs elevated, watching pro race highlights and finding new inspiration.",
+      triggers: { performanceTier: ["any"], stagesCompleted: [3, 4, 5, 6] },
+      weight: 0.5
+    },
+    {
+      id: "trans_group_chat",
+      text: "the cycling group chat was buzzing with race analysis, everyone weighing in on what went right and wrong.",
+      triggers: { performanceTier: ["top10", "podium", "win"], stagesCompleted: [3, 4, 5, 6, 7] },
+      weight: 0.5
+    },
+    {
+      id: "trans_planning_next",
+      text: "you found yourself already researching the next event, turning today's lessons into tomorrow's strategy.",
+      triggers: { performanceTier: ["any"], stagesCompleted: [2, 3, 4, 5, 6] },
+      weight: 0.6
+    },
+    {
+      id: "trans_bike_cleaning",
+      text: "you cleaned the bike meticulously, the ritual helping process the day's racing while preparing for the next.",
+      triggers: { performanceTier: ["any"], stagesCompleted: [3, 4, 5, 6, 7] },
+      weight: 0.4
+    },
+
+    // TRAVEL-THEMED
+    {
+      id: "trans_long_drive",
+      text: "the drive home felt longer than usual, giving time to replay every tactical decision.",
+      triggers: { performanceTier: ["any"], stagesCompleted: [4, 5, 6, 7, 8] },
+      weight: 0.6
+    },
+    {
+      id: "trans_traffic_reflection",
+      text: "stuck in post-race traffic, you had nothing to do but mentally replay the key moments.",
+      triggers: { performanceTier: ["any"], stagesCompleted: [3, 4, 5, 6, 7] },
+      weight: 0.5
+    },
+    {
+      id: "trans_carpool_debrief",
+      text: "the carpool home became an impromptu race debrief, everyone sharing their perspective on what happened.",
+      triggers: { performanceTier: ["top10", "podium"], stagesCompleted: [4, 5, 6, 7] },
+      weight: 0.5
+    },
+    {
+      id: "trans_quiet_drive",
+      text: "the drive home was quiet, music low, mind still processing what happened out there.",
+      triggers: { performanceTier: ["midpack", "back"], stagesCompleted: [3, 4, 5, 6, 7] },
+      weight: 0.5
+    },
+
+    // RESULT-SPECIFIC
+    {
+      id: "trans_win_celebration",
+      text: "you celebrated with the local cycling crew, the victory sweeter for being shared.",
+      triggers: { performanceTier: ["win"], stagesCompleted: [2, 3, 4, 5, 6, 7, 8] },
+      weight: 0.8
+    },
+    {
+      id: "trans_podium_proud",
+      text: "you kept glancing at the podium photo on your phone, not quite believing it was real.",
+      triggers: { performanceTier: ["podium", "win"], stagesCompleted: [2, 3, 4, 5] },
+      weight: 0.7
+    },
+    {
+      id: "trans_near_miss",
+      text: "you replayed the final sprint in your head, wondering what one more watt or better positioning might have changed.",
+      triggers: { performanceTier: ["podium", "top10"], stagesCompleted: [4, 5, 6, 7, 8] },
+      weight: 0.6
+    },
+    {
+      id: "trans_learning_loss",
+      text: "you processed the disappointment, looking for the lessons hidden in the result.",
+      triggers: { performanceTier: ["midpack", "back"], stagesCompleted: [3, 4, 5, 6, 7] },
+      weight: 0.6
+    },
+    {
+      id: "trans_bounce_back",
+      text: "you acknowledged the tough day and immediately started thinking about how to respond in the next race.",
+      triggers: { performanceTier: ["back"], stagesCompleted: [4, 5, 6, 7, 8] },
+      weight: 0.7
+    },
+
+    // PERSONALITY-DRIVEN
+    {
+      id: "trans_data_dive",
+      text: "you dove into the power data immediately, numbers telling a cleaner story than memory alone.",
+      triggers: { personalityMin: { professionalism: 65 }, stagesCompleted: [3, 4, 5, 6, 7] },
+      weight: 0.7
+    },
+    {
+      id: "trans_social_celebration",
+      text: "you celebrated with the local cycling group, the result less important than the shared experience.",
+      triggers: { personalityMin: { humility: 65 }, stagesCompleted: [4, 5, 6, 7] },
+      weight: 0.6
+    },
+    {
+      id: "trans_competitive_review",
+      text: "you replayed the finale in your mind, already planning how to beat your rivals next time.",
+      triggers: { personalityMin: { aggression: 60 }, stagesCompleted: [4, 5, 6, 7, 8] },
+      weight: 0.7
+    },
+    {
+      id: "trans_confident_reflection",
+      text: "you reflected on the race with satisfaction, knowing you'd executed your plan and raced smart.",
+      triggers: { personalityMin: { confidence: 65 }, performanceTier: ["podium", "win"], stagesCompleted: [3, 4, 5, 6, 7] },
+      weight: 0.6
+    },
+    {
+      id: "trans_humble_gratitude",
+      text: "you felt grateful for the race, the competition, and another chance to test yourself.",
+      triggers: { personalityMin: { humility: 70 }, stagesCompleted: [5, 6, 7, 8] },
+      weight: 0.5
+    },
+
+    // SEASON-PHASE SPECIFIC
+    {
+      id: "trans_early_learning",
+      text: "you absorbed the lessons from another race, each one teaching something new about this level of competition.",
+      triggers: { stagesCompleted: [1, 2, 3] },
+      weight: 0.6
+    },
+    {
+      id: "trans_mid_building",
+      text: "you felt the season building, each race adding to your understanding of what works.",
+      triggers: { stagesCompleted: [5, 6] },
+      weight: 0.6
+    },
+    {
+      id: "trans_late_urgency",
+      text: "you felt the weight of the shrinking calendar, each remaining race carrying extra significance.",
+      triggers: { stagesCompleted: [7, 8] },
+      weight: 0.7
+    },
+    {
+      id: "trans_streak_momentum",
+      text: "the winning momentum felt tangible now, confidence building with each strong result.",
+      triggers: { isOnStreak: true, stagesCompleted: [4, 5, 6, 7] },
+      weight: 0.8
+    }
+  ],
+
   // ===== CONTRIBUTOR EXCLUSIVE STORIES =====
   // These stories only appear for users who have supported TPV Career Mode
   contributorExclusive: [

@@ -53,6 +53,45 @@ const EVENT_TYPES = {
   15: "stage race"
 };
 
+// Connector phrases that bridge race story to forward section
+// These create natural transitions with human moments
+const RACE_TO_FORWARD_CONNECTORS = {
+  win: [
+    "Back at the hotel that evening,",
+    "Driving home after the podium ceremony,",
+    "Later that night, still buzzing from the win,"
+  ],
+  podium: [
+    "On the drive back,",
+    "That evening, reviewing race photos,",
+    "Over dinner that night,"
+  ],
+  top10: [
+    "Reflecting on the drive home,",
+    "That evening, legs still heavy,",
+    "Processing the result later,"
+  ],
+  midpack: [
+    "On the quiet drive home,",
+    "Later, foam rolling sore legs,",
+    "That night, replaying key moments,"
+  ],
+  back: [
+    "In the silence of the drive home,",
+    "That evening, despite the disappointment,",
+    "Processing the tough day later,"
+  ]
+};
+
+/**
+ * Select a connector phrase based on performance tier
+ */
+function selectConnector(tier, eventNumber) {
+  const connectors = RACE_TO_FORWARD_CONNECTORS[tier] || RACE_TO_FORWARD_CONNECTORS.midpack;
+  const index = eventNumber % connectors.length;
+  return connectors[index];
+}
+
 /**
  * Analyze race dynamics based on time gaps and position
  * Returns enhanced context about how the race finished
@@ -293,6 +332,102 @@ function generateGenericIntro(raceData, seasonData) {
   
   // Generic intro
   return `The days leading up to ${eventName} had been about preparation and anticipation. You'd studied the course, planned your strategy, done the training—now it was time to execute and see where you stood against the field.`;
+}
+
+/**
+ * Generate CONDENSED race recap (~50-70 words)
+ * Shorter version without self-contained conclusions
+ * Used in the two-part narrative structure
+ */
+function generateRaceRecapCondensed(data) {
+  const {
+    eventNumber,
+    eventName,
+    position,
+    predictedPosition,
+    winMargin,
+    lossMargin,
+    winnerName,
+    earnedDarkHorse,
+    earnedDomination,
+    earnedCloseCall
+  } = data;
+
+  const eventType = EVENT_TYPES[eventNumber];
+  const isDNF = position === 'DNF';
+  const placeDiff = predictedPosition - position;
+  const dynamics = analyzeRaceDynamics(data);
+  const hasWinnerName = winnerName && winnerName !== 'the winner';
+  const gapText = formatGapText(position === 1 ? winMargin : lossMargin);
+
+  // Handle DNF
+  if (isDNF) {
+    return `${eventName} ended before you wanted it to. A DNF is never part of the plan, but racing is unforgiving. Zero points, a blank in the standings, and lessons to process.`;
+  }
+
+  // Determine tier
+  let tier;
+  if (position === 1) tier = 'win';
+  else if (position <= 3) tier = 'podium';
+  else if (position <= 10) tier = 'top10';
+  else if (position <= 20) tier = 'midpack';
+  else tier = 'back';
+
+  // WIN condensed recaps
+  if (tier === 'win') {
+    if (earnedDarkHorse) {
+      return `Nobody saw this coming. Predicted ${predictedPosition}th, you defied every expectation at ${eventName}. ${dynamics.type === 'bunch_sprint' ? 'The sprint was chaos, but you timed it perfectly.' : dynamics.type === 'solo_victory' ? `You attacked and rode away solo${gapText ? `, finishing ${gapText} clear` : ''}.` : 'When it mattered, you found something extra.'} P1—the upset of the day.`;
+    }
+    if (earnedDomination) {
+      return `${eventName} was a masterclass. ${dynamics.type === 'solo_victory' ? `You attacked decisively and ${gapText ? `finished ${gapText} clear` : 'rode away from the field'}.` : dynamics.type === 'bunch_sprint' ? 'You controlled the finale and won the sprint convincingly.' : `You proved strongest when it counted${gapText ? `, winning by ${gapText}` : ''}.`} The kind of day where everything clicks.`;
+    }
+    if (earnedCloseCall) {
+      return `${eventName} came down to the wire. ${dynamics.type === 'photo_finish' ? 'They needed the photo to separate the top finishers.' : 'The sprint was desperate, everyone throwing everything at the line.'} You emerged with the win${gapText ? ` by ${gapText}` : ' by the narrowest of margins'}—inches separating glory from frustration.`;
+    }
+    // Default win
+    return `${eventName} delivered the result you came for. ${dynamics.type === 'solo_victory' ? `You attacked at the right moment and ${gapText ? `finished ${gapText} clear` : 'never looked back'}.` : dynamics.type === 'bunch_sprint' ? 'You timed the sprint perfectly and crossed first.' : `You proved strongest when it counted${gapText ? `, winning by ${gapText}` : ''}.`}`;
+  }
+
+  // PODIUM condensed recaps
+  if (tier === 'podium') {
+    const winnerText = hasWinnerName ? winnerName : 'the winner';
+    if (position === 2) {
+      if (dynamics.type === 'photo_finish' || lossMargin < 1) {
+        return `So close at ${eventName}. The finish came down to a desperate sprint, and you crossed ${gapText ? `${gapText} behind ${winnerText}` : 'just behind'}—close enough to taste the win, far enough to know you came up short.`;
+      }
+      return `Second at ${eventName}. ${hasWinnerName ? `${winnerText} proved slightly stronger` : 'The winner had the edge'}${gapText ? `, finishing ${gapText} ahead` : ''}. You were in the fight until the end, just not quite strong enough to take the top step.`;
+    }
+    // 3rd place
+    if (placeDiff >= 5) {
+      return `Predicted ${predictedPosition}th, you finished on the podium at ${eventName}. Third place—ahead of where anyone expected, proof that the predictions don't account for race craft and determination.`;
+    }
+    return `Third at ${eventName}. ${dynamics.type === 'bunch_sprint' ? 'You battled through a chaotic sprint' : 'You fought hard in the finale'} and secured the final podium spot${gapText ? `, ${gapText} behind the winner` : ''}. Not first, but still on the podium.`;
+  }
+
+  // TOP 10 condensed recaps
+  if (tier === 'top10') {
+    if (placeDiff >= 5) {
+      return `A solid ${position}th at ${eventName}—better than the ${predictedPosition}th the predictions suggested. ${dynamics.type === 'chase_group' ? `The front group rode away${gapText ? ` with ${gapText} on the chase` : ''}, but you led the chasers home.` : 'You rode smart and finished stronger than expected.'}`;
+    }
+    if (placeDiff <= -3) {
+      return `${position}th at ${eventName}—not the result you were hoping for. ${dynamics.type === 'chase_group' ? 'You missed the decisive move and had to settle for leading the chase.' : 'When the race split, you couldn\'t quite go with the strongest riders.'} Still points, but below expectations.`;
+    }
+    return `${position}th at ${eventName}. ${dynamics.type === 'bunch_sprint' ? 'You finished in the main group' : 'You stayed with the front selection'}${gapText ? `, ${gapText} behind the winner` : ''}. A solid result that keeps the season moving forward.`;
+  }
+
+  // MIDPACK condensed recaps
+  if (tier === 'midpack') {
+    if (placeDiff >= 5) {
+      return `${position}th at ${eventName}—better than the ${predictedPosition}th predicted, which counts for something. ${gapText ? `You finished ${gapText} behind the winner, ` : ''}part of a day spent learning and competing.`;
+    }
+    return `${position}th at ${eventName}. ${dynamics.type === 'well_back' ? `The leaders finished ${gapText || 'well'} ahead, and you came home with the main group.` : 'Not the result you wanted, but you stayed in the race and gathered experience.'} Points banked, lessons learned.`;
+  }
+
+  // BACK condensed recaps
+  if (placeDiff >= 10) {
+    return `${position}th at ${eventName}—well ahead of the ${predictedPosition}th predicted. Not a headline result, but significantly better than expected. Progress is progress.`;
+  }
+  return `A tough day at ${eventName}, finishing ${position}th. ${gapText ? `The leaders were ${gapText} up the road. ` : ''}Sometimes racing delivers hard lessons. The question is what you do with them.`;
 }
 
 /**
@@ -689,6 +824,89 @@ function generateRaceRecap(data) {
 }
 
 /**
+ * Generate CONDENSED forward look (2-4 sentences)
+ * Season-phase aware, concise outlook without repeating recap sentiments
+ * Used in the two-part narrative structure
+ */
+function generateForwardLook(seasonData, raceData) {
+  const {
+    stagesCompleted,
+    nextEventNumber,
+    nextEventName,
+    isOnStreak,
+    totalPodiums,
+    totalWins,
+    recentResults,
+    isSeasonComplete
+  } = seasonData;
+
+  // Season complete - no forward look needed
+  if (isSeasonComplete || nextEventNumber > 15 || !nextEventNumber) {
+    if (isOnStreak) {
+      return "The season ends on a high note. Time to rest, recover, and carry this momentum into the off-season.";
+    }
+    return "The season is complete. Time to rest, reflect, and prepare for what comes next.";
+  }
+
+  const nextEventType = EVENT_TYPES[nextEventNumber];
+  let forward = '';
+
+  // EARLY SEASON (stages 1-3): Exploratory, learning-focused
+  if (stagesCompleted <= 3) {
+    const earlyOptions = [
+      `${nextEventName} awaits—another chance to learn what works at this level.`,
+      `Next up: ${nextEventName}. Each race at this stage is about building experience.`,
+      `${nextEventName} is next, another opportunity to test yourself and gather data.`
+    ];
+    forward = earlyOptions[stagesCompleted % earlyOptions.length];
+
+    // Add season phase note
+    forward += ' The season is still taking shape.';
+  }
+  // MID SEASON (stages 4-6): Building, patterns forming
+  else if (stagesCompleted <= 6) {
+    if (nextEventType === 'time trial') {
+      forward = `${nextEventName} is next—a time trial where there's nowhere to hide and no tactics to lean on.`;
+    } else if (nextEventType === 'hill climb') {
+      forward = `${nextEventName} points upward, a test of pure climbing strength.`;
+    } else if (nextEventType === 'stage race') {
+      forward = `The Local Tour begins with ${nextEventName}—three stages that will define the season's finale.`;
+    } else {
+      forward = `Next up: ${nextEventName}. The patterns are forming, the form is building.`;
+    }
+
+    // Add form-based note
+    if (isOnStreak) {
+      forward += ' The momentum is real.';
+    } else if (totalPodiums >= 2) {
+      forward += ' Consistency is becoming the calling card.';
+    } else {
+      forward += ' Every race adds to the picture.';
+    }
+  }
+  // LATE SEASON (stages 7+): Focused, results-driven
+  else {
+    if (nextEventType === 'stage race') {
+      const stageNum = nextEventNumber - 12;
+      if (stageNum === 1) {
+        forward = `The Local Tour begins—three stages that carry the weight of the entire season.`;
+      } else if (stageNum === 2) {
+        forward = `Local Tour Stage 2 awaits. Yesterday's effort is done; today will reshape the GC.`;
+      } else {
+        forward = `The queen stage—Local Tour Stage 3. Everything comes down to this.`;
+      }
+    } else {
+      forward = `${nextEventName} is one of the final chances to make a statement.`;
+    }
+
+    // Add urgency note
+    forward += ' Every remaining race matters.';
+  }
+
+  return forward;
+}
+
+/**
  * Generate season context paragraph
  * These are also LONG paragraphs (5-7 sentences) with forward-looking content
  */
@@ -1069,6 +1287,54 @@ function generateSeasonContext(data) {
  */
 
 /**
+ * Generate INLINE rival phrase for weaving into recap
+ * Returns a short phrase (not a full sentence) or empty string
+ * Used in the two-part narrative structure
+ */
+function generateRivalInline(raceData, seasonData) {
+  // Check if user has rivals and rival data
+  if (!seasonData.topRivals || seasonData.topRivals.length === 0) {
+    return null;
+  }
+
+  // Check if any rivals were in this race
+  const rivalsInRace = [];
+  if (seasonData.rivalEncounters && Array.isArray(seasonData.rivalEncounters)) {
+    for (const encounter of seasonData.rivalEncounters) {
+      if (seasonData.topRivals.includes(encounter.botUid)) {
+        rivalsInRace.push(encounter);
+      }
+    }
+  }
+
+  if (rivalsInRace.length === 0) {
+    return null;
+  }
+
+  // Get the closest/most significant rival
+  const rival = rivalsInRace[0];
+  const userWon = rival.userFinishedAhead;
+  const gap = rival.timeGap.toFixed(1);
+
+  // Return inline phrase (to be woven into recap)
+  if (userWon) {
+    const phrases = [
+      `finishing ahead of rival ${rival.botName} by ${gap}s`,
+      `with ${rival.botName} ${gap}s behind`,
+      `edging out ${rival.botName} by ${gap} seconds`
+    ];
+    return phrases[Math.floor(Math.random() * phrases.length)];
+  } else {
+    const phrases = [
+      `with ${rival.botName} finishing ${gap}s ahead`,
+      `behind rival ${rival.botName} by ${gap} seconds`,
+      `trailing ${rival.botName} by ${gap}s`
+    ];
+    return phrases[Math.floor(Math.random() * phrases.length)];
+  }
+}
+
+/**
  * Generate rival mention if user raced against a rival
  * Checks if any of the user's rivals were in the race (within 30s)
  */
@@ -1152,11 +1418,13 @@ function generateRivalMention(raceData, seasonData) {
 
 /**
  * Main function: Generate complete race story
- * v3.0: Now async with narrative database integration
+ * v4.0: Two-part narrative structure with condensed recap and transition moments
+ * Part 1: Race Story (intro + condensed recap + inline rival) ~120-140 words
+ * Part 2: Forward Look (connector + transition + outlook) ~60-80 words
  */
 async function generateRaceStory(raceData, seasonData, riderId = null, narrativeSelector = null, db = null) {
   const eventName = EVENT_NAMES[raceData.eventNumber] || `Event ${raceData.eventNumber}`;
-  
+
   // Special handling for Event 15 when season is complete
   if (raceData.eventNumber === 15 && seasonData.isSeasonComplete && typeof window !== 'undefined' && window.seasonCompletion) {
     console.log('Generating season completion story for Event 15');
@@ -1170,7 +1438,7 @@ async function generateRaceStory(raceData, seasonData, riderId = null, narrative
         localTourGCPosition: seasonData.localTourGCPosition,
         earnedSeasonPodium: seasonData.seasonRank && seasonData.seasonRank <= 3
       });
-      
+
       return {
         recap: seasonCompleteStory,
         context: ''
@@ -1179,7 +1447,20 @@ async function generateRaceStory(raceData, seasonData, riderId = null, narrative
       console.error('Error generating season complete story:', error);
     }
   }
-  
+
+  // Determine performance tier for connector selection
+  const position = raceData.position;
+  let tier;
+  if (position === 1) tier = 'win';
+  else if (position <= 3) tier = 'podium';
+  else if (position <= 10) tier = 'top10';
+  else if (position <= 20) tier = 'midpack';
+  else tier = 'back';
+
+  // ========================================
+  // PART 1: RACE STORY (~120-140 words)
+  // ========================================
+
   // Generate intro paragraph (uses narrative database if available)
   let introParagraph = '';
   if (riderId && narrativeSelector) {
@@ -1196,29 +1477,80 @@ async function generateRaceStory(raceData, seasonData, riderId = null, narrative
       seasonData
     );
   }
-  
-  // Generate race recap
+
+  // Generate CONDENSED race recap
   const recapData = {
     ...raceData,
     eventName,
     isFirstRace: seasonData.stagesCompleted === 1
   };
-  const recapParagraph = generateRaceRecap(recapData);
+  const recapParagraph = generateRaceRecapCondensed(recapData);
 
-  // Generate rival mention if applicable
-  const rivalMention = generateRivalMention(raceData, seasonData);
+  // Generate inline rival phrase (not full paragraph)
+  const rivalInline = generateRivalInline(raceData, seasonData);
 
-  // Generate season context
-  const contextData = {
-    ...seasonData,
-    eventNumber: raceData.eventNumber,
-    nextEventName: EVENT_NAMES[seasonData.nextEventNumber] || `Event ${seasonData.nextEventNumber}`
-  };
-  const contextParagraph = generateSeasonContext(contextData);
+  // Build Part 1: Weave intro, recap, and rival together
+  let raceStory = introParagraph;
 
-  // Combine into complete story
-  const storyParts = [introParagraph, recapParagraph, rivalMention, contextParagraph].filter(p => p);
-  const completeStory = storyParts.join('\n\n');
+  // Add recap with rival woven in if present
+  if (rivalInline) {
+    // Insert rival phrase before the last sentence of recap
+    const sentences = recapParagraph.split(/(?<=[.!?])\s+/);
+    if (sentences.length > 1) {
+      const lastSentence = sentences.pop();
+      raceStory += ' ' + sentences.join(' ') + ', ' + rivalInline + '. ' + lastSentence;
+    } else {
+      raceStory += ' ' + recapParagraph.replace(/\.$/, '') + ', ' + rivalInline + '.';
+    }
+  } else {
+    raceStory += ' ' + recapParagraph;
+  }
+
+  // ========================================
+  // PART 2: FORWARD LOOK (~60-80 words)
+  // ========================================
+
+  // Select connector based on performance tier
+  const connector = selectConnector(tier, raceData.eventNumber);
+
+  // Select transition moment from narrative database
+  let transitionMoment = '';
+  if (riderId && narrativeSelector && narrativeSelector.selectTransitionMoment) {
+    try {
+      const narrativeContext = {
+        eventNumber: raceData.eventNumber,
+        eventName: eventName,
+        position: raceData.position,
+        predictedPosition: raceData.predictedPosition,
+        performanceTier: tier,
+        totalPoints: seasonData.totalPoints,
+        totalWins: seasonData.totalWins,
+        totalPodiums: seasonData.totalPodiums || 0,
+        recentResults: seasonData.recentResults || [],
+        stagesCompleted: seasonData.stagesCompleted || 1,
+        isOnStreak: seasonData.isOnStreak || false,
+        personality: seasonData.personality || null
+      };
+      transitionMoment = await narrativeSelector.selectTransitionMoment(riderId, narrativeContext, db);
+    } catch (error) {
+      console.log(`   ⚠️ Transition selection failed: ${error.message}`);
+    }
+  }
+
+  // Generate condensed forward look
+  const forwardLook = generateForwardLook(seasonData, raceData);
+
+  // Build Part 2: Connector + transition + forward look
+  let forwardSection = connector;
+  if (transitionMoment) {
+    forwardSection += ' ' + transitionMoment;
+  }
+  forwardSection += ' ' + forwardLook;
+
+  // ========================================
+  // COMBINE INTO COMPLETE STORY
+  // ========================================
+  const completeStory = raceStory.trim() + '\n\n' + forwardSection.trim();
 
   return {
     recap: completeStory,
