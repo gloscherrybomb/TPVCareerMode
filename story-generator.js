@@ -934,7 +934,79 @@ function generateSeasonContext(data) {
     context += `The season is entering its closing chapters, and every stage from here carries extra weight. `;
   }
 
-  if (isOnStreak) {
+  // CLOSING PARAGRAPHS - Check stage count FIRST to avoid premature consistency claims
+  if (stagesCompleted === 1) {
+    // First race - no consistency or pattern talk yet
+    if (recentResults && recentResults[0] === 1) {
+      const closings = [
+        `A win in your first race is the best possible start. You've announced yourself, made a statement, and given yourself a foundation of confidence to build on. Now the real work begins.`,
+        `First race, first win. That's how seasons of destiny begin. The question now is whether you can back it up—whether this was an announcement of intent or a peak you'll spend the season chasing.`,
+        `You couldn't have scripted a better opening. Victory in race one sets the tone, establishes expectations, and puts a target on your back. Embrace the pressure—it means you're doing something right.`
+      ];
+      context += closings[Math.floor(Math.random() * closings.length)];
+    } else if (recentResults && recentResults[0] <= 5) {
+      const closings = [
+        `A top-five finish in your season opener is a strong start. You've shown you can compete at this level, and now you have data—what worked, what didn't, where you can push harder. Build on this.`,
+        `Opening with a strong result gives you confidence and momentum heading into race two. You've proven you belong in the mix. Now it's about building on that foundation.`,
+        `First race done, first lessons learned. A solid opening result gives you something to work with—proof that you can compete here, and a baseline to improve on.`
+      ];
+      context += closings[Math.floor(Math.random() * closings.length)];
+    } else if (recentResults && recentResults[0] <= 15) {
+      const closings = [
+        `Your first race is in the books, and now you have something concrete to work with. Every season starts somewhere, and this opener has shown you where you stand and what to work on.`,
+        `Race one is done. You've got your bearings now—you know the level of competition, you know what's expected, and you know where you need to improve. The season starts in earnest from here.`,
+        `The first race is always about learning as much as racing. You've gathered data, experienced the competition firsthand, and established a baseline. Now the real season begins.`
+      ];
+      context += closings[Math.floor(Math.random() * closings.length)];
+    } else {
+      const closings = [
+        `Every racer's journey has to start somewhere. Your opener wasn't what you hoped for, but it's given you clarity on where you stand and what needs work. The season is long—there's time to improve.`,
+        `A tough opening race isn't the end—it's information. You've learned things about yourself and the competition that will help you in race two and beyond. Use it.`,
+        `The first race didn't go to plan, but that's racing. You're still here, still committed, and you've got a full season ahead to prove what you're capable of. One race doesn't define a campaign.`
+      ];
+      context += closings[Math.floor(Math.random() * closings.length)];
+    }
+  } else if (stagesCompleted <= 3) {
+    // Early season (races 2-3) - still learning, building, no consistency claims yet
+    if (isOnStreak) {
+      const closings = [
+        `Multiple strong results to start the season—you're building real momentum. It's still early days, but you're giving yourself the best possible platform to build on.`,
+        `Back-to-back good performances have set a tone for your season. You're still learning, still adapting, but you're doing it while staying competitive. That's the right approach.`,
+        `You've started with intent, and the results are following. The season is young, but you're making every race count. Keep building.`
+      ];
+      context += closings[Math.floor(Math.random() * closings.length)];
+    } else if (recentResults && recentResults[0] <= 5) {
+      const closings = [
+        `Another strong result adds to what you're building. The season is still young—plenty of racing ahead—but you're giving yourself a solid foundation to work from.`,
+        `You're still in the early stages, still figuring things out, but the results suggest you're figuring them out quickly. Keep learning, keep racing, keep building.`,
+        `The season is still taking shape, and so far you're shaping it well. Each race teaches you something, and you're turning those lessons into competitive finishes.`
+      ];
+      context += closings[Math.floor(Math.random() * closings.length)];
+    } else if (recentResults && recentResults[0] >= 25) {
+      const closings = [
+        `It's early in the season—there's plenty of time to find your form. Every race teaches something, and tough results often teach the most. Keep showing up.`,
+        `The opening races haven't gone to plan, but the season is long. You're still learning, still adapting, and one good result can shift everything. Stay patient.`,
+        `Early struggles don't define a season—how you respond to them does. You've got time, you've got races ahead, and you've got lessons from these opening events to apply.`
+      ];
+      context += closings[Math.floor(Math.random() * closings.length)];
+    } else {
+      const closings = [
+        `The season is still taking shape, and so are you. Every race teaches something, every result adds data. You're building a foundation—not dramatic, not flashy, but solid.`,
+        `The flashes of potential are there—moments in races where everything clicks, where you see what's possible. Now it's about making those moments more frequent, more sustained.`,
+        `This is the phase where commitment gets tested. The racing is harder than you expected, the competition fiercer. But you're still showing up, still racing, still pushing. That matters.`
+      ];
+      context += closings[Math.floor(Math.random() * closings.length)];
+    }
+  } else if (stagesCompleted >= 8) {
+    // Late season - final push, cementing position
+    const closings = [
+      `The final races carry extra weight—not just for points, but for how you'll remember this season. You're tired, everyone's tired, but this is when champions dig deepest.`,
+      `Leave nothing in the tank. The off-season is for rest; the final races are for emptying yourself completely. You'll have months to recover. You'll only have these moments once.`,
+      `You've built a solid season position, and now it's about protecting it. Every race matters, every point counts. Finish strong and cement your place in the final standings.`
+    ];
+    context += closings[Math.floor(Math.random() * closings.length)];
+  } else if (isOnStreak) {
+    // Mid-season (stages 4-7) + on a winning/podium streak
     const closings = [
       `Right now, you're the rider everyone else is worried about. The momentum is real, the confidence is building, and every start line feels like another opportunity to prove this isn't a fluke—it's who you are.`,
       `Winning changes you. Not your character, but your expectations. You're starting to believe that podiums aren't lucky breaks—they're where you belong. Keep this rolling.`,
@@ -942,34 +1014,45 @@ function generateSeasonContext(data) {
     ];
     context += closings[Math.floor(Math.random() * closings.length)];
   } else if (recentResults && recentResults[0] <= 5) {
-    const closings = [
-      `You're racing with the kind of consistency that builds careers. Not flashy, not dominant, but reliably competitive. Those steady top-5s accumulate into something significant.`,
-      `You're knocking on the door. Top-5 finishes are becoming routine, and that consistency suggests a win isn't far off. Sometimes you have to be patient, keep showing up, and let the breakthrough come to you.`,
-      `You've found your rhythm in the peloton. The races don't feel as chaotic anymore, the pace doesn't seem as impossible, and you're reading situations before they develop. Experience is turning into competence.`
-    ];
-    context += closings[Math.floor(Math.random() * closings.length)];
+    // Mid-season + strong recent result - check for actual consistency before claiming it
+    const topFiveCount = recentResults.filter(r => r <= 5).length;
+    const topTenCount = recentResults.filter(r => r <= 10).length;
+
+    if (topFiveCount >= 3) {
+      // Multiple top-5s - NOW consistency talk is truly appropriate
+      const closings = [
+        `You're racing with the kind of consistency that builds careers. Not flashy, not dominant, but reliably competitive. Those steady top-5s accumulate into something significant.`,
+        `You're knocking on the door. Top-5 finishes are becoming routine, and that consistency suggests a win isn't far off. Sometimes you have to be patient, keep showing up, and let the breakthrough come to you.`,
+        `You've found your rhythm in the peloton. The races don't feel as chaotic anymore, the pace doesn't seem as impossible, and you're reading situations before they develop. Experience is turning into competence.`
+      ];
+      context += closings[Math.floor(Math.random() * closings.length)];
+    } else if (topTenCount >= 3) {
+      // Multiple top-10s but not consistent top-5s
+      const closings = [
+        `You're establishing yourself as a consistent presence near the front. Not always on the podium, but always competitive, always in the mix when it matters.`,
+        `The results are adding up—you're proving you can compete at this level race after race. That reliability is the foundation stronger seasons are built on.`,
+        `You've found a level you can sustain. Now it's about pushing that level higher, turning top-tens into top-fives, and top-fives into podiums.`
+      ];
+      context += closings[Math.floor(Math.random() * closings.length)];
+    } else {
+      // Good recent result but not enough history for consistency claims
+      const closings = [
+        `A strong result that shows what you're capable of. The question now is whether you can replicate it, build on it, make it the norm rather than the exception.`,
+        `You've shown you can compete at the sharp end. The work ahead is turning flashes of form into sustained performance.`,
+        `Results like this prove you belong in the mix. Keep pushing, keep learning, and these performances will become more frequent.`
+      ];
+      context += closings[Math.floor(Math.random() * closings.length)];
+    }
   } else if (recentResults && recentResults[0] >= 25) {
+    // Mid-season + poor recent result
     const closings = [
       `One result changes everything. One good race shifts momentum, restores confidence, reminds you why you started. You're one performance away from feeling completely different about this season.`,
       `These tough races are deposits in an experience bank you'll draw on for years. Every struggle teaches resilience, every hard day builds mental toughness. The value isn't always immediate.`,
       `The hardest part of a tough season is continuing to show up. No one would fault you for taking it easy, for protecting your ego. But you're still racing. That takes guts.`
     ];
     context += closings[Math.floor(Math.random() * closings.length)];
-  } else if (stagesCompleted <= 3) {
-    const closings = [
-      `The season is still taking shape, and so are you. Every race teaches something, every result adds data. You're building a foundation—not dramatic, not flashy, but solid.`,
-      `The flashes of potential are there—moments in races where everything clicks, where you see what's possible. Now it's about making those moments more frequent, more sustained.`,
-      `This is the phase where commitment gets tested. The racing is harder than you expected, the competition fiercer. But you're still showing up, still racing, still pushing. That matters.`
-    ];
-    context += closings[Math.floor(Math.random() * closings.length)];
-  } else if (stagesCompleted >= 8) {
-    const closings = [
-      `The final races carry extra weight—not just for points, but for how you'll remember this season. You're tired, everyone's tired, but this is when champions dig deepest.`,
-      `Leave nothing in the tank. The off-season is for rest; the final races are for emptying yourself completely. You'll have months to recover. You'll only have these moments once.`,
-      `You've built a solid season position, and now it's about protecting it. Every race matters, every point counts. Finish strong and cement your place in the final standings.`
-    ];
-    context += closings[Math.floor(Math.random() * closings.length)];
   } else {
+    // Mid-season default
     const closings = [
       `The season's middle chapters are where campaigns are defined. Not the explosive start, not the dramatic finish, but the sustained effort through the middle miles. You're in the grind now.`,
       `You're developing habits now—pre-race routines, pacing strategies, recovery protocols. These habits, formed in the season's middle, will define how you finish.`,

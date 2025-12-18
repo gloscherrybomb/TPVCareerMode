@@ -1,0 +1,71 @@
+name: Regenerate Narratives
+
+on:
+  workflow_dispatch:
+    inputs:
+      user:
+        description: 'User UID (leave empty for all users)'
+        required: false
+        type: string
+      dry_run:
+        description: 'Dry run (preview changes without applying)'
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  regenerate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install firebase-admin
+
+      - name: Regenerate narratives
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          echo "Starting narrative regeneration..."
+
+          CMD="node .github/scripts/regenerate-narratives.js"
+
+          if [ -n "${{ inputs.user }}" ]; then
+            CMD="$CMD --user ${{ inputs.user }}"
+          fi
+
+          if [ "${{ inputs.dry_run }}" == "true" ]; then
+            CMD="$CMD --dry-run"
+          fi
+
+          echo "Running: $CMD"
+          eval $CMD
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "### Narrative Regeneration Complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Options:**" >> $GITHUB_STEP_SUMMARY
+          if [ -n "${{ inputs.user }}" ]; then
+            echo "- User: \`${{ inputs.user }}\`" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "- User: All users" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "- Dry Run: ${{ inputs.dry_run }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**What this does:**" >> $GITHUB_STEP_SUMMARY
+          echo "1. Clears the user's narrative history (which stories they've seen)" >> $GITHUB_STEP_SUMMARY
+          echo "2. Regenerates the story for each completed event in order" >> $GITHUB_STEP_SUMMARY
+          echo "3. Rebuilds the narrative history as stories are generated" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "This is useful after updating narrative generation logic to give users fresh stories." >> $GITHUB_STEP_SUMMARY
