@@ -2766,13 +2766,14 @@ async function updateResultsSummary(season, event, results, userUid, unlockBonus
         position
       );
 
-      const earnedDomination = awardsCalc.checkDomination(position, times.winnerTime, times.secondPlaceTime);
-      const earnedCloseCall = awardsCalc.checkCloseCall(position, times.winnerTime, times.secondPlaceTime);
+      // Time-based awards should NOT be awarded for:
+      // - Event 3: Elimination race (times don't reflect racing - riders eliminated at intervals)
+      // - Event 4: Time challenge (everyone does the same target time)
+      const isTimeIrrelevant = event === 3 || event === 4;
 
-      // Photo Finish should not be awarded for time challenge events (where everyone does the same time)
-      // Event 4 is Coastal Loop Time Challenge (20 minutes)
-      const isTimeChallenge = event === 4;
-      const earnedPhotoFinish = isTimeChallenge ? false : awardsCalc.checkPhotoFinish(position, times.userTime, times.winnerTime);
+      const earnedDomination = isTimeIrrelevant ? false : awardsCalc.checkDomination(position, times.winnerTime, times.secondPlaceTime);
+      const earnedCloseCall = isTimeIrrelevant ? false : awardsCalc.checkCloseCall(position, times.winnerTime, times.secondPlaceTime);
+      const earnedPhotoFinish = isTimeIrrelevant ? false : awardsCalc.checkPhotoFinish(position, times.userTime, times.winnerTime);
 
       const earnedDarkHorse = awardsCalc.checkDarkHorse(position, predictedPosition);
 
