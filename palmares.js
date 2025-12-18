@@ -922,6 +922,11 @@ function displayPersonalityTimeline() {
         }
     });
 
+    // Sort data points by stage number (not event number) to show correct timeline order
+    // Events are completed in stage order, not event number order
+    // e.g., Stage 3 might be Event 9 (choice), Stage 4 is Event 3 (fixed)
+    dataPoints.sort((a, b) => a.stageNumber - b.stageNumber);
+
     // Store data points globally for interactivity
     chartDataPoints = dataPoints;
 
