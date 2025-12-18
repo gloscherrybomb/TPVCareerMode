@@ -1550,7 +1550,9 @@ async function processUserResult(uid, eventInfo, results) {
       rivalEncounters: rivalEncounters,
       // Personality data for story generation
       personality: userData.personality || null,
-      racesCompleted: (userData.completedStages || []).length
+      racesCompleted: (userData.completedStages || []).length,
+      // Interview completion for personality-driven story gating
+      interviewsCompleted: userData.interviewHistory?.totalInterviews || 0
     },
     uid,
     narrativeSelector,

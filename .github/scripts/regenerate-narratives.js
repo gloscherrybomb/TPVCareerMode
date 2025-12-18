@@ -203,7 +203,9 @@ function calculateSeasonDataAtEvent(userData, completedEvents, currentEventIndex
     topRivals: userData.topRivals || [],
     rivalEncounters: [],
     personality: userData.personality || null,
-    racesCompleted: currentEventIndex
+    racesCompleted: currentEventIndex,
+    // Interview completion for personality-driven story gating
+    interviewsCompleted: userData.interviewHistory?.totalInterviews || 0
   };
 }
 

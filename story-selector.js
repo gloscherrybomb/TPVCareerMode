@@ -9,10 +9,61 @@
  * - Handles Firebase storage of rider narrative history
  */
 
+// Emotional tone constants for narrative consistency
+const EMOTIONAL_TONES = {
+  TRIUMPHANT: 'triumphant',   // Wins, breakthroughs, dominant performances
+  POSITIVE: 'positive',       // Good results, progress, building momentum
+  NEUTRAL: 'neutral',         // Factual, descriptive, season context
+  REFLECTIVE: 'reflective',   // Learning moments, analytical
+  STRUGGLING: 'struggling',   // Setbacks, poor results, disappointment
+  RESILIENT: 'resilient'      // Bouncing back, determination despite difficulty
+};
+
+// Category to default emotional tone mapping
+const CATEGORY_TONES = {
+  breakthrough: EMOTIONAL_TONES.TRIUMPHANT,
+  setback: EMOTIONAL_TONES.STRUGGLING,
+  seasonOpening: EMOTIONAL_TONES.NEUTRAL,
+  earlyCareer: EMOTIONAL_TONES.POSITIVE,
+  midSeason: EMOTIONAL_TONES.NEUTRAL,
+  lateSeasonIntros: EMOTIONAL_TONES.NEUTRAL,
+  lifestyle: EMOTIONAL_TONES.NEUTRAL,
+  motivation: EMOTIONAL_TONES.POSITIVE,
+  equipment: EMOTIONAL_TONES.NEUTRAL,
+  weather: EMOTIONAL_TONES.NEUTRAL,
+  travel: EMOTIONAL_TONES.NEUTRAL,
+  localColor: EMOTIONAL_TONES.NEUTRAL,
+  rivalry: EMOTIONAL_TONES.POSITIVE,
+  personalityDriven: EMOTIONAL_TONES.POSITIVE,
+  contributorExclusive: EMOTIONAL_TONES.POSITIVE,
+  postRaceTransitions: EMOTIONAL_TONES.REFLECTIVE
+};
+
+// Tone transition penalties (from -> to = penalty score reduction)
+// Higher penalty = more jarring transition to avoid
+const TONE_TRANSITION_PENALTIES = {
+  [EMOTIONAL_TONES.STRUGGLING]: {
+    [EMOTIONAL_TONES.TRIUMPHANT]: 25,  // Struggling -> Triumphant is very jarring
+    [EMOTIONAL_TONES.POSITIVE]: 10,    // Struggling -> Positive is somewhat jarring
+    [EMOTIONAL_TONES.RESILIENT]: 0     // Struggling -> Resilient is natural progression
+  },
+  [EMOTIONAL_TONES.TRIUMPHANT]: {
+    [EMOTIONAL_TONES.STRUGGLING]: 20,  // Triumphant -> Struggling is jarring (unless bad result)
+    [EMOTIONAL_TONES.REFLECTIVE]: 5    // Triumphant -> Reflective is slightly jarring
+  },
+  [EMOTIONAL_TONES.NEUTRAL]: {},       // Neutral transitions smoothly to anything
+  [EMOTIONAL_TONES.POSITIVE]: {
+    [EMOTIONAL_TONES.STRUGGLING]: 15   // Positive -> Struggling needs context
+  },
+  [EMOTIONAL_TONES.REFLECTIVE]: {},    // Reflective transitions smoothly
+  [EMOTIONAL_TONES.RESILIENT]: {}      // Resilient transitions smoothly
+};
+
 class StorySelector {
   constructor() {
     this.narrativeDB = null;
     this.riderNarrativeHistory = {}; // Cache of what stories this rider has seen
+    this.riderEmotionalState = {};   // Track last emotional tone per rider
   }
 
   /**
@@ -262,8 +313,7 @@ class StorySelector {
 
     // Require win streak (minimum consecutive wins)
     if (triggers.requiresStreak) {
-      const streakLength = context.recentResults ?
-        context.recentResults.filter(p => p === 1).length : 0;
+      const streakLength = this.countConsecutiveWins(context.recentResults);
       if (streakLength < triggers.requiresStreak) {
         return false;
       }
@@ -294,6 +344,15 @@ class StorySelector {
       }
     }
 
+    // Check if interview completion required (for personality-driven stories)
+    // Personality-driven stories should only appear after user has done at least one interview
+    if (triggers.requiresInterview !== undefined) {
+      const interviewsCompleted = context.interviewsCompleted || 0;
+      if (triggers.requiresInterview && interviewsCompleted < 1) {
+        return false;
+      }
+    }
+
     return true;
   }
 
@@ -319,7 +378,7 @@ class StorySelector {
    */
   countConsecutivePodiums(recentResults) {
     if (!recentResults || !Array.isArray(recentResults)) return 0;
-    
+
     let count = 0;
     for (const result of recentResults) {
       if (result <= 3) {
@@ -332,12 +391,84 @@ class StorySelector {
   }
 
   /**
+   * Get the emotional tone of a story
+   * Uses story's explicit tone, or derives from category
+   */
+  getStoryEmotionalTone(story, category) {
+    // If story has explicit emotional tone, use it
+    if (story.emotionalTone) {
+      return story.emotionalTone;
+    }
+
+    // Derive from category default
+    return CATEGORY_TONES[category] || EMOTIONAL_TONES.NEUTRAL;
+  }
+
+  /**
+   * Get the last emotional tone for a rider
+   */
+  getRiderEmotionalState(riderId) {
+    return this.riderEmotionalState[riderId] || EMOTIONAL_TONES.NEUTRAL;
+  }
+
+  /**
+   * Set the emotional state for a rider after story selection
+   */
+  setRiderEmotionalState(riderId, tone) {
+    this.riderEmotionalState[riderId] = tone;
+    console.log(`Emotional state for rider ${riderId}: ${tone}`);
+  }
+
+  /**
+   * Calculate emotional transition penalty
+   * Returns a penalty score to subtract for jarring transitions
+   */
+  calculateTransitionPenalty(fromTone, toTone, context) {
+    // If this is event 1, no penalty (fresh start)
+    if (context.eventNumber === 1) return 0;
+
+    // Get base penalty from transition matrix
+    const fromPenalties = TONE_TRANSITION_PENALTIES[fromTone] || {};
+    let penalty = fromPenalties[toTone] || 0;
+
+    // Context-aware adjustments:
+    // If result matches the tone shift, reduce penalty
+    if (toTone === EMOTIONAL_TONES.STRUGGLING && context.performanceTier === 'back') {
+      // Bad result justifies struggling tone even after positive
+      penalty = Math.max(0, penalty - 10);
+    }
+    if (toTone === EMOTIONAL_TONES.TRIUMPHANT && context.performanceTier === 'win') {
+      // Win justifies triumphant tone even after struggling
+      penalty = Math.max(0, penalty - 15);
+    }
+    if (toTone === EMOTIONAL_TONES.RESILIENT && fromTone === EMOTIONAL_TONES.STRUGGLING) {
+      // Resilient after struggling is actually encouraged
+      penalty = -5; // Bonus instead of penalty
+    }
+
+    return penalty;
+  }
+
+  /**
    * Calculate relevance score for a story based on context match
    * Higher score = more relevant to current situation
+   * @param {object} story - The story to score
+   * @param {object} context - Current race/season context
+   * @param {number} categoryBonus - Bonus score for category priority
+   * @param {string} riderId - Optional rider ID for emotional state tracking
+   * @param {string} category - Optional category name for emotional tone derivation
    */
-  scoreStory(story, context, categoryBonus = 0) {
+  scoreStory(story, context, categoryBonus = 0, riderId = null, category = null) {
     let score = categoryBonus;
     const triggers = story.triggers;
+
+    // Apply emotional transition penalty if we have rider and category info
+    if (riderId && category) {
+      const lastTone = this.getRiderEmotionalState(riderId);
+      const storyTone = this.getStoryEmotionalTone(story, category);
+      const penalty = this.calculateTransitionPenalty(lastTone, storyTone, context);
+      score -= penalty;
+    }
 
     // Base weight contribution (0.3 - 1.0 range normalized to 0-10 points)
     score += (story.weight || 0.5) * 10;
@@ -484,8 +615,7 @@ class StorySelector {
 
     // Winning streak
     if (triggers.requiresStreak) {
-      const streakLength = context.recentResults ?
-        context.recentResults.filter(p => p === 1).length : 0;
+      const streakLength = this.countConsecutiveWins(context.recentResults);
       if (streakLength >= triggers.requiresStreak) {
         score += 15 + (streakLength - triggers.requiresStreak) * 5;
       }
@@ -526,10 +656,10 @@ class StorySelector {
       return null;
     }
 
-    // Score all candidates
+    // Score all candidates (with emotional transition awareness)
     const scoredCandidates = candidates.map(story => ({
       story,
-      score: this.scoreStory(story, context, categoryBonus)
+      score: this.scoreStory(story, context, categoryBonus, riderId, category)
     }));
 
     // Sort by score (highest first)
@@ -572,8 +702,8 @@ class StorySelector {
           continue;
         }
 
-        // Score and add to candidates
-        const score = this.scoreStory(story, context, bonus);
+        // Score and add to candidates (with emotional transition awareness)
+        const score = this.scoreStory(story, context, bonus, riderId, category);
         allCandidates.push({ story, category, score });
       }
     }
@@ -603,6 +733,8 @@ class StorySelector {
       if (opening) {
         introParagraph = opening.text.replace('{eventName}', context.eventName);
         await this.markStoryUsed(riderId, opening.id, context.eventNumber, db);
+        // Set initial emotional state
+        this.setRiderEmotionalState(riderId, EMOTIONAL_TONES.NEUTRAL);
       }
       return introParagraph;
     }
@@ -695,6 +827,10 @@ class StorySelector {
     introParagraph = this.applyVariableSubstitution(selected.story.text, context);
     await this.markStoryUsed(riderId, selected.story.id, context.eventNumber, db);
 
+    // Update emotional state for next story selection
+    const selectedTone = this.getStoryEmotionalTone(selected.story, selected.category);
+    this.setRiderEmotionalState(riderId, selectedTone);
+
     return introParagraph.trim();
   }
 
@@ -736,6 +872,11 @@ class StorySelector {
 
     // Mark as used and apply variable substitution
     await this.markStoryUsed(riderId, transition.id, context.eventNumber, db);
+
+    // Update emotional state for transition moments
+    const transitionTone = this.getStoryEmotionalTone(transition, 'postRaceTransitions');
+    this.setRiderEmotionalState(riderId, transitionTone);
+
     return this.applyVariableSubstitution(transition.text, context);
   }
 

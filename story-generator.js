@@ -273,7 +273,9 @@ async function generateIntroParagraph(raceData, seasonData, riderId, narrativeSe
         stagesCompleted: seasonData.stagesCompleted || 1,
         personality: seasonData.personality || null,
         topRivals: seasonData.topRivals || [],
-        seasonRank: seasonData.seasonPosition || null
+        seasonRank: seasonData.seasonPosition || null,
+        // Interview gating - personality stories require at least 1 interview
+        interviewsCompleted: seasonData.interviewsCompleted || 0
       };
       
       const introMoment = await narrativeSelector.generateIntroStory(
@@ -1534,7 +1536,8 @@ async function generateRaceStory(raceData, seasonData, riderId = null, narrative
         recentResults: seasonData.recentResults || [],
         stagesCompleted: seasonData.stagesCompleted || 1,
         isOnStreak: seasonData.isOnStreak || false,
-        personality: seasonData.personality || null
+        personality: seasonData.personality || null,
+        interviewsCompleted: seasonData.interviewsCompleted || 0
       };
       transitionMoment = await narrativeSelector.selectTransitionMoment(riderId, narrativeContext, db);
     } catch (error) {
