@@ -56,8 +56,11 @@ const EVENT_NAMES = {
 
 /**
  * Clear narrative history for a user from both collections
+ * @param {string} uid - The user's UID (used for riders collection)
+ * @param {string} userDocId - The document ID in users collection
+ * @param {object} userRef - Reference to the user document
  */
-async function clearNarrativeHistory(uid) {
+async function clearNarrativeHistory(uid, userDocId, userRef) {
   let totalCleared = 0;
 
   // 1. Clear from riders/{uid}/narrative_history subcollection
@@ -77,8 +80,8 @@ async function clearNarrativeHistory(uid) {
     totalCleared += ridersSnapshot.size;
   }
 
-  // 2. Clear from users/{uid}/narrative_history subcollection (if exists)
-  const usersHistoryRef = db.collection('users').doc(uid).collection('narrative_history');
+  // 2. Clear from users/{docId}/narrative_history subcollection (if exists)
+  const usersHistoryRef = db.collection('users').doc(userDocId).collection('narrative_history');
   const usersSnapshot = await usersHistoryRef.get();
 
   if (!usersSnapshot.empty) {
@@ -90,19 +93,19 @@ async function clearNarrativeHistory(uid) {
     if (!dryRun) {
       await batch.commit();
     }
-    console.log(`   ${dryRun ? '[DRY RUN] Would clear' : 'Cleared'} ${usersSnapshot.size} entries from users/${uid}/narrative_history`);
+    console.log(`   ${dryRun ? '[DRY RUN] Would clear' : 'Cleared'} ${usersSnapshot.size} entries from users/${userDocId}/narrative_history`);
     totalCleared += usersSnapshot.size;
   }
 
   // 3. Clear narrativeHistory field on users document (if exists)
-  const userDoc = await db.collection('users').doc(uid).get();
+  const userDoc = await userRef.get();
   if (userDoc.exists && userDoc.data().narrativeHistory) {
     if (!dryRun) {
-      await db.collection('users').doc(uid).update({
+      await userRef.update({
         narrativeHistory: admin.firestore.FieldValue.delete()
       });
     }
-    console.log(`   ${dryRun ? '[DRY RUN] Would clear' : 'Cleared'} narrativeHistory field from users/${uid}`);
+    console.log(`   ${dryRun ? '[DRY RUN] Would clear' : 'Cleared'} narrativeHistory field from users/${userDocId}`);
     totalCleared++;
   }
 
@@ -206,8 +209,13 @@ function calculateSeasonDataAtEvent(userData, completedEvents, currentEventIndex
 
 /**
  * Regenerate narrative for a single event
+ * @param {string} uid - The user's UID (used for narrative selector)
+ * @param {object} userRef - Reference to the user document for updates
+ * @param {object} userData - The user's data
+ * @param {array} completedEvents - Array of completed events
+ * @param {number} eventIndex - Index of current event
  */
-async function regenerateEventNarrative(uid, userData, completedEvents, eventIndex) {
+async function regenerateEventNarrative(uid, userRef, userData, completedEvents, eventIndex) {
   const event = completedEvents[eventIndex];
   const eventNumber = event.eventNumber;
   const results = event.results;
@@ -248,10 +256,10 @@ async function regenerateEventNarrative(uid, userData, completedEvents, eventInd
   );
 
   if (storyResult && storyResult.recap) {
-    // Update the event results with new story in 'users' collection
+    // Update the event results with new story using the user reference
     if (!dryRun) {
       const updateKey = `event${eventNumber}Results.story`;
-      await db.collection('users').doc(uid).update({
+      await userRef.update({
         [updateKey]: storyResult.recap
       });
     }
@@ -272,10 +280,24 @@ async function regenerateUserNarratives(uid) {
   console.log(`\nProcessing user: ${uid}`);
 
   // Get user data from 'users' collection (where event results are stored)
-  const userDoc = await db.collection('users').doc(uid).get();
+  // Try document ID first, then query by uid field
+  let userRef = db.collection('users').doc(uid);
+  let userDoc = await userRef.get();
+  let docId = uid;
+
   if (!userDoc.exists) {
-    console.log(`   User not found in 'users' collection`);
-    return { success: false, reason: 'not_found' };
+    console.log(`   Document ID ${uid} not found, searching by uid field...`);
+    const querySnapshot = await db.collection('users').where('uid', '==', uid).limit(1).get();
+
+    if (querySnapshot.empty) {
+      console.log(`   User not found (tried both document ID and uid field)`);
+      return { success: false, reason: 'not_found' };
+    }
+
+    userDoc = querySnapshot.docs[0];
+    userRef = userDoc.ref;
+    docId = userDoc.id;
+    console.log(`   Found user by uid field, document ID: ${docId}`);
   }
 
   const userData = userDoc.data();
@@ -291,13 +313,16 @@ async function regenerateUserNarratives(uid) {
 
   console.log(`   Found ${completedEvents.length} completed events`);
 
+  // Get the actual UID from user data (in case we found by document ID)
+  const actualUid = userData.uid || uid;
+
   // Clear narrative history first
-  await clearNarrativeHistory(uid);
+  await clearNarrativeHistory(actualUid, docId, userRef);
 
   // Regenerate story for each event in order
   let eventsProcessed = 0;
   for (let i = 0; i < completedEvents.length; i++) {
-    const success = await regenerateEventNarrative(uid, userData, completedEvents, i);
+    const success = await regenerateEventNarrative(actualUid, userRef, userData, completedEvents, i);
     if (success) eventsProcessed++;
   }
 
