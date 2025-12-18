@@ -1,5 +1,75 @@
 const admin = require("firebase-admin");
 const fs = require("fs");
+const path = require("path");
+
+/**
+ * Extract timestamp from CSV filename
+ * Pattern: _YYYYMMDD_HHMMSS.csv
+ * Returns timestamp in milliseconds, or 0 if not found
+ */
+function extractTimestampFromFilename(filePath) {
+  const match = filePath.match(/_(\d{8})_(\d{6})\.csv$/);
+  if (!match) {
+    return 0;
+  }
+
+  const dateStr = match[1]; // YYYYMMDD
+  const timeStr = match[2]; // HHMMSS
+
+  const year = dateStr.substring(0, 4);
+  const month = dateStr.substring(4, 6);
+  const day = dateStr.substring(6, 8);
+  const hour = timeStr.substring(0, 2);
+  const minute = timeStr.substring(2, 4);
+  const second = timeStr.substring(4, 6);
+
+  const isoString = `${year}-${month}-${day}T${hour}:${minute}:${second}Z`;
+  return new Date(isoString).getTime();
+}
+
+/**
+ * Find CSV file for a given season/event and return its timestamp
+ * Looks in race_results/season_X/event_Y/ directory
+ */
+function getEventCsvTimestamp(season, eventNumber) {
+  const eventDir = path.join('race_results', `season_${season}`, `event_${eventNumber}`);
+
+  if (!fs.existsSync(eventDir)) {
+    return 0;
+  }
+
+  // Find CSV files in the directory
+  const files = fs.readdirSync(eventDir).filter(f => f.endsWith('.csv'));
+
+  if (files.length === 0) {
+    return 0;
+  }
+
+  // Get the most recent CSV file by timestamp in filename
+  let latestTimestamp = 0;
+  for (const file of files) {
+    const timestamp = extractTimestampFromFilename(file);
+    if (timestamp > latestTimestamp) {
+      latestTimestamp = timestamp;
+    }
+  }
+
+  // If no timestamp in filename, use file modification time
+  if (latestTimestamp === 0) {
+    for (const file of files) {
+      try {
+        const stats = fs.statSync(path.join(eventDir, file));
+        if (stats.mtime.getTime() > latestTimestamp) {
+          latestTimestamp = stats.mtime.getTime();
+        }
+      } catch (e) {
+        // Ignore errors
+      }
+    }
+  }
+
+  return latestTimestamp;
+}
 
 // Initialize Firebase Admin using FIREBASE_SERVICE_ACCOUNT
 if (!admin.apps.length) {
@@ -145,8 +215,33 @@ async function batchFixUnlockBonus() {
     const userData = userDoc.data();
     processedUsers++;
 
+    // Collect all events with their CSV timestamps for chronological sorting
+    const eventsToProcess = [];
     for (const [eventNumStr, eventData] of Object.entries(userUnlocks.events)) {
       const eventNumber = parseInt(eventNumStr);
+      const csvTimestamp = getEventCsvTimestamp(1, eventNumber); // Season 1
+
+      eventsToProcess.push({
+        eventNumber,
+        eventData,
+        csvTimestamp
+      });
+    }
+
+    // Sort by CSV timestamp (chronological order - oldest first)
+    eventsToProcess.sort((a, b) => a.csvTimestamp - b.csvTimestamp);
+
+    console.log(`   Processing ${eventsToProcess.length} events in chronological order:`);
+    eventsToProcess.forEach((evt, idx) => {
+      const date = evt.csvTimestamp ? new Date(evt.csvTimestamp).toISOString() : 'no timestamp';
+      console.log(`     ${idx + 1}. Event ${evt.eventNumber} (${date})`);
+    });
+
+    // Track cooldowns as we process events in order
+    let activeCooldowns = {};
+    let skippedDueToCooldown = 0;
+
+    for (const { eventNumber, eventData, csvTimestamp } of eventsToProcess) {
       const eventResults = userData[`event${eventNumber}Results`];
 
       if (!eventResults) {
@@ -159,14 +254,30 @@ async function batchFixUnlockBonus() {
       if (eventResults.unlockBonusPoints && eventResults.unlockBonusPoints > 0) {
         console.log(`   ⚠️ Event ${eventNumber}: Already has unlock bonus (${eventResults.unlockBonusPoints} pts), skipping`);
         skippedEvents++;
+
+        // Still track these unlocks for cooldown (they were applied previously)
+        if (eventResults.unlockBonusesApplied) {
+          activeCooldowns = {}; // Clear previous cooldowns
+          for (const unlock of eventResults.unlockBonusesApplied) {
+            activeCooldowns[unlock.id] = true;
+          }
+        }
         continue;
       }
 
-      // Calculate total unlock bonus from all unlocks in history
+      // Calculate total unlock bonus, respecting cooldowns
       let totalUnlockBonus = 0;
       const unlockBonusesApplied = [];
+      const skippedUnlocks = [];
 
       for (const unlock of eventData.unlocks) {
+        // Check if this unlock is on cooldown
+        if (activeCooldowns[unlock.id]) {
+          skippedUnlocks.push(unlock.id);
+          skippedDueToCooldown++;
+          continue;
+        }
+
         const config = UNLOCK_CONFIG[unlock.id];
         if (!config) {
           console.log(`   ⚠️ Event ${eventNumber}: Unknown unlock ID ${unlock.id}, using stored points`);
@@ -192,11 +303,29 @@ async function batchFixUnlockBonus() {
         }
       }
 
+      // Log skipped unlocks due to cooldown
+      if (skippedUnlocks.length > 0) {
+        console.log(`   ⏸️ Event ${eventNumber}: Skipped ${skippedUnlocks.join(', ')} (on cooldown)`);
+      }
+
+      // Update cooldowns for next event - only the unlocks we just applied
+      activeCooldowns = {};
+      for (const unlock of unlockBonusesApplied) {
+        activeCooldowns[unlock.id] = true;
+      }
+
+      // Skip if no unlocks to apply (all were on cooldown)
+      if (unlockBonusesApplied.length === 0) {
+        console.log(`   ⚠️ Event ${eventNumber}: No unlocks to apply (all on cooldown)`);
+        skippedEvents++;
+        continue;
+      }
+
       const newPoints = eventResults.points + totalUnlockBonus;
       const newBonusPoints = (eventResults.bonusPoints || 0) + totalUnlockBonus;
 
       const unlockNames = unlockBonusesApplied.map(u => u.id).join(", ");
-      console.log(`   Event ${eventNumber}: +${totalUnlockBonus} pts (${unlockNames})`);
+      console.log(`   ✅ Event ${eventNumber}: +${totalUnlockBonus} pts (${unlockNames})`);
 
       if (!dryRun) {
         // Calculate new total points from all events
@@ -258,6 +387,65 @@ async function batchFixUnlockBonus() {
       }
 
       processedEvents++;
+    }
+
+    if (skippedDueToCooldown > 0) {
+      console.log(`   📊 Skipped ${skippedDueToCooldown} unlock(s) due to cooldown violations`);
+    }
+
+    // After processing all events for this user, update cooldowns based on most recent event
+    // Use CSV timestamps for accurate chronological ordering
+    // IMPORTANT: Look at ALL completed events, not just those with unlocks
+    // If the most recent event had no unlocks applied (e.g., all were on cooldown), cooldowns should be clear
+    if (!dryRun) {
+      // Re-fetch latest user data
+      const latestUserDoc = await userRef.get();
+      const latestUserData = latestUserDoc.data();
+
+      // Find ALL completed events and their CSV timestamps
+      const allCompletedEvents = [];
+      for (let i = 1; i <= 15; i++) {
+        const evtResults = latestUserData[`event${i}Results`];
+        if (evtResults) {
+          // Use CSV timestamp for chronological ordering
+          const csvTimestamp = getEventCsvTimestamp(1, i);
+          const unlockIds = (evtResults.unlockBonusesApplied || []).map(u => u.id);
+          allCompletedEvents.push({
+            eventNumber: i,
+            timestamp: csvTimestamp,
+            unlockIds: unlockIds
+          });
+        }
+      }
+
+      if (allCompletedEvents.length > 0) {
+        // Sort by CSV timestamp descending to find most recent
+        allCompletedEvents.sort((a, b) => b.timestamp - a.timestamp);
+        const mostRecentEvent = allCompletedEvents[0];
+
+        // Set cooldowns for unlocks applied to the most recent event
+        // If no unlocks were applied (all on cooldown), this will be empty - unlocks are now available
+        const newCooldowns = {};
+        for (const unlockId of mostRecentEvent.unlockIds) {
+          newCooldowns[unlockId] = true;
+        }
+
+        // Update user's cooldowns
+        await userRef.update({
+          'unlocks.cooldowns': newCooldowns
+        });
+
+        const cooldownUnlocks = mostRecentEvent.unlockIds.length > 0
+          ? mostRecentEvent.unlockIds.join(', ')
+          : 'none (unlocks available)';
+        console.log(`   🔄 Set cooldowns from most recent event ${mostRecentEvent.eventNumber}: ${cooldownUnlocks}`);
+      } else {
+        // No completed events - clear cooldowns
+        await userRef.update({
+          'unlocks.cooldowns': {}
+        });
+        console.log(`   🔄 No completed events found, cleared cooldowns`);
+      }
     }
   }
 
