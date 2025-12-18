@@ -168,7 +168,7 @@ const NARRATIVE_DATABASE = {
     },
     {
       id: "early_mechanical_lesson",
-      text: "A dropped chain two races ago taught you a valuable lesson: check everything, twice. Now your pre-race ritual includes running through gears multiple times, checking brake pad clearance, testing quick releases. It feels obsessive, but one mechanical DNF was enough to make you paranoid about equipment failure.",
+      text: "You've heard enough stories about dropped chains and mechanical failures to develop a healthy paranoia. Now your pre-race ritual includes running through gears multiple times, checking brake pad clearance, testing quick releases. It might seem obsessive, but a mechanical issue at the wrong moment can ruin months of preparation.",
       triggers: { raceNumber: [3, 4, 5], performanceTier: ["any"], minRacesCompleted: 3 },
       weight: 0.5
     },
