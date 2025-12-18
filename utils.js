@@ -99,6 +99,7 @@ export function getARRBand(arr) {
 
 /**
  * Format a date object or timestamp to local date string
+ * Uses the user's browser locale for formatting (e.g., DD/MM/YYYY for UK, MM/DD/YYYY for US)
  * @param {Date|Object} date - Date object or Firestore timestamp
  * @returns {string} Formatted date string
  */
@@ -106,17 +107,27 @@ export function formatDate(date) {
   if (!date) return 'Unknown date';
 
   try {
+    let jsDate;
+
     // Check if it's a Firestore Timestamp object with seconds property
     if (date.seconds) {
-      const jsDate = new Date(date.seconds * 1000);
-      return jsDate.toLocaleDateString();
+      jsDate = new Date(date.seconds * 1000);
     } else if (date.toDate) {
       // If it has a toDate method (Firestore Timestamp)
-      return date.toDate().toLocaleDateString();
+      jsDate = date.toDate();
     } else {
       // Try to parse as regular date
-      return new Date(date).toLocaleDateString();
+      jsDate = new Date(date);
     }
+
+    // Use user's locale (undefined = browser default) with short date format
+    // This respects the user's system locale settings
+    // UK: 18/12/2025, US: 12/18/2025, etc.
+    return jsDate.toLocaleDateString(undefined, {
+      year: 'numeric',
+      month: 'numeric',
+      day: 'numeric'
+    });
   } catch (e) {
     console.error('Error formatting date:', e);
     return 'Unknown date';
