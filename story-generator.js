@@ -53,43 +53,19 @@ const EVENT_TYPES = {
   15: "stage race"
 };
 
-// Connector phrases that bridge race story to forward section
-// These create natural transitions with human moments
-const RACE_TO_FORWARD_CONNECTORS = {
-  win: [
-    "Back at the hotel that evening,",
-    "Driving home after the podium ceremony,",
-    "Later that night, still buzzing from the win,"
-  ],
-  podium: [
-    "On the drive back,",
-    "That evening, reviewing race photos,",
-    "Over dinner that night,"
-  ],
-  top10: [
-    "Reflecting on the drive home,",
-    "That evening, legs still heavy,",
-    "Processing the result later,"
-  ],
-  midpack: [
-    "On the quiet drive home,",
-    "Later, foam rolling sore legs,",
-    "That night, replaying key moments,"
-  ],
-  back: [
-    "In the silence of the drive home,",
-    "That evening, despite the disappointment,",
-    "Processing the tough day later,"
-  ]
-};
-
 /**
- * Select a connector phrase based on performance tier
+ * Get a default transition phrase when narrative database selection fails
+ * These are generic fallbacks - the real variety comes from the database
  */
-function selectConnector(tier, eventNumber) {
-  const connectors = RACE_TO_FORWARD_CONNECTORS[tier] || RACE_TO_FORWARD_CONNECTORS.midpack;
-  const index = eventNumber % connectors.length;
-  return connectors[index];
+function getDefaultTransition(tier) {
+  const defaults = {
+    win: "The victory was still sinking in as you headed home, already thinking about what comes next.",
+    podium: "The podium finish left you buzzing as the evening wound down.",
+    top10: "A solid result to process on the drive home.",
+    midpack: "The race replayed itself in your mind on the way home.",
+    back: "A tough day, but tomorrow's another opportunity."
+  };
+  return defaults[tier] || defaults.midpack;
 }
 
 /**
@@ -1517,10 +1493,7 @@ async function generateRaceStory(raceData, seasonData, riderId = null, narrative
   // PART 2: FORWARD LOOK (~60-80 words)
   // ========================================
 
-  // Select connector based on performance tier
-  const connector = selectConnector(tier, raceData.eventNumber);
-
-  // Select transition moment from narrative database
+  // Select transition moment from narrative database (now includes its own opener)
   let transitionMoment = '';
   if (riderId && narrativeSelector && narrativeSelector.selectTransitionMoment) {
     try {
@@ -1548,11 +1521,8 @@ async function generateRaceStory(raceData, seasonData, riderId = null, narrative
   // Generate condensed forward look
   const forwardLook = generateForwardLook(seasonData, raceData);
 
-  // Build Part 2: Connector + transition + forward look
-  let forwardSection = connector;
-  if (transitionMoment) {
-    forwardSection += ' ' + transitionMoment;
-  }
+  // Build Part 2: Transition moment + forward look (no separate connector)
+  let forwardSection = transitionMoment || getDefaultTransition(tier);
   forwardSection += ' ' + forwardLook;
 
   // ========================================

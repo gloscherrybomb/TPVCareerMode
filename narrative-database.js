@@ -2306,199 +2306,344 @@ const NARRATIVE_DATABASE = {
   ],
 
   // ===== POST-RACE TRANSITIONS =====
-  // Short transition moments (1-2 sentences) that bridge race completion to forward outlook
-  // These add human moments and connective tissue between race story and season context
+  // Lifestyle-rich transition moments that bridge race completion to forward outlook
+  // Each transition includes its own opener (no separate connector needed)
+  // These add fun, relatable human moments to the narrative
   postRaceTransitions: [
-    // RECOVERY-THEMED
+    // ===== FIRST RACE SPECIAL (stagesCompleted: 1) =====
     {
-      id: "trans_coffee_debrief",
-      text: "you sat at the local cafe, still in race kit, coffee cooling as you processed what just happened.",
-      triggers: { performanceTier: ["any"], stagesCompleted: [2, 3, 4, 5, 6] },
+      id: "trans_first_race_glow",
+      text: "Back home, the reality of completing your first race was still sinking in. You did it. You actually did it.",
+      triggers: { stagesCompleted: [1] },
+      weight: 0.9
+    },
+    {
+      id: "trans_first_race_number",
+      text: "You hung up your race number on the wall, not quite ready to throw it away. First race memorabilia.",
+      triggers: { stagesCompleted: [1] },
+      weight: 0.8
+    },
+    {
+      id: "trans_first_race_photos",
+      text: "You scrolled through the race photos, hardly recognizing yourself in the bunch. That was you. Actually racing.",
+      triggers: { stagesCompleted: [1] },
+      weight: 0.8
+    },
+    {
+      id: "trans_first_race_stories",
+      text: "That evening you told the race story to anyone who'd listen. The details got slightly more dramatic with each retelling.",
+      triggers: { stagesCompleted: [1] },
+      weight: 0.7
+    },
+    {
+      id: "trans_first_race_addiction",
+      text: "Lying in bed that night, you already wanted to race again. The bug had bitten, and it bit hard.",
+      triggers: { stagesCompleted: [1] },
+      weight: 0.8
+    },
+
+    // ===== TRAVEL/VACATION DREAMS =====
+    {
+      id: "trans_mallorca_booking",
+      text: "That evening you found yourself browsing flights to Mallorca. A week of recovery rides in the sun sounded perfect—bike definitely coming with you.",
+      triggers: { performanceTier: ["any"] },
+      weight: 0.7
+    },
+    {
+      id: "trans_alps_daydream",
+      text: "Scrolling through Instagram later, you paused on photos of the Alps. Maybe next year. First, the rest of this season.",
+      triggers: { performanceTier: ["any"] },
       weight: 0.6
     },
     {
-      id: "trans_foam_roller",
-      text: "you worked through a recovery routine, foam roller finding every knot from the day's effort.",
-      triggers: { performanceTier: ["any"], stagesCompleted: [3, 4, 5, 6, 7] },
+      id: "trans_girona_fantasy",
+      text: "You caught yourself pricing up Girona apartments again. The professional cyclist's pilgrimage. One day.",
+      triggers: { performanceTier: ["any"] },
+      weight: 0.6
+    },
+    {
+      id: "trans_california_dreaming",
+      text: "You found yourself daydreaming about California riding—Pacific Coast Highway, year-round sun, endless climbing. The bike would definitely ship.",
+      triggers: { performanceTier: ["any"] },
+      weight: 0.6
+    },
+    {
+      id: "trans_colorado_altitude",
+      text: "Someone mentioned Colorado training camps and now you couldn't stop thinking about altitude and mountain passes.",
+      triggers: { performanceTier: ["any"] },
+      weight: 0.6
+    },
+    {
+      id: "trans_tenerife_camp",
+      text: "You'd been pricing up Tenerife training camps again. Mount Teide calling, wallet not quite ready.",
+      triggers: { performanceTier: ["any"] },
+      weight: 0.6
+    },
+    {
+      id: "trans_nice_escape",
+      text: "That evening you were researching Nice. The Cote d'Azur, the cols, the coffee stops. Racing can wait while you dream.",
+      triggers: { performanceTier: ["any"] },
       weight: 0.5
     },
     {
-      id: "trans_ice_bath",
-      text: "you sat in an ice bath, the cold sharp enough to distract from analyzing every tactical decision.",
-      triggers: { performanceTier: ["midpack", "back"], stagesCompleted: [4, 5, 6, 7] },
+      id: "trans_japan_cycling",
+      text: "A cycling documentary about Japan appeared in your feed. Now you couldn't stop thinking about riding through the countryside there.",
+      triggers: { performanceTier: ["any"] },
       weight: 0.5
     },
     {
-      id: "trans_stretching_routine",
-      text: "you stretched out tight muscles, mentally replaying the key moments while your body recovered.",
-      triggers: { performanceTier: ["any"], stagesCompleted: [3, 4, 5, 6, 7, 8] },
+      id: "trans_roadtrip_planning",
+      text: "You pulled up Google Maps and started planning a cycling road trip. Probably won't happen this year, but the planning was half the fun.",
+      triggers: { performanceTier: ["any"] },
       weight: 0.5
     },
     {
-      id: "trans_recovery_shake",
-      text: "you mixed a recovery shake, the post-race ritual giving structure to the mental processing.",
-      triggers: { performanceTier: ["any"], stagesCompleted: [2, 3, 4, 5] },
-      weight: 0.4
-    },
-    {
-      id: "trans_legs_elevated",
-      text: "you lay with legs elevated against the wall, staring at the ceiling and letting the race replay itself.",
-      triggers: { performanceTier: ["podium", "top10"], stagesCompleted: [4, 5, 6, 7, 8] },
+      id: "trans_tuscany_calling",
+      text: "The Strade Bianche photos on your feed had you researching Tuscany. Gravel roads, rolling hills, excellent pasta. Tempting.",
+      triggers: { performanceTier: ["any"] },
       weight: 0.5
     },
 
-    // LIFESTYLE-THEMED
+    // ===== RECOVERY INDULGENCES =====
     {
-      id: "trans_family_dinner",
-      text: "you found yourself at dinner, explaining the race to people who understood the effort if not the tactics.",
-      triggers: { performanceTier: ["any"], stagesCompleted: [5, 6, 7, 8] },
+      id: "trans_extra_espresso",
+      text: "You treated yourself to a third espresso. The nutritionist would disapprove, but some days require extra caffeine.",
+      triggers: { performanceTier: ["any"] },
+      weight: 0.7
+    },
+    {
+      id: "trans_pizza_reward",
+      text: "Pizza for dinner felt earned. The diet starts again tomorrow, but tonight was about recovery in all its forms.",
+      triggers: { performanceTier: ["any"] },
+      weight: 0.7
+    },
+    {
+      id: "trans_beer_garden",
+      text: "You ended up at the local beer garden with cycling friends, race stories getting slightly more impressive with each round.",
+      triggers: { performanceTier: ["top10", "podium", "win"] },
+      weight: 0.7
+    },
+    {
+      id: "trans_burger_treat",
+      text: "Post-race burger was absolutely necessary. You'd burned enough calories to justify at least two, actually.",
+      triggers: { performanceTier: ["any"] },
       weight: 0.6
     },
     {
-      id: "trans_partner_support",
-      text: "your partner listened patiently to the race replay, asking questions that showed they cared even without fully understanding.",
-      triggers: { performanceTier: ["podium", "win"], stagesCompleted: [4, 5, 6, 7, 8] },
-      weight: 0.5
-    },
-    {
-      id: "trans_quiet_evening",
-      text: "you ended up on the couch, legs elevated, watching pro race highlights and finding new inspiration.",
-      triggers: { performanceTier: ["any"], stagesCompleted: [3, 4, 5, 6] },
-      weight: 0.5
-    },
-    {
-      id: "trans_group_chat",
-      text: "the cycling group chat was buzzing with race analysis, everyone weighing in on what went right and wrong.",
-      triggers: { performanceTier: ["top10", "podium", "win"], stagesCompleted: [3, 4, 5, 6, 7] },
-      weight: 0.5
-    },
-    {
-      id: "trans_planning_next",
-      text: "you found yourself already researching the next event, turning today's lessons into tomorrow's strategy.",
-      triggers: { performanceTier: ["any"], stagesCompleted: [2, 3, 4, 5, 6] },
+      id: "trans_ice_cream_recovery",
+      text: "Ice cream for dinner? It's basically a recovery shake. You'd earned this.",
+      triggers: { performanceTier: ["any"] },
       weight: 0.6
     },
     {
-      id: "trans_bike_cleaning",
-      text: "you cleaned the bike meticulously, the ritual helping process the day's racing while preparing for the next.",
-      triggers: { performanceTier: ["any"], stagesCompleted: [3, 4, 5, 6, 7] },
-      weight: 0.4
-    },
-
-    // TRAVEL-THEMED
-    {
-      id: "trans_long_drive",
-      text: "the drive home felt longer than usual, giving time to replay every tactical decision.",
-      triggers: { performanceTier: ["any"], stagesCompleted: [4, 5, 6, 7, 8] },
+      id: "trans_couch_recovery",
+      text: "You collapsed on the couch with snacks and cycling content. Peak recovery protocol.",
+      triggers: { performanceTier: ["any"] },
       weight: 0.6
     },
     {
-      id: "trans_traffic_reflection",
-      text: "stuck in post-race traffic, you had nothing to do but mentally replay the key moments.",
-      triggers: { performanceTier: ["any"], stagesCompleted: [3, 4, 5, 6, 7] },
+      id: "trans_coffee_shop",
+      text: "The local coffee shop heard the full race recap, whether they wanted to or not. Good coffee makes everything better.",
+      triggers: { performanceTier: ["any"] },
       weight: 0.5
     },
     {
-      id: "trans_carpool_debrief",
-      text: "the carpool home became an impromptu race debrief, everyone sharing their perspective on what happened.",
-      triggers: { performanceTier: ["top10", "podium"], stagesCompleted: [4, 5, 6, 7] },
-      weight: 0.5
-    },
-    {
-      id: "trans_quiet_drive",
-      text: "the drive home was quiet, music low, mind still processing what happened out there.",
-      triggers: { performanceTier: ["midpack", "back"], stagesCompleted: [3, 4, 5, 6, 7] },
+      id: "trans_takeaway_ordered",
+      text: "You ordered takeaway without a shred of guilt. Cooking was not happening tonight.",
+      triggers: { performanceTier: ["any"] },
       weight: 0.5
     },
 
-    // RESULT-SPECIFIC
+    // ===== SHOPPING/GEAR LUST =====
+    {
+      id: "trans_kit_browsing",
+      text: "That evening you found yourself adding new kit to online shopping carts. Retail therapy for the competitive soul.",
+      triggers: { performanceTier: ["any"] },
+      weight: 0.7
+    },
+    {
+      id: "trans_new_wheels",
+      text: "The post-race dopamine had you browsing wheel upgrades again. As if new carbon would've changed today's result.",
+      triggers: { performanceTier: ["any"] },
+      weight: 0.6
+    },
+    {
+      id: "trans_n_plus_one",
+      text: "You found yourself on bike websites again. N+1 is a lifestyle, not a problem.",
+      triggers: { performanceTier: ["any"] },
+      weight: 0.6
+    },
+    {
+      id: "trans_aero_helmet",
+      text: "You'd been eyeing that aero helmet for weeks. Today's race didn't help your resolve to save money.",
+      triggers: { performanceTier: ["top10", "podium"] },
+      weight: 0.6
+    },
+    {
+      id: "trans_power_meter",
+      text: "The post-race analysis had you looking at power meter upgrades. More data, better racing. Probably.",
+      triggers: { performanceTier: ["any"] },
+      weight: 0.5
+    },
+    {
+      id: "trans_new_shoes",
+      text: "New cycling shoes were calling. Your current ones were fine, but 'fine' isn't 'race-winning aero optimized.'",
+      triggers: { performanceTier: ["any"] },
+      weight: 0.5
+    },
+    {
+      id: "trans_saddle_search",
+      text: "That evening disappeared into a saddle comparison rabbit hole. The perfect saddle is out there. Probably.",
+      triggers: { performanceTier: ["midpack", "back"] },
+      weight: 0.5
+    },
+
+    // ===== SOCIAL/COMMUNITY =====
+    {
+      id: "trans_club_whatsapp",
+      text: "The club WhatsApp was buzzing with race analysis. Everyone had opinions on what went right and wrong.",
+      triggers: { performanceTier: ["any"] },
+      weight: 0.7
+    },
+    {
+      id: "trans_strava_kudos",
+      text: "You checked Strava more times than you'd admit, watching the kudos accumulate and reading comments from the cycling community.",
+      triggers: { performanceTier: ["any"] },
+      weight: 0.6
+    },
+    {
+      id: "trans_instagram_post",
+      text: "Crafting the race day Instagram post took longer than expected. Casual, but not too casual. Humble, but not too humble.",
+      triggers: { performanceTier: ["any"] },
+      weight: 0.6
+    },
+    {
+      id: "trans_segment_compare",
+      text: "You spent far too long comparing your Strava segments to other riders from the race. For research purposes.",
+      triggers: { performanceTier: ["any"] },
+      weight: 0.5
+    },
+    {
+      id: "trans_race_photos_wait",
+      text: "You kept refreshing the race photographer's page. Those race photos better be flattering.",
+      triggers: { performanceTier: ["any"] },
+      weight: 0.5
+    },
+    {
+      id: "trans_forum_lurking",
+      text: "That evening found you deep in cycling forums, reading race reports and comparing notes.",
+      triggers: { performanceTier: ["any"] },
+      weight: 0.5
+    },
+    {
+      id: "trans_club_ride_chat",
+      text: "The group ride crew wanted the full story. By the third telling, the gaps were slightly smaller and your positioning slightly better.",
+      triggers: { performanceTier: ["any"] },
+      weight: 0.5
+    },
+
+    // ===== YOUTUBE/CONTENT =====
+    {
+      id: "trans_gcn_rabbit_hole",
+      text: "Three hours disappeared into a GCN YouTube rabbit hole. 'How to corner faster' seemed relevant after today.",
+      triggers: { performanceTier: ["any"] },
+      weight: 0.7
+    },
+    {
+      id: "trans_pro_race_highlights",
+      text: "The evening disappeared into pro race highlights—absorbing tactics, dreaming about what's possible.",
+      triggers: { performanceTier: ["any"] },
+      weight: 0.6
+    },
+    {
+      id: "trans_bike_build_videos",
+      text: "That evening devolved into watching bike build videos on YouTube. The algorithm knows you too well.",
+      triggers: { performanceTier: ["any"] },
+      weight: 0.6
+    },
+    {
+      id: "trans_training_tips",
+      text: "You fell into a training tips rabbit hole online. Marginal gains add up. Or so the videos promised.",
+      triggers: { performanceTier: ["any"] },
+      weight: 0.5
+    },
+    {
+      id: "trans_race_tactics_video",
+      text: "A video on race tactics appeared in your feed. You took mental notes, already planning for next time.",
+      triggers: { performanceTier: ["midpack", "back"] },
+      weight: 0.5
+    },
+
+    // ===== WIN-SPECIFIC =====
+    {
+      id: "trans_win_disbelief",
+      text: "Lying in bed that night, you still couldn't quite believe it. First place. You actually won.",
+      triggers: { performanceTier: ["win"] },
+      weight: 0.9
+    },
     {
       id: "trans_win_celebration",
-      text: "you celebrated with the local cycling crew, the victory sweeter for being shared.",
-      triggers: { performanceTier: ["win"], stagesCompleted: [2, 3, 4, 5, 6, 7, 8] },
+      text: "The victory celebration ran longer than planned. Tomorrow's recovery ride might be more of a recovery shuffle.",
+      triggers: { performanceTier: ["win"] },
       weight: 0.8
     },
     {
-      id: "trans_podium_proud",
-      text: "you kept glancing at the podium photo on your phone, not quite believing it was real.",
-      triggers: { performanceTier: ["podium", "win"], stagesCompleted: [2, 3, 4, 5] },
-      weight: 0.7
-    },
-    {
-      id: "trans_near_miss",
-      text: "you replayed the final sprint in your head, wondering what one more watt or better positioning might have changed.",
-      triggers: { performanceTier: ["podium", "top10"], stagesCompleted: [4, 5, 6, 7, 8] },
-      weight: 0.6
-    },
-    {
-      id: "trans_learning_loss",
-      text: "you processed the disappointment, looking for the lessons hidden in the result.",
-      triggers: { performanceTier: ["midpack", "back"], stagesCompleted: [3, 4, 5, 6, 7] },
-      weight: 0.6
-    },
-    {
-      id: "trans_bounce_back",
-      text: "you acknowledged the tough day and immediately started thinking about how to respond in the next race.",
-      triggers: { performanceTier: ["back"], stagesCompleted: [4, 5, 6, 7, 8] },
-      weight: 0.7
-    },
-
-    // PERSONALITY-DRIVEN
-    {
-      id: "trans_data_dive",
-      text: "you dove into the power data immediately, numbers telling a cleaner story than memory alone.",
-      triggers: { personalityMin: { professionalism: 65 }, stagesCompleted: [3, 4, 5, 6, 7] },
-      weight: 0.7
-    },
-    {
-      id: "trans_social_celebration",
-      text: "you celebrated with the local cycling group, the result less important than the shared experience.",
-      triggers: { personalityMin: { humility: 65 }, stagesCompleted: [4, 5, 6, 7] },
-      weight: 0.6
-    },
-    {
-      id: "trans_competitive_review",
-      text: "you replayed the finale in your mind, already planning how to beat your rivals next time.",
-      triggers: { personalityMin: { aggression: 60 }, stagesCompleted: [4, 5, 6, 7, 8] },
-      weight: 0.7
-    },
-    {
-      id: "trans_confident_reflection",
-      text: "you reflected on the race with satisfaction, knowing you'd executed your plan and raced smart.",
-      triggers: { personalityMin: { confidence: 65 }, performanceTier: ["podium", "win"], stagesCompleted: [3, 4, 5, 6, 7] },
-      weight: 0.6
-    },
-    {
-      id: "trans_humble_gratitude",
-      text: "you felt grateful for the race, the competition, and another chance to test yourself.",
-      triggers: { personalityMin: { humility: 70 }, stagesCompleted: [5, 6, 7, 8] },
-      weight: 0.5
-    },
-
-    // SEASON-PHASE SPECIFIC
-    {
-      id: "trans_early_learning",
-      text: "you absorbed the lessons from another race, each one teaching something new about this level of competition.",
-      triggers: { stagesCompleted: [1, 2, 3] },
-      weight: 0.6
-    },
-    {
-      id: "trans_mid_building",
-      text: "you felt the season building, each race adding to your understanding of what works.",
-      triggers: { stagesCompleted: [5, 6] },
-      weight: 0.6
-    },
-    {
-      id: "trans_late_urgency",
-      text: "you felt the weight of the shrinking calendar, each remaining race carrying extra significance.",
-      triggers: { stagesCompleted: [7, 8] },
-      weight: 0.7
-    },
-    {
-      id: "trans_streak_momentum",
-      text: "the winning momentum felt tangible now, confidence building with each strong result.",
-      triggers: { isOnStreak: true, stagesCompleted: [4, 5, 6, 7] },
+      id: "trans_win_photo",
+      text: "You kept looking at the finish line photo. Arms raised, actually winning. This was real.",
+      triggers: { performanceTier: ["win"] },
       weight: 0.8
+    },
+    {
+      id: "trans_win_replay",
+      text: "You replayed the winning moment at least fifty times that evening. It didn't get old.",
+      triggers: { performanceTier: ["win"] },
+      weight: 0.7
+    },
+
+    // ===== PODIUM-SPECIFIC =====
+    {
+      id: "trans_podium_photo",
+      text: "That podium photo was already your new phone wallpaper. No shame.",
+      triggers: { performanceTier: ["podium"] },
+      weight: 0.8
+    },
+    {
+      id: "trans_podium_buzz",
+      text: "The podium finish left you buzzing all evening. Sleep was going to be difficult.",
+      triggers: { performanceTier: ["podium"] },
+      weight: 0.7
+    },
+    {
+      id: "trans_podium_close",
+      text: "So close to the win. The podium was great, but you couldn't help thinking about what if.",
+      triggers: { performanceTier: ["podium"] },
+      weight: 0.6
+    },
+
+    // ===== TOUGH DAY =====
+    {
+      id: "trans_tough_day_honest",
+      text: "Driving home in silence, you let yourself feel the disappointment fully before planning the response.",
+      triggers: { performanceTier: ["back"] },
+      weight: 0.7
+    },
+    {
+      id: "trans_tough_lessons",
+      text: "Some races teach you more through failure than success ever could. Today was one of those.",
+      triggers: { performanceTier: ["back"] },
+      weight: 0.7
+    },
+    {
+      id: "trans_tough_but_forward",
+      text: "A tough day, but you'd been here before and bounced back. The next race was already on your mind.",
+      triggers: { performanceTier: ["back"] },
+      weight: 0.6
+    },
+    {
+      id: "trans_bad_day_comfort",
+      text: "Comfort food and cycling content. The standard protocol for processing a tough result.",
+      triggers: { performanceTier: ["back"] },
+      weight: 0.6
     }
   ],
 

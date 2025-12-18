@@ -844,28 +844,29 @@ class StorySelector {
     const transition = this.selectFromCategory(riderId, 'postRaceTransitions', context, 10);
 
     if (!transition) {
-      // Fallback: return a generic transition based on performance
+      // Fallback: return a lifestyle-rich transition based on performance
+      // These include their own opener (no separate connector needed)
       const tier = context.performanceTier || 'midpack';
       const stagesCompleted = context.stagesCompleted || 1;
 
       // Different fallbacks for first race vs later races
       if (stagesCompleted <= 1) {
         const firstRaceFallbacks = {
-          win: "you couldn't stop smiling. Your first race, and a win.",
-          podium: "the podium finish from your first race still felt surreal.",
-          top10: "you processed what just happened—your first race, a solid result.",
-          midpack: "you reflected on your debut, finding lessons in every moment.",
-          back: "you processed your first race, knowing everyone starts somewhere."
+          win: "Back home, you couldn't stop smiling. Your first race, and a win. This was actually happening.",
+          podium: "That evening you kept looking at the podium photo. Your first race, and a podium. Unreal.",
+          top10: "You told the race story to anyone who'd listen that evening. Your first race, a solid result.",
+          midpack: "Lying in bed that night, you replayed every moment. Your first race was done. The addiction had begun.",
+          back: "That evening you processed your debut, already planning what to do differently next time."
         };
         return firstRaceFallbacks[tier] || firstRaceFallbacks.midpack;
       }
 
       const fallbacks = {
-        win: "you found yourself replaying the winning moment.",
-        podium: "the podium finish still felt fresh in your mind.",
-        top10: "you processed the solid result.",
-        midpack: "you reflected on what worked and what didn't.",
-        back: "you looked for the lessons in the tough day."
+        win: "The victory celebration ran long that evening. Tomorrow's recovery ride could wait.",
+        podium: "That podium photo was already your phone wallpaper. No shame.",
+        top10: "Post-race pizza felt earned. You'd burned enough calories to justify seconds.",
+        midpack: "You collapsed on the couch with snacks and cycling content. Peak recovery protocol.",
+        back: "Comfort food and cycling content. The standard protocol for processing a tough result."
       };
       return fallbacks[tier] || fallbacks.midpack;
     }
