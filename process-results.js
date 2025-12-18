@@ -1200,13 +1200,14 @@ async function processUserResult(uid, eventInfo, results) {
     );
 
     // Check margin-based awards
-    earnedDomination = awardsCalc.checkDomination(position, times.winnerTime, times.secondPlaceTime);
-    earnedCloseCall = awardsCalc.checkCloseCall(position, times.winnerTime, times.secondPlaceTime);
+    // Time-based awards should NOT be awarded for:
+    // - Event 3: Elimination race (times don't reflect racing - riders eliminated at intervals)
+    // - Event 4: Time challenge (everyone does the same target time)
+    const isTimeIrrelevant = eventNumber === 3 || eventNumber === 4;
 
-    // Photo Finish should not be awarded for time challenge events (where everyone does the same time)
-    // Event 4 is Coastal Loop Time Challenge (20 minutes)
-    const isTimeChallenge = eventNumber === 4;
-    earnedPhotoFinish = isTimeChallenge ? false : awardsCalc.checkPhotoFinish(position, times.userTime, times.winnerTime);
+    earnedDomination = isTimeIrrelevant ? false : awardsCalc.checkDomination(position, times.winnerTime, times.secondPlaceTime);
+    earnedCloseCall = isTimeIrrelevant ? false : awardsCalc.checkCloseCall(position, times.winnerTime, times.secondPlaceTime);
+    earnedPhotoFinish = isTimeIrrelevant ? false : awardsCalc.checkPhotoFinish(position, times.userTime, times.winnerTime);
 
     earnedDarkHorse = awardsCalc.checkDarkHorse(position, predictedPosition);
 

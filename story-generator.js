@@ -71,15 +71,31 @@ function getDefaultTransition(tier) {
 /**
  * Analyze race dynamics based on time gaps and position
  * Returns enhanced context about how the race finished
- * 
+ *
  * Bunch sprint: Many riders within ~5s of winner (field together)
  * Small group: Winner + few riders broke away together (tight gaps within, big gap behind)
  * Solo/breakaway: Winner alone or with clear gap
  * Chase group: User's group finishing together but significantly behind winner(s)
+ *
+ * Note: For elimination races (event 3) and time challenges (event 4), time-based
+ * dynamics are not meaningful and position-based dynamics are returned instead.
  */
 function analyzeRaceDynamics(raceData) {
-  const { position, winMargin, lossMargin } = raceData;
-  
+  const { position, winMargin, lossMargin, eventNumber } = raceData;
+
+  // For elimination races and time challenges, times don't reflect race dynamics
+  // - Elimination: riders are eliminated at intervals, so times are meaningless
+  // - Time challenge: everyone does the same target time
+  const isTimeIrrelevant = eventNumber === 3 || eventNumber === 4;
+
+  if (isTimeIrrelevant) {
+    // Return position-based dynamics only (no time gaps)
+    if (position === 1) return { type: 'elimination_winner', gap: 0, description: 'survived to the end' };
+    if (position <= 3) return { type: 'elimination_podium', gap: 0, description: 'finished on the podium' };
+    if (position <= 10) return { type: 'elimination_top10', gap: 0, description: 'solid finish' };
+    return { type: 'elimination_finish', gap: 0, description: 'finished the race' };
+  }
+
   if (position === 1 && winMargin > 0) {
     // Winner's perspective - how they won
     if (winMargin > 60) return { type: 'solo_victory', gap: winMargin, description: 'rode away solo' };
@@ -88,7 +104,7 @@ function analyzeRaceDynamics(raceData) {
     // Small margin = bunch sprint (many riders close together)
     return { type: 'bunch_sprint', gap: winMargin, description: 'won the bunch sprint' };
   }
-  
+
   if (position > 1 && lossMargin > 0) {
     // Non-winner's perspective - how they finished
     if (lossMargin < 1) return { type: 'photo_finish', gap: lossMargin, description: 'photo finish' };
@@ -101,7 +117,7 @@ function analyzeRaceDynamics(raceData) {
     // 90+ seconds = significantly behind
     return { type: 'well_back', gap: lossMargin, description: 'well behind' };
   }
-  
+
   return { type: 'unknown', gap: 0, description: '' };
 }
 
