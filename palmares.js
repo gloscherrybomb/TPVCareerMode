@@ -209,7 +209,8 @@ async function loadPalmares(user) {
                     earnedPhotoFinish: eventResults.earnedPhotoFinish,
                     earnedDarkHorse: eventResults.earnedDarkHorse,
                     earnedZeroToHero: eventResults.earnedZeroToHero,
-                    processedAt: eventResults.processedAt
+                    processedAt: eventResults.processedAt,
+                    raceDate: eventResults.raceDate
                 });
             }
         }
@@ -321,9 +322,10 @@ function displayResultsTable() {
     filteredResults.forEach(result => {
         const row = document.createElement('tr');
 
-        // Date
+        // Date - prefer raceDate (actual race date) over processedAt (when result was processed)
         const dateCell = document.createElement('td');
-        dateCell.textContent = result.processedAt ? formatDate(result.processedAt.toDate?.() || result.processedAt) : '—';
+        const displayDate = result.raceDate || result.processedAt;
+        dateCell.textContent = displayDate ? formatDate(displayDate.toDate?.() || displayDate) : '—';
         row.appendChild(dateCell);
 
         // Event (clickable)

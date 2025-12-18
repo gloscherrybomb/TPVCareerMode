@@ -1063,8 +1063,12 @@ function parseCSV(csvContent) {
 
 /**
  * Process a single result for a user
+ * @param {string} uid - User's TPV UID
+ * @param {Object} eventInfo - Event info containing season and event number
+ * @param {Array} results - All race results from CSV
+ * @param {number} raceTimestamp - Timestamp of the race (from filename or file modification time)
  */
-async function processUserResult(uid, eventInfo, results) {
+async function processUserResult(uid, eventInfo, results, raceTimestamp) {
   const { season, event: eventNumber } = eventInfo;
   
   // Query for user by uid field (not document ID)
@@ -1274,7 +1278,8 @@ async function processUserResult(uid, eventInfo, results) {
     deltaTime: parseFloat(userResult.DeltaTime) || 0,
     eventPoints: parseInt(userResult.Points) || null, // Points race points (for display only)
     earnedAwards: [], // NEW: Track awards for notification system
-    processedAt: admin.firestore.FieldValue.serverTimestamp()
+    processedAt: admin.firestore.FieldValue.serverTimestamp(),
+    raceDate: raceTimestamp ? new Date(raceTimestamp).toISOString() : null // Actual race date from filename
   };
 
   // NOTE: buildSeasonStandings() moved to after unlock processing (around line 1415)
@@ -3045,7 +3050,7 @@ async function processResults(csvFiles) {
       
       // Process each human's result
       for (const uid of humanUids) {
-        await processUserResult(uid, eventInfo, results);
+        await processUserResult(uid, eventInfo, results, fileInfo.timestamp);
       }
       
       // Rename CSV to include timestamp for chronological tracking
