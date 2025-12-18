@@ -832,13 +832,15 @@ function generateForwardLook(seasonData, raceData) {
   const {
     stagesCompleted,
     nextEventNumber,
-    nextEventName,
     isOnStreak,
     totalPodiums,
     totalWins,
     recentResults,
     isSeasonComplete
   } = seasonData;
+
+  // Compute next event name from EVENT_NAMES
+  const nextEventName = EVENT_NAMES[nextEventNumber] || `Event ${nextEventNumber}`;
 
   // Season complete - no forward look needed
   if (isSeasonComplete || nextEventNumber > 15 || !nextEventNumber) {
