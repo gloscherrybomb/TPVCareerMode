@@ -373,35 +373,35 @@ function generateRaceRecapCondensed(data) {
   else if (position <= 20) tier = 'midpack';
   else tier = 'back';
 
-  // WIN condensed recaps
+  // WIN condensed recaps (~50-70 words)
   if (tier === 'win') {
     if (earnedDarkHorse) {
-      return `Nobody saw this coming. Predicted ${predictedPosition}th, you defied every expectation at ${eventName}. ${dynamics.type === 'bunch_sprint' ? 'The sprint was chaos, but you timed it perfectly.' : dynamics.type === 'solo_victory' ? `You attacked and rode away solo${gapText ? `, finishing ${gapText} clear` : ''}.` : 'When it mattered, you found something extra.'} P1—the upset of the day.`;
+      return `Nobody saw this coming. The predictions had you finishing ${predictedPosition}th at ${eventName}—an afterthought, mid-pack at best. But racing isn't run on spreadsheets. ${dynamics.type === 'bunch_sprint' ? 'The sprint was chaos, riders everywhere, and somehow you timed it perfectly, bursting through to claim victory.' : dynamics.type === 'solo_victory' ? `You attacked when nobody expected it and rode away solo${gapText ? `, finishing ${gapText} clear of the field` : ', the gap growing with every pedal stroke'}.` : 'When it mattered most, you found an extra gear nobody knew you had.'} P1. The upset of the day. The result that rewrites expectations.`;
     }
     if (earnedDomination) {
-      return `${eventName} was a masterclass. ${dynamics.type === 'solo_victory' ? `You attacked decisively and ${gapText ? `finished ${gapText} clear` : 'rode away from the field'}.` : dynamics.type === 'bunch_sprint' ? 'You controlled the finale and won the sprint convincingly.' : `You proved strongest when it counted${gapText ? `, winning by ${gapText}` : ''}.`} The kind of day where everything clicks.`;
+      return `${eventName} was a statement ride. From the early kilometers, you rode with the confidence of someone who knew they had the legs. ${dynamics.type === 'solo_victory' ? `You attacked decisively, rode away from the field, and ${gapText ? `finished ${gapText} clear` : 'never looked back'}.` : dynamics.type === 'bunch_sprint' ? 'You controlled the finale with tactical precision, then won the sprint convincingly.' : `When the race reached its decisive moment, you proved strongest${gapText ? `, winning by ${gapText}` : ''}.`} The kind of day where fitness, tactics, and timing align perfectly.`;
     }
     if (earnedCloseCall) {
-      return `${eventName} came down to the wire. ${dynamics.type === 'photo_finish' ? 'They needed the photo to separate the top finishers.' : 'The sprint was desperate, everyone throwing everything at the line.'} You emerged with the win${gapText ? ` by ${gapText}` : ' by the narrowest of margins'}—inches separating glory from frustration.`;
+      return `${eventName} came down to the wire in the most dramatic fashion. ${dynamics.type === 'photo_finish' ? 'Multiple riders hit the line together, bikes thrown forward, and they needed the photo to separate the top finishers.' : 'The sprint was desperate—everyone red-lined, throwing everything at the line, nobody willing to yield.'} You emerged with the win${gapText ? ` by ${gapText}` : ' by the narrowest of margins'}. Inches separated glory from frustration, and this time, the inches went your way.`;
     }
     // Default win
-    return `${eventName} delivered the result you came for. ${dynamics.type === 'solo_victory' ? `You attacked at the right moment and ${gapText ? `finished ${gapText} clear` : 'never looked back'}.` : dynamics.type === 'bunch_sprint' ? 'You timed the sprint perfectly and crossed first.' : `You proved strongest when it counted${gapText ? `, winning by ${gapText}` : ''}.`}`;
+    return `${eventName} delivered the result you came for. You rode with purpose from the start, staying patient when others burned matches early, positioning yourself for the finale. ${dynamics.type === 'solo_victory' ? `You attacked at the right moment and ${gapText ? `finished ${gapText} clear` : 'never looked back'}.` : dynamics.type === 'bunch_sprint' ? 'When the sprint opened up, you timed it perfectly and crossed first.' : `When the race reached its decisive moment, you proved strongest${gapText ? `, winning by ${gapText}` : ''}.`} First place. The result that matters most.`;
   }
 
-  // PODIUM condensed recaps
+  // PODIUM condensed recaps (~50-70 words)
   if (tier === 'podium') {
     const winnerText = hasWinnerName ? winnerName : 'the winner';
     if (position === 2) {
       if (dynamics.type === 'photo_finish' || lossMargin < 1) {
-        return `So close at ${eventName}. The finish came down to a desperate sprint, and you crossed ${gapText ? `${gapText} behind ${winnerText}` : 'just behind'}—close enough to taste the win, far enough to know you came up short.`;
+        return `So close at ${eventName}. The finish came down to a desperate sprint—multiple riders throwing everything at the line, nobody willing to yield. You crossed ${gapText ? `${gapText} behind ${winnerText}` : 'just behind the winner'}, close enough to taste victory, far enough to know you came up short. Second place by the smallest of margins. It stings, but it also proves you belong at the front.`;
       }
-      return `Second at ${eventName}. ${hasWinnerName ? `${winnerText} proved slightly stronger` : 'The winner had the edge'}${gapText ? `, finishing ${gapText} ahead` : ''}. You were in the fight until the end, just not quite strong enough to take the top step.`;
+      return `Second at ${eventName}. You rode a tactically smart race, positioning yourself well through the key moments and staying with the strongest riders. ${hasWinnerName ? `${winnerText} proved slightly stronger in the finale` : 'The winner had the edge when it mattered'}${gapText ? `, finishing ${gapText} ahead` : ''}. You were in the fight until the end, just not quite strong enough to take the top step. Still, second is second—a podium finish and solid points.`;
     }
     // 3rd place
     if (placeDiff >= 5) {
-      return `Predicted ${predictedPosition}th, you finished on the podium at ${eventName}. Third place—ahead of where anyone expected, proof that the predictions don't account for race craft and determination.`;
+      return `The predictions had you finishing around ${predictedPosition}th at ${eventName}, well off the podium. But racing doesn't follow spreadsheets. You rode with intelligence and determination, staying in contention when others faded, and when the finale came, you were there. Third place—ahead of where anyone expected, proof that form on the day matters more than pre-race predictions.`;
     }
-    return `Third at ${eventName}. ${dynamics.type === 'bunch_sprint' ? 'You battled through a chaotic sprint' : 'You fought hard in the finale'} and secured the final podium spot${gapText ? `, ${gapText} behind the winner` : ''}. Not first, but still on the podium.`;
+    return `${eventName} rewarded smart, patient racing. You stayed out of trouble in the early going, moved up when it mattered, and ${dynamics.type === 'bunch_sprint' ? 'battled through a chaotic sprint to secure' : 'fought hard in the finale to claim'} the final podium spot${gapText ? `, finishing ${gapText} behind the winner` : ''}. Third isn't first, but you stood on the podium, earned solid points, and showed you can compete at the front of this field.`;
   }
 
   // TOP 10 condensed recaps
@@ -845,45 +845,51 @@ function generateForwardLook(seasonData, raceData) {
   // Season complete - no forward look needed
   if (isSeasonComplete || nextEventNumber > 15 || !nextEventNumber) {
     if (isOnStreak) {
-      return "The season ends on a high note. Time to rest, recover, and carry this momentum into the off-season.";
+      return "The season ends on a high note. Time to rest, recover, and carry this momentum into the off-season. There will be time to analyze what worked and what to build on for next year.";
     }
-    return "The season is complete. Time to rest, reflect, and prepare for what comes next.";
+    return "The season is complete. Time to rest, reflect on what you've learned, and start thinking about what comes next. Every race has been a lesson, and those lessons compound.";
   }
 
   const nextEventType = EVENT_TYPES[nextEventNumber];
   let forward = '';
 
+  // Race type descriptions for more detail
+  const raceTypeDetails = {
+    'road race': 'a classic road race where tactics, positioning, and reading the peloton will matter as much as raw power',
+    'criterium': 'a fast, technical criterium—tight corners, constant accelerations, and positioning battles that reward alertness and bike handling',
+    'time trial': 'a time trial where there\'s nowhere to hide, no draft to find, just you against the clock and your own limits',
+    'hill climb': 'a pure climbing test where power-to-weight is everything and the gradient strips away any tactical pretense',
+    'points race': 'a points race where consistency across multiple sprints matters more than a single explosive effort',
+    'track elimination': 'a velodrome elimination where one moment of inattention can end your race—every lap is survival',
+    'gran fondo': 'an endurance challenge where pacing and nutrition will matter as much as fitness',
+    'gravel race': 'a gravel race where bike handling on mixed terrain adds another dimension to the competition',
+    'mountain stage': 'a mountain stage with sustained climbing that will test your ability to suffer',
+    'stage race': 'stage racing where managing effort across multiple days becomes the challenge'
+  };
+
+  const typeDetail = raceTypeDetails[nextEventType] || 'another test of your racing abilities';
+
   // EARLY SEASON (stages 1-3): Exploratory, learning-focused
   if (stagesCompleted <= 3) {
-    const earlyOptions = [
-      `${nextEventName} awaits—another chance to learn what works at this level.`,
-      `Next up: ${nextEventName}. Each race at this stage is about building experience.`,
-      `${nextEventName} is next, another opportunity to test yourself and gather data.`
-    ];
-    forward = earlyOptions[stagesCompleted % earlyOptions.length];
-
-    // Add season phase note
-    forward += ' The season is still taking shape.';
+    if (stagesCompleted === 1) {
+      forward = `${nextEventName} is next—${typeDetail}. With one race under your belt, you have a baseline to build from. The season is young, and each start line is a chance to learn something new about yourself and this level of competition.`;
+    } else {
+      forward = `${nextEventName} awaits—${typeDetail}. You're still in the early chapters of this season, gathering data, testing what works, finding your rhythm in the peloton. The picture is starting to form.`;
+    }
   }
   // MID SEASON (stages 4-6): Building, patterns forming
   else if (stagesCompleted <= 6) {
-    if (nextEventType === 'time trial') {
-      forward = `${nextEventName} is next—a time trial where there's nowhere to hide and no tactics to lean on.`;
-    } else if (nextEventType === 'hill climb') {
-      forward = `${nextEventName} points upward, a test of pure climbing strength.`;
-    } else if (nextEventType === 'stage race') {
-      forward = `The Local Tour begins with ${nextEventName}—three stages that will define the season's finale.`;
+    if (nextEventType === 'stage race') {
+      forward = `The Local Tour begins with ${nextEventName}—three stages over three days that will define the season's finale. Stage racing demands a different mindset: managing effort, recovering between days, thinking beyond just today's result.`;
     } else {
-      forward = `Next up: ${nextEventName}. The patterns are forming, the form is building.`;
-    }
-
-    // Add form-based note
-    if (isOnStreak) {
-      forward += ' The momentum is real.';
-    } else if (totalPodiums >= 2) {
-      forward += ' Consistency is becoming the calling card.';
-    } else {
-      forward += ' Every race adds to the picture.';
+      forward = `Next up: ${nextEventName}, ${typeDetail}. `;
+      if (isOnStreak) {
+        forward += `You're carrying real momentum now, and the field is starting to take notice. The question is whether you can sustain this form through the season's middle chapters.`;
+      } else if (totalPodiums >= 2) {
+        forward += `Your consistency is building a reputation. You're becoming a rider others have to account for, someone who's always in the mix when it matters.`;
+      } else {
+        forward += `The season is past its opening act now. Patterns are emerging in your racing, and each event offers a chance to refine what's working and fix what isn't.`;
+      }
     }
   }
   // LATE SEASON (stages 7+): Focused, results-driven
@@ -891,18 +897,15 @@ function generateForwardLook(seasonData, raceData) {
     if (nextEventType === 'stage race') {
       const stageNum = nextEventNumber - 12;
       if (stageNum === 1) {
-        forward = `The Local Tour begins—three stages that carry the weight of the entire season.`;
+        forward = `The Local Tour begins—three stages that carry the weight of the entire season. Everything you've built, every lesson learned, comes down to these final days. Stage racing rewards the complete rider: fitness, tactics, recovery, and mental resilience all matter.`;
       } else if (stageNum === 2) {
-        forward = `Local Tour Stage 2 awaits. Yesterday's effort is done; today will reshape the GC.`;
+        forward = `Local Tour Stage 2 awaits. Yesterday's effort is in the legs, but the GC picture is still taking shape. Today could reshape the overall standings. Recovery and smart racing will separate those who peak from those who fade.`;
       } else {
-        forward = `The queen stage—Local Tour Stage 3. Everything comes down to this.`;
+        forward = `The queen stage—Local Tour Stage 3. Everything comes down to this. The hardest stage, the final day, the last chance to attack or defend. Whatever happens today is how you'll remember this season.`;
       }
     } else {
-      forward = `${nextEventName} is one of the final chances to make a statement.`;
+      forward = `${nextEventName} is one of the final chances to make a statement—${typeDetail}. The season is entering its closing chapters, and every result from here carries extra weight. There's no time left for dress rehearsals.`;
     }
-
-    // Add urgency note
-    forward += ' Every remaining race matters.';
   }
 
   return forward;

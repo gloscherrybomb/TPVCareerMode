@@ -700,27 +700,36 @@ class StorySelector {
 
   /**
    * Select a post-race transition moment from the database
-   * Returns a short transition phrase or empty string
+   * Returns a short transition phrase
    * Used in the two-part narrative structure
    */
   async selectTransitionMoment(riderId, context, db) {
-    // Skip transition for first race (let intro carry the weight)
-    if (context.stagesCompleted <= 1) {
-      return '';
-    }
-
     // Try to select from postRaceTransitions category
     const transition = this.selectFromCategory(riderId, 'postRaceTransitions', context, 10);
 
     if (!transition) {
       // Fallback: return a generic transition based on performance
       const tier = context.performanceTier || 'midpack';
+      const stagesCompleted = context.stagesCompleted || 1;
+
+      // Different fallbacks for first race vs later races
+      if (stagesCompleted <= 1) {
+        const firstRaceFallbacks = {
+          win: "you couldn't stop smiling. Your first race, and a win.",
+          podium: "the podium finish from your first race still felt surreal.",
+          top10: "you processed what just happened—your first race, a solid result.",
+          midpack: "you reflected on your debut, finding lessons in every moment.",
+          back: "you processed your first race, knowing everyone starts somewhere."
+        };
+        return firstRaceFallbacks[tier] || firstRaceFallbacks.midpack;
+      }
+
       const fallbacks = {
-        win: "you found yourself replaying the winning moment",
-        podium: "the podium finish still felt fresh in your mind",
-        top10: "you processed the solid result",
-        midpack: "you reflected on what worked and what didn't",
-        back: "you looked for the lessons in the tough day"
+        win: "you found yourself replaying the winning moment.",
+        podium: "the podium finish still felt fresh in your mind.",
+        top10: "you processed the solid result.",
+        midpack: "you reflected on what worked and what didn't.",
+        back: "you looked for the lessons in the tough day."
       };
       return fallbacks[tier] || fallbacks.midpack;
     }
