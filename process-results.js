@@ -158,9 +158,9 @@ function calculateBiggestGiant(results, userUid, userPosition, userARR, eventNum
       return r.UID !== userUid && !isNaN(pos) && pos > userPosition && arr > 0;
     })
     .map(r => ({
-      name: r.Name,
+      name: r.Name || null,
       arr: parseInt(r.ARR),
-      uid: r.UID
+      uid: r.UID || null
     }));
 
   if (beaten.length === 0) return currentBiggest;
@@ -1388,8 +1388,8 @@ async function processUserResult(uid, eventInfo, results) {
     const sanitizedResults = sortedResults.map(r => ({
       position: parseInt(r.Position),
       arr: parseInt(r.ARR) || 0,
-      uid: r.UID,
-      name: r.Name
+      uid: r.UID || null,
+      name: r.Name || null
     })).filter(r => !isNaN(r.position));
 
     // Calculate rival data for unlock triggers
@@ -2771,8 +2771,8 @@ async function updateResultsSummary(season, event, results, userUid, unlockBonus
 
       return {
         position: position,
-        name: r.Name,
-        uid: r.UID,
+        name: r.Name || null,
+        uid: r.UID || null,
         team: r.Team || '',
         arr: parseInt(r.ARR) || 0,
         arrBand: r.ARRBand || '',
@@ -2801,8 +2801,8 @@ async function updateResultsSummary(season, event, results, userUid, unlockBonus
       const isCurrentUser = r.UID === userUid;
       return {
         position: 'DNF',
-        name: r.Name,
-        uid: r.UID,
+        name: r.Name || null,
+        uid: r.UID || null,
         team: r.Team || '',
         arr: parseInt(r.ARR) || 0,
         arrBand: r.ARRBand || '',
