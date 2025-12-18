@@ -4,6 +4,16 @@ on:
   push:
     paths:
       - 'race_results/**/*.csv'
+  workflow_call:  # Allows being called from other workflows
+    inputs:
+      csv_files:
+        description: 'JSON array of CSV file paths to process'
+        required: false
+        type: string
+        default: ''
+    secrets:
+      FIREBASE_SERVICE_ACCOUNT:
+        required: true
   workflow_dispatch:  # Allows manual trigger from GitHub UI
     inputs:
       csv_path:
@@ -27,6 +37,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 2  # Need previous commit to detect new files
+          ref: ${{ github.event_name == 'workflow_call' && 'main' || '' }}  # Get latest when called from another workflow
       
       - name: Setup Node.js
         uses: actions/setup-node@v3
@@ -41,11 +52,15 @@ jobs:
       - name: Get changed CSV files
         id: changed-files
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          # Check if files were passed via workflow_call input
+          if [ -n "${{ inputs.csv_files }}" ]; then
+            echo "Using files from workflow_call input"
+            echo "files=${{ inputs.csv_files }}" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             # Manual trigger - find all CSV files in race_results
             echo "files=$(find race_results -name '*.csv' -type f 2>/dev/null | jq -R -s -c 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
           else
-            # Auto trigger - process ADDED or MODIFIED CSV files (AM = Added or Modified)
+            # Auto trigger (push) - process ADDED or MODIFIED CSV files
             echo "files=$(git diff --name-only --diff-filter=AM HEAD~1 HEAD | grep '\.csv$' | jq -R -s -c 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
           fi
       

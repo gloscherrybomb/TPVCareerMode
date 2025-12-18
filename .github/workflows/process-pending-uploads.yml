@@ -10,6 +10,9 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    outputs:
+      has_changes: ${{ steps.commit.outputs.has_changes }}
+      staged_files: ${{ steps.commit.outputs.staged_files_json }}
 
     steps:
       - name: Checkout code
@@ -43,6 +46,14 @@ jobs:
           echo "$STAGED_FILES" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
 
+          # Also output as JSON array for workflow_call
+          if [ -n "$STAGED_FILES" ]; then
+            STAGED_FILES_JSON=$(echo "$STAGED_FILES" | jq -R -s -c 'split("\n") | map(select(length > 0))')
+          else
+            STAGED_FILES_JSON="[]"
+          fi
+          echo "staged_files_json=$STAGED_FILES_JSON" >> $GITHUB_OUTPUT
+
           # Check if there are staged changes
           if git diff --cached --quiet; then
             echo "ℹ️  No new uploads to commit"
@@ -54,10 +65,11 @@ jobs:
             echo "has_changes=true" >> $GITHUB_OUTPUT
           fi
 
-      - name: Trigger process-results workflow
-        if: steps.commit.outputs.has_changes == 'true'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          echo "🚀 Triggering process-results workflow for uploaded files..."
-          gh workflow run process-results.yml
+  # Call process-results workflow after uploads are committed
+  call-process-results:
+    needs: process-uploads
+    if: needs.process-uploads.outputs.has_changes == 'true'
+    uses: ./.github/workflows/process-results.yml
+    with:
+      csv_files: ${{ needs.process-uploads.outputs.staged_files }}
+    secrets: inherit
