@@ -109,7 +109,13 @@ function setupEventListeners() {
     dropzone.addEventListener('dragover', handleDragOver);
     dropzone.addEventListener('dragleave', handleDragLeave);
     dropzone.addEventListener('drop', handleDrop);
-    dropzone.addEventListener('click', () => fileInput.click());
+    dropzone.addEventListener('click', (e) => {
+        // Only trigger file input if clicking the dropzone itself, not the browse button
+        // The label/input already handles its own click
+        if (e.target === dropzone || e.target.closest('.dropzone-icon, .dropzone-text, .dropzone-subtext')) {
+            fileInput.click();
+        }
+    });
 
     // File input
     fileInput.addEventListener('change', handleFileSelect);
@@ -580,20 +586,26 @@ async function handleUpload() {
             uploadedAt: serverTimestamp()
         };
 
-        await addDoc(collection(db, 'pendingUploads'), pendingUpload);
+        console.log('Attempting to upload to Firestore...', { eventNumber: selectedEventNumber, filename: uploadFilename });
+        const docRef = await addDoc(collection(db, 'pendingUploads'), pendingUpload);
+        console.log('Upload successful! Document ID:', docRef.id);
 
+        clearFile();
         showStatus('success', 'Upload Successful!',
             `Your results have been submitted and will be processed within a few minutes. Check your profile shortly.`);
-        clearFile();
 
     } catch (error) {
         console.error('Upload error:', error);
+        console.error('Error code:', error.code);
+        console.error('Error message:', error.message);
         let errorMessage = 'An error occurred while uploading. Please try again.';
 
-        if (error.code === 'permission-denied') {
-            errorMessage = 'You do not have permission to upload. Please ensure you are logged in.';
+        if (error.code === 'permission-denied' || error.code === 'PERMISSION_DENIED') {
+            errorMessage = 'Permission denied. Please ensure you are logged in and try again.';
+        } else if (error.code === 'unavailable') {
+            errorMessage = 'Firestore is temporarily unavailable. Please try again in a moment.';
         } else if (error.message) {
-            errorMessage = error.message;
+            errorMessage = `Error: ${error.message}`;
         }
 
         showStatus('error', 'Upload Failed', errorMessage);
