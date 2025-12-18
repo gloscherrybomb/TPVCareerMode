@@ -579,7 +579,7 @@ function checkGiantKiller(results, userUid) {
  * Check if UID is a bot
  */
 function isBot(uid, gender) {
-  return gender === 'Bot' || (uid && uid.startsWith('Bot'));
+  return gender === 'Bot' || !!(uid && uid.startsWith && uid.startsWith('Bot'));
 }
 
 /**
@@ -1056,14 +1056,23 @@ function parseCSV(csvContent) {
     // Remove the first 2 lines if they contain "OVERALL INDIVIDUAL RESULTS:"
     // TPVirtual CSVs have a title line and blank line before the actual headers
     let processedContent = csvContent;
-    const lines = csvContent.split('\n');
-    
+    let lines = csvContent.split('\n');
+
     if (lines[0].includes('OVERALL INDIVIDUAL RESULTS')) {
       // Skip first 2 lines (title + blank)
-      processedContent = lines.slice(2).join('\n');
+      lines = lines.slice(2);
       console.log('   Detected TPVirtual CSV format, skipping title lines');
     }
-    
+
+    // Truncate at INTERMEDIATE LOCATION RESULTS section (different column structure)
+    const intermediateIndex = lines.findIndex(line => line.includes('INTERMEDIATE LOCATION RESULTS'));
+    if (intermediateIndex !== -1) {
+      lines = lines.slice(0, intermediateIndex);
+      console.log('   Truncating before INTERMEDIATE LOCATION RESULTS section');
+    }
+
+    processedContent = lines.join('\n');
+
     Papa.parse(processedContent, {
       header: true,
       skipEmptyLines: true,
