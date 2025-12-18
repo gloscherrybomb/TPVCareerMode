@@ -495,8 +495,12 @@ function applySort() {
 
         switch (column) {
             case 'date':
-                aVal = a.eventNum;
-                bVal = b.eventNum;
+                // Sort by actual race date (raceDate or processedAt)
+                const aDate = a.raceDate || a.processedAt;
+                const bDate = b.raceDate || b.processedAt;
+                // Convert to timestamp for comparison (handles ISO strings and Firestore timestamps)
+                aVal = aDate ? (aDate.toDate ? aDate.toDate().getTime() : new Date(aDate).getTime()) : 0;
+                bVal = bDate ? (bDate.toDate ? bDate.toDate().getTime() : new Date(bDate).getTime()) : 0;
                 break;
             case 'event':
                 aVal = a.eventName;
