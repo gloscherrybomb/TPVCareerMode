@@ -1,56 +1,18 @@
 // story-generator.js v3.0 - Comprehensive race story generation
 // Features: Narrative database integration (277 stories), race-type awareness, detailed recaps, varied closings
 
-// Event name mappings
-const EVENT_NAMES = {
-  1: "Coast and Roast Crit",
-  2: "Island Classic",
-  3: "The Forest Velodrome Elimination",
-  4: "Coastal Loop Time Challenge",
-  5: "North Lake Points Race",
-  6: "Easy Hill Climb",
-  7: "Flat Eight Criterium",
-  8: "The Grand Gilbert Fondo",
-  9: "Base Camp Classic",
-  10: "Beach and Pine TT",
-  11: "South Lake Points Race",
-  12: "Unbound - Little Egypt",
-  13: "Local Tour Stage 1",
-  14: "Local Tour Stage 2",
-  15: "Local Tour Stage 3"
-};
+// Import shared event configuration
+const { EVENT_NAMES, EVENT_TYPES, OPTIONAL_EVENTS } = require('./event-config');
 
-// Optional choice events (can be selected at stages 3, 6, or 8)
-const OPTIONAL_EVENTS = [6, 7, 8, 9, 10, 11, 12];
-
-// Optional event descriptions by type
+// Optional event descriptions by type (local - specific to narrative generation)
 const OPTIONAL_EVENT_INFO = {
   6: { type: "hill climb", shortDesc: "climb" },
   7: { type: "criterium", shortDesc: "criterium" },
   8: { type: "gran fondo", shortDesc: "endurance challenge" },
-  9: { type: "mountain stage", shortDesc: "mountain stage" },
+  9: { type: "hill climb", shortDesc: "mountain stage" },
   10: { type: "time trial", shortDesc: "time trial" },
   11: { type: "points race", shortDesc: "points race" },
   12: { type: "gravel race", shortDesc: "gravel race" }
-};
-
-// Event characteristics for context
-const EVENT_TYPES = {
-  1: "criterium",
-  2: "road race",
-  3: "track elimination",
-  4: "time trial",
-  5: "points race",
-  6: "hill climb",
-  7: "criterium",
-  8: "gran fondo",
-  9: "mountain stage",
-  10: "time trial",
-  11: "points race",
-  12: "gravel race",
-  13: "stage race",
-  14: "stage race",
-  15: "stage race"
 };
 
 /**
@@ -83,17 +45,23 @@ function getDefaultTransition(tier) {
 function analyzeRaceDynamics(raceData) {
   const { position, winMargin, lossMargin, eventNumber } = raceData;
 
-  // For elimination races and time challenges, times don't reflect race dynamics
-  // - Elimination: riders are eliminated at intervals, so times are meaningless
-  // - Time challenge: everyone does the same target time
-  const isTimeIrrelevant = eventNumber === 3 || eventNumber === 4;
+  // For elimination races and time trials, times don't reflect normal race dynamics
+  // Handle each type with appropriate terminology
 
-  if (isTimeIrrelevant) {
-    // Return position-based dynamics only (no time gaps)
+  // Event 3: Elimination race - riders eliminated at intervals
+  if (eventNumber === 3) {
     if (position === 1) return { type: 'elimination_winner', gap: 0, description: 'survived to the end' };
     if (position <= 3) return { type: 'elimination_podium', gap: 0, description: 'finished on the podium' };
     if (position <= 10) return { type: 'elimination_top10', gap: 0, description: 'solid finish' };
     return { type: 'elimination_finish', gap: 0, description: 'finished the race' };
+  }
+
+  // Event 4: Time trial - distance covered in fixed time determines position
+  if (eventNumber === 4) {
+    if (position === 1) return { type: 'tt_winner', gap: 0, description: 'set the fastest time' };
+    if (position <= 3) return { type: 'tt_podium', gap: 0, description: 'posted a podium time' };
+    if (position <= 10) return { type: 'tt_top10', gap: 0, description: 'solid time trial' };
+    return { type: 'tt_finish', gap: 0, description: 'completed the time trial' };
   }
 
   if (position === 1 && winMargin > 0) {

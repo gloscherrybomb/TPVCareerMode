@@ -8,6 +8,7 @@ const awardsCalc = require('./awards-calculation');
 const storyGen = require('./story-generator');
 const { AWARD_CREDIT_MAP, PER_EVENT_CREDIT_CAP } = require('./currency-config');
 const { UNLOCK_DEFINITIONS, getUnlockById } = require('./unlock-config');
+const { EVENT_NAMES, EVENT_TYPES, OPTIONAL_EVENTS, STAGE_REQUIREMENTS } = require('./event-config');
 
 // Import narrative system modules
 const { NARRATIVE_DATABASE } = require('./narrative-database.js');
@@ -100,13 +101,7 @@ function determinePerformanceTier(position) {
   return 'back';
 }
 
-// Event types for each event in Season 1
-const EVENT_TYPES = {
-  1: 'criterium', 2: 'road race', 3: 'track elimination', 4: 'time trial',
-  5: 'points race', 6: 'hill climb', 7: 'criterium', 8: 'gran fondo',
-  9: 'hill climb', 10: 'time trial', 11: 'points race', 12: 'gravel race',
-  13: 'road race', 14: 'road race', 15: 'time trial'
-};
+// EVENT_TYPES imported from event-config.js
 
 /**
  * Determine event category based on event type
@@ -120,29 +115,9 @@ function getEventCategory(eventType) {
   return 'road'; // Default for road race, gran fondo, etc.
 }
 
-// Stage requirements for Career Mode progression
-const STAGE_REQUIREMENTS = {
-  1: { type: 'fixed', eventId: 1 },
-  2: { type: 'fixed', eventId: 2 },
-  3: { type: 'choice', eventIds: [6, 7, 8, 9, 10, 11, 12] },
-  4: { type: 'fixed', eventId: 3 },
-  5: { type: 'fixed', eventId: 4 },
-  6: { type: 'choice', eventIds: [6, 7, 8, 9, 10, 11, 12] },
-  7: { type: 'fixed', eventId: 5 },
-  8: { type: 'choice', eventIds: [6, 7, 8, 9, 10, 11, 12] },
-  9: { type: 'tour', eventIds: [13, 14, 15] }
-};
+// STAGE_REQUIREMENTS and OPTIONAL_EVENTS imported from event-config.js
 
-const OPTIONAL_EVENTS = [6, 7, 8, 9, 10, 11, 12];
-
-// Event names for lifetime stats tracking
-const EVENT_NAMES = {
-  1: "Coast and Roast Crit", 2: "Island Classic", 3: "Track Showdown", 4: "City Sprint TT",
-  5: "The Capital Kermesse", 6: "Mt. Sterling TT", 7: "North Lake Points Race",
-  8: "Heartland Gran Fondo", 9: "Highland Loop", 10: "Riverside Time Trial",
-  11: "Southern Sky Twilight", 12: "Dirtroads and Glory", 13: "Heritage Highway",
-  14: "Mountain Shadow Classic", 15: "Bayview Breakaway Crit"
-};
+// EVENT_NAMES imported from event-config.js
 
 /**
  * Calculate biggest giant beaten from race results
