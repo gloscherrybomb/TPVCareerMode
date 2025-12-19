@@ -297,6 +297,10 @@ async function refreshUser() {
   renderSlots();
   renderGrid();
   renderProfileButton();
+  // Always re-render equipped display if event context exists (don't rely on maybeRenderEventLoadout guard)
+  if (window.cadenceEventContext && !window.cadenceEventContext.hasResults) {
+    renderEquippedDisplay();
+  }
   maybeRenderEventLoadout();
 }
 
