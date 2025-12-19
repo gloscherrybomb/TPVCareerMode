@@ -347,22 +347,6 @@
     text-decoration: underline;
 }
 
-/* Choice event highlighting (events 6-12 for stages 3, 6, 8) */
-.choice-event-row {
-    background: rgba(138, 43, 226, 0.05); /* Subtle purple tint */
-    border-left: 3px solid rgba(138, 43, 226, 0.4); /* Purple accent bar */
-}
-
-.choice-event-row:hover {
-    background: rgba(138, 43, 226, 0.1);
-}
-
-.choice-event-marker {
-    color: rgba(138, 43, 226, 0.8);
-    font-style: italic;
-    font-weight: 600;
-}
-
 /* Awards cell */
 .awards-cell {
     display: flex;

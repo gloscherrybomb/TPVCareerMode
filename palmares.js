@@ -346,13 +346,7 @@ function displayResultsTable() {
 
         // Season
         const seasonCell = document.createElement('td');
-        const isChoice = isChoiceEvent(result.eventNum);
-        if (isChoice) {
-            seasonCell.textContent = '1';
-            seasonCell.className = 'choice-event-marker';
-        } else {
-            seasonCell.textContent = '1'; // Currently all events are in Season 1
-        }
+        seasonCell.textContent = '1'; // Currently all events are in Season 1
         row.appendChild(seasonCell);
 
         // Stage
@@ -363,14 +357,8 @@ function displayResultsTable() {
         } else {
             // Choice events show "Choice" instead of a stage number
             stageCell.textContent = 'Choice';
-            stageCell.className = 'choice-event-marker';
         }
         row.appendChild(stageCell);
-
-        // Mark the entire row as choice event if applicable
-        if (isChoice) {
-            row.classList.add('choice-event-row');
-        }
 
         // Position
         const posCell = document.createElement('td');
