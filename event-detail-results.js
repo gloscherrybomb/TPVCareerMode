@@ -8,8 +8,10 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebas
 import { makeNameClickable } from './bot-profile-modal.js';
 import { displayPostRaceInterview } from './event-detail-interview.js';
 
-// Get TIME_BASED_EVENTS from window.eventConfig (loaded via script tag)
-const TIME_BASED_EVENTS = window.eventConfig?.TIME_BASED_EVENTS || [];
+// TIME_BASED_EVENTS will be retrieved when needed to avoid timing issues with window.eventConfig
+function getTimeBasedEvents() {
+    return window.eventConfig?.TIME_BASED_EVENTS || [];
+}
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -774,7 +776,8 @@ async function loadEventResults() {
         }
 
         // Check if this is a time-based event (show distance instead of time)
-        const isTimeBasedEvent = TIME_BASED_EVENTS.includes(eventNumber);
+        const isTimeBasedEvent = getTimeBasedEvents().includes(eventNumber);
+        console.log(`Event ${eventNumber}: isTimeBasedEvent=${isTimeBasedEvent}, TIME_BASED_EVENTS=${JSON.stringify(getTimeBasedEvents())}`);
 
         tableHTML += `
             <div class="results-table-container">
@@ -855,6 +858,9 @@ async function loadEventResults() {
             // Display values for DNF vs finished riders
             const positionDisplay = isDNF ? 'DNF' : result.position;
             // For time-based events, show distance in km; otherwise show time
+            if (isTimeBasedEvent) {
+                console.log(`Result for ${result.name}: distance=${result.distance}, time=${result.time}`);
+            }
             const timeOrDistanceDisplay = isDNF ? '—' : (isTimeBasedEvent
                 ? `${(result.distance / 1000).toFixed(2)} km`
                 : formatTime(result.time));
