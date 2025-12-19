@@ -1465,7 +1465,9 @@ async function generateRaceStory(raceData, seasonData, riderId = null, narrative
     const sentences = recapParagraph.split(/(?<=[.!?])\s+/);
     if (sentences.length > 1) {
       const lastSentence = sentences.pop();
-      raceStory += ' ' + sentences.join(' ') + ', ' + rivalInline + '. ' + lastSentence;
+      // Remove trailing punctuation from joined sentences before adding comma
+      const joinedSentences = sentences.join(' ').replace(/[.!?]$/, '');
+      raceStory += ' ' + joinedSentences + ', ' + rivalInline + '. ' + lastSentence;
     } else {
       raceStory += ' ' + recapParagraph.replace(/\.$/, '') + ', ' + rivalInline + '.';
     }
