@@ -602,33 +602,50 @@ export function getPersonaLabel(personality) {
  * Calculate season context for interview triggers
  */
 export function calculateSeasonContext(userData, eventNumber) {
-    const raceHistory = userData?.raceHistory || [];
+    // Build race history from individual event results (event1Results, event2Results, etc.)
+    // Events 1-12 are individual races, 13-15 are tour stages
+    const raceHistory = [];
+    for (let i = 1; i <= 15; i++) {
+        const eventResults = userData?.[`event${i}Results`];
+        if (eventResults && eventResults.position) {
+            raceHistory.push({
+                eventNumber: i,
+                position: eventResults.position,
+                predictedPosition: eventResults.predictedPosition
+            });
+        }
+    }
 
-    // Count consecutive wins/podiums
+    // Count consecutive wins/podiums (from most recent backwards)
     let consecutiveWins = 0;
     let consecutivePodiums = 0;
     let recentBelowExpectation = 0;
 
-    // Look at last 3 races
+    // Look at last 3 races for streaks
     const recentRaces = raceHistory.slice(-3);
 
-    for (let i = recentRaces.length - 1; i >= 0; i--) {
-        const race = recentRaces[i];
-
-        // Consecutive wins
+    // Count consecutive wins from most recent backwards
+    for (let i = raceHistory.length - 1; i >= 0; i--) {
+        const race = raceHistory[i];
         if (race.position === 1) {
             consecutiveWins++;
-        } else if (consecutiveWins === 0) {
-            // Only count if still in streak
-            break;
+        } else {
+            break; // Streak broken
         }
+    }
 
-        // Consecutive podiums
+    // Count consecutive podiums from most recent backwards
+    for (let i = raceHistory.length - 1; i >= 0; i--) {
+        const race = raceHistory[i];
         if (race.position <= 3) {
             consecutivePodiums++;
+        } else {
+            break; // Streak broken
         }
+    }
 
-        // Below expectation
+    // Count below expectation in last 3 races
+    for (const race of recentRaces) {
         if (race.predictedPosition && race.position > race.predictedPosition + 3) {
             recentBelowExpectation++;
         }
@@ -639,6 +656,6 @@ export function calculateSeasonContext(userData, eventNumber) {
         consecutiveWins,
         consecutivePodiums,
         recentBelowExpectation,
-        isSeasonFinale: eventNumber === 12 // Season 1 has 12 races
+        isSeasonFinale: eventNumber === 15 // Season 1 ends with event 15 (Local Tour stage 3)
     };
 }

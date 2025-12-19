@@ -333,7 +333,7 @@ const INTERVIEW_QUESTIONS = {
       triggers: {
         racesCompletedBetween: [1, 1]
       },
-      responses: ['mid_season_confident', 'breakthrough_relieved', 'first_podium_excited']
+      responses: ['mid_season_confident', 'mid_season_humble', 'first_podium_excited']
     }
   },
 
@@ -496,7 +496,7 @@ const INTERVIEW_QUESTIONS = {
       triggers: {
         racesCompletedBetween: [1, 1]
       },
-      responses: ['win_standard_professional', 'comeback_determined', 'progression_patient']
+      responses: ['win_standard_professional', 'mid_season_humble', 'progression_patient']
     },
 
     race_tactics_general: {
