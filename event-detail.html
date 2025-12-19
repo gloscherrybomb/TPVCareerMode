@@ -43,7 +43,7 @@
         </div>
     </nav>
 
-    <div class="event-hero">
+    <div class="event-hero section-loading">
         <div class="hero-background"></div>
         <div class="container">
             <div class="breadcrumb">
@@ -57,7 +57,7 @@
         </div>
     </div>
 
-    <section class="event-overview">
+    <section class="event-overview section-loading">
         <div class="container">
             <div class="overview-grid">
                 <div class="overview-card">
@@ -124,7 +124,7 @@
         </div>
     </section>
 
-    <section class="event-story">
+    <section class="event-story section-loading">
         <div class="container">
             <div class="story-content">
                 <h2 class="story-title">The Story</h2>
@@ -194,7 +194,7 @@
     </section>
 
     <!-- Route Profile Section -->
-    <section class="event-route" id="routeSection">
+    <section class="event-route section-loading" id="routeSection">
         <div class="container">
             <h2 class="section-title-medium" id="routeTitle">Route Profile</h2>
             
@@ -211,7 +211,7 @@
         </div>
     </section>
 
-    <section class="event-scoring">
+    <section class="event-scoring section-loading">
         <div class="container">
             <h2 class="section-title-medium">Scoring System</h2>
             <div class="scoring-grid">
@@ -252,7 +252,7 @@
         </div>
     </section>
 
-    <section class="event-cta">
+    <section class="event-cta section-loading">
         <div class="container">
             <div class="cta-box" id="ctaBox">
                 <!-- Content will be populated by JavaScript -->
@@ -750,6 +750,12 @@
                     console.error('Elevation profile generator not loaded');
                 }
             }
+
+            // Clear loading state from all sections after event data is loaded
+            document.querySelectorAll('.section-loading').forEach(section => {
+                section.classList.remove('section-loading');
+                section.classList.add('section-loaded');
+            });
         });
     </script>
     <script src="awards-config.js"></script>

@@ -93,9 +93,15 @@ async function showPreRaceSections(userData, userUid) {
     if (eventNumber === 13 || eventNumber === 14 || eventNumber === 15) {
         addBackToTourButton();
     }
-    
+
     // Add tour timing warning for multi-stage events
     addTourTimingWarning(eventNumber);
+
+    // Clear any remaining loading states
+    document.querySelectorAll('.section-loading').forEach(section => {
+        section.classList.remove('section-loading');
+        section.classList.add('section-loaded');
+    });
 }
 
 /**
@@ -908,6 +914,12 @@ async function loadEventResults() {
                 displayPostRaceInterview(db, userUid, eventNumber, userResult, results, userData);
             }, 1000);
         }
+
+        // Clear any remaining loading states after results are displayed
+        document.querySelectorAll('.section-loading').forEach(section => {
+            section.classList.remove('section-loading');
+            section.classList.add('section-loaded');
+        });
 
     } catch (error) {
         console.error('Error loading event results:', error);
