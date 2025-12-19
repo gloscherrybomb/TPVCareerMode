@@ -235,6 +235,24 @@ const AWARD_DEFINITIONS = {
     icon: '🔄',
     description: 'Finish top 5 after being bottom half in previous race',
     calculationType: 'event'
+  },
+
+  // Time Trial Awards
+  windTunnel: {
+    id: 'windTunnel',
+    title: 'Wind Tunnel',
+    icon: '🌬️',
+    description: 'Finish top 5 in a time trial when predicted outside top 5',
+    calculationType: 'event'
+  },
+
+  // Points Race Awards
+  theAccountant: {
+    id: 'theAccountant',
+    title: 'The Accountant',
+    icon: '🧮',
+    description: 'Score more points than the rider who crossed the line first',
+    calculationType: 'event'
   }
 };
 

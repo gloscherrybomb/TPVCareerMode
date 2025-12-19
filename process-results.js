@@ -1175,6 +1175,8 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
   let earnedPhotoFinish = false;
   let earnedDarkHorse = false;
   let earnedZeroToHero = false;
+  let earnedWindTunnel = false;
+  let earnedTheAccountant = false;
 
   // Only calculate awards for non-DNF results
   if (!isDNF) {
@@ -1208,6 +1210,17 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
     earnedPhotoFinish = isTimeIrrelevant ? false : awardsCalc.checkPhotoFinish(position, times.userTime, times.winnerTime);
 
     earnedDarkHorse = awardsCalc.checkDarkHorse(position, predictedPosition);
+
+    // Wind Tunnel: top 5 in time trial when predicted outside top 5
+    const eventType = EVENT_TYPES[eventNumber] || 'road race';
+    earnedWindTunnel = awardsCalc.checkWindTunnel(position, predictedPosition, eventType);
+
+    // The Accountant: more points than the rider who crossed the line first in points race
+    if (eventType === 'points race') {
+      const userEventPoints = parseInt(userResult.Points) || 0;
+      const userTime = parseFloat(userResult.Time) || 0;
+      earnedTheAccountant = awardsCalc.checkTheAccountant(userTime, userEventPoints, results);
+    }
 
     // Zero to Hero requires previous event data
     if (eventNumber > 1) {
@@ -1289,6 +1302,8 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
     earnedPhotoFinish: earnedPhotoFinish,
     earnedDarkHorse: earnedDarkHorse,
     earnedZeroToHero: earnedZeroToHero,
+    earnedWindTunnel: earnedWindTunnel,
+    earnedTheAccountant: earnedTheAccountant,
     earnedGCGoldMedal: gcAwards.gcGoldMedal,
     earnedGCSilverMedal: gcAwards.gcSilverMedal,
     earnedGCBronzeMedal: gcAwards.gcBronzeMedal,
@@ -1783,6 +1798,14 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
   if (eventResults.earnedZeroToHero) {
     eventAwards['awards.zeroToHero'] = admin.firestore.FieldValue.increment(1);
     eventResults.earnedAwards.push({ awardId: 'zeroToHero', category: 'performance', intensity: 'flashy' });
+  }
+  if (eventResults.earnedWindTunnel) {
+    eventAwards['awards.windTunnel'] = admin.firestore.FieldValue.increment(1);
+    eventResults.earnedAwards.push({ awardId: 'windTunnel', category: 'event_special', intensity: 'moderate' });
+  }
+  if (eventResults.earnedTheAccountant) {
+    eventAwards['awards.theAccountant'] = admin.firestore.FieldValue.increment(1);
+    eventResults.earnedAwards.push({ awardId: 'theAccountant', category: 'event_special', intensity: 'moderate' });
   }
 
   // GC trophies (only on Event 15)
@@ -2776,6 +2799,18 @@ async function updateResultsSummary(season, event, results, userUid, unlockBonus
 
       const earnedDarkHorse = awardsCalc.checkDarkHorse(position, predictedPosition);
 
+      // Wind Tunnel: top 5 in time trial when predicted outside top 5
+      const eventType = EVENT_TYPES[event] || 'road race';
+      const earnedWindTunnel = awardsCalc.checkWindTunnel(position, predictedPosition, eventType);
+
+      // The Accountant: more points than the rider who crossed the line first in points race
+      let earnedTheAccountant = false;
+      if (eventType === 'points race') {
+        const userEventPoints = parseInt(r.Points) || 0;
+        const userTime = parseFloat(r.Time) || 0;
+        earnedTheAccountant = awardsCalc.checkTheAccountant(userTime, userEventPoints, results);
+      }
+
       // For current user, include unlock bonus points
       const isCurrentUser = r.UID === userUid;
       const userUnlockBonus = isCurrentUser ? unlockBonusPoints : 0;
@@ -2800,6 +2835,8 @@ async function updateResultsSummary(season, event, results, userUid, unlockBonus
         earnedCloseCall: earnedCloseCall,
         earnedPhotoFinish: earnedPhotoFinish,
         earnedDarkHorse: earnedDarkHorse,
+        earnedWindTunnel: earnedWindTunnel,
+        earnedTheAccountant: earnedTheAccountant,
         eventPoints: parseInt(r.Points) || null,
         isBot: isBot(r.UID, r.Gender)
       };
@@ -2830,6 +2867,8 @@ async function updateResultsSummary(season, event, results, userUid, unlockBonus
         earnedCloseCall: false,
         earnedPhotoFinish: false,
         earnedDarkHorse: false,
+        earnedWindTunnel: false,
+        earnedTheAccountant: false,
         eventPoints: null,
         isBot: isBot(r.UID, r.Gender),
         isDNF: true

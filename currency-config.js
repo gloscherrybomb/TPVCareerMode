@@ -32,7 +32,9 @@ const AWARD_CREDIT_MAP = {
   comeback: 25,
   lanternRouge: 10,
   overrated: 5,
-  technicalIssues: 5
+  technicalIssues: 5,
+  windTunnel: 25,
+  theAccountant: 30
 };
 
 // Safety cap per event to avoid runaway stacking in preview

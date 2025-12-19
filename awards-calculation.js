@@ -214,6 +214,54 @@ function getTimesFromResults(results, position) {
   return { winnerTime, secondPlaceTime, userTime };
 }
 
+/**
+ * Check if Wind Tunnel award earned (top 5 in time trial when predicted outside top 5)
+ * @param {number} position - finishing position
+ * @param {number} predictedPosition - predicted finishing position
+ * @param {string} eventType - event type from EVENT_TYPES
+ * @returns {boolean}
+ */
+function checkWindTunnel(position, predictedPosition, eventType) {
+  // Must be a time trial (not hill climb or other event types)
+  if (eventType !== 'time trial') return false;
+  // Must finish top 5
+  if (position > 5) return false;
+  // Must have been predicted outside top 5
+  if (!predictedPosition || predictedPosition <= 5) return false;
+  return true;
+}
+
+/**
+ * Check if The Accountant award earned (more points than the rider who crossed the line first)
+ * In a points race, Position is determined by accumulated points, but this award compares
+ * the user's points against the rider who physically crossed the finish line first (fastest time)
+ * @param {number} userTime - user's finish time
+ * @param {number} userEventPoints - user's event points from Points column
+ * @param {Array} results - all results from the event
+ * @returns {boolean}
+ */
+function checkTheAccountant(userTime, userEventPoints, results) {
+  // Must have event points
+  if (!userEventPoints) return false;
+
+  // Find the rider who crossed the finish line first (fastest time)
+  const finishers = results
+    .filter(r => r.Position !== 'DNF' && parseFloat(r.Time) > 0)
+    .sort((a, b) => parseFloat(a.Time) - parseFloat(b.Time));
+
+  if (finishers.length === 0) return false;
+
+  const firstAcrossLine = finishers[0];
+  const firstAcrossLineTime = parseFloat(firstAcrossLine.Time);
+  const firstAcrossLinePoints = parseInt(firstAcrossLine.Points) || 0;
+
+  // User must not be the rider who crossed first (otherwise nothing special)
+  if (userTime === firstAcrossLineTime) return false;
+
+  // User must have more points than the rider who crossed first
+  return userEventPoints > firstAcrossLinePoints;
+}
+
 // Export for Node.js
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
@@ -223,7 +271,9 @@ if (typeof module !== 'undefined' && module.exports) {
     checkDarkHorse,
     checkZeroToHero,
     calculateCareerAwards,
-    getTimesFromResults
+    getTimesFromResults,
+    checkWindTunnel,
+    checkTheAccountant
   };
 }
 
@@ -236,6 +286,8 @@ if (typeof window !== 'undefined') {
     checkDarkHorse,
     checkZeroToHero,
     calculateCareerAwards,
-    getTimesFromResults
+    getTimesFromResults,
+    checkWindTunnel,
+    checkTheAccountant
   };
 }
