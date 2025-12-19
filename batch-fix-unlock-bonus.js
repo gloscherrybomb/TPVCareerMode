@@ -1,6 +1,7 @@
 const admin = require("firebase-admin");
 const fs = require("fs");
 const path = require("path");
+const { UNLOCK_DEFINITIONS } = require('./unlock-config');
 
 /**
  * Extract timestamp from CSV filename
@@ -82,39 +83,15 @@ if (!admin.apps.length) {
 
 const db = admin.firestore();
 
-// Unlock configuration (must match unlock-config.js)
-const UNLOCK_CONFIG = {
-  paceNotes: { name: 'Pace Notes', pointsBonus: 3, emoji: '📋' },
-  teamCarRecon: { name: 'Team Car Recon', pointsBonus: 4, emoji: '🚗' },
-  sprintPrimer: { name: 'Sprint Primer', pointsBonus: 3, emoji: '⚡' },
-  aeroWheels: { name: 'Aero Wheels', pointsBonus: 5, emoji: '🎡' },
-  cadenceNutrition: { name: 'Cadence Nutrition', pointsBonus: 4, emoji: '🍌' },
-  soigneurSession: { name: 'Soigneur Session', pointsBonus: 4, emoji: '💆' },
-  preRaceMassage: { name: 'Pre-Race Massage', pointsBonus: 5, emoji: '🙌' },
-  windTunnel: { name: 'Wind Tunnel Session', pointsBonus: 6, emoji: '💨' },
-  altitudeAcclim: { name: 'Altitude Camp', pointsBonus: 6, emoji: '🏔️' },
-  signatureMove: { name: 'Signature Move', pointsBonus: 8, emoji: '✨' },
-  contractBonus: { name: 'Contract Bonus', pointsBonus: 7, emoji: '📝' },
-  fanFavorite: { name: 'Fan Favorite', pointsBonus: 7, emoji: '🎉' },
-  climbingGears: { name: 'Climbing Gears', pointsBonus: 5, emoji: '⛰️' },
-  aggroRaceKit: { name: 'Aggro Race Kit', pointsBonus: 5, emoji: '🔥' },
-  tightPackWin: { name: 'Tight Pack Win', pointsBonus: 5, emoji: '🎯' },
-  domestiqueHelp: { name: 'Domestique Help', pointsBonus: 6, emoji: '🤝' },
-  recoveryBoots: { name: 'Recovery Boots', pointsBonus: 6, emoji: '🦵' },
-  rivalSlayer: { name: 'Rival Slayer', pointsBonus: 6, emoji: '⚔️' },
-  mentalCoach: { name: 'Mental Coach', pointsBonus: 4, emoji: '🧠' },
-  aggressionKit: { name: 'Aggression Kit', pointsBonus: 4, emoji: '😤' },
-  tacticalRadio: { name: 'Tactical Radio', pointsBonus: 4, emoji: '📻' },
-  professionalAttitude: { name: 'Professional Attitude', pointsBonus: 4, emoji: '👔' },
-  confidenceBooster: { name: 'Confidence Booster', pointsBonus: 5, emoji: '💪' },
-  aggressorHelmet: { name: 'Aggressor Helmet', pointsBonus: 5, emoji: '🪖' },
-  teamLeaderJersey: { name: 'Team Leader Jersey', pointsBonus: 5, emoji: '👕' },
-  calmAnalyst: { name: 'Calm Analyst', pointsBonus: 5, emoji: '🧘' },
-  humbleChampion: { name: 'Humble Champion', pointsBonus: 5, emoji: '🏆' },
-  showmanGear: { name: 'Showman Gear', pointsBonus: 5, emoji: '🎭' },
-  comebackKing: { name: 'Comeback King', pointsBonus: 5, emoji: '👑' },
-  balancedApproach: { name: 'Balanced Approach', pointsBonus: 7, emoji: '⚖️' }
-};
+// Build UNLOCK_CONFIG from shared UNLOCK_DEFINITIONS (single source of truth)
+const UNLOCK_CONFIG = {};
+for (const unlock of UNLOCK_DEFINITIONS) {
+  UNLOCK_CONFIG[unlock.id] = {
+    name: unlock.name,
+    pointsBonus: unlock.pointsBonus,
+    emoji: unlock.emoji || '🎯'
+  };
+}
 
 /**
  * Batch apply unlock bonuses from a history file
