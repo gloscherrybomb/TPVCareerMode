@@ -789,16 +789,20 @@ function generateRaceRecap(data) {
  * Generate CONDENSED forward look (2-4 sentences)
  * Season-phase aware, concise outlook without repeating recap sentiments
  * Used in the two-part narrative structure
+ * For choice stages (3, 6, 8), describes the upcoming choice rather than a specific event
  */
 function generateForwardLook(seasonData, raceData) {
   const {
     stagesCompleted,
     nextEventNumber,
+    nextStageNumber,
     isOnStreak,
     totalPodiums,
     totalWins,
     recentResults,
-    isSeasonComplete
+    isSeasonComplete,
+    isNextStageChoice,
+    completedOptionalEvents
   } = seasonData;
 
   // Compute next event name from EVENT_NAMES
@@ -810,6 +814,20 @@ function generateForwardLook(seasonData, raceData) {
       return "The season ends on a high note. Time to rest, recover, and carry this momentum into the off-season. There will be time to analyze what worked and what to build on for next year.";
     }
     return "The season is complete. Time to rest, reflect on what you've learned, and start thinking about what comes next. Every race has been a lesson, and those lessons compound.";
+  }
+
+  // Handle choice stages (3, 6, 8) - don't mention specific event name
+  if (isNextStageChoice) {
+    const completedOptionals = completedOptionalEvents || [];
+    const remainingCount = 7 - completedOptionals.length;
+
+    if (completedOptionals.length === 0) {
+      return `Stage ${nextStageNumber} presents your first optional choice—seven different event types to pick from. Each tests different skills and reveals different aspects of your abilities. The decision is yours.`;
+    } else if (completedOptionals.length === 1) {
+      return `Stage ${nextStageNumber} brings your second optional choice. With ${remainingCount} event types still available, consider what you've learned about your strengths and where you want to grow.`;
+    } else {
+      return `Stage ${nextStageNumber} is your final optional choice—${remainingCount} event types remain. Pick wisely, as it's the last variable you control before the season's closing stretch.`;
+    }
   }
 
   const nextEventType = EVENT_TYPES[nextEventNumber];
@@ -1257,6 +1275,7 @@ function generateSeasonContext(data) {
  * Generate INLINE rival phrase for weaving into recap
  * Returns a short phrase (not a full sentence) or empty string
  * Used in the two-part narrative structure
+ * For Event 4 (time challenge), uses distance-based phrasing since times are identical
  */
 function generateRivalInline(raceData, seasonData) {
   // Check if user has rivals and rival data
@@ -1281,6 +1300,29 @@ function generateRivalInline(raceData, seasonData) {
   // Get the closest/most significant rival
   const rival = rivalsInRace[0];
   const userWon = rival.userFinishedAhead;
+  const eventNumber = raceData.eventNumber;
+
+  // For time challenge (Event 4), use distance-based phrasing
+  if (eventNumber === 4) {
+    const distanceGap = ((rival.distanceGap || 0) / 1000).toFixed(2);
+    if (userWon) {
+      const phrases = [
+        `finishing ${distanceGap}km ahead of rival ${rival.botName}`,
+        `with ${rival.botName} covering ${distanceGap}km less`,
+        `outpacing ${rival.botName} by ${distanceGap}km`
+      ];
+      return phrases[Math.floor(Math.random() * phrases.length)];
+    } else {
+      const phrases = [
+        `with rival ${rival.botName} covering ${distanceGap}km more`,
+        `trailing ${rival.botName} by ${distanceGap}km`,
+        `with ${rival.botName} finishing ${distanceGap}km ahead`
+      ];
+      return phrases[Math.floor(Math.random() * phrases.length)];
+    }
+  }
+
+  // Regular events - use time-based phrasing
   const gap = rival.timeGap.toFixed(1);
 
   // Return inline phrase (to be woven into recap)

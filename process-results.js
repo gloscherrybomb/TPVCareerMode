@@ -578,10 +578,17 @@ function isBot(uid, gender) {
 
 /**
  * Calculate rival encounters for this race
- * Finds all bots within 30 seconds of user's time and records the encounter
+ * Finds all bots within 30 seconds of user's time (or 500m for time challenges) and records the encounter
+ * For Event 3 (elimination race), skip entirely as times are meaningless
+ * For Event 4 (time challenge), use distance-based detection since all riders finish at the same time
  */
-function calculateRivalEncounters(results, userUid, userPosition, userTime) {
+function calculateRivalEncounters(results, userUid, userPosition, userTime, eventNumber, userDistance) {
   const encounters = [];
+
+  // Skip for elimination race - times are meaningless
+  if (eventNumber === 3) {
+    return encounters;
+  }
 
   // Find user's result
   const userResult = results.find(r => r.UID === userUid);
@@ -589,11 +596,47 @@ function calculateRivalEncounters(results, userUid, userPosition, userTime) {
     return encounters;
   }
 
-  // Check all other racers
+  // For time challenge (Event 4), use distance-based rival detection
+  if (eventNumber === 4) {
+    results.forEach(result => {
+      const botUid = result.UID;
+      const botPosition = parseInt(result.Position);
+      const botDistance = parseFloat(result.Distance) || 0;
+
+      // Skip if not a bot, DNF, or invalid data
+      if (!isBot(botUid, result.Gender) || result.Position === 'DNF' || isNaN(botPosition)) {
+        return;
+      }
+
+      // Calculate distance gap
+      const distanceGap = Math.abs(userDistance - botDistance);
+
+      // Only track if within 500 meters (reasonable gap for 20min effort)
+      if (distanceGap <= 500) {
+        encounters.push({
+          botUid: botUid,
+          botName: result.Name,
+          botTeam: result.Team || '',
+          botCountry: result.Country || '',
+          botArr: parseInt(result.ARR) || 0,
+          timeGap: 0, // Not meaningful for time challenge
+          distanceGap: distanceGap,
+          userFinishedAhead: userPosition < botPosition,
+          botPosition: botPosition,
+          userPosition: userPosition
+        });
+      }
+    });
+
+    return encounters;
+  }
+
+  // Regular events - use time-based detection
   results.forEach(result => {
     const botUid = result.UID;
     const botTime = parseFloat(result.Time);
     const botPosition = parseInt(result.Position);
+    const botDistance = parseFloat(result.Distance) || 0;
 
     // Skip if not a bot, DNF, or invalid data
     if (!isBot(botUid, result.Gender) || result.Position === 'DNF' || isNaN(botTime) || isNaN(botPosition)) {
@@ -612,6 +655,7 @@ function calculateRivalEncounters(results, userUid, userPosition, userTime) {
         botCountry: result.Country || '',
         botArr: parseInt(result.ARR) || 0,
         timeGap: timeGap,
+        distanceGap: Math.abs(userDistance - botDistance),
         userFinishedAhead: userPosition < botPosition,
         botPosition: botPosition,
         userPosition: userPosition
@@ -1422,7 +1466,9 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
       results,
       uid,
       position,
-      parseFloat(userResult.Time) || 0
+      parseFloat(userResult.Time) || 0,
+      eventNumber,
+      parseFloat(userResult.Distance) || 0
     );
     const existingRivalDataForUnlocks = userData.rivalData || null;
     const updatedRivalDataForUnlocks = updateRivalData(existingRivalDataForUnlocks, rivalEncountersForUnlocks, eventNumber);
@@ -1517,7 +1563,9 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
     results,
     uid,
     position,
-    parseFloat(userResult.Time) || 0
+    parseFloat(userResult.Time) || 0,
+    eventNumber,
+    parseFloat(userResult.Distance) || 0
   );
 
   // Update rival data (must be before story generation)
@@ -1530,7 +1578,8 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
 
   // Log rival encounters
   if (rivalEncounters.length > 0) {
-    console.log(`   🤝 Rival encounters: ${rivalEncounters.length} bot(s) within 30s`);
+    const proximityDesc = eventNumber === 4 ? 'within 500m' : 'within 30s';
+    console.log(`   🤝 Rival encounters: ${rivalEncounters.length} bot(s) ${proximityDesc}`);
   }
 
   // Generate story using v3.0 story generator (has all features built-in)
@@ -2825,6 +2874,7 @@ async function updateResultsSummary(season, event, results, userUid, unlockBonus
         eventRating: parseInt(r.EventRating) || null,
         predictedPosition: predictedPosition,
         time: parseFloat(r.Time) || 0,
+        distance: parseFloat(r.Distance) || 0,
         points: points + userUnlockBonus,
         bonusPoints: bonusPoints + userUnlockBonus,
         unlockBonusPoints: userUnlockBonus,
@@ -2857,6 +2907,7 @@ async function updateResultsSummary(season, event, results, userUid, unlockBonus
         eventRating: parseInt(r.EventRating) || null,
         predictedPosition: null,
         time: null,
+        distance: parseFloat(r.Distance) || 0,
         points: 0,
         bonusPoints: 0,
         unlockBonusPoints: 0,

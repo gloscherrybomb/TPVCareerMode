@@ -8,6 +8,9 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebas
 import { makeNameClickable } from './bot-profile-modal.js';
 import { displayPostRaceInterview } from './event-detail-interview.js';
 
+// Get TIME_BASED_EVENTS from window.eventConfig (loaded via script tag)
+const TIME_BASED_EVENTS = window.eventConfig?.TIME_BASED_EVENTS || [];
+
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
@@ -770,6 +773,9 @@ async function loadEventResults() {
             `;
         }
 
+        // Check if this is a time-based event (show distance instead of time)
+        const isTimeBasedEvent = TIME_BASED_EVENTS.includes(eventNumber);
+
         tableHTML += `
             <div class="results-table-container">
                 <div class="results-table-wrapper">
@@ -779,7 +785,7 @@ async function loadEventResults() {
                                 <th>Pos</th>
                                 <th>Rider</th>
                                 <th>Team</th>
-                                <th>Time</th>
+                                <th>${isTimeBasedEvent ? 'Distance' : 'Time'}</th>
                                 <th>ARR</th>
                                 <th>Points</th>
                                 ${results[0].eventPoints != null ? '<th>PR Pts</th>' : ''}
@@ -848,7 +854,10 @@ async function loadEventResults() {
 
             // Display values for DNF vs finished riders
             const positionDisplay = isDNF ? 'DNF' : result.position;
-            const timeDisplay = isDNF ? '—' : formatTime(result.time);
+            // For time-based events, show distance in km; otherwise show time
+            const timeOrDistanceDisplay = isDNF ? '—' : (isTimeBasedEvent
+                ? `${(result.distance / 1000).toFixed(2)} km`
+                : formatTime(result.time));
             const pointsDisplay = isDNF ? '0' : result.points;
 
             tableHTML += `
@@ -861,7 +870,7 @@ async function loadEventResults() {
                         ${isCurrentUser ? '<span class="you-badge">YOU</span>' : ''}
                     </td>
                     <td class="team-cell">${teamDisplay}</td>
-                    <td class="time-cell">${timeDisplay}</td>
+                    <td class="time-cell">${timeOrDistanceDisplay}</td>
                     <td class="arr-cell">
                         <span class="arr-value">${result.arr}</span>
                         <span class="arr-band">${result.arrBand || getARRBand(result.arr)}</span>
