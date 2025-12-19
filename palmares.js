@@ -667,6 +667,40 @@ function displayDetailedStats() {
     document.getElementById('winRateVsStronger').textContent = competitionStats.winRateVsStronger;
     document.getElementById('winRateVsWeaker').textContent = competitionStats.winRateVsWeaker;
 
+    // Toughest Victory - win with the worst (highest) predicted position
+    const wins = completedResults.filter(r => r.position === 1);
+    const toughestVictoryEl = document.getElementById('toughestVictory');
+    if (wins.length > 0) {
+        // Find win with highest predicted position (most unlikely win)
+        const toughest = wins.reduce((best, current) => {
+            const currentPred = current.predictedPosition || 0;
+            const bestPred = best.predictedPosition || 0;
+            return currentPred > bestPred ? current : best;
+        });
+
+        if (toughest.predictedPosition && toughest.predictedPosition > 1) {
+            toughestVictoryEl.innerHTML = `
+                <div class="stat-row">
+                    <span class="stat-row-label">Event:</span>
+                    <span class="stat-row-value">${toughest.eventName}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-row-label">Predicted:</span>
+                    <span class="stat-row-value">${toughest.predictedPosition}${getOrdinalSuffix(toughest.predictedPosition)}</span>
+                </div>
+            `;
+        } else {
+            // Won but was predicted 1st or no prediction data
+            toughestVictoryEl.innerHTML = `
+                <div class="stat-row">
+                    <span class="stat-row-label">Event:</span>
+                    <span class="stat-row-value">${toughest.eventName}</span>
+                </div>
+            `;
+        }
+    }
+    // If no wins, keep the default "No wins yet" text
+
     // Specialty
     const typeStats = calculateTypeStats(completedResults);
     document.getElementById('bestRaceType').textContent = typeStats.bestType || '—';
