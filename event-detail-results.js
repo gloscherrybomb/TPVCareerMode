@@ -10,6 +10,7 @@ import { displayPostRaceInterview } from './event-detail-interview.js';
 
 // TIME_BASED_EVENTS will be retrieved when needed to avoid timing issues with window.eventConfig
 function getTimeBasedEvents() {
+    console.log('getTimeBasedEvents called, window.eventConfig:', window.eventConfig);
     return window.eventConfig?.TIME_BASED_EVENTS || [];
 }
 
