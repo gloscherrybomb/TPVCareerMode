@@ -52,6 +52,8 @@ jobs:
           else
             STAGED_FILES_JSON="[]"
           fi
+          echo "Debug: STAGED_FILES=$STAGED_FILES"
+          echo "Debug: STAGED_FILES_JSON=$STAGED_FILES_JSON"
           echo "staged_files_json=$STAGED_FILES_JSON" >> $GITHUB_OUTPUT
 
           # Check if there are staged changes

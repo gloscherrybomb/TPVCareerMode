@@ -52,16 +52,23 @@ jobs:
       - name: Get changed CSV files
         id: changed-files
         run: |
+          echo "Debug: event_name=${{ github.event_name }}"
+          echo "Debug: inputs.csv_files=${{ inputs.csv_files }}"
+
           # Check if files were passed via workflow_call input
-          if [ -n "${{ inputs.csv_files }}" ]; then
+          if [ -n "${{ inputs.csv_files }}" ] && [ "${{ inputs.csv_files }}" != "[]" ]; then
             echo "Using files from workflow_call input"
             echo "files=${{ inputs.csv_files }}" >> $GITHUB_OUTPUT
           elif [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             # Manual trigger - find all CSV files in race_results
-            echo "files=$(find race_results -name '*.csv' -type f 2>/dev/null | jq -R -s -c 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
+            FILES=$(find race_results -name '*.csv' -type f 2>/dev/null | jq -R -s -c 'split("\n")[:-1]')
+            echo "Debug: Found files=$FILES"
+            echo "files=$FILES" >> $GITHUB_OUTPUT
           else
-            # Auto trigger (push) - process ADDED or MODIFIED CSV files
-            echo "files=$(git diff --name-only --diff-filter=AM HEAD~1 HEAD | grep '\.csv$' | jq -R -s -c 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
+            # Auto trigger (push) or workflow_call with no files - process ADDED or MODIFIED CSV files
+            FILES=$(git diff --name-only --diff-filter=AM HEAD~1 HEAD 2>/dev/null | grep '\.csv$' | jq -R -s -c 'split("\n")[:-1]' || echo '[]')
+            echo "Debug: Git diff files=$FILES"
+            echo "files=$FILES" >> $GITHUB_OUTPUT
           fi
       
       - name: Process race results
