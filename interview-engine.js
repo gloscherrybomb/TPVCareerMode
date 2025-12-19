@@ -68,6 +68,7 @@ export function buildRaceContext(userResult, allResults, userData, seasonData) {
         rivalName: null,
         rivalGap: null,
         userWon: null,
+        userLost: null,
         totalEncounters: 0,
         h2hWins: 0,
         firstEncounter: false,
@@ -96,6 +97,7 @@ export function buildRaceContext(userResult, allResults, userData, seasonData) {
             context.rivalName = rival.name;
             context.rivalGap = Math.abs(userResult.time - rivalResult.time);
             context.userWon = userResult.position < rivalResult.position;
+            context.userLost = userResult.position > rivalResult.position;
             context.totalEncounters = rival.encounters || 1;
             context.h2hWins = rival.userWins || 0;
             context.firstEncounter = rival.encounters === 1;

@@ -67,7 +67,7 @@ const INTERVIEW_RESPONSES = {
 
   win_close_resilient: {
     id: 'win_close_resilient',
-    text: "After some tough races, this one felt extra sweet. To win in a photo finish shows I'm exactly where I need to be mentally.",
+    text: "When it's that close, you have to dig deep. To win in a photo finish shows I'm exactly where I need to be mentally.",
     style: 'resilient',
     badge: '💚 Resilient',
     personalityImpact: {

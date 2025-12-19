@@ -392,8 +392,9 @@ const INTERVIEW_QUESTIONS = {
       id: 'meeting_expectations',
       text: "You finished close to your prediction today. Is that where you expected to be?",
       triggers: {
-        worseThanPredictionBy: 2,
-        beatPredictionBy: 2
+        positionBetween: [5, 20]
+        // Note: This triggers for mid-pack finishes. The original trigger requiring both
+        // worseThanPredictionBy >= 2 AND beatPredictionBy >= 2 was mathematically impossible.
       },
       responses: ['consistency_professional', 'midpack_realistic', 'progression_patient']
     },
@@ -444,8 +445,8 @@ const INTERVIEW_QUESTIONS = {
       id: 'sprint_finish',
       text: "The sprint came down to positioning. Were you where you wanted to be?",
       triggers: {
-        eventCategory: 'criterium',
-        finishType: 'bunch_sprint'
+        eventType: 'criterium',
+        positionBetween: [1, 10]
       },
       responses: ['sprint_professional', 'sprint_confident', 'sprint_learning']
     },
@@ -485,7 +486,7 @@ const INTERVIEW_QUESTIONS = {
       text: "You made the break and it stuck. Was that part of the plan?",
       triggers: {
         position: 1,
-        raceType: 'road race'
+        eventType: 'road race'
       },
       responses: ['break_tactical', 'break_confident', 'break_opportunistic']
     },
