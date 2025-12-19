@@ -10,7 +10,7 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 // Import shared event configuration from window (loaded via script tag in HTML)
-const { STAGE_REQUIREMENTS, EXPECTED_DISTANCES, EVENT_NAMES } = window.eventConfig;
+const { STAGE_REQUIREMENTS, EXPECTED_DISTANCES, EVENT_NAMES, TIME_BASED_EVENTS } = window.eventConfig;
 
 // State
 let currentUser = null;
@@ -347,57 +347,69 @@ function validateCSV() {
     });
     if (!userInCSV) allValid = false;
 
-    // 2. Check distance/event validation
-    const finishers = parsedCSV.results.filter(r => r.Position !== 'DNF' && r.Distance);
-    if (finishers.length > 0) {
-        const winnerDistance = parseFloat(finishers[0].Distance);
+    // 2. Check distance/event validation (skip for time-based events)
+    const isTimeBasedEvent = selectedEventNumber && TIME_BASED_EVENTS.includes(selectedEventNumber);
 
-        if (selectedEventNumber) {
-            const expectedDistance = EXPECTED_DISTANCES[selectedEventNumber];
-            const tolerance = 0.10; // 10% tolerance
-            const minDist = expectedDistance * (1 - tolerance);
-            const maxDist = expectedDistance * (1 + tolerance);
-            const distanceMatch = winnerDistance >= minDist && winnerDistance <= maxDist;
+    if (isTimeBasedEvent) {
+        // For time-based events, skip distance validation and show info message
+        validations.push({
+            valid: true,
+            icon: '✓',
+            text: `Event ${selectedEventNumber} is a time-based challenge (distance varies by rider)`,
+            type: 'valid'
+        });
+    } else {
+        const finishers = parsedCSV.results.filter(r => r.Position !== 'DNF' && r.Distance);
+        if (finishers.length > 0) {
+            const winnerDistance = parseFloat(finishers[0].Distance);
 
-            validations.push({
-                valid: distanceMatch,
-                icon: distanceMatch ? '✓' : '✗',
-                text: distanceMatch
-                    ? `Distance matches Event ${selectedEventNumber} (~${(expectedDistance / 1000).toFixed(1)}km)`
-                    : `Distance mismatch: Found ${(winnerDistance / 1000).toFixed(1)}km, expected ~${(expectedDistance / 1000).toFixed(1)}km for Event ${selectedEventNumber}`,
-                type: distanceMatch ? 'valid' : 'invalid'
-            });
-            if (!distanceMatch) allValid = false;
-        } else {
-            // Try to detect event from distance
-            const detectedEvent = detectEventFromDistance(winnerDistance);
-            if (detectedEvent) {
+            if (selectedEventNumber) {
+                const expectedDistance = EXPECTED_DISTANCES[selectedEventNumber];
+                const tolerance = 0.10; // 10% tolerance
+                const minDist = expectedDistance * (1 - tolerance);
+                const maxDist = expectedDistance * (1 + tolerance);
+                const distanceMatch = winnerDistance >= minDist && winnerDistance <= maxDist;
+
                 validations.push({
-                    valid: true,
-                    icon: 'ℹ',
-                    text: `Distance suggests Event ${detectedEvent}: ${EVENT_NAMES[detectedEvent]} (~${(winnerDistance / 1000).toFixed(1)}km)`,
-                    type: 'info'
+                    valid: distanceMatch,
+                    icon: distanceMatch ? '✓' : '✗',
+                    text: distanceMatch
+                        ? `Distance matches Event ${selectedEventNumber} (~${(expectedDistance / 1000).toFixed(1)}km)`
+                        : `Distance mismatch: Found ${(winnerDistance / 1000).toFixed(1)}km, expected ~${(expectedDistance / 1000).toFixed(1)}km for Event ${selectedEventNumber}`,
+                    type: distanceMatch ? 'valid' : 'invalid'
                 });
+                if (!distanceMatch) allValid = false;
             } else {
-                validations.push({
-                    valid: false,
-                    icon: '⚠',
-                    text: `Could not match distance (${(winnerDistance / 1000).toFixed(1)}km) to any event`,
-                    type: 'warning'
-                });
-            }
+                // Try to detect event from distance
+                const detectedEvent = detectEventFromDistance(winnerDistance);
+                if (detectedEvent) {
+                    validations.push({
+                        valid: true,
+                        icon: 'ℹ',
+                        text: `Distance suggests Event ${detectedEvent}: ${EVENT_NAMES[detectedEvent]} (~${(winnerDistance / 1000).toFixed(1)}km)`,
+                        type: 'info'
+                    });
+                } else {
+                    validations.push({
+                        valid: false,
+                        icon: '⚠',
+                        text: `Could not match distance (${(winnerDistance / 1000).toFixed(1)}km) to any event`,
+                        type: 'warning'
+                    });
+                }
 
-            // For choice stages, remind to select event
-            const currentStage = userData?.currentStage || 1;
-            const stageReq = STAGE_REQUIREMENTS[currentStage];
-            if (stageReq?.type === 'choice') {
-                validations.push({
-                    valid: false,
-                    icon: '!',
-                    text: 'Please select which event this result is for',
-                    type: 'warning'
-                });
-                allValid = false;
+                // For choice stages, remind to select event
+                const currentStage = userData?.currentStage || 1;
+                const stageReq = STAGE_REQUIREMENTS[currentStage];
+                if (stageReq?.type === 'choice') {
+                    validations.push({
+                        valid: false,
+                        icon: '!',
+                        text: 'Please select which event this result is for',
+                        type: 'warning'
+                    });
+                    allValid = false;
+                }
             }
         }
     }

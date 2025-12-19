@@ -43,6 +43,9 @@ const EVENT_TYPES = {
 // Optional choice events (can be selected at stages 3, 6, or 8)
 const OPTIONAL_EVENTS = [6, 7, 8, 9, 10, 11, 12];
 
+// Time-based events (where distance varies based on rider speed, so distance validation is skipped)
+const TIME_BASED_EVENTS = [4]; // Event 4: Coastal Loop Time Challenge (20 min)
+
 // Expected distances in meters (for CSV validation)
 const EXPECTED_DISTANCES = {
   1: 23400,   // Coast and Roast Crit
@@ -81,6 +84,7 @@ if (typeof module !== 'undefined' && module.exports) {
     EVENT_NAMES,
     EVENT_TYPES,
     OPTIONAL_EVENTS,
+    TIME_BASED_EVENTS,
     EXPECTED_DISTANCES,
     STAGE_REQUIREMENTS
   };
@@ -92,6 +96,7 @@ if (typeof window !== 'undefined') {
     EVENT_NAMES,
     EVENT_TYPES,
     OPTIONAL_EVENTS,
+    TIME_BASED_EVENTS,
     EXPECTED_DISTANCES,
     STAGE_REQUIREMENTS
   };
