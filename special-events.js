@@ -23,7 +23,7 @@ const SPECIAL_EVENTS = [
         name: 'Singapore Criterium',
         icon: '🇸🇬',
         description: 'An exclusive night race through the illuminated streets of Marina Bay. Reserved for riders who prove their commitment.',
-        reward: '+100 Career Points',
+        reward: '+60 Career Points',
         bonusCC: '+50 CC',
         type: 'Criterium',
         unlockMethod: 'store', // 'store', 'achievement', 'seasonal'
