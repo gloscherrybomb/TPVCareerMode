@@ -528,34 +528,40 @@ function renderGrid() {
     });
   });
 
-  // Render special flair items in separate section
+  // Render special items (flairs and special events) in separate section
   const specialGridEl = document.getElementById('tier-special');
   if (specialGridEl) {
     specialGridEl.innerHTML = '';
 
-    // Get all flair items from catalog
-    const flairItems = unlockCatalog.filter(item => item.isFlair);
+    // Get all special items from catalog (flairs and special events)
+    const specialItems = unlockCatalog.filter(item => item.isFlair || item.isSpecialEvent);
 
-    // Apply search filter to flair items too
-    const filteredFlairs = flairItems.filter(item => {
+    // Apply search filter to special items too
+    const filteredSpecials = specialItems.filter(item => {
       if (currentSearch && !item.name.toLowerCase().includes(currentSearch.toLowerCase())) {
         return false;
       }
       return true;
     });
 
-    // Update special section progress
-    const totalFlairs = flairItems.length;
-    const ownedFlairs = flairItems.filter(item => {
+    // Helper function to check ownership of special items
+    const isSpecialItemOwned = (item) => {
       if (item.id === 'money-bags') {
         return userData.hasHighRollerFlair === true;
       }
+      if (item.id === 'singapore-criterium') {
+        return userData.hasSingaporeCriterium === true;
+      }
       return false;
-    }).length;
+    };
+
+    // Update special section progress
+    const totalSpecials = specialItems.length;
+    const ownedSpecials = specialItems.filter(item => isSpecialItemOwned(item)).length;
     const specialProgressEl = document.getElementById('tier-progress-special');
     if (specialProgressEl) {
-      specialProgressEl.textContent = `${ownedFlairs}/${totalFlairs} owned`;
-      specialProgressEl.className = `tier-progress ${ownedFlairs === totalFlairs && totalFlairs > 0 ? 'tier-progress-complete' : ''}`;
+      specialProgressEl.textContent = `${ownedSpecials}/${totalSpecials} owned`;
+      specialProgressEl.className = `tier-progress ${ownedSpecials === totalSpecials && totalSpecials > 0 ? 'tier-progress-complete' : ''}`;
     }
 
     // Handle collapse state for special section
@@ -578,12 +584,9 @@ function renderGrid() {
       }
     }
 
-    filteredFlairs.forEach((item, index) => {
-      // Check ownership for flair items using user flags
-      let owned = false;
-      if (item.id === 'money-bags') {
-        owned = userData.hasHighRollerFlair === true;
-      }
+    filteredSpecials.forEach((item, index) => {
+      // Check ownership for special items using user flags
+      const owned = isSpecialItemOwned(item);
 
       const canAfford = balance >= item.cost;
       const isLocked = !owned && !canAfford;
@@ -677,9 +680,16 @@ async function purchaseItem(item) {
       const balance = data.currency?.balance || 0;
       const inventory = data.unlocks?.inventory || [];
 
-      // Handle flair items differently - they set a user flag instead of adding to inventory
-      if (item.isFlair) {
-        const flairKey = item.id === 'money-bags' ? 'hasHighRollerFlair' : `has${item.id}`;
+      // Handle special items differently - they set a user flag instead of adding to inventory
+      if (item.isFlair || item.isSpecialEvent) {
+        let flairKey;
+        if (item.id === 'money-bags') {
+          flairKey = 'hasHighRollerFlair';
+        } else if (item.id === 'singapore-criterium') {
+          flairKey = 'hasSingaporeCriterium';
+        } else {
+          flairKey = `has${item.id}`;
+        }
         if (data[flairKey]) return; // Already owned
         if (balance < item.cost) throw new Error('Insufficient CC');
         tx.update(userDocRef, {

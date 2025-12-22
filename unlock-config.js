@@ -308,6 +308,21 @@ const UNLOCK_DEFINITIONS = [
     emoji: '💰',
     emojiFallback: '$',
     isFlair: true
+  },
+  // Special Event Unlocks
+  {
+    id: 'singapore-criterium',
+    name: 'Singapore Criterium',
+    cost: 800,
+    tier: 1000,
+    pointsBonus: 0,
+    trigger: 'special-event',
+    description: 'Unlock the exclusive Singapore Criterium special event',
+    narrative: 'The lights of Marina Bay await. This prestigious night race through the streets of Singapore is reserved for riders who prove their commitment to the sport.',
+    emoji: '🇸🇬',
+    emojiFallback: 'SG',
+    isSpecialEvent: true,
+    eventId: 101
   }
 ];
 

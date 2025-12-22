@@ -428,9 +428,51 @@ If you're in GC contention, this is where you make your move. If you're behind, 
     }
 };
 
-// Function to get event by ID
+// Special Events Data - exclusive one-off events unlockable through the store
+const specialEventData = {
+    101: {
+        id: 101,
+        number: "SE01",
+        name: "Singapore Criterium",
+        subtitle: "Night race through the streets of Marina Bay",
+        type: "Criterium",
+        level: "Special Event",
+        isSpecialEvent: true,
+        unlockId: "singapore-criterium",
+        distance: "TBD",
+        climbing: "TBD",
+        course: "TBD",
+        format: "TBD",
+        maxPoints: 100,
+        icon: "🇸🇬",
+        description: `The Singapore Criterium is an exclusive night race through the illuminated streets of Marina Bay. Reserved for riders who have proven their dedication to the sport, this prestigious event offers a unique racing experience under the city lights.
+
+Racing under floodlights with the Singapore skyline as your backdrop, you'll navigate a technical circuit that demands both speed and precision. The humid tropical conditions add an extra layer of challenge to this already demanding event.
+
+This is more than just a race—it's a statement. Being here means you've earned your place among the elite.`,
+        strategy: "Night racing requires extra focus. The course will be well-lit but shadows can play tricks. Stay hydrated in the tropical heat and humidity. Technical corners are critical—smooth is fast. Position yourself well before key turns and be prepared for aggressive racing throughout.",
+        routeDetails: {
+            start: "Marina Bay Street Circuit",
+            keyPoint: "Technical night circuit",
+            difficulty: "High-speed technical racing",
+            finish: "Marina Bay"
+        },
+        rewards: {
+            careerPoints: 100,
+            bonusCC: 50
+        },
+        scheduleUrl: null // To be set when event is configured
+    }
+};
+
+// Function to get event by ID (includes both regular and special events)
 function getEvent(id) {
-    return eventData[id] || null;
+    return eventData[id] || specialEventData[id] || null;
+}
+
+// Function to get special event by ID
+function getSpecialEvent(id) {
+    return specialEventData[id] || null;
 }
 
 // Function to calculate points distribution
@@ -510,13 +552,15 @@ function calculateSinglePosition(position, maxPoints) {
 
 // Export for use in HTML (CommonJS)
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { eventData, getEvent, calculatePoints, calculateSinglePosition };
+    module.exports = { eventData, specialEventData, getEvent, getSpecialEvent, calculatePoints, calculateSinglePosition };
 }
 
 // Also make available in browser via window object
 if (typeof window !== 'undefined') {
     window.eventData = eventData;
+    window.specialEventData = specialEventData;
     window.getEvent = getEvent;
+    window.getSpecialEvent = getSpecialEvent;
     window.calculatePoints = calculatePoints;
     window.calculateSinglePosition = calculateSinglePosition;
 }

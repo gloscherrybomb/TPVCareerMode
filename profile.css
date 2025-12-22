@@ -2320,43 +2320,57 @@
    MONEY BAGS FLAIR EFFECTS
    ============================================ */
 
-.profile-header.money-bags-profile {
-    position: relative;
-    border: 2px solid rgba(34, 197, 94, 0.5);
-    box-shadow: 0 0 30px rgba(34, 197, 94, 0.15);
-    animation: moneyBagsPulse 3s ease-in-out infinite;
+/* Animated flair badge below profile photo */
+.money-bags-flair {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    padding: 0.6rem 1.25rem;
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.15), rgba(16, 185, 129, 0.1));
+    border: 1px solid rgba(34, 197, 94, 0.4);
+    border-radius: 25px;
+    animation: moneyBagsFlairPulse 3s ease-in-out infinite;
 }
 
-.profile-header.money-bags-profile::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg,
-        rgba(34, 197, 94, 0.1) 0%,
-        transparent 40%,
-        transparent 60%,
-        rgba(16, 185, 129, 0.05) 100%);
-    pointer-events: none;
-    border-radius: inherit;
-    z-index: 0;
+.money-bags-flair-icon {
+    font-size: 1.2rem;
+    animation: moneyBagsIconBounce 2s ease-in-out infinite;
 }
 
-@keyframes moneyBagsPulse {
+.money-bags-flair-text {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #22c55e;
+    text-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+}
+
+@keyframes moneyBagsFlairPulse {
     0%, 100% {
-        box-shadow: 0 0 30px rgba(34, 197, 94, 0.15);
-        border-color: rgba(34, 197, 94, 0.5);
+        box-shadow: 0 0 15px rgba(34, 197, 94, 0.2);
+        border-color: rgba(34, 197, 94, 0.4);
     }
     50% {
-        box-shadow: 0 0 40px rgba(34, 197, 94, 0.25);
+        box-shadow: 0 0 25px rgba(34, 197, 94, 0.4);
         border-color: rgba(34, 197, 94, 0.7);
     }
 }
 
-/* Ensure child elements are above the overlay */
-.profile-header.money-bags-profile > * {
-    position: relative;
-    z-index: 1;
+@keyframes moneyBagsIconBounce {
+    0%, 100% {
+        transform: translateY(0) scale(1);
+    }
+    25% {
+        transform: translateY(-2px) scale(1.1);
+    }
+    50% {
+        transform: translateY(0) scale(1);
+    }
+    75% {
+        transform: translateY(1px) scale(0.95);
+    }
 }

@@ -245,13 +245,25 @@ function displayProfileInfo(user, userData, stats, seasonRanking, globalRanking)
         : '';
     profileNameEl.innerHTML = displayName + contributorBadge;
 
-    // Apply Money Bags flair effects to profile header
-    const profileHeader = document.querySelector('.profile-header');
-    if (profileHeader) {
-        if (userData.hasHighRollerFlair) {
-            profileHeader.classList.add('money-bags-profile');
-        } else {
-            profileHeader.classList.remove('money-bags-profile');
+    // Apply Money Bags flair below profile photo
+    const profilePhotoSection = document.querySelector('.profile-photo-section');
+    const existingFlair = document.querySelector('.money-bags-flair');
+
+    if (userData.hasHighRollerFlair) {
+        // Add flair if it doesn't exist
+        if (!existingFlair && profilePhotoSection) {
+            const flairElement = document.createElement('div');
+            flairElement.className = 'money-bags-flair';
+            flairElement.innerHTML = `
+                <span class="money-bags-flair-icon">💰</span>
+                <span class="money-bags-flair-text">Money Bags</span>
+            `;
+            profilePhotoSection.appendChild(flairElement);
+        }
+    } else {
+        // Remove flair if it exists
+        if (existingFlair) {
+            existingFlair.remove();
         }
     }
     document.getElementById('profileUID').textContent = userData.uid || 'No UID';

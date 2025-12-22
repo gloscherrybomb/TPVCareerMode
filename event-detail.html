@@ -465,9 +465,11 @@
         const urlParams = new URLSearchParams(window.location.search);
         const eventId = urlParams.get('id') || '1';
         const event = getEvent(parseInt(eventId));
+        const isSpecialEvent = parseInt(eventId) >= 100;
 
         if (!event) {
-            window.location.href = 'events.html';
+            // Redirect to appropriate page based on event type
+            window.location.href = isSpecialEvent ? 'special-events.html' : 'events.html';
         }
 
         // Update page content
@@ -477,6 +479,11 @@
 
             // Helper function to get stage label
             function getStageLabel(eventId) {
+                // Special events (100+)
+                if (eventId >= 100) {
+                    return 'Special Event';
+                }
+
                 // Map event IDs to stage numbers
                 const eventToStage = {
                     1: 'Stage 1',
@@ -489,61 +496,104 @@
                     15: 'Local Tour Stage 3'
                     // Optional events (6-12) handled separately
                 };
-                
+
                 // For optional events, just say "Optional Event"
                 if (eventId >= 6 && eventId <= 12) {
                     return 'Optional Event';
                 }
-                
+
                 return eventToStage[eventId] || `Event ${eventId}`;
             }
 
             const stageLabel = getStageLabel(parseInt(eventId));
 
-            // Update breadcrumb
-            document.querySelector('.breadcrumb').innerHTML = `
-                <a href="index.html">Home</a> / <a href="events.html">Events</a> / ${event.name}
-            `;
+            // Update breadcrumb (different for special events)
+            if (isSpecialEvent) {
+                document.querySelector('.breadcrumb').innerHTML = `
+                    <a href="index.html">Home</a> / <a href="special-events.html">Special Events</a> / ${event.name}
+                `;
+            } else {
+                document.querySelector('.breadcrumb').innerHTML = `
+                    <a href="index.html">Home</a> / <a href="events.html">Events</a> / ${event.name}
+                `;
+            }
 
             // Update hero section
             document.querySelector('.event-badge').textContent = `${stageLabel} • ${event.level}`;
             document.querySelector('.event-hero-title').textContent = event.name;
             document.querySelector('.event-hero-subtitle').textContent = event.subtitle;
 
-            // Update overview cards
+            // Update overview cards (different layout for special events)
             const overviewGrid = document.querySelector('.overview-grid');
-            overviewGrid.innerHTML = `
-                <div class="overview-card">
-                    <div class="overview-icon">📍</div>
-                    <div class="overview-label">Distance</div>
-                    <div class="overview-value">${event.distance}</div>
-                </div>
-                <div class="overview-card">
-                    <div class="overview-icon">⛰️</div>
-                    <div class="overview-label">Climbing</div>
-                    <div class="overview-value">${event.climbing}</div>
-                </div>
-                <div class="overview-card">
-                    <div class="overview-icon">🏷️</div>
-                    <div class="overview-label">Type</div>
-                    <div class="overview-value">${event.type}</div>
-                </div>
-                <div class="overview-card">
-                    <div class="overview-icon">⭐</div>
-                    <div class="overview-label">Max Points</div>
-                    <div class="overview-value">${event.maxPoints}</div>
-                </div>
-                <div class="overview-card">
-                    <div class="overview-icon">${event.mandatory ? '🔴' : '🟢'}</div>
-                    <div class="overview-label">Status</div>
-                    <div class="overview-value">${event.mandatory ? 'Mandatory' : 'Optional'}</div>
-                </div>
-                <div class="overview-card">
-                    <div class="overview-icon">🔄</div>
-                    <div class="overview-label">Format</div>
-                    <div class="overview-value">${event.format}</div>
-                </div>
-            `;
+            if (isSpecialEvent) {
+                // Special event overview with rewards info
+                overviewGrid.innerHTML = `
+                    <div class="overview-card">
+                        <div class="overview-icon">📍</div>
+                        <div class="overview-label">Distance</div>
+                        <div class="overview-value">${event.distance}</div>
+                    </div>
+                    <div class="overview-card">
+                        <div class="overview-icon">⛰️</div>
+                        <div class="overview-label">Climbing</div>
+                        <div class="overview-value">${event.climbing}</div>
+                    </div>
+                    <div class="overview-card">
+                        <div class="overview-icon">🏷️</div>
+                        <div class="overview-label">Type</div>
+                        <div class="overview-value">${event.type}</div>
+                    </div>
+                    <div class="overview-card">
+                        <div class="overview-icon">🏆</div>
+                        <div class="overview-label">Career Points</div>
+                        <div class="overview-value">${event.rewards?.careerPoints || event.maxPoints}</div>
+                    </div>
+                    <div class="overview-card">
+                        <div class="overview-icon">💰</div>
+                        <div class="overview-label">Bonus CC</div>
+                        <div class="overview-value">+${event.rewards?.bonusCC || 0}</div>
+                    </div>
+                    <div class="overview-card">
+                        <div class="overview-icon">🔄</div>
+                        <div class="overview-label">Format</div>
+                        <div class="overview-value">${event.format}</div>
+                    </div>
+                `;
+            } else {
+                // Regular season event overview
+                overviewGrid.innerHTML = `
+                    <div class="overview-card">
+                        <div class="overview-icon">📍</div>
+                        <div class="overview-label">Distance</div>
+                        <div class="overview-value">${event.distance}</div>
+                    </div>
+                    <div class="overview-card">
+                        <div class="overview-icon">⛰️</div>
+                        <div class="overview-label">Climbing</div>
+                        <div class="overview-value">${event.climbing}</div>
+                    </div>
+                    <div class="overview-card">
+                        <div class="overview-icon">🏷️</div>
+                        <div class="overview-label">Type</div>
+                        <div class="overview-value">${event.type}</div>
+                    </div>
+                    <div class="overview-card">
+                        <div class="overview-icon">⭐</div>
+                        <div class="overview-label">Max Points</div>
+                        <div class="overview-value">${event.maxPoints}</div>
+                    </div>
+                    <div class="overview-card">
+                        <div class="overview-icon">${event.mandatory ? '🔴' : '🟢'}</div>
+                        <div class="overview-label">Status</div>
+                        <div class="overview-value">${event.mandatory ? 'Mandatory' : 'Optional'}</div>
+                    </div>
+                    <div class="overview-card">
+                        <div class="overview-icon">🔄</div>
+                        <div class="overview-label">Format</div>
+                        <div class="overview-value">${event.format}</div>
+                    </div>
+                `;
+            }
 
             // Update story section
             const storyText = document.querySelector('.story-text');
