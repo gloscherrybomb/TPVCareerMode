@@ -4,6 +4,9 @@ on:
   push:
     paths:
       - 'race_results/**/*.csv'
+  workflow_run:  # Triggered when Process Pending Uploads completes
+    workflows: ["Process Pending Uploads"]
+    types: [completed]
   workflow_call:  # Allows being called from other workflows
     inputs:
       csv_files:
@@ -29,15 +32,19 @@ on:
 jobs:
   process-results:
     runs-on: ubuntu-latest
+    # Skip if triggered by workflow_run that failed or had no changes
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     permissions:
       contents: write  # Needed to push commits back
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
           fetch-depth: 2  # Need previous commit to detect new files
-          ref: ${{ github.event_name == 'workflow_call' && 'main' || '' }}  # Get latest when called from another workflow
+          # For workflow_run: checkout the commit from the triggering workflow
+          # For workflow_call: checkout main to get latest
+          ref: ${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || (github.event_name == 'workflow_call' && 'main' || '') }}
       
       - name: Setup Node.js
         uses: actions/setup-node@v3
@@ -63,6 +70,14 @@ jobs:
             # Manual trigger - find all CSV files in race_results
             FILES=$(find race_results -name '*.csv' -type f 2>/dev/null | jq -R -s -c 'split("\n")[:-1]')
             echo "Debug: Found files=$FILES"
+            echo "files=$FILES" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event_name }}" = "workflow_run" ]; then
+            # Triggered by Process Pending Uploads - get CSV files from last commit
+            FILES=$(git diff --name-only --diff-filter=AM HEAD~1 HEAD 2>/dev/null | grep 'race_results/.*\.csv$' | jq -R -s -c 'split("\n")[:-1]' || echo '[]')
+            echo "Debug: workflow_run git diff files=$FILES"
+            if [ "$FILES" = "[]" ]; then
+              echo "ℹ️  No new CSV files in the triggering commit"
+            fi
             echo "files=$FILES" >> $GITHUB_OUTPUT
           else
             # Auto trigger (push) or workflow_call with no files - process ADDED or MODIFIED CSV files
