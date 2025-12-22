@@ -544,6 +544,56 @@ body {
     color: var(--accent-purple);
 }
 
+.tier-badge.tier-1000 {
+    background: rgba(34, 197, 94, 0.15);
+    border: 2px solid rgba(34, 197, 94, 0.3);
+    color: #22c55e;
+}
+
+/* Special Section Styling */
+.special-section {
+    margin-top: 2rem;
+}
+
+.special-section .tier-header {
+    border-color: rgba(34, 197, 94, 0.2);
+}
+
+.special-description {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+.special-info {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin: 0.75rem 0;
+    padding: 0.75rem 1rem;
+    background: rgba(34, 197, 94, 0.05);
+    border-left: 3px solid rgba(34, 197, 94, 0.4);
+    border-radius: 0 8px 8px 0;
+}
+
+.special-section .unlock-card {
+    border-color: rgba(34, 197, 94, 0.3);
+}
+
+.special-section .unlock-card:hover {
+    border-color: rgba(34, 197, 94, 0.6);
+    box-shadow: 0 8px 32px rgba(34, 197, 94, 0.2);
+}
+
+.special-owned {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: rgba(34, 197, 94, 0.1);
+    border-radius: 50px;
+    border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
 .tier-progress {
     font-size: 0.85rem;
     color: var(--text-secondary);

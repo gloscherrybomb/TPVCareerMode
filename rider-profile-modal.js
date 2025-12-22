@@ -364,6 +364,74 @@ function initializeRiderModal() {
                 filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.8));
                 vertical-align: middle;
             }
+
+            /* High Roller Flair Styles */
+            .rider-profile-card.high-roller-card {
+                position: relative;
+                border: 2px solid rgba(34, 197, 94, 0.5);
+            }
+
+            .rider-profile-card.high-roller-card::before {
+                content: '';
+                position: absolute;
+                top: -2px;
+                left: -2px;
+                right: -2px;
+                bottom: -2px;
+                background: linear-gradient(45deg,
+                    rgba(34, 197, 94, 0.2),
+                    rgba(16, 185, 129, 0.1),
+                    rgba(34, 197, 94, 0.2),
+                    rgba(16, 185, 129, 0.1)
+                );
+                background-size: 300% 300%;
+                border-radius: 14px;
+                z-index: -1;
+                animation: highRollerGlow 4s ease infinite;
+            }
+
+            @keyframes highRollerGlow {
+                0%, 100% { background-position: 0% 50%; }
+                50% { background-position: 100% 50%; }
+            }
+
+            .high-roller-flair-row {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 0.5rem;
+                padding: 0.75rem 1.5rem;
+                background: linear-gradient(90deg,
+                    transparent,
+                    rgba(34, 197, 94, 0.15),
+                    transparent);
+                border-radius: 20px;
+                margin: 1rem 0;
+            }
+
+            .high-roller-icon {
+                font-size: 1.5rem;
+                filter: drop-shadow(0 0 6px rgba(34, 197, 94, 0.8));
+                animation: highRollerIconPulse 2s ease-in-out infinite;
+            }
+
+            @keyframes highRollerIconPulse {
+                0%, 100% {
+                    filter: drop-shadow(0 0 6px rgba(34, 197, 94, 0.8));
+                }
+                50% {
+                    filter: drop-shadow(0 0 12px rgba(34, 197, 94, 1));
+                }
+            }
+
+            .high-roller-label {
+                color: #22c55e;
+                font-weight: 700;
+                font-size: 1rem;
+                text-transform: uppercase;
+                letter-spacing: 0.1em;
+                font-family: 'Orbitron', sans-serif;
+            }
         `;
         document.head.appendChild(styles);
     }
@@ -550,8 +618,18 @@ function buildRiderProfileHTML(data, name) {
     const contributorClass = isContributor ? ' contributor-profile' : '';
     const contributorBadge = isContributor ? '<span class="contributor-star-badge" title="TPV Contributor">&#9733;</span>' : '';
 
+    // Check High Roller flair status
+    const hasHighRoller = data.hasHighRollerFlair || false;
+    const highRollerClass = hasHighRoller ? ' high-roller-card' : '';
+    const highRollerRow = hasHighRoller ? `
+        <div class="high-roller-flair-row">
+            <span class="high-roller-icon">💰</span>
+            <span class="high-roller-label">High Roller</span>
+        </div>
+    ` : '';
+
     let html = `
-        <div class="rider-profile-card${contributorClass}">
+        <div class="rider-profile-card${contributorClass}${highRollerClass}">
             <div class="rider-profile-header">
                 <div class="rider-profile-avatar">
                     ${photoURL ? `<img src="${photoURL}" alt="${displayName}">` : initials}
@@ -593,6 +671,8 @@ function buildRiderProfileHTML(data, name) {
                 </div>
             </div>
         </div>
+
+        ${highRollerRow}
 
         ${data.personality && data.interviewHistory?.totalInterviews > 0 ? `
         <div class="profile-personality-section">

@@ -294,6 +294,20 @@ const UNLOCK_DEFINITIONS = [
     narrative: 'No extremes, no weaknesses—well-rounded excellence. Consistent top-10s are your signature.',
     emoji: '⚖️',
     requiredBalanced: true
+  },
+  // Cosmetic Flairs (no gameplay bonus, just visual prestige)
+  {
+    id: 'high-roller-flair',
+    name: 'High Roller Flair',
+    cost: 1000,
+    tier: 1000,
+    pointsBonus: 0,
+    trigger: 'cosmetic',
+    description: 'A prestigious badge for big spenders',
+    narrative: 'Some riders let their results do the talking. Others let their wallet do the talking. You? You do both.',
+    emoji: '💰',
+    emojiFallback: '$',
+    isFlair: true
   }
 ];
 

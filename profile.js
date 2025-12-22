@@ -244,6 +244,16 @@ function displayProfileInfo(user, userData, stats, seasonRanking, globalRanking)
         ? ' <span class="profile-contributor-badge" title="Thank you for your contribution to support TPV Career Mode">&#9733;</span>'
         : '';
     profileNameEl.innerHTML = displayName + contributorBadge;
+
+    // Apply High Roller flair effects to profile header
+    const profileHeader = document.querySelector('.profile-header');
+    if (profileHeader) {
+        if (userData.hasHighRollerFlair) {
+            profileHeader.classList.add('high-roller-profile');
+        } else {
+            profileHeader.classList.remove('high-roller-profile');
+        }
+    }
     document.getElementById('profileUID').textContent = userData.uid || 'No UID';
     document.getElementById('profileTeam').textContent = userData.team || 'No Team';
     

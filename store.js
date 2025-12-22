@@ -300,8 +300,16 @@ function renderGrid() {
     400: []
   };
 
+  // Separate array for special flair items
+  const specialItems = [];
+
   // Apply filtering and sorting
   let filteredCatalog = unlockCatalog.filter(item => {
+    // Skip flair items from main catalog - they're rendered separately
+    if (item.isFlair) {
+      return false;
+    }
+
     // Apply search filter
     if (currentSearch && !item.name.toLowerCase().includes(currentSearch.toLowerCase())) {
       return false;
@@ -519,6 +527,122 @@ function renderGrid() {
       gridEl.appendChild(card);
     });
   });
+
+  // Render special flair items in separate section
+  const specialGridEl = document.getElementById('tier-special');
+  if (specialGridEl) {
+    specialGridEl.innerHTML = '';
+
+    // Get all flair items from catalog
+    const flairItems = unlockCatalog.filter(item => item.isFlair);
+
+    // Apply search filter to flair items too
+    const filteredFlairs = flairItems.filter(item => {
+      if (currentSearch && !item.name.toLowerCase().includes(currentSearch.toLowerCase())) {
+        return false;
+      }
+      return true;
+    });
+
+    // Update special section progress
+    const totalFlairs = flairItems.length;
+    const ownedFlairs = flairItems.filter(item => {
+      if (item.id === 'high-roller-flair') {
+        return userData.hasHighRollerFlair === true;
+      }
+      return false;
+    }).length;
+    const specialProgressEl = document.getElementById('tier-progress-special');
+    if (specialProgressEl) {
+      specialProgressEl.textContent = `${ownedFlairs}/${totalFlairs} owned`;
+      specialProgressEl.className = `tier-progress ${ownedFlairs === totalFlairs && totalFlairs > 0 ? 'tier-progress-complete' : ''}`;
+    }
+
+    // Handle collapse state for special section
+    const specialSection = document.querySelector('.tier-section[data-tier="special"]');
+    const specialToggle = document.querySelector('[data-tier-toggle="special"]');
+    const specialIcon = specialToggle?.querySelector('.tier-collapse-icon');
+    if (specialSection) {
+      if (collapseState.hasOwnProperty('special')) {
+        if (collapseState['special']) {
+          specialSection.classList.add('tier-collapsed');
+          if (specialIcon) specialIcon.textContent = '▶';
+        } else {
+          specialSection.classList.remove('tier-collapsed');
+          if (specialIcon) specialIcon.textContent = '▼';
+        }
+      } else {
+        // Default: not collapsed for special section
+        specialSection.classList.remove('tier-collapsed');
+        if (specialIcon) specialIcon.textContent = '▼';
+      }
+    }
+
+    filteredFlairs.forEach((item, index) => {
+      // Check ownership for flair items using user flags
+      let owned = false;
+      if (item.id === 'high-roller-flair') {
+        owned = userData.hasHighRollerFlair === true;
+      }
+
+      const canAfford = balance >= item.cost;
+      const isLocked = !owned && !canAfford;
+
+      // Create card using existing component
+      const card = createUnlockCardSync(item, {
+        size: 'full',
+        showNarrative: true,
+        showTrigger: false, // Special items don't have triggers
+        showCost: true,
+        isOwned: owned,
+        isEquipped: false,
+        isLocked: isLocked
+      });
+
+      card.style.setProperty('--card-index', index);
+
+      // Add simplified action buttons for flair items (no equip option)
+      const cardBody = card.querySelector('.card-body');
+      const actionsDiv = document.createElement('div');
+      actionsDiv.className = 'unlock-actions special-actions';
+      actionsDiv.style.marginTop = '0.75rem';
+      actionsDiv.style.display = 'flex';
+      actionsDiv.style.gap = '0.75rem';
+      actionsDiv.style.justifyContent = 'center';
+
+      if (owned) {
+        const status = document.createElement('div');
+        status.className = 'unlock-status special-owned';
+        status.innerHTML = '✓ Owned';
+        status.style.color = '#22c55e';
+        status.style.fontWeight = '600';
+        actionsDiv.appendChild(status);
+      } else {
+        const buyBtn = document.createElement('button');
+        buyBtn.className = 'btn-buy';
+        if (canAfford) {
+          buyBtn.textContent = 'Purchase';
+          buyBtn.disabled = false;
+          buyBtn.addEventListener('click', () => purchaseItem(item));
+        } else {
+          buyBtn.textContent = `Need ${item.cost - balance} more CC`;
+          buyBtn.disabled = true;
+        }
+        actionsDiv.appendChild(buyBtn);
+      }
+
+      cardBody.appendChild(actionsDiv);
+
+      if (isLocked) {
+        const lockIcon = document.createElement('div');
+        lockIcon.className = 'unlock-lock-icon';
+        lockIcon.textContent = '🔒';
+        card.appendChild(lockIcon);
+      }
+
+      specialGridEl.appendChild(card);
+    });
+  }
 }
 
 async function purchaseSlot(cost) {
@@ -552,12 +676,25 @@ async function purchaseItem(item) {
       const data = snap.data();
       const balance = data.currency?.balance || 0;
       const inventory = data.unlocks?.inventory || [];
-      if (inventory.includes(item.id)) return;
-      if (balance < item.cost) throw new Error('Insufficient CC');
-      tx.update(userDocRef, {
-        'currency.balance': balance - item.cost,
-        'unlocks.inventory': [...inventory, item.id]
-      });
+
+      // Handle flair items differently - they set a user flag instead of adding to inventory
+      if (item.isFlair) {
+        const flairKey = item.id === 'high-roller-flair' ? 'hasHighRollerFlair' : `has${item.id}`;
+        if (data[flairKey]) return; // Already owned
+        if (balance < item.cost) throw new Error('Insufficient CC');
+        tx.update(userDocRef, {
+          'currency.balance': balance - item.cost,
+          [flairKey]: true
+        });
+      } else {
+        // Regular equipment item
+        if (inventory.includes(item.id)) return;
+        if (balance < item.cost) throw new Error('Insufficient CC');
+        tx.update(userDocRef, {
+          'currency.balance': balance - item.cost,
+          'unlocks.inventory': [...inventory, item.id]
+        });
+      }
     });
     await refresh();
   } catch (err) {
