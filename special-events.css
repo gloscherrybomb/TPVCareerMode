@@ -1,7 +1,14 @@
 /* Special Events Page Styles */
 
+/* Page Header - match events page spacing */
+.page-header {
+    padding: 8rem 0 4rem;
+    background: linear-gradient(135deg, rgba(255, 27, 107, 0.1), rgba(69, 202, 255, 0.1));
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
 .special-events-page {
-    padding: 2rem 0 4rem;
+    padding-bottom: 4rem;
     min-height: 50vh;
 }
 

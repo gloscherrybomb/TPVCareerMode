@@ -443,7 +443,7 @@ const specialEventData = {
         climbing: "TBD",
         course: "TBD",
         format: "TBD",
-        maxPoints: 100,
+        maxPoints: 60,
         icon: "🇸🇬",
         description: `The Singapore Criterium is an exclusive night race through the illuminated streets of Marina Bay. Reserved for riders who have proven their dedication to the sport, this prestigious event offers a unique racing experience under the city lights.
 
@@ -458,7 +458,7 @@ This is more than just a race—it's a statement. Being here means you've earned
             finish: "Marina Bay"
         },
         rewards: {
-            careerPoints: 100,
+            careerPoints: 60,
             bonusCC: 50
         },
         scheduleUrl: null // To be set when event is configured
