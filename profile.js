@@ -245,13 +245,13 @@ function displayProfileInfo(user, userData, stats, seasonRanking, globalRanking)
         : '';
     profileNameEl.innerHTML = displayName + contributorBadge;
 
-    // Apply High Roller flair effects to profile header
+    // Apply Money Bags flair effects to profile header
     const profileHeader = document.querySelector('.profile-header');
     if (profileHeader) {
         if (userData.hasHighRollerFlair) {
-            profileHeader.classList.add('high-roller-profile');
+            profileHeader.classList.add('money-bags-profile');
         } else {
-            profileHeader.classList.remove('high-roller-profile');
+            profileHeader.classList.remove('money-bags-profile');
         }
     }
     document.getElementById('profileUID').textContent = userData.uid || 'No UID';

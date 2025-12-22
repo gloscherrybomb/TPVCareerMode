@@ -547,7 +547,7 @@ function renderGrid() {
     // Update special section progress
     const totalFlairs = flairItems.length;
     const ownedFlairs = flairItems.filter(item => {
-      if (item.id === 'high-roller-flair') {
+      if (item.id === 'money-bags') {
         return userData.hasHighRollerFlair === true;
       }
       return false;
@@ -581,7 +581,7 @@ function renderGrid() {
     filteredFlairs.forEach((item, index) => {
       // Check ownership for flair items using user flags
       let owned = false;
-      if (item.id === 'high-roller-flair') {
+      if (item.id === 'money-bags') {
         owned = userData.hasHighRollerFlair === true;
       }
 
@@ -679,7 +679,7 @@ async function purchaseItem(item) {
 
       // Handle flair items differently - they set a user flag instead of adding to inventory
       if (item.isFlair) {
-        const flairKey = item.id === 'high-roller-flair' ? 'hasHighRollerFlair' : `has${item.id}`;
+        const flairKey = item.id === 'money-bags' ? 'hasHighRollerFlair' : `has${item.id}`;
         if (data[flairKey]) return; // Already owned
         if (balance < item.cost) throw new Error('Insufficient CC');
         tx.update(userDocRef, {

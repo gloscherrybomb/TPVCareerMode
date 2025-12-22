@@ -365,13 +365,13 @@ function initializeRiderModal() {
                 vertical-align: middle;
             }
 
-            /* High Roller Flair Styles */
-            .rider-profile-card.high-roller-card {
+            /* Money Bags Flair Styles */
+            .rider-profile-card.money-bags-card {
                 position: relative;
                 border: 2px solid rgba(34, 197, 94, 0.5);
             }
 
-            .rider-profile-card.high-roller-card::before {
+            .rider-profile-card.money-bags-card::before {
                 content: '';
                 position: absolute;
                 top: -2px;
@@ -387,15 +387,15 @@ function initializeRiderModal() {
                 background-size: 300% 300%;
                 border-radius: 14px;
                 z-index: -1;
-                animation: highRollerGlow 4s ease infinite;
+                animation: moneyBagsGlow 4s ease infinite;
             }
 
-            @keyframes highRollerGlow {
+            @keyframes moneyBagsGlow {
                 0%, 100% { background-position: 0% 50%; }
                 50% { background-position: 100% 50%; }
             }
 
-            .high-roller-flair-row {
+            .money-bags-flair-row {
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -409,13 +409,13 @@ function initializeRiderModal() {
                 margin: 1rem 0;
             }
 
-            .high-roller-icon {
+            .money-bags-icon {
                 font-size: 1.5rem;
                 filter: drop-shadow(0 0 6px rgba(34, 197, 94, 0.8));
-                animation: highRollerIconPulse 2s ease-in-out infinite;
+                animation: moneyBagsIconPulse 2s ease-in-out infinite;
             }
 
-            @keyframes highRollerIconPulse {
+            @keyframes moneyBagsIconPulse {
                 0%, 100% {
                     filter: drop-shadow(0 0 6px rgba(34, 197, 94, 0.8));
                 }
@@ -424,7 +424,7 @@ function initializeRiderModal() {
                 }
             }
 
-            .high-roller-label {
+            .money-bags-label {
                 color: #22c55e;
                 font-weight: 700;
                 font-size: 1rem;
@@ -618,18 +618,18 @@ function buildRiderProfileHTML(data, name) {
     const contributorClass = isContributor ? ' contributor-profile' : '';
     const contributorBadge = isContributor ? '<span class="contributor-star-badge" title="TPV Contributor">&#9733;</span>' : '';
 
-    // Check High Roller flair status
-    const hasHighRoller = data.hasHighRollerFlair || false;
-    const highRollerClass = hasHighRoller ? ' high-roller-card' : '';
-    const highRollerRow = hasHighRoller ? `
-        <div class="high-roller-flair-row">
-            <span class="high-roller-icon">💰</span>
-            <span class="high-roller-label">High Roller</span>
+    // Check Money Bags flair status
+    const hasMoneyBags = data.hasHighRollerFlair || false;
+    const moneyBagsClass = hasMoneyBags ? ' money-bags-card' : '';
+    const moneyBagsRow = hasMoneyBags ? `
+        <div class="money-bags-flair-row">
+            <span class="money-bags-icon">💰</span>
+            <span class="money-bags-label">Money Bags</span>
         </div>
     ` : '';
 
     let html = `
-        <div class="rider-profile-card${contributorClass}${highRollerClass}">
+        <div class="rider-profile-card${contributorClass}${moneyBagsClass}">
             <div class="rider-profile-header">
                 <div class="rider-profile-avatar">
                     ${photoURL ? `<img src="${photoURL}" alt="${displayName}">` : initials}
@@ -672,7 +672,7 @@ function buildRiderProfileHTML(data, name) {
             </div>
         </div>
 
-        ${highRollerRow}
+        ${moneyBagsRow}
 
         ${data.personality && data.interviewHistory?.totalInterviews > 0 ? `
         <div class="profile-personality-section">

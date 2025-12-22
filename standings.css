@@ -335,17 +335,17 @@
     }
 }
 
-/* High Roller Indicator */
-.high-roller-indicator {
+/* Money Bags Indicator */
+.money-bags-indicator {
     display: inline-block;
     margin-left: 0.3rem;
     font-size: 0.9rem;
     filter: drop-shadow(0 0 3px rgba(34, 197, 94, 0.6));
     vertical-align: middle;
-    animation: highRollerGlow 2s ease-in-out infinite;
+    animation: moneyBagsGlow 2s ease-in-out infinite;
 }
 
-@keyframes highRollerGlow {
+@keyframes moneyBagsGlow {
     0%, 100% {
         filter: drop-shadow(0 0 3px rgba(34, 197, 94, 0.6));
     }

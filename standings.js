@@ -505,6 +505,7 @@ async function renderGlobalRankings(forceRefresh = false) {
                 ageBand: data.ageBand || null,
                 country: data.country || null,
                 isContributor: data.isContributor || false,
+                hasMoneyBags: data.hasHighRollerFlair || false,
                 isCurrentUser: currentUser && doc.id === currentUser.uid
             });
         });
@@ -608,6 +609,9 @@ function renderGlobalRankingsTable(rankings, globalContent) {
                 // Contributor badge
                 const contributorBadge = racer.isContributor ? '<span class="contributor-badge" title="TPV Contributor">&#9733;</span>' : '';
 
+                // Money Bags indicator
+                const moneyBagsIndicator = racer.hasMoneyBags ? '<span class="money-bags-indicator" title="Money Bags">💰</span>' : '';
+
                 tableHTML += `
                     <tr class="${rowClass}">
                         <td class="rank-cell">
@@ -615,6 +619,7 @@ function renderGlobalRankingsTable(rankings, globalContent) {
                         </td>
                         <td class="name-cell">
                             <span class="rider-name">${nameHTML}</span>
+                            ${moneyBagsIndicator}
                             ${contributorBadge}
                             ${countryFlagHTML}
                             ${racer.isCurrentUser ? '<span class="you-badge">YOU</span>' : ''}

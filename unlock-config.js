@@ -297,8 +297,8 @@ const UNLOCK_DEFINITIONS = [
   },
   // Cosmetic Flairs (no gameplay bonus, just visual prestige)
   {
-    id: 'high-roller-flair',
-    name: 'High Roller Flair',
+    id: 'money-bags',
+    name: 'Money Bags',
     cost: 1000,
     tier: 1000,
     pointsBonus: 0,
