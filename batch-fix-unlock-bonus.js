@@ -192,23 +192,28 @@ async function batchFixUnlockBonus() {
     const userData = userDoc.data();
     processedUsers++;
 
-    // Collect all events with their CSV timestamps for chronological sorting
+    // Collect ALL completed events from database (not just those in unlock history)
+    // This ensures we properly track cooldown cycles even for events where no unlock triggered
     const eventsToProcess = [];
-    for (const [eventNumStr, eventData] of Object.entries(userUnlocks.events)) {
-      const eventNumber = parseInt(eventNumStr);
-      const csvTimestamp = getEventCsvTimestamp(1, eventNumber); // Season 1
+    for (let i = 1; i <= 15; i++) {
+      const eventResults = userData[`event${i}Results`];
+      if (eventResults) {
+        const csvTimestamp = getEventCsvTimestamp(1, i); // Season 1
+        const unlockHistoryData = userUnlocks.events[i.toString()] || null;
 
-      eventsToProcess.push({
-        eventNumber,
-        eventData,
-        csvTimestamp
-      });
+        eventsToProcess.push({
+          eventNumber: i,
+          eventData: unlockHistoryData, // May be null if no unlocks triggered for this event
+          csvTimestamp
+        });
+      }
     }
 
     // Sort by CSV timestamp (chronological order - oldest first)
     eventsToProcess.sort((a, b) => a.csvTimestamp - b.csvTimestamp);
 
-    console.log(`   Processing ${eventsToProcess.length} events in chronological order:`);
+    const eventsWithUnlocks = eventsToProcess.filter(e => e.eventData !== null).length;
+    console.log(`   Processing ${eventsToProcess.length} completed events (${eventsWithUnlocks} with unlock history) in chronological order:`);
     eventsToProcess.forEach((evt, idx) => {
       const date = evt.csvTimestamp ? new Date(evt.csvTimestamp).toISOString() : 'no timestamp';
       console.log(`     ${idx + 1}. Event ${evt.eventNumber} (${date})`);
@@ -239,6 +244,14 @@ async function batchFixUnlockBonus() {
             activeCooldowns[unlock.id] = true;
           }
         }
+        continue;
+      }
+
+      // If no unlock history for this event, just clear cooldowns and continue
+      // This advances the cooldown cycle - unlocks that were resting are now available
+      if (!eventData || !eventData.unlocks || eventData.unlocks.length === 0) {
+        console.log(`   ⏭️ Event ${eventNumber}: No unlock history, clearing cooldowns`);
+        activeCooldowns = {};
         continue;
       }
 
