@@ -255,11 +255,24 @@ function calculateBiggestWinMargin(position, results, eventNumber, currentBigges
 }
 
 /**
+ * Check if an event is a special event (not part of regular season progression)
+ */
+function isSpecialEvent(eventNumber) {
+  // Special events are event IDs > 100 (e.g., 101 = Singapore Criterium)
+  return eventNumber > 100;
+}
+
+/**
  * Check if an event is valid for a given stage
  */
 function isEventValidForStage(eventNumber, currentStage, usedOptionalEvents = [], tourProgress = {}) {
+  // Special events are always valid but don't affect season progression
+  if (isSpecialEvent(eventNumber)) {
+    return { valid: true, isSpecialEvent: true };
+  }
+
   const stageReq = STAGE_REQUIREMENTS[currentStage];
-  
+
   if (!stageReq) {
     return { valid: false, reason: `Invalid stage: ${currentStage}` };
   }
@@ -1166,15 +1179,20 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
   
   // Validate if this event is valid for the user's current stage
   const validation = isEventValidForStage(eventNumber, currentStage, usedOptionalEvents, tourProgress);
-  
+  const isSpecialEventResult = validation.isSpecialEvent === true;
+
   if (!validation.valid) {
     console.log(`❌ Event ${eventNumber} is not valid for user ${uid} at stage ${currentStage}`);
     console.log(`   Reason: ${validation.reason}`);
     console.log(`   This result will NOT be processed or stored.`);
     return;
   }
-  
-  console.log(`✅ Event ${eventNumber} is valid for stage ${currentStage}`);
+
+  if (isSpecialEventResult) {
+    console.log(`⭐ Event ${eventNumber} is a SPECIAL EVENT - will add career points only, no stage progression`);
+  } else {
+    console.log(`✅ Event ${eventNumber} is valid for stage ${currentStage}`);
+  }
   
   // Find user's result in CSV (first occurrence only)
   const userResult = results.find(r => r.UID === uid);
@@ -1363,15 +1381,15 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
   // NOTE: buildSeasonStandings() moved to after unlock processing (around line 1415)
   // to ensure points includes unlock bonus
 
-  // Track if this is an optional event
+  // Track if this is an optional event (skip for special events)
   const newUsedOptionalEvents = [...usedOptionalEvents];
-  if (OPTIONAL_EVENTS.includes(eventNumber) && !usedOptionalEvents.includes(eventNumber)) {
+  if (!isSpecialEventResult && OPTIONAL_EVENTS.includes(eventNumber) && !usedOptionalEvents.includes(eventNumber)) {
     newUsedOptionalEvents.push(eventNumber);
   }
-  
-  // Update tour progress if this is a tour event
+
+  // Update tour progress if this is a tour event (skip for special events)
   const newTourProgress = { ...tourProgress };
-  if (validation.isTour) {
+  if (!isSpecialEventResult && validation.isTour) {
     if (eventNumber === 13) {
       newTourProgress.event13Completed = true;
       newTourProgress.event13Date = new Date().toISOString();
@@ -1383,9 +1401,9 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
       newTourProgress.event15Date = new Date().toISOString();
     }
   }
-  
-  // Calculate next stage
-  const nextStage = calculateNextStage(currentStage, newTourProgress);
+
+  // Calculate next stage (special events don't advance stage)
+  const nextStage = isSpecialEventResult ? currentStage : calculateNextStage(currentStage, newTourProgress);
   
   // Generate story text for this race result
   // Calculate win margin or margin to winner
@@ -1519,9 +1537,14 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
     eventResults.unlockBonusesApplied = unlockBonusesApplied;
   }
 
-  // Build season standings with all racers from CSV
+  // Build season standings with all racers from CSV (skip for special events)
   // IMPORTANT: This must be after unlock processing so points includes unlock bonus
-  const seasonStandings = await buildSeasonStandings(results, userData, eventNumber, uid, points);
+  let seasonStandings = null;
+  if (!isSpecialEventResult) {
+    seasonStandings = await buildSeasonStandings(results, userData, eventNumber, uid, points);
+  } else {
+    console.log(`   ⭐ Skipping season standings for special event`);
+  }
 
   // After event 15, there is no next event - season is complete
   if (eventNumber === 15) {
@@ -1761,10 +1784,9 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
   // NOTE: Cadence Credits calculation moved to AFTER awards are added (after line 1710+)
 
   // Update user document
+  // Special events only add career points, not season points or progression
   const updates = {
     [`event${eventNumber}Results`]: eventResults,
-    currentStage: nextStage,
-    totalPoints: (userData.totalPoints || 0) + points,
     careerPoints: (userData.careerPoints || 0) + points,
     totalEvents: (userData.totalEvents || 0) + 1,
     totalWins: careerStats.totalWins,
@@ -1776,17 +1798,23 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
     podiumRate: careerStats.podiumRate,
     // Note: awards are updated via individual field increments below
     arr: eventResults.arr, // Store most recent ARR
-    [`season${season}Standings`]: seasonStandings,
     team: userResult.Team || '',
     gender: userResult.Gender || null,
     country: userResult.Country || null,
     ageBand: userResult.AgeBand || null,
-    usedOptionalEvents: newUsedOptionalEvents,
-    tourProgress: newTourProgress,
     rivalData: updatedRivalData, // Add rival data
     lifetimeStats: newLifetimeStats, // Add lifetime statistics
     ...dnsFlags // Add DNS flags if any
   };
+
+  // Only update season-related fields for regular events (not special events)
+  if (!isSpecialEventResult) {
+    updates.currentStage = nextStage;
+    updates.totalPoints = (userData.totalPoints || 0) + points;
+    updates[`season${season}Standings`] = seasonStandings;
+    updates.usedOptionalEvents = newUsedOptionalEvents;
+    updates.tourProgress = newTourProgress;
+  }
 
   if (!skipUnlocks) {
     // Unlock cooldowns - only update when processing unlocks

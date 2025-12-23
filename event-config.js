@@ -18,7 +18,9 @@ const EVENT_NAMES = {
   12: 'Unbound - Little Egypt',
   13: 'Local Tour Stage 1',
   14: 'Local Tour Stage 2',
-  15: 'Local Tour Stage 3'
+  15: 'Local Tour Stage 3',
+  // Special events (IDs > 100)
+  101: 'Singapore Criterium'
 };
 
 // Event types for each event in Season 1
@@ -37,7 +39,9 @@ const EVENT_TYPES = {
   12: 'gravel race',
   13: 'stage race',
   14: 'stage race',
-  15: 'stage race'
+  15: 'stage race',
+  // Special events (IDs > 100)
+  101: 'criterium'  // Singapore Criterium
 };
 
 // Optional choice events (can be selected at stages 3, 6, or 8)
