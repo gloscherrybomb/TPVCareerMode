@@ -154,5 +154,46 @@ function createEventCard(event, isUnlocked, isFreeEvent = false) {
     return card;
 }
 
+// Setup explainer section collapse toggle
+function setupExplainerToggle() {
+    const section = document.getElementById('explainerSection');
+    const toggle = document.getElementById('explainerToggle');
+    const icon = section?.querySelector('.explainer-collapse-icon');
+
+    if (!section || !toggle) return;
+
+    // Load saved state from localStorage (default: collapsed)
+    const savedState = localStorage.getItem('specialEventsExplainerCollapsed');
+    const isCollapsed = savedState === null ? true : savedState === 'true';
+
+    if (isCollapsed) {
+        section.classList.add('collapsed');
+        if (icon) icon.textContent = '▶';
+    } else {
+        section.classList.remove('collapsed');
+        if (icon) icon.textContent = '▼';
+    }
+
+    // Add click handler
+    toggle.addEventListener('click', (e) => {
+        e.preventDefault();
+        const currentlyCollapsed = section.classList.contains('collapsed');
+
+        if (currentlyCollapsed) {
+            section.classList.remove('collapsed');
+            if (icon) icon.textContent = '▼';
+        } else {
+            section.classList.add('collapsed');
+            if (icon) icon.textContent = '▶';
+        }
+
+        // Save state
+        localStorage.setItem('specialEventsExplainerCollapsed', !currentlyCollapsed);
+    });
+}
+
+// Initialize toggle on page load
+document.addEventListener('DOMContentLoaded', setupExplainerToggle);
+
 // Expose for potential external use
 window.renderSpecialEvents = renderSpecialEvents;

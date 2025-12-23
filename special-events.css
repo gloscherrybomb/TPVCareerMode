@@ -61,12 +61,6 @@
 /* Explainer Section */
 .explainer-section {
     margin-bottom: 3rem;
-}
-
-.explainer-card {
-    display: flex;
-    gap: 2rem;
-    padding: 2rem;
     background: linear-gradient(135deg, rgba(255, 170, 0, 0.08), rgba(255, 215, 0, 0.05));
     border: 1px solid rgba(255, 170, 0, 0.2);
     border-radius: 16px;
@@ -74,7 +68,7 @@
     overflow: hidden;
 }
 
-.explainer-card::before {
+.explainer-section::before {
     content: '';
     position: absolute;
     top: 0;
@@ -84,9 +78,73 @@
     background: linear-gradient(90deg, #ffaa00, #ffd700, #ffaa00);
 }
 
-.explainer-icon {
-    font-size: 3rem;
+/* Explainer Header (clickable toggle) */
+.explainer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 1.5rem;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.explainer-header:hover {
+    background: rgba(255, 170, 0, 0.05);
+}
+
+.explainer-header-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.explainer-header-left .explainer-icon {
+    font-size: 1.75rem;
     flex-shrink: 0;
+}
+
+.explainer-header-left h3 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #ffd700;
+    margin: 0;
+}
+
+.explainer-collapse-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.explainer-collapse-btn:hover {
+    color: var(--text-primary);
+    transform: scale(1.1);
+}
+
+.explainer-collapse-icon {
+    transition: transform 0.3s ease;
+    font-size: 0.9rem;
+}
+
+/* Collapsed state */
+.explainer-section.collapsed .explainer-card {
+    display: none;
+}
+
+.explainer-section:not(.collapsed) .explainer-collapse-icon {
+    transform: rotate(90deg);
+}
+
+.explainer-card {
+    padding: 0 1.5rem 1.5rem 1.5rem;
+    position: relative;
 }
 
 .explainer-content h3 {
@@ -309,11 +367,16 @@
         padding-top: 7.5rem;
     }
 
+    .explainer-header {
+        padding: 1rem 1.25rem;
+    }
+
+    .explainer-header-left h3 {
+        font-size: 1.1rem;
+    }
+
     .explainer-card {
-        flex-direction: column;
-        text-align: center;
-        padding: 1.5rem;
-        gap: 1rem;
+        padding: 0 1.25rem 1.25rem 1.25rem;
     }
 
     .explainer-content ul {

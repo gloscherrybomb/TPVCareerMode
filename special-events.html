@@ -74,12 +74,19 @@
             <!-- Events Content (hidden until logged in) -->
             <div id="eventsContent" style="display: none;">
 
-                <!-- Explainer Section -->
-                <section class="explainer-section">
-                    <div class="explainer-card">
-                        <div class="explainer-icon">🌟</div>
-                        <div class="explainer-content">
+                <!-- Explainer Section (Collapsible) -->
+                <section class="explainer-section collapsed" id="explainerSection">
+                    <div class="explainer-header" id="explainerToggle">
+                        <div class="explainer-header-left">
+                            <span class="explainer-icon">🌟</span>
                             <h3>What are Special Events?</h3>
+                        </div>
+                        <button class="explainer-collapse-btn" aria-label="Toggle section">
+                            <span class="explainer-collapse-icon">▶</span>
+                        </button>
+                    </div>
+                    <div class="explainer-card">
+                        <div class="explainer-content">
                             <p>Special Events are challenges that exist outside the regular season calendar. They offer unique opportunities to earn rewards and boost your career.</p>
                             <ul>
                                 <li><strong>Don't affect Season Standings</strong> - Your season progress remains separate</li>
