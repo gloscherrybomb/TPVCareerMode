@@ -17,6 +17,19 @@ const eventsGrid = document.getElementById('eventsGrid');
 // Special event definitions (linked to unlock-config.js and event-data.js)
 const SPECIAL_EVENTS = [
     {
+        id: 102,
+        unlockId: null,
+        unlockField: null,
+        name: 'The Leveller',
+        icon: '⚖️',
+        description: 'An all-rounder points race to find your ranking fast. Great for new racers to bag Career Points and Cadence Credits early!',
+        reward: '+40 Career Points',
+        bonusCC: 'Standard CC',
+        type: 'Points Race',
+        unlockMethod: 'free',  // Available immediately to all users
+        cost: 0
+    },
+    {
         id: 101,
         unlockId: 'singapore-criterium',
         unlockField: 'hasSingaporeCriterium',
@@ -81,21 +94,24 @@ function renderSpecialEvents() {
     unlockedSection.innerHTML = '';
 
     SPECIAL_EVENTS.forEach(event => {
-        const isUnlocked = currentUserData && currentUserData[event.unlockField];
-        const card = createEventCard(event, isUnlocked);
+        // Free events are always unlocked, others check the unlock field
+        const isFreeEvent = event.unlockMethod === 'free';
+        const isUnlocked = isFreeEvent || (currentUserData && currentUserData[event.unlockField]);
+        const card = createEventCard(event, isUnlocked, isFreeEvent);
         unlockedSection.appendChild(card);
     });
 }
 
 // Create an event card element
-function createEventCard(event, isUnlocked) {
+function createEventCard(event, isUnlocked, isFreeEvent = false) {
     const card = document.createElement('div');
     card.className = `special-event-card ${isUnlocked ? 'unlocked' : 'locked'}`;
 
     if (isUnlocked) {
-        // Unlocked card - clickable, leads to event detail
+        // Unlocked/Available card - clickable, leads to event detail
+        const badgeText = isFreeEvent ? 'Available' : 'Unlocked';
         card.innerHTML = `
-            <div class="event-badge available">Unlocked</div>
+            <div class="event-badge available">${badgeText}</div>
             <div class="event-icon">${event.icon}</div>
             <h3 class="event-title">${event.name}</h3>
             <p class="event-description">${event.description}</p>

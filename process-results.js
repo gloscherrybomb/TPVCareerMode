@@ -418,7 +418,9 @@ const EVENT_MAX_POINTS = {
   12: 145, // Unbound - Little Egypt
   13: 120, // Local Tour Stage 1
   14: 95,  // Local Tour Stage 2
-  15: 135  // Local Tour Stage 3
+  15: 135, // Local Tour Stage 3
+  // Special events (IDs > 100)
+  102: 40  // The Leveller
 };
 
 /**

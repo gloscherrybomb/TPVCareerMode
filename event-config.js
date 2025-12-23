@@ -20,7 +20,8 @@ const EVENT_NAMES = {
   14: 'Local Tour Stage 2',
   15: 'Local Tour Stage 3',
   // Special events (IDs > 100)
-  101: 'Singapore Criterium'
+  101: 'Singapore Criterium',
+  102: 'The Leveller'
 };
 
 // Event types for each event in Season 1
@@ -41,7 +42,8 @@ const EVENT_TYPES = {
   14: 'stage race',
   15: 'stage race',
   // Special events (IDs > 100)
-  101: 'criterium'  // Singapore Criterium
+  101: 'criterium',  // Singapore Criterium
+  102: 'points race'  // The Leveller
 };
 
 // Optional choice events (can be selected at stages 3, 6, or 8)
