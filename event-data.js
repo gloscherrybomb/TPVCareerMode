@@ -145,7 +145,7 @@ This race rewards riders who can produce power repeatedly under fatigue—exactl
             difficulty: "Relentlessly challenging",
             finish: "Most points wins"
         },
-        scheduleUrl: "https://tpvirtualhub.com/clone?o=eyJzY2hlZHVsZUtleSI6NTI0NjAsImFjY2Vzc0NvZGUiOjE4NjA2MCwicmVxdWlyZUFjY2Vzc0NvZGUiOnRydWUsInRpdGxlVGVtcGxhdGUiOiJOb3J0aCBMYWtlIFBvaW50cyBSYWNlIC0gVFBWIENhcmVlciBNb2RlIn0="
+        scheduleUrl: "https://tpvirtualhub.com/clone?o=eyJzY2hlZHVsZUtleSI6NTMzMDMsImFjY2Vzc0NvZGUiOjE4NjA2MCwicmVxdWlyZUFjY2Vzc0NvZGUiOnRydWUsInRpdGxlVGVtcGxhdGUiOiJOb3J0aCBMYWtlIFBvaW50cyBSYWNlIC0gVFBWIENhcmVlciBNb2RlIn0="
     },
     6: {
         number: "06",
