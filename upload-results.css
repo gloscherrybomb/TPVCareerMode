@@ -221,6 +221,83 @@
     border-color: var(--accent-pink);
 }
 
+/* Special Events Upload Section */
+.special-events-upload-section {
+    background: var(--dark-card);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 170, 0, 0.3);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.special-events-header {
+    margin-bottom: 1rem;
+}
+
+.special-events-header h3 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.1rem;
+    color: #ffd700;
+    margin: 0 0 0.25rem 0;
+}
+
+.special-events-header p {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+.special-events-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.special-event-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.875rem 1.25rem;
+    background: var(--dark-elevated);
+    border: 2px solid rgba(255, 170, 0, 0.2);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: left;
+}
+
+.special-event-btn:hover {
+    border-color: rgba(255, 170, 0, 0.5);
+    background: rgba(255, 170, 0, 0.05);
+}
+
+.special-event-btn.selected {
+    border-color: #ffd700;
+    background: rgba(255, 170, 0, 0.15);
+    box-shadow: 0 0 12px rgba(255, 170, 0, 0.2);
+}
+
+.special-event-icon {
+    font-size: 1.75rem;
+}
+
+.special-event-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+}
+
+.special-event-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.95rem;
+}
+
+.special-event-desc {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
 /* Upload Area */
 .upload-area {
     margin-bottom: 1.5rem;

@@ -68,7 +68,9 @@ const EXPECTED_DISTANCES = {
   12: 38000,  // Unbound Little Egypt
   13: 35200,  // Local Tour Stage 1
   14: 27300,  // Local Tour Stage 2
-  15: 28100   // Local Tour Stage 3
+  15: 28100,  // Local Tour Stage 3
+  // Special events
+  102: 17500  // The Leveller
 };
 
 // Stage requirements for Career Mode progression

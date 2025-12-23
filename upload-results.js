@@ -12,6 +12,17 @@ const db = getFirestore(app);
 // Import shared event configuration from window (loaded via script tag in HTML)
 const { STAGE_REQUIREMENTS, EXPECTED_DISTANCES, EVENT_NAMES, TIME_BASED_EVENTS } = window.eventConfig;
 
+// Special events available for upload (The Leveller is free for all)
+const UPLOAD_SPECIAL_EVENTS = [
+    {
+        id: 102,
+        name: 'The Leveller',
+        icon: '⚖️',
+        description: 'Points Race - All-rounder challenge',
+        isFree: true  // Available to all users
+    }
+];
+
 // State
 let currentUser = null;
 let userData = null;
@@ -19,6 +30,7 @@ let selectedFile = null;
 let parsedCSV = null;
 let validationPassed = false;
 let selectedEventNumber = null;
+let isSpecialEventUpload = false;
 
 // DOM Elements
 const loadingState = document.getElementById('loadingState');
@@ -28,6 +40,8 @@ const currentStageEl = document.getElementById('currentStage');
 const validEventsList = document.getElementById('validEventsList');
 const eventSelectionSection = document.getElementById('eventSelectionSection');
 const eventSelect = document.getElementById('eventSelect');
+const specialEventsSection = document.getElementById('specialEventsSection');
+const specialEventsList = document.getElementById('specialEventsList');
 const dropzone = document.getElementById('dropzone');
 const fileInput = document.getElementById('fileInput');
 const fileInfo = document.getElementById('fileInfo');
@@ -132,32 +146,96 @@ function displayStageInfo() {
     const stageReq = STAGE_REQUIREMENTS[currentStage];
     if (!stageReq) {
         validEventsList.innerHTML = '<span class="valid-event-tag">Season Complete</span>';
+    } else {
+        let validEvents = [];
+
+        if (stageReq.type === 'fixed') {
+            validEvents = [stageReq.eventId];
+            eventSelectionSection.style.display = 'none';
+            selectedEventNumber = stageReq.eventId;
+        } else if (stageReq.type === 'choice') {
+            validEvents = stageReq.eventIds.filter(id => !usedOptionalEvents.includes(id));
+            showEventSelection(validEvents);
+        } else if (stageReq.type === 'tour') {
+            const nextTourEvent = getNextTourEvent(tourProgress);
+            if (nextTourEvent) {
+                validEvents = [nextTourEvent];
+                selectedEventNumber = nextTourEvent;
+            }
+            eventSelectionSection.style.display = 'none';
+        }
+
+        // Display valid events
+        validEventsList.innerHTML = validEvents.map(eventId => {
+            const name = EVENT_NAMES[eventId] || `Event ${eventId}`;
+            return `<span class="valid-event-tag highlight">Event ${eventId}: ${name}</span>`;
+        }).join('');
+    }
+
+    // Display special events section
+    displaySpecialEvents();
+}
+
+// Display available special events for upload
+function displaySpecialEvents() {
+    if (!specialEventsSection || !specialEventsList) return;
+
+    // Filter to events user has access to
+    const availableEvents = UPLOAD_SPECIAL_EVENTS.filter(event => {
+        if (event.isFree) return true;
+        // Check unlock field in userData if needed for future paid events
+        return false;
+    });
+
+    if (availableEvents.length === 0) {
+        specialEventsSection.style.display = 'none';
         return;
     }
 
-    let validEvents = [];
+    specialEventsSection.style.display = 'block';
+    specialEventsList.innerHTML = availableEvents.map(event => `
+        <button class="special-event-btn" data-event-id="${event.id}">
+            <span class="special-event-icon">${event.icon}</span>
+            <span class="special-event-info">
+                <span class="special-event-name">${event.name}</span>
+                <span class="special-event-desc">${event.description}</span>
+            </span>
+        </button>
+    `).join('');
 
-    if (stageReq.type === 'fixed') {
-        validEvents = [stageReq.eventId];
-        eventSelectionSection.style.display = 'none';
-        selectedEventNumber = stageReq.eventId;
-    } else if (stageReq.type === 'choice') {
-        validEvents = stageReq.eventIds.filter(id => !usedOptionalEvents.includes(id));
-        showEventSelection(validEvents);
-    } else if (stageReq.type === 'tour') {
-        const nextTourEvent = getNextTourEvent(tourProgress);
-        if (nextTourEvent) {
-            validEvents = [nextTourEvent];
-            selectedEventNumber = nextTourEvent;
-        }
-        eventSelectionSection.style.display = 'none';
+    // Add click handlers
+    specialEventsList.querySelectorAll('.special-event-btn').forEach(btn => {
+        btn.addEventListener('click', () => handleSpecialEventSelect(parseInt(btn.dataset.eventId)));
+    });
+}
+
+// Handle special event selection
+function handleSpecialEventSelect(eventId) {
+    // Toggle selection
+    const wasSelected = selectedEventNumber === eventId && isSpecialEventUpload;
+
+    // Clear all selections
+    specialEventsList.querySelectorAll('.special-event-btn').forEach(btn => {
+        btn.classList.remove('selected');
+    });
+
+    if (wasSelected) {
+        // Deselect - go back to season event
+        isSpecialEventUpload = false;
+        selectedEventNumber = null;
+        displayStageInfo(); // Reset to show season event
+    } else {
+        // Select this special event
+        isSpecialEventUpload = true;
+        selectedEventNumber = eventId;
+        const btn = specialEventsList.querySelector(`[data-event-id="${eventId}"]`);
+        if (btn) btn.classList.add('selected');
     }
 
-    // Display valid events
-    validEventsList.innerHTML = validEvents.map(eventId => {
-        const name = EVENT_NAMES[eventId] || `Event ${eventId}`;
-        return `<span class="valid-event-tag highlight">Event ${eventId}: ${name}</span>`;
-    }).join('');
+    // Re-validate if we have a file
+    if (parsedCSV) {
+        validateCSV();
+    }
 }
 
 // Get next tour event
@@ -247,6 +325,7 @@ function clearFile() {
     parsedCSV = null;
     validationPassed = false;
     selectedEventNumber = null;
+    isSpecialEventUpload = false;
     fileInput.value = '';
     fileInfo.style.display = 'none';
     validationResults.style.display = 'none';
@@ -259,6 +338,13 @@ function clearFile() {
     if (stageReq?.type === 'choice') {
         eventSelect.value = '';
         selectedEventNumber = null;
+    }
+
+    // Reset special event selection
+    if (specialEventsList) {
+        specialEventsList.querySelectorAll('.special-event-btn').forEach(btn => {
+            btn.classList.remove('selected');
+        });
     }
 }
 
@@ -414,19 +500,30 @@ function validateCSV() {
         }
     }
 
-    // 3. Check stage validity
+    // 3. Check stage validity (or special event validity)
     if (selectedEventNumber) {
         const currentStage = userData?.currentStage || 1;
         const usedOptionalEvents = userData?.usedOptionalEvents || [];
         const tourProgress = userData?.tourProgress || {};
 
         const stageValidation = isEventValidForStage(selectedEventNumber, currentStage, usedOptionalEvents, tourProgress);
+
+        let validationText;
+        if (stageValidation.valid) {
+            if (stageValidation.isSpecialEvent) {
+                const eventName = EVENT_NAMES[selectedEventNumber] || `Event ${selectedEventNumber}`;
+                validationText = `${eventName} is a Special Event (does not affect season progression)`;
+            } else {
+                validationText = `Event ${selectedEventNumber} is valid for Stage ${currentStage}`;
+            }
+        } else {
+            validationText = stageValidation.reason;
+        }
+
         validations.push({
             valid: stageValidation.valid,
             icon: stageValidation.valid ? '✓' : '✗',
-            text: stageValidation.valid
-                ? `Event ${selectedEventNumber} is valid for Stage ${currentStage}`
-                : stageValidation.reason,
+            text: validationText,
             type: stageValidation.valid ? 'valid' : 'invalid'
         });
         if (!stageValidation.valid) allValid = false;
@@ -461,8 +558,18 @@ function detectEventFromDistance(distance) {
     return null;
 }
 
+// Check if event is a special event
+function isSpecialEvent(eventNumber) {
+    return eventNumber > 100;
+}
+
 // Validate event for stage (mirror process-results.js logic)
 function isEventValidForStage(eventNumber, currentStage, usedOptionalEvents, tourProgress) {
+    // Special events are always valid (they don't affect season progression)
+    if (isSpecialEvent(eventNumber)) {
+        return { valid: true, isSpecialEvent: true };
+    }
+
     const stageReq = STAGE_REQUIREMENTS[currentStage];
 
     if (!stageReq) {
