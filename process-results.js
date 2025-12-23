@@ -1910,7 +1910,15 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
       eventResults.earnedAwards.push({ awardId: 'gcBronzeMedal', category: 'gc', intensity: 'flashy' });
     }
   }
-  
+
+  // Special Event Awards
+  // The Equalizer - awarded for completing The Leveller (event 102)
+  if (eventNumber === 102) {
+    console.log('   🎚️ THE LEVELLER completed! Awarding The Equalizer');
+    eventAwards['awards.theEqualizer'] = admin.firestore.FieldValue.increment(1);
+    eventResults.earnedAwards.push({ awardId: 'theEqualizer', category: 'special_event', intensity: 'moderate' });
+  }
+
   // Merge event awards into updates
   Object.assign(updates, eventAwards);
   

@@ -253,6 +253,15 @@ const AWARD_DEFINITIONS = {
     icon: '🧮',
     description: 'Score more points than the rider who crossed the line first',
     calculationType: 'event'
+  },
+
+  // Special Event Awards
+  theEqualizer: {
+    id: 'theEqualizer',
+    title: 'The Equalizer',
+    icon: '🎚️',
+    description: 'Complete The Leveller special event',
+    calculationType: 'event'
   }
 };
 
