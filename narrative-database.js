@@ -2680,6 +2680,134 @@ const NARRATIVE_DATABASE = {
       triggers: { requiresContributor: true },
       weight: 0.5
     }
+  ],
+
+  // ===== SPECIAL EVENTS =====
+  // Dedicated narratives for special events (Event 101: Singapore Criterium, Event 102: The Leveller)
+  specialEvents: [
+    // ===== SINGAPORE CRITERIUM (Event 101) =====
+    {
+      id: "special_singapore_night_atmosphere",
+      text: "The Singapore night air wraps around you like a warm blanket as you roll to the start line. Floodlights blaze overhead, turning the Marina Bay street circuit into a theatrical stage. This isn't like any race you've done before—the tropical humidity, the glittering skyline, the exclusive atmosphere of an event you had to earn your way into. The heat is oppressive but somehow electric. Around you, the other riders look equally awed and intimidated by the setting.",
+      triggers: { eventNumber: 101, performanceTier: ["any"] },
+      weight: 0.9
+    },
+    {
+      id: "special_singapore_marina_bay",
+      text: "Marina Bay's skyline towers behind the start line, a wall of illuminated skyscrapers reflecting off the water. You've seen photos of this place, dreamed about racing here, but nothing prepared you for the reality. The Singapore Criterium is invitation-only, exclusive, prestigious—and somehow you're here, pinning a race number to your jersey under lights bright enough to film a movie. The night racing format adds an edge of unreality to everything.",
+      triggers: { eventNumber: 101, performanceTier: ["any"] },
+      weight: 0.8
+    },
+    {
+      id: "special_singapore_tropical_heat",
+      text: "The tropical heat hits different at night. You'd expected it to cool down after sunset, but Singapore doesn't work that way—the humidity hangs in the air like a physical presence, making every breath feel heavy. Your pre-race warmup left you drenched in sweat before you even started. The riders around you are dealing with the same conditions, dabbing at faces, sipping constantly from bottles. This will be as much a test of heat management as racing ability.",
+      triggers: { eventNumber: 101, performanceTier: ["midpack", "back"] },
+      weight: 0.7
+    },
+    {
+      id: "special_singapore_earned_entry",
+      text: "Not everyone gets to race the Singapore Criterium. You had to earn this—prove yourself worthy of an invitation to one of the most exclusive events on the calendar. As you look around at the other competitors, you realize they all went through the same process. This isn't a participation-trophy event. This is where serious riders come to test themselves under extraordinary conditions. The floodlit street circuit awaits.",
+      triggers: { eventNumber: 101, performanceTier: ["any"] },
+      weight: 0.7
+    },
+    {
+      id: "special_singapore_urban_circuit",
+      text: "The Singapore street circuit is tighter than you expected—technical corners that demand respect, barriers close enough to touch, the constant awareness that one mistake on this unforgiving urban tarmac could end your night early. But that's part of the appeal. Night criteriums reward the bold and punish the careless. As you complete your reconnaissance lap, you're already planning your lines, identifying the corners where you can gain time.",
+      triggers: { eventNumber: 101, performanceTier: ["top10", "podium", "win"] },
+      weight: 0.7
+    },
+    {
+      id: "special_singapore_night_victory",
+      text: "Under the Singapore lights, with Marina Bay's skyline glittering behind you, you crossed the line first. Night racing has a magic all its own—the floodlights, the heat, the exclusive atmosphere of an event you had to earn your way into. Tonight, you didn't just participate. You dominated. The winner's podium here feels different than anywhere else, surrounded by the city's glow and the knowledge that you've conquered one of cycling's most unique challenges.",
+      triggers: { eventNumber: 101, performanceTier: ["win"] },
+      weight: 0.95
+    },
+    {
+      id: "special_singapore_podium_lights",
+      text: "A podium finish at the Singapore Criterium. The floodlights that illuminated your race now illuminate your celebration, casting long shadows across the Marina Bay circuit. You came here wondering if you belonged among this exclusive field, and now you have your answer. The tropical heat tested you, the technical circuit challenged you, but you rose to meet it all. This result will stay with you long after you've left Singapore's humid embrace.",
+      triggers: { eventNumber: 101, performanceTier: ["podium"] },
+      weight: 0.9
+    },
+    {
+      id: "special_singapore_exotic_dream",
+      text: "Racing in Singapore felt like stepping into someone else's life. The exotic location, the night format, the prestige of an invitation-only event—none of it seemed real until you were actually there, heart pounding, legs spinning, chasing the rider ahead through pools of floodlight and shadow. Whatever the result, you'll carry this experience with you. Not many people can say they've raced under the Singapore lights.",
+      triggers: { eventNumber: 101, performanceTier: ["any"] },
+      weight: 0.6
+    },
+    {
+      id: "special_singapore_shadow_racing",
+      text: "Night racing creates its own rhythm. The floodlights cast sharp shadows that shift as you corner, creating moments of brightness and darkness in rapid succession. Your eyes constantly adjust, your brain processing the unusual visual input while your legs drive the pedals. It's disorienting at first, then exhilarating once you find the flow. The Singapore street circuit under lights is unlike anything else in cycling.",
+      triggers: { eventNumber: 101, performanceTier: ["any"] },
+      weight: 0.5
+    },
+    {
+      id: "special_singapore_prestige",
+      text: "The Singapore Criterium carries a weight that regular races don't. Standing at the start, you're acutely aware of what it took to get here—the qualifying results, the invitation, the journey to this humid metropolis. The prestige of this event isn't manufactured; it's earned by every rider who makes it to the start line. Tonight, under the lights of Marina Bay, you'll find out if you can match that prestige with performance.",
+      triggers: { eventNumber: 101, performanceTier: ["podium", "win"] },
+      weight: 0.7
+    },
+
+    // ===== THE LEVELLER (Event 102) =====
+    {
+      id: "special_leveller_proving_ground",
+      text: "The Leveller isn't like other races. It doesn't favor the pure climber or the dedicated sprinter—it demands everything. Seven laps of North Lake's rolling terrain, with points scattered across the course, testing your endurance, your explosiveness, and your tactical brain all at once. This is where you find out what kind of rider you really are. No hiding behind a single strength here. The Leveller exposes everything.",
+      triggers: { eventNumber: 102, performanceTier: ["any"] },
+      weight: 0.9
+    },
+    {
+      id: "special_leveller_rank_calibration",
+      text: "They call it The Leveller because it calibrates everyone to their true level. Specialists who dominate in their comfort zone often struggle here, while all-rounders finally get a race that plays to their versatility. As you roll to the start, you're genuinely uncertain how this will go. Your strengths might carry you, or your weaknesses might be ruthlessly exposed. Seven laps from now, you'll know exactly where you stand.",
+      triggers: { eventNumber: 102, performanceTier: ["any"] },
+      weight: 0.8
+    },
+    {
+      id: "special_leveller_north_lake",
+      text: "North Lake's rolling terrain is familiar territory, but racing it for points changes everything. The climbs that felt manageable on training rides become battlegrounds when there are points on the line. The descents that once offered recovery now demand immediate acceleration into the next effort. Seven laps of this, and you'll have answered some important questions about your riding.",
+      triggers: { eventNumber: 102, performanceTier: ["any"] },
+      weight: 0.7
+    },
+    {
+      id: "special_leveller_balanced_test",
+      text: "Endurance for the seven laps. Explosiveness for the points sprints. Climbing ability for the rolling terrain. Time trial power to close gaps. The Leveller tests them all, equally and mercilessly. You've spent your training focusing on various aspects of your fitness, and now every bit of that work will be examined. This is the most complete test of cycling ability you've ever faced.",
+      triggers: { eventNumber: 102, performanceTier: ["top10", "podium"] },
+      weight: 0.8
+    },
+    {
+      id: "special_leveller_career_jumpstart",
+      text: "For developing riders, The Leveller is a golden opportunity. It's open to everyone, free to enter, and the results matter for your ranking calibration. A strong performance here can jumpstart a career, placing you in the right categories with riders at your level. You're not just racing for points today—you're racing to establish your identity in the peloton.",
+      triggers: { eventNumber: 102, performanceTier: ["any"] },
+      weight: 0.7
+    },
+    {
+      id: "special_leveller_points_tactical",
+      text: "Points racing requires a different mindset. You can't just empty the tank for the finish line—you need to meter your efforts across multiple sprints, making tactical decisions about which points to contest and which to let go. The Leveller's seven-lap format means plenty of opportunities, but also plenty of ways to overcook your effort too early. Smart racing wins here as much as strong legs.",
+      triggers: { eventNumber: 102, performanceTier: ["podium", "win"] },
+      weight: 0.7
+    },
+    {
+      id: "special_leveller_all_rounder_identity",
+      text: "Some riders know exactly what they are—pure climbers, dedicated sprinters, time trial specialists. Others are harder to categorize, good at everything but dominant at nothing. The Leveller is designed for the second group. If you've ever wondered whether being an all-rounder is a strength or a weakness, today will provide the answer. Seven laps of multi-faceted racing await.",
+      triggers: { eventNumber: 102, performanceTier: ["any"] },
+      weight: 0.6
+    },
+    {
+      id: "special_leveller_free_opportunity",
+      text: "Unlike some special events that require unlocking, The Leveller is open to all. It's a gift to developing riders—a chance to test yourself against a demanding format without barriers to entry. Free doesn't mean easy, though. The rolling terrain of North Lake and the points race format will extract every watt you can produce. The opportunity is free; earning a good result still costs effort.",
+      triggers: { eventNumber: 102, performanceTier: ["any"] },
+      weight: 0.6
+    },
+    {
+      id: "special_leveller_complete_rider",
+      text: "Winning The Leveller means something specific: you're a complete rider. Not just fast in one discipline, but capable across the board. The rolling terrain tested your climbing. The points format tested your sprinting. The seven laps tested your endurance. And you passed every test. Few riders can claim to be true all-rounders, but after today, you're one of them.",
+      triggers: { eventNumber: 102, performanceTier: ["win"] },
+      weight: 0.95
+    },
+    {
+      id: "special_leveller_weakness_exposed",
+      text: "The Leveller earned its name today. Whatever strengths you brought to the start line, your weaknesses were exposed just as clearly. The points you couldn't contest, the climbs where you lost ground, the moments when specialists pulled away and you couldn't follow—all of it adds up to a clear picture of where you need to improve. Painful, perhaps, but invaluable information for a developing rider.",
+      triggers: { eventNumber: 102, performanceTier: ["back"] },
+      weight: 0.7
+    }
   ]
 };
 // Export for use in other modules

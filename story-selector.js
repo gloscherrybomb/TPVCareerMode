@@ -36,7 +36,8 @@ const CATEGORY_TONES = {
   rivalry: EMOTIONAL_TONES.POSITIVE,
   personalityDriven: EMOTIONAL_TONES.POSITIVE,
   contributorExclusive: EMOTIONAL_TONES.POSITIVE,
-  postRaceTransitions: EMOTIONAL_TONES.REFLECTIVE
+  postRaceTransitions: EMOTIONAL_TONES.REFLECTIVE,
+  specialEvents: EMOTIONAL_TONES.POSITIVE
 };
 
 // Tone transition penalties (from -> to = penalty score reduction)
@@ -737,6 +738,17 @@ class StorySelector {
         this.setRiderEmotionalState(riderId, EMOTIONAL_TONES.NEUTRAL);
       }
       return introParagraph;
+    }
+
+    // Special Events (eventNumber >= 100): Use dedicated specialEvents category
+    if (context.eventNumber >= 100) {
+      const specialStory = this.selectFromCategory(riderId, 'specialEvents', context, 30);
+      if (specialStory) {
+        introParagraph = this.applyVariableSubstitution(specialStory.text, context);
+        await this.markStoryUsed(riderId, specialStory.id, context.eventNumber, db);
+        this.setRiderEmotionalState(riderId, this.getStoryEmotionalTone(specialStory, 'specialEvents'));
+      }
+      return introParagraph.trim();
     }
 
     // Build list of relevant categories with priority bonuses

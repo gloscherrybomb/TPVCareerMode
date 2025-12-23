@@ -1289,6 +1289,280 @@ const INTERVIEW_RESPONSES = {
       aggression: 4,
       showmanship: 1
     }
+  },
+
+  // ===== SPECIAL EVENTS RESPONSES =====
+
+  // Singapore Criterium - Win Responses
+  singapore_win_proud: {
+    id: 'singapore_win_proud',
+    text: "Winning under those lights, with Marina Bay behind us—I'll never forget this. The night racing atmosphere was electric, and to take the victory here means everything. This is what I worked so hard to unlock.",
+    style: 'confident',
+    badge: '💪 Confident',
+    personalityImpact: {
+      confidence: 4,
+      showmanship: 2
+    }
+  },
+
+  singapore_win_humble: {
+    id: 'singapore_win_humble',
+    text: "The setting was incredible, but I tried to focus on the racing. The heat was challenging for everyone. I'm grateful to have earned entry to this event and even more grateful for this result.",
+    style: 'humble',
+    badge: '🤝 Humble',
+    personalityImpact: {
+      humility: 4,
+      professionalism: 2
+    }
+  },
+
+  singapore_win_showman: {
+    id: 'singapore_win_showman',
+    text: "Night racing, Singapore skyline, exclusive entry—and now a victory! This is what racing dreams are made of. The atmosphere was absolutely unreal tonight. I'll be celebrating under these lights all evening!",
+    style: 'showman',
+    badge: '⚡ Showman',
+    personalityImpact: {
+      showmanship: 5,
+      confidence: 2
+    }
+  },
+
+  // Singapore Criterium - Podium Responses
+  singapore_podium_grateful: {
+    id: 'singapore_podium_grateful',
+    text: "To stand on this podium, under these lights, in this incredible setting—I'm just so grateful. The journey to get here, to earn entry to this event, and then to finish on the podium? It's overwhelming in the best way.",
+    style: 'humble',
+    badge: '🤝 Humble',
+    personalityImpact: {
+      humility: 4,
+      resilience: 2
+    }
+  },
+
+  singapore_podium_confident: {
+    id: 'singapore_podium_confident',
+    text: "I came here to prove I belong with the best, and a podium does exactly that. Night racing, tropical conditions, exclusive field—I handled it all. Next time, I'm going for the top step.",
+    style: 'confident',
+    badge: '💪 Confident',
+    personalityImpact: {
+      confidence: 4,
+      aggression: 1
+    }
+  },
+
+  singapore_podium_professional: {
+    id: 'singapore_podium_professional',
+    text: "We prepared specifically for the night format and tropical conditions. Adjusted hydration, adapted warmup, studied the circuit under lights. The preparation paid off with this podium result.",
+    style: 'professional',
+    badge: '🎯 Professional',
+    personalityImpact: {
+      professionalism: 4,
+      confidence: 1
+    }
+  },
+
+  // Singapore Criterium - Midpack Responses
+  singapore_mid_learning: {
+    id: 'singapore_mid_learning',
+    text: "Night racing is a completely different experience—the shadows, the heat, the intensity. I learned so much tonight. The result isn't what I wanted, but the experience is invaluable for next time.",
+    style: 'humble',
+    badge: '🤝 Humble',
+    personalityImpact: {
+      humility: 3,
+      professionalism: 2
+    }
+  },
+
+  singapore_mid_motivated: {
+    id: 'singapore_mid_motivated',
+    text: "The atmosphere here is incredible, and now I know what it takes to compete at this level. This result lights a fire under me. I'll be back, better prepared, and ready to challenge for the podium.",
+    style: 'aggressive',
+    badge: '😤 Aggressive',
+    personalityImpact: {
+      aggression: 3,
+      resilience: 2
+    }
+  },
+
+  singapore_mid_resilient: {
+    id: 'singapore_mid_resilient',
+    text: "The conditions tested everyone out there tonight. I battled through the heat and humidity, adapted to the night format, and finished the race. Not the result I wanted, but I proved I can handle the challenge.",
+    style: 'resilient',
+    badge: '💚 Resilient',
+    personalityImpact: {
+      resilience: 4,
+      professionalism: 1
+    }
+  },
+
+  // Singapore Criterium - Tough Finish Responses
+  singapore_tough_honest: {
+    id: 'singapore_tough_honest',
+    text: "The tropical conditions got the better of me tonight. The humidity was brutal, and I couldn't manage my effort the way I needed to. Tough lesson, but an honest one. I know what to work on now.",
+    style: 'honest',
+    badge: '😔 Honest',
+    personalityImpact: {
+      humility: 3,
+      resilience: 1
+    }
+  },
+
+  singapore_tough_resilient: {
+    id: 'singapore_tough_resilient',
+    text: "It was a rough night, but I finished. The heat, the intensity, the pressure of this exclusive event—it all added up. But I didn't quit, and that means something. I'll come back stronger.",
+    style: 'resilient',
+    badge: '💚 Resilient',
+    personalityImpact: {
+      resilience: 4,
+      professionalism: 1
+    }
+  },
+
+  singapore_tough_analytical: {
+    id: 'singapore_tough_analytical',
+    text: "Looking at the data, my power dropped significantly in the final laps—classic heat management failure. The night format and tropical conditions require specific preparation I didn't quite nail. Valuable lesson.",
+    style: 'professional',
+    badge: '🎯 Professional',
+    personalityImpact: {
+      professionalism: 3,
+      resilience: 2
+    }
+  },
+
+  // The Leveller - Win Responses
+  leveller_win_confident: {
+    id: 'leveller_win_confident',
+    text: "The Leveller tests everything, and today I proved I can do it all. Climbing, sprinting, endurance—it all came together. This result shows I'm not a one-dimensional rider. I'm the complete package.",
+    style: 'confident',
+    badge: '💪 Confident',
+    personalityImpact: {
+      confidence: 4,
+      professionalism: 1
+    }
+  },
+
+  leveller_win_humble: {
+    id: 'leveller_win_humble',
+    text: "It's a great feeling to win an event that tests so many different abilities. I've been working on my weaknesses, and today showed that work is paying off. Still room to improve, but this is encouraging.",
+    style: 'humble',
+    badge: '🤝 Humble',
+    personalityImpact: {
+      humility: 3,
+      resilience: 2
+    }
+  },
+
+  leveller_win_tactical: {
+    id: 'leveller_win_tactical',
+    text: "Points racing is about choosing your battles wisely. I identified which sprints to contest, managed my energy across seven laps, and executed the plan. Tactical discipline won this race.",
+    style: 'professional',
+    badge: '🎯 Professional',
+    personalityImpact: {
+      professionalism: 4,
+      confidence: 1
+    }
+  },
+
+  // The Leveller - Podium Responses
+  leveller_podium_climbing: {
+    id: 'leveller_podium_climbing',
+    text: "The rolling terrain played to my climbing strengths. I gained time on every rise and protected those advantages on the flat sections. North Lake's profile really suits my abilities.",
+    style: 'confident',
+    badge: '💪 Confident',
+    personalityImpact: {
+      confidence: 3,
+      professionalism: 2
+    }
+  },
+
+  leveller_podium_sprint: {
+    id: 'leveller_podium_sprint',
+    text: "The points format let me use my sprint to full advantage. I picked my moments, won the key sprints, and accumulated points when it mattered. That's how you race The Leveller.",
+    style: 'confident',
+    badge: '💪 Confident',
+    personalityImpact: {
+      confidence: 3,
+      showmanship: 2
+    }
+  },
+
+  leveller_podium_allround: {
+    id: 'leveller_podium_allround',
+    text: "This is the race I was made for—no single skill dominates, you need everything. I'm not the best climber or sprinter individually, but put it all together and I can compete with anyone.",
+    style: 'professional',
+    badge: '🎯 Professional',
+    personalityImpact: {
+      professionalism: 3,
+      resilience: 2
+    }
+  },
+
+  // The Leveller - Solid Finish Responses
+  leveller_solid_learning: {
+    id: 'leveller_solid_learning',
+    text: "The Leveller is a reality check—it shows you exactly where you stand. I learned a lot about my strengths and weaknesses today. The points format exposed areas I need to develop.",
+    style: 'humble',
+    badge: '🤝 Humble',
+    personalityImpact: {
+      humility: 3,
+      professionalism: 2
+    }
+  },
+
+  leveller_solid_tactical: {
+    id: 'leveller_solid_tactical',
+    text: "Seven laps is a long time to manage effort and tactics. I made some good decisions and some mistakes. The learning from this race will help me in future points races.",
+    style: 'professional',
+    badge: '🎯 Professional',
+    personalityImpact: {
+      professionalism: 3,
+      resilience: 1
+    }
+  },
+
+  leveller_solid_patient: {
+    id: 'leveller_solid_patient',
+    text: "Building all-round ability takes time. This result is part of a longer journey—identifying weaknesses and systematically improving them. I'm patient but determined to climb higher.",
+    style: 'resilient',
+    badge: '💚 Resilient',
+    personalityImpact: {
+      resilience: 3,
+      professionalism: 2
+    }
+  },
+
+  // The Leveller - Struggle Responses
+  leveller_struggle_honest: {
+    id: 'leveller_struggle_honest',
+    text: "The Leveller doesn't lie—it exposed gaps in my abilities that I can't ignore. The climbs, the sprints, the endurance... I've got work to do across the board. Humbling, but honest.",
+    style: 'honest',
+    badge: '😔 Honest',
+    personalityImpact: {
+      humility: 4,
+      resilience: 1
+    }
+  },
+
+  leveller_struggle_determined: {
+    id: 'leveller_struggle_determined',
+    text: "Not the result I wanted, but exactly the information I needed. Now I know precisely what to work on. I'll be back for this race, and the result will be very different.",
+    style: 'aggressive',
+    badge: '😤 Aggressive',
+    personalityImpact: {
+      aggression: 3,
+      resilience: 2
+    }
+  },
+
+  leveller_struggle_analytical: {
+    id: 'leveller_struggle_analytical',
+    text: "Looking at where I lost points—mostly on the climbs and in the later laps when fatigue set in. Those are trainable weaknesses. I'll analyze the data and build a specific improvement plan.",
+    style: 'professional',
+    badge: '🎯 Professional',
+    personalityImpact: {
+      professionalism: 4,
+      resilience: 1
+    }
   }
 };
 

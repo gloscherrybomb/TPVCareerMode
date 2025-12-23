@@ -222,6 +222,10 @@ function checkQuestionTriggers(questionTriggers, context) {
             return context.isDNF === trigger;
         }
 
+        if (key === 'eventNumber') {
+            return context.eventNumber === trigger;
+        }
+
         // Default: check direct context value match
         const contextValue = context[key];
         return checkTrigger(trigger, contextValue, context);
@@ -300,7 +304,16 @@ function selectBestQuestion(eligibleQuestions, context, recentQuestions = []) {
         'rival_first_encounter',
         'rival_close_battle',
         'rival_beat_them',
-        'rival_they_won'
+        'rival_they_won',
+        // Special events (high priority when triggered)
+        'singapore_win',
+        'singapore_podium',
+        'singapore_midpack',
+        'singapore_tough',
+        'leveller_win',
+        'leveller_podium',
+        'leveller_solid',
+        'leveller_struggle'
     ];
 
     // Collect all matching medium priority questions

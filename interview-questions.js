@@ -557,6 +557,92 @@ const INTERVIEW_QUESTIONS = {
       },
       responses: ['win_standard_professional', 'consistency_professional', 'progression_tactical']
     }
+  },
+
+  // ===== SPECIAL EVENTS QUESTIONS =====
+  specialEvents: {
+
+    // Singapore Criterium (Event 101)
+    singapore_win: {
+      id: 'singapore_win',
+      text: "A night race victory under the Singapore lights! How does winning in this unique atmosphere feel?",
+      triggers: {
+        eventNumber: 101,
+        position: 1
+      },
+      responses: ['singapore_win_proud', 'singapore_win_humble', 'singapore_win_showman']
+    },
+
+    singapore_podium: {
+      id: 'singapore_podium',
+      text: "A podium finish at the Singapore Criterium—racing under those lights with the Marina Bay skyline. What was that experience like?",
+      triggers: {
+        eventNumber: 101,
+        positionIn: [2, 3]
+      },
+      responses: ['singapore_podium_grateful', 'singapore_podium_confident', 'singapore_podium_professional']
+    },
+
+    singapore_midpack: {
+      id: 'singapore_midpack',
+      text: "Your first Singapore night race. The heat, the lights, the atmosphere—how did you find it?",
+      triggers: {
+        eventNumber: 101,
+        positionBetween: [4, 20]
+      },
+      responses: ['singapore_mid_learning', 'singapore_mid_motivated', 'singapore_mid_resilient']
+    },
+
+    singapore_tough: {
+      id: 'singapore_tough',
+      text: "The Singapore heat and humidity can be brutal. What happened out there tonight?",
+      triggers: {
+        eventNumber: 101,
+        positionGreaterThan: 20
+      },
+      responses: ['singapore_tough_honest', 'singapore_tough_resilient', 'singapore_tough_analytical']
+    },
+
+    // The Leveller (Event 102)
+    leveller_win: {
+      id: 'leveller_win',
+      text: "You've topped The Leveller—the all-rounder's test. What does this say about your abilities?",
+      triggers: {
+        eventNumber: 102,
+        position: 1
+      },
+      responses: ['leveller_win_confident', 'leveller_win_humble', 'leveller_win_tactical']
+    },
+
+    leveller_podium: {
+      id: 'leveller_podium',
+      text: "A podium at The Leveller proves you can do it all. Which of your skills made the difference today?",
+      triggers: {
+        eventNumber: 102,
+        positionIn: [2, 3]
+      },
+      responses: ['leveller_podium_climbing', 'leveller_podium_sprint', 'leveller_podium_allround']
+    },
+
+    leveller_solid: {
+      id: 'leveller_solid',
+      text: "The Leveller tests everything—endurance, sprint, climbing. How did you balance those demands?",
+      triggers: {
+        eventNumber: 102,
+        positionBetween: [4, 15]
+      },
+      responses: ['leveller_solid_learning', 'leveller_solid_tactical', 'leveller_solid_patient']
+    },
+
+    leveller_struggle: {
+      id: 'leveller_struggle',
+      text: "The Leveller exposed some areas to work on. What did you learn about your riding today?",
+      triggers: {
+        eventNumber: 102,
+        positionGreaterThan: 15
+      },
+      responses: ['leveller_struggle_honest', 'leveller_struggle_determined', 'leveller_struggle_analytical']
+    }
   }
 };
 
