@@ -2694,8 +2694,49 @@ async function buildSeasonStandings(results, userData, eventNumber, currentUid, 
   const standings = Array.from(standingsMap.values());
   standings.sort((a, b) => b.points - a.points);
 
+  // Limit to 80 bots, stratified by points to maintain ability diversity
+  const MAX_BOTS = 80;
+  const QUINTILES = 5;
+  const BOTS_PER_QUINTILE = MAX_BOTS / QUINTILES; // 16
+
+  const humans = standings.filter(r => !r.isBot);
+  const bots = standings.filter(r => r.isBot);
+
+  let finalStandings;
+
+  if (bots.length <= MAX_BOTS) {
+    // No filtering needed
+    console.log(`   Bot count (${bots.length}) within limit of ${MAX_BOTS}, keeping all`);
+    finalStandings = standings;
+  } else {
+    // Stratify bots into quintiles and take 16 from each
+    console.log(`   Limiting bots from ${bots.length} to ${MAX_BOTS} (stratified by points)`);
+
+    // Bots are already sorted by points (descending) from standings sort
+    const quintileSize = Math.ceil(bots.length / QUINTILES);
+    const selectedBots = [];
+
+    for (let q = 0; q < QUINTILES; q++) {
+      const start = q * quintileSize;
+      const end = Math.min(start + quintileSize, bots.length);
+      const quintileBots = bots.slice(start, end);
+
+      // Take up to 16 from this quintile (they're already sorted by points within quintile)
+      const selected = quintileBots.slice(0, BOTS_PER_QUINTILE);
+      selectedBots.push(...selected);
+
+      console.log(`   Quintile ${q + 1}: ${quintileBots.length} bots, selected ${selected.length}`);
+    }
+
+    console.log(`   Total bots selected: ${selectedBots.length}`);
+
+    // Recombine humans + selected bots and re-sort
+    finalStandings = [...humans, ...selectedBots];
+    finalStandings.sort((a, b) => b.points - a.points);
+  }
+
   // Final sanitization: ensure no undefined values for Firestore compatibility
-  standings.forEach(racer => {
+  finalStandings.forEach(racer => {
     if (racer.uid === undefined) racer.uid = null;
     if (racer.name === undefined) racer.name = null;
     if (racer.team === undefined) racer.team = '';
@@ -2704,7 +2745,7 @@ async function buildSeasonStandings(results, userData, eventNumber, currentUid, 
     if (racer.events === undefined) racer.events = 0;
   });
 
-  return standings;
+  return finalStandings;
 }
 
 /**
