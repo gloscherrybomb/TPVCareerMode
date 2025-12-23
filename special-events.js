@@ -12,7 +12,6 @@ const db = getFirestore(app);
 const loadingState = document.getElementById('loadingState');
 const loginPrompt = document.getElementById('loginPrompt');
 const eventsContent = document.getElementById('eventsContent');
-const eventsGrid = document.getElementById('eventsGrid');
 
 // Special event definitions (linked to unlock-config.js and event-data.js)
 const SPECIAL_EVENTS = [
@@ -84,72 +83,51 @@ async function loadUserData(uid) {
 
 // Render special events based on unlock status
 function renderSpecialEvents() {
-    if (!eventsGrid) return;
+    // Find the container for available events
+    const availableSection = document.getElementById('availableEventsSection');
+    if (!availableSection) return;
 
-    // Find the placeholder for unlockable events
-    const unlockedSection = document.getElementById('unlockedEventsSection');
-    if (!unlockedSection) return;
-
-    // Clear and rebuild the unlocked events section
-    unlockedSection.innerHTML = '';
+    // Clear and rebuild the available events section
+    availableSection.innerHTML = '';
 
     SPECIAL_EVENTS.forEach(event => {
-        // Free events are always unlocked, others check the unlock field
+        // Free events are always available, others check the unlock field
         const isFreeEvent = event.unlockMethod === 'free';
         const isUnlocked = isFreeEvent || (currentUserData && currentUserData[event.unlockField]);
-        const card = createEventCard(event, isUnlocked, isFreeEvent);
-        unlockedSection.appendChild(card);
+
+        // Only show events that are available (free or purchased)
+        if (isUnlocked) {
+            const card = createEventCard(event, isFreeEvent);
+            availableSection.appendChild(card);
+        }
     });
 }
 
-// Create an event card element
-function createEventCard(event, isUnlocked, isFreeEvent = false) {
+// Create an event card element for available events
+function createEventCard(event, isFreeEvent = false) {
     const card = document.createElement('div');
-    card.className = `special-event-card ${isUnlocked ? 'unlocked' : 'locked'}`;
+    card.className = 'special-event-card unlocked';
 
-    if (isUnlocked) {
-        // Unlocked/Available card - clickable, leads to event detail
-        const badgeText = isFreeEvent ? 'Available' : 'Unlocked';
-        card.innerHTML = `
-            <div class="event-badge available">${badgeText}</div>
-            <div class="event-icon">${event.icon}</div>
-            <h3 class="event-title">${event.name}</h3>
-            <p class="event-description">${event.description}</p>
-            <div class="event-meta">
-                <span class="event-reward">🏆 ${event.reward}</span>
-                <span class="event-type">${event.type}</span>
-            </div>
-            <div class="event-status">
-                <button class="btn btn-primary btn-view-event">View Event</button>
-            </div>
-        `;
+    const badgeText = isFreeEvent ? 'Available' : 'Unlocked';
+    card.innerHTML = `
+        <div class="event-badge available">${badgeText}</div>
+        <div class="event-icon">${event.icon}</div>
+        <h3 class="event-title">${event.name}</h3>
+        <p class="event-description">${event.description}</p>
+        <div class="event-meta">
+            <span class="event-reward">🏆 ${event.reward}</span>
+            <span class="event-type">${event.type}</span>
+        </div>
+        <div class="event-status">
+            <button class="btn btn-primary btn-view-event">View Event</button>
+        </div>
+    `;
 
-        // Add click handler to navigate to event detail
-        card.addEventListener('click', () => {
-            window.location.href = `event-detail.html?id=${event.id}`;
-        });
-        card.style.cursor = 'pointer';
-    } else {
-        // Locked card - shows how to unlock
-        const unlockText = event.unlockMethod === 'store'
-            ? `Unlock in Store for ${event.cost} CC`
-            : 'Complete requirements to unlock';
-
-        card.innerHTML = `
-            <div class="event-badge locked-badge">Locked</div>
-            <div class="event-icon locked-icon">${event.icon}</div>
-            <h3 class="event-title">${event.name}</h3>
-            <p class="event-description">${event.description}</p>
-            <div class="event-meta">
-                <span class="event-reward">🏆 ${event.reward}</span>
-                <span class="event-type">${event.type}</span>
-            </div>
-            <div class="event-status">
-                <span class="status-text">${unlockText}</span>
-                ${event.unlockMethod === 'store' ? '<a href="store.html" class="btn btn-secondary btn-small">Go to Store</a>' : ''}
-            </div>
-        `;
-    }
+    // Add click handler to navigate to event detail
+    card.addEventListener('click', () => {
+        window.location.href = `event-detail.html?id=${event.id}`;
+    });
+    card.style.cursor = 'pointer';
 
     return card;
 }
