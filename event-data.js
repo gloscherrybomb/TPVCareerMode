@@ -127,11 +127,11 @@ Nail the pacing and you'll set a personal best that becomes your calling card. T
         type: "Points Race",
         level: "Local Amateur",
         mandatory: true,
-        distance: "19.6 km",
-        climbing: "388 m",
+        distance: "19.8 km",
+        climbing: "392 m",
         course: "North Lake Loop Reverse",
-        format: "4 laps",
-        maxPoints: 80,
+        format: "7 laps",
+        maxPoints: 85,
         icon: "🎯",
         description: `A local specialty that has riders grimacing before they even clip in. The North Lake Loop Reverse is relentlessly rolling—there's no such thing as cruising here, it's always either up or down.
 
