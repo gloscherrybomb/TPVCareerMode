@@ -35,7 +35,7 @@ const AWARD_CREDIT_MAP = {
   technicalIssues: 5,
   windTunnel: 25,
   theAccountant: 30,
-  theEqualizer: 0,  // Special event award - no bonus CC (uses completion bonus if only award)
+  theEqualizer: 30,  // Special event award - 30CC + 20CC completion bonus = 50CC for The Leveller
   singaporeSling: 30,  // Singapore Criterium podium bonus
   // Power-based awards
   powerSurge: 25,

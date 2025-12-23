@@ -1994,9 +1994,17 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
   const awardIds = (eventResults.earnedAwards || []).map(a => a.awardId);
   earnedCadenceCredits = calculateCadenceCreditsFromAwards(awardIds);
 
-  // If no CC from awards, give completion bonus for finishing the race
+  // Special case: The Leveller (theEqualizer) always gets completion bonus on top of award
+  // For all other events, completion bonus is only given if no awards earned
   let ccSource = 'awards';
-  if (earnedCadenceCredits === 0) {
+  const hasTheEqualizer = awardIds.includes('theEqualizer');
+
+  if (hasTheEqualizer) {
+    // The Leveller: 30CC award + 20CC completion bonus = 50CC total
+    earnedCadenceCredits += COMPLETION_BONUS_CC;
+    ccSource = 'awards'; // Still mark as awards since theEqualizer is the primary source
+  } else if (earnedCadenceCredits === 0) {
+    // Other events: completion bonus only if no awards
     earnedCadenceCredits = COMPLETION_BONUS_CC;
     ccSource = 'completion';
   }
