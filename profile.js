@@ -89,6 +89,7 @@ async function calculateUserStats(userUID, userData) {
                 bonusPoints: eventResults.bonusPoints || 0,
                 unlockBonusPoints: eventResults.unlockBonusPoints || 0,
                 earnedCadenceCredits: eventResults.earnedCadenceCredits || 0,
+                ccSource: eventResults.ccSource || 'awards',
                 predictedPosition: eventResults.predictedPosition || null,
                 earnedPunchingMedal: eventResults.earnedPunchingMedal || false,
                 earnedGiantKillerMedal: eventResults.earnedGiantKillerMedal || false,
@@ -405,7 +406,9 @@ function displayRecentResults(results) {
 
         // Add Cadence Coins earned
         if (result.earnedCadenceCredits > 0) {
-            bonusHTML += `<span class="cc-earned" title="Cadence Credits earned">⚡${result.earnedCadenceCredits} CC</span>`;
+            const ccIcon = result.ccSource === 'completion' ? '🏁' : '⚡';
+            const ccTitle = result.ccSource === 'completion' ? 'Race completion bonus' : 'Cadence Credits earned';
+            bonusHTML += `<span class="cc-earned" title="${ccTitle}">${ccIcon}${result.earnedCadenceCredits} CC</span>`;
         }
 
         // Format predicted position if available

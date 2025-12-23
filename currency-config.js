@@ -40,11 +40,15 @@ const AWARD_CREDIT_MAP = {
 // Safety cap per event to avoid runaway stacking in preview
 const PER_EVENT_CREDIT_CAP = 150;
 
+// Bonus CC for completing a race when no awards are earned
+const COMPLETION_BONUS_CC = 20;
+
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
     FEATURE_FLAG_KEY,
     AWARD_CREDIT_MAP,
-    PER_EVENT_CREDIT_CAP
+    PER_EVENT_CREDIT_CAP,
+    COMPLETION_BONUS_CC
   };
 }
 
@@ -52,6 +56,7 @@ if (typeof window !== 'undefined') {
   window.currencyConfig = {
     FEATURE_FLAG_KEY,
     AWARD_CREDIT_MAP,
-    PER_EVENT_CREDIT_CAP
+    PER_EVENT_CREDIT_CAP,
+    COMPLETION_BONUS_CC
   };
 }

@@ -6,7 +6,7 @@ const Papa = require('papaparse');
 const admin = require('firebase-admin');
 const awardsCalc = require('./awards-calculation');
 const storyGen = require('./story-generator');
-const { AWARD_CREDIT_MAP, PER_EVENT_CREDIT_CAP } = require('./currency-config');
+const { AWARD_CREDIT_MAP, PER_EVENT_CREDIT_CAP, COMPLETION_BONUS_CC } = require('./currency-config');
 const { UNLOCK_DEFINITIONS, getUnlockById } = require('./unlock-config');
 const { EVENT_NAMES, EVENT_TYPES, OPTIONAL_EVENTS, STAGE_REQUIREMENTS } = require('./event-config');
 
@@ -1977,6 +1977,13 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
   const awardIds = (eventResults.earnedAwards || []).map(a => a.awardId);
   earnedCadenceCredits = calculateCadenceCreditsFromAwards(awardIds);
 
+  // If no CC from awards, give completion bonus for finishing the race
+  let ccSource = 'awards';
+  if (earnedCadenceCredits === 0) {
+    earnedCadenceCredits = COMPLETION_BONUS_CC;
+    ccSource = 'completion';
+  }
+
   const txId = `cc_event_${eventNumber}`;
   const alreadyProcessed = existingTransactions.some(t => t.id === txId);
 
@@ -1988,7 +1995,7 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
       id: txId,
       type: 'earn',
       delta: earnedCadenceCredits,
-      source: 'awards',
+      source: ccSource,
       eventNumber: eventNumber,
       awardIds: awardIds,
       timestamp: txTimestamp
@@ -2000,6 +2007,7 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
 
   // Add CC earned to event results for display
   eventResults.earnedCadenceCredits = earnedCadenceCredits;
+  eventResults.ccSource = ccSource; // Track source for UI display
 
   // Currency updates
   const currentBalance = userData.currency?.balance || 0;
@@ -2007,7 +2015,11 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
     updates['currency.balance'] = currentBalance + earnedCadenceCredits;
     const currentTotalEarned = userData.currency?.totalEarned || 0;
     updates['currency.totalEarned'] = currentTotalEarned + earnedCadenceCredits;
-    console.log(`   💰 Awarding ${earnedCadenceCredits} CC from ${awardIds.length} awards (new balance: ${currentBalance + earnedCadenceCredits})`);
+    if (ccSource === 'completion') {
+      console.log(`   💰 Awarding ${earnedCadenceCredits} CC for race completion (new balance: ${currentBalance + earnedCadenceCredits})`);
+    } else {
+      console.log(`   💰 Awarding ${earnedCadenceCredits} CC from ${awardIds.length} awards (new balance: ${currentBalance + earnedCadenceCredits})`);
+    }
   }
   if (cadenceCreditTransaction) {
     updates['currency.transactions'] = admin.firestore.FieldValue.arrayUnion(cadenceCreditTransaction);

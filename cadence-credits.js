@@ -495,12 +495,14 @@ function renderCCResults(eventResults) {
   if (!panel) return;
 
   const earnedCC = eventResults.earnedCadenceCredits || 0;
+  const ccSource = eventResults.ccSource || 'awards';
   const unlockBonuses = eventResults.unlockBonusesApplied || [];
   const unlockPoints = eventResults.unlockBonusPoints || 0;
   const newBalance = userDocData.currency?.balance || 0;
 
   const hasEarned = earnedCC > 0;
   const hasUnlock = unlockBonuses.length > 0;
+  const isCompletionBonus = ccSource === 'completion';
 
   if (!hasEarned && !hasUnlock) return; // Don't show if nothing to display
 
@@ -513,10 +515,10 @@ function renderCCResults(eventResults) {
       <div class="cc-results-grid">
         ${hasEarned ? `
           <div class="cc-result-card earned">
-            <div class="cc-result-icon">⚡</div>
+            <div class="cc-result-icon">${isCompletionBonus ? '🏁' : '⚡'}</div>
             <div class="cc-result-amount earned">+${earnedCC}</div>
             <div class="cc-result-label">Cadence Credits Earned</div>
-            <div class="cc-result-detail">From achievements and awards</div>
+            <div class="cc-result-detail">${isCompletionBonus ? 'Race completion bonus' : 'From achievements and awards'}</div>
             <div class="cc-result-badge">New balance: ${newBalance} CC</div>
           </div>
         ` : ''}
