@@ -262,6 +262,13 @@ const AWARD_DEFINITIONS = {
     icon: '🎚️',
     description: 'Complete The Leveller special event',
     calculationType: 'event'
+  },
+  singaporeSling: {
+    id: 'singaporeSling',
+    title: 'Singapore Sling',
+    icon: '🍸',
+    description: 'Podium at the Singapore Criterium',
+    calculationType: 'event'
   }
 };
 

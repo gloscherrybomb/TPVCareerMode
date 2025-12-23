@@ -1919,6 +1919,13 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
     eventResults.earnedAwards.push({ awardId: 'theEqualizer', category: 'special_event', intensity: 'moderate' });
   }
 
+  // Singapore Sling - awarded for podium at Singapore Criterium (event 101)
+  if (eventNumber === 101 && userPosition <= 3) {
+    console.log('   🍸 SINGAPORE CRITERIUM podium! Awarding Singapore Sling');
+    eventAwards['awards.singaporeSling'] = admin.firestore.FieldValue.increment(1);
+    eventResults.earnedAwards.push({ awardId: 'singaporeSling', category: 'special_event', intensity: 'high' });
+  }
+
   // Merge event awards into updates
   Object.assign(updates, eventAwards);
   
