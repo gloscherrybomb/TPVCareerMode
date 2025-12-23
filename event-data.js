@@ -317,7 +317,7 @@ With points awarded at regular sprint laps, the pace surges constantly, making t
         level: "Local Amateur",
         mandatory: false,
         distance: "38.0 km",
-        climbing: "493 m",
+        climbing: "357 m",
         course: "Unbound Little Egypt",
         format: "Fondo-style",
         maxPoints: 145,

@@ -67,7 +67,7 @@ const UNLOCK_DEFINITIONS = [
     tier: 200,
     pointsBonus: 5,
     trigger: 'predictedTop5AndFinishTop5',
-    description: 'Predicted top 5 and finish top 3',
+    description: 'Predicted top 5 and finish top 5',
     narrative: 'Magic hands work out the tension. Deliver on your promise for bonus points.',
     emoji: '💆'
   },
@@ -101,7 +101,7 @@ const UNLOCK_DEFINITIONS = [
     tier: 300,
     pointsBonus: 7,
     trigger: 'top5OrTop10Gap10',
-    description: 'finish top 3, or top 10 within 10s of winner',
+    description: 'Finish top 3, or top 10 within 10s of winner',
     narrative: 'Loud kit, louder racing. Here to attack, not survive. Back it up with results.',
     emoji: '🔥'
   },
@@ -134,7 +134,7 @@ const UNLOCK_DEFINITIONS = [
     tier: 400,
     pointsBonus: 8,
     trigger: 'tourBackToBackPodiums',
-    description: 'Tour stage and finish top 3',
+    description: 'Finish top 3 in a tour stage',
     narrative: 'Compression tech speeds recovery between brutal stages. Podium in tours.',
     emoji: '🧦'
   },
@@ -157,7 +157,7 @@ const UNLOCK_DEFINITIONS = [
     tier: 200,
     pointsBonus: 5,
     trigger: 'beatPredictionByAny',
-    description: 'Beat prediction → +6 pts & +5 Confidence',
+    description: 'Beat prediction → +5 pts & +5 Confidence',
     narrative: 'Sports psychology rebuilds self-belief. Outperform predictions, build confidence.',
     emoji: '🧠',
     personalityBonus: { confidence: 5 }
