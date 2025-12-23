@@ -526,7 +526,7 @@
             // Update overview cards (different layout for special events)
             const overviewGrid = document.querySelector('.overview-grid');
             if (isSpecialEvent) {
-                // Special event overview with rewards info
+                // Special event overview - same format as regular events
                 overviewGrid.innerHTML = `
                     <div class="overview-card">
                         <div class="overview-icon">📍</div>
@@ -547,16 +547,6 @@
                         <div class="overview-icon">🏆</div>
                         <div class="overview-label">Career Points</div>
                         <div class="overview-value">${event.rewards?.careerPoints || event.maxPoints}</div>
-                    </div>
-                    <div class="overview-card">
-                        <div class="overview-icon">💰</div>
-                        <div class="overview-label">Bonus CC</div>
-                        <div class="overview-value">+${event.rewards?.bonusCC || 0}</div>
-                    </div>
-                    <div class="overview-card">
-                        <div class="overview-icon">🔄</div>
-                        <div class="overview-label">Format</div>
-                        <div class="overview-value">${event.format}</div>
                     </div>
                 `;
             } else {
@@ -781,12 +771,14 @@
                 
                 // Populate standard CTA
                 const ctaBox = document.getElementById('ctaBox');
+                const backLink = isSpecialEvent ? 'special-events.html' : 'events.html';
+                const backText = isSpecialEvent ? 'Back to Special Events' : 'Back to Events';
                 ctaBox.innerHTML = `
                     <h2>Ready to Race?</h2>
-                    <p>Schedule this event on TrainingPeaks Virtual and complete it to progress in your career.</p>
+                    <p>Schedule this event on TrainingPeaks Virtual and complete it to earn Career Points.</p>
                     <div class="cta-buttons">
                         <button class="btn btn-primary btn-large" id="scheduleButton">Schedule Event</button>
-                        <button class="btn btn-secondary btn-large" onclick="location.href='events.html'">Back to Events</button>
+                        <button class="btn btn-secondary btn-large" onclick="location.href='${backLink}'">${backText}</button>
                     </div>
                 `;
                 

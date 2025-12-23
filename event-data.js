@@ -473,10 +473,10 @@ This is more than just a race—it's a statement. Being here means you've earned
         isSpecialEvent: true,
         isFreeEvent: true,  // Available to all users without purchase
         unlockId: null,
-        distance: "TBD",
-        climbing: "TBD",
-        course: "TBD",
-        format: "Points Race - All-rounder challenge",
+        distance: "17.5 km",
+        climbing: "341 m",
+        course: "North Lake Loop",
+        format: "7 laps",
         maxPoints: 40,
         icon: "⚖️",
         description: `The Leveller is an all-rounder challenging points race, that is great for new racers to find their appropriate ranking fast. It will take all of your skills to do well in this race - endurance, sprint, time trial and climbing.
@@ -484,14 +484,13 @@ This is more than just a race—it's a statement. Being here means you've earned
 We recommend doing this event early on in your career to bag some extra Career Points and Cadence Credits and ensure you are in the right races as your career takes off.`,
         strategy: "This race tests all your abilities equally. Pace yourself through the endurance sections, attack on the climbs, and save something for the sprint finishes. Consistency is key - the Leveller rewards all-round performance over specialization.",
         routeDetails: {
-            start: "TBD",
-            keyPoint: "All-rounder challenge",
+            start: "North Lake",
+            keyPoint: "Rolling hills around North Lake",
             difficulty: "Tests endurance, sprint, TT and climbing",
-            finish: "TBD"
+            finish: "North Lake"
         },
         rewards: {
-            careerPoints: 40,
-            bonusCC: 0  // Uses standard CC system
+            careerPoints: 40
         },
         scheduleUrl: "https://tpvirtualhub.com/clone?o=eyJzY2hlZHVsZUtleSI6NTMzMjEsImFjY2Vzc0NvZGUiOjE4NjA2MCwicmVxdWlyZUFjY2Vzc0NvZGUiOnRydWUsInRpdGxlVGVtcGxhdGUiOiJUaGUgTGV2ZWxsZXIifQ=="
     }

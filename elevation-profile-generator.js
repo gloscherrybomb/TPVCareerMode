@@ -15,6 +15,7 @@ class ElevationProfileGenerator {
             'Velodrome': 'Forest Velodrome',
             'Coastal Loop': 'Coastal Loop',
             'North Lake Loop Reverse': 'North Lake Loop Reverse',
+            'North Lake Loop': 'North Lake Loop',
             'Easy Hill Climb': 'Easy Hill Climb',
             'Flat Eight': 'Flat Eight',
             'A Grand Day Out': 'A Grand Day Out',
