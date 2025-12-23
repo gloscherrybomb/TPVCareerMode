@@ -541,6 +541,75 @@
     font-family: 'Exo 2', sans-serif;
 }
 
+/* ===== POWER RECORDS GRID ===== */
+.power-records-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+}
+
+.power-record-card {
+    background: #141824;
+    border: 1px solid rgba(69, 202, 255, 0.3);
+    border-radius: 8px;
+    padding: 1.25rem 1rem;
+    text-align: center;
+    transition: all 0.2s ease;
+}
+
+.power-record-card:hover {
+    border-color: var(--accent-blue, #45caff);
+    background: rgba(69, 202, 255, 0.05);
+    transform: translateY(-2px);
+}
+
+.power-record-card.empty {
+    border-color: rgba(255, 255, 255, 0.1);
+    opacity: 0.6;
+}
+
+.power-record-card.empty:hover {
+    transform: none;
+    background: #141824;
+}
+
+.power-record-card .record-icon {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.power-record-card .record-label {
+    font-family: 'Exo 2', sans-serif;
+    font-size: 0.8rem;
+    color: var(--text-secondary, #a0a8c0);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.5rem;
+}
+
+.power-record-card .record-value {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent-blue, #45caff);
+    margin-bottom: 0.25rem;
+}
+
+.power-record-card.empty .record-value {
+    color: var(--text-secondary, #a0a8c0);
+    font-size: 1.25rem;
+}
+
+.power-record-card .record-event {
+    font-family: 'Exo 2', sans-serif;
+    font-size: 0.75rem;
+    color: var(--text-secondary, #a0a8c0);
+    font-style: italic;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 /* ===== LOADING & ERROR STATES ===== */
 .loading-state,
 .login-prompt {

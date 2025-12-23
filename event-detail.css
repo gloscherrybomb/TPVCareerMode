@@ -824,6 +824,29 @@
     margin-top: 0.25rem;
 }
 
+/* Power Cell (for JSON results with power data) */
+.power-cell {
+    font-family: 'Courier New', monospace;
+    font-weight: 600;
+    text-align: center;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+}
+
+/* Power award icons in bonus cell */
+.medal-icon.power-surge {
+    color: #FF4500;
+}
+
+.medal-icon.steady-eddie {
+    color: #4CAF50;
+}
+
+.medal-icon.blast-off {
+    color: #FFD700;
+    text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+}
+
 /* Points Cell */
 .points-cell {
     text-align: right;

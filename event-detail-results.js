@@ -782,6 +782,9 @@ async function loadEventResults() {
         const isTimeBasedEvent = getTimeBasedEvents().includes(eventNumber);
         console.log(`Event ${eventNumber}: isTimeBasedEvent=${isTimeBasedEvent}, TIME_BASED_EVENTS=${JSON.stringify(getTimeBasedEvents())}`);
 
+        // Check if results have power data (from JSON processing)
+        const hasPowerData = results.some(r => r.avgPower || r.maxPower || r.nrmPower);
+
         tableHTML += `
             <div class="results-table-container">
                 <div class="results-table-wrapper">
@@ -792,6 +795,7 @@ async function loadEventResults() {
                                 <th>Rider</th>
                                 <th>Team</th>
                                 <th>${isTimeBasedEvent ? 'Distance' : 'Time'}</th>
+                                ${hasPowerData ? '<th>Avg W</th><th>NP</th><th>Max W</th>' : ''}
                                 <th>ARR</th>
                                 <th>Points</th>
                                 ${results[0].eventPoints != null ? '<th>PR Pts</th>' : ''}
@@ -853,6 +857,16 @@ async function loadEventResults() {
                 if (result.earnedZeroToHero) {
                     bonusHTML += `<span class="medal-icon zero-to-hero" title="Bottom 20% to top 20%">🚀</span>`;
                 }
+                // Power awards
+                if (result.earnedPowerSurge) {
+                    bonusHTML += `<span class="medal-icon power-surge" title="Max power 30%+ above avg, top 10">💥</span>`;
+                }
+                if (result.earnedSteadyEddie) {
+                    bonusHTML += `<span class="medal-icon steady-eddie" title="NP within 1% of avg power">📊</span>`;
+                }
+                if (result.earnedBlastOff) {
+                    bonusHTML += `<span class="medal-icon blast-off" title="Broke 1300W max power">🚀</span>`;
+                }
             }
             if (!bonusHTML) {
                 bonusHTML = '<span class="no-bonus">—</span>';
@@ -869,6 +883,19 @@ async function loadEventResults() {
                 : formatTime(result.time));
             const pointsDisplay = isDNF ? '0' : result.points;
 
+            // Power data cells (only if event has power data)
+            let powerCellsHTML = '';
+            if (hasPowerData) {
+                const avgPower = isDNF ? '—' : (result.avgPower || '—');
+                const nrmPower = isDNF ? '—' : (result.nrmPower || '—');
+                const maxPower = isDNF ? '—' : (result.maxPower || '—');
+                powerCellsHTML = `
+                    <td class="power-cell">${avgPower}</td>
+                    <td class="power-cell">${nrmPower}</td>
+                    <td class="power-cell">${maxPower}</td>
+                `;
+            }
+
             tableHTML += `
                 <tr class="${rowClass}">
                     <td class="rank-cell">
@@ -880,6 +907,7 @@ async function loadEventResults() {
                     </td>
                     <td class="team-cell">${teamDisplay}</td>
                     <td class="time-cell">${timeOrDistanceDisplay}</td>
+                    ${powerCellsHTML}
                     <td class="arr-cell">
                         <span class="arr-value">${result.arr}</span>
                         <span class="arr-band">${result.arrBand || getARRBand(result.arr)}</span>

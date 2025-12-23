@@ -1,0 +1,104 @@
+name: Process JSON Race Results
+
+on:
+  push:
+    paths:
+      - 'race_results/**/*.json'
+  workflow_call:
+    inputs:
+      json_files:
+        description: 'JSON array of JSON file paths to process'
+        required: false
+        type: string
+        default: ''
+    secrets:
+      FIREBASE_SERVICE_ACCOUNT:
+        required: true
+  workflow_dispatch:
+    inputs:
+      json_path:
+        description: 'Path to JSON file (e.g., race_results/season_1/event_1/results.json)'
+        required: false
+        default: ''
+
+jobs:
+  process-json-results:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+          ref: ${{ github.event_name == 'workflow_call' && 'main' || '' }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: |
+          npm install firebase-admin
+
+      - name: Get JSON files to process
+        id: changed-files
+        run: |
+          echo "Debug: event_name=${{ github.event_name }}"
+          echo "Debug: inputs.json_files=${{ inputs.json_files }}"
+
+          # Check if files were passed via workflow_call input
+          if [ -n "${{ inputs.json_files }}" ] && [ "${{ inputs.json_files }}" != "[]" ]; then
+            echo "Using files from workflow_call input"
+            echo "files=${{ inputs.json_files }}" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            # Manual trigger - find all JSON files in race_results
+            FILES=$(find race_results -name '*.json' -type f 2>/dev/null | jq -R -s -c 'split("\n")[:-1]')
+            echo "Debug: Found files=$FILES"
+            echo "files=$FILES" >> $GITHUB_OUTPUT
+          else
+            # Auto trigger (push) - process ADDED or MODIFIED JSON files
+            FILES=$(git diff --name-only --diff-filter=AM HEAD~1 HEAD 2>/dev/null | grep 'race_results/.*\.json$' | jq -R -s -c 'split("\n")[:-1]' || echo '[]')
+            echo "Debug: Git diff files=$FILES"
+            echo "files=$FILES" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Check if files to process
+        id: check-files
+        run: |
+          FILES='${{ steps.changed-files.outputs.files }}'
+          if [ "$FILES" = "[]" ] || [ -z "$FILES" ]; then
+            echo "No JSON files to process"
+            echo "has_files=false" >> $GITHUB_OUTPUT
+          else
+            echo "Found files to process: $FILES"
+            echo "has_files=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Process JSON race results
+        if: steps.check-files.outputs.has_files == 'true'
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          echo "Processing JSON results..."
+          node process-json-results.js '${{ steps.changed-files.outputs.files }}'
+
+      - name: Commit renamed JSON files
+        if: steps.check-files.outputs.has_files == 'true'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+
+          # Add JSON files that have changed
+          git add race_results/**/*.json || true
+
+          # Check if there are staged changes
+          if git diff --cached --quiet; then
+            echo "No files to commit (already processed or no changes)"
+          else
+            git commit -m "Auto: Add timestamps to processed JSON result files"
+            git push
+            echo "Committed processed files"
+          fi

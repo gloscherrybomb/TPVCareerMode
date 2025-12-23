@@ -93,7 +93,11 @@ const AWARD_NAMES = {
     gcGold: { name: "GC Gold Trophy", icon: "🏆" },
     gcSilver: { name: "GC Silver Trophy", icon: "🥈" },
     gcBronze: { name: "GC Bronze Trophy", icon: "🥉" },
-    gluttonForPunishment: { name: "Glutton for Punishment", icon: "🎖️" }
+    gluttonForPunishment: { name: "Glutton for Punishment", icon: "🎖️" },
+    // Power awards
+    powerSurge: { name: "Power Surge", icon: "💥" },
+    steadyEddie: { name: "Steady Eddie", icon: "📊" },
+    blastOff: { name: "Blast Off", icon: "🚀" }
 };
 
 // Helper function to get stage number for an event
@@ -226,6 +230,7 @@ async function loadPalmares(user) {
         displayResultsTable();
 
         displayDetailedStats();
+        displayPowerRecords();
         displayAwardsTable();
         displayPersonalityTimeline();
         displayRivalsTable();
@@ -862,6 +867,85 @@ function displayAwardsTable() {
 
         tbody.appendChild(row);
     });
+}
+
+// Display power records section
+function displayPowerRecords() {
+    const powerRecords = userData.powerRecords;
+    const section = document.getElementById('powerRecordsSection');
+    const grid = document.getElementById('powerRecordsGrid');
+
+    // Hide section if no power records
+    if (!powerRecords || Object.keys(powerRecords).length === 0) {
+        section.style.display = 'none';
+        return;
+    }
+
+    section.style.display = 'block';
+
+    // Define the records to display
+    const recordItems = [
+        {
+            key: 'maxPowerEver',
+            label: 'Max Power Ever',
+            icon: '💥',
+            unit: 'W'
+        },
+        {
+            key: 'bestAvgPower',
+            label: 'Best Avg Power',
+            icon: '⚡',
+            unit: 'W'
+        },
+        {
+            key: 'bestNrmPower',
+            label: 'Best Normalized Power',
+            icon: '📊',
+            unit: 'W'
+        },
+        {
+            key: 'bestAvgPower20km',
+            label: 'Best AP (20km+)',
+            icon: '🛣️',
+            unit: 'W'
+        },
+        {
+            key: 'bestNrmPower20km',
+            label: 'Best NP (20km+)',
+            icon: '🛣️',
+            unit: 'W'
+        },
+        {
+            key: 'bestAvgPower40km',
+            label: 'Best AP (40km+)',
+            icon: '🏔️',
+            unit: 'W'
+        },
+        {
+            key: 'bestNrmPower40km',
+            label: 'Best NP (40km+)',
+            icon: '🏔️',
+            unit: 'W'
+        }
+    ];
+
+    let html = '';
+
+    recordItems.forEach(item => {
+        const record = powerRecords[item.key];
+        const hasValue = record && record.value;
+
+        html += `
+            <div class="power-record-card${hasValue ? '' : ' empty'}">
+                <div class="record-icon">${item.icon}</div>
+                <div class="record-label">${item.label}</div>
+                <div class="record-value">${hasValue ? record.value + item.unit : '—'}</div>
+                <div class="record-event">${hasValue ? (record.eventName || '') : 'No data yet'}</div>
+            </div>
+        `;
+    });
+
+    grid.innerHTML = html;
 }
 
 // Map event number to stage number based on user's choice selections

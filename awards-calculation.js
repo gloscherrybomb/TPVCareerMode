@@ -262,6 +262,43 @@ function checkTheAccountant(userTime, userEventPoints, results) {
   return userEventPoints > firstAcrossLinePoints;
 }
 
+// ================== POWER AWARD CHECKS ==================
+
+/**
+ * Check if Power Surge award earned (max power 30%+ above avg, top 10)
+ * @param {number} position - finishing position
+ * @param {Object} userResult - user's result with power data
+ * @returns {boolean}
+ */
+function checkPowerSurge(position, userResult) {
+  if (position > 10) return false;
+  if (!userResult.AvgPower || !userResult.MaxPower) return false;
+  return (userResult.MaxPower / userResult.AvgPower) >= 1.3;
+}
+
+/**
+ * Check if Steady Eddie award earned (NP within 1% of avg power)
+ * @param {Object} userResult - user's result with power data
+ * @returns {boolean}
+ */
+function checkSteadyEddie(userResult) {
+  if (!userResult.AvgPower || !userResult.NrmPower) return false;
+  const percentDiff = Math.abs(userResult.NrmPower - userResult.AvgPower) / userResult.AvgPower * 100;
+  return percentDiff <= 1;
+}
+
+/**
+ * Check if Blast Off award earned (1300W+ max power, one-time)
+ * @param {Object} userResult - user's result with power data
+ * @param {boolean} hasAlreadyEarned - whether user has already earned this award
+ * @returns {boolean}
+ */
+function checkBlastOff(userResult, hasAlreadyEarned) {
+  if (hasAlreadyEarned) return false;
+  if (!userResult.MaxPower) return false;
+  return userResult.MaxPower >= 1300;
+}
+
 // Export for Node.js
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = {
@@ -273,7 +310,10 @@ if (typeof module !== 'undefined' && module.exports) {
     calculateCareerAwards,
     getTimesFromResults,
     checkWindTunnel,
-    checkTheAccountant
+    checkTheAccountant,
+    checkPowerSurge,
+    checkSteadyEddie,
+    checkBlastOff
   };
 }
 
@@ -288,6 +328,9 @@ if (typeof window !== 'undefined') {
     calculateCareerAwards,
     getTimesFromResults,
     checkWindTunnel,
-    checkTheAccountant
+    checkTheAccountant,
+    checkPowerSurge,
+    checkSteadyEddie,
+    checkBlastOff
   };
 }

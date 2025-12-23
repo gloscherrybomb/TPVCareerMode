@@ -36,7 +36,11 @@ const AWARD_CREDIT_MAP = {
   windTunnel: 25,
   theAccountant: 30,
   theEqualizer: 0,  // Special event award - no bonus CC (uses completion bonus if only award)
-  singaporeSling: 30  // Singapore Criterium podium bonus
+  singaporeSling: 30,  // Singapore Criterium podium bonus
+  // Power-based awards
+  powerSurge: 25,
+  steadyEddie: 30,
+  blastOff: 50
 };
 
 // Safety cap per event to avoid runaway stacking in preview

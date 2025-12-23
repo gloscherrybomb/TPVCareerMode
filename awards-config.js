@@ -269,6 +269,29 @@ const AWARD_DEFINITIONS = {
     icon: '🍸',
     description: 'Podium at the Singapore Criterium',
     calculationType: 'event'
+  },
+
+  // Power-based awards (requires JSON results with power data)
+  powerSurge: {
+    id: 'powerSurge',
+    title: 'Power Surge',
+    icon: '💥',
+    description: 'Max power exceeds average by 30%+ and finish top 10',
+    calculationType: 'event'
+  },
+  steadyEddie: {
+    id: 'steadyEddie',
+    title: 'Steady Eddie',
+    icon: '📊',
+    description: 'Normalized power within 1% of average power',
+    calculationType: 'event'
+  },
+  blastOff: {
+    id: 'blastOff',
+    title: 'Blast Off',
+    icon: '🚀',
+    description: 'Break 1300W max power (one-time achievement)',
+    calculationType: 'career'
   }
 };
 
