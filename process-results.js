@@ -8,7 +8,7 @@ const awardsCalc = require('./awards-calculation');
 const storyGen = require('./story-generator');
 const { AWARD_CREDIT_MAP, PER_EVENT_CREDIT_CAP, COMPLETION_BONUS_CC } = require('./currency-config');
 const { UNLOCK_DEFINITIONS, getUnlockById } = require('./unlock-config');
-const { EVENT_NAMES, EVENT_TYPES, OPTIONAL_EVENTS, STAGE_REQUIREMENTS } = require('./event-config');
+const { EVENT_NAMES, EVENT_TYPES, OPTIONAL_EVENTS, STAGE_REQUIREMENTS, TIME_BASED_EVENTS } = require('./event-config');
 
 // Import narrative system modules
 const { NARRATIVE_DATABASE } = require('./narrative-database.js');
@@ -1270,7 +1270,8 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
     // Check margin-based awards
     // Time-based awards should NOT be awarded for:
     // - Event 3: Elimination race (times don't reflect racing - riders eliminated at intervals)
-    const isTimeIrrelevant = eventNumber === 3;
+    // - Time-based events (e.g., Event 4): All riders finish at the same clock time, distance varies
+    const isTimeIrrelevant = eventNumber === 3 || TIME_BASED_EVENTS.includes(eventNumber);
 
     earnedDomination = isTimeIrrelevant ? false : awardsCalc.checkDomination(position, times.winnerTime, times.secondPlaceTime);
     earnedCloseCall = isTimeIrrelevant ? false : awardsCalc.checkCloseCall(position, times.winnerTime, times.secondPlaceTime);
@@ -1950,7 +1951,7 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
   }
   if (earnedLanternRouge) {
     eventAwards['awards.lanternRouge'] = admin.firestore.FieldValue.increment(1);
-    eventResults.earnedAwards.push({ awardId: 'lanternRouge', category: 'position', intensity: 'low' });
+    eventResults.earnedAwards.push({ awardId: 'lanternRouge', category: 'event_special', intensity: 'subtle' });
   }
 
   // GC trophies (only on Event 15)
@@ -1982,14 +1983,14 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
   if (eventNumber === 102) {
     console.log('   🎚️ THE LEVELLER completed! Awarding The Equalizer');
     eventAwards['awards.theEqualizer'] = admin.firestore.FieldValue.increment(1);
-    eventResults.earnedAwards.push({ awardId: 'theEqualizer', category: 'special_event', intensity: 'moderate' });
+    eventResults.earnedAwards.push({ awardId: 'theEqualizer', category: 'event_special', intensity: 'moderate' });
   }
 
   // Singapore Sling - awarded for podium at Singapore Criterium (event 101)
   if (eventNumber === 101 && position <= 3 && !isDNF) {
     console.log('   🍸 SINGAPORE CRITERIUM podium! Awarding Singapore Sling');
     eventAwards['awards.singaporeSling'] = admin.firestore.FieldValue.increment(1);
-    eventResults.earnedAwards.push({ awardId: 'singaporeSling', category: 'special_event', intensity: 'high' });
+    eventResults.earnedAwards.push({ awardId: 'singaporeSling', category: 'event_special', intensity: 'flashy' });
   }
 
   // Merge event awards into updates
@@ -2026,15 +2027,16 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
     if (allPodiums) {
       console.log('   📈 PODIUM STREAK! 5 consecutive top 3 finishes');
       updates['awards.podiumStreak'] = admin.firestore.FieldValue.increment(1);
-      eventResults.earnedAwards.push({ awardId: 'podiumStreak', category: 'streak', intensity: 'flashy' });
+      eventResults.earnedAwards.push({ awardId: 'podiumStreak', category: 'performance', intensity: 'flashy' });
     }
   }
   
   // COMEBACK KID - Top 5 after bottom half finish
   if (recentPositions.length >= 2 && position <= 5) {
     const previousPosition = recentPositions[recentPositions.length - 2];
-    const totalRiders = results.length;
-    const bottomHalf = totalRiders / 2;
+    // Use finishers only (exclude DNFs) for accurate bottom half calculation
+    const totalFinishers = results.filter(r => r.Position !== 'DNF' && !isNaN(parseInt(r.Position))).length;
+    const bottomHalf = totalFinishers / 2;
 
     if (previousPosition > bottomHalf) {
       console.log(`   🔄 COMEBACK KID! Top 5 finish after position ${previousPosition}`);
@@ -2055,7 +2057,7 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
     if (previousPositions.length > 0 && previousPositions[previousPositions.length - 1] === 1) {
       console.log('   🔁 BACK TO BACK! 2 consecutive wins');
       updates['awards.backToBack'] = admin.firestore.FieldValue.increment(1);
-      eventResults.earnedAwards.push({ awardId: 'backToBack', category: 'career', intensity: 'flashy' });
+      eventResults.earnedAwards.push({ awardId: 'backToBack', category: 'performance', intensity: 'flashy' });
     }
   }
 
@@ -2065,7 +2067,7 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
     if (currentTrophyCollector === 0 && totalPodiums >= 5) {
       console.log('   🏆 TROPHY COLLECTOR! 5+ podium finishes');
       updates['awards.trophyCollector'] = 1;
-      eventResults.earnedAwards.push({ awardId: 'trophyCollector', category: 'career', intensity: 'moderate' });
+      eventResults.earnedAwards.push({ awardId: 'trophyCollector', category: 'performance', intensity: 'moderate' });
     }
   }
 
@@ -2073,20 +2075,29 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
   const currentWeekendWarrior = userData.awards?.weekendWarrior || 0;
   if (currentWeekendWarrior === 0) {
     // Count weekend events from previous results
+    // Use raceDate if available (actual race date), otherwise fall back to processedAt
     let weekendEventCount = 0;
     for (let i = 1; i <= 15; i++) {
       const evtData = userData[`event${i}Results`];
-      if (evtData && evtData.processedAt) {
-        const date = evtData.processedAt.toDate ? evtData.processedAt.toDate() : new Date(evtData.processedAt);
-        const dayOfWeek = date.getDay();
-        if (dayOfWeek === 0 || dayOfWeek === 6) { // Sunday = 0, Saturday = 6
-          weekendEventCount++;
+      if (evtData) {
+        // Prefer raceDate (actual race date from filename) over processedAt (when results were processed)
+        let date = null;
+        if (evtData.raceDate) {
+          date = new Date(evtData.raceDate);
+        } else if (evtData.processedAt) {
+          date = evtData.processedAt.toDate ? evtData.processedAt.toDate() : new Date(evtData.processedAt);
+        }
+        if (date) {
+          const dayOfWeek = date.getDay();
+          if (dayOfWeek === 0 || dayOfWeek === 6) { // Sunday = 0, Saturday = 6
+            weekendEventCount++;
+          }
         }
       }
     }
-    // Check if current event is on a weekend
-    const now = new Date();
-    const currentDayOfWeek = now.getDay();
+    // Check if current event is on a weekend - use race timestamp if available
+    const currentRaceDate = raceTimestamp ? new Date(raceTimestamp) : new Date();
+    const currentDayOfWeek = currentRaceDate.getDay();
     if (currentDayOfWeek === 0 || currentDayOfWeek === 6) {
       weekendEventCount++;
     }
@@ -2094,7 +2105,7 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
     if (weekendEventCount >= 5) {
       console.log(`   🏁 WEEKEND WARRIOR! ${weekendEventCount} weekend events completed`);
       updates['awards.weekendWarrior'] = 1;
-      eventResults.earnedAwards.push({ awardId: 'weekendWarrior', category: 'career', intensity: 'moderate' });
+      eventResults.earnedAwards.push({ awardId: 'weekendWarrior', category: 'performance', intensity: 'moderate' });
     }
   }
 
@@ -2112,7 +2123,7 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
     if (currentOverrated === 0 && worseThanPredicted >= 5) {
       console.log('   📉 OVERRATED! Finished worse than predicted 5+ times');
       updates['awards.overrated'] = 1;
-      eventResults.earnedAwards.push({ awardId: 'overrated', category: 'career', intensity: 'low' });
+      eventResults.earnedAwards.push({ awardId: 'overrated', category: 'event_special', intensity: 'subtle' });
     }
   }
 
@@ -2129,7 +2140,7 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
     if (currentTechnicalIssues === 0 && dnfCount >= 3) {
       console.log('   🔧 TECHNICAL ISSUES! 3+ DNFs');
       updates['awards.technicalIssues'] = 1;
-      eventResults.earnedAwards.push({ awardId: 'technicalIssues', category: 'career', intensity: 'low' });
+      eventResults.earnedAwards.push({ awardId: 'technicalIssues', category: 'event_special', intensity: 'subtle' });
     }
   }
 

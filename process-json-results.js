@@ -9,7 +9,7 @@ const awardsCalc = require('./awards-calculation');
 const storyGen = require('./story-generator');
 const { AWARD_CREDIT_MAP, PER_EVENT_CREDIT_CAP, COMPLETION_BONUS_CC } = require('./currency-config');
 const { UNLOCK_DEFINITIONS, getUnlockById } = require('./unlock-config');
-const { EVENT_NAMES, EVENT_TYPES, OPTIONAL_EVENTS, STAGE_REQUIREMENTS } = require('./event-config');
+const { EVENT_NAMES, EVENT_TYPES, OPTIONAL_EVENTS, STAGE_REQUIREMENTS, TIME_BASED_EVENTS } = require('./event-config');
 const { parseJSON, hasPowerData } = require('./json-parser');
 
 // Import narrative system modules
@@ -2046,7 +2046,8 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
       position
     );
 
-    const isTimeIrrelevant = eventNumber === 3;
+    // Time-based awards should NOT be awarded for elimination races or time-based events
+    const isTimeIrrelevant = eventNumber === 3 || TIME_BASED_EVENTS.includes(eventNumber);
     earnedDomination = isTimeIrrelevant ? false : awardsCalc.checkDomination(position, times.winnerTime, times.secondPlaceTime);
     earnedCloseCall = isTimeIrrelevant ? false : awardsCalc.checkCloseCall(position, times.winnerTime, times.secondPlaceTime);
     earnedPhotoFinish = isTimeIrrelevant ? false : awardsCalc.checkPhotoFinish(position, times.userTime, times.winnerTime, times.secondPlaceTime);
@@ -2604,16 +2605,16 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
     // Power awards
     if (earnedPowerSurge) {
       updateData['awards.powerSurge'] = admin.firestore.FieldValue.increment(1);
-      eventResults.earnedAwards.push({ awardId: 'powerSurge', category: 'power', intensity: 'moderate' });
+      eventResults.earnedAwards.push({ awardId: 'powerSurge', category: 'performance', intensity: 'moderate' });
     }
     if (earnedSteadyEddie) {
       updateData['awards.steadyEddie'] = admin.firestore.FieldValue.increment(1);
-      eventResults.earnedAwards.push({ awardId: 'steadyEddie', category: 'power', intensity: 'moderate' });
+      eventResults.earnedAwards.push({ awardId: 'steadyEddie', category: 'performance', intensity: 'moderate' });
     }
     if (earnedBlastOff) {
       updateData['awards.blastOff'] = admin.firestore.FieldValue.increment(1);
       updateData.hasEarnedBlastOff = true;  // Prevent earning again
-      eventResults.earnedAwards.push({ awardId: 'blastOff', category: 'power', intensity: 'flashy' });
+      eventResults.earnedAwards.push({ awardId: 'blastOff', category: 'performance', intensity: 'flashy' });
     }
 
     // PODIUM STREAK - 5 consecutive top 3 finishes
@@ -2636,7 +2637,7 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
         if (allPodiums) {
           console.log('   📈 PODIUM STREAK! 5 consecutive top 3 finishes');
           updateData['awards.podiumStreak'] = admin.firestore.FieldValue.increment(1);
-          eventResults.earnedAwards.push({ awardId: 'podiumStreak', category: 'streak', intensity: 'flashy' });
+          eventResults.earnedAwards.push({ awardId: 'podiumStreak', category: 'performance', intensity: 'flashy' });
         }
       }
     }
@@ -2653,7 +2654,7 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
     if (previousPositions.length > 0 && previousPositions[previousPositions.length - 1] === 1) {
       console.log('   🔁 BACK TO BACK! 2 consecutive wins');
       updateData['awards.backToBack'] = admin.firestore.FieldValue.increment(1);
-      eventResults.earnedAwards.push({ awardId: 'backToBack', category: 'career', intensity: 'flashy' });
+      eventResults.earnedAwards.push({ awardId: 'backToBack', category: 'performance', intensity: 'flashy' });
     }
   }
 
@@ -2663,7 +2664,7 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
     if (currentTrophyCollector === 0 && totalPodiums >= 5) {
       console.log('   🏆 TROPHY COLLECTOR! 5+ podium finishes');
       updateData['awards.trophyCollector'] = 1;
-      eventResults.earnedAwards.push({ awardId: 'trophyCollector', category: 'career', intensity: 'moderate' });
+      eventResults.earnedAwards.push({ awardId: 'trophyCollector', category: 'performance', intensity: 'moderate' });
     }
   }
 
@@ -2673,7 +2674,7 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
   if (currentWeekendWarrior === 0 && totalEventsCompleted >= 5) {
     console.log('   🏁 WEEKEND WARRIOR! 5+ events completed');
     updateData['awards.weekendWarrior'] = 1;
-    eventResults.earnedAwards.push({ awardId: 'weekendWarrior', category: 'career', intensity: 'moderate' });
+    eventResults.earnedAwards.push({ awardId: 'weekendWarrior', category: 'performance', intensity: 'moderate' });
   }
 
   // OVERRATED - Finish worse than predicted 5+ times (one-time award)
@@ -2690,7 +2691,7 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
     if (currentOverrated === 0 && worseThanPredicted >= 5) {
       console.log('   📉 OVERRATED! Finished worse than predicted 5+ times');
       updateData['awards.overrated'] = 1;
-      eventResults.earnedAwards.push({ awardId: 'overrated', category: 'career', intensity: 'low' });
+      eventResults.earnedAwards.push({ awardId: 'overrated', category: 'event_special', intensity: 'subtle' });
     }
   }
 
@@ -2707,7 +2708,7 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
     if (currentTechnicalIssues === 0 && dnfCount >= 3) {
       console.log('   🔧 TECHNICAL ISSUES! 3+ DNFs');
       updateData['awards.technicalIssues'] = 1;
-      eventResults.earnedAwards.push({ awardId: 'technicalIssues', category: 'career', intensity: 'low' });
+      eventResults.earnedAwards.push({ awardId: 'technicalIssues', category: 'event_special', intensity: 'subtle' });
     }
   }
 
@@ -2720,14 +2721,14 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
   if (eventNum === 102) {
     console.log('   🎚️ THE LEVELLER completed! Awarding The Equalizer');
     updateData['awards.theEqualizer'] = admin.firestore.FieldValue.increment(1);
-    eventResults.earnedAwards.push({ awardId: 'theEqualizer', category: 'special_event', intensity: 'moderate' });
+    eventResults.earnedAwards.push({ awardId: 'theEqualizer', category: 'event_special', intensity: 'moderate' });
   }
 
   // Singapore Sling - awarded for podium at Singapore Criterium (event 101)
   if (eventNum === 101 && position <= 3 && !isDNF) {
     console.log('   🍸 SINGAPORE CRITERIUM podium! Awarding Singapore Sling');
     updateData['awards.singaporeSling'] = admin.firestore.FieldValue.increment(1);
-    eventResults.earnedAwards.push({ awardId: 'singaporeSling', category: 'special_event', intensity: 'high' });
+    eventResults.earnedAwards.push({ awardId: 'singaporeSling', category: 'event_special', intensity: 'flashy' });
   }
 
   // GC trophies (only on Event 15 - final tour stage)
@@ -3032,7 +3033,8 @@ async function updateResultsSummary(season, event, results, userUid, unlockBonus
 
       // Time-based awards should NOT be awarded for:
       // - Event 3: Elimination race (times don't reflect racing)
-      const isTimeIrrelevant = event === 3;
+      // - Time-based events (e.g., Event 4): All riders finish at the same clock time
+      const isTimeIrrelevant = event === 3 || TIME_BASED_EVENTS.includes(event);
 
       const earnedDomination = isTimeIrrelevant ? false : awardsCalc.checkDomination(position, times.winnerTime, times.secondPlaceTime);
       const earnedCloseCall = isTimeIrrelevant ? false : awardsCalc.checkCloseCall(position, times.winnerTime, times.secondPlaceTime);
