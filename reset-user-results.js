@@ -90,7 +90,24 @@ async function resetUserResults() {
           lanternRouge: 0,
           seasonChampion: 0,
           seasonRunnerUp: 0,
-          seasonThirdPlace: 0
+          seasonThirdPlace: 0,
+          // Season special awards
+          perfectSeason: 0,
+          podiumStreak: 0,
+          specialist: 0,
+          allRounder: 0,
+          comeback: 0,
+          gluttonForPunishment: 0,
+          // Event-specific awards
+          windTunnel: 0,
+          theAccountant: 0,
+          // Special event awards
+          theEqualizer: 0,
+          singaporeSling: 0,
+          // Power-based awards
+          powerSurge: 0,
+          steadyEddie: 0,
+          blastOff: 0
         },
 
         // Delete all event result blocks (1–15)
@@ -109,6 +126,10 @@ async function resetUserResults() {
         event13Results: admin.firestore.FieldValue.delete(),
         event14Results: admin.firestore.FieldValue.delete(),
         event15Results: admin.firestore.FieldValue.delete(),
+
+        // Special event results (101 = Singapore Criterium, 102 = The Leveller)
+        event101Results: admin.firestore.FieldValue.delete(),
+        event102Results: admin.firestore.FieldValue.delete(),
 
         // DNS flags
         event14DNS: admin.firestore.FieldValue.delete(),

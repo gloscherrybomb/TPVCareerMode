@@ -97,7 +97,15 @@ const AWARD_NAMES = {
     // Power awards
     powerSurge: { name: "Power Surge", icon: "💥" },
     steadyEddie: { name: "Steady Eddie", icon: "📊" },
-    blastOff: { name: "Blast Off", icon: "🚀" }
+    blastOff: { name: "Blast Off", icon: "🚀" },
+
+    // Event-specific awards
+    windTunnel: { name: "Wind Tunnel", icon: "🌬️" },
+    theAccountant: { name: "The Accountant", icon: "🧮" },
+
+    // Special event awards
+    theEqualizer: { name: "The Equalizer", icon: "🎚️" },
+    singaporeSling: { name: "Singapore Sling", icon: "🍸" }
 };
 
 // Helper function to get stage number for an event

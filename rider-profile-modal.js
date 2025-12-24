@@ -582,7 +582,23 @@ function buildRiderProfileHTML(data, name) {
         podiumStreak: { icon: '📈', name: 'Podium Streak' },
         specialist: { icon: '⭐', name: 'Specialist' },
         allRounder: { icon: '🌟', name: 'All-Rounder' },
-        comeback: { icon: '🔄', name: 'Comeback Kid' }
+        comeback: { icon: '🔄', name: 'Comeback Kid' },
+
+        // Event-specific awards
+        windTunnel: { icon: '🌬️', name: 'Wind Tunnel' },
+        theAccountant: { icon: '🧮', name: 'The Accountant' },
+
+        // Special event awards
+        theEqualizer: { icon: '🎚️', name: 'The Equalizer' },
+        singaporeSling: { icon: '🍸', name: 'Singapore Sling' },
+
+        // Power-based awards
+        powerSurge: { icon: '💥', name: 'Power Surge' },
+        steadyEddie: { icon: '📊', name: 'Steady Eddie' },
+        blastOff: { icon: '🚀', name: 'Blast Off' },
+
+        // Other awards
+        gluttonForPunishment: { icon: '🎖️', name: 'Glutton for Punishment' }
     };
     
     // Build awards list with counts

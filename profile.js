@@ -536,7 +536,17 @@ function displayAwards(awards) {
         specialist: awards.specialist || 0,
         allRounder: awards.allRounder || 0,
         comeback: awards.comeback || 0,
-        gluttonForPunishment: awards.gluttonForPunishment || 0
+        gluttonForPunishment: awards.gluttonForPunishment || 0,
+        // Event-specific awards
+        windTunnel: awards.windTunnel || 0,
+        theAccountant: awards.theAccountant || 0,
+        // Special event awards
+        theEqualizer: awards.theEqualizer || 0,
+        singaporeSling: awards.singaporeSling || 0,
+        // Power-based awards
+        powerSurge: awards.powerSurge || 0,
+        steadyEddie: awards.steadyEddie || 0,
+        blastOff: awards.blastOff || 0
     };
 
     // Use mapped awards for the rest of the function
@@ -554,7 +564,10 @@ function displayAwards(awards) {
                         (awards.seasonChampion || 0) + (awards.seasonRunnerUp || 0) + (awards.seasonThirdPlace || 0) +
                         (awards.perfectSeason || 0) + (awards.podiumStreak || 0) +
                         (awards.specialist || 0) + (awards.allRounder || 0) + (awards.comeback || 0) +
-                        (awards.gluttonForPunishment || 0);
+                        (awards.gluttonForPunishment || 0) +
+                        (awards.windTunnel || 0) + (awards.theAccountant || 0) +
+                        (awards.theEqualizer || 0) + (awards.singaporeSling || 0) +
+                        (awards.powerSurge || 0) + (awards.steadyEddie || 0) + (awards.blastOff || 0);
     
     if (totalAwards === 0) {
         container.innerHTML = `
@@ -931,6 +944,90 @@ function displayAwards(awards) {
                 <div class="award-count">${awards.gluttonForPunishment}x</div>
                 <div class="award-title">Glutton for Punishment</div>
                 <div class="award-description">Reset Season & Started Over</div>
+            </div>
+        `;
+    }
+
+    // Wind Tunnel (top 5 in TT when predicted outside top 5)
+    if (awards.windTunnel > 0) {
+        html += `
+            <div class="award-card wind-tunnel">
+                <div class="award-icon">🌬️</div>
+                <div class="award-count">${awards.windTunnel}x</div>
+                <div class="award-title">Wind Tunnel</div>
+                <div class="award-description">Top 5 in TT When Predicted Lower</div>
+            </div>
+        `;
+    }
+
+    // The Accountant (scored more points than line winner)
+    if (awards.theAccountant > 0) {
+        html += `
+            <div class="award-card the-accountant">
+                <div class="award-icon">🧮</div>
+                <div class="award-count">${awards.theAccountant}x</div>
+                <div class="award-title">The Accountant</div>
+                <div class="award-description">Outscored the Line Winner</div>
+            </div>
+        `;
+    }
+
+    // The Equalizer (completed The Leveller special event)
+    if (awards.theEqualizer > 0) {
+        html += `
+            <div class="award-card the-equalizer">
+                <div class="award-icon">🎚️</div>
+                <div class="award-count">${awards.theEqualizer}x</div>
+                <div class="award-title">The Equalizer</div>
+                <div class="award-description">Completed The Leveller</div>
+            </div>
+        `;
+    }
+
+    // Singapore Sling (podium at Singapore Criterium)
+    if (awards.singaporeSling > 0) {
+        html += `
+            <div class="award-card singapore-sling">
+                <div class="award-icon">🍸</div>
+                <div class="award-count">${awards.singaporeSling}x</div>
+                <div class="award-title">Singapore Sling</div>
+                <div class="award-description">Podium at Singapore Criterium</div>
+            </div>
+        `;
+    }
+
+    // Power Surge (max power 30%+ above average, top 10 finish)
+    if (awards.powerSurge > 0) {
+        html += `
+            <div class="award-card power-surge">
+                <div class="award-icon">💥</div>
+                <div class="award-count">${awards.powerSurge}x</div>
+                <div class="award-title">Power Surge</div>
+                <div class="award-description">Max Power 30%+ Above Average</div>
+            </div>
+        `;
+    }
+
+    // Steady Eddie (normalized power within 1% of average)
+    if (awards.steadyEddie > 0) {
+        html += `
+            <div class="award-card steady-eddie">
+                <div class="award-icon">📊</div>
+                <div class="award-count">${awards.steadyEddie}x</div>
+                <div class="award-title">Steady Eddie</div>
+                <div class="award-description">Perfectly Paced Effort</div>
+            </div>
+        `;
+    }
+
+    // Blast Off (broke 1300W max power)
+    if (awards.blastOff > 0) {
+        html += `
+            <div class="award-card blast-off">
+                <div class="award-icon">🚀</div>
+                <div class="award-count">${awards.blastOff}x</div>
+                <div class="award-title">Blast Off</div>
+                <div class="award-description">Broke 1300W Max Power</div>
             </div>
         `;
     }
