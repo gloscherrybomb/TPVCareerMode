@@ -570,7 +570,7 @@ function buildRiderProfileHTML(data, name) {
         giantKiller: { icon: '⚔️', name: 'Giant Killer' },
         bullseye: { icon: '🎯', name: 'Bullseye' },
         hotStreak: { icon: '🔥', name: 'Hot Streak' },
-        domination: { icon: '👑', name: 'Domination' },
+        domination: { icon: '💪', name: 'Domination' },
         closeCall: { icon: '😅', name: 'Close Call' },
         photoFinish: { icon: '📸', name: 'Photo Finish' },
         darkHorse: { icon: '🐴', name: 'Dark Horse' },

@@ -85,8 +85,8 @@ const AWARD_NAMES = {
     giantKiller: { name: "Giant Killer", icon: "⚔️" },
     bullseye: { name: "Bullseye", icon: "🎯" },
     hotStreak: { name: "Hot Streak", icon: "🔥" },
-    domination: { name: "Domination", icon: "👑" },
-    closeCall: { name: "Close Call", icon: "😰" },
+    domination: { name: "Domination", icon: "💪" },
+    closeCall: { name: "Close Call", icon: "😅" },
     photoFinish: { name: "Photo Finish", icon: "📸" },
     darkHorse: { name: "Dark Horse", icon: "🐴" },
     zeroToHero: { name: "Zero to Hero", icon: "🦸" },
@@ -499,8 +499,8 @@ function displayResultsTable() {
         if (result.earnedGiantKillerMedal) medals.push('⚔️');
         if (result.earnedBullseyeMedal) medals.push('🎯');
         if (result.earnedHotStreakMedal) medals.push('🔥');
-        if (result.earnedDomination) medals.push('👑');
-        if (result.earnedCloseCall) medals.push('😰');
+        if (result.earnedDomination) medals.push('💪');
+        if (result.earnedCloseCall) medals.push('😅');
         if (result.earnedPhotoFinish) medals.push('📸');
         if (result.earnedDarkHorse) medals.push('🐴');
         if (result.earnedZeroToHero) medals.push('🦸');

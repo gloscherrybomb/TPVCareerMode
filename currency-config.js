@@ -41,7 +41,9 @@ const AWARD_CREDIT_MAP = {
   // Power-based awards
   powerSurge: 25,
   steadyEddie: 30,
-  blastOff: 50
+  blastOff: 50,
+  // Season reset award
+  gluttonForPunishment: 100
 };
 
 // Safety cap per event to avoid runaway stacking in preview

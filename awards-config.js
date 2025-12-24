@@ -48,14 +48,14 @@ const AWARD_DEFINITIONS = {
   punchingMedal: {
     id: 'punchingMedal',
     title: 'Punching Above',
-    icon: '👊',
+    icon: '🥊',
     description: 'Beat prediction by 10+ places',
     calculationType: 'event'
   },
   giantKillerMedal: {
     id: 'giantKillerMedal',
     title: 'Giant Killer',
-    icon: '🗡️',
+    icon: '⚔️',
     description: 'Beat the highest-rated rider',
     calculationType: 'event'
   },
@@ -125,7 +125,7 @@ const AWARD_DEFINITIONS = {
     id: 'weekendWarrior',
     title: 'Weekend Warrior',
     icon: '🏁',
-    description: 'Complete 5+ weekend events',
+    description: 'Complete 5+ events on weekends (Saturday or Sunday)',
     calculationType: 'career'
   },
   
@@ -133,7 +133,7 @@ const AWARD_DEFINITIONS = {
   zeroToHero: {
     id: 'zeroToHero',
     title: 'Zero to Hero',
-    icon: '🚀',
+    icon: '🦸',
     description: 'Bottom 20% one event, top 20% next',
     calculationType: 'career'
   },
@@ -233,7 +233,7 @@ const AWARD_DEFINITIONS = {
     id: 'comeback',
     title: 'Comeback Kid',
     icon: '🔄',
-    description: 'Finish top 5 after being bottom half in previous race',
+    description: 'Finish top 5 after finishing in the bottom half of the previous race',
     calculationType: 'event'
   },
 
@@ -291,6 +291,15 @@ const AWARD_DEFINITIONS = {
     title: 'Blast Off',
     icon: '🚀',
     description: 'Break 1300W max power (one-time achievement)',
+    calculationType: 'career'
+  },
+
+  // Season reset award
+  gluttonForPunishment: {
+    id: 'gluttonForPunishment',
+    title: 'Glutton for Punishment',
+    icon: '🎖️',
+    description: 'Reset and restart the season after completing it',
     calculationType: 'career'
   }
 };

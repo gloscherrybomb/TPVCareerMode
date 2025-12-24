@@ -212,7 +212,7 @@ function calculateBiggestWinMargin(position, results, eventNumber, currentBigges
 
   // For elimination races and time trials, margin isn't meaningful
   // Store with 0 margin so they don't compete with real margin-based wins
-  const isTimeIrrelevant = eventNumber === 3 || eventNumber === 4;
+  const isTimeIrrelevant = eventNumber === 3;
 
   if (isTimeIrrelevant) {
     // Only use this win if there's no current biggest win
@@ -1270,12 +1270,11 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
     // Check margin-based awards
     // Time-based awards should NOT be awarded for:
     // - Event 3: Elimination race (times don't reflect racing - riders eliminated at intervals)
-    // - Event 4: Time challenge (everyone does the same target time)
-    const isTimeIrrelevant = eventNumber === 3 || eventNumber === 4;
+    const isTimeIrrelevant = eventNumber === 3;
 
     earnedDomination = isTimeIrrelevant ? false : awardsCalc.checkDomination(position, times.winnerTime, times.secondPlaceTime);
     earnedCloseCall = isTimeIrrelevant ? false : awardsCalc.checkCloseCall(position, times.winnerTime, times.secondPlaceTime);
-    earnedPhotoFinish = isTimeIrrelevant ? false : awardsCalc.checkPhotoFinish(position, times.userTime, times.winnerTime);
+    earnedPhotoFinish = isTimeIrrelevant ? false : awardsCalc.checkPhotoFinish(position, times.userTime, times.winnerTime, times.secondPlaceTime);
 
     earnedDarkHorse = awardsCalc.checkDarkHorse(position, predictedPosition);
 
@@ -1296,9 +1295,10 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
       if (prevEventResults && prevEventResults.position && prevEventResults.position !== 'DNF') {
         // Get total finishers for both events from results
         const currentFinishers = results.filter(r => r.Position !== 'DNF' && !isNaN(parseInt(r.Position))).length;
-        // We need previous event's total finishers - we'll approximate from standings or use null
+        // Use stored totalFinishers from previous event if available, otherwise use current event's count as estimate
+        const prevFinishers = prevEventResults.totalFinishers || currentFinishers;
         earnedZeroToHero = awardsCalc.checkZeroToHero(
-          { position: prevEventResults.position, totalFinishers: 50 }, // Approximate
+          { position: prevEventResults.position, totalFinishers: prevFinishers },
           { position: position, totalFinishers: currentFinishers }
         );
       }
@@ -1334,17 +1334,7 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
       console.log('   🏮 LANTERN ROUGE! Last place finish');
     }
 
-    // Comeback - improved 10+ positions from previous event
-    if (eventNumber > 1) {
-      const prevResult = userData[`event${eventNumber - 1}Results`];
-      if (prevResult && prevResult.position && prevResult.position !== 'DNF') {
-        const improvement = prevResult.position - position;
-        if (improvement >= 10) {
-          earnedComeback = true;
-          console.log(`   🔄 COMEBACK! Improved ${improvement} positions from last event`);
-        }
-      }
-    }
+    // Note: Comeback is calculated in career awards section (Top 5 after bottom half finish)
   }
   
   // Initialize GC awards (will be populated later for tour stages)
@@ -1425,6 +1415,7 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
     distance: parseFloat(userResult.Distance) || 0,
     deltaTime: parseFloat(userResult.DeltaTime) || 0,
     eventPoints: parseInt(userResult.Points) || null, // Points race points (for display only)
+    totalFinishers: results.filter(r => r.Position !== 'DNF' && !isNaN(parseInt(r.Position))).length, // For Zero to Hero calculation
     earnedAwards: [], // NEW: Track awards for notification system
     processedAt: admin.firestore.FieldValue.serverTimestamp(),
     raceDate: raceTimestamp ? new Date(raceTimestamp).toISOString() : null // Actual race date from filename
@@ -2031,10 +2022,11 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
   if (recentPositions.length >= 5) {
     const last5 = recentPositions.slice(-5);
     const allPodiums = last5.every(pos => pos <= 3);
-    
+
     if (allPodiums) {
       console.log('   📈 PODIUM STREAK! 5 consecutive top 3 finishes');
       updates['awards.podiumStreak'] = admin.firestore.FieldValue.increment(1);
+      eventResults.earnedAwards.push({ awardId: 'podiumStreak', category: 'streak', intensity: 'flashy' });
     }
   }
   
@@ -2047,6 +2039,7 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
     if (previousPosition > bottomHalf) {
       console.log(`   🔄 COMEBACK KID! Top 5 finish after position ${previousPosition}`);
       updates['awards.comeback'] = admin.firestore.FieldValue.increment(1);
+      eventResults.earnedComeback = true;
       eventResults.earnedAwards.push({ awardId: 'comeback', category: 'event_special', intensity: 'moderate' });
     }
   }
@@ -2076,13 +2069,33 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
     }
   }
 
-  // WEEKEND WARRIOR - Complete 5+ events (one-time award)
-  const totalEventsCompleted = (userData.totalEvents || 0) + 1;
+  // WEEKEND WARRIOR - Complete 5+ weekend events (Saturday/Sunday) (one-time award)
   const currentWeekendWarrior = userData.awards?.weekendWarrior || 0;
-  if (currentWeekendWarrior === 0 && totalEventsCompleted >= 5) {
-    console.log('   🏁 WEEKEND WARRIOR! 5+ events completed');
-    updates['awards.weekendWarrior'] = 1;
-    eventResults.earnedAwards.push({ awardId: 'weekendWarrior', category: 'career', intensity: 'moderate' });
+  if (currentWeekendWarrior === 0) {
+    // Count weekend events from previous results
+    let weekendEventCount = 0;
+    for (let i = 1; i <= 15; i++) {
+      const evtData = userData[`event${i}Results`];
+      if (evtData && evtData.processedAt) {
+        const date = evtData.processedAt.toDate ? evtData.processedAt.toDate() : new Date(evtData.processedAt);
+        const dayOfWeek = date.getDay();
+        if (dayOfWeek === 0 || dayOfWeek === 6) { // Sunday = 0, Saturday = 6
+          weekendEventCount++;
+        }
+      }
+    }
+    // Check if current event is on a weekend
+    const now = new Date();
+    const currentDayOfWeek = now.getDay();
+    if (currentDayOfWeek === 0 || currentDayOfWeek === 6) {
+      weekendEventCount++;
+    }
+
+    if (weekendEventCount >= 5) {
+      console.log(`   🏁 WEEKEND WARRIOR! ${weekendEventCount} weekend events completed`);
+      updates['awards.weekendWarrior'] = 1;
+      eventResults.earnedAwards.push({ awardId: 'weekendWarrior', category: 'career', intensity: 'moderate' });
+    }
   }
 
   // OVERRATED - Finish worse than predicted 5+ times (one-time award)
@@ -3114,11 +3127,11 @@ async function updateResultsSummary(season, event, results, userUid, unlockBonus
       // Time-based awards should NOT be awarded for:
       // - Event 3: Elimination race (times don't reflect racing - riders eliminated at intervals)
       // - Event 4: Time challenge (everyone does the same target time)
-      const isTimeIrrelevant = event === 3 || event === 4;
+      const isTimeIrrelevant = event === 3;
 
       const earnedDomination = isTimeIrrelevant ? false : awardsCalc.checkDomination(position, times.winnerTime, times.secondPlaceTime);
       const earnedCloseCall = isTimeIrrelevant ? false : awardsCalc.checkCloseCall(position, times.winnerTime, times.secondPlaceTime);
-      const earnedPhotoFinish = isTimeIrrelevant ? false : awardsCalc.checkPhotoFinish(position, times.userTime, times.winnerTime);
+      const earnedPhotoFinish = isTimeIrrelevant ? false : awardsCalc.checkPhotoFinish(position, times.userTime, times.winnerTime, times.secondPlaceTime);
 
       const earnedDarkHorse = awardsCalc.checkDarkHorse(position, predictedPosition);
 

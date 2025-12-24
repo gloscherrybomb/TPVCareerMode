@@ -2046,7 +2046,7 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
       position
     );
 
-    const isTimeIrrelevant = eventNumber === 3 || eventNumber === 4;
+    const isTimeIrrelevant = eventNumber === 3;
     earnedDomination = isTimeIrrelevant ? false : awardsCalc.checkDomination(position, times.winnerTime, times.secondPlaceTime);
     earnedCloseCall = isTimeIrrelevant ? false : awardsCalc.checkCloseCall(position, times.winnerTime, times.secondPlaceTime);
     earnedPhotoFinish = isTimeIrrelevant ? false : awardsCalc.checkPhotoFinish(position, times.userTime, times.winnerTime, times.secondPlaceTime);
@@ -3032,12 +3032,11 @@ async function updateResultsSummary(season, event, results, userUid, unlockBonus
 
       // Time-based awards should NOT be awarded for:
       // - Event 3: Elimination race (times don't reflect racing)
-      // - Event 4: Time challenge (everyone does the same target time)
-      const isTimeIrrelevant = event === 3 || event === 4;
+      const isTimeIrrelevant = event === 3;
 
       const earnedDomination = isTimeIrrelevant ? false : awardsCalc.checkDomination(position, times.winnerTime, times.secondPlaceTime);
       const earnedCloseCall = isTimeIrrelevant ? false : awardsCalc.checkCloseCall(position, times.winnerTime, times.secondPlaceTime);
-      const earnedPhotoFinish = isTimeIrrelevant ? false : awardsCalc.checkPhotoFinish(position, times.userTime, times.winnerTime);
+      const earnedPhotoFinish = isTimeIrrelevant ? false : awardsCalc.checkPhotoFinish(position, times.userTime, times.winnerTime, times.secondPlaceTime);
 
       const earnedDarkHorse = awardsCalc.checkDarkHorse(position, predictedPosition);
 
