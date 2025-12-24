@@ -104,7 +104,51 @@ async function calculateUserStats(userUID, userData) {
             });
         }
     }
-    
+
+    // Also check special events (101, 102, etc.)
+    const specialEventIds = [101, 102];
+    const specialEventNames = {
+        101: 'Singapore Criterium',
+        102: 'The Leveller'
+    };
+
+    for (const eventNum of specialEventIds) {
+        const eventResults = userData[`event${eventNum}Results`];
+
+        if (eventResults && eventResults.position && eventResults.position !== 'DNF') {
+            const position = eventResults.position;
+
+            if (position > 0) {
+                stats.positions.push(position);
+            }
+
+            stats.recentResults.push({
+                eventNum: eventNum,
+                stageNumber: null, // Special events don't have stage numbers
+                eventName: specialEventNames[eventNum] || `Special Event ${eventNum}`,
+                position: position,
+                time: eventResults.time || 'N/A',
+                points: eventResults.points || 0,
+                bonusPoints: eventResults.bonusPoints || 0,
+                unlockBonusPoints: eventResults.unlockBonusPoints || 0,
+                earnedCadenceCredits: eventResults.earnedCadenceCredits || 0,
+                ccSource: eventResults.ccSource || 'awards',
+                predictedPosition: eventResults.predictedPosition || null,
+                earnedPunchingMedal: eventResults.earnedPunchingMedal || false,
+                earnedGiantKillerMedal: eventResults.earnedGiantKillerMedal || false,
+                earnedBullseyeMedal: eventResults.earnedBullseyeMedal || false,
+                earnedHotStreakMedal: eventResults.earnedHotStreakMedal || false,
+                earnedDomination: eventResults.earnedDomination || false,
+                earnedCloseCall: eventResults.earnedCloseCall || false,
+                earnedPhotoFinish: eventResults.earnedPhotoFinish || false,
+                earnedDarkHorse: eventResults.earnedDarkHorse || false,
+                earnedZeroToHero: eventResults.earnedZeroToHero || false,
+                isSpecialEvent: true,
+                date: eventResults.processedAt
+            });
+        }
+    }
+
     // Sort recent results by stage number (most recent stage first)
     // This ensures results appear in stage completion order, not event number order
     // Falls back to eventNum for legacy data without stageNumber

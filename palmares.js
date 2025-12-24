@@ -219,6 +219,43 @@ async function loadPalmares(user) {
             }
         }
 
+        // Also check special events (101, 102, etc.)
+        const specialEventIds = [101, 102];
+        const SPECIAL_EVENT_DATA = {
+            101: { name: 'Singapore Criterium', type: 'criterium' },
+            102: { name: 'The Leveller', type: 'special' }
+        };
+
+        for (const eventNum of specialEventIds) {
+            const eventResults = userData[`event${eventNum}Results`];
+            if (eventResults) {
+                allResults.push({
+                    eventNum: eventNum,
+                    eventName: SPECIAL_EVENT_DATA[eventNum]?.name || `Special Event ${eventNum}`,
+                    eventType: SPECIAL_EVENT_DATA[eventNum]?.type || 'special',
+                    isSpecialEvent: true,
+                    position: eventResults.position,
+                    time: eventResults.time,
+                    arr: eventResults.arr,
+                    predictedPosition: eventResults.predictedPosition,
+                    points: eventResults.points || 0,
+                    bonusPoints: eventResults.bonusPoints || 0,
+                    earnedCadenceCredits: eventResults.earnedCadenceCredits || 0,
+                    earnedPunchingMedal: eventResults.earnedPunchingMedal,
+                    earnedGiantKillerMedal: eventResults.earnedGiantKillerMedal,
+                    earnedBullseyeMedal: eventResults.earnedBullseyeMedal,
+                    earnedHotStreakMedal: eventResults.earnedHotStreakMedal,
+                    earnedDomination: eventResults.earnedDomination,
+                    earnedCloseCall: eventResults.earnedCloseCall,
+                    earnedPhotoFinish: eventResults.earnedPhotoFinish,
+                    earnedDarkHorse: eventResults.earnedDarkHorse,
+                    earnedZeroToHero: eventResults.earnedZeroToHero,
+                    processedAt: eventResults.processedAt,
+                    raceDate: eventResults.raceDate
+                });
+            }
+        }
+
         // Display all sections
         displayHeader();
         displayKeyStats();

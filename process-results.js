@@ -2001,9 +2001,12 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
   Object.assign(updates, eventAwards);
   
   // Add to completedStages (store the STAGE number, not event number)
-  const completedStages = userData.completedStages || [];
-  if (!completedStages.includes(currentStage)) {
-    updates.completedStages = admin.firestore.FieldValue.arrayUnion(currentStage);
+  // Skip for special events - they don't count as season stages
+  if (!isSpecialEventResult) {
+    const completedStages = userData.completedStages || [];
+    if (!completedStages.includes(currentStage)) {
+      updates.completedStages = admin.firestore.FieldValue.arrayUnion(currentStage);
+    }
   }
   
   // Check for special event-based awards

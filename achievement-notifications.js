@@ -433,23 +433,26 @@ class AchievementNotifications {
       return window.eventSequence[eventNumber - 1].title;
     }
 
-    // Fallback event names
+    // Fallback event names (matches EVENT_NAMES in event-config.js)
     const eventNames = {
       1: 'Coast and Roast Crit',
       2: 'Island Classic',
-      3: 'Volcano Climb',
-      4: 'Flatland Sprint',
-      5: 'Mountain Circuit',
-      6: 'Harbor Loop',
-      7: 'Downtown Crit',
-      8: 'Ocean Boulevard',
-      9: 'Canyon Challenge',
-      10: 'Ridge Road TT',
-      11: 'Beach Sprint',
-      12: 'Jungle Circuit',
-      13: 'Local Tour - Stage 1',
-      14: 'Local Tour - Stage 2',
-      15: 'Local Tour - Final Stage'
+      3: 'The Forest Velodrome Elimination',
+      4: 'Coastal Loop Time Challenge',
+      5: 'North Lake Points Race',
+      6: 'Easy Hill Climb',
+      7: 'Flat Eight Criterium',
+      8: 'The Grand Gilbert Fondo',
+      9: 'Base Camp Classic',
+      10: 'Beach and Pine TT',
+      11: 'South Lake Points Race',
+      12: 'Unbound - Little Egypt',
+      13: 'Local Tour Stage 1',
+      14: 'Local Tour Stage 2',
+      15: 'Local Tour Stage 3',
+      // Special events
+      101: 'Singapore Criterium',
+      102: 'The Leveller'
     };
     return eventNames[eventNumber] || `Event ${eventNumber}`;
   }

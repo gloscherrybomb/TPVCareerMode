@@ -167,24 +167,49 @@ function calculatePredictedPosition(results, userUid) {
 
 /**
  * Check if user earned Giant Killer medal
+ * Giant Killer: User finishes ahead of the rider with the highest EventRating
  */
 function checkGiantKiller(results, userUid) {
   const userResult = results.find(r => r.UID === userUid);
-  if (!userResult || userResult.Position === 'DNF' || !userResult.EventRating) return false;
+  if (!userResult || userResult.Position === 'DNF') {
+    console.log(`   Giant Killer: User ${userUid} not eligible (DNF or not found)`);
+    return false;
+  }
+  if (userResult.EventRating === undefined || userResult.EventRating === null) {
+    console.log(`   Giant Killer: User ${userUid} has no EventRating`);
+    return false;
+  }
 
   const userPosition = parseInt(userResult.Position);
   if (isNaN(userPosition)) return false;
 
+  // Filter to finishers with valid EventRating (including 0)
   const finishers = results.filter(r =>
-    r.Position !== 'DNF' && r.EventRating && !isNaN(parseInt(r.EventRating))
+    r.Position !== 'DNF' &&
+    r.EventRating !== undefined &&
+    r.EventRating !== null &&
+    !isNaN(parseInt(r.EventRating))
   );
-  if (finishers.length === 0) return false;
+  if (finishers.length === 0) {
+    console.log(`   Giant Killer: No finishers with EventRating found`);
+    return false;
+  }
 
   finishers.sort((a, b) => parseInt(b.EventRating) - parseInt(a.EventRating));
   const giant = finishers[0];
-  if (giant.UID === userUid) return false;
 
-  return userPosition < parseInt(giant.Position);
+  console.log(`   Giant Killer check: User pos=${userPosition} (ER=${userResult.EventRating}), Giant=${giant.Name} (ER=${giant.EventRating}, pos=${giant.Position})`);
+
+  if (giant.UID === userUid) {
+    console.log(`   Giant Killer: User IS the giant (highest rated), not eligible`);
+    return false;
+  }
+
+  const giantPosition = parseInt(giant.Position);
+  const earned = userPosition < giantPosition;
+  console.log(`   Giant Killer result: ${earned ? 'EARNED' : 'not earned'} (user pos ${userPosition} ${earned ? '<' : '>='} giant pos ${giantPosition})`);
+
+  return earned;
 }
 
 /**
@@ -2618,15 +2643,19 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
   }
 
   // Special Event Awards
+  // Use parseInt for type-safe comparison (eventNumber may be string from some sources)
+  const eventNum = parseInt(eventNumber);
+  console.log(`   Special event check: eventNumber=${eventNumber} (type: ${typeof eventNumber}), parsed=${eventNum}`);
+
   // The Equalizer - awarded for completing The Leveller (event 102)
-  if (eventNumber === 102) {
+  if (eventNum === 102) {
     console.log('   🎚️ THE LEVELLER completed! Awarding The Equalizer');
     updateData['awards.theEqualizer'] = admin.firestore.FieldValue.increment(1);
     eventResults.earnedAwards.push({ awardId: 'theEqualizer', category: 'special_event', intensity: 'moderate' });
   }
 
   // Singapore Sling - awarded for podium at Singapore Criterium (event 101)
-  if (eventNumber === 101 && position <= 3 && !isDNF) {
+  if (eventNum === 101 && position <= 3 && !isDNF) {
     console.log('   🍸 SINGAPORE CRITERIUM podium! Awarding Singapore Sling');
     updateData['awards.singaporeSling'] = admin.firestore.FieldValue.increment(1);
     eventResults.earnedAwards.push({ awardId: 'singaporeSling', category: 'special_event', intensity: 'high' });
@@ -2694,18 +2723,18 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
     if (earnedBlastOff) { earnedCC += AWARD_CREDIT_MAP.blastOff || 50; awardList.push('blastOff'); }
   }
 
-  // Special event awards CC
-  if (eventNumber === 102) {
+  // Special event awards CC (use parseInt for type-safe comparison)
+  if (parseInt(eventNumber) === 102) {
     earnedCC += AWARD_CREDIT_MAP.theEqualizer || 0;
     awardList.push('theEqualizer');
   }
-  if (eventNumber === 101 && position <= 3 && !isDNF) {
+  if (parseInt(eventNumber) === 101 && position <= 3 && !isDNF) {
     earnedCC += AWARD_CREDIT_MAP.singaporeSling || 0;
     awardList.push('singaporeSling');
   }
 
   // GC awards CC (only on event 15)
-  if (eventNumber === 15 && gcAwards) {
+  if (parseInt(eventNumber) === 15 && gcAwards) {
     if (gcAwards.gcGoldMedal) { earnedCC += AWARD_CREDIT_MAP.gcGoldMedal || 0; awardList.push('gcGoldMedal'); }
     if (gcAwards.gcSilverMedal) { earnedCC += AWARD_CREDIT_MAP.gcSilverMedal || 0; awardList.push('gcSilverMedal'); }
     if (gcAwards.gcBronzeMedal) { earnedCC += AWARD_CREDIT_MAP.gcBronzeMedal || 0; awardList.push('gcBronzeMedal'); }
