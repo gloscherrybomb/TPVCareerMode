@@ -25,6 +25,7 @@ const AWARD_CREDIT_MAP = {
   seasonThirdPlace: 60,
   perfectSeason: 150,
   podiumStreak: 50,
+  backToBack: 50,
   weekendWarrior: 20,
   trophyCollector: 20,
   specialist: 20,

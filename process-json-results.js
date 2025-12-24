@@ -2642,6 +2642,75 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
     }
   }
 
+  // BACK TO BACK - Win 2 races in a row
+  if (position === 1) {
+    const previousPositions = [];
+    for (let i = 1; i <= 15; i++) {
+      if (userData[`event${i}Results`] && userData[`event${i}Results`].position) {
+        previousPositions.push(userData[`event${i}Results`].position);
+      }
+    }
+    if (previousPositions.length > 0 && previousPositions[previousPositions.length - 1] === 1) {
+      console.log('   🔁 BACK TO BACK! 2 consecutive wins');
+      updateData['awards.backToBack'] = admin.firestore.FieldValue.increment(1);
+      eventResults.earnedAwards.push({ awardId: 'backToBack', category: 'career', intensity: 'flashy' });
+    }
+  }
+
+  // TROPHY COLLECTOR - Podium 5+ times (one-time award)
+  if (position <= 3) {
+    const currentTrophyCollector = userData.awards?.trophyCollector || 0;
+    if (currentTrophyCollector === 0 && totalPodiums >= 5) {
+      console.log('   🏆 TROPHY COLLECTOR! 5+ podium finishes');
+      updateData['awards.trophyCollector'] = 1;
+      eventResults.earnedAwards.push({ awardId: 'trophyCollector', category: 'career', intensity: 'moderate' });
+    }
+  }
+
+  // WEEKEND WARRIOR - Complete 5+ events (one-time award)
+  const totalEventsCompleted = (userData.totalEvents || 0) + 1;
+  const currentWeekendWarrior = userData.awards?.weekendWarrior || 0;
+  if (currentWeekendWarrior === 0 && totalEventsCompleted >= 5) {
+    console.log('   🏁 WEEKEND WARRIOR! 5+ events completed');
+    updateData['awards.weekendWarrior'] = 1;
+    eventResults.earnedAwards.push({ awardId: 'weekendWarrior', category: 'career', intensity: 'moderate' });
+  }
+
+  // OVERRATED - Finish worse than predicted 5+ times (one-time award)
+  if (!isDNF && predictedPosition && position > predictedPosition) {
+    let worseThanPredicted = 1;
+    for (let i = 1; i <= 15; i++) {
+      const evtData = userData[`event${i}Results`];
+      if (evtData && evtData.position && evtData.predictedPosition &&
+          evtData.position > evtData.predictedPosition) {
+        worseThanPredicted++;
+      }
+    }
+    const currentOverrated = userData.awards?.overrated || 0;
+    if (currentOverrated === 0 && worseThanPredicted >= 5) {
+      console.log('   📉 OVERRATED! Finished worse than predicted 5+ times');
+      updateData['awards.overrated'] = 1;
+      eventResults.earnedAwards.push({ awardId: 'overrated', category: 'career', intensity: 'low' });
+    }
+  }
+
+  // TECHNICAL ISSUES - DNF 3+ times (one-time award)
+  if (isDNF) {
+    let dnfCount = 1;
+    for (let i = 1; i <= 15; i++) {
+      const evtData = userData[`event${i}Results`];
+      if (evtData && (evtData.position === null || evtData.position === 'DNF')) {
+        dnfCount++;
+      }
+    }
+    const currentTechnicalIssues = userData.awards?.technicalIssues || 0;
+    if (currentTechnicalIssues === 0 && dnfCount >= 3) {
+      console.log('   🔧 TECHNICAL ISSUES! 3+ DNFs');
+      updateData['awards.technicalIssues'] = 1;
+      eventResults.earnedAwards.push({ awardId: 'technicalIssues', category: 'career', intensity: 'low' });
+    }
+  }
+
   // Special Event Awards
   // Use parseInt for type-safe comparison (eventNumber may be string from some sources)
   const eventNum = parseInt(eventNumber);

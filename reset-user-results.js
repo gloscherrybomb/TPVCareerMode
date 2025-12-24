@@ -107,7 +107,13 @@ async function resetUserResults() {
           // Power-based awards
           powerSurge: 0,
           steadyEddie: 0,
-          blastOff: 0
+          blastOff: 0,
+          // Career milestone awards
+          backToBack: 0,
+          weekendWarrior: 0,
+          trophyCollector: 0,
+          technicalIssues: 0,
+          overrated: 0
         },
 
         // Delete all event result blocks (1–15)

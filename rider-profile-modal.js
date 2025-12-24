@@ -598,7 +598,14 @@ function buildRiderProfileHTML(data, name) {
         blastOff: { icon: '🚀', name: 'Blast Off' },
 
         // Other awards
-        gluttonForPunishment: { icon: '🎖️', name: 'Glutton for Punishment' }
+        gluttonForPunishment: { icon: '🎖️', name: 'Glutton for Punishment' },
+
+        // Career milestone awards
+        backToBack: { icon: '🔁', name: 'Back to Back' },
+        weekendWarrior: { icon: '🏁', name: 'Weekend Warrior' },
+        trophyCollector: { icon: '🏆', name: 'Trophy Collector' },
+        technicalIssues: { icon: '🔧', name: 'Technical Issues' },
+        overrated: { icon: '📉', name: 'Overrated' }
     };
     
     // Build awards list with counts

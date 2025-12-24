@@ -105,7 +105,25 @@ const AWARD_NAMES = {
 
     // Special event awards
     theEqualizer: { name: "The Equalizer", icon: "🎚️" },
-    singaporeSling: { name: "Singapore Sling", icon: "🍸" }
+    singaporeSling: { name: "Singapore Sling", icon: "🍸" },
+
+    // Career/Season awards
+    lanternRouge: { name: "Lantern Rouge", icon: "🏮" },
+    seasonChampion: { name: "Season Champion", icon: "🏆" },
+    seasonRunnerUp: { name: "Season Runner-Up", icon: "🥈" },
+    seasonThirdPlace: { name: "Season Third Place", icon: "🥉" },
+    perfectSeason: { name: "Perfect Season", icon: "💯" },
+    podiumStreak: { name: "Podium Streak", icon: "📈" },
+    specialist: { name: "Specialist", icon: "⭐" },
+    allRounder: { name: "All-Rounder", icon: "🌟" },
+    comeback: { name: "Comeback Kid", icon: "🔄" },
+
+    // Career milestone awards
+    overrated: { name: "Overrated", icon: "📉" },
+    backToBack: { name: "Back to Back", icon: "🔁" },
+    weekendWarrior: { name: "Weekend Warrior", icon: "🏁" },
+    trophyCollector: { name: "Trophy Collector", icon: "🏆" },
+    technicalIssues: { name: "Technical Issues", icon: "🔧" }
 };
 
 // Helper function to get stage number for an event
