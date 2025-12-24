@@ -2137,6 +2137,13 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
   const marginToWinner = position === 1 ? 0 : userTime - winnerTime;
   const winMargin = position === 1 && secondTime ? secondTime - winnerTime : 0;
 
+  // Calculate rival encounters BEFORE unlock context (needed for rival-based triggers)
+  const rivalEncounters = calculateRivalEncounters(results, uid, position, userTime, eventNumber, distance);
+  const existingRivalData = userData.rivalData || null;
+  const updatedRivalData = updateRivalData(existingRivalData, rivalEncounters, eventNumber);
+  const topRivals = identifyTopRivals(updatedRivalData);
+  updatedRivalData.topRivals = topRivals;
+
   // ================== UNLOCK BONUS HANDLING ==================
   const skipUnlocks = process.env.SKIP_UNLOCKS === 'true';
   let unlockBonusPoints = 0;
@@ -2169,8 +2176,8 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
         totalFinishers: sortedFinishers.length,
         userARR: parseInt(userResult.ARR) || 0,
         results: sanitizedResults,
-        topRivals: userData.rivalData?.topRivals || [],
-        rivalEncounters: [],
+        topRivals: updatedRivalData.topRivals || [],
+        rivalEncounters: rivalEncounters,
         personality: userData.personality || null
       };
 
@@ -2219,6 +2226,7 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
     stageNumber: currentStage,
     time: parseFloat(userResult.Time) || 0,
     arr: parseInt(userResult.ARR) || 0,
+    arrBand: userResult.ARRBand || '',
     eventRating: parseInt(userResult.EventRating) || null,
     predictedPosition: predictedPosition,
     eventType: eventType,
@@ -2299,17 +2307,8 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
   // Update power records
   const updatedPowerRecords = updatePowerRecords(userData.powerRecords, eventResults, eventNumber, distance);
 
-  // Calculate rival encounters (must be before user document update)
-  // userTime already defined above for margin calculations
-  const rivalEncounters = calculateRivalEncounters(results, uid, position, userTime, eventNumber, distance);
-
-  // Update rival data
-  const existingRivalData = userData.rivalData || null;
-  const updatedRivalData = updateRivalData(existingRivalData, rivalEncounters, eventNumber);
-
-  // Identify top 10 rivals
-  const topRivals = identifyTopRivals(updatedRivalData);
-  updatedRivalData.topRivals = topRivals;
+  // NOTE: rivalEncounters, existingRivalData, updatedRivalData, and topRivals
+  // are calculated earlier (before unlock context) to support rival-based unlock triggers
 
   // Build season standings (only for non-special events)
   let seasonStandings = [];
@@ -2841,10 +2840,18 @@ async function processJSONResults(jsonFiles) {
       }
 
       // Update bot ARRs based on race results
-      await updateBotARRs(eventInfo.season, eventInfo.event, allResults);
+      try {
+        await updateBotARRs(eventInfo.season, eventInfo.event, allResults);
+      } catch (botArrError) {
+        console.error(`   ⚠️ Bot ARR update error: ${botArrError.message}`);
+      }
 
       // Process any pending bot profile requests
-      await processBotProfileRequests();
+      try {
+        await processBotProfileRequests();
+      } catch (botProfileError) {
+        console.error(`   ⚠️ Bot profile request error: ${botProfileError.message}`);
+      }
 
     } catch (error) {
       console.error(`❌ Error processing ${filePath}:`, error);
@@ -3032,18 +3039,21 @@ async function updateResultsSummary(season, event, results, userUid, unlockBonus
   // Check if results have power data
   const resultsHavePowerData = results.some(r => r.AvgPower || r.MaxPower || r.NrmPower);
 
-  await summaryRef.set({
-    season: season,
-    event: event,
-    userUid: userUid,
-    totalParticipants: finishedResults.length,
-    totalDNFs: dnfResults.length,
-    hasPowerData: resultsHavePowerData,
-    processedAt: admin.firestore.FieldValue.serverTimestamp(),
-    results: validResults
-  });
-
-  console.log(`   ✅ Updated results summary for season ${season} event ${event}`);
+  try {
+    await summaryRef.set({
+      season: season,
+      event: event,
+      userUid: userUid,
+      totalParticipants: finishedResults.length,
+      totalDNFs: dnfResults.length,
+      hasPowerData: resultsHavePowerData,
+      processedAt: admin.firestore.FieldValue.serverTimestamp(),
+      results: validResults
+    });
+    console.log(`   ✅ Updated results summary for season ${season} event ${event}`);
+  } catch (summaryError) {
+    console.error(`   ⚠️ Failed to update results summary for ${userUid}: ${summaryError.message}`);
+  }
 }
 
 // Main execution

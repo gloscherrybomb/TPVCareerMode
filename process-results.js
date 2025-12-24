@@ -1241,6 +1241,10 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
   let earnedZeroToHero = false;
   let earnedWindTunnel = false;
   let earnedTheAccountant = false;
+  let earnedBullseyeMedal = false;
+  let earnedHotStreakMedal = false;
+  let earnedLanternRouge = false;
+  let earnedComeback = false;
 
   // Only calculate awards for non-DNF results
   if (!isDNF) {
@@ -1297,6 +1301,48 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
           { position: prevEventResults.position, totalFinishers: 50 }, // Approximate
           { position: position, totalFinishers: currentFinishers }
         );
+      }
+    }
+
+    // Bullseye - exact predicted position match
+    if (predictedPosition && position === predictedPosition) {
+      earnedBullseyeMedal = true;
+      console.log('   🎯 BULLSEYE! Finished exactly at predicted position');
+    }
+
+    // Hot Streak - 3 consecutive wins
+    if (position === 1) {
+      let consecutiveWins = 1; // Current win counts
+      for (let i = eventNumber - 1; i >= 1; i--) {
+        const prevResult = userData[`event${i}Results`];
+        if (prevResult && prevResult.position === 1) {
+          consecutiveWins++;
+        } else {
+          break;
+        }
+      }
+      if (consecutiveWins >= 3) {
+        earnedHotStreakMedal = true;
+        console.log(`   🔥 HOT STREAK! ${consecutiveWins} consecutive wins`);
+      }
+    }
+
+    // Lantern Rouge - last place finisher (not DNF)
+    const finishersForLantern = results.filter(r => r.Position !== 'DNF' && !isNaN(parseInt(r.Position)));
+    if (position === finishersForLantern.length) {
+      earnedLanternRouge = true;
+      console.log('   🏮 LANTERN ROUGE! Last place finish');
+    }
+
+    // Comeback - improved 10+ positions from previous event
+    if (eventNumber > 1) {
+      const prevResult = userData[`event${eventNumber - 1}Results`];
+      if (prevResult && prevResult.position && prevResult.position !== 'DNF') {
+        const improvement = prevResult.position - position;
+        if (improvement >= 10) {
+          earnedComeback = true;
+          console.log(`   🔄 COMEBACK! Improved ${improvement} positions from last event`);
+        }
       }
     }
   }
@@ -1368,6 +1414,10 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
     earnedZeroToHero: earnedZeroToHero,
     earnedWindTunnel: earnedWindTunnel,
     earnedTheAccountant: earnedTheAccountant,
+    earnedBullseyeMedal: earnedBullseyeMedal,
+    earnedHotStreakMedal: earnedHotStreakMedal,
+    earnedLanternRouge: earnedLanternRouge,
+    earnedComeback: earnedComeback,
     earnedGCGoldMedal: gcAwards.gcGoldMedal,
     earnedGCSilverMedal: gcAwards.gcSilverMedal,
     earnedGCBronzeMedal: gcAwards.gcBronzeMedal,
@@ -1941,7 +1991,7 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
   }
 
   // Singapore Sling - awarded for podium at Singapore Criterium (event 101)
-  if (eventNumber === 101 && userPosition <= 3) {
+  if (eventNumber === 101 && position <= 3 && !isDNF) {
     console.log('   🍸 SINGAPORE CRITERIUM podium! Awarding Singapore Sling');
     eventAwards['awards.singaporeSling'] = admin.firestore.FieldValue.increment(1);
     eventResults.earnedAwards.push({ awardId: 'singaporeSling', category: 'special_event', intensity: 'high' });
