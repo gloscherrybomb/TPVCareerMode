@@ -826,22 +826,33 @@ function initTabs() {
     const seasonContent = document.getElementById('seasonContent');
     const globalContent = document.getElementById('globalContent');
 
+    // Function to switch tabs
+    function switchToTab(tab) {
+        tabButtons.forEach(btn => btn.classList.remove('active'));
+        const targetButton = document.querySelector(`.tab-btn[data-tab="${tab}"]`);
+        if (targetButton) targetButton.classList.add('active');
+
+        if (tab === 'season') {
+            seasonContent.classList.add('active');
+            globalContent.classList.remove('active');
+        } else if (tab === 'global') {
+            seasonContent.classList.remove('active');
+            globalContent.classList.add('active');
+        }
+    }
+
+    // Check URL hash on load
+    const hash = window.location.hash.replace('#', '');
+    if (hash === 'season' || hash === 'global') {
+        switchToTab(hash);
+    }
+
     tabButtons.forEach(button => {
         button.addEventListener('click', () => {
             const tab = button.dataset.tab;
-            
-            // Update active button
-            tabButtons.forEach(btn => btn.classList.remove('active'));
-            button.classList.add('active');
-            
-            // Show/hide content
-            if (tab === 'season') {
-                seasonContent.classList.add('active');
-                globalContent.classList.remove('active');
-            } else {
-                seasonContent.classList.remove('active');
-                globalContent.classList.add('active');
-            }
+            switchToTab(tab);
+            // Update URL hash without scrolling
+            history.replaceState(null, null, `#${tab}`);
         });
     });
 }

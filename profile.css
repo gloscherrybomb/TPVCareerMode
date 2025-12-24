@@ -383,6 +383,12 @@
     box-shadow: 0 10px 30px rgba(255, 27, 107, 0.2);
 }
 
+.stat-card-link {
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+}
+
 .stat-icon {
     font-size: 2.5rem;
     width: 60px;

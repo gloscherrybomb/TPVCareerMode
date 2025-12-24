@@ -612,10 +612,11 @@ onAuthStateChanged(auth, async (user) => {
         }
 
         // Show upload results link for beta users
-        const uploadResultsLink = document.getElementById('upload-results-link');
-        if (uploadResultsLink && userData.beta_access === true) {
-          uploadResultsLink.style.display = '';
-        }
+        // TEMPORARILY DISABLED
+        // const uploadResultsLink = document.getElementById('upload-results-link');
+        // if (uploadResultsLink && userData.beta_access === true) {
+        //   uploadResultsLink.style.display = '';
+        // }
       }
     } catch (error) {
       console.error('Error checking contributor status:', error);
