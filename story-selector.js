@@ -154,6 +154,17 @@ class StorySelector {
       }
     }
 
+    // Check event number (used by special events)
+    if (triggers.eventNumber !== undefined) {
+      if (Array.isArray(triggers.eventNumber)) {
+        if (!triggers.eventNumber.includes(context.eventNumber)) {
+          return false;
+        }
+      } else if (triggers.eventNumber !== context.eventNumber) {
+        return false;
+      }
+    }
+
     // Check performance tier
     if (triggers.performanceTier !== undefined) {
       if (Array.isArray(triggers.performanceTier)) {
@@ -483,6 +494,17 @@ class StorySelector {
           score += 5; // Matches one of several events
         }
       } else if (triggers.raceNumber === context.eventNumber) {
+        score += 10; // Exact single event match
+      }
+    }
+
+    // Event number match (used by special events)
+    if (triggers.eventNumber !== undefined) {
+      if (Array.isArray(triggers.eventNumber)) {
+        if (triggers.eventNumber.includes(context.eventNumber)) {
+          score += 5; // Matches one of several events
+        }
+      } else if (triggers.eventNumber === context.eventNumber) {
         score += 10; // Exact single event match
       }
     }
