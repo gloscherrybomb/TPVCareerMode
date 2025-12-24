@@ -209,6 +209,23 @@ async function batchFixUnlockBonus() {
       }
     }
 
+    // Also check special events (101, 102, etc.)
+    const specialEventIds = [101, 102];
+    for (const eventNum of specialEventIds) {
+      const eventResults = userData[`event${eventNum}Results`];
+      if (eventResults) {
+        const csvTimestamp = getEventCsvTimestamp(1, eventNum); // Season 1
+        const unlockHistoryData = userUnlocks.events[eventNum.toString()] || null;
+
+        eventsToProcess.push({
+          eventNumber: eventNum,
+          eventData: unlockHistoryData,
+          csvTimestamp,
+          isSpecialEvent: true
+        });
+      }
+    }
+
     // Sort by CSV timestamp (chronological order - oldest first)
     eventsToProcess.sort((a, b) => a.csvTimestamp - b.csvTimestamp);
 
@@ -318,9 +335,10 @@ async function batchFixUnlockBonus() {
       console.log(`   ✅ Event ${eventNumber}: +${totalUnlockBonus} pts (${unlockNames})`);
 
       if (!dryRun) {
-        // Calculate new total points from all events
+        // Calculate new total points from all events (including special events)
         let totalPointsFromEvents = 0;
-        for (let i = 1; i <= 15; i++) {
+        const allEventIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 101, 102];
+        for (const i of allEventIds) {
           const evtResults = userData[`event${i}Results`];
           if (evtResults && typeof evtResults.points === "number") {
             if (i === eventNumber) {
@@ -392,9 +410,10 @@ async function batchFixUnlockBonus() {
       const latestUserDoc = await userRef.get();
       const latestUserData = latestUserDoc.data();
 
-      // Find ALL completed events and their CSV timestamps
+      // Find ALL completed events and their CSV timestamps (including special events)
       const allCompletedEvents = [];
-      for (let i = 1; i <= 15; i++) {
+      const allEventIdsForCooldown = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 101, 102];
+      for (const i of allEventIdsForCooldown) {
         const evtResults = latestUserData[`event${i}Results`];
         if (evtResults) {
           // Use CSV timestamp for chronological ordering

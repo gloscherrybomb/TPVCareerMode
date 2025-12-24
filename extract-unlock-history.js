@@ -101,6 +101,29 @@ async function extractUnlockHistory() {
         }
       }
 
+      // Also check special events (101, 102, etc.)
+      const specialEventIds = [101, 102];
+      for (const eventNum of specialEventIds) {
+        const eventResults = userData[`event${eventNum}Results`];
+
+        if (eventResults && eventResults.unlockBonusesApplied && eventResults.unlockBonusesApplied.length > 0) {
+          hasUnlocks = true;
+
+          userUnlocks.events[eventNum] = {
+            position: eventResults.position,
+            isSpecialEvent: true,
+            unlocks: eventResults.unlockBonusesApplied.map(unlock => ({
+              id: unlock.id,
+              name: unlock.name,
+              pointsAdded: unlock.pointsAdded,
+              reason: unlock.reason || "Unknown"
+            }))
+          };
+
+          totalApplications += eventResults.unlockBonusesApplied.length;
+        }
+      }
+
       if (hasUnlocks) {
         unlockHistory.users[userUid] = userUnlocks;
         usersWithUnlocks++;
