@@ -6,9 +6,15 @@ const fs = require('fs');
 const path = require('path');
 const admin = require('firebase-admin');
 const awardsCalc = require('./awards-calculation');
+const storyGen = require('./story-generator');
 const { AWARD_CREDIT_MAP, PER_EVENT_CREDIT_CAP, COMPLETION_BONUS_CC } = require('./currency-config');
+const { UNLOCK_DEFINITIONS, getUnlockById } = require('./unlock-config');
 const { EVENT_NAMES, EVENT_TYPES, OPTIONAL_EVENTS, STAGE_REQUIREMENTS } = require('./event-config');
 const { parseJSON, hasPowerData } = require('./json-parser');
+
+// Import narrative system modules
+const { NARRATIVE_DATABASE } = require('./narrative-database.js');
+const { StorySelector } = require('./story-selector.js');
 
 // Initialize Firebase Admin
 const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
@@ -17,6 +23,11 @@ admin.initializeApp({
 });
 
 const db = admin.firestore();
+
+// Initialize narrative story selector
+const narrativeSelector = new StorySelector();
+narrativeSelector.initialize(NARRATIVE_DATABASE);
+console.log('📖 Narrative system initialized');
 
 // Event maximum points lookup (from Career Mode spreadsheet)
 const EVENT_MAX_POINTS = {
@@ -207,6 +218,307 @@ function calculateNextStage(currentStage, tourProgress = {}) {
     return 9;
   }
   return currentStage;
+}
+
+// ================== PERSONALITY RECOVERY ==================
+
+/**
+ * Recover personality from interview history if missing from user document.
+ * This handles cases where user data was reset but interview records remain.
+ */
+async function recoverPersonalityIfNeeded(userId, userData, userRef) {
+  // If personality exists, return it
+  if (userData.personality) {
+    return userData.personality;
+  }
+
+  console.log(`   ⚠️ Personality missing for user ${userId}, checking interview history...`);
+
+  // Check if user has interview history
+  const interviewHistory = userData.interviewHistory;
+  if (!interviewHistory || !interviewHistory.totalInterviews || interviewHistory.totalInterviews === 0) {
+    console.log(`   ℹ️ No interview history found, using default personality`);
+    return null;
+  }
+
+  // Try to recover from interview documents
+  const lastEventNum = interviewHistory.lastInterviewEventNumber;
+  if (!lastEventNum) {
+    console.log(`   ⚠️ Interview history exists but no lastInterviewEventNumber`);
+    return null;
+  }
+
+  try {
+    // Query interviews for this user, ordered by event number descending
+    const interviewsSnapshot = await db.collection('interviews')
+      .where('userId', '==', userId)
+      .orderBy('eventNumber', 'desc')
+      .limit(1)
+      .get();
+
+    if (interviewsSnapshot.empty) {
+      console.log(`   ⚠️ No interview documents found for user ${userId}`);
+      return null;
+    }
+
+    const latestInterview = interviewsSnapshot.docs[0].data();
+    if (latestInterview.personalityAfter) {
+      console.log(`   ✅ RECOVERED personality from interview for event ${latestInterview.eventNumber}`);
+
+      // Update user document with recovered personality
+      await userRef.update({
+        personality: latestInterview.personalityAfter
+      });
+      console.log(`   ✅ Saved recovered personality to user document`);
+
+      return latestInterview.personalityAfter;
+    }
+  } catch (error) {
+    console.error(`   ❌ Error recovering personality:`, error.message);
+  }
+
+  return null;
+}
+
+// ================== UNLOCK SYSTEM ==================
+
+/**
+ * Evaluate whether a given unlock should trigger for this event
+ * Returns { triggered: boolean, reason: string }
+ */
+function evaluateUnlockTrigger(unlockId, context) {
+  const { position, predictedPosition, marginToWinner, gapToWinner, eventCategory, eventNumber, totalFinishers, userARR, results, topRivals, rivalEncounters } = context;
+
+  switch (unlockId) {
+    case 'paceNotes':
+      if (!predictedPosition) return { triggered: false };
+      return {
+        triggered: Math.abs(predictedPosition - position) <= 5,
+        reason: 'Finished within +/-5 places of prediction'
+      };
+    case 'teamCarRecon':
+      return {
+        triggered: position <= 10 || (typeof marginToWinner === 'number' && marginToWinner < 45),
+        reason: 'Top 10 or close gap to winner'
+      };
+    case 'sprintPrimer':
+      return {
+        triggered: position <= 8,
+        reason: 'Strong sprint/segment or top 8 finish'
+      };
+    case 'aeroWheels':
+      if (!predictedPosition) return { triggered: false };
+      return {
+        triggered: (predictedPosition - position >= 5) && position <= 15,
+        reason: 'Beat prediction by 5+ and finish top 15'
+      };
+    case 'cadenceNutrition':
+      return {
+        triggered: typeof gapToWinner === 'number' && gapToWinner <= 20,
+        reason: 'Within 20s of winner'
+      };
+    case 'soigneurSession':
+      if (!predictedPosition) return { triggered: false };
+      return {
+        triggered: predictedPosition <= 5 && position <= 5,
+        reason: 'Predicted and finished top 5'
+      };
+    case 'preRaceMassage':
+      if (!predictedPosition) return { triggered: false };
+      return {
+        triggered: predictedPosition <= 10 && position <= 3,
+        reason: 'Predicted top 10 and podium'
+      };
+    case 'climbingGears':
+      return {
+        triggered: eventCategory === 'climbing' && position <= 5,
+        reason: 'Climbing day top 5'
+      };
+    case 'aggroRaceKit':
+      return {
+        triggered: position <= 5 || (position <= 10 && typeof marginToWinner === 'number' && marginToWinner < 20),
+        reason: 'Top 5, or top 10 within 20s'
+      };
+    case 'tightPackWin': {
+      const top10 = (results || []).slice(0, 10).map(r => parseFloat(r.Time)).filter(t => !isNaN(t));
+      const tight = top10.length === 10 && (Math.max(...top10) - Math.min(...top10)) <= 5;
+      return {
+        triggered: position === 1 && tight,
+        reason: 'Won in a tight 5s top-10 finish'
+      };
+    }
+    case 'domestiqueHelp': {
+      const higherARRRider = results.find(r => r.arr > userARR && r.position > position);
+      return {
+        triggered: Boolean(higherARRRider) && position <= 5,
+        reason: 'Beat highest ARR rider and top 5'
+      };
+    }
+    case 'recoveryBoots':
+      return {
+        triggered: eventNumber >= 13 && eventNumber <= 15 && position <= 5,
+        reason: 'Tour stage top 5'
+      };
+    case 'directorsTablet':
+      if (!predictedPosition) return { triggered: false };
+      return {
+        triggered: (predictedPosition - position >= 8) || (predictedPosition >= 10 && position <= 3),
+        reason: 'Big beat vs prediction or podium from deep prediction'
+      };
+    case 'beatPredictionByAny':
+      if (!predictedPosition) return { triggered: false };
+      return {
+        triggered: predictedPosition - position > 0,
+        reason: 'Beat prediction'
+      };
+    case 'winSprint':
+      return {
+        triggered: position === 1,
+        reason: 'Won the race'
+      };
+    case 'finishTop10':
+      return {
+        triggered: position <= 10,
+        reason: 'Finished in top 10'
+      };
+    case 'completeRace':
+      return {
+        triggered: position !== 'DNF' && typeof position === 'number',
+        reason: 'Completed the race'
+      };
+    case 'podiumFinish':
+      return {
+        triggered: position <= 3,
+        reason: 'Podium finish'
+      };
+    case 'winOrBeatBy5':
+      if (!predictedPosition) {
+        return {
+          triggered: position === 1,
+          reason: 'Won the race'
+        };
+      }
+      return {
+        triggered: position === 1 || (predictedPosition - position >= 5),
+        reason: 'Win or aggressive beat of prediction'
+      };
+    case 'top15Finish':
+      return {
+        triggered: position <= 15,
+        reason: 'Consistent top 15 finish'
+      };
+    case 'withinPrediction':
+      if (!predictedPosition) return { triggered: false };
+      return {
+        triggered: Math.abs(predictedPosition - position) <= 3,
+        reason: 'Finished within 3 places of prediction'
+      };
+    case 'win':
+      return {
+        triggered: position === 1,
+        reason: 'Won the race'
+      };
+    case 'beatPrediction3':
+      if (!predictedPosition) return { triggered: false };
+      return {
+        triggered: predictedPosition - position >= 3,
+        reason: 'Beat prediction by 3+'
+      };
+    case 'top10':
+      return {
+        triggered: position <= 10,
+        reason: 'Finished top 10'
+      };
+    case 'beatTopRival': {
+      if (!topRivals || topRivals.length === 0 || !results) {
+        return { triggered: false };
+      }
+      const top3RivalUids = topRivals.slice(0, 3).map(r => r.botUid);
+      const beatRival = results.find(r => {
+        return top3RivalUids.includes(r.uid) && r.position > position;
+      });
+      if (beatRival) {
+        const rivalName = beatRival.name || 'rival';
+        return {
+          triggered: true,
+          reason: `Beat top rival ${rivalName}`
+        };
+      }
+      return { triggered: false };
+    }
+    default:
+      return { triggered: false };
+  }
+}
+
+/**
+ * Determine which unlocks to trigger (all that meet conditions) based on equipped and cooldowns
+ */
+function selectUnlocksToApply(equippedIds, cooldowns, context) {
+  const triggered = [];
+
+  for (const id of equippedIds) {
+    const unlock = getUnlockById(id);
+    if (!unlock) continue;
+
+    // Simple boolean cooldown: skip if resting (triggered last race)
+    if (cooldowns && cooldowns[id] === true) {
+      continue;
+    }
+
+    const result = evaluateUnlockTrigger(id, context);
+    if (result.triggered) {
+      triggered.push({
+        unlock,
+        reason: result.reason || unlock.description
+      });
+    }
+  }
+
+  // Apply at most two highest-value unlocks
+  return triggered
+    .sort((a, b) => (b.unlock.pointsBonus || 0) - (a.unlock.pointsBonus || 0))
+    .slice(0, 2);
+}
+
+// ================== STORY GENERATION HELPERS ==================
+
+/**
+ * Get list of completed optional events for story generation
+ */
+function getCompletedOptionalEvents(userData, currentEventNumber) {
+  const OPTIONAL_EVENT_LIST = [6, 7, 8, 9, 10, 11, 12];
+  const completedOptionals = [];
+
+  for (const eventNum of OPTIONAL_EVENT_LIST) {
+    if (userData[`event${eventNum}Results`]) {
+      completedOptionals.push(eventNum);
+    }
+  }
+
+  // Don't count current event as completed yet
+  const currentEventIndex = completedOptionals.indexOf(currentEventNumber);
+  if (currentEventIndex !== -1) {
+    completedOptionals.splice(currentEventIndex, 1);
+  }
+
+  return completedOptionals;
+}
+
+/**
+ * Get next event number based on next stage
+ */
+function getNextEventNumber(nextStage, tourProgress = {}) {
+  const STAGE_TO_EVENT_MAP = {
+    1: 1, 2: 2, 4: 3, 5: 4, 7: 5, 9: 13
+  };
+
+  if (STAGE_TO_EVENT_MAP[nextStage]) {
+    return STAGE_TO_EVENT_MAP[nextStage];
+  }
+
+  // For choice stages (3, 6, 8), return next stage number as placeholder
+  return nextStage;
 }
 
 // ================== POWER AWARD CHECKS ==================
@@ -902,14 +1214,20 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
 
   if (usersQuery.empty) {
     console.log(`❌ User with uid ${uid} not found in database`);
-    return;
+    return { unlockBonusPoints: 0, unlockBonusesApplied: [] };
   }
 
   const userDoc = usersQuery.docs[0];
   const userRef = userDoc.ref;
-  const userData = userDoc.data();
+  let userData = userDoc.data();
 
   console.log(`   Found user: ${userData.name || uid} (Document ID: ${userDoc.id})`);
+
+  // Recover personality from interview history if missing
+  const recoveredPersonality = await recoverPersonalityIfNeeded(uid, userData, userRef);
+  if (recoveredPersonality && !userData.personality) {
+    userData.personality = recoveredPersonality;
+  }
 
   const currentStage = userData.currentStage || 1;
   const usedOptionalEvents = userData.usedOptionalEvents || [];
@@ -921,7 +1239,7 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
 
   if (!validation.valid) {
     console.log(`❌ Event ${eventNumber} not valid for user at stage ${currentStage}: ${validation.reason}`);
-    return;
+    return { unlockBonusPoints: 0, unlockBonusesApplied: [] };
   }
 
   if (isSpecialEventResult) {
@@ -932,14 +1250,14 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
   const userResult = results.find(r => r.UID === uid);
   if (!userResult) {
     console.log(`User ${uid} not found in results, skipping`);
-    return;
+    return { unlockBonusPoints: 0, unlockBonusesApplied: [] };
   }
 
   // Check if already processed
   const existingResults = userData[`event${eventNumber}Results`];
   if (existingResults && existingResults.position === parseInt(userResult.Position)) {
     console.log(`Event ${eventNumber} already processed for user ${uid}, skipping`);
-    return;
+    return { unlockBonusPoints: 0, unlockBonusesApplied: [] };
   }
 
   let position = parseInt(userResult.Position);
@@ -1100,6 +1418,82 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
     }
   }
 
+  // Calculate win/loss margins for unlock context and story generation
+  const sortedFinishers = results
+    .filter(r => r.Position !== 'DNF' && !isNaN(parseInt(r.Position)))
+    .sort((a, b) => parseInt(a.Position) - parseInt(b.Position));
+
+  const winnerResult = sortedFinishers[0];
+  const secondResult = sortedFinishers[1];
+  const winnerName = winnerResult?.Name || 'Unknown';
+  const secondPlaceName = secondResult?.Name || null;
+  const winnerTime = parseFloat(winnerResult?.Time) || 0;
+  const secondTime = parseFloat(secondResult?.Time) || 0;
+  const userTime = parseFloat(userResult.Time) || 0;
+  const marginToWinner = position === 1 ? 0 : userTime - winnerTime;
+  const winMargin = position === 1 && secondTime ? secondTime - winnerTime : 0;
+
+  // ================== UNLOCK BONUS HANDLING ==================
+  const skipUnlocks = process.env.SKIP_UNLOCKS === 'true';
+  let unlockBonusPoints = 0;
+  let unlockBonusesApplied = [];
+  const previousCooldowns = { ...(userData.unlocks?.cooldowns || {}) };
+  const newCooldowns = {};
+
+  if (!skipUnlocks && !isDNF && !isSpecialEventResult) {
+    const equipped = Array.isArray(userData.unlocks?.equipped) ? userData.unlocks.equipped : [];
+    const slotCount = userData.unlocks?.slotCount || 1;
+    const equippedToUse = equipped.slice(0, slotCount).filter(Boolean);
+
+    if (equippedToUse.length > 0) {
+      // Sanitize results for unlock context
+      const sanitizedResults = sortedFinishers.map(r => ({
+        position: parseInt(r.Position),
+        arr: parseInt(r.ARR) || 0,
+        uid: r.UID || null,
+        name: r.Name || null
+      }));
+
+      // Build unlock context
+      const unlockContext = {
+        position,
+        predictedPosition,
+        marginToWinner: position === 1 ? winMargin : marginToWinner,
+        gapToWinner: position === 1 ? 0 : marginToWinner,
+        eventCategory,
+        eventNumber,
+        totalFinishers: sortedFinishers.length,
+        userARR: parseInt(userResult.ARR) || 0,
+        results: sanitizedResults,
+        topRivals: userData.rivalData?.topRivals || [],
+        rivalEncounters: []
+      };
+
+      // Check triggers
+      const triggeredUnlocks = selectUnlocksToApply(equippedToUse, previousCooldowns, unlockContext);
+      if (triggeredUnlocks.length > 0) {
+        triggeredUnlocks.forEach(selectedUnlock => {
+          const unlockPoints = selectedUnlock.unlock.pointsBonus || 0;
+          unlockBonusPoints += unlockPoints;
+          unlockBonusesApplied.push({
+            id: selectedUnlock.unlock.id,
+            name: selectedUnlock.unlock.name,
+            emoji: selectedUnlock.unlock.emoji || '🎯',
+            emojiFallback: selectedUnlock.unlock.emojiFallback || null,
+            pointsAdded: unlockPoints,
+            reason: selectedUnlock.reason
+          });
+          newCooldowns[selectedUnlock.unlock.id] = true;
+          console.log(`   💎 Unlock applied (${selectedUnlock.unlock.name}): +${unlockPoints} pts`);
+        });
+
+        // Add unlock bonus to points
+        points += unlockBonusPoints;
+        bonusPoints += unlockBonusPoints;
+      }
+    }
+  }
+
   // Prepare event results WITH power data
   const eventResults = {
     position: isDNF ? 'DNF' : position,
@@ -1113,6 +1507,8 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
     eventCategory: eventCategory,
     points: points,
     bonusPoints: bonusPoints,
+    unlockBonusPoints: unlockBonusPoints,
+    unlockBonusesApplied: unlockBonusesApplied,
     distance: distance,
     deltaTime: parseFloat(userResult.DeltaTime) || 0,
     eventPoints: parseInt(userResult.Points) || null,
@@ -1186,7 +1582,7 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
   const updatedPowerRecords = updatePowerRecords(userData.powerRecords, eventResults, eventNumber, distance);
 
   // Calculate rival encounters (must be before user document update)
-  const userTime = parseFloat(userResult.Time) || 0;
+  // userTime already defined above for margin calculations
   const rivalEncounters = calculateRivalEncounters(results, uid, position, userTime, eventNumber, distance);
 
   // Update rival data
@@ -1205,6 +1601,99 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
 
   // Add rival encounters to eventResults for potential story generation
   eventResults.rivalEncounters = rivalEncounters;
+
+  // ================== STORY GENERATION ==================
+  // Calculate context needed for story generation
+  const completedEventNumbers = [];
+  for (let i = 1; i <= 15; i++) {
+    if (userData[`event${i}Results`]) {
+      completedEventNumbers.push(i);
+    }
+  }
+
+  // Recent results for form analysis
+  const recentResults = completedEventNumbers.slice(-3).map(evtNum => {
+    const evtData = userData[`event${evtNum}Results`];
+    return evtData ? evtData.position : null;
+  }).filter(p => p !== null);
+  recentResults.push(position); // Add current race
+
+  // Check if on winning streak
+  const isOnStreak = recentResults.length >= 2 && recentResults.every(p => p === 1);
+
+  // Count total podiums and wins
+  let totalPodiums = 0;
+  let totalWins = 0;
+  for (let i = 1; i <= 15; i++) {
+    const evtData = userData[`event${i}Results`];
+    if (evtData && evtData.position <= 3) totalPodiums++;
+    if (evtData && evtData.position === 1) totalWins++;
+  }
+  if (position <= 3) totalPodiums++;
+  if (position === 1) totalWins++;
+
+  // Calculate next event number
+  const nextEventNumber = eventNumber === 15 ? null : getNextEventNumber(nextStage, newTourProgress);
+
+  // Generate story using narrative system
+  let unifiedStory = '';
+  try {
+    const storyResult = await storyGen.generateRaceStory(
+      {
+        eventNumber: eventNumber,
+        position: isDNF ? 'DNF' : position,
+        predictedPosition: predictedPosition,
+        winMargin: winMargin,
+        lossMargin: marginToWinner,
+        earnedDomination: earnedDomination,
+        earnedCloseCall: earnedCloseCall,
+        earnedPhotoFinish: earnedPhotoFinish,
+        earnedDarkHorse: earnedDarkHorse,
+        earnedZeroToHero: earnedZeroToHero,
+        winnerName: winnerName,
+        secondPlaceName: secondPlaceName,
+        gcPosition: gcResults?.userGC?.gcPosition || null,
+        gcGap: gcResults?.userGC?.gapToLeader || null,
+        // JSON-exclusive: power data for story
+        avgPower: userResult.AvgPower || null,
+        nrmPower: userResult.NrmPower || null,
+        maxPower: userResult.MaxPower || null
+      },
+      {
+        stagesCompleted: completedEventNumbers.length + 1,
+        totalPoints: (userData.totalPoints || 0) + points,
+        totalWins: totalWins,
+        nextStageNumber: nextStage,
+        nextEventNumber: nextEventNumber,
+        isNextStageChoice: [3, 6, 8].includes(nextStage),
+        completedOptionalEvents: getCompletedOptionalEvents(userData, eventNumber),
+        recentResults: recentResults,
+        isOnStreak: isOnStreak,
+        totalPodiums: totalPodiums,
+        seasonPosition: null,
+        topRivals: updatedRivalData.topRivals || [],
+        rivalEncounters: rivalEncounters,
+        personality: userData.personality || null,
+        racesCompleted: completedEventNumbers.length,
+        interviewsCompleted: userData.interviewHistory?.totalInterviews || 0
+      },
+      uid,
+      narrativeSelector,
+      db
+    );
+
+    unifiedStory = storyResult.recap;
+
+    if (unifiedStory) {
+      console.log(`   📖 Generated story (${unifiedStory.split('\n\n').length} paragraphs)`);
+    }
+  } catch (storyError) {
+    console.error(`   ⚠️ Story generation error: ${storyError.message}`);
+  }
+
+  // Store story in event results
+  eventResults.story = unifiedStory;
+  eventResults.timestamp = admin.firestore.FieldValue.serverTimestamp();
 
   // Calculate lifetime statistics
   const existingLifetime = userData.lifetimeStats || {};
@@ -1260,6 +1749,9 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
     updateData.usedOptionalEvents = newUsedOptionalEvents;
     updateData.tourProgress = newTourProgress;
   }
+
+  // Update unlock cooldowns
+  updateData['unlocks.cooldowns'] = newCooldowns;
 
   // Award increments and earnedAwards population
   if (!isDNF) {
@@ -1464,6 +1956,9 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
   if (userResult.AvgPower) {
     console.log(`   ⚡ Power: Avg ${userResult.AvgPower}W, NP ${userResult.NrmPower}W, Max ${userResult.MaxPower}W`);
   }
+
+  // Return unlock data for updateResultsSummary
+  return { unlockBonusPoints, unlockBonusesApplied };
 }
 
 /**
@@ -1482,29 +1977,61 @@ async function processJSONResults(jsonFiles) {
       // Read and parse JSON
       const jsonContent = fs.readFileSync(filePath, 'utf8');
       const rawResults = JSON.parse(jsonContent);
-      const results = parseJSON(rawResults);
+      const allResults = parseJSON(rawResults);
 
-      console.log(`   Found ${results.length} results in JSON`);
+      console.log(`   Found ${allResults.length} total results in JSON`);
 
-      if (hasPowerData(results)) {
+      if (hasPowerData(allResults)) {
         console.log(`   ⚡ Power data available`);
       }
 
-      // Find human UIDs
-      const humanUids = results
-        .filter(r => !r.IsBot)
-        .map(r => r.UID)
-        .filter((uid, index, self) => uid && self.indexOf(uid) === index);
+      // Group results by pen - each pen is a separate race
+      const resultsByPen = {};
+      allResults.forEach(r => {
+        const pen = r.Pen || 1;
+        if (!resultsByPen[pen]) resultsByPen[pen] = [];
+        resultsByPen[pen].push(r);
+      });
 
-      console.log(`   Found ${humanUids.length} human racer(s): ${humanUids.join(', ')}`);
+      const penNumbers = Object.keys(resultsByPen).map(p => parseInt(p)).sort((a, b) => a - b);
+      console.log(`   Found ${penNumbers.length} pen(s): ${penNumbers.join(', ')}`);
 
-      // Process each human's result
+      // Filter to pens with at least one human rider
+      const pensWithHumans = penNumbers.filter(pen => {
+        const penResults = resultsByPen[pen];
+        return penResults.some(r => !r.IsBot);
+      });
+
+      if (pensWithHumans.length === 0) {
+        console.log(`   ⚠️ No pens with human riders found, skipping file`);
+        continue;
+      }
+
+      console.log(`   Processing ${pensWithHumans.length} pen(s) with human riders: ${pensWithHumans.join(', ')}`);
+
       const raceTimestamp = Date.now();
-      for (const uid of humanUids) {
-        await processUserResult(uid, eventInfo, results, raceTimestamp);
 
-        // Update results summary for this user (for event-detail display)
-        await updateResultsSummary(eventInfo.season, eventInfo.event, results, uid);
+      // Process each pen as a separate race
+      for (const penNumber of pensWithHumans) {
+        const penResults = resultsByPen[penNumber];
+        console.log(`\n   🏁 Processing Pen ${penNumber} (${penResults.length} riders)`);
+
+        // Find human UIDs in this pen
+        const humanUids = penResults
+          .filter(r => !r.IsBot)
+          .map(r => r.UID)
+          .filter((uid, index, self) => uid && self.indexOf(uid) === index);
+
+        console.log(`      Human racer(s) in pen: ${humanUids.join(', ')}`);
+
+        // Process each human's result within this pen's context
+        for (const uid of humanUids) {
+          // Pass penResults (not allResults) so calculations are pen-specific
+          const { unlockBonusPoints, unlockBonusesApplied } = await processUserResult(uid, eventInfo, penResults, raceTimestamp);
+
+          // Update results summary for this user with pen-specific results
+          await updateResultsSummary(eventInfo.season, eventInfo.event, penResults, uid, unlockBonusPoints || 0, unlockBonusesApplied || []);
+        }
       }
 
       // Rename JSON to include timestamp

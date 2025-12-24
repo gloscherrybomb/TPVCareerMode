@@ -24,8 +24,8 @@ function transformResult(result) {
   // Construct full name from first and last name
   const name = `${result.firstName || ''} ${result.lastName || ''}`.trim();
 
-  // Handle DNF - if isDNF is true, position should be "DNF"
-  const position = result.isDNF ? 'DNF' : result.position;
+  // Handle DNF - if isDNF is true or position is 32767 (TPV DNF marker), position should be "DNF"
+  const position = (result.isDNF || result.position >= 32767) ? 'DNF' : result.position;
 
   // Convert time from milliseconds to seconds
   const timeSeconds = result.time ? result.time / 1000 : 0;
@@ -65,6 +65,7 @@ function transformResult(result) {
     // Additional fields for internal use
     IsBot: result.isBot || false,
     IsDNF: result.isDNF || false,
+    Pen: result.pen || 1,  // Pen/category number for multi-pen events
 
     // Original delta values (may be useful)
     Delta: result.delta || 0,
