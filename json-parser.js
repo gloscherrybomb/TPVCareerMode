@@ -16,6 +16,20 @@ function mapGender(genderCode) {
 }
 
 /**
+ * Get ARR band category based on rating
+ * @param {number} arr - Player's ARR rating
+ * @returns {string} ARR band category
+ */
+function getARRBand(arr) {
+  if (arr >= 1300) return 'Elite';
+  if (arr >= 1100) return 'Pro';
+  if (arr >= 900) return 'Advanced';
+  if (arr >= 700) return 'Intermediate';
+  if (arr >= 500) return 'Novice';
+  return 'Beginner';
+}
+
+/**
  * Transform a single JSON result object to internal format
  * @param {Object} result - Single JSON result object from API
  * @returns {Object} Result in internal format matching CSV structure
@@ -48,6 +62,7 @@ function transformResult(result) {
     Distance: distanceMeters,
     Time: timeSeconds,
     ARR: result.arr || 0,
+    ARRBand: getARRBand(result.arr || 0),
     EventRating: result.rating || 0,
     Gender: mapGender(result.gender),
     Country: country,

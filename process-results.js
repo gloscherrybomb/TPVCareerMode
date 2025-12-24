@@ -1505,7 +1505,8 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
       userARR: parseInt(userResult.ARR) || 0,
       results: sanitizedResults,
       topRivals: topRivalsForUnlocks,
-      rivalEncounters: rivalEncountersForUnlocks
+      rivalEncounters: rivalEncountersForUnlocks,
+      personality: userData.personality || null
     };
 
     // Check triggers - pass previousCooldowns to exclude resting unlocks
@@ -1524,6 +1525,20 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
         });
         // Set cooldown for this unlock (simple boolean - resting for next race)
         newCooldowns[selectedUnlock.unlock.id] = true;
+
+        // Apply personality bonus if defined
+        if (selectedUnlock.unlock.personalityBonus) {
+          const currentPersonality = userData.personality || {
+            confidence: 50, aggression: 50, professionalism: 50,
+            humility: 50, showmanship: 50, resilience: 50
+          };
+          for (const [trait, bonus] of Object.entries(selectedUnlock.unlock.personalityBonus)) {
+            currentPersonality[trait] = Math.min(100, (currentPersonality[trait] || 50) + bonus);
+          }
+          userData.personality = currentPersonality;
+          console.log(`   🧠 Personality bonus applied: +${JSON.stringify(selectedUnlock.unlock.personalityBonus)}`);
+        }
+
         console.log(`   💎 Unlock applied (${selectedUnlock.unlock.name}): +${unlockPoints} pts`);
       });
 
@@ -1823,6 +1838,12 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
     // Save new cooldowns (only triggered unlocks are set to true, others are cleared)
     updates['unlocks.cooldowns'] = newCooldowns;
   }
+
+  // Update personality if changed (from unlock bonuses)
+  if (userData.personality) {
+    updates.personality = userData.personality;
+  }
+
   // NOTE: Currency updates happen AFTER awards are added (around line 1800+)
   
   // Track awards earned in THIS event specifically
@@ -2425,6 +2446,27 @@ function selectUnlocksToApply(equippedIds, cooldowns, context) {
     // Simple boolean cooldown: skip if resting (triggered last race)
     if (cooldowns && cooldowns[id] === true) {
       continue;
+    }
+
+    // Check personality requirements (if defined)
+    if (unlock.requiredPersonality) {
+      let meetsRequirement = true;
+      for (const [trait, required] of Object.entries(unlock.requiredPersonality)) {
+        const userTraitValue = context.personality?.[trait] || 0;
+        if (userTraitValue < required) {
+          meetsRequirement = false;
+          break;
+        }
+      }
+      if (!meetsRequirement) continue;
+    }
+
+    // Check balanced personality requirement (all traits 45-65)
+    if (unlock.requiredBalanced) {
+      if (!context.personality) continue;
+      const traitValues = Object.values(context.personality);
+      const isBalanced = traitValues.length > 0 && traitValues.every(v => v >= 45 && v <= 65);
+      if (!isBalanced) continue;
     }
 
     const result = evaluateUnlockTrigger(id, context);

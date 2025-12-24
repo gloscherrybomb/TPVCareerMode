@@ -466,6 +466,33 @@ function selectUnlocksToApply(equippedIds, cooldowns, context) {
       continue;
     }
 
+    // Check personality requirements (if defined)
+    if (unlock.requiredPersonality) {
+      let meetsRequirement = true;
+      for (const [trait, required] of Object.entries(unlock.requiredPersonality)) {
+        const userTraitValue = context.personality?.[trait] || 0;
+        if (userTraitValue < required) {
+          meetsRequirement = false;
+          break;
+        }
+      }
+      if (!meetsRequirement) {
+        continue; // Skip this unlock if personality requirement not met
+      }
+    }
+
+    // Check balanced personality requirement (all traits 45-65)
+    if (unlock.requiredBalanced) {
+      if (!context.personality) {
+        continue; // Can't check balance without personality data
+      }
+      const traitValues = Object.values(context.personality);
+      const isBalanced = traitValues.length > 0 && traitValues.every(v => v >= 45 && v <= 65);
+      if (!isBalanced) {
+        continue; // Skip if not balanced
+      }
+    }
+
     const result = evaluateUnlockTrigger(id, context);
     if (result.triggered) {
       triggered.push({
@@ -519,6 +546,683 @@ function getNextEventNumber(nextStage, tourProgress = {}) {
 
   // For choice stages (3, 6, 8), return next stage number as placeholder
   return nextStage;
+}
+
+// ================== CAREER STATISTICS ==================
+
+/**
+ * Calculate career statistics from all event results
+ */
+async function calculateCareerStats(userData) {
+  const stats = {
+    totalRaces: 0,
+    totalWins: 0,
+    totalPodiums: 0,
+    totalTop10s: 0,
+    bestFinish: null,
+    positions: [],
+    awards: {
+      gold: 0,
+      silver: 0,
+      bronze: 0,
+      punchingMedal: 0,
+      giantKiller: 0,
+      bullseye: 0,
+      hotStreak: 0,
+      domination: 0,
+      closeCall: 0,
+      photoFinish: 0,
+      darkHorse: 0,
+      zeroToHero: 0,
+      gcGold: 0,
+      gcSilver: 0,
+      gcBronze: 0,
+      lanternRouge: 0
+    }
+  };
+
+  // Iterate through all possible events
+  for (let eventNum = 1; eventNum <= 15; eventNum++) {
+    const eventResults = userData[`event${eventNum}Results`];
+
+    if (eventResults && eventResults.position && eventResults.position !== 'DNF') {
+      const position = eventResults.position;
+
+      // Count races
+      stats.totalRaces++;
+
+      // Track positions for average calculation
+      stats.positions.push(position);
+
+      // Count wins and podiums
+      if (position === 1) {
+        stats.totalWins++;
+        stats.awards.gold++;
+      }
+      if (position === 2) {
+        stats.awards.silver++;
+      }
+      if (position === 3) {
+        stats.awards.bronze++;
+      }
+      if (position <= 3) {
+        stats.totalPodiums++;
+      }
+
+      // Count top 10s
+      if (position <= 10) {
+        stats.totalTop10s++;
+      }
+
+      // Track best finish
+      if (stats.bestFinish === null || position < stats.bestFinish) {
+        stats.bestFinish = position;
+      }
+
+      // Count special awards
+      if (eventResults.earnedPunchingMedal) {
+        stats.awards.punchingMedal++;
+      }
+      if (eventResults.earnedGiantKillerMedal) {
+        stats.awards.giantKiller++;
+      }
+      if (eventResults.earnedBullseyeMedal) {
+        stats.awards.bullseye++;
+      }
+      if (eventResults.earnedHotStreakMedal) {
+        stats.awards.hotStreak++;
+      }
+      if (eventResults.earnedDomination) {
+        stats.awards.domination++;
+      }
+      if (eventResults.earnedCloseCall) {
+        stats.awards.closeCall++;
+      }
+      if (eventResults.earnedPhotoFinish) {
+        stats.awards.photoFinish++;
+      }
+      if (eventResults.earnedDarkHorse) {
+        stats.awards.darkHorse++;
+      }
+      if (eventResults.earnedZeroToHero) {
+        stats.awards.zeroToHero++;
+      }
+      if (eventResults.earnedGCGoldMedal) {
+        stats.awards.gcGold++;
+      }
+      if (eventResults.earnedGCSilverMedal) {
+        stats.awards.gcSilver++;
+      }
+      if (eventResults.earnedGCBronzeMedal) {
+        stats.awards.gcBronze++;
+      }
+    }
+  }
+
+  // Calculate derived stats
+  if (stats.totalRaces > 0) {
+    // Average finish position
+    const totalPositions = stats.positions.reduce((sum, pos) => sum + pos, 0);
+    stats.averageFinish = parseFloat((totalPositions / stats.totalRaces).toFixed(1));
+
+    // Win rate (percentage)
+    stats.winRate = parseFloat(((stats.totalWins / stats.totalRaces) * 100).toFixed(1));
+
+    // Podium rate (percentage)
+    stats.podiumRate = parseFloat(((stats.totalPodiums / stats.totalRaces) * 100).toFixed(1));
+  } else {
+    stats.averageFinish = null;
+    stats.winRate = 0;
+    stats.podiumRate = 0;
+  }
+
+  return stats;
+}
+
+// ================== SEASON STANDINGS HELPERS ==================
+
+/**
+ * Deterministic random number generator using bot UID and event as seed
+ */
+function getSeededRandom(botName, eventNumber) {
+  let hash = 0;
+  const seed = `${botName}-${eventNumber}`;
+  for (let i = 0; i < seed.length; i++) {
+    const char = seed.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  const x = Math.sin(Math.abs(hash)) * 10000;
+  return x - Math.floor(x);
+}
+
+/**
+ * Simulate a race position for a bot based on their ARR/rating
+ */
+function simulatePosition(botName, arr, eventNumber, fieldSize = 50) {
+  let expectedPosition;
+  if (arr >= 1400) {
+    expectedPosition = 5;
+  } else if (arr >= 1200) {
+    expectedPosition = 12;
+  } else if (arr >= 1000) {
+    expectedPosition = 20;
+  } else if (arr >= 800) {
+    expectedPosition = 30;
+  } else {
+    expectedPosition = 40;
+  }
+
+  const randomOffset = Math.floor(getSeededRandom(botName, eventNumber) * 20) - 10;
+  let simulatedPosition = expectedPosition + randomOffset;
+  simulatedPosition = Math.max(1, Math.min(fieldSize, simulatedPosition));
+
+  return simulatedPosition;
+}
+
+/**
+ * Fetch all results from events 1 through currentEvent
+ */
+async function getAllPreviousEventResults(season, currentEvent, userUid) {
+  const allEventResults = {};
+
+  for (let eventNum = 1; eventNum <= currentEvent; eventNum++) {
+    try {
+      const docRef = db.collection('results').doc(`season${season}_event${eventNum}_${userUid}`);
+      const docSnapshot = await docRef.get();
+
+      if (docSnapshot.exists) {
+        const data = docSnapshot.data();
+        if (data.results && Array.isArray(data.results)) {
+          allEventResults[eventNum] = data.results;
+        }
+      }
+    } catch (error) {
+      console.log(`   Warning: Could not fetch results for event ${eventNum}:`, error.message);
+    }
+  }
+
+  return allEventResults;
+}
+
+/**
+ * Build season standings including all racers
+ * Includes simulated results for bots to keep standings competitive
+ */
+async function buildSeasonStandings(results, userData, eventNumber, currentUid, userActualPoints) {
+  const season = 1;
+  const existingStandings = userData[`season${season}Standings`] || [];
+
+  // Get list of events the user has actually completed
+  const completedEventNumbers = [];
+  for (let i = 1; i <= 15; i++) {
+    if (userData[`event${i}Results`]) {
+      completedEventNumbers.push(i);
+    }
+  }
+  if (!completedEventNumbers.includes(eventNumber)) {
+    completedEventNumbers.push(eventNumber);
+  }
+  completedEventNumbers.sort((a, b) => a - b);
+
+  console.log(`   User has completed events: [${completedEventNumbers.join(', ')}]`);
+
+  // Calculate user's correct total points from stored event results
+  let userCorrectPreviousPoints = 0;
+  for (let i = 1; i <= 15; i++) {
+    if (i === eventNumber) continue;
+    const eventResults = userData[`event${i}Results`];
+    if (eventResults && typeof eventResults.points === 'number') {
+      userCorrectPreviousPoints += eventResults.points;
+    }
+  }
+  console.log(`   User's correct points from previous events: ${userCorrectPreviousPoints}`);
+
+  // Create a map of existing racers
+  const standingsMap = new Map();
+  existingStandings.forEach(racer => {
+    if (typeof racer.points === 'string' && racer.points.includes('[object Object]')) {
+      const numericPart = racer.points.replace(/\[object Object\]/g, '');
+      racer.points = parseInt(numericPart) || 0;
+    } else if (typeof racer.points === 'object') {
+      racer.points = racer.points.points || 0;
+    }
+    racer.points = Number(racer.points) || 0;
+    if (racer.uid === undefined) {
+      racer.uid = null;
+    }
+    standingsMap.set(racer.uid || racer.name, racer);
+  });
+
+  // Process all racers from CURRENT event results
+  results.forEach(result => {
+    const uid = result.UID || null;
+    const name = result.Name;
+    const position = parseInt(result.Position);
+
+    if (result.Position === 'DNF' || isNaN(position)) {
+      return;
+    }
+
+    const pointsResult = calculatePoints(position, eventNumber);
+    let points = pointsResult.points;
+    const arr = parseInt(result.ARR) || 0;
+    const team = result.Team || '';
+    const isBotRacer = isBot(uid, result.Gender);
+    const isCurrentUserResult = uid === currentUid;
+
+    if (isCurrentUserResult && userActualPoints !== undefined) {
+      points = userActualPoints;
+      console.log(`   Using user's actual points for current event (including bonus): ${points}`);
+    }
+
+    const key = isBotRacer ? name : uid;
+
+    if (standingsMap.has(key)) {
+      const racer = standingsMap.get(key);
+      if (isCurrentUserResult) {
+        racer.points = userCorrectPreviousPoints + points;
+        racer.events = completedEventNumbers.length;
+      } else {
+        racer.points = (racer.points || 0) + points;
+        racer.events = (racer.events || 0) + 1;
+      }
+      racer.arr = arr;
+      racer.team = team || racer.team;
+      if (!racer.uid) {
+        racer.uid = uid;
+      }
+    } else {
+      let totalPoints = points;
+      let eventCount = 1;
+      if (isCurrentUserResult) {
+        totalPoints = userCorrectPreviousPoints + points;
+        eventCount = completedEventNumbers.length;
+      }
+      standingsMap.set(key, {
+        name: name,
+        uid: uid,
+        arr: arr,
+        team: team,
+        events: eventCount,
+        points: totalPoints,
+        isBot: isBotRacer,
+        isCurrentUser: isCurrentUserResult
+      });
+    }
+  });
+
+  // Backfill bots with simulated results
+  console.log('   Backfilling bot results...');
+  const allEventResults = await getAllPreviousEventResults(season, eventNumber, currentUid);
+  allEventResults[eventNumber] = results;
+
+  const allBots = new Map();
+
+  for (const [eventNum, eventResults] of Object.entries(allEventResults)) {
+    eventResults.forEach(result => {
+      const isBotRacer = isBot(result.UID || result.uid, result.Gender);
+      if (isBotRacer && result.Position !== 'DNF' && result.position !== 'DNF') {
+        const botName = result.Name || result.name;
+        const botUid = result.UID || result.uid;
+        const arr = parseInt(result.ARR || result.arr) || 900;
+
+        if (!allBots.has(botName)) {
+          allBots.set(botName, {
+            name: botName,
+            uid: botUid,
+            arr: arr,
+            actualEvents: new Set()
+          });
+        }
+        allBots.get(botName).actualEvents.add(parseInt(eventNum));
+        allBots.get(botName).arr = arr;
+        allBots.get(botName).uid = botUid;
+      }
+    });
+  }
+
+  console.log(`   Found ${allBots.size} unique bots across all events`);
+
+  for (const [botName, botInfo] of allBots.entries()) {
+    if (!standingsMap.has(botName)) {
+      standingsMap.set(botName, {
+        name: botName,
+        uid: botInfo.uid || null,
+        arr: botInfo.arr,
+        team: '',
+        events: 0,
+        points: 0,
+        isBot: true,
+        isCurrentUser: false
+      });
+    }
+
+    const botStanding = standingsMap.get(botName);
+    if (!botStanding.uid && botInfo.uid) {
+      botStanding.uid = botInfo.uid;
+    }
+
+    botStanding.points = 0;
+    let simulatedEvents = 0;
+
+    for (const eventNum of completedEventNumbers) {
+      if (botInfo.actualEvents.has(eventNum)) {
+        const eventResults = allEventResults[eventNum] || [];
+        const botResult = eventResults.find(r => (r.Name || r.name) === botName);
+        if (botResult) {
+          const position = parseInt(botResult.Position || botResult.position);
+          if (!isNaN(position) && (botResult.Position !== 'DNF' && botResult.position !== 'DNF')) {
+            const pointsResult = calculatePoints(position, eventNum);
+            botStanding.points += pointsResult.points;
+          }
+        }
+      } else {
+        const simulatedPosition = simulatePosition(botName, botInfo.arr, eventNum);
+        const points = calculatePoints(simulatedPosition, eventNum).points;
+        botStanding.points += points;
+        simulatedEvents++;
+      }
+    }
+
+    botStanding.events = completedEventNumbers.length;
+    botStanding.simulatedEvents = simulatedEvents;
+  }
+
+  // Ensure all bots have correct events count
+  for (const [key, racer] of standingsMap.entries()) {
+    if (racer.isBot) {
+      racer.events = completedEventNumbers.length;
+    }
+  }
+
+  console.log(`   Simulated results for ${allBots.size} bots`);
+
+  // Convert to array and sort
+  const standings = Array.from(standingsMap.values());
+  standings.sort((a, b) => b.points - a.points);
+
+  // Limit to 80 bots, stratified by points
+  const MAX_BOTS = 80;
+  const QUINTILES = 5;
+  const BOTS_PER_QUINTILE = MAX_BOTS / QUINTILES;
+
+  const humans = standings.filter(r => !r.isBot);
+  const bots = standings.filter(r => r.isBot);
+
+  let finalStandings;
+
+  if (bots.length <= MAX_BOTS) {
+    finalStandings = standings;
+  } else {
+    console.log(`   Limiting bots from ${bots.length} to ${MAX_BOTS}`);
+    const quintileSize = Math.ceil(bots.length / QUINTILES);
+    const selectedBots = [];
+
+    for (let q = 0; q < QUINTILES; q++) {
+      const start = q * quintileSize;
+      const end = Math.min(start + quintileSize, bots.length);
+      const quintileBots = bots.slice(start, end);
+      const selected = quintileBots.slice(0, BOTS_PER_QUINTILE);
+      selectedBots.push(...selected);
+    }
+
+    finalStandings = [...humans, ...selectedBots];
+    finalStandings.sort((a, b) => b.points - a.points);
+  }
+
+  // Final sanitization for Firestore
+  finalStandings.forEach(racer => {
+    if (racer.uid === undefined) racer.uid = null;
+    if (racer.name === undefined) racer.name = null;
+    if (racer.team === undefined) racer.team = '';
+    if (racer.arr === undefined) racer.arr = 0;
+    if (racer.points === undefined) racer.points = 0;
+    if (racer.events === undefined) racer.events = 0;
+  });
+
+  return finalStandings;
+}
+
+/**
+ * Check if season is complete and mark it, award season podium trophies
+ */
+async function checkAndMarkSeasonComplete(userRef, userData, eventNumber, recentUpdates, seasonStandings) {
+  const earnedSeasonAwards = [];
+  const currentData = { ...userData, ...recentUpdates };
+
+  console.log(`\n🔍 Checking season completion for event ${eventNumber}...`);
+
+  // Season 1 is complete when:
+  // 1. Event 15 is completed with results
+  // 2. OR Event 14 or 15 are marked as DNS
+  const event15Complete = currentData.event15Results &&
+                         currentData.event15Results.position &&
+                         currentData.event15Results.position !== 'DNF';
+  const event14DNS = currentData.event14DNS === true;
+  const event15DNS = currentData.event15DNS === true;
+  const isSeasonComplete = event15Complete || event14DNS || event15DNS;
+
+  // If season is already marked complete, skip
+  if (currentData.season1Complete === true) {
+    console.log('   Season already marked complete, skipping trophy awards');
+    return earnedSeasonAwards;
+  }
+
+  // If season is not yet complete, skip
+  if (!isSeasonComplete) {
+    console.log('   Season not yet complete');
+    return earnedSeasonAwards;
+  }
+
+  console.log('🏆 Season 1 is now COMPLETE for this user!');
+
+  // Get user's season rank from the season standings
+  const userRank = seasonStandings.findIndex(r => r.uid === userData.uid) + 1;
+
+  if (userRank === 0 || userRank > seasonStandings.length) {
+    console.log('   User not found in season standings');
+  } else {
+    console.log(`   User's season rank: ${userRank} out of ${seasonStandings.length}`);
+  }
+
+  // Prepare season completion updates
+  const seasonUpdates = {
+    season1Complete: true,
+    season1CompletionDate: admin.firestore.FieldValue.serverTimestamp(),
+    season1Rank: userRank,
+    localTourStatus: event14DNS || event15DNS ? 'dnf' : 'completed',
+    currentSeason: 1
+  };
+
+  // Award season podium trophies
+  if (userRank === 1) {
+    console.log('   🏆 SEASON CHAMPION! Awarding Season Champion trophy');
+    seasonUpdates['awards.seasonChampion'] = admin.firestore.FieldValue.increment(1);
+    earnedSeasonAwards.push({ awardId: 'seasonChampion', category: 'season', intensity: 'ultraFlashy' });
+  } else if (userRank === 2) {
+    console.log('   🥈 SEASON RUNNER-UP! Awarding Season Runner-Up trophy');
+    seasonUpdates['awards.seasonRunnerUp'] = admin.firestore.FieldValue.increment(1);
+    earnedSeasonAwards.push({ awardId: 'seasonRunnerUp', category: 'season', intensity: 'ultraFlashy' });
+  } else if (userRank === 3) {
+    console.log('   🥉 SEASON THIRD PLACE! Awarding Season Third Place trophy');
+    seasonUpdates['awards.seasonThirdPlace'] = admin.firestore.FieldValue.increment(1);
+    earnedSeasonAwards.push({ awardId: 'seasonThirdPlace', category: 'season', intensity: 'ultraFlashy' });
+  }
+
+  // Check for special season achievement awards
+  console.log('   Checking for special achievement awards...');
+
+  // PERFECT SEASON - Win every event
+  let isPerfectSeason = true;
+  for (let i = 1; i <= 15; i++) {
+    const eventResults = currentData[`event${i}Results`];
+    if (!eventResults || eventResults.position !== 1) {
+      isPerfectSeason = false;
+      break;
+    }
+  }
+  if (isPerfectSeason) {
+    console.log('   💯 PERFECT SEASON! Won every single event!');
+    seasonUpdates['awards.perfectSeason'] = admin.firestore.FieldValue.increment(1);
+    earnedSeasonAwards.push({ awardId: 'perfectSeason', category: 'season', intensity: 'ultraFlashy' });
+  }
+
+  // SPECIALIST - Win 3+ events of the same type
+  const eventTypeWins = {};
+  for (let i = 1; i <= 15; i++) {
+    const eventResults = currentData[`event${i}Results`];
+    if (eventResults && eventResults.position === 1) {
+      const eventType = EVENT_TYPES[i];
+      eventTypeWins[eventType] = (eventTypeWins[eventType] || 0) + 1;
+    }
+  }
+
+  const maxWinsInType = Math.max(...Object.values(eventTypeWins), 0);
+  if (maxWinsInType >= 3) {
+    const specialistType = Object.keys(eventTypeWins).find(t => eventTypeWins[t] === maxWinsInType);
+    console.log(`   ⭐ SPECIALIST! Won ${maxWinsInType} ${specialistType} events`);
+    seasonUpdates['awards.specialist'] = admin.firestore.FieldValue.increment(1);
+    earnedSeasonAwards.push({ awardId: 'specialist', category: 'season', intensity: 'ultraFlashy' });
+  }
+
+  // ALL-ROUNDER - Win at least one event of 5+ different types
+  const uniqueTypesWon = Object.keys(eventTypeWins).length;
+  if (uniqueTypesWon >= 5) {
+    console.log(`   🌟 ALL-ROUNDER! Won ${uniqueTypesWon} different event types`);
+    seasonUpdates['awards.allRounder'] = admin.firestore.FieldValue.increment(1);
+    earnedSeasonAwards.push({ awardId: 'allRounder', category: 'season', intensity: 'ultraFlashy' });
+  }
+
+  // Update user document with season completion
+  await userRef.update(seasonUpdates);
+
+  return earnedSeasonAwards;
+}
+
+/**
+ * Update bot profile ARRs from race results
+ */
+async function updateBotARRs(season, event, results) {
+  console.log('   Updating bot ARRs...');
+
+  let botsFound = 0;
+  let botsUpdated = 0;
+  let botsNotFound = 0;
+
+  for (const result of results) {
+    const uid = result.UID;
+    const arr = parseInt(result.ARR);
+
+    if (!isBot(uid, result.Gender)) {
+      continue;
+    }
+
+    if (!arr || isNaN(arr) || arr < 0) {
+      continue;
+    }
+
+    botsFound++;
+
+    try {
+      const botProfileRef = db.collection('botProfiles').doc(uid);
+      const botProfileDoc = await botProfileRef.get();
+
+      if (!botProfileDoc.exists) {
+        botsNotFound++;
+        continue;
+      }
+
+      await botProfileRef.update({
+        arr: arr,
+        lastARRUpdate: admin.firestore.FieldValue.serverTimestamp(),
+        lastEventId: `season${season}_event${event}`
+      });
+
+      botsUpdated++;
+    } catch (error) {
+      console.error(`   Error updating bot ${uid}:`, error.message);
+    }
+  }
+
+  if (botsFound > 0) {
+    console.log(`   Bot ARR updates: ${botsUpdated} updated, ${botsNotFound} profiles not found`);
+  }
+}
+
+/**
+ * Process pending bot profile requests from Firestore
+ */
+async function processBotProfileRequests() {
+  try {
+    console.log('\n📋 Checking for pending bot profile requests...');
+
+    const requestsSnapshot = await db.collection('botProfileRequests')
+      .where('processed', '==', false)
+      .get();
+
+    if (requestsSnapshot.empty) {
+      console.log('   No pending bot profile requests');
+      return;
+    }
+
+    console.log(`   Found ${requestsSnapshot.size} pending request(s)`);
+
+    const requestsFilePath = path.join(__dirname, 'bot-profile-requests', 'requests.txt');
+    const dirPath = path.dirname(requestsFilePath);
+    if (!fs.existsSync(dirPath)) {
+      fs.mkdirSync(dirPath, { recursive: true });
+    }
+
+    let appendedCount = 0;
+    let deletedCount = 0;
+
+    for (const doc of requestsSnapshot.docs) {
+      const request = doc.data();
+
+      const botProfileDoc = await db.collection('botProfiles').doc(request.botUid).get();
+
+      if (botProfileDoc.exists) {
+        console.log(`   Bot profile already exists for ${request.botName}, removing request...`);
+        await db.collection('botProfileRequests').doc(doc.id).delete();
+        deletedCount++;
+        continue;
+      }
+
+      const timestamp = new Date(request.timestamp).toISOString().replace('T', ' ').split('.')[0] + ' UTC';
+      const entry = `
+================================================================================
+Request submitted: ${timestamp}
+Firestore Document ID: ${doc.id}
+Submitted by User UID: ${request.userUid}
+Bot UID: ${request.botUid}
+Bot Name: ${request.botName}
+Bot Team: ${request.botTeam || 'Independent'}
+Bot ARR: ${request.botArr}
+Bot Country: ${request.botCountry}
+Interesting Fact: ${request.interestFact}
+================================================================================
+`;
+
+      fs.appendFileSync(requestsFilePath, entry, 'utf8');
+
+      await db.collection('botProfileRequests').doc(doc.id).update({
+        processed: true,
+        processedAt: admin.firestore.FieldValue.serverTimestamp()
+      });
+
+      appendedCount++;
+      console.log(`   Processed request for ${request.botName} (${request.botUid})`);
+    }
+
+    console.log(`   Appended ${appendedCount} request(s) to ${requestsFilePath}`);
+    if (deletedCount > 0) {
+      console.log(`   Removed ${deletedCount} duplicate request(s)`);
+    }
+
+  } catch (error) {
+    console.error('Error processing bot profile requests:', error);
+  }
 }
 
 // ================== POWER AWARD CHECKS ==================
@@ -1406,7 +2110,7 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
       position: position,
       time: parseFloat(userResult.Time) || 0
     };
-    gcResults = await calculateGC(1, uid, eventNumber, currentUserResult);
+    gcResults = await calculateGC(season, uid, eventNumber, currentUserResult);
 
     if (gcResults && eventNumber === 15) {
       gcBonusPoints = gcResults.bonusPoints;
@@ -1466,7 +2170,8 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
         userARR: parseInt(userResult.ARR) || 0,
         results: sanitizedResults,
         topRivals: userData.rivalData?.topRivals || [],
-        rivalEncounters: []
+        rivalEncounters: [],
+        personality: userData.personality || null
       };
 
       // Check triggers
@@ -1485,6 +2190,19 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
           });
           newCooldowns[selectedUnlock.unlock.id] = true;
           console.log(`   💎 Unlock applied (${selectedUnlock.unlock.name}): +${unlockPoints} pts`);
+
+          // Apply personality bonus if defined
+          if (selectedUnlock.unlock.personalityBonus) {
+            const currentPersonality = userData.personality || {
+              confidence: 50, aggression: 50, professionalism: 50,
+              humility: 50, showmanship: 50, resilience: 50
+            };
+            for (const [trait, bonus] of Object.entries(selectedUnlock.unlock.personalityBonus)) {
+              currentPersonality[trait] = Math.min(100, (currentPersonality[trait] || 50) + bonus);
+            }
+            userData.personality = currentPersonality;
+            console.log(`   🧠 Personality bonus applied: +${JSON.stringify(selectedUnlock.unlock.personalityBonus)}`);
+          }
         });
 
         // Add unlock bonus to points
@@ -1592,6 +2310,14 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
   // Identify top 10 rivals
   const topRivals = identifyTopRivals(updatedRivalData);
   updatedRivalData.topRivals = topRivals;
+
+  // Build season standings (only for non-special events)
+  let seasonStandings = [];
+  if (!isSpecialEventResult) {
+    console.log('   📊 Building season standings...');
+    seasonStandings = await buildSeasonStandings(results, userData, eventNumber, uid, points);
+    console.log(`   Season standings built with ${seasonStandings.length} racers`);
+  }
 
   // Log rival encounters
   if (rivalEncounters.length > 0) {
@@ -1734,9 +2460,31 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
     }
   }
 
+  // Calculate career statistics from all event results (including current)
+  const tempUserData = { ...userData };
+  tempUserData[`event${eventNumber}Results`] = eventResults;
+  const careerStats = await calculateCareerStats(tempUserData);
+
   // Prepare update object
   const updateData = {
     [`event${eventNumber}Results`]: eventResults,
+    // Career statistics
+    careerPoints: (userData.careerPoints || 0) + points,
+    totalEvents: (userData.totalEvents || 0) + 1,
+    totalWins: careerStats.totalWins,
+    totalPodiums: careerStats.totalPodiums,
+    totalTop10s: careerStats.totalTop10s,
+    bestFinish: careerStats.bestFinish,
+    averageFinish: careerStats.averageFinish,
+    winRate: careerStats.winRate,
+    podiumRate: careerStats.podiumRate,
+    // User profile fields
+    arr: eventResults.arr,
+    team: userResult.Team || '',
+    gender: userResult.Gender || null,
+    country: userResult.Country || null,
+    ageBand: userResult.AgeBand || null,
+    // Other tracking
     totalPoints: admin.firestore.FieldValue.increment(points),
     powerRecords: updatedPowerRecords,
     rivalData: updatedRivalData,
@@ -1748,10 +2496,16 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
     updateData.currentStage = nextStage;
     updateData.usedOptionalEvents = newUsedOptionalEvents;
     updateData.tourProgress = newTourProgress;
+    updateData[`season${season}Standings`] = seasonStandings;
   }
 
   // Update unlock cooldowns
   updateData['unlocks.cooldowns'] = newCooldowns;
+
+  // Update personality if changed (from unlock bonuses)
+  if (userData.personality) {
+    updateData.personality = userData.personality;
+  }
 
   // Award increments and earnedAwards population
   if (!isDNF) {
@@ -1836,6 +2590,31 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
       updateData['awards.blastOff'] = admin.firestore.FieldValue.increment(1);
       updateData.hasEarnedBlastOff = true;  // Prevent earning again
       eventResults.earnedAwards.push({ awardId: 'blastOff', category: 'power', intensity: 'flashy' });
+    }
+
+    // PODIUM STREAK - 5 consecutive top 3 finishes
+    if (position <= 3) {
+      const recentPositions = [];
+      for (let i = 1; i <= 15; i++) {
+        const evtData = userData[`event${i}Results`];
+        if (evtData && evtData.position && evtData.position !== 'DNF') {
+          recentPositions.push(evtData.position);
+        }
+      }
+      // Add current position
+      recentPositions.push(position);
+
+      // Check if last 5 results are all top 3
+      if (recentPositions.length >= 5) {
+        const last5 = recentPositions.slice(-5);
+        const allPodiums = last5.every(pos => typeof pos === 'number' && pos <= 3);
+
+        if (allPodiums) {
+          console.log('   📈 PODIUM STREAK! 5 consecutive top 3 finishes');
+          updateData['awards.podiumStreak'] = admin.firestore.FieldValue.increment(1);
+          eventResults.earnedAwards.push({ awardId: 'podiumStreak', category: 'streak', intensity: 'flashy' });
+        }
+      }
     }
   }
 
@@ -1949,6 +2728,16 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
   earnedCC = Math.min(earnedCC, PER_EVENT_CREDIT_CAP);
   updateData.cadenceCredits = admin.firestore.FieldValue.increment(earnedCC);
 
+  // Check for season completion and award season trophies
+  const earnedSeasonAwards = await checkAndMarkSeasonComplete(
+    userRef, userData, eventNumber, updateData, seasonStandings
+  );
+  if (earnedSeasonAwards && earnedSeasonAwards.length > 0) {
+    console.log(`   Adding ${earnedSeasonAwards.length} season award(s) to event${eventNumber}Results`);
+    eventResults.earnedAwards.push(...earnedSeasonAwards);
+    updateData[`event${eventNumber}Results`] = eventResults;
+  }
+
   // Update user document
   await userRef.update(updateData);
 
@@ -2050,6 +2839,12 @@ async function processJSONResults(jsonFiles) {
           console.log(`   ⚠️ Could not rename: ${renameError.message}`);
         }
       }
+
+      // Update bot ARRs based on race results
+      await updateBotARRs(eventInfo.season, eventInfo.event, allResults);
+
+      // Process any pending bot profile requests
+      await processBotProfileRequests();
 
     } catch (error) {
       console.error(`❌ Error processing ${filePath}:`, error);
