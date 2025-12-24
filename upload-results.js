@@ -1,10 +1,5 @@
 // Upload Results Page Logic
 
-// TEMPORARILY DISABLED - Redirect to homepage
-alert('Upload Results is temporarily disabled. Redirecting to homepage.');
-window.location.href = 'index.html';
-throw new Error('Page disabled'); // Stop further script execution
-
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 import { getFirestore, doc, getDoc, collection, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
@@ -114,6 +109,14 @@ async function loadUserData(user) {
         }
 
         userData = userDoc.data();
+
+        // Check beta access - only beta users can use upload results
+        if (userData.beta_access !== true) {
+            alert('Upload Results is currently only available to beta testers. Redirecting to homepage.');
+            window.location.href = 'index.html';
+            return;
+        }
+
         showUploadContent();
         displayStageInfo();
     } catch (error) {
