@@ -204,15 +204,15 @@ function calculateHighestARR(currentARR, eventNumber, existing) {
 
 /**
  * Calculate biggest win margin
- * For elimination races (event 3) and time trials (event 4), margin isn't meaningful
+ * For elimination races (event 3) and time-based events (e.g., event 4), margin isn't meaningful
  * so we store 0 margin - they'll only show as biggest win if no other wins exist
  */
 function calculateBiggestWinMargin(position, results, eventNumber, currentBiggest) {
   if (position !== 1) return currentBiggest;
 
-  // For elimination races and time trials, margin isn't meaningful
+  // For elimination races and time-based events, margin isn't meaningful
   // Store with 0 margin so they don't compete with real margin-based wins
-  const isTimeIrrelevant = eventNumber === 3;
+  const isTimeIrrelevant = eventNumber === 3 || TIME_BASED_EVENTS.includes(eventNumber);
 
   if (isTimeIrrelevant) {
     // Only use this win if there's no current biggest win
@@ -3137,8 +3137,8 @@ async function updateResultsSummary(season, event, results, userUid, unlockBonus
 
       // Time-based awards should NOT be awarded for:
       // - Event 3: Elimination race (times don't reflect racing - riders eliminated at intervals)
-      // - Event 4: Time challenge (everyone does the same target time)
-      const isTimeIrrelevant = event === 3;
+      // - Time-based events (e.g., Event 4): All riders finish at the same clock time, distance varies
+      const isTimeIrrelevant = event === 3 || TIME_BASED_EVENTS.includes(event);
 
       const earnedDomination = isTimeIrrelevant ? false : awardsCalc.checkDomination(position, times.winnerTime, times.secondPlaceTime);
       const earnedCloseCall = isTimeIrrelevant ? false : awardsCalc.checkCloseCall(position, times.winnerTime, times.secondPlaceTime);

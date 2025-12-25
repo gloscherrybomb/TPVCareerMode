@@ -1648,13 +1648,13 @@ function calculateHighestARR(currentARR, eventNumber, existing) {
 
 /**
  * Calculate biggest win margin
- * For elimination races (event 3) and time trials (event 4), margin isn't meaningful
+ * For elimination races (event 3) and time-based events (e.g., event 4), margin isn't meaningful
  */
 function calculateBiggestWinMargin(position, results, eventNumber, currentBiggest) {
   if (position !== 1) return currentBiggest;
 
-  // For elimination races and time trials, margin isn't meaningful
-  const isTimeIrrelevant = eventNumber === 3 || eventNumber === 4;
+  // For elimination races and time-based events, margin isn't meaningful
+  const isTimeIrrelevant = eventNumber === 3 || TIME_BASED_EVENTS.includes(eventNumber);
 
   if (isTimeIrrelevant) {
     // Only use this win if there's no current biggest win

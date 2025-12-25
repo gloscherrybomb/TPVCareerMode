@@ -354,8 +354,8 @@ function displayKeyAchievements() {
     // Biggest Win
     const bigWin = lifetime.biggestWin;
     if (bigWin) {
-        // For elimination races (event 3) and time trials (event 4), margin isn't meaningful
-        const isTimeIrrelevant = bigWin.eventNumber === 3 || bigWin.eventNumber === 4;
+        // For elimination races (event 3) and time-based events (e.g., event 4), margin isn't meaningful
+        const isTimeIrrelevant = bigWin.eventNumber === 3 || (window.eventConfig?.TIME_BASED_EVENTS || []).includes(bigWin.eventNumber);
         if (isTimeIrrelevant) {
             document.querySelector('#achievementBiggestWin .achievement-text').innerHTML =
                 `Biggest Win: <strong>${bigWin.eventName}</strong>`;
