@@ -78,10 +78,18 @@ class StorySelector {
    * Load rider's narrative history from Firebase
    */
   async loadRiderHistory(riderId, db) {
+    // Skip loading history when SKIP_NARRATIVE_HISTORY is set (useful for testing/reprocessing)
+    // This allows all stories to be selected as if they've never been seen
+    if (process.env.SKIP_NARRATIVE_HISTORY === 'true') {
+      console.log(`   ⏭️ Skipping narrative history load for rider ${riderId} (SKIP_NARRATIVE_HISTORY=true)`);
+      this.riderNarrativeHistory[riderId] = {};
+      return {};
+    }
+
     try {
       const historyRef = db.collection('riders').doc(riderId).collection('narrative_history');
       const snapshot = await historyRef.get();
-      
+
       this.riderNarrativeHistory[riderId] = {};
       snapshot.forEach(doc => {
         const data = doc.data();
@@ -91,7 +99,7 @@ class StorySelector {
           context: data.context
         };
       });
-      
+
       console.log(`Loaded narrative history for rider ${riderId}:`, Object.keys(this.riderNarrativeHistory[riderId]).length, 'stories seen');
       return this.riderNarrativeHistory[riderId];
     } catch (error) {
@@ -105,9 +113,15 @@ class StorySelector {
    * Mark a story as used for a specific rider
    */
   async markStoryUsed(riderId, storyId, eventNumber, db) {
+    // Skip marking stories as used when SKIP_NARRATIVE_HISTORY is set (useful for testing/reprocessing)
+    if (process.env.SKIP_NARRATIVE_HISTORY === 'true') {
+      console.log(`   ⏭️ Skipping narrative history update for ${storyId} (SKIP_NARRATIVE_HISTORY=true)`);
+      return;
+    }
+
     try {
       const historyRef = db.collection('riders').doc(riderId).collection('narrative_history').doc(storyId);
-      
+
       await historyRef.set({
         usedAt: new Date().toISOString(),
         eventNumber: eventNumber,
