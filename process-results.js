@@ -347,14 +347,12 @@ function calculateNextStage(currentStage, tourProgress = {}) {
     return currentStage + 1;
   }
   
-  // Stage 9 is the tour - stay at stage 9 until all 3 events complete
-  if (currentStage === 9) {
-    if (tourProgress.event13Completed && tourProgress.event14Completed && tourProgress.event15Completed) {
-      return 9; // Season complete - no stage 10
-    }
-    return 9; // Stay at stage 9 until all tour events done
+  // Stage 9 is the tour finale - stay at 9 regardless of completion status
+  // Season completion is tracked separately via the season1Complete flag
+  if (currentStage >= 9) {
+    return 9;
   }
-  
+
   return currentStage;
 }
 
@@ -889,7 +887,8 @@ async function calculateGC(season, userUid, upToEvent = 15, currentUserResult = 
   
   // Fetch results from all stages by querying all result documents for each event
   const stageResults = {};
-  
+  const failedStages = [];
+
   for (const eventNum of stageNumbers) {
     try {
       // Query all result documents for this event (format: season1_event13_*)
@@ -922,10 +921,16 @@ async function calculateGC(season, userUid, upToEvent = 15, currentUserResult = 
         console.log(`   Event ${eventNum}: Found ${uniqueResults.length} riders`);
       }
     } catch (error) {
-      console.log(`   Warning: Could not fetch results for event ${eventNum}:`, error.message);
+      console.log(`   ⚠️ Warning: Could not fetch results for event ${eventNum}:`, error.message);
+      failedStages.push(eventNum);
     }
   }
-  
+
+  // Log if any stages failed to load
+  if (failedStages.length > 0) {
+    console.log(`   ⚠️ GC calculation incomplete - missing data for events: ${failedStages.join(', ')}`);
+  }
+
   const availableStages = Object.keys(stageResults).map(k => parseInt(k));
   
   if (availableStages.length === 0) {
@@ -1279,7 +1284,7 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
   let earnedBullseyeMedal = false;
   let earnedHotStreakMedal = false;
   let earnedLanternRouge = false;
-  let earnedComeback = false;
+  // Note: earnedComeback is set directly on eventResults object at award calculation time
 
   // Only calculate awards for non-DNF results
   if (!isDNF) {
@@ -1443,7 +1448,7 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
     earnedBullseyeMedal: earnedBullseyeMedal,
     earnedHotStreakMedal: earnedHotStreakMedal,
     earnedLanternRouge: earnedLanternRouge,
-    earnedComeback: earnedComeback,
+    earnedComeback: false, // Set to true later if comeback award is earned (line ~2079)
     earnedGCGoldMedal: gcAwards.gcGoldMedal,
     earnedGCSilverMedal: gcAwards.gcSilverMedal,
     earnedGCBronzeMedal: gcAwards.gcBronzeMedal,
@@ -1558,8 +1563,8 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
       name: r.Name || null
     })).filter(r => !isNaN(r.position));
 
-    // Calculate rival data for unlock triggers
-    const rivalEncountersForUnlocks = calculateRivalEncounters(
+    // Calculate rival data ONCE (used for both unlocks and story generation)
+    const rivalEncounters = calculateRivalEncounters(
       results,
       uid,
       position,
@@ -1567,9 +1572,16 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
       eventNumber,
       parseFloat(userResult.Distance) || 0
     );
-    const existingRivalDataForUnlocks = userData.rivalData || null;
-    const updatedRivalDataForUnlocks = updateRivalData(existingRivalDataForUnlocks, rivalEncountersForUnlocks, eventNumber);
-    const topRivalsForUnlocks = identifyTopRivals(updatedRivalDataForUnlocks);
+    const existingRivalData = userData.rivalData || null;
+    const updatedRivalData = updateRivalData(existingRivalData, rivalEncounters, eventNumber);
+    const topRivals = identifyTopRivals(updatedRivalData);
+    updatedRivalData.topRivals = topRivals;
+
+    // Log rival encounters
+    if (rivalEncounters.length > 0) {
+      const proximityDesc = eventNumber === 4 ? 'within 500m' : 'within 30s';
+      console.log(`   🤝 Rival encounters: ${rivalEncounters.length} bot(s) ${proximityDesc}`);
+    }
 
     const unlockContext = {
       position,
@@ -1581,8 +1593,8 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
       totalFinishers: sortedResults.length,
       userARR: parseInt(userResult.ARR) || 0,
       results: sanitizedResults,
-      topRivals: topRivalsForUnlocks,
-      rivalEncounters: rivalEncountersForUnlocks,
+      topRivals: topRivals,
+      rivalEncounters: rivalEncounters,
       personality: userData.personality || null
     };
 
@@ -1675,29 +1687,8 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
   }
   if (position === 1) totalWins++; // Include current race
 
-  // Calculate rival encounters for this race (must be before story generation)
-  const rivalEncounters = calculateRivalEncounters(
-    results,
-    uid,
-    position,
-    parseFloat(userResult.Time) || 0,
-    eventNumber,
-    parseFloat(userResult.Distance) || 0
-  );
-
-  // Update rival data (must be before story generation)
-  const existingRivalData = userData.rivalData || null;
-  const updatedRivalData = updateRivalData(existingRivalData, rivalEncounters, eventNumber);
-
-  // Identify top 10 rivals
-  const topRivals = identifyTopRivals(updatedRivalData);
-  updatedRivalData.topRivals = topRivals;
-
-  // Log rival encounters
-  if (rivalEncounters.length > 0) {
-    const proximityDesc = eventNumber === 4 ? 'within 500m' : 'within 30s';
-    console.log(`   🤝 Rival encounters: ${rivalEncounters.length} bot(s) ${proximityDesc}`);
-  }
+  // Note: rivalEncounters, updatedRivalData, and topRivals are calculated earlier (before unlock processing)
+  // to ensure consistent data is used for both unlocks and story generation
 
   // Generate story using v3.0 story generator (has all features built-in)
   let unifiedStory = '';
@@ -1780,9 +1771,11 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
     // Check if previous tour stage was completed in time
     if (eventNumber === 14 && userData.event13Results) {
       // Check if event 13 was done more than 36 hours ago
-      const event13Timestamp = userData.event13Results.timestamp;
-      if (event13Timestamp) {
-        const event13Time = event13Timestamp.toMillis ? event13Timestamp.toMillis() : event13Timestamp;
+      const event13Timestamp = userData.event13Results?.timestamp;
+      if (event13Timestamp != null) {
+        const event13Time = typeof event13Timestamp.toMillis === 'function'
+          ? event13Timestamp.toMillis()
+          : event13Timestamp;
         const now = Date.now();
         const hoursSinceEvent13 = (now - event13Time) / (1000 * 60 * 60);
 
@@ -1796,9 +1789,11 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
 
     if (eventNumber === 15 && userData.event14Results) {
       // Check if event 14 was done more than 36 hours ago
-      const event14Timestamp = userData.event14Results.timestamp;
-      if (event14Timestamp) {
-        const event14Time = event14Timestamp.toMillis ? event14Timestamp.toMillis() : event14Timestamp;
+      const event14Timestamp = userData.event14Results?.timestamp;
+      if (event14Timestamp != null) {
+        const event14Time = typeof event14Timestamp.toMillis === 'function'
+          ? event14Timestamp.toMillis()
+          : event14Timestamp;
         const now = Date.now();
         const hoursSinceEvent14 = (now - event14Time) / (1000 * 60 * 60);
 
@@ -2591,8 +2586,8 @@ function evaluateUnlockTrigger(unlockId, context) {
         return { triggered: false };
       }
 
-      // Get top 3 rival UIDs
-      const top3RivalUids = topRivals.slice(0, 3).map(r => r.botUid);
+      // Get top 3 rival UIDs (topRivals is already an array of UID strings from identifyTopRivals)
+      const top3RivalUids = topRivals.slice(0, 3);
 
       // Check if any of the top 3 rivals finished behind the user
       const beatRival = results.find(r => {
@@ -2626,7 +2621,10 @@ function selectUnlocksToApply(equippedIds, cooldowns, context) {
 
   for (const id of equippedIds) {
     const unlock = getUnlockById(id);
-    if (!unlock) continue;
+    if (!unlock) {
+      console.log(`   ⚠️ Warning: Equipped unlock '${id}' not found in unlock definitions`);
+      continue;
+    }
 
     // Simple boolean cooldown: skip if resting (triggered last race)
     if (cooldowns && cooldowns[id] === true) {
@@ -3330,10 +3328,11 @@ async function checkAndMarkSeasonComplete(userRef, userData, eventNumber, recent
   const userRank = seasonStandings.findIndex(r => r.uid === userData.uid) + 1;
   
   if (userRank === 0 || userRank > seasonStandings.length) {
-    console.log('   ⚠️ User not found in season standings');
-  } else {
-    console.log(`   User's season rank: ${userRank} out of ${seasonStandings.length}`);
+    console.log('   ⚠️ User not found in season standings - skipping season awards');
+    return earnedSeasonAwards; // Return early - don't award trophies incorrectly
   }
+
+  console.log(`   User's season rank: ${userRank} out of ${seasonStandings.length}`);
   
   // Prepare season completion updates
   const seasonUpdates = {
@@ -3641,23 +3640,3 @@ Interesting Fact: ${request.interestFact}
 })();
 
 module.exports = { processResults, calculatePoints };
-
-function hasBackToBackTourPodiums(results, uid, eventNumber) {
-  if (!results || eventNumber < 14) return false;
-  const prevEvent = eventNumber - 1;
-  const prev = results.find(r => parseInt(r.Event) === prevEvent || r.eventNumber === prevEvent);
-  const prevPos = prev ? parseInt(prev.Position) : null;
-  return prevPos !== null && !isNaN(prevPos) && prevPos <= 3;
-}
-
-function getTopRivalForUser(uid, results, predictedPosition) {
-  if (!results || !predictedPosition) return null;
-  const ahead = results
-    .filter(r => r.UID !== uid && r.PredictedPosition && parseInt(r.PredictedPosition) < predictedPosition)
-    .sort((a,b) => parseInt(a.PredictedPosition) - parseInt(b.PredictedPosition));
-  if (!ahead.length) return null;
-  return { uid: ahead[0].UID, name: ahead[0].Name, predicted: parseInt(ahead[0].PredictedPosition) };
-}
-
-
-
