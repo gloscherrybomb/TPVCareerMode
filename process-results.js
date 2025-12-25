@@ -1525,13 +1525,21 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
   const previousEventNumber = completedEventNumbers.length > 0 ? completedEventNumbers[completedEventNumbers.length - 1] : null;
   
   // Determine next event number based on next stage
-  let nextEventNumber = nextStage;
-  const STAGE_REQUIREMENTS_MAP = {
-    1: 1, 2: 2, 4: 3, 5: 4, 7: 5, 9: 13
+  // Fixed stages map to specific events; choice stages (3, 6, 8) are null (player chooses)
+  const STAGE_TO_EVENT_MAP = {
+    1: 1,    // Stage 1 -> Event 1 (Coast and Roast Crit)
+    2: 2,    // Stage 2 -> Event 2 (Island Classic)
+    3: null, // Stage 3 -> Player choice (events 6-12)
+    4: 3,    // Stage 4 -> Event 3 (Track Elimination)
+    5: 4,    // Stage 5 -> Event 4 (Time Trial)
+    6: null, // Stage 6 -> Player choice (events 6-12)
+    7: 5,    // Stage 7 -> Event 5 (Points Race)
+    8: null, // Stage 8 -> Player choice (events 6-12)
+    9: 13    // Stage 9 -> Event 13 (Tour Stage 1, then 14, 15)
   };
-  if (STAGE_REQUIREMENTS_MAP[nextStage]) {
-    nextEventNumber = STAGE_REQUIREMENTS_MAP[nextStage];
-  }
+  let nextEventNumber = STAGE_TO_EVENT_MAP[nextStage] !== undefined
+    ? STAGE_TO_EVENT_MAP[nextStage]
+    : null;
 
   // Cadence Credits system enabled for all users
   // SKIP_UNLOCKS only skips unlock trigger processing (bonus points from equipped items)
