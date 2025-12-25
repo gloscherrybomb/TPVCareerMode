@@ -315,6 +315,17 @@
     font-family: 'Exo 2', sans-serif;
 }
 
+/* Column alignment utilities */
+.palmares-table th.align-center,
+.palmares-table td.align-center {
+    text-align: center;
+}
+
+.palmares-table th.align-right,
+.palmares-table td.align-right {
+    text-align: right;
+}
+
 /* Position cell styling */
 .pos-cell {
     font-weight: 700;
@@ -350,6 +361,7 @@
 /* Awards cell */
 .awards-cell {
     display: flex;
+    justify-content: center;
     gap: 0.25rem;
     font-size: 1rem;
 }

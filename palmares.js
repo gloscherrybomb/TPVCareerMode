@@ -414,11 +414,13 @@ function displayResultsTable() {
 
         // Season
         const seasonCell = document.createElement('td');
+        seasonCell.className = 'align-center';
         seasonCell.textContent = '1'; // Currently all events are in Season 1
         row.appendChild(seasonCell);
 
         // Stage
         const stageCell = document.createElement('td');
+        stageCell.className = 'align-center';
         const stageNum = getStageForEvent(result.eventNum);
         if (stageNum !== null) {
             stageCell.textContent = stageNum;
@@ -446,7 +448,7 @@ function displayResultsTable() {
             posText = pos + getOrdinalSuffix(pos);
         }
 
-        posCell.className = posClass;
+        posCell.className = posClass + ' align-center';
         posCell.textContent = posText;
         row.appendChild(posCell);
 
@@ -454,33 +456,34 @@ function displayResultsTable() {
         const vsPredCell = document.createElement('td');
         if (result.predictedPosition && pos !== 'DNF') {
             const diff = result.predictedPosition - pos;
-            let vsPredClass = 'vs-pred-neutral';
+            let vsPredClass = 'vs-pred-neutral align-center';
             let vsPredText = '0';
 
             if (diff > 0) {
-                vsPredClass = 'vs-pred-positive';
+                vsPredClass = 'vs-pred-positive align-center';
                 vsPredText = `+${diff}`;
             } else if (diff < 0) {
-                vsPredClass = 'vs-pred-negative';
+                vsPredClass = 'vs-pred-negative align-center';
                 vsPredText = `${diff}`;
             }
 
             vsPredCell.className = vsPredClass;
             vsPredCell.textContent = vsPredText;
         } else {
+            vsPredCell.className = 'align-center';
             vsPredCell.textContent = '—';
         }
         row.appendChild(vsPredCell);
 
         // ARR
         const arrCell = document.createElement('td');
-        arrCell.className = 'stat-row-value';
+        arrCell.className = 'stat-row-value align-right';
         arrCell.textContent = result.arr || '—';
         row.appendChild(arrCell);
 
         // Points (result.points already includes all bonuses)
         const pointsCell = document.createElement('td');
-        pointsCell.className = 'stat-row-value';
+        pointsCell.className = 'stat-row-value align-right';
         pointsCell.textContent = result.points;
         row.appendChild(pointsCell);
 
@@ -509,7 +512,7 @@ function displayResultsTable() {
 
         // Cadence Coins
         const ccCell = document.createElement('td');
-        ccCell.className = 'cc-cell stat-row-value';
+        ccCell.className = 'cc-cell stat-row-value align-right';
         ccCell.textContent = result.earnedCadenceCredits || 0;
         row.appendChild(ccCell);
 
