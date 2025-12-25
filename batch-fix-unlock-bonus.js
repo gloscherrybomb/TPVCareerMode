@@ -198,13 +198,17 @@ async function batchFixUnlockBonus() {
     for (let i = 1; i <= 15; i++) {
       const eventResults = userData[`event${i}Results`];
       if (eventResults) {
-        const csvTimestamp = getEventCsvTimestamp(1, i); // Season 1
+        // Use user's processedAt timestamp or stageNumber for correct chronological order
+        // This is more accurate than CSV file timestamps which may reflect other users' completions
+        const userTimestamp = eventResults.processedAt ? new Date(eventResults.processedAt).getTime() : 0;
+        const stageNumber = eventResults.stageNumber || 0;
         const unlockHistoryData = userUnlocks.events[i.toString()] || null;
 
         eventsToProcess.push({
           eventNumber: i,
           eventData: unlockHistoryData, // May be null if no unlocks triggered for this event
-          csvTimestamp
+          userTimestamp,
+          stageNumber
         });
       }
     }
@@ -214,33 +218,44 @@ async function batchFixUnlockBonus() {
     for (const eventNum of specialEventIds) {
       const eventResults = userData[`event${eventNum}Results`];
       if (eventResults) {
-        const csvTimestamp = getEventCsvTimestamp(1, eventNum); // Season 1
+        // Use user's processedAt timestamp for correct chronological order
+        const userTimestamp = eventResults.processedAt ? new Date(eventResults.processedAt).getTime() : 0;
+        const stageNumber = eventResults.stageNumber || 0;
         const unlockHistoryData = userUnlocks.events[eventNum.toString()] || null;
 
         eventsToProcess.push({
           eventNumber: eventNum,
           eventData: unlockHistoryData,
-          csvTimestamp,
+          userTimestamp,
+          stageNumber,
           isSpecialEvent: true
         });
       }
     }
 
-    // Sort by CSV timestamp (chronological order - oldest first)
-    eventsToProcess.sort((a, b) => a.csvTimestamp - b.csvTimestamp);
+    // Sort by stageNumber (most reliable) or processedAt timestamp (chronological order - oldest first)
+    eventsToProcess.sort((a, b) => {
+      // Prefer stageNumber if both have it
+      if (a.stageNumber && b.stageNumber) {
+        return a.stageNumber - b.stageNumber;
+      }
+      // Fall back to processedAt timestamp
+      return a.userTimestamp - b.userTimestamp;
+    });
 
     const eventsWithUnlocks = eventsToProcess.filter(e => e.eventData !== null).length;
     console.log(`   Processing ${eventsToProcess.length} completed events (${eventsWithUnlocks} with unlock history) in chronological order:`);
     eventsToProcess.forEach((evt, idx) => {
-      const date = evt.csvTimestamp ? new Date(evt.csvTimestamp).toISOString() : 'no timestamp';
-      console.log(`     ${idx + 1}. Event ${evt.eventNumber} (${date})`);
+      const date = evt.userTimestamp ? new Date(evt.userTimestamp).toISOString() : 'no timestamp';
+      const stageInfo = evt.stageNumber ? `Stage ${evt.stageNumber}` : 'no stage';
+      console.log(`     ${idx + 1}. Event ${evt.eventNumber} (${stageInfo}, ${date})`);
     });
 
     // Track cooldowns as we process events in order
     let activeCooldowns = {};
     let skippedDueToCooldown = 0;
 
-    for (const { eventNumber, eventData, csvTimestamp } of eventsToProcess) {
+    for (const { eventNumber, eventData, stageNumber } of eventsToProcess) {
       const eventResults = userData[`event${eventNumber}Results`];
 
       if (!eventResults) {
@@ -402,7 +417,7 @@ async function batchFixUnlockBonus() {
     }
 
     // After processing all events for this user, update cooldowns based on most recent event
-    // Use CSV timestamps for accurate chronological ordering
+    // Use stageNumber or processedAt for accurate chronological ordering per user
     // IMPORTANT: Look at ALL completed events, not just those with unlocks
     // If the most recent event had no unlocks applied (e.g., all were on cooldown), cooldowns should be clear
     if (!dryRun) {
@@ -410,26 +425,35 @@ async function batchFixUnlockBonus() {
       const latestUserDoc = await userRef.get();
       const latestUserData = latestUserDoc.data();
 
-      // Find ALL completed events and their CSV timestamps (including special events)
+      // Find ALL completed events and their timestamps (including special events)
       const allCompletedEvents = [];
       const allEventIdsForCooldown = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 101, 102];
       for (const i of allEventIdsForCooldown) {
         const evtResults = latestUserData[`event${i}Results`];
         if (evtResults) {
-          // Use CSV timestamp for chronological ordering
-          const csvTimestamp = getEventCsvTimestamp(1, i);
+          // Use user's stageNumber or processedAt for chronological ordering
+          const stageNumber = evtResults.stageNumber || 0;
+          const userTimestamp = evtResults.processedAt ? new Date(evtResults.processedAt).getTime() : 0;
           const unlockIds = (evtResults.unlockBonusesApplied || []).map(u => u.id);
           allCompletedEvents.push({
             eventNumber: i,
-            timestamp: csvTimestamp,
+            stageNumber: stageNumber,
+            timestamp: userTimestamp,
             unlockIds: unlockIds
           });
         }
       }
 
       if (allCompletedEvents.length > 0) {
-        // Sort by CSV timestamp descending to find most recent
-        allCompletedEvents.sort((a, b) => b.timestamp - a.timestamp);
+        // Sort by stageNumber (most reliable) or processedAt timestamp descending to find most recent
+        allCompletedEvents.sort((a, b) => {
+          // Prefer stageNumber if both have it
+          if (a.stageNumber && b.stageNumber) {
+            return b.stageNumber - a.stageNumber;
+          }
+          // Fall back to processedAt timestamp
+          return b.timestamp - a.timestamp;
+        });
         const mostRecentEvent = allCompletedEvents[0];
 
         // Set cooldowns for unlocks applied to the most recent event
@@ -447,7 +471,8 @@ async function batchFixUnlockBonus() {
         const cooldownUnlocks = mostRecentEvent.unlockIds.length > 0
           ? mostRecentEvent.unlockIds.join(', ')
           : 'none (unlocks available)';
-        console.log(`   🔄 Set cooldowns from most recent event ${mostRecentEvent.eventNumber}: ${cooldownUnlocks}`);
+        const stageInfo = mostRecentEvent.stageNumber ? `Stage ${mostRecentEvent.stageNumber}` : '';
+        console.log(`   🔄 Set cooldowns from most recent event ${mostRecentEvent.eventNumber} (${stageInfo}): ${cooldownUnlocks}`);
       } else {
         // No completed events - clear cooldowns
         await userRef.update({
