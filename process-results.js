@@ -1551,6 +1551,27 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
     console.log(`   💰 CC earning from awards will still be processed`);
   }
 
+  // Calculate rival data ONCE (used for both unlocks and story generation)
+  // This must be outside the skipUnlocks block since story generation always needs it
+  const rivalEncounters = calculateRivalEncounters(
+    results,
+    uid,
+    position,
+    parseFloat(userResult.Time) || 0,
+    eventNumber,
+    parseFloat(userResult.Distance) || 0
+  );
+  const existingRivalData = userData.rivalData || null;
+  const updatedRivalData = updateRivalData(existingRivalData, rivalEncounters, eventNumber);
+  const topRivals = identifyTopRivals(updatedRivalData);
+  updatedRivalData.topRivals = topRivals;
+
+  // Log rival encounters
+  if (rivalEncounters.length > 0) {
+    const proximityDesc = eventNumber === 4 ? 'within 500m' : 'within 30s';
+    console.log(`   🤝 Rival encounters: ${rivalEncounters.length} bot(s) ${proximityDesc}`);
+  }
+
   // Apply unlock bonuses (one per race) - only if not skipping
   let unlockBonusPoints = 0;
   let unlockBonusesApplied = [];
@@ -1570,26 +1591,6 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
       uid: r.UID || null,
       name: r.Name || null
     })).filter(r => !isNaN(r.position));
-
-    // Calculate rival data ONCE (used for both unlocks and story generation)
-    const rivalEncounters = calculateRivalEncounters(
-      results,
-      uid,
-      position,
-      parseFloat(userResult.Time) || 0,
-      eventNumber,
-      parseFloat(userResult.Distance) || 0
-    );
-    const existingRivalData = userData.rivalData || null;
-    const updatedRivalData = updateRivalData(existingRivalData, rivalEncounters, eventNumber);
-    const topRivals = identifyTopRivals(updatedRivalData);
-    updatedRivalData.topRivals = topRivals;
-
-    // Log rival encounters
-    if (rivalEncounters.length > 0) {
-      const proximityDesc = eventNumber === 4 ? 'within 500m' : 'within 30s';
-      console.log(`   🤝 Rival encounters: ${rivalEncounters.length} bot(s) ${proximityDesc}`);
-    }
 
     const unlockContext = {
       position,
