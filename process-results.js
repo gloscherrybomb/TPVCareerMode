@@ -781,6 +781,9 @@ function updateRivalData(existingRivalData, encounters, eventNumber) {
  * - Average time gap (closer = better)
  * - Head-to-head competitiveness (50-50 win ratio = stronger rivalry)
  * Higher score = closer racing more often with competitive results = bigger rival
+ *
+ * Note: Rivals must have at least one race with valid time gap data to be scored.
+ * Encounters from time-based events (where avgGap is null) don't contribute to scoring.
  */
 function identifyTopRivals(rivalData) {
   if (!rivalData || !rivalData.encounters) {
@@ -790,6 +793,16 @@ function identifyTopRivals(rivalData) {
   // Calculate rivalry score for each bot
   const rivalScores = Object.keys(rivalData.encounters).map(botUid => {
     const data = rivalData.encounters[botUid];
+
+    // Skip rivals that have no valid time gap data (only encountered in time-based events)
+    // avgGap will be null if all encounters were from time-based events
+    if (data.avgGap === null || data.avgGap === undefined) {
+      return {
+        botUid: botUid,
+        score: 0,  // No score for rivals without time gap data
+        races: data.races
+      };
+    }
 
     // Base score: more races (weighted heavily) and closer gaps = higher
     // Using races^1.5 to strongly favor repeated encounters
@@ -814,7 +827,9 @@ function identifyTopRivals(rivalData) {
   });
 
   // Sort by rivalry score (descending) and return top 10 UIDs
+  // Filter out zero-score rivals (those with only time-based encounters)
   const topRivals = rivalScores
+    .filter(r => r.score > 0)
     .sort((a, b) => b.score - a.score)
     .slice(0, 10)
     .map(r => r.botUid);
