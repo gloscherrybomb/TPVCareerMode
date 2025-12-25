@@ -1331,9 +1331,9 @@ function updatePowerRecords(existingRecords, eventResults, eventNumber, distance
 
 /**
  * Calculate rival encounters for this race
- * Finds all bots within 30 seconds of user's time (or 500m for time challenges)
+ * Finds all bots within 30 seconds of user's time (or 500m for time challenges) and records the encounter
  * For Event 3 (elimination race), skip entirely as times are meaningless
- * For Event 4 (time challenge), use distance-based detection since all riders finish at the same time
+ * For time-based events (e.g., Event 4), use distance-based detection since all riders finish at the same time
  */
 function calculateRivalEncounters(results, userUid, userPosition, userTime, eventNumber, userDistance) {
   const encounters = [];
@@ -1349,8 +1349,8 @@ function calculateRivalEncounters(results, userUid, userPosition, userTime, even
     return encounters;
   }
 
-  // For time challenge (Event 4), use distance-based rival detection
-  if (eventNumber === 4) {
+  // For time-based events (e.g., Event 4), use distance-based rival detection
+  if (TIME_BASED_EVENTS.includes(eventNumber)) {
     results.forEach(result => {
       const botUid = result.UID;
       const botPosition = parseInt(result.Position);
@@ -1372,7 +1372,7 @@ function calculateRivalEncounters(results, userUid, userPosition, userTime, even
           botTeam: result.Team || '',
           botCountry: result.Country || '',
           botArr: parseInt(result.ARR) || 0,
-          timeGap: 0, // Not meaningful for time challenge
+          timeGap: null, // null indicates time gap is not meaningful for this event type
           distanceGap: distanceGap,
           userFinishedAhead: userPosition < botPosition,
           botPosition: botPosition,
@@ -1438,6 +1438,8 @@ function updateRivalData(existingRivalData, encounters, eventNumber) {
   // Update each encounter
   encounters.forEach(encounter => {
     const botUid = encounter.botUid;
+    // timeGap is null for time-based events (e.g., time challenges) where time gaps are meaningless
+    const hasValidTimeGap = encounter.timeGap !== null && encounter.timeGap !== undefined;
 
     // Initialize bot encounter data if doesn't exist (first encounter with this rival)
     if (!rivalData.encounters[botUid]) {
@@ -1449,9 +1451,11 @@ function updateRivalData(existingRivalData, encounters, eventNumber) {
         races: 1,  // This IS a race, so start at 1
         userWins: encounter.userFinishedAhead ? 1 : 0,
         botWins: encounter.userFinishedAhead ? 0 : 1,
-        totalGap: encounter.timeGap,
-        avgGap: encounter.timeGap,
-        closestGap: encounter.timeGap,
+        // Only set gap stats if we have a valid time gap (not a time-based event)
+        totalGap: hasValidTimeGap ? encounter.timeGap : 0,
+        avgGap: hasValidTimeGap ? encounter.timeGap : null,
+        closestGap: hasValidTimeGap ? encounter.timeGap : null,
+        racesWithTimeGap: hasValidTimeGap ? 1 : 0,  // Track how many races have valid time gaps
         lastRace: eventNumber
       };
     } else {
@@ -1462,23 +1466,39 @@ function updateRivalData(existingRivalData, encounters, eventNumber) {
       if (isNewRace) {
         // This is a new race with this rival - increment counters
         botData.races += 1;
-        botData.totalGap += encounter.timeGap;
 
         if (encounter.userFinishedAhead) {
           botData.userWins += 1;
         } else {
           botData.botWins += 1;
         }
-      } else {
-        // Reprocessing same event - recalculate the gap for this race
+
+        // Only update gap stats if we have a valid time gap
+        if (hasValidTimeGap) {
+          botData.totalGap = (botData.totalGap || 0) + encounter.timeGap;
+          botData.racesWithTimeGap = (botData.racesWithTimeGap || 0) + 1;
+        }
+      } else if (hasValidTimeGap) {
+        // Reprocessing same event with valid time gap - recalculate the gap for this race
         // Remove old contribution and add new one
-        const oldContribution = botData.totalGap / botData.races;
-        botData.totalGap = botData.totalGap - oldContribution + encounter.timeGap;
+        const racesWithGap = botData.racesWithTimeGap || botData.races;
+        if (racesWithGap > 0) {
+          const oldContribution = botData.totalGap / racesWithGap;
+          botData.totalGap = botData.totalGap - oldContribution + encounter.timeGap;
+        }
       }
 
-      // Update derived stats and metadata
-      botData.avgGap = botData.totalGap / botData.races;
-      botData.closestGap = Math.min(botData.closestGap, encounter.timeGap);
+      // Update derived stats only if we have races with valid time gaps
+      const racesWithGap = botData.racesWithTimeGap || 0;
+      if (racesWithGap > 0) {
+        botData.avgGap = botData.totalGap / racesWithGap;
+        if (hasValidTimeGap) {
+          botData.closestGap = botData.closestGap !== null
+            ? Math.min(botData.closestGap, encounter.timeGap)
+            : encounter.timeGap;
+        }
+      }
+
       botData.lastRace = eventNumber;
 
       // Update bot info (in case it changed)
