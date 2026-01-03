@@ -1,0 +1,320 @@
+/* season-switcher.css
+   Styles for the reusable season switcher component
+   Matches the existing TPV Career Mode design language
+*/
+
+/* ============================================================================
+   BASE COMPONENT
+   ============================================================================ */
+
+.season-switcher {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.season-switcher--full {
+  justify-content: center;
+}
+
+.season-switcher--compact {
+  display: inline-flex;
+}
+
+/* ============================================================================
+   LABEL
+   ============================================================================ */
+
+.season-switcher__label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.season-switcher__icon {
+  font-size: 1.2rem;
+}
+
+/* ============================================================================
+   SELECT CONTAINER
+   ============================================================================ */
+
+.season-switcher__select-container {
+  position: relative;
+  min-width: 280px;
+}
+
+.season-switcher--compact .season-switcher__select-container {
+  min-width: 200px;
+}
+
+.season-switcher__select {
+  width: 100%;
+  padding: 0.75rem 2.5rem 0.75rem 1rem;
+  background: var(--dark-card);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  transition: all 0.3s ease;
+  background-image: linear-gradient(135deg, rgba(255, 27, 107, 0.03), rgba(69, 202, 255, 0.03));
+}
+
+.season-switcher__select:hover {
+  border-color: rgba(69, 202, 255, 0.4);
+}
+
+.season-switcher__select:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+  box-shadow: 0 0 0 3px rgba(69, 202, 255, 0.1);
+}
+
+.season-switcher__select option {
+  background: var(--dark-card);
+  color: var(--text-primary);
+  padding: 0.5rem;
+}
+
+.season-switcher__select option:disabled {
+  color: var(--text-secondary);
+  opacity: 0.6;
+}
+
+/* ============================================================================
+   ARROW ICON
+   ============================================================================ */
+
+.season-switcher__arrow {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: var(--accent-blue);
+  display: flex;
+  align-items: center;
+}
+
+/* ============================================================================
+   RETURN BUTTON
+   ============================================================================ */
+
+.season-switcher__return-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem;
+  background: linear-gradient(135deg, var(--accent-pink), var(--accent-blue));
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.season-switcher__return-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 15px rgba(255, 27, 107, 0.3);
+}
+
+.season-switcher__return-btn svg {
+  flex-shrink: 0;
+}
+
+/* ============================================================================
+   VIEWING HISTORY INDICATOR
+   ============================================================================ */
+
+.season-history-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(255, 165, 0, 0.05));
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+}
+
+.season-history-banner__text {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+}
+
+.season-history-banner__text strong {
+  color: #ffd700;
+  font-weight: 600;
+}
+
+/* ============================================================================
+   SEASON STATS CARD (for completed seasons)
+   ============================================================================ */
+
+.season-stats-card {
+  background: linear-gradient(135deg, rgba(255, 27, 107, 0.05), rgba(69, 202, 255, 0.05));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 2rem;
+  margin: 2rem 0;
+}
+
+.season-stats-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.season-stats-card__title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.season-stats-card__title-icon {
+  font-size: 1.5rem;
+}
+
+.season-stats-card__date {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.season-stats-card__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1.5rem;
+}
+
+.season-stats-card__stat {
+  text-align: center;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 12px;
+}
+
+.season-stats-card__stat-value {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--accent-pink), var(--accent-blue));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 0.25rem;
+}
+
+.season-stats-card__stat-label {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Rank highlight */
+.season-stats-card__stat--rank .season-stats-card__stat-value {
+  font-size: 2.5rem;
+}
+
+.season-stats-card__rank-suffix {
+  font-size: 1rem;
+  -webkit-text-fill-color: var(--text-secondary);
+}
+
+/* Completion story */
+.season-stats-card__story {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.season-stats-card__story-title {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.season-stats-card__story-content {
+  font-size: 1rem;
+  line-height: 1.8;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+/* ============================================================================
+   RESPONSIVE
+   ============================================================================ */
+
+@media (max-width: 768px) {
+  .season-switcher--full {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .season-switcher__select-container {
+    width: 100%;
+    min-width: auto;
+    max-width: 400px;
+  }
+
+  .season-switcher--compact .season-switcher__select-container {
+    min-width: auto;
+    width: 100%;
+  }
+
+  .season-history-banner {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.75rem;
+  }
+
+  .season-stats-card__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .season-stats-card__stat-value {
+    font-size: 1.5rem;
+  }
+
+  .season-stats-card__stat--rank .season-stats-card__stat-value {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .season-stats-card__grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .season-stats-card {
+    padding: 1.5rem;
+  }
+}

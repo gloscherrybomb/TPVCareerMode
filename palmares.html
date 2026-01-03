@@ -14,6 +14,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="palmares.css">
+    <link rel="stylesheet" href="season-switcher.css">
 </head>
 <body>
     <!-- Navigation -->
@@ -176,6 +177,14 @@
                 </div>
             </div>
 
+            <!-- Season Stats Section (for completed seasons) -->
+            <div id="seasonStatsSection" class="palmares-section" style="display: none;">
+                <h2 class="section-heading">Completed Season Stats</h2>
+                <div id="seasonStatsContainer" class="season-stats-grid">
+                    <!-- Populated via JS -->
+                </div>
+            </div>
+
             <!-- Main Results Table -->
             <div class="palmares-section">
                 <h2 class="section-heading">Complete Results History</h2>
@@ -199,6 +208,13 @@
                             <!-- Populated via JS -->
                         </tbody>
                     </table>
+                </div>
+                <!-- Pagination Controls -->
+                <div id="paginationControls" class="pagination-controls" style="display: none;">
+                    <button id="loadMoreBtn" class="btn btn-secondary btn-load-more">
+                        Load More Results
+                    </button>
+                    <span id="paginationStatus" class="pagination-status"></span>
                 </div>
             </div>
 
@@ -556,6 +572,8 @@
     </div>
 
     <!-- Include Firebase and authentication -->
+    <script src="season-config.js"></script>
+    <script src="season-data-helpers.js"></script>
     <script type="module" src="app.js"></script>
     <script type="module" src="palmares.js"></script>
 </body>

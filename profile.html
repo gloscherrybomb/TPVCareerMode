@@ -18,6 +18,7 @@
     <link rel="stylesheet" href="achievement-notifications.css">
     <link rel="stylesheet" href="cadence-credits.css">
     <link rel="stylesheet" href="unlock-card.css">
+    <link rel="stylesheet" href="season-switcher.css">
     <script src="unlock-config.js"></script>
     <script src="currency-config.js"></script>
     <script src="unlock-image-loader.js"></script>
@@ -284,10 +285,18 @@
                     </div>
                 </div>
 
-                <!-- Career Progress Section -->
+                <!-- Season Progress Section -->
                 <div class="profile-section">
-                    <h2 class="section-title">Career Progress</h2>
-                    <div class="progress-card">
+                    <div class="section-header-with-switcher">
+                        <h2 class="section-title" id="seasonProgressTitle">Season 1 Progress</h2>
+                        <div id="profileSeasonSwitcher" class="profile-season-switcher"></div>
+                    </div>
+
+                    <!-- History banner shown when viewing a completed past season -->
+                    <div id="profileHistoryBanner" style="display: none;"></div>
+
+                    <!-- Active season progress (shown for current season) -->
+                    <div id="activeSeasonProgress" class="progress-card">
                         <div class="progress-info">
                             <div class="progress-label">Current Stage</div>
                             <div class="progress-stage" id="currentStage">Stage 1</div>
@@ -299,6 +308,9 @@
                             <span id="completedEvents">0</span> events completed
                         </div>
                     </div>
+
+                    <!-- Completed season summary (shown when viewing a completed season) -->
+                    <div id="completedSeasonSummary" style="display: none;"></div>
                 </div>
             </div>
         </div>
@@ -529,6 +541,9 @@
     </footer>
 
     <script src="event-data.js"></script>
+    <script src="season-config.js"></script>
+    <script src="season-data-helpers.js"></script>
+    <script src="season-switcher.js"></script>
     <script src="awards-config.js"></script>
     <script src="awards-calculation.js"></script>
     <script src="career-summary-generator.js"></script>

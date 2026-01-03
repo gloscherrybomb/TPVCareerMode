@@ -16,6 +16,11 @@ const db = getFirestore(app);
 initRiderProfileModal(db);
 
 let currentUser = null;
+let currentUserData = null;
+
+// Season switcher state
+let standingsSeasonSwitcher = null;
+let viewingSeason = 1;
 
 // Filter state
 let filters = {
@@ -23,6 +28,103 @@ let filters = {
     ageGroup: 'all',
     country: 'all'
 };
+
+// Initialize season switcher for standings
+function initStandingsSeasonSwitcher() {
+    if (!window.SeasonSwitcher) {
+        console.warn('SeasonSwitcher not loaded');
+        return;
+    }
+
+    // Get initial viewing season from URL or localStorage
+    viewingSeason = window.getViewingSeasonFromUrl ?
+        window.getViewingSeasonFromUrl(1) : 1;
+
+    standingsSeasonSwitcher = new window.SeasonSwitcher({
+        containerId: 'standingsSeasonSwitcher',
+        userData: currentUserData,
+        currentSeason: currentUserData?.currentSeason || 1,
+        viewingSeason: viewingSeason,
+        showLabels: true,
+        mode: 'compact',
+        onSeasonChange: handleStandingsSeasonChange
+    });
+
+    standingsSeasonSwitcher.render();
+    updateStandingsTitle();
+}
+
+// Handle season change from the switcher
+function handleStandingsSeasonChange(newSeason) {
+    console.log(`Standings: Season ${newSeason} selected`);
+    viewingSeason = newSeason;
+
+    updateStandingsTitle();
+    updateStandingsHistoryBanner();
+    renderSeasonStandings(true); // Force refresh for new season
+}
+
+// Update the season standings title
+function updateStandingsTitle() {
+    const title = document.getElementById('seasonStandingsTitle');
+    if (!title) return;
+
+    const seasonConfig = window.seasonConfig?.getSeasonConfig?.(viewingSeason);
+    if (seasonConfig) {
+        title.textContent = `${seasonConfig.name} - ${seasonConfig.subtitle}`;
+    } else {
+        title.textContent = `Season ${viewingSeason}`;
+    }
+}
+
+// Show/hide history banner when viewing a past completed season
+function updateStandingsHistoryBanner() {
+    const banner = document.getElementById('standingsHistoryBanner');
+    if (!banner) return;
+
+    if (standingsSeasonSwitcher && standingsSeasonSwitcher.isViewingHistory()) {
+        const seasonConfig = window.seasonConfig?.getSeasonConfig?.(viewingSeason);
+        const seasonName = seasonConfig ?
+            `${seasonConfig.name} - ${seasonConfig.subtitle}` :
+            `Season ${viewingSeason}`;
+
+        banner.innerHTML = `
+            <div class="season-history-banner">
+                <span class="season-history-banner__text">
+                    <strong>Viewing History:</strong> ${seasonName} (Completed)
+                </span>
+                ${window.createReturnToCurrentButton ?
+                    window.createReturnToCurrentButton(standingsSeasonSwitcher.currentSeason, (s) => {
+                        standingsSeasonSwitcher.update({ viewingSeason: s });
+                        handleStandingsSeasonChange(s);
+                    }) : ''
+                }
+            </div>
+        `;
+        banner.style.display = 'block';
+    } else {
+        banner.style.display = 'none';
+    }
+}
+
+// Update season switcher when user data is available
+function updateStandingsSeasonSwitcherWithUserData(userData) {
+    currentUserData = userData;
+
+    if (!standingsSeasonSwitcher) {
+        initStandingsSeasonSwitcher();
+    }
+
+    if (standingsSeasonSwitcher) {
+        const currentSeason = userData?.currentSeason || 1;
+        standingsSeasonSwitcher.update({
+            userData: userData,
+            currentSeason: currentSeason,
+            viewingSeason: viewingSeason
+        });
+        updateStandingsHistoryBanner();
+    }
+}
 
 // Apply filters to rankings
 function applyFilters(rankings) {
@@ -246,16 +348,20 @@ async function renderSeasonStandings(forceRefresh = false) {
     let standings = [];
     let userData = null;
 
+    // Cache key includes season number
+    const cacheKey = `${SEASON_STANDINGS_CACHE_KEY}_s${viewingSeason}_${currentUser.uid}`;
+    const timestampKey = `${SEASON_STANDINGS_TIMESTAMP_KEY}_s${viewingSeason}_${currentUser.uid}`;
+
     // Check cache first (unless force refresh)
     if (!forceRefresh) {
-        const cachedData = localStorage.getItem(SEASON_STANDINGS_CACHE_KEY + '_' + currentUser.uid);
-        const cacheTimestamp = localStorage.getItem(SEASON_STANDINGS_TIMESTAMP_KEY + '_' + currentUser.uid);
+        const cachedData = localStorage.getItem(cacheKey);
+        const cacheTimestamp = localStorage.getItem(timestampKey);
         const now = Date.now();
 
         if (cachedData && cacheTimestamp) {
             const cacheAge = now - parseInt(cacheTimestamp);
             if (cacheAge < CACHE_DURATION) {
-                console.log(`📦 Using cached season standings (${Math.round(cacheAge / 1000)}s old)`);
+                console.log(`📦 Using cached season ${viewingSeason} standings (${Math.round(cacheAge / 1000)}s old)`);
                 const cached = JSON.parse(cachedData);
                 standings = cached.standings;
                 userData = cached.userData;
@@ -268,7 +374,7 @@ async function renderSeasonStandings(forceRefresh = false) {
     }
 
     // Cache miss or expired - fetch from Firestore
-    console.log('🔄 Fetching fresh season standings from Firestore...');
+    console.log(`🔄 Fetching fresh season ${viewingSeason} standings from Firestore...`);
 
     // Show loading state
     seasonContent.innerHTML = `
@@ -282,19 +388,29 @@ async function renderSeasonStandings(forceRefresh = false) {
     const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
     userData = userDoc.data();
 
-    // Use stored season standings (includes backfilled bot results)
-    standings = userData.season1Standings || [];
+    // Get standings for the selected season using season data helpers
+    if (window.seasonDataHelpers?.getSeasonData) {
+        const seasonData = window.seasonDataHelpers.getSeasonData(userData, viewingSeason);
+        standings = seasonData?.standings || [];
+    } else {
+        // Fallback: direct access based on season number
+        if (viewingSeason === 1) {
+            standings = userData.season1Standings || [];
+        } else {
+            standings = userData?.seasons?.[`season${viewingSeason}`]?.standings || [];
+        }
+    }
 
     // Store in cache
     localStorage.setItem(
-        SEASON_STANDINGS_CACHE_KEY + '_' + currentUser.uid,
+        cacheKey,
         JSON.stringify({ standings, userData })
     );
     localStorage.setItem(
-        SEASON_STANDINGS_TIMESTAMP_KEY + '_' + currentUser.uid,
+        timestampKey,
         Date.now().toString()
     );
-    console.log(`✅ Cached season standings for user ${currentUser.uid}`);
+    console.log(`✅ Cached season ${viewingSeason} standings for user ${currentUser.uid}`);
 
     // Render the table
     await renderSeasonStandingsTable(standings, userData, seasonContent);
@@ -332,10 +448,10 @@ async function renderSeasonStandingsTable(standings, userData, seasonContent) {
     
     // Fallback: Calculate from results if no stored standings
     if (standings.length === 0) {
-        console.log('No stored standings found, calculating from results...');
-        standings = await calculateRealSeasonStandings(1);
+        console.log(`No stored standings found for season ${viewingSeason}, calculating from results...`);
+        standings = await calculateRealSeasonStandings(viewingSeason);
     } else {
-        console.log('Using stored season standings with backfilled data');
+        console.log(`Using stored season ${viewingSeason} standings with backfilled data`);
     }
     
     // Mark current user
@@ -860,7 +976,20 @@ function initTabs() {
 // Initialize on auth state change
 onAuthStateChanged(auth, async (user) => {
     currentUser = user;
-    
+
+    // Load user data for season switcher
+    if (user) {
+        try {
+            const userDoc = await getDoc(doc(db, 'users', user.uid));
+            if (userDoc.exists()) {
+                const userData = userDoc.data();
+                updateStandingsSeasonSwitcherWithUserData(userData);
+            }
+        } catch (err) {
+            console.warn('Error loading user data for season switcher:', err);
+        }
+    }
+
     // Render all content
     await renderSeasonStandings();
     await renderGlobalRankings();
@@ -872,6 +1001,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initTabs();
     initSubTabs();
     initFilters();
+    initStandingsSeasonSwitcher(); // Initialize season switcher
     renderSeasonStandings();
     renderGlobalRankings().catch(err => console.error('Error rendering global rankings:', err));
     renderTeamRankings();

@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="season-completion.css">
     <link rel="stylesheet" href="achievement-notifications.css">
     <link rel="stylesheet" href="cadence-credits.css">
+    <link rel="stylesheet" href="season-switcher.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -59,26 +60,10 @@
     <!-- Season Selector -->
     <section class="season-selector-section">
         <div class="container">
-            <div class="season-selector-wrapper">
-                <label for="seasonSelect" class="season-selector-label">
-                    <span class="season-icon">🏆</span>
-                    <span>Season:</span>
-                </label>
-                <div class="season-select-container">
-                    <select id="seasonSelect" class="season-select" onchange="selectSeason(this.value)">
-                        <option value="1" selected>Season 1 - Local Amateur</option>
-                        <option value="2" disabled>Season 2 - Continental Pro (Coming Spring 26)</option>
-                        <option value="3" disabled>Season 3 - Pro Continental (Coming Summer 26)</option>
-                        <option value="4" disabled>Season 4 - World Tour (Coming Fall 26)</option>
-                        <option value="5" disabled>Season 5 - Legends (Coming Winter 26)</option>
-                    </select>
-                    <div class="select-arrow">
-                        <svg width="12" height="8" viewBox="0 0 12 8" fill="none">
-                            <path d="M1 1L6 6L11 1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </div>
-                </div>
-            </div>
+            <!-- Season switcher will be rendered here by JavaScript -->
+            <div id="seasonSwitcherContainer" class="season-selector-wrapper"></div>
+            <!-- History banner shown when viewing a completed past season -->
+            <div id="seasonHistoryBanner" style="display: none;"></div>
         </div>
     </section>
 
@@ -377,6 +362,9 @@
     </div>
 
     <script src="event-data.js"></script>
+    <script src="season-config.js"></script>
+    <script src="season-data-helpers.js"></script>
+    <script src="season-switcher.js"></script>
     <script type="module" src="event-sequence.js"></script>
     <script type="module" src="app.js"></script>
     <script src="events.js"></script>
@@ -1024,10 +1012,26 @@
         // Global function to update UI when progress changes (called by Firebase)
         window.updateProgressUI = async function() {
             console.log('Updating UI after Firebase progress load');
-            
+
             // Check admin status now that user is authenticated
             await checkAndShowAdminToggle();
-            
+
+            // Load user data and update season switcher
+            try {
+                const progressManager = window.progressManager;
+                if (progressManager?.currentUser) {
+                    const { getFirestore, doc, getDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+                    const db = getFirestore();
+                    const userDoc = await getDoc(doc(db, 'users', progressManager.currentUser.uid));
+                    if (userDoc.exists()) {
+                        const userData = userDoc.data();
+                        updateSeasonSwitcherWithUserData(userData);
+                    }
+                }
+            } catch (err) {
+                console.warn('Error loading user data for season switcher:', err);
+            }
+
             renderTimeline();
             renderEventSequence();
             updateProgressStats();
@@ -1061,22 +1065,108 @@
         // Make functions global for onclick handlers
         window.openChoiceModal = openChoiceModal;
         window.selectChoiceEvent = selectChoiceEvent;
-        
-        // Season selection handler
-        window.selectSeason = function(seasonNumber) {
-            // Convert to number if it's a string
-            seasonNumber = parseInt(seasonNumber);
-            
-            // Currently only Season 1 is available
-            if (seasonNumber !== 1) {
-                // Future seasons are locked - revert to Season 1
-                document.getElementById('seasonSelect').value = '1';
+
+        // Season Switcher - will be initialized once and updated when user data loads
+        let seasonSwitcher = null;
+        let viewingSeason = 1; // Track which season we're viewing
+
+        // Initialize season switcher with defaults (before user data loads)
+        function initSeasonSwitcher() {
+            if (!window.SeasonSwitcher) {
+                console.warn('SeasonSwitcher not loaded');
                 return;
             }
-            
-            // Season 1 is already active, no action needed
-            // In the future, this will load different season data
-            console.log(`Season ${seasonNumber} selected`);
+
+            // Get initial viewing season from URL or localStorage
+            viewingSeason = window.getViewingSeasonFromUrl ?
+                window.getViewingSeasonFromUrl(1) : 1;
+
+            seasonSwitcher = new window.SeasonSwitcher({
+                containerId: 'seasonSwitcherContainer',
+                userData: null, // Will be updated when user data loads
+                currentSeason: 1,
+                viewingSeason: viewingSeason,
+                showLabels: true,
+                onSeasonChange: handleSeasonChange
+            });
+
+            seasonSwitcher.render();
+        }
+
+        // Handle season change from the switcher
+        function handleSeasonChange(newSeason) {
+            console.log(`Season ${newSeason} selected`);
+            viewingSeason = newSeason;
+
+            // Update the history banner
+            updateSeasonHistoryBanner();
+
+            // Re-render the page for the selected season
+            renderTimeline();
+            renderEventSequence();
+            updateProgressStats();
+            updateSeasonStory();
+        }
+
+        // Show/hide history banner when viewing a past completed season
+        function updateSeasonHistoryBanner() {
+            const banner = document.getElementById('seasonHistoryBanner');
+            if (!banner) return;
+
+            // Only show banner if viewing a completed past season
+            if (seasonSwitcher && seasonSwitcher.isViewingHistory()) {
+                const seasonConfig = window.seasonConfig?.getSeasonConfig?.(viewingSeason);
+                const seasonName = seasonConfig ?
+                    `${seasonConfig.name} - ${seasonConfig.subtitle}` :
+                    `Season ${viewingSeason}`;
+
+                banner.innerHTML = `
+                    <div class="season-history-banner">
+                        <span class="season-history-banner__text">
+                            <strong>Viewing History:</strong> ${seasonName} (Completed)
+                        </span>
+                        ${window.createReturnToCurrentButton ?
+                            window.createReturnToCurrentButton(seasonSwitcher.currentSeason, (s) => {
+                                seasonSwitcher.update({ viewingSeason: s });
+                                handleSeasonChange(s);
+                            }) : ''
+                        }
+                    </div>
+                `;
+                banner.style.display = 'block';
+            } else {
+                banner.style.display = 'none';
+            }
+        }
+
+        // Update season switcher when user data is available
+        function updateSeasonSwitcherWithUserData(userData) {
+            if (!seasonSwitcher) {
+                initSeasonSwitcher();
+            }
+
+            if (seasonSwitcher) {
+                const currentSeason = userData?.currentSeason || 1;
+                seasonSwitcher.update({
+                    userData: userData,
+                    currentSeason: currentSeason,
+                    viewingSeason: viewingSeason
+                });
+                updateSeasonHistoryBanner();
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            initSeasonSwitcher();
+        });
+
+        // Legacy support - keep selectSeason for any old references
+        window.selectSeason = function(seasonNumber) {
+            if (seasonSwitcher) {
+                seasonSwitcher.update({ viewingSeason: parseInt(seasonNumber) });
+                handleSeasonChange(parseInt(seasonNumber));
+            }
         };
         
         // Season 1 Reset Function

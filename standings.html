@@ -11,6 +11,7 @@
     
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="standings.css">
+    <link rel="stylesheet" href="season-switcher.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -66,9 +67,14 @@
     <section class="standings-content active" id="seasonContent">
         <div class="container">
             <div class="standings-header">
-                <h2>Season 1 - Local Amateur</h2>
+                <h2 id="seasonStandingsTitle">Season 1 - Local Amateur</h2>
                 <p class="standings-description">Your personal season rankings including all racers from your events</p>
+                <!-- Season switcher for viewing historical seasons -->
+                <div id="standingsSeasonSwitcher" class="standings-season-switcher" style="margin-top: 1rem;"></div>
             </div>
+
+            <!-- History banner shown when viewing a completed past season -->
+            <div id="standingsHistoryBanner" style="display: none;"></div>
 
             <!-- JavaScript will populate this -->
             <div id="seasonStandings">
@@ -324,6 +330,9 @@
         </div>
     </div>
 
+    <script src="season-config.js"></script>
+    <script src="season-data-helpers.js"></script>
+    <script src="season-switcher.js"></script>
     <script type="module" src="app.js"></script>
     <script type="module" src="standings.js"></script>
 </body>

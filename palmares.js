@@ -27,6 +27,11 @@ let filteredResults = [];
 let currentSort = { column: 'date', direction: 'desc' };
 let interviewHistory = [];
 
+// Pagination state
+const RESULTS_PER_PAGE = 20;
+let currentPage = 1;
+let displayedResults = 0;
+
 // Personality chart state
 let chartDataPoints = [];
 let visibleTraits = {
@@ -222,71 +227,151 @@ async function loadPalmares(user) {
         // Fetch interview history for personality chart
         interviewHistory = await fetchInterviewHistory(userData.uid);
 
-        // Collect all event results
+        // Collect all event results using season-aware helpers
         allResults = [];
-        for (let i = 1; i <= 15; i++) {
-            const eventResults = userData[`event${i}Results`];
-            if (eventResults) {
-                allResults.push({
-                    eventNum: i,
-                    eventName: EVENT_DATA[i]?.name || `Event ${i}`,
-                    eventType: EVENT_DATA[i]?.type || 'unknown',
-                    position: eventResults.position,
-                    time: eventResults.time,
-                    arr: eventResults.arr,
-                    predictedPosition: eventResults.predictedPosition,
-                    points: eventResults.points || 0,
-                    bonusPoints: eventResults.bonusPoints || 0,
-                    earnedCadenceCredits: eventResults.earnedCadenceCredits || 0,
-                    earnedPunchingMedal: eventResults.earnedPunchingMedal,
-                    earnedGiantKillerMedal: eventResults.earnedGiantKillerMedal,
-                    earnedBullseyeMedal: eventResults.earnedBullseyeMedal,
-                    earnedHotStreakMedal: eventResults.earnedHotStreakMedal,
-                    earnedDomination: eventResults.earnedDomination,
-                    earnedCloseCall: eventResults.earnedCloseCall,
-                    earnedPhotoFinish: eventResults.earnedPhotoFinish,
-                    earnedDarkHorse: eventResults.earnedDarkHorse,
-                    earnedZeroToHero: eventResults.earnedZeroToHero,
-                    processedAt: eventResults.processedAt,
-                    raceDate: eventResults.raceDate
-                });
+
+        // Use season data helpers if available, otherwise fall back to legacy approach
+        if (window.seasonDataHelpers && window.seasonConfig) {
+            // Get all seasons (released ones)
+            const allSeasons = window.seasonConfig.getAllSeasons();
+
+            for (const season of allSeasons) {
+                if (season.status !== 'released' || !season.events) continue;
+
+                // Get events for this season
+                for (let eventId = season.eventRange.start; eventId <= season.eventRange.end; eventId++) {
+                    const eventResults = window.seasonDataHelpers.getEventResults(userData, eventId);
+                    if (eventResults) {
+                        const eventInfo = season.events[eventId] || {};
+                        allResults.push({
+                            eventNum: eventId,
+                            seasonId: season.id,
+                            eventName: eventInfo.name || `Event ${eventId}`,
+                            eventType: eventInfo.type || 'unknown',
+                            position: eventResults.position,
+                            time: eventResults.time,
+                            arr: eventResults.arr,
+                            predictedPosition: eventResults.predictedPosition,
+                            points: eventResults.points || 0,
+                            bonusPoints: eventResults.bonusPoints || 0,
+                            earnedCadenceCredits: eventResults.earnedCadenceCredits || 0,
+                            earnedPunchingMedal: eventResults.earnedPunchingMedal,
+                            earnedGiantKillerMedal: eventResults.earnedGiantKillerMedal,
+                            earnedBullseyeMedal: eventResults.earnedBullseyeMedal,
+                            earnedHotStreakMedal: eventResults.earnedHotStreakMedal,
+                            earnedDomination: eventResults.earnedDomination,
+                            earnedCloseCall: eventResults.earnedCloseCall,
+                            earnedPhotoFinish: eventResults.earnedPhotoFinish,
+                            earnedDarkHorse: eventResults.earnedDarkHorse,
+                            earnedZeroToHero: eventResults.earnedZeroToHero,
+                            processedAt: eventResults.processedAt,
+                            raceDate: eventResults.raceDate
+                        });
+                    }
+                }
             }
-        }
 
-        // Also check special events (101, 102, etc.)
-        const specialEventIds = [101, 102];
-        const SPECIAL_EVENT_DATA = {
-            101: { name: 'Singapore Criterium', type: 'criterium' },
-            102: { name: 'The Leveller', type: 'special' }
-        };
+            // Get special events
+            const specialEvents = window.seasonConfig.SPECIAL_EVENTS || {};
+            for (const eventId of Object.keys(specialEvents)) {
+                const eventResults = userData[`event${eventId}Results`];
+                if (eventResults) {
+                    const eventInfo = specialEvents[eventId];
+                    allResults.push({
+                        eventNum: parseInt(eventId),
+                        seasonId: null,
+                        eventName: eventInfo.name || `Special Event ${eventId}`,
+                        eventType: eventInfo.type || 'special',
+                        isSpecialEvent: true,
+                        position: eventResults.position,
+                        time: eventResults.time,
+                        arr: eventResults.arr,
+                        predictedPosition: eventResults.predictedPosition,
+                        points: eventResults.points || 0,
+                        bonusPoints: eventResults.bonusPoints || 0,
+                        earnedCadenceCredits: eventResults.earnedCadenceCredits || 0,
+                        earnedPunchingMedal: eventResults.earnedPunchingMedal,
+                        earnedGiantKillerMedal: eventResults.earnedGiantKillerMedal,
+                        earnedBullseyeMedal: eventResults.earnedBullseyeMedal,
+                        earnedHotStreakMedal: eventResults.earnedHotStreakMedal,
+                        earnedDomination: eventResults.earnedDomination,
+                        earnedCloseCall: eventResults.earnedCloseCall,
+                        earnedPhotoFinish: eventResults.earnedPhotoFinish,
+                        earnedDarkHorse: eventResults.earnedDarkHorse,
+                        earnedZeroToHero: eventResults.earnedZeroToHero,
+                        processedAt: eventResults.processedAt,
+                        raceDate: eventResults.raceDate
+                    });
+                }
+            }
+        } else {
+            // Fallback: Legacy approach for Season 1 (events 1-15)
+            for (let i = 1; i <= 15; i++) {
+                const eventResults = userData[`event${i}Results`];
+                if (eventResults) {
+                    allResults.push({
+                        eventNum: i,
+                        seasonId: 1,
+                        eventName: EVENT_DATA[i]?.name || `Event ${i}`,
+                        eventType: EVENT_DATA[i]?.type || 'unknown',
+                        position: eventResults.position,
+                        time: eventResults.time,
+                        arr: eventResults.arr,
+                        predictedPosition: eventResults.predictedPosition,
+                        points: eventResults.points || 0,
+                        bonusPoints: eventResults.bonusPoints || 0,
+                        earnedCadenceCredits: eventResults.earnedCadenceCredits || 0,
+                        earnedPunchingMedal: eventResults.earnedPunchingMedal,
+                        earnedGiantKillerMedal: eventResults.earnedGiantKillerMedal,
+                        earnedBullseyeMedal: eventResults.earnedBullseyeMedal,
+                        earnedHotStreakMedal: eventResults.earnedHotStreakMedal,
+                        earnedDomination: eventResults.earnedDomination,
+                        earnedCloseCall: eventResults.earnedCloseCall,
+                        earnedPhotoFinish: eventResults.earnedPhotoFinish,
+                        earnedDarkHorse: eventResults.earnedDarkHorse,
+                        earnedZeroToHero: eventResults.earnedZeroToHero,
+                        processedAt: eventResults.processedAt,
+                        raceDate: eventResults.raceDate
+                    });
+                }
+            }
 
-        for (const eventNum of specialEventIds) {
-            const eventResults = userData[`event${eventNum}Results`];
-            if (eventResults) {
-                allResults.push({
-                    eventNum: eventNum,
-                    eventName: SPECIAL_EVENT_DATA[eventNum]?.name || `Special Event ${eventNum}`,
-                    eventType: SPECIAL_EVENT_DATA[eventNum]?.type || 'special',
-                    isSpecialEvent: true,
-                    position: eventResults.position,
-                    time: eventResults.time,
-                    arr: eventResults.arr,
-                    predictedPosition: eventResults.predictedPosition,
-                    points: eventResults.points || 0,
-                    bonusPoints: eventResults.bonusPoints || 0,
-                    earnedCadenceCredits: eventResults.earnedCadenceCredits || 0,
-                    earnedPunchingMedal: eventResults.earnedPunchingMedal,
-                    earnedGiantKillerMedal: eventResults.earnedGiantKillerMedal,
-                    earnedBullseyeMedal: eventResults.earnedBullseyeMedal,
-                    earnedHotStreakMedal: eventResults.earnedHotStreakMedal,
-                    earnedDomination: eventResults.earnedDomination,
-                    earnedCloseCall: eventResults.earnedCloseCall,
-                    earnedPhotoFinish: eventResults.earnedPhotoFinish,
-                    earnedDarkHorse: eventResults.earnedDarkHorse,
-                    earnedZeroToHero: eventResults.earnedZeroToHero,
-                    processedAt: eventResults.processedAt,
-                    raceDate: eventResults.raceDate
-                });
+            // Also check special events (101, 102, etc.)
+            const specialEventIds = [101, 102];
+            const SPECIAL_EVENT_DATA = {
+                101: { name: 'Singapore Criterium', type: 'criterium' },
+                102: { name: 'The Leveller', type: 'special' }
+            };
+
+            for (const eventNum of specialEventIds) {
+                const eventResults = userData[`event${eventNum}Results`];
+                if (eventResults) {
+                    allResults.push({
+                        eventNum: eventNum,
+                        seasonId: null,
+                        eventName: SPECIAL_EVENT_DATA[eventNum]?.name || `Special Event ${eventNum}`,
+                        eventType: SPECIAL_EVENT_DATA[eventNum]?.type || 'special',
+                        isSpecialEvent: true,
+                        position: eventResults.position,
+                        time: eventResults.time,
+                        arr: eventResults.arr,
+                        predictedPosition: eventResults.predictedPosition,
+                        points: eventResults.points || 0,
+                        bonusPoints: eventResults.bonusPoints || 0,
+                        earnedCadenceCredits: eventResults.earnedCadenceCredits || 0,
+                        earnedPunchingMedal: eventResults.earnedPunchingMedal,
+                        earnedGiantKillerMedal: eventResults.earnedGiantKillerMedal,
+                        earnedBullseyeMedal: eventResults.earnedBullseyeMedal,
+                        earnedHotStreakMedal: eventResults.earnedHotStreakMedal,
+                        earnedDomination: eventResults.earnedDomination,
+                        earnedCloseCall: eventResults.earnedCloseCall,
+                        earnedPhotoFinish: eventResults.earnedPhotoFinish,
+                        earnedDarkHorse: eventResults.earnedDarkHorse,
+                        earnedZeroToHero: eventResults.earnedZeroToHero,
+                        processedAt: eventResults.processedAt,
+                        raceDate: eventResults.raceDate
+                    });
+                }
             }
         }
 
@@ -294,9 +379,12 @@ async function loadPalmares(user) {
         displayHeader();
         displayKeyStats();
         displayKeyAchievements();
+        displaySeasonStats();
 
         // Apply default filter and display results
         filteredResults = [...allResults];
+        currentPage = 1;
+        displayedResults = 0;
         applySort();
         displayResultsTable();
 
@@ -397,12 +485,110 @@ function displayKeyAchievements() {
     }
 }
 
-// Display results table
-function displayResultsTable() {
-    const tbody = document.getElementById('resultsTableBody');
-    tbody.innerHTML = '';
+// Display season stats for completed seasons
+function displaySeasonStats() {
+    const section = document.getElementById('seasonStatsSection');
+    const container = document.getElementById('seasonStatsContainer');
 
-    filteredResults.forEach(result => {
+    // Check if season helpers are available
+    if (!window.seasonConfig || !window.seasonDataHelpers) {
+        section.style.display = 'none';
+        return;
+    }
+
+    // Get all completed seasons
+    const completedSeasons = window.seasonConfig.getCompletedSeasons(userData);
+
+    if (completedSeasons.length === 0) {
+        section.style.display = 'none';
+        return;
+    }
+
+    // Show the section
+    section.style.display = 'block';
+    container.innerHTML = '';
+
+    // Create a stats card for each completed season
+    completedSeasons.forEach(seasonId => {
+        const seasonConfig = window.seasonConfig.getSeasonConfig(seasonId);
+        const seasonStats = window.seasonDataHelpers.getSeasonStats(userData, seasonId);
+
+        if (!seasonConfig || !seasonStats) return;
+
+        const card = document.createElement('div');
+        card.className = 'season-stats-card palmares-season-card';
+
+        // Format completion date
+        let completionDateStr = '—';
+        if (seasonStats.completionDate) {
+            const date = seasonStats.completionDate.toDate ? seasonStats.completionDate.toDate() : new Date(seasonStats.completionDate);
+            completionDateStr = formatDate(date);
+        }
+
+        // Build card HTML
+        card.innerHTML = `
+            <div class="season-stats-header">
+                <h3 class="season-stats-title">${seasonConfig.name}</h3>
+                <span class="season-stats-subtitle">${seasonConfig.subtitle}</span>
+            </div>
+            <div class="season-stats-body">
+                <div class="season-stat-row">
+                    <span class="season-stat-label">Final Rank:</span>
+                    <span class="season-stat-value rank-value">${seasonStats.finalRank ? '#' + seasonStats.finalRank : '—'}</span>
+                </div>
+                <div class="season-stat-row">
+                    <span class="season-stat-label">Best Finish:</span>
+                    <span class="season-stat-value">${seasonStats.bestFinish}${getOrdinalSuffix(seasonStats.bestFinish)}</span>
+                </div>
+                <div class="season-stat-row">
+                    <span class="season-stat-label">Worst Finish:</span>
+                    <span class="season-stat-value">${seasonStats.worstFinish}${getOrdinalSuffix(seasonStats.worstFinish)}</span>
+                </div>
+                <div class="season-stat-row">
+                    <span class="season-stat-label">Average Finish:</span>
+                    <span class="season-stat-value">${seasonStats.averageFinish}</span>
+                </div>
+                <div class="season-stat-divider"></div>
+                <div class="season-stat-row">
+                    <span class="season-stat-label">Wins / Podiums / Top 10:</span>
+                    <span class="season-stat-value">${seasonStats.wins} / ${seasonStats.podiums} / ${seasonStats.topTens}</span>
+                </div>
+                <div class="season-stat-row">
+                    <span class="season-stat-label">Total Points:</span>
+                    <span class="season-stat-value">${seasonStats.totalPoints.toLocaleString()}</span>
+                </div>
+                <div class="season-stat-row">
+                    <span class="season-stat-label">Cadence Credits Earned:</span>
+                    <span class="season-stat-value cc-value">${seasonStats.totalCadenceCredits.toLocaleString()} CC</span>
+                </div>
+                <div class="season-stat-divider"></div>
+                <div class="season-stat-row">
+                    <span class="season-stat-label">Completed:</span>
+                    <span class="season-stat-value">${completionDateStr}</span>
+                </div>
+            </div>
+        `;
+
+        container.appendChild(card);
+    });
+}
+
+// Display results table with pagination
+function displayResultsTable(appendMode = false) {
+    const tbody = document.getElementById('resultsTableBody');
+
+    // If not appending, clear and reset
+    if (!appendMode) {
+        tbody.innerHTML = '';
+        displayedResults = 0;
+    }
+
+    // Calculate which results to display
+    const startIndex = displayedResults;
+    const endIndex = Math.min(displayedResults + RESULTS_PER_PAGE, filteredResults.length);
+    const resultsToShow = filteredResults.slice(startIndex, endIndex);
+
+    resultsToShow.forEach(result => {
         const row = document.createElement('tr');
 
         // Date - prefer raceDate (actual race date) over processedAt (when result was processed)
@@ -423,7 +609,12 @@ function displayResultsTable() {
         // Season
         const seasonCell = document.createElement('td');
         seasonCell.className = 'align-center';
-        seasonCell.textContent = '1'; // Currently all events are in Season 1
+        // Use seasonId from result, or determine from event number using season config
+        let seasonNum = result.seasonId;
+        if (!seasonNum && window.seasonConfig) {
+            seasonNum = window.seasonConfig.getSeasonForEvent(result.eventNum);
+        }
+        seasonCell.textContent = seasonNum || (result.isSpecialEvent ? 'SE' : '1');
         row.appendChild(seasonCell);
 
         // Stage
@@ -527,9 +718,41 @@ function displayResultsTable() {
         tbody.appendChild(row);
     });
 
-    // Update result count
-    document.getElementById('resultCount').textContent = filteredResults.length;
+    // Update displayed count
+    displayedResults = endIndex;
+
+    // Update result count display
+    document.getElementById('resultCount').textContent = displayedResults;
     document.getElementById('totalResults').textContent = allResults.length;
+
+    // Update pagination controls
+    updatePaginationControls();
+}
+
+// Update pagination controls visibility and status
+function updatePaginationControls() {
+    const paginationControls = document.getElementById('paginationControls');
+    const paginationStatus = document.getElementById('paginationStatus');
+    const remainingResults = filteredResults.length - displayedResults;
+
+    if (filteredResults.length > RESULTS_PER_PAGE) {
+        paginationControls.style.display = 'flex';
+
+        if (remainingResults > 0) {
+            document.getElementById('loadMoreBtn').style.display = 'inline-block';
+            paginationStatus.textContent = `Showing ${displayedResults} of ${filteredResults.length} results`;
+        } else {
+            document.getElementById('loadMoreBtn').style.display = 'none';
+            paginationStatus.textContent = `Showing all ${filteredResults.length} results`;
+        }
+    } else {
+        paginationControls.style.display = 'none';
+    }
+}
+
+// Load more results
+function loadMoreResults() {
+    displayResultsTable(true);
 }
 
 // Apply filtering
@@ -555,6 +778,10 @@ function applyFilters() {
 
         return true;
     });
+
+    // Reset pagination when filters change
+    currentPage = 1;
+    displayedResults = 0;
 
     applySort();
     displayResultsTable();
@@ -1857,6 +2084,9 @@ onAuthStateChanged(auth, async (user) => {
 document.getElementById('searchFilter')?.addEventListener('input', applyFilters);
 document.getElementById('filterType')?.addEventListener('change', applyFilters);
 document.getElementById('filterCategory')?.addEventListener('change', applyFilters);
+
+// Pagination event listener
+document.getElementById('loadMoreBtn')?.addEventListener('click', loadMoreResults);
 
 // Sortable table headers
 document.querySelectorAll('.palmares-table th.sortable').forEach(th => {

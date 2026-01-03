@@ -359,6 +359,35 @@
     -webkit-text-fill-color: transparent;
 }
 
+/* Section header with switcher layout */
+.section-header-with-switcher {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.section-header-with-switcher .section-title {
+    margin-bottom: 0;
+}
+
+.profile-season-switcher {
+    flex-shrink: 0;
+}
+
+@media (max-width: 600px) {
+    .section-header-with-switcher {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .profile-season-switcher {
+        width: 100%;
+    }
+}
+
 /* Stats Grid */
 .stats-grid {
     display: grid;

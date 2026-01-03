@@ -622,6 +622,124 @@
     text-overflow: ellipsis;
 }
 
+/* ===== PAGINATION CONTROLS ===== */
+.pagination-controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+    padding: 1rem 0;
+}
+
+.btn-load-more {
+    background: linear-gradient(135deg, rgba(69, 202, 255, 0.1), rgba(69, 202, 255, 0.2));
+    border: 1px solid var(--accent-blue, #45caff);
+    color: var(--accent-blue, #45caff);
+    padding: 0.75rem 2rem;
+    border-radius: 6px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-load-more:hover {
+    background: linear-gradient(135deg, rgba(69, 202, 255, 0.2), rgba(69, 202, 255, 0.3));
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(69, 202, 255, 0.2);
+}
+
+.pagination-status {
+    font-family: 'Exo 2', sans-serif;
+    font-size: 0.85rem;
+    color: var(--text-secondary, #a0a8c0);
+}
+
+/* ===== SEASON STATS GRID ===== */
+.season-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.5rem;
+}
+
+.palmares-season-card {
+    background: linear-gradient(135deg, #141824 0%, #1a1f2e 100%);
+    border: 1px solid rgba(69, 202, 255, 0.3);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.2s ease;
+}
+
+.palmares-season-card:hover {
+    border-color: var(--accent-blue, #45caff);
+    box-shadow: 0 4px 20px rgba(69, 202, 255, 0.15);
+}
+
+.season-stats-header {
+    background: rgba(69, 202, 255, 0.1);
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid rgba(69, 202, 255, 0.2);
+}
+
+.season-stats-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--accent-blue, #45caff);
+    margin: 0 0 0.25rem 0;
+}
+
+.season-stats-subtitle {
+    font-family: 'Exo 2', sans-serif;
+    font-size: 0.85rem;
+    color: var(--text-secondary, #a0a8c0);
+}
+
+.season-stats-body {
+    padding: 1.25rem;
+}
+
+.season-stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+}
+
+.season-stat-row:not(:last-child) {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.season-stat-label {
+    font-family: 'Exo 2', sans-serif;
+    font-size: 0.85rem;
+    color: var(--text-secondary, #a0a8c0);
+}
+
+.season-stat-value {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary, #ffffff);
+}
+
+.season-stat-value.rank-value {
+    color: #ffd700;
+    font-size: 1.1rem;
+}
+
+.season-stat-value.cc-value {
+    color: #ffc107;
+}
+
+.season-stat-divider {
+    height: 1px;
+    background: rgba(69, 202, 255, 0.2);
+    margin: 0.75rem 0;
+}
+
 /* ===== LOADING & ERROR STATES ===== */
 .loading-state,
 .login-prompt {
@@ -740,6 +858,19 @@
 
     .stats-grid {
         grid-template-columns: 1fr;
+    }
+
+    .season-stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .pagination-controls {
+        padding: 1rem;
+    }
+
+    .btn-load-more {
+        width: 100%;
+        padding: 1rem;
     }
 }
 

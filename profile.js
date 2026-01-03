@@ -36,6 +36,229 @@ let currentUser = null;
 let userData = null;
 let userStats = null;
 
+// Season switcher state
+let profileSeasonSwitcher = null;
+let viewingSeason = 1;
+
+// Initialize profile season switcher
+function initProfileSeasonSwitcher() {
+    if (!window.SeasonSwitcher) {
+        console.warn('SeasonSwitcher not loaded');
+        return;
+    }
+
+    // Get initial viewing season from URL or localStorage
+    viewingSeason = window.getViewingSeasonFromUrl ?
+        window.getViewingSeasonFromUrl(userData?.currentSeason || 1) : 1;
+
+    profileSeasonSwitcher = new window.SeasonSwitcher({
+        containerId: 'profileSeasonSwitcher',
+        userData: userData,
+        currentSeason: userData?.currentSeason || 1,
+        viewingSeason: viewingSeason,
+        showLabels: true,
+        mode: 'compact',
+        onSeasonChange: handleProfileSeasonChange
+    });
+
+    profileSeasonSwitcher.render();
+    updateSeasonProgressDisplay();
+}
+
+// Handle season change from the switcher
+function handleProfileSeasonChange(newSeason) {
+    console.log(`Profile: Season ${newSeason} selected`);
+    viewingSeason = newSeason;
+
+    updateSeasonProgressTitle();
+    updateSeasonHistoryBanner();
+    updateSeasonProgressDisplay();
+}
+
+// Update the season progress title
+function updateSeasonProgressTitle() {
+    const title = document.getElementById('seasonProgressTitle');
+    if (!title) return;
+
+    const seasonConfig = window.seasonConfig?.getSeasonConfig?.(viewingSeason);
+    const isComplete = window.seasonConfig?.isSeasonComplete?.(userData, viewingSeason);
+
+    if (seasonConfig) {
+        title.textContent = isComplete ?
+            `${seasonConfig.name} Complete` :
+            `${seasonConfig.name} Progress`;
+    } else {
+        title.textContent = `Season ${viewingSeason} Progress`;
+    }
+}
+
+// Show/hide history banner when viewing a past completed season
+function updateSeasonHistoryBanner() {
+    const banner = document.getElementById('profileHistoryBanner');
+    if (!banner) return;
+
+    if (profileSeasonSwitcher && profileSeasonSwitcher.isViewingHistory()) {
+        const seasonConfig = window.seasonConfig?.getSeasonConfig?.(viewingSeason);
+        const seasonName = seasonConfig ?
+            `${seasonConfig.name} - ${seasonConfig.subtitle}` :
+            `Season ${viewingSeason}`;
+
+        banner.innerHTML = `
+            <div class="season-history-banner">
+                <span class="season-history-banner__text">
+                    <strong>Viewing History:</strong> ${seasonName} (Completed)
+                </span>
+                ${window.createReturnToCurrentButton ?
+                    window.createReturnToCurrentButton(profileSeasonSwitcher.currentSeason, (s) => {
+                        profileSeasonSwitcher.update({ viewingSeason: s });
+                        handleProfileSeasonChange(s);
+                    }) : ''
+                }
+            </div>
+        `;
+        banner.style.display = 'block';
+    } else {
+        banner.style.display = 'none';
+    }
+}
+
+// Update the season progress display based on viewing season
+function updateSeasonProgressDisplay() {
+    const activeProgress = document.getElementById('activeSeasonProgress');
+    const completedSummary = document.getElementById('completedSeasonSummary');
+
+    if (!activeProgress || !completedSummary) return;
+
+    const isComplete = window.seasonConfig?.isSeasonComplete?.(userData, viewingSeason);
+    const currentSeason = userData?.currentSeason || 1;
+    const isViewingCurrentSeason = viewingSeason === currentSeason;
+
+    if (isComplete && !isViewingCurrentSeason) {
+        // Viewing a completed past season - show summary
+        activeProgress.style.display = 'none';
+        completedSummary.style.display = 'block';
+        displayCompletedSeasonSummary(viewingSeason);
+    } else {
+        // Viewing current (or in-progress) season - show progress
+        activeProgress.style.display = 'block';
+        completedSummary.style.display = 'none';
+        displayActiveSeasonProgress(viewingSeason);
+    }
+
+    updateSeasonProgressTitle();
+}
+
+// Display progress for active season
+function displayActiveSeasonProgress(seasonId) {
+    if (!userData) return;
+
+    const seasonConfig = window.seasonConfig?.getSeasonConfig?.(seasonId);
+    const seasonData = window.seasonDataHelpers?.getSeasonData?.(userData, seasonId);
+
+    if (!seasonData) {
+        // No data for this season
+        document.getElementById('currentStage').textContent = 'Stage 1';
+        document.getElementById('completedEvents').textContent = '0';
+        document.getElementById('progressFill').style.width = '0%';
+        return;
+    }
+
+    const currentStage = seasonData.currentStage || 1;
+    const completedEvents = (seasonData.completedStages?.length || 0) +
+                           (seasonData.completedOptionalEvents?.length || 0);
+    const totalStages = seasonConfig?.stageCount || 9;
+
+    document.getElementById('currentStage').textContent = `Stage ${currentStage}`;
+    document.getElementById('completedEvents').textContent = completedEvents;
+
+    const progressPercent = Math.round((completedEvents / totalStages) * 100);
+    document.getElementById('progressFill').style.width = `${progressPercent}%`;
+}
+
+// Display summary for completed season
+function displayCompletedSeasonSummary(seasonId) {
+    const container = document.getElementById('completedSeasonSummary');
+    if (!container || !userData) return;
+
+    const seasonConfig = window.seasonConfig?.getSeasonConfig?.(seasonId);
+    const seasonStats = window.seasonDataHelpers?.getSeasonStats?.(userData, seasonId);
+    const seasonData = window.seasonDataHelpers?.getSeasonData?.(userData, seasonId);
+
+    if (!seasonStats && !seasonData) {
+        container.innerHTML = `
+            <div class="season-stats-card">
+                <p style="text-align: center; color: var(--text-secondary);">
+                    No data available for this season.
+                </p>
+            </div>
+        `;
+        return;
+    }
+
+    const stats = seasonStats || {};
+    const data = seasonData || {};
+
+    // Format completion date
+    let completionDateStr = 'N/A';
+    if (data.completionDate) {
+        const date = data.completionDate.toDate ? data.completionDate.toDate() : new Date(data.completionDate);
+        completionDateStr = date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    }
+
+    // Get ordinal suffix for rank
+    const rankSuffix = data.rank ? getOrdinalSuffix(data.rank) : '';
+
+    container.innerHTML = `
+        <div class="season-stats-card">
+            <div class="season-stats-card__header">
+                <div class="season-stats-card__title">
+                    <span class="season-stats-card__title-icon">&#127942;</span>
+                    ${seasonConfig?.name || 'Season ' + seasonId} Complete
+                </div>
+                <div class="season-stats-card__date">
+                    Completed: ${completionDateStr}
+                </div>
+            </div>
+
+            <div class="season-stats-card__grid">
+                <div class="season-stats-card__stat season-stats-card__stat--rank">
+                    <div class="season-stats-card__stat-value">
+                        ${data.rank || '-'}<span class="season-stats-card__rank-suffix">${rankSuffix}</span>
+                    </div>
+                    <div class="season-stats-card__stat-label">Final Rank</div>
+                </div>
+                <div class="season-stats-card__stat">
+                    <div class="season-stats-card__stat-value">${stats.totalPoints || data.totalPoints || 0}</div>
+                    <div class="season-stats-card__stat-label">Total Points</div>
+                </div>
+                <div class="season-stats-card__stat">
+                    <div class="season-stats-card__stat-value">${stats.wins || 0}</div>
+                    <div class="season-stats-card__stat-label">Wins</div>
+                </div>
+                <div class="season-stats-card__stat">
+                    <div class="season-stats-card__stat-value">${stats.podiums || 0}</div>
+                    <div class="season-stats-card__stat-label">Podiums</div>
+                </div>
+                <div class="season-stats-card__stat">
+                    <div class="season-stats-card__stat-value">${stats.bestFinish || '-'}</div>
+                    <div class="season-stats-card__stat-label">Best Finish</div>
+                </div>
+                <div class="season-stats-card__stat">
+                    <div class="season-stats-card__stat-value">${stats.eventsCompleted || '-'}</div>
+                    <div class="season-stats-card__stat-label">Events</div>
+                </div>
+            </div>
+
+            ${data.completionStory ? `
+                <div class="season-stats-card__story">
+                    <div class="season-stats-card__story-title">Season Wrap-Up</div>
+                    <div class="season-stats-card__story-content">${data.completionStory}</div>
+                </div>
+            ` : ''}
+        </div>
+    `;
+}
+
 // Show/hide sections based on auth state
 function showLoadingState() {
     document.getElementById('loadingState').style.display = 'flex';
@@ -366,18 +589,10 @@ function displayProfileInfo(user, userData, stats, seasonRanking, globalRanking)
     
     // Recent results
     displayRecentResults(stats.recentResults);
-    
-    // Career progress
-    const currentStage = userData.currentStage || 1;
-    const completedEvents = (userData.completedStages || []).length + (userData.completedOptionalEvents || []).length;
-    const totalEvents = 9; // Adjust based on your stage structure
-    
-    document.getElementById('currentStage').textContent = `Stage ${currentStage}`;
-    document.getElementById('completedEvents').textContent = completedEvents;
-    
-    const progressPercent = (completedEvents / totalEvents) * 100;
-    document.getElementById('progressFill').style.width = `${progressPercent}%`;
-    
+
+    // Season progress (using the season-aware switcher and display)
+    initProfileSeasonSwitcher();
+
     // Awards
     displayAwards(stats.awards);
 
