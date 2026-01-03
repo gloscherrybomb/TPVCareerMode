@@ -80,10 +80,11 @@ function applyPersonalityChanges(currentPersonality, personalityDelta) {
  * Also updates the personalityAfter field in each interview document
  */
 async function recalculateUserPersonality(userId) {
-  // Query all interviews for this user, ordered by event number
+  // Query all interviews for this user, ordered by completion timestamp
+  // This ensures personality is recalculated in the order events were actually completed
   const interviewsSnapshot = await db.collection('interviews')
     .where('userId', '==', userId)
-    .orderBy('eventNumber', 'asc')
+    .orderBy('timestamp', 'asc')
     .get();
 
   if (interviewsSnapshot.empty) {

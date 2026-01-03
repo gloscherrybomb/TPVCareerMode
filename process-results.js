@@ -59,10 +59,11 @@ async function recoverPersonalityIfNeeded(userId, userData, userRef) {
   }
 
   try {
-    // Query interviews for this user, ordered by event number descending
+    // Query interviews for this user, ordered by completion timestamp descending
+    // This gets the most recently completed event's interview, not highest event number
     const interviewsSnapshot = await db.collection('interviews')
       .where('userId', '==', userId)
-      .orderBy('eventNumber', 'desc')
+      .orderBy('timestamp', 'desc')
       .limit(1)
       .get();
 
@@ -1516,12 +1517,20 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
   }
   
   // Find previous event number and all completed events for story context
-  const completedEventNumbers = [];
+  // Build array of completed events with timestamps for proper ordering
+  const completedEvents = [];
   for (let i = 1; i <= 15; i++) {
     if (userData[`event${i}Results`]) {
-      completedEventNumbers.push(i);
+      const evtData = userData[`event${i}Results`];
+      const timestamp = evtData.raceDate || evtData.processedAt;
+      const timestampMs = timestamp ? (timestamp.toDate ? timestamp.toDate().getTime() : new Date(timestamp).getTime()) : 0;
+      completedEvents.push({ eventNum: i, timestamp: timestampMs });
     }
   }
+
+  // Sort by completion timestamp (oldest first)
+  completedEvents.sort((a, b) => a.timestamp - b.timestamp);
+  const completedEventNumbers = completedEvents.map(e => e.eventNum);
   const previousEventNumber = completedEventNumbers.length > 0 ? completedEventNumbers[completedEventNumbers.length - 1] : null;
   
   // Determine next event number based on next stage

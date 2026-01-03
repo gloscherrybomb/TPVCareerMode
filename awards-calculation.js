@@ -115,9 +115,16 @@ function calculateCareerAwards(allEventResults) {
   let consecutiveWins = 0;
   let weekendEvents = 0;
   let lastWasWin = false;
-  
-  // Sort events by event number
-  const sortedEvents = [...allEventResults].sort((a, b) => a.eventNum - b.eventNum);
+
+  // Sort events by completion timestamp to check consecutive results in completion order
+  // Prefer raceDate (actual race date) over processedAt (when result was processed)
+  const sortedEvents = [...allEventResults].sort((a, b) => {
+    const aDate = a.raceDate || a.processedAt || a.completedAt;
+    const bDate = b.raceDate || b.processedAt || b.completedAt;
+    const aTime = aDate ? (aDate.toDate ? aDate.toDate().getTime() : new Date(aDate).getTime()) : 0;
+    const bTime = bDate ? (bDate.toDate ? bDate.toDate().getTime() : new Date(bDate).getTime()) : 0;
+    return aTime - bTime; // Ascending - oldest first for consecutive award calculation
+  });
   
   for (let i = 0; i < sortedEvents.length; i++) {
     const event = sortedEvents[i];

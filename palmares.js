@@ -174,7 +174,7 @@ async function fetchInterviewHistory(userId) {
         const q = query(
             interviewsRef,
             where('userId', '==', userId),
-            orderBy('eventNumber', 'asc')
+            orderBy('timestamp', 'asc')
         );
 
         const querySnapshot = await getDocs(q);
@@ -793,7 +793,15 @@ function displayDetailedStats() {
 
 // Calculate streaks
 function calculateStreaks(results) {
-    const sorted = [...results].sort((a, b) => a.eventNum - b.eventNum);
+    // Sort by completion timestamp (prefer raceDate, fall back to processedAt)
+    // This ensures streaks are calculated in the order events were actually completed
+    const sorted = [...results].sort((a, b) => {
+        const aDate = a.raceDate || a.processedAt;
+        const bDate = b.raceDate || b.processedAt;
+        const aTime = aDate ? (aDate.toDate ? aDate.toDate().getTime() : new Date(aDate).getTime()) : 0;
+        const bTime = bDate ? (bDate.toDate ? bDate.toDate().getTime() : new Date(bDate).getTime()) : 0;
+        return aTime - bTime; // Ascending - oldest first for streak calculation
+    });
 
     let top10Streak = 0, maxTop10 = 0;
     let podiumStreak = 0, maxPodium = 0;
@@ -1100,15 +1108,25 @@ function displayPersonalityTimeline() {
             dataPoints.push({
                 eventNumber: interview.eventNumber,
                 stageNumber: stageNumber,
+                timestamp: interview.timestamp,
                 ...interview.personalityAfter
             });
         }
     });
 
-    // Sort data points by stage number (not event number) to show correct timeline order
-    // Events are completed in stage order, not event number order
-    // e.g., Stage 3 might be Event 9 (choice), Stage 4 is Event 3 (fixed)
-    dataPoints.sort((a, b) => a.stageNumber - b.stageNumber);
+    // Sort data points by completion timestamp to show correct timeline order
+    // This ensures personality development is shown in the order events were actually completed
+    // including special events which may be completed between career stages
+    dataPoints.sort((a, b) => {
+        // First data point (eventNumber 0) should always be first
+        if (a.eventNumber === 0) return -1;
+        if (b.eventNumber === 0) return 1;
+
+        // Sort by timestamp
+        const aTime = a.timestamp ? (a.timestamp.toDate ? a.timestamp.toDate().getTime() : new Date(a.timestamp).getTime()) : 0;
+        const bTime = b.timestamp ? (b.timestamp.toDate ? b.timestamp.toDate().getTime() : new Date(b.timestamp).getTime()) : 0;
+        return aTime - bTime; // Ascending - oldest first for chart progression
+    });
 
     // Store data points globally for interactivity
     chartDataPoints = dataPoints;

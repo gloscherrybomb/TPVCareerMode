@@ -274,10 +274,11 @@ async function recoverPersonalityIfNeeded(userId, userData, userRef) {
   }
 
   try {
-    // Query interviews for this user, ordered by event number descending
+    // Query interviews for this user, ordered by completion timestamp descending
+    // This gets the most recently completed event's interview, not highest event number
     const interviewsSnapshot = await db.collection('interviews')
       .where('userId', '==', userId)
-      .orderBy('eventNumber', 'desc')
+      .orderBy('timestamp', 'desc')
       .limit(1)
       .get();
 
@@ -2390,14 +2391,22 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
 
   // ================== STORY GENERATION ==================
   // Calculate context needed for story generation
-  const completedEventNumbers = [];
+  // Build array of completed events with timestamps for proper ordering
+  const completedEvents = [];
   for (let i = 1; i <= 15; i++) {
     if (userData[`event${i}Results`]) {
-      completedEventNumbers.push(i);
+      const evtData = userData[`event${i}Results`];
+      const timestamp = evtData.raceDate || evtData.processedAt;
+      const timestampMs = timestamp ? (timestamp.toDate ? timestamp.toDate().getTime() : new Date(timestamp).getTime()) : 0;
+      completedEvents.push({ eventNum: i, timestamp: timestampMs });
     }
   }
 
-  // Recent results for form analysis
+  // Sort by completion timestamp (oldest first)
+  completedEvents.sort((a, b) => a.timestamp - b.timestamp);
+  const completedEventNumbers = completedEvents.map(e => e.eventNum);
+
+  // Recent results for form analysis (last 3 completed events by timestamp)
   const recentResults = completedEventNumbers.slice(-3).map(evtNum => {
     const evtData = userData[`event${evtNum}Results`];
     return evtData ? evtData.position : null;
