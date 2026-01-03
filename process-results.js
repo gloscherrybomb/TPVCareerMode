@@ -1024,22 +1024,23 @@ async function calculateGC(season, userUid, upToEvent = 15, currentUserResult = 
           // Simulate this stage for this bot
           const fieldSize = stageResults[eventNum]?.length || 50;
           const simulatedPosition = simulatePosition(uid, rider.arr, eventNum, fieldSize);
-          
-          // Convert position to approximate time based on event characteristics
-          // Use the median time from actual results as baseline
-          const actualTimes = stageResults[eventNum]
-            ?.filter(r => r.time && r.position !== 'DNF')
-            .map(r => parseFloat(r.time))
-            .sort((a, b) => a - b) || [3600];
-          
-          const medianTime = actualTimes[Math.floor(actualTimes.length / 2)] || 3600;
-          const maxTime = actualTimes[actualTimes.length - 1] || 4000;
-          
-          // Scale time based on simulated position
-          // Better positions = closer to median, worse = closer to max
-          const positionRatio = (simulatedPosition - 1) / fieldSize;
-          const simulatedTime = medianTime + (maxTime - medianTime) * positionRatio;
-          
+
+          // Simulate time based on riders with similar ARR (more realistic)
+          let simulatedTime = simulateTimeFromARR(uid, rider.arr, stageResults[eventNum], eventNum);
+
+          // Fallback to position-based interpolation if no valid ARR matches
+          if (!simulatedTime) {
+            const actualTimes = stageResults[eventNum]
+              ?.filter(r => r.time && r.position !== 'DNF')
+              .map(r => parseFloat(r.time))
+              .sort((a, b) => a - b) || [];
+
+            const minTime = actualTimes[0] || 1800;
+            const maxTime = actualTimes[actualTimes.length - 1] || minTime * 1.1;
+            const positionRatio = (simulatedPosition - 1) / Math.max(1, fieldSize - 1);
+            simulatedTime = minTime + (maxTime - minTime) * positionRatio;
+          }
+
           rider.stageResults[eventNum] = {
             position: simulatedPosition,
             time: simulatedTime,
@@ -2719,6 +2720,52 @@ function simulatePosition(botName, arr, eventNumber, fieldSize = 50) {
   simulatedPosition = Math.max(1, Math.min(fieldSize, simulatedPosition));
   
   return simulatedPosition;
+}
+
+/**
+ * Simulate a race time for a bot based on times of riders with similar ARR
+ * @param {string} botUid - Bot's unique identifier (for seeded random)
+ * @param {number} botARR - Bot's ARR rating
+ * @param {Array} stageResults - Array of actual race results for the stage
+ * @param {number} eventNum - Event number (for seeded random)
+ * @returns {number|null} - Simulated time in seconds, or null if fallback needed
+ */
+function simulateTimeFromARR(botUid, botARR, stageResults, eventNum) {
+  // Get actual results with valid times and ARR
+  const validResults = (stageResults || [])
+    .filter(r => r.time && parseFloat(r.time) > 0 && r.arr && r.position !== 'DNF')
+    .map(r => ({ arr: parseInt(r.arr) || 1000, time: parseFloat(r.time) }));
+
+  if (validResults.length === 0) {
+    return null; // Fallback to position-based method
+  }
+
+  // Find riders within ARR range (start tight, expand if needed)
+  let arrRange = 50;
+  let similarRiders = [];
+
+  while (similarRiders.length < 2 && arrRange <= 300) {
+    similarRiders = validResults.filter(r =>
+      Math.abs(r.arr - botARR) <= arrRange
+    );
+    arrRange += 50;
+  }
+
+  // If still no matches after expanding range, use closest ARR riders
+  if (similarRiders.length === 0) {
+    validResults.sort((a, b) =>
+      Math.abs(a.arr - botARR) - Math.abs(b.arr - botARR)
+    );
+    similarRiders = validResults.slice(0, 3);
+  }
+
+  // Calculate median time of similar riders
+  const times = similarRiders.map(r => r.time).sort((a, b) => a - b);
+  const medianTime = times[Math.floor(times.length / 2)];
+
+  // Add small random variance (±1% using seeded random) for realism
+  const variance = (getSeededRandom(botUid, eventNum) - 0.5) * 0.02;
+  return medianTime * (1 + variance);
 }
 
 /**
