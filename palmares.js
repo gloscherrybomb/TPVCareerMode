@@ -1038,6 +1038,12 @@ function mapEventToStage(eventNumber, choiceSelections) {
     // Convert to number for consistent comparison
     const eventNum = parseInt(eventNumber);
 
+    // Special events (101+) are not part of season stages
+    // They should return null, not their event number
+    if (eventNum >= 100) {
+        return null;
+    }
+
     // Check mandatory stages (including Local Tour stages 9-11)
     for (const seq of EVENT_SEQUENCE) {
         if (seq.eventId === eventNum) {
@@ -1054,9 +1060,9 @@ function mapEventToStage(eventNumber, choiceSelections) {
         }
     }
 
-    // Fallback - couldn't find mapping
+    // Fallback - couldn't find mapping (shouldn't happen for valid events 1-15)
     console.warn(`Could not map event ${eventNum} to a stage. choiceSelections:`, choiceSelections);
-    return eventNum; // Use event number as fallback
+    return null; // Return null instead of eventNum to avoid using event number as stage
 }
 
 // Display personality evolution chart
@@ -1149,8 +1155,16 @@ function displayPersonalityTimeline() {
     })));
 
     // TEMPORARY: Show debug info directly on page for mobile debugging
-    const debugInfo = dataPoints.map(p => `E${p.eventNumber}:${p.completionOrder}`).join(', ');
+    const debugInfo = dataPoints.map(p => `E${p.eventNumber}:${p.completionOrder}(S${p.stageNumber})`).join(', ');
     showDebugOnPage('Data Points', debugInfo);
+
+    // Additional debug: Check if any special events exist
+    const specialEvents = dataPoints.filter(p => p.eventNumber >= 100);
+    if (specialEvents.length > 0) {
+        showDebugOnPage('Special Events Found', specialEvents.map(p =>
+            `E${p.eventNumber}: order=${p.completionOrder}, stage=${p.stageNumber}`
+        ).join(', '));
+    }
 
     // Store data points globally for interactivity
     chartDataPoints = dataPoints;
