@@ -100,7 +100,8 @@ async function calculateUserStats(userUID, userData) {
                 earnedPhotoFinish: eventResults.earnedPhotoFinish || false,
                 earnedDarkHorse: eventResults.earnedDarkHorse || false,
                 earnedZeroToHero: eventResults.earnedZeroToHero || false,
-                date: eventResults.processedAt
+                raceDate: eventResults.raceDate,
+                processedAt: eventResults.processedAt
             });
         }
     }
@@ -144,18 +145,22 @@ async function calculateUserStats(userUID, userData) {
                 earnedDarkHorse: eventResults.earnedDarkHorse || false,
                 earnedZeroToHero: eventResults.earnedZeroToHero || false,
                 isSpecialEvent: true,
-                date: eventResults.processedAt
+                raceDate: eventResults.raceDate,
+                processedAt: eventResults.processedAt
             });
         }
     }
 
-    // Sort recent results by stage number (most recent stage first)
-    // This ensures results appear in stage completion order, not event number order
-    // Falls back to eventNum for legacy data without stageNumber
+    // Sort recent results by completion timestamp (most recent first)
+    // Prefer raceDate (actual race date from CSV filename) over processedAt (when results were processed)
+    // This ensures results appear in the order they were actually completed, including special events
     stats.recentResults.sort((a, b) => {
-        const stageA = a.stageNumber || a.eventNum;
-        const stageB = b.stageNumber || b.eventNum;
-        return stageB - stageA;
+        const aDate = a.raceDate || a.processedAt;
+        const bDate = b.raceDate || b.processedAt;
+        // Convert to timestamp for comparison (handles ISO strings and Firestore timestamps)
+        const aTime = aDate ? (aDate.toDate ? aDate.toDate().getTime() : new Date(aDate).getTime()) : 0;
+        const bTime = bDate ? (bDate.toDate ? bDate.toDate().getTime() : new Date(bDate).getTime()) : 0;
+        return bTime - aTime; // Descending - most recent first
     });
 
     return stats;
