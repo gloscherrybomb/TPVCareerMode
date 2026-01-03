@@ -1136,6 +1136,12 @@ function displayPersonalityTimeline() {
         return aTime - bTime; // Ascending - oldest first for chart progression
     });
 
+    // Assign completion order numbers (0, 1, 2, 3, etc.) for X axis display
+    // This replaces stage numbers with simple sequential numbers showing completion order
+    dataPoints.forEach((point, index) => {
+        point.completionOrder = index;
+    });
+
     // Store data points globally for interactivity
     chartDataPoints = dataPoints;
 
@@ -1179,9 +1185,9 @@ function drawPersonalityChart(dataPoints) {
         sampledPoints = sampleDataPoints(dataPoints, 15);
     }
 
-    // Get min and max stage numbers for X axis
-    const minStage = Math.min(...sampledPoints.map(p => p.stageNumber));
-    const maxStage = Math.max(...sampledPoints.map(p => p.stageNumber));
+    // Get min and max completion order for X axis (simple sequential numbers)
+    const minOrder = Math.min(...sampledPoints.map(p => p.completionOrder));
+    const maxOrder = Math.max(...sampledPoints.map(p => p.completionOrder));
 
     // Find min and max values across all traits for dynamic Y-axis scaling
     let minValue = 100;
@@ -1213,9 +1219,9 @@ function drawPersonalityChart(dataPoints) {
     maxValue = Math.ceil(maxValue / 5) * 5;
 
     // Helper functions for coordinate conversion
-    const xScale = (stageNum) => {
-        if (maxStage === minStage) return padding.left + chartWidth / 2;
-        return padding.left + ((stageNum - minStage) / (maxStage - minStage)) * chartWidth;
+    const xScale = (orderNum) => {
+        if (maxOrder === minOrder) return padding.left + chartWidth / 2;
+        return padding.left + ((orderNum - minOrder) / (maxOrder - minOrder)) * chartWidth;
     };
 
     const yScale = (value) => {
@@ -1244,22 +1250,22 @@ function drawPersonalityChart(dataPoints) {
         ctx.fillText(Math.round(value).toString(), padding.left - 10, y);
     }
 
-    // Vertical grid lines (stages)
-    const stageStep = Math.max(1, Math.ceil((maxStage - minStage) / 10));
-    for (let stage = minStage; stage <= maxStage; stage += stageStep) {
-        const x = xScale(stage);
+    // Vertical grid lines (completion order)
+    const orderStep = Math.max(1, Math.ceil((maxOrder - minOrder) / 10));
+    for (let order = minOrder; order <= maxOrder; order += orderStep) {
+        const x = xScale(order);
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
         ctx.beginPath();
         ctx.moveTo(x, padding.top);
         ctx.lineTo(x, padding.top + chartHeight);
         ctx.stroke();
 
-        // X-axis labels
+        // X-axis labels (simple sequential numbers)
         ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
         ctx.font = '12px Exo 2, sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'top';
-        ctx.fillText(stage === 0 ? 'Start' : `Stage ${stage}`, x, padding.top + chartHeight + 10);
+        ctx.fillText(order === 0 ? 'Start' : order.toString(), x, padding.top + chartHeight + 10);
     }
 
     // Draw axes
@@ -1280,7 +1286,7 @@ function drawPersonalityChart(dataPoints) {
         ctx.beginPath();
 
         sampledPoints.forEach((point, index) => {
-            const x = xScale(point.stageNumber);
+            const x = xScale(point.completionOrder);
             const y = yScale(point[trait.name] || 50);
 
             if (index === 0) {
@@ -1294,7 +1300,7 @@ function drawPersonalityChart(dataPoints) {
 
         // Draw points
         sampledPoints.forEach(point => {
-            const x = xScale(point.stageNumber);
+            const x = xScale(point.completionOrder);
             const y = yScale(point[trait.name] || 50);
 
             ctx.fillStyle = trait.color;
@@ -1308,7 +1314,7 @@ function drawPersonalityChart(dataPoints) {
     const highlightIndex = clickedEventIndex !== null ? clickedEventIndex : hoveredEventIndex;
     if (highlightIndex !== null && highlightIndex < sampledPoints.length) {
         const hoveredPoint = sampledPoints[highlightIndex];
-        const x = xScale(hoveredPoint.stageNumber);
+        const x = xScale(hoveredPoint.completionOrder);
 
         // Draw vertical line at hovered event
         ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
@@ -1446,23 +1452,23 @@ function findDataPointAtPosition(canvasX, canvasY, canvas) {
         return null;
     }
 
-    // Find nearest stage point
+    // Find nearest completion order point
     const sampledPoints = chartDataPoints.length > 15 ? sampleDataPoints(chartDataPoints, 15) : chartDataPoints;
-    const minStage = Math.min(...sampledPoints.map(p => p.stageNumber));
-    const maxStage = Math.max(...sampledPoints.map(p => p.stageNumber));
+    const minOrder = Math.min(...sampledPoints.map(p => p.completionOrder));
+    const maxOrder = Math.max(...sampledPoints.map(p => p.completionOrder));
 
-    if (maxStage === minStage) return null;
+    if (maxOrder === minOrder) return null;
 
-    // Convert mouse X to stage number
-    const stageProgress = (canvasX - padding.left) / chartWidth;
-    const stageNumber = minStage + stageProgress * (maxStage - minStage);
+    // Convert mouse X to completion order
+    const orderProgress = (canvasX - padding.left) / chartWidth;
+    const completionOrder = minOrder + orderProgress * (maxOrder - minOrder);
 
     // Find closest point
     let closestIndex = 0;
     let closestDistance = Infinity;
 
     sampledPoints.forEach((point, index) => {
-        const distance = Math.abs(point.stageNumber - stageNumber);
+        const distance = Math.abs(point.completionOrder - completionOrder);
         if (distance < closestDistance) {
             closestDistance = distance;
             closestIndex = index;
@@ -1470,7 +1476,7 @@ function findDataPointAtPosition(canvasX, canvasY, canvas) {
     });
 
     // Only return if click is reasonably close (within 5% of chart width)
-    const threshold = (maxStage - minStage) * 0.05;
+    const threshold = (maxOrder - minOrder) * 0.05;
     if (closestDistance < threshold) {
         return closestIndex;
     }
