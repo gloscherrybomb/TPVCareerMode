@@ -1,6 +1,21 @@
 // season-completion.js - Handle end-of-season detection and completion logic
 
 /**
+ * Format number as ordinal (1st, 2nd, 3rd, 21st, 22nd, 23rd, etc.)
+ * @param {number} num - The number to format
+ * @returns {string} The number with ordinal suffix (e.g., "1st", "21st")
+ */
+function formatOrdinal(num) {
+  if (!num) return '';
+  const j = num % 10;
+  const k = num % 100;
+  if (j === 1 && k !== 11) return num + 'st';
+  if (j === 2 && k !== 12) return num + 'nd';
+  if (j === 3 && k !== 13) return num + 'rd';
+  return num + 'th';
+}
+
+/**
  * Check if Season 1 is complete for a user
  * Season 1 is complete when:
  * - Event 15 (Local Tour Stage 3) is completed with results
@@ -66,9 +81,9 @@ function generateSeasonCompleteStory(data) {
     } else if (position <= 3) {
         story += `The final day of the Local Tour brought the curtain down on Season 1 with a podium finish on the toughest stage of the year. You finished ${position === 2 ? 'second' : 'third'}, a fitting end to a season of hard racing and steady progress. `;
     } else if (position <= 10) {
-        story += `As the final riders crossed the line on the queen stage of the Local Tour, Season 1 officially came to a close. Your ${position}th place finish today capped off what's been a season of growth, challenges, and valuable experience. `;
+        story += `As the final riders crossed the line on the queen stage of the Local Tour, Season 1 officially came to a close. Your ${formatOrdinal(position)} place finish today capped off what's been a season of growth, challenges, and valuable experience. `;
     } else {
-        story += `The final climb of the Local Tour—and the final test of Season 1—demanded everything you had. You finished ${position}th today as the season reached its conclusion, bringing an end to months of racing, learning, and pushing yourself against the field. `;
+        story += `The final climb of the Local Tour—and the final test of Season 1—demanded everything you had. You finished ${formatOrdinal(position)} today as the season reached its conclusion, bringing an end to months of racing, learning, and pushing yourself against the field. `;
     }
     
     // Middle section - Local Tour GC result
@@ -77,7 +92,7 @@ function generateSeasonCompleteStory(data) {
     } else if (localTourGCPosition <= 3) {
         story += `Across the three days of the Local Tour, you fought hard for every second and secured ${localTourGCPosition === 2 ? 'second' : 'third'} place in the overall GC standings—a podium finish in the season's premier stage race. `;
     } else {
-        story += `Over three challenging stages, you battled through the Local Tour and finished ${localTourGCPosition}th in the overall GC—solid stage racing experience that will serve you well in future seasons. `;
+        story += `Over three challenging stages, you battled through the Local Tour and finished ${formatOrdinal(localTourGCPosition)} in the overall GC—solid stage racing experience that will serve you well in future seasons. `;
     }
     
     // Season wrap-up based on overall season performance

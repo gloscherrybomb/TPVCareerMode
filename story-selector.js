@@ -910,13 +910,44 @@ class StorySelector {
       }
 
       const fallbacks = {
-        win: "The victory celebration ran long that evening. Tomorrow's recovery ride could wait.",
-        podium: "That podium photo was already your phone wallpaper. No shame.",
-        top10: "Post-race pizza felt earned. You'd burned enough calories to justify seconds.",
-        midpack: "You collapsed on the couch with snacks and cycling content. Peak recovery protocol.",
-        back: "Comfort food and cycling content. The standard protocol for processing a tough result."
+        win: [
+          "The victory celebration ran long that evening. Tomorrow's recovery ride could wait.",
+          "You found yourself replaying the winning moment over and over. Still didn't feel real.",
+          "The evening was spent fielding congratulatory messages. This never gets old.",
+          "You slept well that night, the satisfaction of victory still warming your thoughts.",
+          "That evening, everything just felt right. This is why you race."
+        ],
+        podium: [
+          "That podium photo was already your phone wallpaper. No shame.",
+          "The podium spot earned tonight would fuel training for weeks to come.",
+          "You kept looking at the result on your phone. Third feels good.",
+          "The evening passed in a happy blur, the podium finish still sinking in.",
+          "You drifted off replaying the key moments that earned you that podium spot."
+        ],
+        top10: [
+          "A solid evening of recovery followed a solid race. Balance in all things.",
+          "You reviewed the race data that evening, satisfied with the day's work.",
+          "The top ten finish deserved a relaxed evening. You'd earned it.",
+          "That night you slept the sleep of someone who'd raced well and finished strong.",
+          "The evening was quiet, but the satisfaction of a good result lingered."
+        ],
+        midpack: [
+          "An unremarkable evening followed an unremarkable result. Tomorrow's another day.",
+          "You processed the day's racing while scrolling through cycling content.",
+          "The result wasn't what you'd hoped for, but the legs would be better next time.",
+          "An evening of recovery—physical and mental—followed the day's efforts.",
+          "You wound down with familiar routines, the race already fading into memory."
+        ],
+        back: [
+          "A quiet evening gave space to process the day's disappointment.",
+          "The result stung, but tomorrow would bring fresh perspective.",
+          "You let the frustration of the day dissipate slowly through the evening.",
+          "Not every race goes to plan. The evening was about accepting that.",
+          "The long drive home gave time to think about what went wrong and how to fix it."
+        ]
       };
-      return fallbacks[tier] || fallbacks.midpack;
+      const tierFallbacks = fallbacks[tier] || fallbacks.midpack;
+      return tierFallbacks[Math.floor(Math.random() * tierFallbacks.length)];
     }
 
     // Mark as used and apply variable substitution

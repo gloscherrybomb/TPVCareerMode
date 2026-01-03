@@ -2415,7 +2415,7 @@ const NARRATIVE_DATABASE = {
       id: "trans_pizza_reward",
       text: "Pizza for dinner felt earned. The diet starts again tomorrow, but tonight was about recovery in all its forms.",
       triggers: { performanceTier: ["any"] },
-      weight: 0.7
+      weight: 0.4
     },
     {
       id: "trans_beer_garden",
@@ -2427,31 +2427,31 @@ const NARRATIVE_DATABASE = {
       id: "trans_burger_treat",
       text: "Post-race burger was absolutely necessary. You'd burned enough calories to justify at least two, actually.",
       triggers: { performanceTier: ["any"] },
-      weight: 0.6
+      weight: 0.4
     },
     {
       id: "trans_ice_cream_recovery",
       text: "Ice cream for dinner? It's basically a recovery shake. You'd earned this.",
       triggers: { performanceTier: ["any"] },
-      weight: 0.6
+      weight: 0.4
     },
     {
       id: "trans_couch_recovery",
       text: "You collapsed on the couch with snacks and cycling content. Peak recovery protocol.",
       triggers: { performanceTier: ["any"] },
-      weight: 0.6
+      weight: 0.4
     },
     {
       id: "trans_coffee_shop",
       text: "The local coffee shop heard the full race recap, whether they wanted to or not. Good coffee makes everything better.",
       triggers: { performanceTier: ["any"] },
-      weight: 0.5
+      weight: 0.4
     },
     {
       id: "trans_takeaway_ordered",
       text: "You ordered takeaway without a shred of guilt. Cooking was not happening tonight.",
       triggers: { performanceTier: ["any"] },
-      weight: 0.5
+      weight: 0.3
     },
 
     // ===== SHOPPING/GEAR LUST =====
