@@ -1148,6 +1148,10 @@ function displayPersonalityTimeline() {
         hasTimestamp: !!p.timestamp
     })));
 
+    // TEMPORARY: Show debug info directly on page for mobile debugging
+    const debugInfo = dataPoints.map(p => `E${p.eventNumber}:${p.completionOrder}`).join(', ');
+    showDebugOnPage('Data Points', debugInfo);
+
     // Store data points globally for interactivity
     chartDataPoints = dataPoints;
 
@@ -1210,6 +1214,9 @@ function drawPersonalityChart(dataPoints) {
         validPoints: validPoints.length,
         completionOrders: validPoints.map(p => p.completionOrder)
     });
+
+    // TEMPORARY: Show X axis range on page for mobile debugging
+    showDebugOnPage('X Axis Range', `min: ${minOrder}, max: ${maxOrder}, orders: [${validPoints.map(p => p.completionOrder).join(', ')}]`);
 
     // Use validPoints for rendering
     sampledPoints = validPoints;
@@ -1880,3 +1887,33 @@ document.querySelectorAll('.palmares-table th.sortable').forEach(th => {
         displayResultsTable();
     });
 });
+
+// TEMPORARY: Helper function to show debug info on page (for mobile debugging)
+function showDebugOnPage(label, content) {
+    let debugContainer = document.getElementById('mobileDebugInfo');
+    if (!debugContainer) {
+        debugContainer = document.createElement('div');
+        debugContainer.id = 'mobileDebugInfo';
+        debugContainer.style.cssText = `
+            position: fixed;
+            top: 60px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.9);
+            color: #0f0;
+            padding: 10px;
+            border: 2px solid #0f0;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 11px;
+            max-width: 90%;
+            z-index: 10000;
+            overflow: auto;
+            max-height: 300px;
+        `;
+        document.body.appendChild(debugContainer);
+    }
+    const line = document.createElement('div');
+    line.style.marginBottom = '5px';
+    line.innerHTML = `<strong>${label}:</strong> ${content}`;
+    debugContainer.appendChild(line);
+}
