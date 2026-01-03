@@ -1142,6 +1142,12 @@ function displayPersonalityTimeline() {
         point.completionOrder = index;
     });
 
+    console.log('Personality chart data points:', dataPoints.map(p => ({
+        eventNum: p.eventNumber,
+        completionOrder: p.completionOrder,
+        hasTimestamp: !!p.timestamp
+    })));
+
     // Store data points globally for interactivity
     chartDataPoints = dataPoints;
 
@@ -1186,8 +1192,27 @@ function drawPersonalityChart(dataPoints) {
     }
 
     // Get min and max completion order for X axis (simple sequential numbers)
-    const minOrder = Math.min(...sampledPoints.map(p => p.completionOrder));
-    const maxOrder = Math.max(...sampledPoints.map(p => p.completionOrder));
+    // Filter out any points that don't have completionOrder set (defensive)
+    const validPoints = sampledPoints.filter(p => p.completionOrder !== undefined && p.completionOrder !== null);
+
+    if (validPoints.length === 0) {
+        console.error('No valid data points with completionOrder!', sampledPoints);
+        return;
+    }
+
+    const minOrder = Math.min(...validPoints.map(p => p.completionOrder));
+    const maxOrder = Math.max(...validPoints.map(p => p.completionOrder));
+
+    console.log('Chart X axis range:', {
+        minOrder,
+        maxOrder,
+        totalPoints: sampledPoints.length,
+        validPoints: validPoints.length,
+        completionOrders: validPoints.map(p => p.completionOrder)
+    });
+
+    // Use validPoints for rendering
+    sampledPoints = validPoints;
 
     // Find min and max values across all traits for dynamic Y-axis scaling
     let minValue = 100;
