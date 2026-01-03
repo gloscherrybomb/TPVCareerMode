@@ -1148,24 +1148,6 @@ function displayPersonalityTimeline() {
         point.completionOrder = index;
     });
 
-    console.log('Personality chart data points:', dataPoints.map(p => ({
-        eventNum: p.eventNumber,
-        completionOrder: p.completionOrder,
-        hasTimestamp: !!p.timestamp
-    })));
-
-    // TEMPORARY: Show debug info directly on page for mobile debugging
-    const debugInfo = dataPoints.map(p => `E${p.eventNumber}:${p.completionOrder}(S${p.stageNumber})`).join(', ');
-    showDebugOnPage('Data Points', debugInfo);
-
-    // Additional debug: Check if any special events exist
-    const specialEvents = dataPoints.filter(p => p.eventNumber >= 100);
-    if (specialEvents.length > 0) {
-        showDebugOnPage('Special Events Found', specialEvents.map(p =>
-            `E${p.eventNumber}: order=${p.completionOrder}, stage=${p.stageNumber}`
-        ).join(', '));
-    }
-
     // Store data points globally for interactivity
     chartDataPoints = dataPoints;
 
@@ -1220,17 +1202,6 @@ function drawPersonalityChart(dataPoints) {
 
     const minOrder = Math.min(...validPoints.map(p => p.completionOrder));
     const maxOrder = Math.max(...validPoints.map(p => p.completionOrder));
-
-    console.log('Chart X axis range:', {
-        minOrder,
-        maxOrder,
-        totalPoints: sampledPoints.length,
-        validPoints: validPoints.length,
-        completionOrders: validPoints.map(p => p.completionOrder)
-    });
-
-    // TEMPORARY: Show X axis range on page for mobile debugging
-    showDebugOnPage('X Axis Range', `min: ${minOrder}, max: ${maxOrder}, orders: [${validPoints.map(p => p.completionOrder).join(', ')}]`);
 
     // Use validPoints for rendering
     sampledPoints = validPoints;
@@ -1901,33 +1872,3 @@ document.querySelectorAll('.palmares-table th.sortable').forEach(th => {
         displayResultsTable();
     });
 });
-
-// TEMPORARY: Helper function to show debug info on page (for mobile debugging)
-function showDebugOnPage(label, content) {
-    let debugContainer = document.getElementById('mobileDebugInfo');
-    if (!debugContainer) {
-        debugContainer = document.createElement('div');
-        debugContainer.id = 'mobileDebugInfo';
-        debugContainer.style.cssText = `
-            position: fixed;
-            top: 60px;
-            right: 10px;
-            background: rgba(0, 0, 0, 0.9);
-            color: #0f0;
-            padding: 10px;
-            border: 2px solid #0f0;
-            border-radius: 5px;
-            font-family: monospace;
-            font-size: 11px;
-            max-width: 90%;
-            z-index: 10000;
-            overflow: auto;
-            max-height: 300px;
-        `;
-        document.body.appendChild(debugContainer);
-    }
-    const line = document.createElement('div');
-    line.style.marginBottom = '5px';
-    line.innerHTML = `<strong>${label}:</strong> ${content}`;
-    debugContainer.appendChild(line);
-}
