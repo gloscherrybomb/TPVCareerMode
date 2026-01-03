@@ -173,8 +173,9 @@ async function fetchInterviewHistory(userId) {
         const interviewsRef = collection(db, 'interviews');
         const q = query(
             interviewsRef,
-            where('userId', '==', userId),
-            orderBy('timestamp', 'asc')
+            where('userId', '==', userId)
+            // Note: We don't orderBy here to avoid needing a compound index
+            // Sorting is done client-side after fetching
         );
 
         const querySnapshot = await getDocs(q);
@@ -187,6 +188,13 @@ async function fetchInterviewHistory(userId) {
                 personalityAfter: data.personalityAfter,
                 timestamp: data.timestamp
             });
+        });
+
+        // Sort by timestamp client-side (ascending - oldest first)
+        interviews.sort((a, b) => {
+            const aTime = a.timestamp ? (a.timestamp.toDate ? a.timestamp.toDate().getTime() : new Date(a.timestamp).getTime()) : 0;
+            const bTime = b.timestamp ? (b.timestamp.toDate ? b.timestamp.toDate().getTime() : new Date(b.timestamp).getTime()) : 0;
+            return aTime - bTime;
         });
 
         return interviews;

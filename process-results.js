@@ -59,12 +59,11 @@ async function recoverPersonalityIfNeeded(userId, userData, userRef) {
   }
 
   try {
-    // Query interviews for this user, ordered by completion timestamp descending
+    // Query interviews for this user
     // This gets the most recently completed event's interview, not highest event number
+    // Note: We fetch all and sort client-side to avoid needing a compound index
     const interviewsSnapshot = await db.collection('interviews')
       .where('userId', '==', userId)
-      .orderBy('timestamp', 'desc')
-      .limit(1)
       .get();
 
     if (interviewsSnapshot.empty) {
@@ -72,7 +71,14 @@ async function recoverPersonalityIfNeeded(userId, userData, userRef) {
       return null;
     }
 
-    const latestInterview = interviewsSnapshot.docs[0].data();
+    // Sort by timestamp descending (most recent first) and get the latest
+    const sortedDocs = interviewsSnapshot.docs.sort((a, b) => {
+      const aTime = a.data().timestamp ? a.data().timestamp.toMillis() : 0;
+      const bTime = b.data().timestamp ? b.data().timestamp.toMillis() : 0;
+      return bTime - aTime; // Descending
+    });
+
+    const latestInterview = sortedDocs[0].data();
     if (latestInterview.personalityAfter) {
       console.log(`   ✅ RECOVERED personality from interview for event ${latestInterview.eventNumber}`);
 

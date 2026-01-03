@@ -80,17 +80,24 @@ function applyPersonalityChanges(currentPersonality, personalityDelta) {
  * Also updates the personalityAfter field in each interview document
  */
 async function recalculateUserPersonality(userId) {
-  // Query all interviews for this user, ordered by completion timestamp
-  // This ensures personality is recalculated in the order events were actually completed
+  // Query all interviews for this user
+  // We'll sort by completion timestamp to ensure personality is recalculated in correct order
+  // Note: We fetch all and sort in-memory to avoid needing a compound index
   const interviewsSnapshot = await db.collection('interviews')
     .where('userId', '==', userId)
-    .orderBy('timestamp', 'asc')
     .get();
 
   if (interviewsSnapshot.empty) {
     console.log(`   No interviews found for user ${userId}`);
     return null;
   }
+
+  // Sort by timestamp ascending (oldest first) for chronological processing
+  const sortedDocs = interviewsSnapshot.docs.sort((a, b) => {
+    const aTime = a.data().timestamp ? a.data().timestamp.toMillis() : 0;
+    const bTime = b.data().timestamp ? b.data().timestamp.toMillis() : 0;
+    return aTime - bTime; // Ascending
+  });
 
   // Start with default personality
   let personality = getDefaultPersonality();
@@ -99,7 +106,7 @@ async function recalculateUserPersonality(userId) {
   const interviewUpdates = [];
 
   // Apply each interview's personality delta in order
-  for (const doc of interviewsSnapshot.docs) {
+  for (const doc of sortedDocs) {
     const interview = doc.data();
 
     if (interview.personalityDelta) {
