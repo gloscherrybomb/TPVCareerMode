@@ -1016,22 +1016,9 @@ function generateSeasonContext(data) {
   const nextEventType = EVENT_TYPES[nextEventNumber];
   
   console.log(`Story Generator Debug: nextStageNumber=${nextStageNumber}, nextEventNumber=${nextEventNumber}, isNextStageChoice=${isNextStageChoice}, nextEventType=${nextEventType}`);
-  
-  // Special case: Event 15 (Local Tour Stage 3) completes the season (stage 9)
-  // Events 13, 14, 15 are all part of stage 9, so only show "season complete" after event 15
-  if (nextEventNumber === null || nextEventNumber === undefined || nextEventNumber > 15) {
-    // No next event - this was the final race
-    // Context about season completion is handled in unified-story-generator
-    // Don't add duplicate forward-looking text here
-    if (isOnStreak) {
-      context += `You finished the season on a strong note, with momentum that will carry into the off-season training. The work doesn't stop—it just changes form. `;
-    } else {
-      context += `The season is complete. Time to rest, recover, reflect on what worked and what didn't, and prepare for Season 2. `;
-    }
-    return context;
-  }
-  
-  // Special handling for optional stages - describe remaining choices
+
+  // Check for choice stages FIRST before checking if nextEventNumber is null
+  // Choice stages have nextEventNumber = null but are NOT the end of the season
   if (isNextStageChoice) {
     // Determine which optional events are still available
     const completedOptionals = completedOptionalEvents || [];
@@ -1083,7 +1070,22 @@ function generateSeasonContext(data) {
     
     return context;
   }
-  
+
+  // Now check if season is actually complete (after handling choice stages)
+  // Event 15 (Local Tour Stage 3) completes the season (stage 9)
+  // Only show "season complete" if nextEventNumber is null and it's NOT a choice stage
+  if (nextEventNumber === null || nextEventNumber === undefined || nextEventNumber > 15) {
+    // No next event - this was the final race
+    // Context about season completion is handled in unified-story-generator
+    // Don't add duplicate forward-looking text here
+    if (isOnStreak) {
+      context += `You finished the season on a strong note, with momentum that will carry into the off-season training. The work doesn't stop—it just changes form. `;
+    } else {
+      context += `The season is complete. Time to rest, recover, reflect on what worked and what didn't, and prepare for Season 2. `;
+    }
+    return context;
+  }
+
   if (nextEventType === 'time trial') {
     context += `${nextEventName} awaits at Stage ${nextStageNumber}, a pure test against the clock where there's nowhere to hide and no teammates to lean on. It's just you, the bike, and the relentless ticking of the timer. This is where mental strength matters as much as physical power—the ability to sustain maximum effort when every instinct screams to back off. `;
   } else if (nextEventType === 'criterium') {
