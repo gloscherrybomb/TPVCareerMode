@@ -824,7 +824,8 @@ function generateForwardLook(seasonData, raceData) {
   const nextEventName = EVENT_NAMES[nextEventNumber] || `Event ${nextEventNumber}`;
 
   // Season complete - no forward look needed
-  if (isSeasonComplete || nextEventNumber > 15 || !nextEventNumber) {
+  // Note: nextEventNumber is null for choice stages (3, 6, 8), so we must check isNextStageChoice
+  if (isSeasonComplete || nextEventNumber > 15 || (!nextEventNumber && !isNextStageChoice)) {
     if (isOnStreak) {
       return "The season ends on a high note. Time to rest, recover, and carry this momentum into the off-season. There will be time to analyze what worked and what to build on for next year.";
     }
