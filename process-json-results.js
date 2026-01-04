@@ -1848,8 +1848,8 @@ function simulateTimeFromARR(botUid, botARR, stageResults, eventNum) {
     const randomIndex = Math.floor(getSeededRandom(botUid, eventNum) * times.length);
     baseTime = times[randomIndex];
 
-    // Add additional variance (±5%) to spread times further
-    const extraVariance = (getSeededRandom(botUid + '_extra', eventNum) - 0.5) * 0.10;
+    // Add additional variance (±1%) to spread times slightly
+    const extraVariance = (getSeededRandom(botUid + '_extra', eventNum) - 0.5) * 0.02;
     baseTime = baseTime * (1 + extraVariance);
   } else {
     // For non-stage races, use median with small variance (original behavior)
@@ -2044,6 +2044,14 @@ async function calculateGC(season, userUid, upToEvent = 15, currentUserResult = 
             const { minTime, maxTime } = timeRange;
             const positionRatio = (simulatedPosition - 1) / Math.max(1, fieldSize - 1);
             simulatedTime = minTime + (maxTime - minTime) * positionRatio;
+          }
+
+          // CRITICAL: Clamp simulated time to never be faster than the actual stage minimum
+          // The ±5% variance in simulateTimeFromARR can push times below the actual minimum,
+          // which is impossible - no one can be faster than the fastest actual finisher
+          const { minTime } = timeRange;
+          if (simulatedTime < minTime) {
+            simulatedTime = minTime;
           }
 
           rider.stageResults[eventNum] = { position: simulatedPosition, time: simulatedTime, isActual: false, isSimulated: true };
