@@ -1285,12 +1285,14 @@ Interesting Fact: ${request.interestFact}
 // ================== POWER AWARD CHECKS ==================
 
 /**
- * Check if Power Surge award earned (max power 30%+ above avg, top 10)
+ * Check if Power Surge award earned (NP 15%+ above avg power, top 10 finish)
+ * Rewards riders who put in lots of high power surges and still finish top 10
  */
 function checkPowerSurge(position, userResult) {
   if (position > 10) return false;
-  if (!userResult.AvgPower || !userResult.MaxPower) return false;
-  return (userResult.MaxPower / userResult.AvgPower) >= 1.3;
+  if (!userResult.AvgPower || !userResult.NrmPower) return false;
+  // NP/AP ratio >= 1.15 indicates a surgy, attacking effort
+  return (userResult.NrmPower / userResult.AvgPower) >= 1.15;
 }
 
 /**
