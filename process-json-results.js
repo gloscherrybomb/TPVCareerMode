@@ -2952,12 +2952,60 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
 }
 
 /**
+ * Extract race date from a JSON file for sorting
+ */
+function getRaceDateFromFile(filePath) {
+  try {
+    const jsonContent = fs.readFileSync(filePath, 'utf8');
+    const parsedJson = JSON.parse(jsonContent);
+
+    if (parsedJson.metadata && parsedJson.metadata.raceDate) {
+      return new Date(parsedJson.metadata.raceDate).getTime();
+    }
+
+    // Fallback: try to extract date from filename (format: YYYYMMDD_HHMMSS)
+    const match = filePath.match(/_(\d{8})_(\d{6})\.json$/);
+    if (match) {
+      const dateStr = match[1];
+      const timeStr = match[2];
+      const year = dateStr.substring(0, 4);
+      const month = dateStr.substring(4, 6);
+      const day = dateStr.substring(6, 8);
+      const hour = timeStr.substring(0, 2);
+      const min = timeStr.substring(2, 4);
+      const sec = timeStr.substring(4, 6);
+      return new Date(`${year}-${month}-${day}T${hour}:${min}:${sec}Z`).getTime();
+    }
+
+    return Date.now(); // Default to now if no date found
+  } catch (error) {
+    console.warn(`   ⚠️ Could not extract date from ${filePath}: ${error.message}`);
+    return Date.now();
+  }
+}
+
+/**
  * Main processing function for JSON files
  */
 async function processJSONResults(jsonFiles) {
   console.log(`\n🔷 Processing ${jsonFiles.length} JSON file(s)...`);
 
-  for (const filePath of jsonFiles) {
+  // Sort files by race date (chronological order) to ensure proper stage progression
+  console.log(`\n📅 Sorting files by race date...`);
+  const filesWithDates = jsonFiles.map(filePath => ({
+    filePath,
+    raceDate: getRaceDateFromFile(filePath)
+  }));
+
+  filesWithDates.sort((a, b) => a.raceDate - b.raceDate);
+
+  const sortedFiles = filesWithDates.map(f => f.filePath);
+  console.log(`   Sorted order:`);
+  filesWithDates.forEach((f, i) => {
+    console.log(`   ${i + 1}. ${new Date(f.raceDate).toISOString()} - ${f.filePath.split('/').pop()}`);
+  });
+
+  for (const filePath of sortedFiles) {
     try {
       console.log(`\n📄 Processing: ${filePath}`);
 
