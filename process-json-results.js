@@ -2598,8 +2598,8 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
     // Career statistics
     careerPoints: (userData.careerPoints || 0) + points,
     totalEvents: (userData.totalEvents || 0) + 1,
-    totalWins: careerStats.totalWins,
-    totalPodiums: careerStats.totalPodiums,
+    careerWins: careerStats.totalWins,
+    careerPodiums: careerStats.totalPodiums,
     totalTop10s: careerStats.totalTop10s,
     bestFinish: careerStats.bestFinish,
     averageFinish: careerStats.averageFinish,
@@ -2622,6 +2622,7 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
   if (!isSpecialEventResult) {
     updateData.currentStage = nextStage;
     updateData.usedOptionalEvents = newUsedOptionalEvents;
+    updateData.completedOptionalEvents = newUsedOptionalEvents;  // Alias for frontend compatibility
     updateData.tourProgress = newTourProgress;
     updateData[`season${season}Standings`] = seasonStandings;
   }

@@ -1903,8 +1903,8 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
     [`event${eventNumber}Results`]: eventResults,
     careerPoints: (userData.careerPoints || 0) + points,
     totalEvents: (userData.totalEvents || 0) + 1,
-    totalWins: careerStats.totalWins,
-    totalPodiums: careerStats.totalPodiums,
+    careerWins: careerStats.totalWins,
+    careerPodiums: careerStats.totalPodiums,
     totalTop10s: careerStats.totalTop10s,
     bestFinish: careerStats.bestFinish,
     averageFinish: careerStats.averageFinish,
@@ -1927,6 +1927,7 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
     updates.totalPoints = (userData.totalPoints || 0) + points;
     updates[`season${season}Standings`] = seasonStandings;
     updates.usedOptionalEvents = newUsedOptionalEvents;
+    updates.completedOptionalEvents = newUsedOptionalEvents;  // Alias for frontend compatibility
     updates.tourProgress = newTourProgress;
   }
 
