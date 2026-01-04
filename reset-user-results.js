@@ -226,6 +226,31 @@ async function resetUserResults() {
     // NOTE: Interview documents are PRESERVED - users won't need to re-answer questions
     console.log('✅ Interview documents preserved - users can continue from existing personality profiles');
 
+    // Delete all results collection documents (race results with bot times)
+    console.log('Deleting results collection...');
+    const resultsSnapshot = await db.collection('results').get();
+    console.log(`Found ${resultsSnapshot.size} results documents`);
+
+    if (!resultsSnapshot.empty) {
+      // Firestore batch has a limit of 500 operations, so we need to batch in chunks
+      const BATCH_SIZE = 500;
+      let deletedCount = 0;
+
+      for (let i = 0; i < resultsSnapshot.docs.length; i += BATCH_SIZE) {
+        const chunk = resultsSnapshot.docs.slice(i, i + BATCH_SIZE);
+        const resultsBatch = db.batch();
+        chunk.forEach(doc => {
+          resultsBatch.delete(doc.ref);
+        });
+        await resultsBatch.commit();
+        deletedCount += chunk.length;
+        console.log(`   Deleted ${deletedCount}/${resultsSnapshot.size} results documents...`);
+      }
+      console.log(`✅ Results collection cleared: ${deletedCount} documents deleted`);
+    } else {
+      console.log('No results documents found');
+    }
+
     // Delete narrative history for all riders
     console.log('Deleting narrative history...');
     const ridersSnapshot = await db.collection('riders').get();
