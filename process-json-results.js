@@ -1863,8 +1863,13 @@ function simulateTimeFromARR(botUid, botARR, stageResults, eventNum) {
 
 /**
  * Calculate General Classification (GC) for stage race (events 13, 14, 15)
+ * @param {number} season - Season number
+ * @param {string} userUid - User's UID
+ * @param {number} upToEvent - Event number to calculate GC through (13, 14, or 15)
+ * @param {Object} currentUserResult - Current user's result (for stages not yet stored)
+ * @param {Array} currentEventResults - Full results from current event (for stages not yet stored)
  */
-async function calculateGC(season, userUid, upToEvent = 15, currentUserResult = null) {
+async function calculateGC(season, userUid, upToEvent = 15, currentUserResult = null, currentEventResults = null) {
   console.log(`   Calculating GC through event ${upToEvent}...`);
 
   const stageNumbers = [];
@@ -1900,11 +1905,30 @@ async function calculateGC(season, userUid, upToEvent = 15, currentUserResult = 
         });
 
         stageResults[eventNum] = uniqueResults;
-        console.log(`   Event ${eventNum}: Found ${uniqueResults.length} riders`);
+        console.log(`   Event ${eventNum}: Found ${uniqueResults.length} riders (from Firebase)`);
       }
     } catch (error) {
       console.log(`   Warning: Could not fetch results for event ${eventNum}:`, error.message);
     }
+  }
+
+  // If current event results provided and not already in stageResults, add them
+  if (currentEventResults && currentEventResults.length > 0 && !stageResults[upToEvent]) {
+    // Transform current event results to match Firebase format (lowercase field names)
+    const transformedResults = currentEventResults
+      .filter(r => r.Position !== 'DNF' && r.Time && parseFloat(r.Time) > 0)
+      .map(r => ({
+        uid: r.UID || '',
+        name: r.Name || '',
+        team: r.Team || '',
+        arr: parseInt(r.ARR) || 0,
+        position: parseInt(r.Position) || 999,
+        time: parseFloat(r.Time) || 0,
+        gender: r.Gender || 'Unknown'
+      }));
+
+    stageResults[upToEvent] = transformedResults;
+    console.log(`   Event ${upToEvent}: Using ${transformedResults.length} riders from current event results`);
   }
 
   const availableStages = Object.keys(stageResults).map(k => parseInt(k));
@@ -2345,7 +2369,8 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
       position: position,
       time: parseFloat(userResult.Time) || 0
     };
-    gcResults = await calculateGC(season, uid, eventNumber, currentUserResult);
+    // Pass full results array so GC can use current event data before it's stored to Firebase
+    gcResults = await calculateGC(season, uid, eventNumber, currentUserResult, results);
 
     if (gcResults && eventNumber === 15) {
       gcBonusPoints = gcResults.bonusPoints;

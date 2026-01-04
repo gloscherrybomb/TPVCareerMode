@@ -882,16 +882,21 @@ function getCompletedOptionalEvents(userData, currentEventNumber) {
  * Calculate General Classification (GC) for stage race (events 13, 14, 15)
  * Returns GC standings with cumulative times and awards
  * Can calculate partial GC (after stage 1 or 2) or final GC (after stage 3)
+ * @param {number} season - Season number
+ * @param {string} userUid - User's UID
+ * @param {number} upToEvent - Event number to calculate GC through (13, 14, or 15)
+ * @param {Object} currentUserResult - Current user's result (for stages not yet stored)
+ * @param {Array} currentEventResults - Full results from current event (for stages not yet stored)
  */
-async function calculateGC(season, userUid, upToEvent = 15, currentUserResult = null) {
+async function calculateGC(season, userUid, upToEvent = 15, currentUserResult = null, currentEventResults = null) {
   console.log(`   Calculating GC through event ${upToEvent}...`);
-  
+
   // Determine which stages to include
   const stageNumbers = [];
   if (upToEvent >= 13) stageNumbers.push(13);
   if (upToEvent >= 14) stageNumbers.push(14);
   if (upToEvent >= 15) stageNumbers.push(15);
-  
+
   // Fetch results from all stages by querying all result documents for each event
   const stageResults = {};
   const failedStages = [];
@@ -903,7 +908,7 @@ async function calculateGC(season, userUid, upToEvent = 15, currentUserResult = 
         .where(admin.firestore.FieldPath.documentId(), '>=', `season${season}_event${eventNum}_`)
         .where(admin.firestore.FieldPath.documentId(), '<', `season${season}_event${eventNum}_\uf8ff`)
         .get();
-      
+
       if (!querySnapshot.empty) {
         // Collect all results from all users
         const allResults = [];
@@ -913,7 +918,7 @@ async function calculateGC(season, userUid, upToEvent = 15, currentUserResult = 
             allResults.push(...data.results);
           }
         });
-        
+
         // De-duplicate by UID (in case same rider appears in multiple result docs)
         const uniqueResults = [];
         const seenUIDs = new Set();
@@ -923,14 +928,33 @@ async function calculateGC(season, userUid, upToEvent = 15, currentUserResult = 
             uniqueResults.push(r);
           }
         });
-        
+
         stageResults[eventNum] = uniqueResults;
-        console.log(`   Event ${eventNum}: Found ${uniqueResults.length} riders`);
+        console.log(`   Event ${eventNum}: Found ${uniqueResults.length} riders (from Firebase)`);
       }
     } catch (error) {
       console.log(`   ⚠️ Warning: Could not fetch results for event ${eventNum}:`, error.message);
       failedStages.push(eventNum);
     }
+  }
+
+  // If current event results provided and not already in stageResults, add them
+  if (currentEventResults && currentEventResults.length > 0 && !stageResults[upToEvent]) {
+    // Transform current event results to match Firebase format (lowercase field names)
+    const transformedResults = currentEventResults
+      .filter(r => r.Position !== 'DNF' && r.Time && parseFloat(r.Time) > 0)
+      .map(r => ({
+        uid: r.UID || '',
+        name: r.Name || '',
+        team: r.Team || '',
+        arr: parseInt(r.ARR) || 0,
+        position: parseInt(r.Position) || 999,
+        time: parseFloat(r.Time) || 0,
+        gender: r.Gender || 'Unknown'
+      }));
+
+    stageResults[upToEvent] = transformedResults;
+    console.log(`   Event ${upToEvent}: Using ${transformedResults.length} riders from current event results`);
   }
 
   // Log if any stages failed to load
@@ -939,7 +963,7 @@ async function calculateGC(season, userUid, upToEvent = 15, currentUserResult = 
   }
 
   const availableStages = Object.keys(stageResults).map(k => parseInt(k));
-  
+
   if (availableStages.length === 0) {
     console.log('   ⚠️ No stage results available for GC calculation');
     return null;
@@ -1451,7 +1475,8 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
       position: position,
       time: parseFloat(userResult.Time) || 0
     };
-    gcResults = await calculateGC(season, uid, eventNumber, currentUserResult);
+    // Pass full results array so GC can use current event data before it's stored to Firebase
+    gcResults = await calculateGC(season, uid, eventNumber, currentUserResult, results);
     
     if (gcResults) {
       // Only add bonus points on final stage (event 15)
