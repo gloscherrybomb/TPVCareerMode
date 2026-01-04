@@ -164,14 +164,13 @@ function displayActiveSeasonProgress(seasonId) {
     }
 
     const currentStage = seasonData.currentStage || 1;
-    const completedEvents = (seasonData.completedStages?.length || 0) +
-                           (seasonData.completedOptionalEvents?.length || 0);
+    const completedStages = seasonData.completedStages?.length || 0;
     const totalStages = seasonConfig?.stageCount || 9;
 
     document.getElementById('currentStage').textContent = `Stage ${currentStage}`;
-    document.getElementById('completedEvents').textContent = completedEvents;
+    document.getElementById('completedEvents').textContent = completedStages;
 
-    const progressPercent = Math.round((completedEvents / totalStages) * 100);
+    const progressPercent = Math.round((completedStages / totalStages) * 100);
     document.getElementById('progressFill').style.width = `${progressPercent}%`;
 }
 
