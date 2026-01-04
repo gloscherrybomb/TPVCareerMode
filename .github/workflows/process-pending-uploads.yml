@@ -1,9 +1,10 @@
 name: Process Pending Uploads
 
 on:
-  schedule:
-    - cron: '*/5 * * * *'  # Run every 5 minutes
-  workflow_dispatch:  # Allow manual trigger
+  # Schedule disabled - JSON processing now handles results automatically
+  # schedule:
+  #   - cron: '*/5 * * * *'
+  workflow_dispatch:  # Keep manual trigger for emergency use
 
 jobs:
   process-uploads:
