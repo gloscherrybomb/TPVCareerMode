@@ -2504,6 +2504,9 @@ function calculateCadenceCreditsFromAwards(earnedAwardIds = []) {
 function evaluateUnlockTrigger(unlockId, context) {
   const { position, predictedPosition, marginToWinner, gapToWinner, eventCategory, eventNumber, totalFinishers, userARR, results, topRivals, rivalEncounters } = context;
 
+  // Time-based conditions are not valid for elimination races (Event 3) or time challenges (Event 4)
+  const isTimeIrrelevant = eventNumber === 3 || TIME_BASED_EVENTS.includes(eventNumber);
+
   switch (unlockId) {
     case 'paceNotes':
       if (!predictedPosition) return { triggered: false };
@@ -2512,6 +2515,13 @@ function evaluateUnlockTrigger(unlockId, context) {
         reason: 'Finished within +/-5 places of prediction'
       };
     case 'teamCarRecon':
+      // For time-irrelevant races, only use position-based trigger
+      if (isTimeIrrelevant) {
+        return {
+          triggered: position <= 10,
+          reason: 'Top 10 finish'
+        };
+      }
       return {
         triggered: position <= 10 || (typeof marginToWinner === 'number' && marginToWinner < 45),
         reason: 'Top 10 or close gap to winner'
@@ -2528,6 +2538,10 @@ function evaluateUnlockTrigger(unlockId, context) {
         reason: 'Beat prediction by 5+ and finish top 15'
       };
     case 'cadenceNutrition':
+      // Time-based only - doesn't trigger for time-irrelevant races
+      if (isTimeIrrelevant) {
+        return { triggered: false, reason: 'Time gaps not applicable for this race type' };
+      }
       return {
         triggered: typeof gapToWinner === 'number' && gapToWinner <= 20,
         reason: 'Within 20s of winner'
@@ -2550,11 +2564,22 @@ function evaluateUnlockTrigger(unlockId, context) {
         reason: 'Climbing day top 5'
       };
     case 'aggroRaceKit':
+      // For time-irrelevant races, only use position-based trigger
+      if (isTimeIrrelevant) {
+        return {
+          triggered: position <= 5,
+          reason: 'Top 5 finish'
+        };
+      }
       return {
         triggered: position <= 5 || (position <= 10 && typeof marginToWinner === 'number' && marginToWinner < 20),
         reason: 'Top 5, or top 10 within 20s'
       };
     case 'tightPackWin': {
+      // Time-based only - doesn't trigger for time-irrelevant races
+      if (isTimeIrrelevant) {
+        return { triggered: false, reason: 'Time gaps not applicable for this race type' };
+      }
       const top10 = (results || []).slice(0, 10).map(r => parseFloat(r.Time)).filter(t => !isNaN(t));
       const tight = top10.length === 10 && (Math.max(...top10) - Math.min(...top10)) <= 5;
       return {
