@@ -1781,8 +1781,9 @@ function simulatePosition(botName, arr, eventNumber, fieldSize = 50) {
  */
 function simulateTimeFromARR(botUid, botARR, stageResults, eventNum) {
   // Get actual results with valid times and ARR
+  // Note: r.arr >= 0 allows ARR=0 (unranked riders), which was previously excluded by truthy check
   const validResults = (stageResults || [])
-    .filter(r => r.time && parseFloat(r.time) > 0 && r.arr && r.position !== 'DNF')
+    .filter(r => r.time && parseFloat(r.time) > 0 && r.arr !== undefined && r.arr !== null && r.position !== 'DNF')
     .map(r => ({ arr: parseInt(r.arr) || 1000, time: parseFloat(r.time) }));
 
   if (validResults.length === 0) {
@@ -1808,13 +1809,31 @@ function simulateTimeFromARR(botUid, botARR, stageResults, eventNum) {
     similarRiders = validResults.slice(0, 3);
   }
 
-  // Calculate median time of similar riders
+  // Sort times from fastest to slowest
   const times = similarRiders.map(r => r.time).sort((a, b) => a - b);
-  const medianTime = times[Math.floor(times.length / 2)];
 
-  // Add small random variance (±1% using seeded random) for realism
-  const variance = (getSeededRandom(botUid, eventNum) - 0.5) * 0.02;
-  return medianTime * (1 + variance);
+  // For stage races (events 13-15), pick a random time from the full range
+  // This simulates good days and bad days, preventing unrealistically consistent performance
+  const isStageRace = eventNum >= 13 && eventNum <= 15;
+
+  let baseTime;
+  if (isStageRace && times.length >= 2) {
+    // Pick a random time from the full range of similar riders
+    // Use seeded random to be deterministic
+    const randomIndex = Math.floor(getSeededRandom(botUid, eventNum) * times.length);
+    baseTime = times[randomIndex];
+
+    // Add additional variance (±5%) to spread times further
+    const extraVariance = (getSeededRandom(botUid + '_extra', eventNum) - 0.5) * 0.10;
+    baseTime = baseTime * (1 + extraVariance);
+  } else {
+    // For non-stage races, use median with small variance (original behavior)
+    const medianTime = times[Math.floor(times.length / 2)];
+    const variance = (getSeededRandom(botUid, eventNum) - 0.5) * 0.02;
+    baseTime = medianTime * (1 + variance);
+  }
+
+  return baseTime;
 }
 
 /**
@@ -1919,25 +1938,48 @@ async function calculateGC(season, userUid, upToEvent = 15, currentUserResult = 
     });
   }
 
+  // Pre-calculate actual time ranges for each stage (for fallback simulation)
+  const stageTimeRanges = {};
+  stageNumbers.forEach(eventNum => {
+    const actualTimes = stageResults[eventNum]
+      ?.filter(r => r.time && parseFloat(r.time) > 0 && r.position !== 'DNF')
+      .map(r => parseFloat(r.time))
+      .sort((a, b) => a - b) || [];
+
+    if (actualTimes.length > 0) {
+      stageTimeRanges[eventNum] = {
+        minTime: actualTimes[0],
+        maxTime: actualTimes[actualTimes.length - 1],
+        hasValidTimes: true
+      };
+      console.log(`   Stage ${eventNum}: Time range ${actualTimes[0].toFixed(0)}s - ${actualTimes[actualTimes.length - 1].toFixed(0)}s (${actualTimes.length} riders)`);
+    } else {
+      stageTimeRanges[eventNum] = { hasValidTimes: false };
+      console.log(`   ⚠️ Stage ${eventNum}: No valid times found for simulation`);
+    }
+  });
+
   allRiders.forEach((rider, uid) => {
     if (rider.isBot && !botDNS.has(uid)) {
       stageNumbers.forEach(eventNum => {
         if (!rider.actualStages.has(eventNum)) {
+          // Check if we have valid times for this stage
+          const timeRange = stageTimeRanges[eventNum];
+          if (!timeRange?.hasValidTimes) {
+            // No valid times for this stage - can't simulate, mark as DNS
+            botDNS.add(uid);
+            return;
+          }
+
           const fieldSize = stageResults[eventNum]?.length || 50;
           const simulatedPosition = simulatePosition(uid, rider.arr, eventNum, fieldSize);
 
           // Simulate time based on riders with similar ARR (more realistic)
           let simulatedTime = simulateTimeFromARR(uid, rider.arr, stageResults[eventNum], eventNum);
 
-          // Fallback to position-based interpolation if no valid ARR matches
+          // Fallback to position-based interpolation using ACTUAL stage time range
           if (!simulatedTime) {
-            const actualTimes = stageResults[eventNum]
-              ?.filter(r => r.time && r.position !== 'DNF')
-              .map(r => parseFloat(r.time))
-              .sort((a, b) => a - b) || [];
-
-            const minTime = actualTimes[0] || 1800;
-            const maxTime = actualTimes[actualTimes.length - 1] || minTime * 1.1;
+            const { minTime, maxTime } = timeRange;
             const positionRatio = (simulatedPosition - 1) / Math.max(1, fieldSize - 1);
             simulatedTime = minTime + (maxTime - minTime) * positionRatio;
           }
