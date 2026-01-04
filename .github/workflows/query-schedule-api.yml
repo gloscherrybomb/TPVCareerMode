@@ -23,19 +23,20 @@ jobs:
       - name: Query schedule API for new completed races
         run: node .github/scripts/query-schedule-api.js
 
-      - name: Commit updated processed keys
+      - name: Commit new results and updated keys
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
 
-          # Add the processed keys file if it changed
+          # Add new JSON result files and processed keys
+          git add race_results/**/*.json || true
           git add processed-event-keys.json || true
 
           # Check if there are staged changes
           if git diff --cached --quiet; then
-            echo "No changes to processed-event-keys.json"
+            echo "No new results to commit"
           else
-            git commit -m "Auto: Update processed event keys"
+            git commit -m "Auto: Add API-fetched race results"
             git push
-            echo "Committed updated processed event keys"
+            echo "Committed new race results"
           fi

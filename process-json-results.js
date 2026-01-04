@@ -2965,7 +2965,27 @@ async function processJSONResults(jsonFiles) {
 
       // Read and parse JSON
       const jsonContent = fs.readFileSync(filePath, 'utf8');
-      const rawResults = JSON.parse(jsonContent);
+      const parsedJson = JSON.parse(jsonContent);
+
+      // Handle both formats: wrapped {metadata, results} or flat array
+      let rawResults;
+      let jsonMetadata = null;
+      if (parsedJson.metadata && Array.isArray(parsedJson.results)) {
+        // New format with metadata wrapper
+        rawResults = parsedJson.results;
+        jsonMetadata = parsedJson.metadata;
+        console.log(`   📦 JSON format: wrapped (with metadata)`);
+        if (jsonMetadata.raceDate) {
+          console.log(`   📅 Race date from metadata: ${jsonMetadata.raceDate}`);
+        }
+      } else if (Array.isArray(parsedJson)) {
+        // Old format: flat array
+        rawResults = parsedJson;
+        console.log(`   📦 JSON format: flat array`);
+      } else {
+        throw new Error('Invalid JSON format: expected array or {metadata, results}');
+      }
+
       const allResults = parseJSON(rawResults);
 
       console.log(`   Found ${allResults.length} total results in JSON`);
@@ -2998,7 +3018,15 @@ async function processJSONResults(jsonFiles) {
 
       console.log(`   Processing ${pensWithHumans.length} pen(s) with human riders: ${pensWithHumans.join(', ')}`);
 
-      const raceTimestamp = Date.now();
+      // Use raceDate from metadata if available, otherwise use current time
+      let raceTimestamp;
+      if (jsonMetadata && jsonMetadata.raceDate) {
+        raceTimestamp = new Date(jsonMetadata.raceDate).getTime();
+        console.log(`   Using race date from metadata: ${jsonMetadata.raceDate}`);
+      } else {
+        raceTimestamp = Date.now();
+        console.log(`   Using current time as race timestamp`);
+      }
 
       // Process each pen as a separate race
       for (const penNumber of pensWithHumans) {
