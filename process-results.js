@@ -988,12 +988,20 @@ async function calculateGC(season, userUid, upToEvent = 15, currentUserResult = 
           stageResults: {}
         });
       }
-      // Mark this stage as actually raced
       const rider = allRiders.get(r.uid);
+      const actualTime = parseFloat(r.time) || 0;
+
+      // Skip results with zero/invalid times - they can't contribute to GC
+      if (actualTime <= 0) {
+        console.log(`   ⚠️ Skipping ${r.name} (${r.uid}) for event ${eventNum} - invalid time: ${r.time}`);
+        return;
+      }
+
+      // Mark this stage as actually raced
       rider.actualStages.add(eventNum);
       rider.stageResults[eventNum] = {
         position: r.position,
-        time: parseFloat(r.time) || 0,
+        time: actualTime,
         isActual: true
       };
     });
@@ -1089,11 +1097,17 @@ async function calculateGC(season, userUid, upToEvent = 15, currentUserResult = 
       let cumulativeTime = 0;
       let actualStagesCount = 0;
       let simulatedStagesCount = 0;
+      let hasInvalidTime = false;
 
       stageNumbers.forEach(eventNum => {
         const result = rider.stageResults[eventNum];
         if (result) {
-          cumulativeTime += result.time;
+          // Time of 0 or missing is invalid - can't include in GC
+          if (!result.time || result.time <= 0) {
+            hasInvalidTime = true;
+          } else {
+            cumulativeTime += result.time;
+          }
           if (result.isActual) {
             actualStagesCount++;
           } else {
@@ -1101,6 +1115,11 @@ async function calculateGC(season, userUid, upToEvent = 15, currentUserResult = 
           }
         }
       });
+
+      // Skip riders with any invalid/zero stage times
+      if (hasInvalidTime) {
+        return;
+      }
 
       gcStandings.push({
         uid: rider.uid,

@@ -1921,8 +1921,21 @@ async function calculateGC(season, userUid, upToEvent = 15, currentUserResult = 
         });
       }
       const rider = allRiders.get(r.uid);
+      const actualTime = parseFloat(r.time) || 0;
+
+      // Skip results with zero/invalid times - they can't contribute to GC
+      if (actualTime <= 0) {
+        console.log(`   ⚠️ Skipping ${r.name} (${r.uid}) for event ${eventNum} - invalid time: ${r.time}`);
+        return;
+      }
+
       rider.actualStages.add(eventNum);
-      rider.stageResults[eventNum] = { position: r.position, time: parseFloat(r.time) || 0, isActual: true };
+      rider.stageResults[eventNum] = { position: r.position, time: actualTime, isActual: true };
+
+      // Flag suspiciously low times (less than 30 minutes for a stage race)
+      if (actualTime < 1800) {
+        console.log(`   ⚠️ SUSPICIOUS: ${r.name} (${r.uid}) has time ${actualTime.toFixed(1)}s for event ${eventNum} - too fast!`);
+      }
     });
   });
 
@@ -1997,14 +2010,25 @@ async function calculateGC(season, userUid, upToEvent = 15, currentUserResult = 
     if (stagesCompleted === stageNumbers.length && !botDNS.has(rider.uid)) {
       let cumulativeTime = 0;
       let actualStagesCount = 0;
+      let hasInvalidTime = false;
 
       stageNumbers.forEach(eventNum => {
         const result = rider.stageResults[eventNum];
         if (result) {
-          cumulativeTime += result.time;
+          // Time of 0 or missing is invalid - can't include in GC
+          if (!result.time || result.time <= 0) {
+            hasInvalidTime = true;
+          } else {
+            cumulativeTime += result.time;
+          }
           if (result.isActual) actualStagesCount++;
         }
       });
+
+      // Skip riders with any invalid/zero stage times
+      if (hasInvalidTime) {
+        return;
+      }
 
       gcStandings.push({
         uid: rider.uid,
@@ -2028,6 +2052,30 @@ async function calculateGC(season, userUid, upToEvent = 15, currentUserResult = 
     rider.gcPosition = index + 1;
     rider.gapToLeader = index === 0 ? 0 : rider.cumulativeTime - gcStandings[0].cumulativeTime;
   });
+
+  // Debug: Log top 10 GC standings to diagnose impossible times
+  console.log(`   🔍 GC Debug - Top 10 standings:`);
+  const minPossibleTime = Object.values(stageTimeRanges).reduce((sum, r) => sum + (r.minTime || 0), 0);
+  console.log(`   Minimum possible GC time: ${minPossibleTime.toFixed(0)}s`);
+  gcStandings.slice(0, 10).forEach((r, i) => {
+    const rider = allRiders.get(r.uid);
+    const s13 = rider?.stageResults[13];
+    const s14 = rider?.stageResults[14];
+    const s15 = rider?.stageResults[15];
+    console.log(`   ${i+1}. ${r.name} (${r.uid}): ${r.cumulativeTime.toFixed(0)}s total`);
+    console.log(`      S13: ${s13?.time?.toFixed(0) || 'N/A'}s ${s13?.isActual ? '(ACTUAL)' : s13?.isSimulated ? '(SIM)' : ''}`);
+    console.log(`      S14: ${s14?.time?.toFixed(0) || 'N/A'}s ${s14?.isActual ? '(ACTUAL)' : s14?.isSimulated ? '(SIM)' : ''}`);
+    console.log(`      S15: ${s15?.time?.toFixed(0) || 'N/A'}s ${s15?.isActual ? '(ACTUAL)' : s15?.isSimulated ? '(SIM)' : ''}`);
+  });
+  // Also log user's position
+  const userStanding = gcStandings.find(r => r.uid === userUid);
+  if (userStanding) {
+    const userRider = allRiders.get(userUid);
+    console.log(`   User (${userStanding.gcPosition}): ${userStanding.name}: ${userStanding.cumulativeTime.toFixed(0)}s total`);
+    console.log(`      S13: ${userRider?.stageResults[13]?.time?.toFixed(0) || 'N/A'}s ${userRider?.stageResults[13]?.isActual ? '(ACTUAL)' : '(SIM)'}`);
+    console.log(`      S14: ${userRider?.stageResults[14]?.time?.toFixed(0) || 'N/A'}s ${userRider?.stageResults[14]?.isActual ? '(ACTUAL)' : '(SIM)'}`);
+    console.log(`      S15: ${userRider?.stageResults[15]?.time?.toFixed(0) || 'N/A'}s ${userRider?.stageResults[15]?.isActual ? '(ACTUAL)' : '(SIM)'}`);
+  }
 
   const userGC = gcStandings.find(r => r.uid === userUid);
   let gcAwards = { gcGoldMedal: false, gcSilverMedal: false, gcBronzeMedal: false };
