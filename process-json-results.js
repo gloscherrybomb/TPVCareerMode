@@ -2625,6 +2625,12 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
     updateData.completedOptionalEvents = newUsedOptionalEvents;  // Alias for frontend compatibility
     updateData.tourProgress = newTourProgress;
     updateData[`season${season}Standings`] = seasonStandings;
+
+    // Add to completedStages (store the STAGE number, not event number)
+    const completedStages = userData.completedStages || [];
+    if (!completedStages.includes(currentStage)) {
+      updateData.completedStages = admin.firestore.FieldValue.arrayUnion(currentStage);
+    }
   }
 
   // Update unlock cooldowns
