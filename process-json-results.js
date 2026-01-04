@@ -2343,7 +2343,7 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
   const eventResults = {
     position: isDNF ? 'DNF' : position,
     isDNF: isDNF,
-    stageNumber: currentStage,
+    stageNumber: isSpecialEventResult ? null : currentStage,
     time: parseFloat(userResult.Time) || 0,
     arr: parseInt(userResult.ARR) || 0,
     arrBand: userResult.ARRBand || '',
