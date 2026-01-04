@@ -1,0 +1,41 @@
+name: Query Schedule API
+
+on:
+  schedule:
+    - cron: '*/15 * * * *'  # Run every 15 minutes
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  query-schedule:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Query schedule API for new completed races
+        run: node .github/scripts/query-schedule-api.js
+
+      - name: Commit updated processed keys
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+
+          # Add the processed keys file if it changed
+          git add processed-event-keys.json || true
+
+          # Check if there are staged changes
+          if git diff --cached --quiet; then
+            echo "No changes to processed-event-keys.json"
+          else
+            git commit -m "Auto: Update processed event keys"
+            git push
+            echo "Committed updated processed event keys"
+          fi
