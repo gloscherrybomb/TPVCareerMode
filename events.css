@@ -259,6 +259,8 @@
     align-items: center;
     gap: 0.5rem;
     z-index: 2;
+    flex: 1;
+    text-align: center;
 }
 
 .stage-dot {
