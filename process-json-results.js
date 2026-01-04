@@ -2548,6 +2548,45 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
   eventResults.story = unifiedStory;
   eventResults.timestamp = admin.firestore.FieldValue.serverTimestamp();
 
+  // Check for DNS on Local Tour stages (36-hour window enforcement)
+  const dnsFlags = {};
+  if (eventNumber >= 13 && eventNumber <= 15) {
+    // Check if previous tour stage was completed in time
+    if (eventNumber === 14 && userData.event13Results) {
+      const event13Timestamp = userData.event13Results?.timestamp;
+      if (event13Timestamp != null) {
+        const event13Time = typeof event13Timestamp.toMillis === 'function'
+          ? event13Timestamp.toMillis()
+          : event13Timestamp;
+        const now = Date.now();
+        const hoursSinceEvent13 = (now - event13Time) / (1000 * 60 * 60);
+
+        if (hoursSinceEvent13 > 36) {
+          console.log(`   ⚠️ WARNING: Event 14 completed ${hoursSinceEvent13.toFixed(1)} hours after Event 13 (>36hr window)`);
+          dnsFlags.event14DNS = true;
+          dnsFlags.event14DNSReason = `Completed ${hoursSinceEvent13.toFixed(1)} hours after Stage 1 (36hr limit exceeded)`;
+        }
+      }
+    }
+
+    if (eventNumber === 15 && userData.event14Results) {
+      const event14Timestamp = userData.event14Results?.timestamp;
+      if (event14Timestamp != null) {
+        const event14Time = typeof event14Timestamp.toMillis === 'function'
+          ? event14Timestamp.toMillis()
+          : event14Timestamp;
+        const now = Date.now();
+        const hoursSinceEvent14 = (now - event14Time) / (1000 * 60 * 60);
+
+        if (hoursSinceEvent14 > 36) {
+          console.log(`   ⚠️ WARNING: Event 15 completed ${hoursSinceEvent14.toFixed(1)} hours after Event 14 (>36hr window)`);
+          dnsFlags.event15DNS = true;
+          dnsFlags.event15DNSReason = `Completed ${hoursSinceEvent14.toFixed(1)} hours after Stage 2 (36hr limit exceeded)`;
+        }
+      }
+    }
+  }
+
   // Calculate lifetime statistics
   const existingLifetime = userData.lifetimeStats || {};
   const eventMeta = EVENT_METADATA[eventNumber] || { distance: 0, climbing: 0 };
@@ -2633,8 +2672,13 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
     }
   }
 
-  // Update unlock cooldowns
-  updateData['unlocks.cooldowns'] = newCooldowns;
+  // Update unlock cooldowns (only if not skipping unlocks)
+  if (!skipUnlocks) {
+    updateData['unlocks.cooldowns'] = newCooldowns;
+  }
+
+  // Add DNS flags if any (for tour stage timing violations)
+  Object.assign(updateData, dnsFlags);
 
   // Update personality if changed (from unlock bonuses)
   if (userData.personality) {
