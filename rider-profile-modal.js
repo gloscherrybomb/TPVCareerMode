@@ -625,9 +625,9 @@ function buildRiderProfileHTML(data, name) {
     if (data.season3Complete === true) seasonsCompleted++;
     // Add more seasons as they're released
     
-    const eventsPerSeason = 9; // 6 mandatory + 3 optional that must be completed
-    const currentSeasonEvents = completedStages.length + completedOptionalEvents.length;
-    const currentSeasonProgressPercent = Math.min((currentSeasonEvents / eventsPerSeason) * 100, 100);
+    const stagesPerSeason = 9; // Total stages in a season
+    const currentSeasonStages = completedStages.length;
+    const currentSeasonProgressPercent = Math.min((currentSeasonStages / stagesPerSeason) * 100, 100);
 
     // Get country flag if available
     const country = data.country || null;
@@ -690,7 +690,7 @@ function buildRiderProfileHTML(data, name) {
                     <div class="rider-progress-bar">
                         <div class="rider-progress-fill" style="width: ${currentSeasonProgressPercent}%"></div>
                     </div>
-                    <span class="rider-profile-meta-label" style="margin-top: 0.25rem;">${currentSeasonEvents} / ${eventsPerSeason} events completed</span>
+                    <span class="rider-profile-meta-label" style="margin-top: 0.25rem;">${currentSeasonStages} / ${stagesPerSeason} stages completed</span>
                 </div>
             </div>
         </div>
