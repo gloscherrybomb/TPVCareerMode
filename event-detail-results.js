@@ -991,16 +991,11 @@ document.addEventListener('DOMContentLoaded', () => {
     onAuthStateChanged(auth, async (user) => {
         currentUser = user;
 
-        // Update schedule button based on login state and beta access
+        // Update schedule button based on login state
         const scheduleButton = document.getElementById('scheduleButton');
         if (scheduleButton) {
             if (user) {
                 scheduleButton.textContent = 'Schedule Event';
-
-                // Fetch user doc to check beta_access
-                const userDoc = await getDoc(doc(db, 'users', user.uid));
-                const userData = userDoc.exists() ? userDoc.data() : {};
-                const hasBetaAccess = userData.beta_access === true;
 
                 // Get current event's schedule URL
                 const event = getEvent(eventNumber);
@@ -1008,7 +1003,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 scheduleButton.onclick = (e) => {
                     e.preventDefault();
-                    if (hasBetaAccess && scheduleUrl) {
+                    if (scheduleUrl) {
                         window.open(scheduleUrl, '_blank');
                     } else {
                         alert('Coming Soon');

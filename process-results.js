@@ -1057,12 +1057,14 @@ async function calculateGC(season, userUid, upToEvent = 15, currentUserResult = 
       .sort((a, b) => a - b) || [];
 
     if (actualTimes.length > 0) {
+      const medianTime = actualTimes[Math.floor(actualTimes.length / 2)];
       stageTimeRanges[eventNum] = {
         minTime: actualTimes[0],
         maxTime: actualTimes[actualTimes.length - 1],
+        medianTime: medianTime,
         hasValidTimes: true
       };
-      console.log(`   Stage ${eventNum}: Time range ${actualTimes[0].toFixed(0)}s - ${actualTimes[actualTimes.length - 1].toFixed(0)}s (${actualTimes.length} riders)`);
+      console.log(`   Stage ${eventNum}: Time range ${actualTimes[0].toFixed(0)}s - ${actualTimes[actualTimes.length - 1].toFixed(0)}s, median ${medianTime.toFixed(0)}s (${actualTimes.length} riders)`);
     } else {
       stageTimeRanges[eventNum] = { hasValidTimes: false };
       console.log(`   ⚠️ Stage ${eventNum}: No valid times found for simulation`);
@@ -1086,7 +1088,7 @@ async function calculateGC(season, userUid, upToEvent = 15, currentUserResult = 
           const fieldSize = stageResults[eventNum]?.length || 50;
           const simulatedPosition = simulatePosition(uid, rider.arr, eventNum, fieldSize);
 
-          // Simulate time based on riders with similar ARR (more realistic)
+          // Simulate time based on riders with similar ARR
           let simulatedTime = simulateTimeFromARR(uid, rider.arr, stageResults[eventNum], eventNum);
 
           // Fallback to position-based interpolation using ACTUAL stage time range
@@ -1096,13 +1098,16 @@ async function calculateGC(season, userUid, upToEvent = 15, currentUserResult = 
             simulatedTime = minTime + (maxTime - minTime) * positionRatio;
           }
 
-          // CRITICAL: Clamp simulated time to never be faster than the actual stage minimum
-          // The ±5% variance in simulateTimeFromARR can push times below the actual minimum,
-          // which is impossible - no one can be faster than the fastest actual finisher
-          const { minTime } = timeRange;
+          // Clamp simulated time to never be faster than the actual stage minimum
+          const { minTime, medianTime } = timeRange;
           if (simulatedTime < minTime) {
             simulatedTime = minTime;
           }
+
+          // IMPORTANT: Blend simulated times toward the median to prevent clustering at minimum
+          // Bots who didn't actually race a stage shouldn't get "best case" times
+          // Use 50/50 blend between ARR-based time and median time
+          simulatedTime = (simulatedTime + medianTime) / 2;
 
           rider.stageResults[eventNum] = {
             position: simulatedPosition,
