@@ -240,16 +240,24 @@
     margin-top: 0.5rem;
 }
 
+/* Career Stats Container */
+.profile-career-stats {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+}
+
 /* Quick Stats */
 .quick-stats-title {
     font-family: 'Orbitron', sans-serif;
-    font-size: 1.2rem;
+    font-size: 0.9rem;
     font-weight: 700;
     color: var(--text-secondary);
     text-transform: uppercase;
     letter-spacing: 2px;
-    margin-bottom: 1rem;
-    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+    margin-top: 0;
 }
 
 .profile-quick-stats {
@@ -1223,6 +1231,10 @@
     }
 
     .profile-personality-header {
+        margin: 0 auto;
+    }
+
+    .profile-career-stats {
         margin: 0 auto;
     }
 
