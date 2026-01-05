@@ -2016,7 +2016,7 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
     updates.season1Wins = seasonStats.totalWins;
     updates.season1Podiums = seasonStats.totalPodiums;
     updates.season1Top10s = seasonStats.totalTop10s;
-    updates.season1Points = (userData.season1Points || 0) + points;
+    updates.season1Points = seasonStats.totalPoints;
     updates.season1BestFinish = seasonStats.bestFinish;
     updates.season1AvgFinish = seasonStats.averageFinish;
     updates.season1WinRate = seasonStats.winRate;

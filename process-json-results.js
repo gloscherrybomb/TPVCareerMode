@@ -2968,7 +2968,7 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
     updateData.season1Wins = seasonStats.totalWins;
     updateData.season1Podiums = seasonStats.totalPodiums;
     updateData.season1Top10s = seasonStats.totalTop10s;
-    updateData.season1Points = admin.firestore.FieldValue.increment(points);
+    updateData.season1Points = seasonStats.totalPoints;
     updateData.season1BestFinish = seasonStats.bestFinish;
     updateData.season1AvgFinish = seasonStats.averageFinish;
     updateData.season1WinRate = seasonStats.winRate;

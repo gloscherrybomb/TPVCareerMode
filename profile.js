@@ -468,14 +468,18 @@ async function loadProfile(user) {
         const calculatedStats = await calculateUserStats(userData.uid, userData);
         
         // Merge stored stats with calculated stats
-        // Profile page shows SEASON stats (not career stats)
         userStats = {
-            // Use stored season stats (always up-to-date from results processing)
-            totalRaces: userData.season1Events || 0,
-            totalWins: userData.season1Wins || 0,
-            totalPodiums: userData.season1Podiums || 0,
-            totalTop10s: userData.season1Top10s || 0,
-            totalPoints: userData.season1Points || 0,
+            // Career stats (for top quick stats section)
+            totalRaces: userData.careerEvents || 0,
+            totalWins: userData.careerWins || 0,
+            totalPodiums: userData.careerPodiums || 0,
+            totalPoints: userData.careerPoints || 0,
+            // Season stats (for Season Statistics section)
+            seasonRaces: userData.season1Events || 0,
+            seasonWins: userData.season1Wins || 0,
+            seasonPodiums: userData.season1Podiums || 0,
+            seasonTop10s: userData.season1Top10s || 0,
+            seasonPoints: userData.season1Points || 0,
             bestFinish: userData.season1BestFinish || null,
             averageFinish: userData.season1AvgFinish || null,
             winRate: userData.season1WinRate || 0,
@@ -586,7 +590,13 @@ function displayProfileInfo(user, userData, stats, seasonRanking, globalRanking)
     document.getElementById('avgFinish').textContent = stats.averageFinish ? Math.round(stats.averageFinish) + getOrdinalSuffix(stats.averageFinish) : 'N/A';
     document.getElementById('winRate').textContent = `${stats.winRate}%`;
     document.getElementById('podiumRate').textContent = `${stats.podiumRate}%`;
-    
+
+    // Season stats
+    document.getElementById('seasonRaces').textContent = stats.seasonRaces;
+    document.getElementById('seasonWins').textContent = stats.seasonWins;
+    document.getElementById('seasonPodiums').textContent = stats.seasonPodiums;
+    document.getElementById('seasonPoints').textContent = stats.seasonPoints;
+
     // Recent results
     displayRecentResults(stats.recentResults);
 

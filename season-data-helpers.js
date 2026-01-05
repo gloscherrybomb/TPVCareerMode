@@ -158,6 +158,7 @@ function getSeasonProgress(userData, seasonId) {
 
 /**
  * Get season statistics summary for a completed season
+ * Uses stored Firebase values as the source of truth for main stats
  * @param {object} userData - User document from Firestore
  * @param {number} seasonId - The season ID
  * @returns {object|null} - Season stats or null
@@ -170,40 +171,56 @@ function getSeasonStats(userData, seasonId) {
   const seasonData = getSeasonData(userData, seasonId);
   if (!seasonData) return null;
 
-  // Calculate stats from event results
+  // Get stored season stats from Firebase (source of truth)
+  let storedStats;
+  if (seasonId === 1) {
+    storedStats = {
+      events: userData.season1Events || 0,
+      wins: userData.season1Wins || 0,
+      podiums: userData.season1Podiums || 0,
+      topTens: userData.season1Top10s || 0,
+      points: userData.season1Points || 0,
+      bestFinish: userData.season1BestFinish || null,
+      avgFinish: userData.season1AvgFinish || null
+    };
+  } else {
+    // Season 2+ stats are stored in nested structure
+    const seasonKey = `season${seasonId}`;
+    const nestedData = userData?.seasons?.[seasonKey] || {};
+    storedStats = {
+      events: nestedData.events || 0,
+      wins: nestedData.wins || 0,
+      podiums: nestedData.podiums || 0,
+      topTens: nestedData.top10s || 0,
+      points: nestedData.points || 0,
+      bestFinish: nestedData.bestFinish || null,
+      avgFinish: nestedData.avgFinish || null
+    };
+  }
+
+  // Only calculate worstFinish and totalCadenceCredits from event results (not stored)
   const eventResults = getSeasonEventResults(userData, seasonId);
   const positions = [];
-  let totalPoints = 0;
   let totalCC = 0;
-  let wins = 0;
-  let podiums = 0;
-  let topTens = 0;
 
   for (const [eventId, results] of Object.entries(eventResults)) {
     if (results && results.position && results.position !== 'DNF') {
-      const pos = parseInt(results.position);
-      positions.push(pos);
-
-      if (pos === 1) wins++;
-      if (pos <= 3) podiums++;
-      if (pos <= 10) topTens++;
-
-      totalPoints += results.points || 0;
+      positions.push(parseInt(results.position));
       totalCC += (results.earnedCadenceCredits || 0) + (results.unlockBonusPoints || 0);
     }
   }
 
-  if (positions.length === 0) return null;
+  if (storedStats.events === 0 && positions.length === 0) return null;
 
   return {
-    eventsCompleted: positions.length,
-    bestFinish: Math.min(...positions),
-    worstFinish: Math.max(...positions),
-    averageFinish: Math.round((positions.reduce((a, b) => a + b, 0) / positions.length) * 10) / 10,
-    wins,
-    podiums,
-    topTens,
-    totalPoints,
+    eventsCompleted: storedStats.events,
+    bestFinish: storedStats.bestFinish,
+    worstFinish: positions.length > 0 ? Math.max(...positions) : null,
+    averageFinish: storedStats.avgFinish,
+    wins: storedStats.wins,
+    podiums: storedStats.podiums,
+    topTens: storedStats.topTens,
+    totalPoints: storedStats.points,
     totalCadenceCredits: totalCC,
     finalRank: seasonData.rank,
     completionDate: seasonData.completionDate,
