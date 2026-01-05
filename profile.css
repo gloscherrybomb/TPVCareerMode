@@ -414,6 +414,33 @@
     gap: 1.5rem;
 }
 
+/* Compact Stats Grid */
+.stats-grid-compact {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+}
+
+.stats-grid-compact .stat-card {
+    padding: 1rem;
+    gap: 1rem;
+}
+
+.stats-grid-compact .stat-icon {
+    font-size: 1.8rem;
+    width: 45px;
+    height: 45px;
+    border-radius: 10px;
+}
+
+.stats-grid-compact .stat-label {
+    font-size: 0.75rem;
+    margin-bottom: 0.2rem;
+}
+
+.stats-grid-compact .stat-value {
+    font-size: 1.4rem;
+}
+
 .stat-card {
     display: flex;
     align-items: center;
@@ -1291,6 +1318,10 @@
 
     .stats-grid {
         grid-template-columns: 1fr;
+    }
+
+    .stats-grid-compact {
+        grid-template-columns: repeat(2, 1fr);
     }
 
     .result-card {
