@@ -64,15 +64,5 @@ jobs:
             fi
           fi
 
-      - name: Trigger results processing workflow
-        if: steps.commit.outputs.has_new_results == 'true'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          echo "Triggering process-json-results workflow via repository_dispatch"
-          gh api \
-            --method POST \
-            -H "Accept: application/vnd.github+json" \
-            /repos/${{ github.repository }}/dispatches \
-            -f event_type='process-race-results' \
-            -f "client_payload[json_files]=${{ steps.commit.outputs.new_files }}"
+      # Note: process-json-results.yml is triggered automatically via workflow_run
+      # when this workflow completes. It discovers unprocessed files itself.

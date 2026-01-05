@@ -3538,21 +3538,17 @@ async function processJSONResults(jsonFiles) {
         }
       }
 
-      // Rename JSON to include timestamp
-      const timestamp = new Date().toISOString()
-        .replace(/[-:]/g, '')
-        .replace(/\..+/, '')
-        .replace('T', '_');
-
-      const hasTimestamp = /(_\d{8}_\d{6})\.json$/.test(filePath);
-      if (!hasTimestamp) {
-        const newPath = filePath.replace(/\.json$/, `_${timestamp}.json`);
-        try {
-          fs.renameSync(filePath, newPath);
-          console.log(`   📅 Renamed to: ${path.basename(newPath)}`);
-        } catch (renameError) {
-          console.log(`   ⚠️ Could not rename: ${renameError.message}`);
+      // Mark JSON file as processed by adding processedAt to metadata
+      try {
+        const updatedJson = { ...parsedJson };
+        if (!updatedJson.metadata) {
+          updatedJson.metadata = {};
         }
+        updatedJson.metadata.processedAt = new Date().toISOString();
+        fs.writeFileSync(filePath, JSON.stringify(updatedJson, null, 2));
+        console.log(`   ✅ Marked as processed: ${path.basename(filePath)}`);
+      } catch (writeError) {
+        console.log(`   ⚠️ Could not mark as processed: ${writeError.message}`);
       }
 
       // Update bot ARRs based on race results
