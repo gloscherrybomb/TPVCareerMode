@@ -130,6 +130,7 @@
                         </div>
                     </div>
 
+                    <h3 class="quick-stats-title">Career Statistics</h3>
                     <div class="profile-quick-stats">
                         <div class="quick-stat">
                             <div class="quick-stat-value" id="totalRaces">0</div>
@@ -192,7 +193,10 @@
 
                 <!-- Season Stats Section -->
                 <div class="profile-section">
-                    <h2 class="section-title">Season Statistics</h2>
+                    <div class="section-header-with-switcher">
+                        <h2 class="section-title">Season Statistics</h2>
+                        <div id="profileSeasonSwitcher" class="profile-season-switcher"></div>
+                    </div>
                     <div class="stats-grid">
                         <a href="standings.html#season" class="stat-card stat-card-link">
                             <div class="stat-icon">🏆</div>
@@ -315,10 +319,7 @@
 
                 <!-- Season Progress Section -->
                 <div class="profile-section">
-                    <div class="section-header-with-switcher">
-                        <h2 class="section-title" id="seasonProgressTitle">Season 1 Progress</h2>
-                        <div id="profileSeasonSwitcher" class="profile-season-switcher"></div>
-                    </div>
+                    <h2 class="section-title" id="seasonProgressTitle">Season 1 Progress</h2>
 
                     <!-- History banner shown when viewing a completed past season -->
                     <div id="profileHistoryBanner" style="display: none;"></div>

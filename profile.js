@@ -70,6 +70,8 @@ function handleProfileSeasonChange(newSeason) {
     console.log(`Profile: Season ${newSeason} selected`);
     viewingSeason = newSeason;
 
+    updateSeasonStats(viewingSeason);
+    updateSeasonAwards(viewingSeason);
     updateSeasonProgressTitle();
     updateSeasonHistoryBanner();
     updateSeasonProgressDisplay();
@@ -256,6 +258,98 @@ function displayCompletedSeasonSummary(seasonId) {
             ` : ''}
         </div>
     `;
+}
+
+// Update season statistics when season changes
+function updateSeasonStats(seasonId) {
+    const seasonStats = window.seasonDataHelpers?.getSeasonStats?.(userData, seasonId);
+
+    if (!seasonStats) {
+        // No data for this season - show defaults
+        document.getElementById('seasonRank').textContent = '-';
+        document.getElementById('avgFinish').textContent = '-';
+        document.getElementById('winRate').textContent = '0%';
+        document.getElementById('podiumRate').textContent = '0%';
+        document.getElementById('seasonRaces').textContent = '0';
+        document.getElementById('seasonWins').textContent = '0';
+        document.getElementById('seasonPodiums').textContent = '0';
+        document.getElementById('seasonPoints').textContent = '0';
+        return;
+    }
+
+    // Update season stats display
+    document.getElementById('avgFinish').textContent = seasonStats.averageFinish
+        ? Math.round(seasonStats.averageFinish) + getOrdinalSuffix(seasonStats.averageFinish)
+        : '-';
+
+    // Calculate win rate and podium rate
+    const events = seasonStats.eventsCompleted || 0;
+    const winRate = events > 0 ? Math.round((seasonStats.wins / events) * 100) : 0;
+    const podiumRate = events > 0 ? Math.round((seasonStats.podiums / events) * 100) : 0;
+
+    document.getElementById('winRate').textContent = `${winRate}%`;
+    document.getElementById('podiumRate').textContent = `${podiumRate}%`;
+    document.getElementById('seasonRaces').textContent = events;
+    document.getElementById('seasonWins').textContent = seasonStats.wins || 0;
+    document.getElementById('seasonPodiums').textContent = seasonStats.podiums || 0;
+    document.getElementById('seasonPoints').textContent = seasonStats.totalPoints || 0;
+
+    // Update season rank if available
+    if (seasonStats.finalRank) {
+        document.getElementById('seasonRank').textContent = `#${seasonStats.finalRank}`;
+    }
+}
+
+// Update awards display for selected season
+function updateSeasonAwards(seasonId) {
+    const awards = calculateSeasonAwards(userData, seasonId);
+    displayAwards(awards);
+}
+
+// Calculate awards earned in a specific season from event results
+function calculateSeasonAwards(userData, seasonId) {
+    const seasonConfig = window.seasonConfig?.getSeasonConfig?.(seasonId);
+    if (!seasonConfig || !seasonConfig.events) return {};
+
+    const awards = {
+        gold: 0, silver: 0, bronze: 0, lanternRouge: 0,
+        punchingMedal: 0, giantKiller: 0, bullseye: 0, hotStreak: 0,
+        domination: 0, closeCall: 0, photoFinish: 0, darkHorse: 0,
+        zeroToHero: 0, windTunnel: 0, theAccountant: 0
+    };
+
+    // Loop through events in this season
+    for (const eventId of Object.keys(seasonConfig.events)) {
+        const eventResults = window.seasonDataHelpers?.getEventResults?.(userData, parseInt(eventId));
+        if (!eventResults || eventResults.position === 'DNF') continue;
+
+        const position = eventResults.position;
+
+        // Count position-based medals
+        if (position === 1) awards.gold++;
+        else if (position === 2) awards.silver++;
+        else if (position === 3) awards.bronze++;
+
+        // Check for lantern rouge (last place)
+        if (eventResults.totalFinishers && position === eventResults.totalFinishers) {
+            awards.lanternRouge++;
+        }
+
+        // Count earned medals from event results
+        if (eventResults.earnedPunchingMedal) awards.punchingMedal++;
+        if (eventResults.earnedGiantKillerMedal) awards.giantKiller++;
+        if (eventResults.earnedBullseyeMedal) awards.bullseye++;
+        if (eventResults.earnedHotStreakMedal) awards.hotStreak++;
+        if (eventResults.earnedDomination) awards.domination++;
+        if (eventResults.earnedCloseCall) awards.closeCall++;
+        if (eventResults.earnedPhotoFinish) awards.photoFinish++;
+        if (eventResults.earnedDarkHorse) awards.darkHorse++;
+        if (eventResults.earnedZeroToHero) awards.zeroToHero++;
+        if (eventResults.earnedWindTunnel) awards.windTunnel++;
+        if (eventResults.earnedTheAccountant) awards.theAccountant++;
+    }
+
+    return awards;
 }
 
 // Show/hide sections based on auth state

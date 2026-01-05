@@ -241,6 +241,17 @@
 }
 
 /* Quick Stats */
+.quick-stats-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 1rem;
+    margin-top: 0.5rem;
+}
+
 .profile-quick-stats {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
