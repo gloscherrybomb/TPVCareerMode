@@ -25,6 +25,11 @@ on:
         required: false
         default: false
         type: boolean
+      skip_narrative_history:
+        description: 'Skip narrative history (prevents story repetition tracking during reprocessing)'
+        required: false
+        default: false
+        type: boolean
 
 jobs:
   process-json-results:
@@ -88,9 +93,13 @@ jobs:
         env:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           SKIP_UNLOCKS: ${{ inputs.skip_unlocks == true && 'true' || 'false' }}
+          SKIP_NARRATIVE_HISTORY: ${{ inputs.skip_narrative_history == true && 'true' || 'false' }}
         run: |
           if [ "$SKIP_UNLOCKS" == "true" ]; then
             echo "⏭️ Unlock processing will be skipped"
+          fi
+          if [ "$SKIP_NARRATIVE_HISTORY" == "true" ]; then
+            echo "⏭️ Narrative history tracking will be skipped"
           fi
           echo "Processing JSON results..."
 
