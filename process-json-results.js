@@ -3132,7 +3132,8 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
 
   // Cap credits
   earnedCC = Math.min(earnedCC, PER_EVENT_CREDIT_CAP);
-  updateData.cadenceCredits = admin.firestore.FieldValue.increment(earnedCC);
+  updateData['currency.balance'] = admin.firestore.FieldValue.increment(earnedCC);
+  updateData['currency.totalEarned'] = admin.firestore.FieldValue.increment(earnedCC);
 
   // Check for season completion and award season trophies
   const earnedSeasonAwards = await checkAndMarkSeasonComplete(
