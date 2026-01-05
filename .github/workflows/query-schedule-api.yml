@@ -64,5 +64,5 @@ jobs:
             fi
           fi
 
-      # Note: process-json-results.yml is triggered automatically via workflow_run
+      # Note: process-json-results.yml triggers automatically via workflow_run
       # when this workflow completes. It discovers unprocessed files itself.
