@@ -530,8 +530,8 @@ function buildRiderProfileHTML(data, name) {
     const completedOptionalEvents = data.completedOptionalEvents || [];
     
     // Read wins, podiums, and awards directly from user document
-    const wins = data.totalWins || 0;
-    const podiums = data.totalPodiums || 0;
+    const wins = data.careerWins || 0;
+    const podiums = data.careerPodiums || 0;
     
     // Get initials for avatar placeholder
     const initials = displayName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
