@@ -2245,6 +2245,9 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
     position = null;
   }
 
+  // Calculate total finishers for Zero to Hero calculation
+  const totalFinishers = results.filter(r => r.Position !== 'DNF' && !isNaN(parseInt(r.Position))).length;
+
   const predictedPosition = calculatePredictedPosition(results, uid);
 
   // Calculate points
@@ -2513,6 +2516,7 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
     distance: distance,
     deltaTime: parseFloat(userResult.DeltaTime) || 0,
     eventPoints: parseInt(userResult.Points) || null,
+    totalFinishers: totalFinishers,
 
     // Standard awards
     earnedPunchingMedal: earnedPunchingMedal,
@@ -3121,19 +3125,48 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
   // Special case: The Leveller (theEqualizer) always gets completion bonus on top of award
   // For all other events, completion bonus is only given if no awards earned
   const hasTheEqualizer = awardList.includes('theEqualizer');
+  let ccSource = 'awards';
 
   if (hasTheEqualizer) {
     // The Leveller: 30CC award + 20CC completion bonus = 50CC total
     earnedCC += COMPLETION_BONUS_CC;
+    ccSource = 'awards'; // Still mark as awards since theEqualizer is the primary source
   } else if (awardList.length === 0 && !isDNF) {
     // Other events: completion bonus only if no awards
     earnedCC = COMPLETION_BONUS_CC;
+    ccSource = 'completion';
   }
 
   // Cap credits
   earnedCC = Math.min(earnedCC, PER_EVENT_CREDIT_CAP);
-  updateData['currency.balance'] = admin.firestore.FieldValue.increment(earnedCC);
-  updateData['currency.totalEarned'] = admin.firestore.FieldValue.increment(earnedCC);
+
+  // Add CC earned to event results for display
+  eventResults.earnedCadenceCredits = earnedCC;
+  eventResults.ccSource = ccSource;
+
+  // Update currency balance and total earned
+  if (earnedCC > 0) {
+    updateData['currency.balance'] = admin.firestore.FieldValue.increment(earnedCC);
+    updateData['currency.totalEarned'] = admin.firestore.FieldValue.increment(earnedCC);
+
+    // Create transaction record for audit trail
+    const cadenceCreditTransaction = {
+      id: `cc_event_${eventNumber}`,
+      type: 'earn',
+      delta: earnedCC,
+      source: ccSource,
+      eventNumber: eventNumber,
+      awardIds: awardList,
+      timestamp: admin.firestore.Timestamp.now()
+    };
+    updateData['currency.transactions'] = admin.firestore.FieldValue.arrayUnion(cadenceCreditTransaction);
+
+    if (ccSource === 'completion') {
+      console.log(`   💰 Awarding ${earnedCC} CC for race completion`);
+    } else {
+      console.log(`   💰 Awarding ${earnedCC} CC from ${awardList.length} awards`);
+    }
+  }
 
   // Check for season completion and award season trophies
   const earnedSeasonAwards = await checkAndMarkSeasonComplete(
