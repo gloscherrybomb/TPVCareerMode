@@ -1199,6 +1199,22 @@
                 const currentSeasonPoints = userData.totalPoints || 0;
                 const newCareerPoints = currentCareerPoints - currentSeasonPoints + 50;
 
+                // Calculate careerWins/careerPodiums from special events only (events > 100)
+                // Season event contributions are being reset, but special event contributions remain
+                let newCareerWins = 0;
+                let newCareerPodiums = 0;
+                for (let eventNum = 101; eventNum <= 110; eventNum++) {
+                    const eventResults = userData[`event${eventNum}Results`];
+                    if (eventResults && eventResults.position) {
+                        if (eventResults.position === 1) {
+                            newCareerWins++;
+                        }
+                        if (eventResults.position <= 3) {
+                            newCareerPodiums++;
+                        }
+                    }
+                }
+
                 // Delete all race result documents for this user (season1_event1_UID through season1_event15_UID)
                 const deletePromises = [];
                 for (let i = 1; i <= 15; i++) {
@@ -1222,6 +1238,8 @@
                     currentStage: 1,
                     totalPoints: 0,
                     careerPoints: newCareerPoints,
+                    careerWins: newCareerWins,
+                    careerPodiums: newCareerPodiums,
                     totalEvents: 0,
                     totalWins: 0,
                     totalPodiums: 0,
@@ -1239,6 +1257,19 @@
                     localTourStatus: 'in_progress',
                     season1CelebrationViewed: false,
                     gluttonForPunishmentAwarded: true,
+                    // Reset cadence credits
+                    currency: {
+                        balance: 0,
+                        totalEarned: 0,
+                        transactions: []
+                    },
+                    // Reset unlocks (shop purchases)
+                    unlocks: {
+                        inventory: [],
+                        equipped: [],
+                        slotCount: 1,
+                        cooldowns: {}
+                    },
                     awards: {
                         gold: 0,
                         silver: 0,
