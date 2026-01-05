@@ -354,6 +354,15 @@
     }
 }
 
+/* Season Completed Marker */
+.season-completed-marker {
+    display: inline;
+    margin-left: 0.2rem;
+    color: var(--accent-blue);
+    font-weight: bold;
+    cursor: help;
+}
+
 /* Team Cell */
 .team-cell {
     color: var(--text-secondary);

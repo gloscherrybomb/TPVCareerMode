@@ -610,11 +610,24 @@ async function renderGlobalRankings(forceRefresh = false) {
 
             // Use careerPoints for global rankings (lifetime achievement)
             const points = data.careerPoints || 0;
+            const currentSeason = data.currentSeason || 1;
+
+            // Check if current season is complete (rider finished but hasn't progressed)
+            // For season 1: check season1Complete field
+            // For season 2+: check seasons.seasonX.complete field
+            let seasonCompleted = false;
+            if (currentSeason === 1) {
+                seasonCompleted = data.season1Complete === true;
+            } else {
+                seasonCompleted = data?.seasons?.[`season${currentSeason}`]?.complete === true;
+            }
+
             rankings.push({
                 uid: doc.id,
                 name: data.name || 'Unknown',
                 team: data.team || '',
-                season: data.currentSeason || 1,
+                season: currentSeason,
+                seasonCompleted: seasonCompleted,
                 events: data.careerTotalEvents || data.completedStages?.length || 0,
                 points: points,
                 gender: data.gender || null,
@@ -740,7 +753,7 @@ function renderGlobalRankingsTable(rankings, globalContent) {
                             ${countryFlagHTML}
                             ${racer.isCurrentUser ? '<span class="you-badge">YOU</span>' : ''}
                         </td>
-                        <td class="season-cell">Season ${racer.season}</td>
+                        <td class="season-cell">Season ${racer.season}${racer.seasonCompleted ? '<span class="season-completed-marker" title="Season completed">*</span>' : ''}</td>
                         <td class="events-cell">${racer.events}</td>
                         <td class="points-cell">
                             <span class="points-value">${racer.points}</span>
