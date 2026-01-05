@@ -8,6 +8,9 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    outputs:
+      has_new_results: ${{ steps.commit.outputs.has_new_results }}
+      new_files: ${{ steps.commit.outputs.new_files }}
 
     steps:
       - name: Checkout code
@@ -22,6 +25,7 @@ jobs:
         run: node .github/scripts/query-schedule-api.js
 
       - name: Commit new results and updated keys
+        id: commit
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
@@ -33,8 +37,23 @@ jobs:
           # Check if there are staged changes
           if git diff --cached --quiet; then
             echo "No new results to commit"
+            echo "has_new_results=false" >> $GITHUB_OUTPUT
           else
+            # Get list of new JSON files before committing
+            NEW_FILES=$(git diff --cached --name-only | grep 'race_results/.*\.json$' | jq -R -s -c 'split("\n")[:-1]')
+            echo "new_files=$NEW_FILES" >> $GITHUB_OUTPUT
+
             git commit -m "Auto: Add API-fetched race results"
             git push
             echo "Committed new race results"
+            echo "has_new_results=true" >> $GITHUB_OUTPUT
           fi
+
+  process-results:
+    needs: query-schedule
+    if: needs.query-schedule.outputs.has_new_results == 'true'
+    uses: ./.github/workflows/process-json-results.yml
+    with:
+      json_files: ${{ needs.query-schedule.outputs.new_files }}
+    secrets:
+      FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
