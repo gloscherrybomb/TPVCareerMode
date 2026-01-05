@@ -115,17 +115,19 @@ jobs:
           echo "$OUTPUT"
 
           # Count processed users from output (each "✅ Processed: Position" line = 1 user)
-          PROCESSED_COUNT=$(echo "$OUTPUT" | grep -c "✅ Processed: Position" || echo "0")
+          # Use || true to prevent grep from failing the pipeline when no matches
+          PROCESSED_COUNT=$(echo "$OUTPUT" | grep -c "✅ Processed: Position" || true)
+          if [ -z "$PROCESSED_COUNT" ]; then PROCESSED_COUNT=0; fi
           echo "processed_count=$PROCESSED_COUNT" >> $GITHUB_OUTPUT
 
           # Extract rider names from "Found user: Name (Document ID: ...)" lines
-          RIDER_NAMES=$(echo "$OUTPUT" | grep -oP 'Found user: \K[^(]+' | sed 's/ *$//' | head -20 | tr '\n' ', ' | sed 's/,$//')
+          RIDER_NAMES=$(echo "$OUTPUT" | grep -oP 'Found user: \K[^(]+' | sed 's/ *$//' | head -20 | tr '\n' ', ' | sed 's/,$//' || true)
           echo "rider_names=$RIDER_NAMES" >> $GITHUB_OUTPUT
 
           # Parse event info from file paths
           FILES='${{ steps.changed-files.outputs.files }}'
-          EVENTS=$(echo "$FILES" | grep -oP 'event_\d+' | sort -u | tr '\n' ', ' | sed 's/,$//' | sed 's/event_//g')
-          SEASONS=$(echo "$FILES" | grep -oP 'season_\d+' | sort -u | tr '\n' ', ' | sed 's/,$//' | sed 's/season_//g')
+          EVENTS=$(echo "$FILES" | grep -oP 'event_\d+' | sort -u | tr '\n' ', ' | sed 's/,$//' | sed 's/event_//g' || true)
+          SEASONS=$(echo "$FILES" | grep -oP 'season_\d+' | sort -u | tr '\n' ', ' | sed 's/,$//' | sed 's/season_//g' || true)
           echo "events=$EVENTS" >> $GITHUB_OUTPUT
           echo "seasons=$SEASONS" >> $GITHUB_OUTPUT
 
