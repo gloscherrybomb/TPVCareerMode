@@ -2410,13 +2410,28 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
     const lastPosition = Math.max(...finishers.map(r => parseInt(r.Position)));
     earnedLanternRouge = position === lastPosition && finishers.length > 1;
 
-    // Hot Streak: beat prediction 3 events in a row
+    // Hot Streak: beat prediction 3 events in a row (chronological order)
     if (predictedPosition && position < predictedPosition) {
-      // Check last 2 events for prediction beats
+      // Build list of previously completed events sorted by timestamp
+      const previousEvents = [];
+      for (let i = 1; i <= 15; i++) {
+        if (i !== eventNumber && userData[`event${i}Results`]) {
+          const evtData = userData[`event${i}Results`];
+          const timestamp = evtData.raceDate || evtData.processedAt;
+          const timestampMs = timestamp ? (timestamp.toDate ? timestamp.toDate().getTime() : new Date(timestamp).getTime()) : 0;
+          previousEvents.push({ eventNum: i, timestamp: timestampMs });
+        }
+      }
+      // Sort by timestamp descending (most recent first)
+      previousEvents.sort((a, b) => b.timestamp - a.timestamp);
+
+      // Check last 2 events chronologically for prediction beats
       let streak = 1; // Current event beats prediction
-      for (let i = eventNumber - 1; i >= Math.max(1, eventNumber - 2); i--) {
-        const prevResults = userData[`event${i}Results`];
-        if (prevResults && prevResults.predictedPosition && prevResults.position < prevResults.predictedPosition) {
+      for (let i = 0; i < Math.min(2, previousEvents.length); i++) {
+        const prevResults = userData[`event${previousEvents[i].eventNum}Results`];
+        if (prevResults && prevResults.predictedPosition &&
+            prevResults.position !== 'DNF' &&
+            prevResults.position < prevResults.predictedPosition) {
           streak++;
         } else {
           break;

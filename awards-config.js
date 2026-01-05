@@ -70,7 +70,7 @@ const AWARD_DEFINITIONS = {
     id: 'hotStreakMedal',
     title: 'Hot Streak',
     icon: '🔥',
-    description: 'Win 3 races in a row',
+    description: 'Beat prediction 3 races in a row',
     calculationType: 'event'
   },
   
