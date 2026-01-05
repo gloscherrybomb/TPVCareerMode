@@ -1196,23 +1196,49 @@
 
                 // Calculate new career points: remove season points, add 50 bonus
                 const currentCareerPoints = userData.careerPoints || 0;
-                const currentSeasonPoints = userData.totalPoints || 0;
+                const currentSeasonPoints = userData.season1Points || userData.totalPoints || 0;
                 const newCareerPoints = currentCareerPoints - currentSeasonPoints + 50;
 
-                // Calculate careerWins/careerPodiums from special events only (events > 100)
+                // Calculate all career stats from special events only (events > 100)
                 // Season event contributions are being reset, but special event contributions remain
+                let newCareerEvents = 0;
                 let newCareerWins = 0;
                 let newCareerPodiums = 0;
+                let newCareerTop10s = 0;
+                let newCareerBestFinish = null;
+                let careerPositions = [];
+
                 for (let eventNum = 101; eventNum <= 110; eventNum++) {
                     const eventResults = userData[`event${eventNum}Results`];
-                    if (eventResults && eventResults.position) {
-                        if (eventResults.position === 1) {
+                    if (eventResults && eventResults.position && eventResults.position !== 'DNF') {
+                        const position = eventResults.position;
+                        newCareerEvents++;
+                        careerPositions.push(position);
+
+                        if (position === 1) {
                             newCareerWins++;
                         }
-                        if (eventResults.position <= 3) {
+                        if (position <= 3) {
                             newCareerPodiums++;
                         }
+                        if (position <= 10) {
+                            newCareerTop10s++;
+                        }
+                        if (newCareerBestFinish === null || position < newCareerBestFinish) {
+                            newCareerBestFinish = position;
+                        }
                     }
+                }
+
+                // Calculate derived career stats
+                let newCareerAvgFinish = null;
+                let newCareerWinRate = 0;
+                let newCareerPodiumRate = 0;
+                if (newCareerEvents > 0) {
+                    const totalPositions = careerPositions.reduce((sum, pos) => sum + pos, 0);
+                    newCareerAvgFinish = parseFloat((totalPositions / newCareerEvents).toFixed(1));
+                    newCareerWinRate = parseFloat(((newCareerWins / newCareerEvents) * 100).toFixed(1));
+                    newCareerPodiumRate = parseFloat(((newCareerPodiums / newCareerEvents) * 100).toFixed(1));
                 }
 
                 // Delete all race result documents for this user (season1_event1_UID through season1_event15_UID)
@@ -1236,18 +1262,27 @@
                 // Reset all season 1 data
                 const resetData = {
                     currentStage: 1,
-                    totalPoints: 0,
+                    // Career statistics (recalculated from special events only)
                     careerPoints: newCareerPoints,
+                    careerEvents: newCareerEvents,
                     careerWins: newCareerWins,
                     careerPodiums: newCareerPodiums,
-                    totalEvents: 0,
-                    totalWins: 0,
-                    totalPodiums: 0,
-                    totalTop10s: 0,
-                    bestFinish: null,
-                    averageFinish: null,
-                    winRate: 0,
-                    podiumRate: 0,
+                    careerTop10s: newCareerTop10s,
+                    careerBestFinish: newCareerBestFinish,
+                    careerAvgFinish: newCareerAvgFinish,
+                    careerWinRate: newCareerWinRate,
+                    careerPodiumRate: newCareerPodiumRate,
+                    // Season 1 statistics (reset to 0)
+                    season1Events: 0,
+                    season1Wins: 0,
+                    season1Podiums: 0,
+                    season1Top10s: 0,
+                    season1Points: 0,
+                    season1BestFinish: null,
+                    season1AvgFinish: null,
+                    season1WinRate: 0,
+                    season1PodiumRate: 0,
+                    // Season progression
                     completedStages: [],
                     usedOptionalEvents: [],
                     tourProgress: {},

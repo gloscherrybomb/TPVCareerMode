@@ -132,9 +132,9 @@ function generateSeasonCompleteStory(data) {
 function generateSeasonSummaryText(userData) {
     const completionStatus = checkSeasonComplete(userData);
     const seasonRank = userData.season1Rank || 'unranked';
-    const totalPoints = userData.totalPoints || 0;
-    const totalWins = userData.totalWins || 0;
-    const totalPodiums = userData.totalPodiums || 0;
+    const totalPoints = userData.season1Points || 0;
+    const totalWins = userData.season1Wins || 0;
+    const totalPodiums = userData.season1Podiums || 0;
     const completedEvents = (userData.completedStages || []).length;
     
     let summary = '';
@@ -184,9 +184,9 @@ function generateSeasonSummaryText(userData) {
 function generateProfileSeasonReview(userData) {
     const completionStatus = checkSeasonComplete(userData);
     const seasonRank = userData.season1Rank || null;
-    const totalPoints = userData.totalPoints || 0;
-    const totalWins = userData.totalWins || 0;
-    const totalPodiums = userData.totalPodiums || 0;
+    const totalPoints = userData.season1Points || 0;
+    const totalWins = userData.season1Wins || 0;
+    const totalPodiums = userData.season1Podiums || 0;
     const totalEvents = (userData.completedStages || []).length;
     
     // Get their best and worst moments

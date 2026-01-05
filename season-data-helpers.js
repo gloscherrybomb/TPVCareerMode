@@ -224,18 +224,28 @@ function getCareerStats(userData) {
   if (!userData) {
     return {
       careerPoints: 0,
-      totalWins: 0,
-      totalPodiums: 0,
-      totalEvents: 0,
+      careerWins: 0,
+      careerPodiums: 0,
+      careerEvents: 0,
+      careerTop10s: 0,
+      careerBestFinish: null,
+      careerAvgFinish: null,
+      careerWinRate: 0,
+      careerPodiumRate: 0,
       seasonsCompleted: 0
     };
   }
 
   return {
     careerPoints: userData.careerPoints || 0,
-    totalWins: userData.totalWins || 0,
-    totalPodiums: userData.totalPodiums || 0,
-    totalEvents: userData.totalEvents || 0,
+    careerWins: userData.careerWins || 0,
+    careerPodiums: userData.careerPodiums || 0,
+    careerEvents: userData.careerEvents || 0,
+    careerTop10s: userData.careerTop10s || 0,
+    careerBestFinish: userData.careerBestFinish || null,
+    careerAvgFinish: userData.careerAvgFinish || null,
+    careerWinRate: userData.careerWinRate || 0,
+    careerPodiumRate: userData.careerPodiumRate || 0,
     seasonsCompleted: getSeasonConfigModule().getCompletedSeasons(userData).length
   };
 }

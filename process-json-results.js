@@ -638,8 +638,13 @@ async function calculateCareerStats(userData) {
     }
   };
 
-  // Iterate through all possible events
-  for (let eventNum = 1; eventNum <= 15; eventNum++) {
+  // Iterate through all possible events (season 1: 1-15, special events: 101-110)
+  const eventNumbers = [
+    ...Array.from({length: 15}, (_, i) => i + 1),   // Season 1: events 1-15
+    ...Array.from({length: 10}, (_, i) => i + 101)  // Special events: 101-110
+  ];
+
+  for (const eventNum of eventNumbers) {
     const eventResults = userData[`event${eventNum}Results`];
 
     if (eventResults && eventResults.position && eventResults.position !== 'DNF') {
@@ -726,6 +731,79 @@ async function calculateCareerStats(userData) {
     stats.winRate = parseFloat(((stats.totalWins / stats.totalRaces) * 100).toFixed(1));
 
     // Podium rate (percentage)
+    stats.podiumRate = parseFloat(((stats.totalPodiums / stats.totalRaces) * 100).toFixed(1));
+  } else {
+    stats.averageFinish = null;
+    stats.winRate = 0;
+    stats.podiumRate = 0;
+  }
+
+  return stats;
+}
+
+/**
+ * Calculate season-specific statistics (only events 1-15 for season 1)
+ * Does not include special events
+ */
+async function calculateSeasonStats(userData, seasonNumber = 1) {
+  const stats = {
+    totalRaces: 0,
+    totalWins: 0,
+    totalPodiums: 0,
+    totalTop10s: 0,
+    totalPoints: 0,
+    bestFinish: null,
+    positions: []
+  };
+
+  // Season 1 events are 1-15
+  const startEvent = 1;
+  const endEvent = 15;
+
+  for (let eventNum = startEvent; eventNum <= endEvent; eventNum++) {
+    const eventResults = userData[`event${eventNum}Results`];
+
+    if (eventResults && eventResults.position && eventResults.position !== 'DNF') {
+      const position = eventResults.position;
+
+      // Count races
+      stats.totalRaces++;
+
+      // Track positions for average calculation
+      stats.positions.push(position);
+
+      // Count wins
+      if (position === 1) {
+        stats.totalWins++;
+      }
+
+      // Count podiums
+      if (position <= 3) {
+        stats.totalPodiums++;
+      }
+
+      // Count top 10s
+      if (position <= 10) {
+        stats.totalTop10s++;
+      }
+
+      // Track best finish
+      if (stats.bestFinish === null || position < stats.bestFinish) {
+        stats.bestFinish = position;
+      }
+
+      // Add points from this event
+      if (eventResults.points) {
+        stats.totalPoints += eventResults.points;
+      }
+    }
+  }
+
+  // Calculate derived stats
+  if (stats.totalRaces > 0) {
+    const totalPositions = stats.positions.reduce((sum, pos) => sum + pos, 0);
+    stats.averageFinish = parseFloat((totalPositions / stats.totalRaces).toFixed(1));
+    stats.winRate = parseFloat(((stats.totalWins / stats.totalRaces) * 100).toFixed(1));
     stats.podiumRate = parseFloat(((stats.totalPodiums / stats.totalRaces) * 100).toFixed(1));
   } else {
     stats.averageFinish = null;
@@ -2850,20 +2928,21 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
   const tempUserData = { ...userData };
   tempUserData[`event${eventNumber}Results`] = eventResults;
   const careerStats = await calculateCareerStats(tempUserData);
+  const seasonStats = await calculateSeasonStats(tempUserData, 1);
 
   // Prepare update object
   const updateData = {
     [`event${eventNumber}Results`]: eventResults,
-    // Career statistics
+    // Career statistics (all events including special)
     careerPoints: (userData.careerPoints || 0) + points,
-    totalEvents: (userData.totalEvents || 0) + 1,
+    careerEvents: careerStats.totalRaces,
     careerWins: careerStats.totalWins,
     careerPodiums: careerStats.totalPodiums,
-    totalTop10s: careerStats.totalTop10s,
-    bestFinish: careerStats.bestFinish,
-    averageFinish: careerStats.averageFinish,
-    winRate: careerStats.winRate,
-    podiumRate: careerStats.podiumRate,
+    careerTop10s: careerStats.totalTop10s,
+    careerBestFinish: careerStats.bestFinish,
+    careerAvgFinish: careerStats.averageFinish,
+    careerWinRate: careerStats.winRate,
+    careerPodiumRate: careerStats.podiumRate,
     // User profile fields
     arr: eventResults.arr,
     team: userResult.Team || '',
@@ -2871,19 +2950,29 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
     country: userResult.Country || null,
     ageBand: userResult.AgeBand || null,
     // Other tracking
-    totalPoints: admin.firestore.FieldValue.increment(points),
     powerRecords: updatedPowerRecords,
     rivalData: updatedRivalData,
     lifetimeStats: newLifetimeStats
   };
 
-  // Stage progression (only for non-special events)
+  // Stage progression and season stats (only for non-special events)
   if (!isSpecialEventResult) {
     updateData.currentStage = nextStage;
     updateData.usedOptionalEvents = newUsedOptionalEvents;
     updateData.completedOptionalEvents = newUsedOptionalEvents;  // Alias for frontend compatibility
     updateData.tourProgress = newTourProgress;
     updateData[`season${season}Standings`] = seasonStandings;
+
+    // Season 1 statistics (only season events, not special events)
+    updateData.season1Events = seasonStats.totalRaces;
+    updateData.season1Wins = seasonStats.totalWins;
+    updateData.season1Podiums = seasonStats.totalPodiums;
+    updateData.season1Top10s = seasonStats.totalTop10s;
+    updateData.season1Points = admin.firestore.FieldValue.increment(points);
+    updateData.season1BestFinish = seasonStats.bestFinish;
+    updateData.season1AvgFinish = seasonStats.averageFinish;
+    updateData.season1WinRate = seasonStats.winRate;
+    updateData.season1PodiumRate = seasonStats.podiumRate;
 
     // Add to completedStages (store the STAGE number, not event number)
     const completedStages = userData.completedStages || [];

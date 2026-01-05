@@ -418,17 +418,18 @@ function displayHeader() {
 }
 
 // Display key stats bar
+// Palmares page shows CAREER stats (lifetime across all seasons and special events)
 function displayKeyStats() {
     const dnfCount = allResults.filter(r => r.position === 'DNF').length;
     const completedResults = allResults.filter(r => r.position !== 'DNF');
 
-    document.getElementById('statRaces').textContent = allResults.length;
-    document.getElementById('statWins').textContent = userData.totalWins || 0;
-    document.getElementById('statPodiums').textContent = userData.totalPodiums || 0;
-    document.getElementById('statTop10').textContent = userData.totalTop10s || 0;
+    document.getElementById('statRaces').textContent = userData.careerEvents || allResults.length;
+    document.getElementById('statWins').textContent = userData.careerWins || 0;
+    document.getElementById('statPodiums').textContent = userData.careerPodiums || 0;
+    document.getElementById('statTop10').textContent = userData.careerTop10s || 0;
     document.getElementById('statDNF').textContent = dnfCount;
-    document.getElementById('statAvg').textContent = Math.round(userData.averageFinish) || '0';
-    document.getElementById('statPoints').textContent = userData.totalPoints || 0;
+    document.getElementById('statAvg').textContent = Math.round(userData.careerAvgFinish) || '0';
+    document.getElementById('statPoints').textContent = userData.careerPoints || 0;
     document.getElementById('statCadenceCoins').textContent = userData.currency?.totalEarned || 0;
     document.getElementById('statARR').textContent = userData.arr || 0;
 }
@@ -942,17 +943,18 @@ function displayDetailedStats() {
     const totalCareerCC = userData.currency?.totalEarned || 0;
     document.getElementById('totalCareerCC').textContent = `${totalCareerCC.toLocaleString()} CC`;
 
-    // Performance
-    const winRate = allResults.length > 0 ? ((userData.totalWins || 0) / completedResults.length * 100).toFixed(1) : 0;
-    const podiumRate = allResults.length > 0 ? ((userData.totalPodiums || 0) / completedResults.length * 100).toFixed(1) : 0;
-    const top10Rate = allResults.length > 0 ? ((userData.totalTop10s || 0) / completedResults.length * 100).toFixed(1) : 0;
+    // Performance (using career stats)
+    const winRate = userData.careerWinRate || 0;
+    const podiumRate = userData.careerPodiumRate || 0;
+    const careerEvents = userData.careerEvents || completedResults.length;
+    const top10Rate = careerEvents > 0 ? ((userData.careerTop10s || 0) / careerEvents * 100).toFixed(1) : 0;
 
-    document.getElementById('perfWins').textContent = `${userData.totalWins || 0} (${winRate}%)`;
-    document.getElementById('perfPodiums').textContent = `${userData.totalPodiums || 0} (${podiumRate}%)`;
-    document.getElementById('perfTop10').textContent = `${userData.totalTop10s || 0} (${top10Rate}%)`;
-    document.getElementById('perfAvgFinish').textContent = Math.round(userData.averageFinish) || '0';
+    document.getElementById('perfWins').textContent = `${userData.careerWins || 0} (${winRate}%)`;
+    document.getElementById('perfPodiums').textContent = `${userData.careerPodiums || 0} (${podiumRate}%)`;
+    document.getElementById('perfTop10').textContent = `${userData.careerTop10s || 0} (${top10Rate}%)`;
+    document.getElementById('perfAvgFinish').textContent = Math.round(userData.careerAvgFinish) || '0';
 
-    const bestFinish = userData.bestFinish || null;
+    const bestFinish = userData.careerBestFinish || null;
     document.getElementById('perfBestFinish').textContent = bestFinish ?
         `${bestFinish}${getOrdinalSuffix(bestFinish)}` : '—';
 

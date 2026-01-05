@@ -468,17 +468,18 @@ async function loadProfile(user) {
         const calculatedStats = await calculateUserStats(userData.uid, userData);
         
         // Merge stored stats with calculated stats
+        // Profile page shows SEASON stats (not career stats)
         userStats = {
-            // Use stored stats (always up-to-date from results processing)
-            totalRaces: userData.totalEvents || 0,
-            totalWins: userData.totalWins || 0,
-            totalPodiums: userData.totalPodiums || 0,
-            totalTop10s: userData.totalTop10s || 0,
-            totalPoints: userData.totalPoints || 0,
-            bestFinish: userData.bestFinish || null,
-            averageFinish: userData.averageFinish || null,
-            winRate: userData.winRate || 0,
-            podiumRate: userData.podiumRate || 0,
+            // Use stored season stats (always up-to-date from results processing)
+            totalRaces: userData.season1Events || 0,
+            totalWins: userData.season1Wins || 0,
+            totalPodiums: userData.season1Podiums || 0,
+            totalTop10s: userData.season1Top10s || 0,
+            totalPoints: userData.season1Points || 0,
+            bestFinish: userData.season1BestFinish || null,
+            averageFinish: userData.season1AvgFinish || null,
+            winRate: userData.season1WinRate || 0,
+            podiumRate: userData.season1PodiumRate || 0,
             arr: userData.arr || null, // ARR stored from most recent race
             awards: userData.awards || calculatedStats.awards, // Prefer stored awards
             // Use calculated stats for data not stored

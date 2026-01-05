@@ -615,7 +615,7 @@ async function renderGlobalRankings(forceRefresh = false) {
                 name: data.name || 'Unknown',
                 team: data.team || '',
                 season: data.currentSeason || 1,
-                events: data.totalEvents || (data.completedStages?.length || 0),
+                events: data.season1Events || (data.completedStages?.length || 0),
                 points: points,
                 gender: data.gender || null,
                 ageBand: data.ageBand || null,

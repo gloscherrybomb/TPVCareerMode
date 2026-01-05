@@ -524,24 +524,29 @@ function buildRiderProfileHTML(data, name) {
     const arrBand = getARRBand(arr);
     const team = data.team || 'Independent';
     const season = data.currentSeason || 1;
-    const totalPoints = data.totalPoints || 0;
-    const totalEvents = data.totalEvents || 0;
+
+    // Season progress (for progress bar at top)
+    const season1Points = data.season1Points || 0;
+    const season1Events = data.season1Events || 0;
     const completedStages = data.completedStages || [];
     const completedOptionalEvents = data.completedOptionalEvents || [];
-    
-    // Read wins, podiums, and awards directly from user document
+
+    // Career stats (for stats section - shows lifetime stats)
+    const careerEvents = data.careerEvents || 0;
     const wins = data.careerWins || 0;
     const podiums = data.careerPodiums || 0;
+    const careerTop10s = data.careerTop10s || 0;
+    const careerBestFinish = data.careerBestFinish || null;
+    const careerAvgFinish = data.careerAvgFinish ? Math.round(data.careerAvgFinish) : 'N/A';
+    const careerWinRate = data.careerWinRate;
+    const careerPodiumRate = data.careerPodiumRate;
     const totalCCEarned = data.currency?.totalEarned || 0;
-    
+
     // Get initials for avatar placeholder
     const initials = displayName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
-    
+
     // Get profile photo URL if exists (use high-res version for Google photos)
     const photoURL = getHighResPhotoURL(data.photoURL, 300);
-    
-    // Use stored average finish (already calculated and stored)
-    const avgFinish = data.averageFinish ? Math.round(data.averageFinish) : 'N/A';
     
     // Get awards from user document
     const awards = data.awards || {};
@@ -715,12 +720,12 @@ function buildRiderProfileHTML(data, name) {
 
         <div class="rider-stats-grid">
             <div class="rider-stat-card">
-                <div class="rider-stat-label">Total Points</div>
-                <div class="rider-stat-value">${totalPoints}</div>
+                <div class="rider-stat-label">Career Points</div>
+                <div class="rider-stat-value">${data.careerPoints || 0}</div>
             </div>
             <div class="rider-stat-card">
                 <div class="rider-stat-label">Events</div>
-                <div class="rider-stat-value">${totalEvents}</div>
+                <div class="rider-stat-value">${careerEvents}</div>
             </div>
             <div class="rider-stat-card">
                 <div class="rider-stat-label">Wins</div>
@@ -732,23 +737,23 @@ function buildRiderProfileHTML(data, name) {
             </div>
             <div class="rider-stat-card">
                 <div class="rider-stat-label">Top 10s</div>
-                <div class="rider-stat-value">${data.totalTop10s || 0}</div>
+                <div class="rider-stat-value">${careerTop10s}</div>
             </div>
             <div class="rider-stat-card">
                 <div class="rider-stat-label">Best Finish</div>
-                <div class="rider-stat-value">${data.bestFinish ? `${data.bestFinish}${getOrdinalSuffix(data.bestFinish)}` : 'N/A'}</div>
+                <div class="rider-stat-value">${careerBestFinish ? `${careerBestFinish}${getOrdinalSuffix(careerBestFinish)}` : 'N/A'}</div>
             </div>
             <div class="rider-stat-card">
                 <div class="rider-stat-label">Avg Finish</div>
-                <div class="rider-stat-value">${avgFinish}</div>
+                <div class="rider-stat-value">${careerAvgFinish}</div>
             </div>
             <div class="rider-stat-card">
                 <div class="rider-stat-label">Win Rate</div>
-                <div class="rider-stat-value">${data.winRate !== undefined ? data.winRate + '%' : 'N/A'}</div>
+                <div class="rider-stat-value">${careerWinRate !== undefined ? careerWinRate + '%' : 'N/A'}</div>
             </div>
             <div class="rider-stat-card">
                 <div class="rider-stat-label">Podium Rate</div>
-                <div class="rider-stat-value">${data.podiumRate !== undefined ? data.podiumRate + '%' : 'N/A'}</div>
+                <div class="rider-stat-value">${careerPodiumRate !== undefined ? careerPodiumRate + '%' : 'N/A'}</div>
             </div>
             <div class="rider-stat-card">
                 <div class="rider-stat-label">Career CC</div>
