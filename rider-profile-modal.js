@@ -532,6 +532,7 @@ function buildRiderProfileHTML(data, name) {
     // Read wins, podiums, and awards directly from user document
     const wins = data.careerWins || 0;
     const podiums = data.careerPodiums || 0;
+    const totalCCEarned = data.currency?.totalEarned || 0;
     
     // Get initials for avatar placeholder
     const initials = displayName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
@@ -747,9 +748,13 @@ function buildRiderProfileHTML(data, name) {
                 <div class="rider-stat-label">Podium Rate</div>
                 <div class="rider-stat-value">${data.podiumRate !== undefined ? data.podiumRate + '%' : 'N/A'}</div>
             </div>
+            <div class="rider-stat-card">
+                <div class="rider-stat-label">Career CC</div>
+                <div class="rider-stat-value">${totalCCEarned}</div>
+            </div>
         </div>
     `;
-    
+
     // Add awards section if rider has awards
     if (awardsList && awardsList.length > 0) {
         html += `
