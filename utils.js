@@ -146,6 +146,7 @@ export function getCountryCode2(countryCode3) {
   const code = countryCode3.toUpperCase();
 
   // ISO 3166-1 alpha-3 to alpha-2 conversion map
+  // Includes both standard ISO codes AND IOC (Olympic) codes used by TPV
   const codeMap = {
     'AFG': 'af', 'ALB': 'al', 'DZA': 'dz', 'AND': 'ad', 'AGO': 'ao',
     'ARG': 'ar', 'ARM': 'am', 'AUS': 'au', 'AUT': 'at', 'AZE': 'az',
@@ -186,7 +187,216 @@ export function getCountryCode2(countryCode3) {
     'TUR': 'tr', 'TKM': 'tm', 'TUV': 'tv', 'UGA': 'ug', 'UKR': 'ua',
     'ARE': 'ae', 'GBR': 'gb', 'USA': 'us', 'URY': 'uy', 'UZB': 'uz',
     'VUT': 'vu', 'VEN': 've', 'VNM': 'vn', 'YEM': 'ye', 'ZMB': 'zm',
-    'ZWE': 'zw', 'ENG': 'gb-eng', 'SCO': 'gb-sct', 'WAL': 'gb-wls'
+    'ZWE': 'zw', 'ENG': 'gb-eng', 'SCO': 'gb-sct', 'WAL': 'gb-wls',
+    // IOC (Olympic) codes used by TrainingPeaks Virtual
+    'SUI': 'ch',  // Switzerland
+    'NED': 'nl',  // Netherlands
+    'DEN': 'dk',  // Denmark
+    'POR': 'pt',  // Portugal
+    'CRO': 'hr',  // Croatia
+    'SLO': 'si',  // Slovenia
+    'LAT': 'lv',  // Latvia
+    'MAS': 'my',  // Malaysia
+    'PHI': 'ph',  // Philippines
+    'INA': 'id',  // Indonesia
+    'SIN': 'sg',  // Singapore (alt)
+    'VIE': 'vn',  // Vietnam
+    'THA': 'th',  // Thailand (same as ISO)
+    'TPE': 'tw',  // Chinese Taipei
+    'HKG': 'hk',  // Hong Kong
+    'MAC': 'mo',  // Macau
+    'BRU': 'bn',  // Brunei
+    'MYA': 'mm',  // Myanmar
+    'CAM': 'kh',  // Cambodia
+    'NEP': 'np',  // Nepal (alt)
+    'SRI': 'lk',  // Sri Lanka
+    'BAN': 'bd',  // Bangladesh
+    'PAK': 'pk',  // Pakistan (same as ISO)
+    'AFG': 'af',  // Afghanistan (same as ISO)
+    'UAE': 'ae',  // United Arab Emirates
+    'KSA': 'sa',  // Saudi Arabia
+    'BRN': 'bh',  // Bahrain (IOC), conflicts with ISO Brunei
+    'KUW': 'kw',  // Kuwait
+    'OMA': 'om',  // Oman
+    'QAT': 'qa',  // Qatar (same as ISO)
+    'IRQ': 'iq',  // Iraq (same as ISO)
+    'SYR': 'sy',  // Syria (same as ISO)
+    'LIB': 'lb',  // Lebanon
+    'JOR': 'jo',  // Jordan (same as ISO)
+    'PLE': 'ps',  // Palestine
+    'YEM': 'ye',  // Yemen (same as ISO)
+    'TUR': 'tr',  // Turkey (same as ISO)
+    'CYP': 'cy',  // Cyprus (same as ISO)
+    'AZE': 'az',  // Azerbaijan (same as ISO)
+    'GEO': 'ge',  // Georgia (same as ISO)
+    'ARM': 'am',  // Armenia (same as ISO)
+    'KAZ': 'kz',  // Kazakhstan (same as ISO)
+    'UZB': 'uz',  // Uzbekistan (same as ISO)
+    'TKM': 'tm',  // Turkmenistan (same as ISO)
+    'KGZ': 'kg',  // Kyrgyzstan (same as ISO)
+    'TJK': 'tj',  // Tajikistan (same as ISO)
+    'MGL': 'mn',  // Mongolia
+    'CHI': 'cl',  // Chile
+    'ARG': 'ar',  // Argentina (same as ISO)
+    'URU': 'uy',  // Uruguay
+    'PAR': 'py',  // Paraguay
+    'BOL': 'bo',  // Bolivia (same as ISO)
+    'PER': 'pe',  // Peru (same as ISO)
+    'ECU': 'ec',  // Ecuador (same as ISO)
+    'COL': 'co',  // Colombia (same as ISO)
+    'VEN': 've',  // Venezuela (same as ISO)
+    'GUA': 'gt',  // Guatemala
+    'HON': 'hn',  // Honduras
+    'ESA': 'sv',  // El Salvador
+    'NCA': 'ni',  // Nicaragua
+    'CRC': 'cr',  // Costa Rica
+    'PAN': 'pa',  // Panama (same as ISO)
+    'CUB': 'cu',  // Cuba (same as ISO)
+    'HAI': 'ht',  // Haiti
+    'DOM': 'do',  // Dominican Republic (same as ISO)
+    'PUR': 'pr',  // Puerto Rico
+    'TRI': 'tt',  // Trinidad and Tobago
+    'BAR': 'bb',  // Barbados
+    'GRN': 'gd',  // Grenada
+    'SKN': 'kn',  // Saint Kitts and Nevis
+    'LCA': 'lc',  // Saint Lucia (same as ISO)
+    'VIN': 'vc',  // Saint Vincent
+    'ANT': 'ag',  // Antigua and Barbuda
+    'BAH': 'bs',  // Bahamas
+    'BER': 'bm',  // Bermuda
+    'CAY': 'ky',  // Cayman Islands
+    'ISV': 'vi',  // US Virgin Islands
+    'IVB': 'vg',  // British Virgin Islands
+    'AHO': 'aw',  // Aruba (historical)
+    'ARU': 'aw',  // Aruba
+    'CUR': 'cw',  // Curacao
+    'GUY': 'gy',  // Guyana (same as ISO)
+    'SUR': 'sr',  // Suriname (same as ISO)
+    'MEX': 'mx',  // Mexico (same as ISO)
+    'USA': 'us',  // United States (same as ISO)
+    'CAN': 'ca',  // Canada (same as ISO)
+    'RSA': 'za',  // South Africa (same as ISO)
+    'EGY': 'eg',  // Egypt (same as ISO)
+    'ALG': 'dz',  // Algeria
+    'MAR': 'ma',  // Morocco (same as ISO)
+    'TUN': 'tn',  // Tunisia (same as ISO)
+    'LBA': 'ly',  // Libya
+    'NGR': 'ng',  // Nigeria
+    'GHA': 'gh',  // Ghana (same as ISO)
+    'CIV': 'ci',  // Ivory Coast (same as ISO)
+    'SEN': 'sn',  // Senegal (same as ISO)
+    'CMR': 'cm',  // Cameroon (same as ISO)
+    'GAM': 'gm',  // Gambia
+    'GUI': 'gn',  // Guinea
+    'MLI': 'ml',  // Mali (same as ISO)
+    'BUR': 'bf',  // Burkina Faso
+    'NIG': 'ne',  // Niger
+    'TOG': 'tg',  // Togo
+    'BEN': 'bj',  // Benin (same as ISO)
+    'CGO': 'cg',  // Congo
+    'COD': 'cd',  // DR Congo (same as ISO)
+    'GAB': 'ga',  // Gabon (same as ISO)
+    'ANG': 'ao',  // Angola
+    'NAM': 'na',  // Namibia (same as ISO)
+    'BOT': 'bw',  // Botswana
+    'ZIM': 'zw',  // Zimbabwe
+    'ZAM': 'zm',  // Zambia
+    'MOZ': 'mz',  // Mozambique (same as ISO)
+    'TAN': 'tz',  // Tanzania
+    'KEN': 'ke',  // Kenya (same as ISO)
+    'UGA': 'ug',  // Uganda (same as ISO)
+    'RWA': 'rw',  // Rwanda (same as ISO)
+    'BDI': 'bi',  // Burundi (same as ISO)
+    'ETH': 'et',  // Ethiopia (same as ISO)
+    'ERI': 'er',  // Eritrea (same as ISO)
+    'SUD': 'sd',  // Sudan
+    'SSD': 'ss',  // South Sudan (same as ISO)
+    'SOL': 'so',  // Somalia (alt)
+    'DJI': 'dj',  // Djibouti (same as ISO)
+    'MAD': 'mg',  // Madagascar
+    'MRI': 'mu',  // Mauritius
+    'SEY': 'sc',  // Seychelles
+    'COM': 'km',  // Comoros (same as ISO)
+    'MAW': 'mw',  // Malawi
+    'LES': 'ls',  // Lesotho
+    'SWZ': 'sz',  // Eswatini (same as ISO)
+    'CPV': 'cv',  // Cape Verde (same as ISO)
+    'GBS': 'gw',  // Guinea-Bissau
+    'STP': 'st',  // Sao Tome (same as ISO)
+    'GEQ': 'gq',  // Equatorial Guinea
+    'CAF': 'cf',  // Central African Republic (same as ISO)
+    'CHA': 'td',  // Chad
+    'LBR': 'lr',  // Liberia (same as ISO)
+    'SLE': 'sl',  // Sierra Leone (same as ISO)
+    'GAM': 'gm',  // Gambia
+    'MTN': 'mr',  // Mauritania
+    'NZL': 'nz',  // New Zealand (same as ISO)
+    'AUS': 'au',  // Australia (same as ISO)
+    'FIJ': 'fj',  // Fiji
+    'PNG': 'pg',  // Papua New Guinea (same as ISO)
+    'SAM': 'ws',  // Samoa
+    'TGA': 'to',  // Tonga
+    'VAN': 'vu',  // Vanuatu
+    'SOL': 'sb',  // Solomon Islands
+    'FSM': 'fm',  // Micronesia (same as ISO)
+    'PLW': 'pw',  // Palau (same as ISO)
+    'MHL': 'mh',  // Marshall Islands (same as ISO)
+    'KIR': 'ki',  // Kiribati (same as ISO)
+    'NRU': 'nr',  // Nauru (same as ISO)
+    'TUV': 'tv',  // Tuvalu (same as ISO)
+    'COK': 'ck',  // Cook Islands
+    'NIU': 'nu',  // Niue
+    'ASA': 'as',  // American Samoa
+    'GUM': 'gu',  // Guam
+    'GBR': 'gb',  // Great Britain (same as ISO)
+    'NIR': 'gb-nir',  // Northern Ireland
+    'IRL': 'ie',  // Ireland (same as ISO)
+    'FRA': 'fr',  // France (same as ISO)
+    'ESP': 'es',  // Spain (same as ISO)
+    'ITA': 'it',  // Italy (same as ISO)
+    'BEL': 'be',  // Belgium (same as ISO)
+    'NED': 'nl',  // Netherlands
+    'LUX': 'lu',  // Luxembourg (same as ISO)
+    'SUI': 'ch',  // Switzerland
+    'AUT': 'at',  // Austria (same as ISO)
+    'GER': 'de',  // Germany
+    'POL': 'pl',  // Poland (same as ISO)
+    'CZE': 'cz',  // Czech Republic (same as ISO)
+    'SVK': 'sk',  // Slovakia (same as ISO)
+    'HUN': 'hu',  // Hungary (same as ISO)
+    'ROU': 'ro',  // Romania (same as ISO)
+    'BUL': 'bg',  // Bulgaria
+    'SRB': 'rs',  // Serbia (same as ISO)
+    'MNE': 'me',  // Montenegro (same as ISO)
+    'BIH': 'ba',  // Bosnia (same as ISO)
+    'CRO': 'hr',  // Croatia
+    'SLO': 'si',  // Slovenia
+    'MKD': 'mk',  // North Macedonia (same as ISO)
+    'ALB': 'al',  // Albania (same as ISO)
+    'KOS': 'xk',  // Kosovo
+    'GRE': 'gr',  // Greece
+    'MLT': 'mt',  // Malta (same as ISO)
+    'AND': 'ad',  // Andorra (same as ISO)
+    'MON': 'mc',  // Monaco
+    'SMR': 'sm',  // San Marino (same as ISO)
+    'LIE': 'li',  // Liechtenstein (same as ISO)
+    'VAT': 'va',  // Vatican City
+    'NOR': 'no',  // Norway (same as ISO)
+    'SWE': 'se',  // Sweden (same as ISO)
+    'DEN': 'dk',  // Denmark
+    'FIN': 'fi',  // Finland (same as ISO)
+    'ISL': 'is',  // Iceland (same as ISO)
+    'FAR': 'fo',  // Faroe Islands
+    'EST': 'ee',  // Estonia (same as ISO)
+    'LAT': 'lv',  // Latvia
+    'LTU': 'lt',  // Lithuania (same as ISO)
+    'BLR': 'by',  // Belarus (same as ISO)
+    'UKR': 'ua',  // Ukraine (same as ISO)
+    'MDA': 'md',  // Moldova (same as ISO)
+    'RUS': 'ru',  // Russia (same as ISO)
+    'POR': 'pt',  // Portugal
+    'ISR': 'il',  // Israel (same as ISO)
+    'JPN': 'jp'   // Japan (same as ISO)
   };
 
   return codeMap[code] || null;
