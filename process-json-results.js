@@ -2297,6 +2297,21 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
   const userRef = userDoc.ref;
   let userData = userDoc.data();
 
+  // Find user's result first (before logging "Found user" to avoid false positives in Discord notifications)
+  const userResult = results.find(r => r.UID === uid);
+  if (!userResult) {
+    console.log(`User ${uid} not found in results, skipping`);
+    return { unlockBonusPoints: 0, unlockBonusesApplied: [] };
+  }
+
+  // Check if already processed (before logging "Found user" to avoid false positives in Discord notifications)
+  const existingResults = userData[`event${eventNumber}Results`];
+  if (existingResults && existingResults.position === parseInt(userResult.Position)) {
+    console.log(`   ⏭️ Event ${eventNumber} already processed for ${userData.name || uid}, skipping`);
+    return { unlockBonusPoints: 0, unlockBonusesApplied: [] };
+  }
+
+  // Now we know this is a new result - log the user
   console.log(`   Found user: ${userData.name || uid} (Document ID: ${userDoc.id})`);
 
   // Recover personality from interview history if missing
@@ -2320,20 +2335,6 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
 
   if (isSpecialEventResult) {
     console.log(`⭐ Event ${eventNumber} is SPECIAL - career points only, no stage progression`);
-  }
-
-  // Find user's result
-  const userResult = results.find(r => r.UID === uid);
-  if (!userResult) {
-    console.log(`User ${uid} not found in results, skipping`);
-    return { unlockBonusPoints: 0, unlockBonusesApplied: [] };
-  }
-
-  // Check if already processed
-  const existingResults = userData[`event${eventNumber}Results`];
-  if (existingResults && existingResults.position === parseInt(userResult.Position)) {
-    console.log(`Event ${eventNumber} already processed for user ${uid}, skipping`);
-    return { unlockBonusPoints: 0, unlockBonusesApplied: [] };
   }
 
   let position = parseInt(userResult.Position);
