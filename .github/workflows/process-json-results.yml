@@ -83,6 +83,7 @@ jobs:
           fi
 
       - name: Process JSON race results
+        id: process-results
         if: steps.check-files.outputs.has_files == 'true'
         env:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
@@ -92,7 +93,21 @@ jobs:
             echo "⏭️ Unlock processing will be skipped"
           fi
           echo "Processing JSON results..."
-          node process-json-results.js '${{ steps.changed-files.outputs.files }}'
+
+          # Capture output and extract summary
+          OUTPUT=$(node process-json-results.js '${{ steps.changed-files.outputs.files }}' 2>&1) || true
+          echo "$OUTPUT"
+
+          # Count processed users from output (each "✅ Processed: Position" line = 1 user)
+          PROCESSED_COUNT=$(echo "$OUTPUT" | grep -c "✅ Processed: Position" || echo "0")
+          echo "processed_count=$PROCESSED_COUNT" >> $GITHUB_OUTPUT
+
+          # Parse event info from file paths
+          FILES='${{ steps.changed-files.outputs.files }}'
+          EVENTS=$(echo "$FILES" | grep -oP 'event_\d+' | sort -u | tr '\n' ', ' | sed 's/,$//' | sed 's/event_//g')
+          SEASONS=$(echo "$FILES" | grep -oP 'season_\d+' | sort -u | tr '\n' ', ' | sed 's/,$//' | sed 's/season_//g')
+          echo "events=$EVENTS" >> $GITHUB_OUTPUT
+          echo "seasons=$SEASONS" >> $GITHUB_OUTPUT
 
       - name: Commit renamed JSON files
         if: steps.check-files.outputs.has_files == 'true'
@@ -111,3 +126,66 @@ jobs:
             git push
             echo "Committed processed files"
           fi
+
+      - name: Send Discord notification
+        if: steps.check-files.outputs.has_files == 'true' && steps.process-results.outputs.processed_count != '0'
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          EVENTS="${{ steps.process-results.outputs.events }}"
+          SEASONS="${{ steps.process-results.outputs.seasons }}"
+          PROCESSED="${{ steps.process-results.outputs.processed_count }}"
+          RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+          # Build event display text
+          if [ -n "$EVENTS" ]; then
+            EVENT_TEXT="Event $EVENTS"
+          else
+            EVENT_TEXT="Unknown Event"
+          fi
+
+          if [ -n "$SEASONS" ]; then
+            SEASON_TEXT="Season $SEASONS"
+          else
+            SEASON_TEXT=""
+          fi
+
+          # Send Discord embed
+          curl -H "Content-Type: application/json" -X POST "$DISCORD_WEBHOOK_URL" -d @- <<EOF
+          {
+            "embeds": [{
+              "title": "🏁 Race Results Processed",
+              "color": 5814783,
+              "fields": [
+                {
+                  "name": "📅 Event",
+                  "value": "$EVENT_TEXT",
+                  "inline": true
+                },
+                {
+                  "name": "🏆 Season",
+                  "value": "$SEASON_TEXT",
+                  "inline": true
+                },
+                {
+                  "name": "👥 Riders Processed",
+                  "value": "$PROCESSED",
+                  "inline": true
+                }
+              ],
+              "footer": {
+                "text": "TPV Career Mode"
+              },
+              "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            }],
+            "components": [{
+              "type": 1,
+              "components": [{
+                "type": 2,
+                "style": 5,
+                "label": "View Workflow Run",
+                "url": "$RUN_URL"
+              }]
+            }]
+          }
+          EOF
