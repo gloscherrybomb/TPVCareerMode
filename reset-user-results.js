@@ -135,6 +135,9 @@ async function resetUserResults() {
           overrated: 0
         },
 
+        // Reset one-time award flags (these prevent re-earning)
+        hasEarnedBlastOff: false,
+
         // Delete all event result blocks (1–15)
         event1Results: admin.firestore.FieldValue.delete(),
         event2Results: admin.firestore.FieldValue.delete(),
