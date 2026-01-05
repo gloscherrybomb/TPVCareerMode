@@ -30,9 +30,5 @@ npm-debug.log*
 .claude/
 
 # Documentation files (keep local only)
-CODE-REVIEW-INTERVIEW-SYSTEM.md
-INTERVIEW-SYSTEM-COMPLETE.md
-Season2-Ideas.md
-PERSONALITY-AWARDS-SUMMARY.md
+*.md
 card-preview.html
-UNLOCK-IMAGES-GUIDE.md
