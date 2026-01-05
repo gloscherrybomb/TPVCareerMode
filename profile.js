@@ -509,15 +509,15 @@ async function calculateSeasonRanking(userUID, userData) {
 // Calculate global ranking (from user documents)
 async function calculateGlobalRanking(userUID) {
     try {
-        // Get all users and their total points
+        // Get all users and their career points (matches global rankings page)
         const usersSnapshot = await getDocs(collection(db, 'users'));
         const users = [];
-        
+
         usersSnapshot.forEach(doc => {
             const data = doc.data();
             users.push({
                 uid: doc.id,
-                points: data.totalPoints || 0
+                points: data.careerPoints || 0
             });
         });
         
@@ -1684,7 +1684,7 @@ function displayCareerSummary(userData, stats) {
     // Calculate current season stats
     const season = 1;
     const currentSeasonStages = (userData.completedStages || []).length;
-    const currentSeasonPoints = userData.totalPoints || 0;
+    const currentSeasonPoints = userData.season1Points || 0;
     
     // Count current season wins and podiums
     let currentSeasonWins = 0;

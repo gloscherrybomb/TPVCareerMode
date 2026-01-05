@@ -846,9 +846,9 @@
                         if (window.seasonCompletionUI.shouldShowCelebration(userData)) {
                             const seasonData = {
                                 seasonRank: userData.season1Rank || null,
-                                totalPoints: userData.totalPoints || 0,
-                                totalWins: userData.totalWins || 0,
-                                totalPodiums: userData.totalPodiums || 0,
+                                totalPoints: userData.season1Points || 0,
+                                totalWins: userData.season1Wins || 0,
+                                totalPodiums: userData.season1Podiums || 0,
                                 totalEvents: (userData.completedStages || []).length,
                                 localTourGCPosition: userData.localTourGCPosition,
                                 earnedSeasonPodium: userData.season1Rank <= 3,

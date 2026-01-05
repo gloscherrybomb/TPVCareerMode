@@ -111,7 +111,7 @@ function getSeasonData(userData, seasonId) {
       completedOptionalEvents: userData.completedOptionalEvents || [],
       choiceSelections: userData.choiceSelections || {},
       usedOptionalEvents: userData.usedOptionalEvents || [],
-      totalPoints: userData.totalPoints || 0,
+      totalPoints: userData.season1Points || 0,
       completionDate: userData.season1CompletionDate || null,
       completionStory: userData.season1CompletionStory || null
     };
