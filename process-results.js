@@ -2512,21 +2512,23 @@ async function calculateCareerStats(userData) {
   
   // Calculate derived stats
   if (stats.totalRaces > 0) {
-    // Average finish position
+    // Average finish position (only counts finished races - DNFs don't have a position)
     const totalPositions = stats.positions.reduce((sum, pos) => sum + pos, 0);
     stats.averageFinish = parseFloat((totalPositions / stats.totalRaces).toFixed(1));
-    
-    // Win rate (percentage)
-    stats.winRate = parseFloat(((stats.totalWins / stats.totalRaces) * 100).toFixed(1));
-    
-    // Podium rate (percentage)
-    stats.podiumRate = parseFloat(((stats.totalPodiums / stats.totalRaces) * 100).toFixed(1));
   } else {
     stats.averageFinish = null;
+  }
+
+  // Win rate and podium rate use total events participated (including DNFs)
+  // A DNF counts as a failure to win/podium
+  if (stats.totalEventsParticipated > 0) {
+    stats.winRate = parseFloat(((stats.totalWins / stats.totalEventsParticipated) * 100).toFixed(1));
+    stats.podiumRate = parseFloat(((stats.totalPodiums / stats.totalEventsParticipated) * 100).toFixed(1));
+  } else {
     stats.winRate = 0;
     stats.podiumRate = 0;
   }
-  
+
   return stats;
 }
 
@@ -2596,12 +2598,19 @@ async function calculateSeasonStats(userData, seasonNumber = 1) {
 
   // Calculate derived stats
   if (stats.totalRaces > 0) {
+    // Average finish position (only counts finished races - DNFs don't have a position)
     const totalPositions = stats.positions.reduce((sum, pos) => sum + pos, 0);
     stats.averageFinish = parseFloat((totalPositions / stats.totalRaces).toFixed(1));
-    stats.winRate = parseFloat(((stats.totalWins / stats.totalRaces) * 100).toFixed(1));
-    stats.podiumRate = parseFloat(((stats.totalPodiums / stats.totalRaces) * 100).toFixed(1));
   } else {
     stats.averageFinish = null;
+  }
+
+  // Win rate and podium rate use total events participated (including DNFs)
+  // A DNF counts as a failure to win/podium
+  if (stats.totalEventsParticipated > 0) {
+    stats.winRate = parseFloat(((stats.totalWins / stats.totalEventsParticipated) * 100).toFixed(1));
+    stats.podiumRate = parseFloat(((stats.totalPodiums / stats.totalEventsParticipated) * 100).toFixed(1));
+  } else {
     stats.winRate = 0;
     stats.podiumRate = 0;
   }
