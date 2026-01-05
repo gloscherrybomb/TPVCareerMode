@@ -78,6 +78,17 @@ async function resetUserResults() {
         season1WinRate: 0,
         season1PodiumRate: 0,
 
+        // DELETE old fields (replaced by career*/season1* fields above)
+        totalEvents: admin.firestore.FieldValue.delete(),
+        totalWins: admin.firestore.FieldValue.delete(),
+        totalPodiums: admin.firestore.FieldValue.delete(),
+        totalTop10s: admin.firestore.FieldValue.delete(),
+        totalPoints: admin.firestore.FieldValue.delete(),
+        bestFinish: admin.firestore.FieldValue.delete(),
+        averageFinish: admin.firestore.FieldValue.delete(),
+        winRate: admin.firestore.FieldValue.delete(),
+        podiumRate: admin.firestore.FieldValue.delete(),
+
         // Reset awards
         awards: {
           gold: 0,
