@@ -93,12 +93,12 @@ function transformResult(result) {
     DeltaTime: deltaTimeSeconds,
     Points: result.points || 0,  // For points races
 
-    // New power data fields
-    AvgPower: result.avgPower || null,
-    MaxPower: result.maxPower || null,
-    NrmPower: result.nrmPower || null,
-    AvgHR: result.avgHr || null,
-    MaxHR: result.maxHr || null,
+    // New power data fields (parse as numbers to ensure clean comparisons)
+    AvgPower: result.avgPower ? parseFloat(result.avgPower) : null,
+    MaxPower: result.maxPower ? parseFloat(result.maxPower) : null,
+    NrmPower: result.nrmPower ? parseFloat(result.nrmPower) : null,
+    AvgHR: result.avgHr ? parseFloat(result.avgHr) : null,
+    MaxHR: result.maxHr ? parseFloat(result.maxHr) : null,
 
     // Additional fields for internal use
     IsBot: result.isBot || false,

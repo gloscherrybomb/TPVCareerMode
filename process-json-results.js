@@ -1382,7 +1382,7 @@ function checkPowerSurge(position, userResult) {
   if (position > 10) return false;
   if (!userResult.AvgPower || !userResult.NrmPower) return false;
   // NP/AP ratio >= 1.15 indicates a surgy, attacking effort
-  return (userResult.NrmPower / userResult.AvgPower) >= 1.15;
+  return (parseFloat(userResult.NrmPower) / parseFloat(userResult.AvgPower)) >= 1.15;
 }
 
 /**
@@ -1400,7 +1400,7 @@ function checkSteadyEddie(userResult) {
 function checkBlastOff(userResult, hasAlreadyEarned) {
   if (hasAlreadyEarned) return false;
   if (!userResult.MaxPower) return false;
-  return userResult.MaxPower >= 1300;
+  return parseFloat(userResult.MaxPower) >= 1300;
 }
 
 // ================== POWER RECORDS TRACKING ==================

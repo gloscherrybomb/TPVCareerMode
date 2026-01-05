@@ -280,7 +280,7 @@ function checkTheAccountant(userTime, userEventPoints, results) {
 function checkPowerSurge(position, userResult) {
   if (position > 10) return false;
   if (!userResult.AvgPower || !userResult.MaxPower) return false;
-  return (userResult.MaxPower / userResult.AvgPower) >= 1.3;
+  return (parseFloat(userResult.MaxPower) / parseFloat(userResult.AvgPower)) >= 1.3;
 }
 
 /**
@@ -303,7 +303,7 @@ function checkSteadyEddie(userResult) {
 function checkBlastOff(userResult, hasAlreadyEarned) {
   if (hasAlreadyEarned) return false;
   if (!userResult.MaxPower) return false;
-  return userResult.MaxPower >= 1300;
+  return parseFloat(userResult.MaxPower) >= 1300;
 }
 
 // Export for Node.js
