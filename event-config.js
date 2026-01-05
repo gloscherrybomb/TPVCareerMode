@@ -34,7 +34,7 @@ const EVENT_TYPES = {
   6: 'hill climb',
   7: 'criterium',
   8: 'gran fondo',
-  9: 'hill climb',
+  9: 'road race',
   10: 'time trial',
   11: 'points race',
   12: 'gravel race',

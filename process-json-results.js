@@ -2278,6 +2278,8 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
   let earnedPowerSurge = false;
   let earnedSteadyEddie = false;
   let earnedBlastOff = false;
+  let earnedSmoothOperator = false;
+  let earnedBunchKick = false;
 
   if (!isDNF) {
     // Prediction awards
@@ -2366,6 +2368,63 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
       if (earnedPowerSurge) console.log(`   💥 Power Surge earned!`);
       if (earnedSteadyEddie) console.log(`   📊 Steady Eddie earned!`);
       if (earnedBlastOff) console.log(`   🚀 BLAST OFF earned! (${userResult.MaxPower}W)`);
+
+      // Smooth Operator: smallest AP-NP difference in top 5
+      // Skip for elimination races, time-based events, time trials, and Easy Hill Climb (event 6)
+      const eventTypeForPowerAwards = EVENT_TYPES[eventNumber] || 'road race';
+      const isIndividualTimedEffort = eventTypeForPowerAwards === 'time trial' || eventNumber === 6;
+      if (!isTimeIrrelevant && !isIndividualTimedEffort && position <= 5 && userResult.AvgPower && userResult.NrmPower) {
+        const top5WithPower = results
+          .filter(r => r.Position !== 'DNF' && !isNaN(parseInt(r.Position)))
+          .filter(r => parseInt(r.Position) <= 5)
+          .filter(r => r.AvgPower && r.NrmPower);
+
+        if (top5WithPower.length >= 3) {
+          const userDiff = Math.abs(parseFloat(userResult.AvgPower) - parseFloat(userResult.NrmPower));
+          const smallestDiff = Math.min(...top5WithPower.map(r =>
+            Math.abs(parseFloat(r.AvgPower) - parseFloat(r.NrmPower))
+          ));
+          earnedSmoothOperator = (userDiff === smallestDiff);
+          if (earnedSmoothOperator) console.log(`   🔋 Smooth Operator earned! (AP-NP diff: ${userDiff.toFixed(1)}W)`);
+        }
+      }
+
+      // Bunch Kick: highest max power in a group sprint finish
+      // Requires: 3+ riders finishing within 3 seconds OF EACH OTHER
+      // Skip for elimination races, time-based events, time trials, and hill climbs
+      if (!isTimeIrrelevant && !isIndividualTimedEffort && userResult.MaxPower) {
+        const sprintFinishers = results
+          .filter(r => r.Position !== 'DNF' && !isNaN(parseInt(r.Position)) && parseFloat(r.Time) > 0)
+          .sort((a, b) => parseFloat(a.Time) - parseFloat(b.Time)); // Sort by time
+
+        if (sprintFinishers.length >= 3) {
+          const winnerTime = parseFloat(sprintFinishers[0].Time);
+          const frontGroup = [];
+
+          for (const rider of sprintFinishers) {
+            const riderTime = parseFloat(rider.Time);
+            // Check if rider is within 3 seconds of the WINNER
+            if ((riderTime - winnerTime) <= 3000) { // 3 seconds in ms
+              frontGroup.push(rider);
+            } else {
+              break;
+            }
+          }
+
+          // Front group must have 3+ riders all within 3 seconds of each other
+          if (frontGroup.length >= 3) {
+            const userInFrontGroup = frontGroup.some(r => r.UID === uid);
+            if (userInFrontGroup) {
+              const frontGroupWithPower = frontGroup.filter(r => r.MaxPower && !isNaN(parseFloat(r.MaxPower)));
+              if (frontGroupWithPower.length >= 3) {
+                const maxPowerInGroup = Math.max(...frontGroupWithPower.map(r => parseFloat(r.MaxPower)));
+                earnedBunchKick = (parseFloat(userResult.MaxPower) === maxPowerInGroup);
+                if (earnedBunchKick) console.log(`   ⚡ Bunch Kick earned! (Max: ${userResult.MaxPower}W in sprint group of ${frontGroup.length})`);
+              }
+            }
+          }
+        }
+      }
     }
   }
 
@@ -2544,6 +2603,8 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
     earnedPowerSurge: earnedPowerSurge,
     earnedSteadyEddie: earnedSteadyEddie,
     earnedBlastOff: earnedBlastOff,
+    earnedSmoothOperator: earnedSmoothOperator,
+    earnedBunchKick: earnedBunchKick,
 
     // GC AWARDS (tour events only)
     earnedGCGoldMedal: gcAwards.gcGoldMedal,
@@ -2928,6 +2989,14 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
       updateData.hasEarnedBlastOff = true;  // Prevent earning again
       eventResults.earnedAwards.push({ awardId: 'blastOff', category: 'performance', intensity: 'flashy' });
     }
+    if (earnedSmoothOperator) {
+      updateData['awards.smoothOperator'] = admin.firestore.FieldValue.increment(1);
+      eventResults.earnedAwards.push({ awardId: 'smoothOperator', category: 'performance', intensity: 'moderate' });
+    }
+    if (earnedBunchKick) {
+      updateData['awards.bunchKick'] = admin.firestore.FieldValue.increment(1);
+      eventResults.earnedAwards.push({ awardId: 'bunchKick', category: 'performance', intensity: 'moderate' });
+    }
 
     // PODIUM STREAK - 5 consecutive top 3 finishes
     if (position <= 3) {
@@ -3103,6 +3172,8 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
     if (earnedPowerSurge) { earnedCC += AWARD_CREDIT_MAP.powerSurge || 25; awardList.push('powerSurge'); }
     if (earnedSteadyEddie) { earnedCC += AWARD_CREDIT_MAP.steadyEddie || 30; awardList.push('steadyEddie'); }
     if (earnedBlastOff) { earnedCC += AWARD_CREDIT_MAP.blastOff || 50; awardList.push('blastOff'); }
+    if (earnedSmoothOperator) { earnedCC += AWARD_CREDIT_MAP.smoothOperator || 30; awardList.push('smoothOperator'); }
+    if (earnedBunchKick) { earnedCC += AWARD_CREDIT_MAP.bunchKick || 30; awardList.push('bunchKick'); }
   }
 
   // Special event awards CC (use parseInt for type-safe comparison)

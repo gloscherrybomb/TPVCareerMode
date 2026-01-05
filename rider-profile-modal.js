@@ -597,6 +597,8 @@ function buildRiderProfileHTML(data, name) {
         powerSurge: { icon: '💥', name: 'Power Surge' },
         steadyEddie: { icon: '📊', name: 'Steady Eddie' },
         blastOff: { icon: '🚀', name: 'Blast Off' },
+        smoothOperator: { icon: '🔋', name: 'Smooth Operator' },
+        bunchKick: { icon: '⚡', name: 'Bunch Kick' },
 
         // Other awards
         gluttonForPunishment: { icon: '🎖️', name: 'Glutton for Punishment' },

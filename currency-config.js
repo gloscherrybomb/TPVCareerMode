@@ -42,6 +42,8 @@ const AWARD_CREDIT_MAP = {
   powerSurge: 25,
   steadyEddie: 30,
   blastOff: 50,
+  smoothOperator: 30,
+  bunchKick: 30,
   // Season reset award
   gluttonForPunishment: 100
 };
