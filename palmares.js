@@ -1071,16 +1071,18 @@ function calculateStreaks(results) {
 
 // Calculate type statistics
 function calculateTypeStats(results) {
+    // Total possible event types in the system
+    const TOTAL_EVENT_TYPES = 5; // criterium, time trial, road race, track, climbing
+
     const distribution = {};
-    let totalTypes = 0;
     let typesWithWins = 0;
     let typesWithPodiums = 0;
+    let typesWithTop10 = 0;
 
     results.forEach(result => {
         const type = result.eventType;
         if (!distribution[type]) {
             distribution[type] = { total: 0, wins: 0, podiums: 0, top10: 0 };
-            totalTypes++;
         }
 
         distribution[type].total++;
@@ -1122,6 +1124,7 @@ function calculateTypeStats(results) {
 
         if (stats.wins > 0) typesWithWins++;
         if (stats.podiums > 0) typesWithPodiums++;
+        if (stats.top10 > 0) typesWithTop10++;
     });
 
     // Fallback hierarchy: wins -> podiums -> top10
@@ -1132,15 +1135,18 @@ function calculateTypeStats(results) {
         bestType = bestTop10Type;
     }
 
-    // Versatility score: prioritize win variety, then podium variety, then event participation
-    let baseScore = typesWithWins;
-    if (typesWithWins === 0) {
-        baseScore = typesWithPodiums;
-    }
-    if (baseScore === 0) {
-        baseScore = Object.keys(distribution).length;
-    }
-    const versatility = totalTypes > 0 ? Math.round((baseScore / totalTypes) * 10) : 0;
+    // Versatility score: rewards breadth of success across ALL possible event types
+    // - Wins in different types are most valuable (2 points each)
+    // - Podiums in different types add value (1 point each, but not double-counting wins)
+    // - Top 10s in different types add some value (0.5 points each)
+    // - Participation in different types adds minor value (0.25 points each)
+    //
+    // Max possible with 5 types: 5×2 + 5×1 + 5×0.5 + 5×0.25 = 18.75
+    // Scale to 0-10 range
+    const typesParticipated = Object.keys(distribution).length;
+    const successScore = (typesWithWins * 2) + (typesWithPodiums * 1) + (typesWithTop10 * 0.5) + (typesParticipated * 0.25);
+    const maxPossible = TOTAL_EVENT_TYPES * (2 + 1 + 0.5 + 0.25); // 18.75
+    const versatility = Math.min(10, Math.round((successScore / maxPossible) * 10));
 
     return { distribution, bestType, versatility };
 }
