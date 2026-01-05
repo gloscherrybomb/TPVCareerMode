@@ -957,11 +957,11 @@
         padding: 0.75rem 0.5rem;
     }
 
-    /* Hide team and ARR on mobile */
+    /* Hide team and ARR on mobile (using classes to handle dynamic power columns) */
     .team-cell,
+    .team-header,
     .arr-cell,
-    .results-table th:nth-child(3),
-    .results-table th:nth-child(5) {
+    .arr-header {
         display: none;
     }
 

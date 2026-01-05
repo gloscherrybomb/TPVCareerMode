@@ -791,15 +791,15 @@ async function loadEventResults() {
                     <table class="results-table">
                         <thead>
                             <tr>
-                                <th>Pos</th>
-                                <th>Rider</th>
-                                <th>Team</th>
-                                <th>${isTimeBasedEvent ? 'Distance' : 'Time'}</th>
-                                ${hasPowerData ? '<th>Avg W</th><th>NP</th><th>Max W</th>' : ''}
-                                <th>ARR</th>
-                                <th>Points</th>
-                                ${results[0].eventPoints != null ? '<th>PR Pts</th>' : ''}
-                                <th>Bonuses</th>
+                                <th class="rank-header">Pos</th>
+                                <th class="name-header">Rider</th>
+                                <th class="team-header">Team</th>
+                                <th class="time-header">${isTimeBasedEvent ? 'Distance' : 'Time'}</th>
+                                ${hasPowerData ? '<th class="power-header">Avg W</th><th class="power-header">NP</th><th class="power-header">Max W</th>' : ''}
+                                <th class="arr-header">ARR</th>
+                                <th class="points-header">Points</th>
+                                ${results[0].eventPoints != null ? '<th class="event-points-header">PR Pts</th>' : ''}
+                                <th class="bonus-header">Bonuses</th>
                             </tr>
                         </thead>
                         <tbody>
