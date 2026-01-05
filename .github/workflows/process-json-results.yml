@@ -102,6 +102,10 @@ jobs:
           PROCESSED_COUNT=$(echo "$OUTPUT" | grep -c "✅ Processed: Position" || echo "0")
           echo "processed_count=$PROCESSED_COUNT" >> $GITHUB_OUTPUT
 
+          # Extract rider names from "Found user: Name (Document ID: ...)" lines
+          RIDER_NAMES=$(echo "$OUTPUT" | grep -oP 'Found user: \K[^(]+' | sed 's/ *$//' | head -20 | tr '\n' ', ' | sed 's/,$//')
+          echo "rider_names=$RIDER_NAMES" >> $GITHUB_OUTPUT
+
           # Parse event info from file paths
           FILES='${{ steps.changed-files.outputs.files }}'
           EVENTS=$(echo "$FILES" | grep -oP 'event_\d+' | sort -u | tr '\n' ', ' | sed 's/,$//' | sed 's/event_//g')
@@ -135,6 +139,7 @@ jobs:
           EVENTS="${{ steps.process-results.outputs.events }}"
           SEASONS="${{ steps.process-results.outputs.seasons }}"
           PROCESSED="${{ steps.process-results.outputs.processed_count }}"
+          RIDER_NAMES="${{ steps.process-results.outputs.rider_names }}"
           RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
           # Build event display text
@@ -148,6 +153,17 @@ jobs:
             SEASON_TEXT="Season $SEASONS"
           else
             SEASON_TEXT=""
+          fi
+
+          # Build riders text (truncate if too long)
+          if [ -n "$RIDER_NAMES" ]; then
+            # Truncate to 1024 chars (Discord field limit)
+            RIDERS_TEXT=$(echo "$RIDER_NAMES" | cut -c1-1000)
+            if [ ${#RIDER_NAMES} -gt 1000 ]; then
+              RIDERS_TEXT="${RIDERS_TEXT}..."
+            fi
+          else
+            RIDERS_TEXT="None"
           fi
 
           # Send Discord embed
@@ -168,9 +184,9 @@ jobs:
                   "inline": true
                 },
                 {
-                  "name": "👥 Riders Processed",
-                  "value": "$PROCESSED",
-                  "inline": true
+                  "name": "👥 Riders ($PROCESSED)",
+                  "value": "$RIDERS_TEXT",
+                  "inline": false
                 }
               ],
               "footer": {
