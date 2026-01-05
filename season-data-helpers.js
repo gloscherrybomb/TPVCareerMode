@@ -175,7 +175,7 @@ function getSeasonStats(userData, seasonId) {
   let storedStats;
   if (seasonId === 1) {
     storedStats = {
-      events: userData.season1Events || 0,
+      events: userData.season1TotalEvents || 0,
       wins: userData.season1Wins || 0,
       podiums: userData.season1Podiums || 0,
       topTens: userData.season1Top10s || 0,
@@ -257,7 +257,7 @@ function getCareerStats(userData) {
     careerPoints: userData.careerPoints || 0,
     careerWins: userData.careerWins || 0,
     careerPodiums: userData.careerPodiums || 0,
-    careerEvents: userData.careerEvents || 0,
+    careerEvents: userData.careerTotalEvents || 0,
     careerTop10s: userData.careerTop10s || 0,
     careerBestFinish: userData.careerBestFinish || null,
     careerAvgFinish: userData.careerAvgFinish || null,

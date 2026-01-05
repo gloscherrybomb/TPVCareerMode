@@ -564,12 +564,12 @@ async function loadProfile(user) {
         // Merge stored stats with calculated stats
         userStats = {
             // Career stats (for top quick stats section)
-            totalRaces: userData.careerEvents || 0,
+            totalRaces: userData.careerTotalEvents || 0,
             totalWins: userData.careerWins || 0,
             totalPodiums: userData.careerPodiums || 0,
             totalPoints: userData.careerPoints || 0,
             // Season stats (for Season Statistics section)
-            seasonRaces: userData.season1Events || 0,
+            seasonRaces: userData.season1TotalEvents || 0,
             seasonWins: userData.season1Wins || 0,
             seasonPodiums: userData.season1Podiums || 0,
             seasonTop10s: userData.season1Top10s || 0,

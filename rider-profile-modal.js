@@ -532,7 +532,7 @@ function buildRiderProfileHTML(data, name) {
     const completedOptionalEvents = data.completedOptionalEvents || [];
 
     // Career stats (for stats section - shows lifetime stats)
-    const careerEvents = data.careerEvents || 0;
+    const careerEvents = data.careerTotalEvents || 0;
     const wins = data.careerWins || 0;
     const podiums = data.careerPodiums || 0;
     const careerTop10s = data.careerTop10s || 0;

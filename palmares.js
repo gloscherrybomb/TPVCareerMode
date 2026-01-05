@@ -423,7 +423,7 @@ function displayKeyStats() {
     const dnfCount = allResults.filter(r => r.position === 'DNF').length;
     const completedResults = allResults.filter(r => r.position !== 'DNF');
 
-    document.getElementById('statRaces').textContent = userData.careerEvents || allResults.length;
+    document.getElementById('statRaces').textContent = userData.careerTotalEvents || allResults.length;
     document.getElementById('statWins').textContent = userData.careerWins || 0;
     document.getElementById('statPodiums').textContent = userData.careerPodiums || 0;
     document.getElementById('statTop10').textContent = userData.careerTop10s || 0;
@@ -935,10 +935,12 @@ function displayDetailedStats() {
     const minutes = Math.floor((totalSeconds % 3600) / 60);
     document.getElementById('totalRaceTime').textContent = `${hours}h ${minutes}m`;
 
+    const totalEvents = userData.careerTotalEvents || allResults.length;
+    const finishedEvents = userData.careerEvents || completedResults.length;
     document.getElementById('eventsCompleted').textContent =
-        `${completedResults.length} / ${allResults.length}`;
+        `${finishedEvents} / ${totalEvents}`;
     document.getElementById('completionRate').textContent =
-        `${allResults.length > 0 ? ((completedResults.length / allResults.length) * 100).toFixed(0) : 100}%`;
+        `${totalEvents > 0 ? ((finishedEvents / totalEvents) * 100).toFixed(0) : 100}%`;
 
     const totalCareerCC = userData.currency?.totalEarned || 0;
     document.getElementById('totalCareerCC').textContent = `${totalCareerCC.toLocaleString()} CC`;

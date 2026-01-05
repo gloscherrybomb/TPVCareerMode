@@ -1984,7 +1984,8 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
     [`event${eventNumber}Results`]: eventResults,
     // Career statistics (all events including special)
     careerPoints: (userData.careerPoints || 0) + points,
-    careerEvents: careerStats.totalRaces,
+    careerTotalEvents: careerStats.totalEventsParticipated, // All events including DNF
+    careerEvents: careerStats.totalRaces, // Only finished races (for rate calculations)
     careerWins: careerStats.totalWins,
     careerPodiums: careerStats.totalPodiums,
     careerTop10s: careerStats.totalTop10s,
@@ -2012,7 +2013,8 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
     updates.tourProgress = newTourProgress;
 
     // Season 1 statistics (only season events, not special events)
-    updates.season1Events = seasonStats.totalRaces;
+    updates.season1TotalEvents = seasonStats.totalEventsParticipated; // All events including DNF
+    updates.season1Events = seasonStats.totalRaces; // Only finished races (for rate calculations)
     updates.season1Wins = seasonStats.totalWins;
     updates.season1Podiums = seasonStats.totalPodiums;
     updates.season1Top10s = seasonStats.totalTop10s;
@@ -2391,7 +2393,8 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
  */
 async function calculateCareerStats(userData) {
   const stats = {
-    totalRaces: 0,
+    totalEventsParticipated: 0, // All events including DNF
+    totalRaces: 0, // Only finished races (excludes DNF) - used for rate calculations
     totalWins: 0,
     totalPodiums: 0,
     totalTop10s: 0,
@@ -2425,6 +2428,11 @@ async function calculateCareerStats(userData) {
 
   for (const eventNum of eventNumbers) {
     const eventResults = userData[`event${eventNum}Results`];
+
+    // Count all events participated (including DNF)
+    if (eventResults && eventResults.position) {
+      stats.totalEventsParticipated++;
+    }
 
     if (eventResults && eventResults.position && eventResults.position !== 'DNF') {
       const position = eventResults.position;
@@ -2528,7 +2536,8 @@ async function calculateCareerStats(userData) {
  */
 async function calculateSeasonStats(userData, seasonNumber = 1) {
   const stats = {
-    totalRaces: 0,
+    totalEventsParticipated: 0, // All events including DNF
+    totalRaces: 0, // Only finished races (excludes DNF) - used for rate calculations
     totalWins: 0,
     totalPodiums: 0,
     totalTop10s: 0,
@@ -2543,6 +2552,11 @@ async function calculateSeasonStats(userData, seasonNumber = 1) {
 
   for (let eventNum = startEvent; eventNum <= endEvent; eventNum++) {
     const eventResults = userData[`event${eventNum}Results`];
+
+    // Count all events participated (including DNF)
+    if (eventResults && eventResults.position) {
+      stats.totalEventsParticipated++;
+    }
 
     if (eventResults && eventResults.position && eventResults.position !== 'DNF') {
       const position = eventResults.position;
