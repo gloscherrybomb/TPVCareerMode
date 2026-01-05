@@ -350,7 +350,7 @@ async function batchFixUnlockBonus() {
       console.log(`   ✅ Event ${eventNumber}: +${totalUnlockBonus} pts (${unlockNames})`);
 
       if (!dryRun) {
-        // Calculate new total points from all events (including special events)
+        // Calculate new total points from all events (including special events) for career
         let totalPointsFromEvents = 0;
         const allEventIds = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 101, 102];
         for (const i of allEventIds) {
@@ -364,11 +364,24 @@ async function batchFixUnlockBonus() {
           }
         }
 
+        // Calculate season 1 points separately (only events 1-15, not special events)
+        let season1PointsTotal = 0;
+        for (let i = 1; i <= 15; i++) {
+          const evtResults = userData[`event${i}Results`];
+          if (evtResults && typeof evtResults.points === "number") {
+            if (i === eventNumber) {
+              season1PointsTotal += newPoints;
+            } else {
+              season1PointsTotal += evtResults.points;
+            }
+          }
+        }
+
         // Update season standings
         const season1Standings = userData.season1Standings || [];
         const userStandingIndex = season1Standings.findIndex(s => s.uid === userUid);
         if (userStandingIndex >= 0) {
-          season1Standings[userStandingIndex].points = totalPointsFromEvents;
+          season1Standings[userStandingIndex].points = season1PointsTotal;
         }
         season1Standings.sort((a, b) => (b.points || 0) - (a.points || 0));
 
@@ -380,6 +393,7 @@ async function batchFixUnlockBonus() {
           [`event${eventNumber}Results.unlockBonusesApplied`]: unlockBonusesApplied,
           totalPoints: totalPointsFromEvents,
           careerPoints: totalPointsFromEvents,
+          season1Points: season1PointsTotal,
           season1Standings: season1Standings
         };
 

@@ -158,6 +158,7 @@ async function fixUnlockBonus() {
     console.log(`\n💰 Points totals:`);
     console.log(`   Current totalPoints: ${userData.totalPoints || 0}`);
     console.log(`   Current careerPoints: ${userData.careerPoints || 0}`);
+    console.log(`   Current season1Points: ${userData.season1Points || 0}`);
     console.log(`   Calculated from events: ${totalPointsFromEvents}`);
 
     // Update season standings
@@ -184,6 +185,7 @@ async function fixUnlockBonus() {
       [`event${eventNumber}Results.unlockBonusesApplied`]: unlockBonusesApplied,
       totalPoints: totalPointsFromEvents,
       careerPoints: totalPointsFromEvents,
+      season1Points: totalPointsFromEvents,
       season1Standings: season1Standings
     };
 
