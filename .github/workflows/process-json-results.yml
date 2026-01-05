@@ -120,15 +120,14 @@ jobs:
           if [ -z "$PROCESSED_COUNT" ]; then PROCESSED_COUNT=0; fi
           echo "processed_count=$PROCESSED_COUNT" >> $GITHUB_OUTPUT
 
-          # Extract rider names from "Found user: Name (Document ID: ...)" lines
-          RIDER_NAMES=$(echo "$OUTPUT" | grep -oP 'Found user: \K[^(]+' | sed 's/ *$//' | head -20 | tr '\n' ', ' | sed 's/,$//' || true)
+          # Extract rider names with their event from "Found user: Name [Event X] (Document ID: ...)" lines
+          # Format: "Name (Event X)" for each rider
+          RIDER_NAMES=$(echo "$OUTPUT" | grep -oP 'Found user: \K[^\(]+' | sed 's/ *$//' | sed 's/\[Event /(/g' | sed 's/\]/)/g' | head -20 | tr '\n' ', ' | sed 's/,$//' || true)
           echo "rider_names=$RIDER_NAMES" >> $GITHUB_OUTPUT
 
-          # Parse event info from file paths
+          # Parse season info from file paths (events now shown per rider)
           FILES='${{ steps.changed-files.outputs.files }}'
-          EVENTS=$(echo "$FILES" | grep -oP 'event_\d+' | sort -u | tr '\n' ', ' | sed 's/,$//' | sed 's/event_//g' || true)
           SEASONS=$(echo "$FILES" | grep -oP 'season_\d+' | sort -u | tr '\n' ', ' | sed 's/,$//' | sed 's/season_//g' || true)
-          echo "events=$EVENTS" >> $GITHUB_OUTPUT
           echo "seasons=$SEASONS" >> $GITHUB_OUTPUT
 
       - name: Commit renamed JSON files
@@ -154,23 +153,15 @@ jobs:
         env:
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: |
-          EVENTS="${{ steps.process-results.outputs.events }}"
           SEASONS="${{ steps.process-results.outputs.seasons }}"
           PROCESSED="${{ steps.process-results.outputs.processed_count }}"
           RIDER_NAMES="${{ steps.process-results.outputs.rider_names }}"
           RUN_URL="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
-          # Build event display text
-          if [ -n "$EVENTS" ]; then
-            EVENT_TEXT="Event $EVENTS"
-          else
-            EVENT_TEXT="Unknown Event"
-          fi
-
           if [ -n "$SEASONS" ]; then
             SEASON_TEXT="Season $SEASONS"
           else
-            SEASON_TEXT=""
+            SEASON_TEXT="Unknown"
           fi
 
           # Build riders text (truncate if too long)
@@ -191,11 +182,6 @@ jobs:
               "title": "🏁 Race Results Processed",
               "color": 5814783,
               "fields": [
-                {
-                  "name": "📅 Event",
-                  "value": "$EVENT_TEXT",
-                  "inline": true
-                },
                 {
                   "name": "🏆 Season",
                   "value": "$SEASON_TEXT",

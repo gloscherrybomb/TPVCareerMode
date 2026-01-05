@@ -2311,8 +2311,8 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
     return { unlockBonusPoints: 0, unlockBonusesApplied: [] };
   }
 
-  // Now we know this is a new result - log the user
-  console.log(`   Found user: ${userData.name || uid} (Document ID: ${userDoc.id})`);
+  // Now we know this is a new result - log the user with event info for Discord notifications
+  console.log(`   Found user: ${userData.name || uid} [Event ${eventNumber}] (Document ID: ${userDoc.id})`);
 
   // Recover personality from interview history if missing
   const recoveredPersonality = await recoverPersonalityIfNeeded(uid, userData, userRef);
