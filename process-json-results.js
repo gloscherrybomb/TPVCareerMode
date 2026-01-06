@@ -6,7 +6,7 @@ const fs = require('fs');
 const path = require('path');
 const admin = require('firebase-admin');
 const awardsCalc = require('./awards-calculation');
-const storyGen = require('./story-generator');
+const { generateRaceStory, generateRaceRecapCondensed } = require('./story-generator');
 const { AWARD_CREDIT_MAP, PER_EVENT_CREDIT_CAP, COMPLETION_BONUS_CC } = require('./currency-config');
 const { UNLOCK_DEFINITIONS, getUnlockById } = require('./unlock-config');
 const { EVENT_NAMES, EVENT_TYPES, OPTIONAL_EVENTS, STAGE_REQUIREMENTS, TIME_BASED_EVENTS } = require('./event-config');
@@ -147,9 +147,9 @@ async function sendUserDiscordNotification(userData, eventResults, eventNumber, 
     const position = eventResults.position;
     const positionText = position === 'DNF' ? 'DNF' : `${position}${getOrdinalSuffix(position)}`;
 
-    // Truncate story for Discord (max ~300 chars for embed field)
-    let storyExcerpt = null;
-    if (eventResults.story) {
+    // Use condensed Discord story, fall back to truncated main story
+    let storyExcerpt = eventResults.discordStory || null;
+    if (!storyExcerpt && eventResults.story) {
       const firstParagraph = eventResults.story.split('\n\n')[0];
       storyExcerpt = firstParagraph.length > 300
         ? firstParagraph.substring(0, 297) + '...'
@@ -163,12 +163,12 @@ async function sendUserDiscordNotification(userData, eventResults, eventNumber, 
       color: getPositionColor(position),
       fields: [
         {
-          name: 'Position',
+          name: '🏁 Position',
           value: positionText,
           inline: true
         },
         {
-          name: 'Points',
+          name: '⭐ Points',
           value: `${eventResults.points}${eventResults.bonusPoints > 0 ? ` (+${eventResults.bonusPoints} bonus)` : ''}`,
           inline: true
         }
@@ -191,7 +191,7 @@ async function sendUserDiscordNotification(userData, eventResults, eventNumber, 
         predictionText = `${positionText} (exact!)`;
       }
       embed.fields.push({
-        name: 'Prediction',
+        name: '🎯 Prediction',
         value: predictionText,
         inline: true
       });
@@ -224,7 +224,7 @@ async function sendUserDiscordNotification(userData, eventResults, eventNumber, 
 
     if (awardsEarned > 0) {
       embed.fields.push({
-        name: 'Awards',
+        name: '🏆 Awards',
         value: `${awardsEarned} earned`,
         inline: true
       });
@@ -232,7 +232,7 @@ async function sendUserDiscordNotification(userData, eventResults, eventNumber, 
 
     if (storyExcerpt) {
       embed.fields.push({
-        name: 'Race Recap',
+        name: '📖 Race Recap',
         value: storyExcerpt,
         inline: false
       });
@@ -300,9 +300,9 @@ async function sendPublicResultNotification(userData, eventResults, eventNumber,
     const position = eventResults.position;
     const positionText = position === 'DNF' ? 'DNF' : `${position}${getOrdinalSuffix(position)}`;
 
-    // Truncate story for Discord (max ~300 chars for embed field)
-    let storyExcerpt = null;
-    if (eventResults.story) {
+    // Use condensed Discord story, fall back to truncated main story
+    let storyExcerpt = eventResults.discordStory || null;
+    if (!storyExcerpt && eventResults.story) {
       const firstParagraph = eventResults.story.split('\n\n')[0];
       storyExcerpt = firstParagraph.length > 300
         ? firstParagraph.substring(0, 297) + '...'
@@ -310,16 +310,16 @@ async function sendPublicResultNotification(userData, eventResults, eventNumber,
     }
 
     const embed = {
-      title: `Race Results: ${riderName} - ${eventName}`,
+      title: `🏁 ${riderName} - ${eventName}`,
       color: getPositionColor(position),
       fields: [
         {
-          name: 'Position',
+          name: '🥇 Position',
           value: positionText,
           inline: true
         },
         {
-          name: 'Points',
+          name: '⭐ Points',
           value: `${eventResults.points}${eventResults.bonusPoints > 0 ? ` (+${eventResults.bonusPoints} bonus)` : ''}`,
           inline: true
         }
@@ -333,7 +333,7 @@ async function sendPublicResultNotification(userData, eventResults, eventNumber,
     // Add story excerpt if available
     if (storyExcerpt) {
       embed.fields.push({
-        name: 'Race Recap',
+        name: '📖 Race Recap',
         value: storyExcerpt,
         inline: false
       });
@@ -351,7 +351,7 @@ async function sendPublicResultNotification(userData, eventResults, eventNumber,
         predictionText = `${positionText} (exact!)`;
       }
       embed.fields.push({
-        name: 'Prediction',
+        name: '🎯 Prediction',
         value: predictionText,
         inline: true
       });
@@ -384,7 +384,7 @@ async function sendPublicResultNotification(userData, eventResults, eventNumber,
 
     if (publicAwardsEarned > 0) {
       embed.fields.push({
-        name: 'Awards',
+        name: '🏆 Awards',
         value: `${publicAwardsEarned} earned`,
         inline: true
       });
@@ -3198,7 +3198,7 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
   // Generate story using narrative system
   let unifiedStory = '';
   try {
-    const storyResult = await storyGen.generateRaceStory(
+    const storyResult = await generateRaceStory(
       {
         eventNumber: eventNumber,
         position: isDNF ? 'DNF' : position,
@@ -3253,6 +3253,26 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
 
   // Store story in event results
   eventResults.story = unifiedStory;
+
+  // Generate condensed story for Discord notifications
+  try {
+    const eventName = EVENT_DISPLAY_NAMES[eventNumber] || `Event ${eventNumber}`;
+    eventResults.discordStory = generateRaceRecapCondensed({
+      eventNumber,
+      eventName,
+      position: isDNF ? 'DNF' : position,
+      predictedPosition,
+      winMargin,
+      lossMargin: marginToWinner,
+      winnerName,
+      earnedDarkHorse,
+      earnedDomination,
+      earnedCloseCall
+    });
+  } catch (discordStoryError) {
+    console.log(`   ⚠️ Discord story generation error: ${discordStoryError.message}`);
+    eventResults.discordStory = null;
+  }
   eventResults.timestamp = admin.firestore.FieldValue.serverTimestamp();
 
   // Check for DNS on Local Tour stages (36-hour window enforcement)

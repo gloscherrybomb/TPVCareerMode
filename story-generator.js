@@ -1584,7 +1584,7 @@ async function generateRaceStory(raceData, seasonData, riderId = null, narrative
 
 // Export for both Node.js and browser
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = { generateRaceStory, EVENT_NAMES };
+  module.exports = { generateRaceStory, generateRaceRecapCondensed, EVENT_NAMES };
 } else if (typeof window !== 'undefined') {
-  window.storyGenerator = { generateRaceStory, EVENT_NAMES };
+  window.storyGenerator = { generateRaceStory, generateRaceRecapCondensed, EVENT_NAMES };
 }
