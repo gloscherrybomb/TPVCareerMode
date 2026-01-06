@@ -293,7 +293,8 @@ function createResultCard(resultData) {
         processedAt,
         resultDocId,
         highFiveCount,
-        resultOwnerUid
+        resultOwnerUid,
+        photoURL
     } = resultData;
 
     const positionText = position === 'DNF' ? 'DNF' : `${position}${getOrdinalSuffix(position)}`;
@@ -382,6 +383,11 @@ function createResultCard(resultData) {
         `;
     }
 
+    // Build profile image HTML
+    const profileImageHTML = photoURL
+        ? `<img src="${photoURL}" alt="${riderName}">`
+        : `<div class="result-profile-placeholder">🚴</div>`;
+
     return `
         <div class="result-card-wrapper" data-result-id="${resultDocId}">
             <article class="result-card ${cardClass}">
@@ -390,19 +396,30 @@ function createResultCard(resultData) {
                     ${highFiveHeaderHTML}
                 </div>
                 <div class="result-card-body">
-                    <div class="result-stats-grid">
-                        <div class="result-stat">
-                            <div class="result-stat-label"><span>&#129351;</span> Position</div>
-                            <div class="result-stat-value position-value ${positionClass}">${positionText}</div>
+                    <div class="result-body-layout">
+                        <div class="result-profile-column">
+                            <div class="result-profile-image">
+                                ${profileImageHTML}
+                            </div>
                         </div>
-                        <div class="result-stat">
-                            <div class="result-stat-label"><span>&#11088;</span> Points</div>
-                            <div class="result-stat-value">${pointsText}</div>
+                        <div class="result-stats-column">
+                            <div class="result-stats-grid">
+                                <div class="result-stat">
+                                    <div class="result-stat-label"><span>&#129351;</span> Position</div>
+                                    <div class="result-stat-value position-value ${positionClass}">${positionText}</div>
+                                </div>
+                                <div class="result-stat">
+                                    <div class="result-stat-label"><span>&#11088;</span> Points</div>
+                                    <div class="result-stat-value">${pointsText}</div>
+                                </div>
+                                ${predictionHTML}
+                                ${awardsHTML}
+                            </div>
                         </div>
-                        ${predictionHTML}
-                        ${awardsHTML}
+                        <div class="result-recap-column">
+                            ${recapHTML}
+                        </div>
                     </div>
-                    ${recapHTML}
                 </div>
                 <div class="result-card-footer">
                     <span class="result-footer-brand">TPV Career Mode</span>
@@ -473,6 +490,7 @@ async function fetchResults(isLoadMore = false) {
             let story = null;
             let predictedPosition = userResult.predictedPosition || null;
             let awardsCount = countAwards(userResult, null);
+            let photoURL = null;
 
             // Try to fetch user profile for discordStory (condensed format)
             // Note: userUid is the TPV player ID, but users collection is keyed by Firebase Auth UID
@@ -488,6 +506,7 @@ async function fetchResults(isLoadMore = false) {
                 if (!userSnapshot.empty) {
                     const userData = userSnapshot.docs[0].data();
                     riderName = userData.name || riderName;
+                    photoURL = userData.photoURL || null;
 
                     // Get event-specific results for discordStory
                     const eventResultsKey = `event${eventNumber}Results`;
@@ -560,7 +579,8 @@ async function fetchResults(isLoadMore = false) {
                 processedAt: data.processedAt,
                 resultDocId,
                 highFiveCount,
-                resultOwnerUid: userUid
+                resultOwnerUid: userUid,
+                photoURL
             });
         }
 
