@@ -3,11 +3,10 @@
 /* Base Container - Fixed position directly below navbar */
 .news-ticker {
     position: fixed;
-    top: 0;
+    top: 80px; /* Navbar height from styles.css mobile nav positioning */
     left: 0;
     right: 0;
-    z-index: 1001; /* Above navbar */
-    margin-top: 73px; /* Push below navbar */
+    z-index: 999;
     background: rgba(10, 14, 26, 0.98);
     border-bottom: 1px solid rgba(69, 202, 255, 0.4);
     backdrop-filter: blur(10px);
