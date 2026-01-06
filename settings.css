@@ -316,6 +316,41 @@
     height: 16px;
 }
 
+/* Discord Button */
+.btn-discord {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem;
+    background: #5865f2;
+    border: none;
+    border-radius: 6px;
+    color: white;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-discord:hover {
+    background: #4752c4;
+    transform: translateY(-1px);
+}
+
+.btn-discord svg {
+    flex-shrink: 0;
+}
+
+/* Step Note */
+.step-note {
+    display: block;
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
 /* Discord Hint */
 .discord-hint {
     margin-top: 1rem;
