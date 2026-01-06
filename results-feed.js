@@ -43,6 +43,13 @@ function canSeeEventName(eventNumber) {
     // No progress data yet - show first 2 events by default (be conservative)
     if (currentUserProgress === null) return eventNumber <= 2;
 
+    // Rider's Choice events (6-12) are visible once user completes Stage 2 (event 2)
+    // because they become available to choose at Stage 3
+    const isRidersChoiceEvent = eventNumber >= 6 && eventNumber <= 12;
+    if (isRidersChoiceEvent && currentUserProgress >= 2) {
+        return true;
+    }
+
     // Can see events up to progress + 1 (next stage choices)
     return eventNumber <= currentUserProgress + 1;
 }
@@ -69,6 +76,11 @@ function getEventDisplayName(eventNumber, forceReveal = false) {
         }
         if (regularEvent && regularEvent.mandatory === false) {
             return "Rider's Choice Event";
+        }
+        // Handle Local Tour stages (events 13, 14, 15 = Stage 9.1, 9.2, 9.3)
+        if (eventNumber >= 13 && eventNumber <= 15) {
+            const tourStageNum = eventNumber - 12;
+            return `Stage 9.${tourStageNum}`;
         }
         return `Stage ${eventNumber}`;
     }
