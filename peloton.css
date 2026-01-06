@@ -1,3 +1,10 @@
+/* Page Header */
+.page-header {
+    padding: 8rem 0 4rem;
+    background: linear-gradient(135deg, rgba(255, 27, 107, 0.1), rgba(69, 202, 255, 0.1));
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
 /* Search Section */
 .search-section {
     padding: 2rem 0;
@@ -372,6 +379,10 @@
 
 /* Responsive */
 @media (max-width: 768px) {
+    .page-header {
+        padding: 6rem 0 3rem;
+    }
+
     .search-wrapper {
         flex-direction: column;
     }
