@@ -25,13 +25,80 @@ const RESULTS_PER_PAGE = 15;
 let lastVisible = null;
 let isLoading = false;
 let allResultsLoaded = false;
+let currentUserProgress = null; // Highest completed event number for current user
+let currentUser = null;
 
-// Get event display name from eventData (loaded in HTML)
-function getEventDisplayName(eventNumber) {
+/**
+ * Calculate which events the user can see (spoiler protection)
+ * Users can see events up to their last completed event + 1 (next choices)
+ * Unauthenticated users can see all events (no spoilers if not playing)
+ */
+function canSeeEventName(eventNumber) {
+    // Not logged in - show all (no spoilers for non-players)
+    if (!currentUser) return true;
+
+    // No progress data yet - hide future events (be conservative)
+    if (currentUserProgress === null) return eventNumber <= 2; // Show first 2 events by default
+
+    // Can see events up to progress + 1 (next stage choices)
+    return eventNumber <= currentUserProgress + 1;
+}
+
+/**
+ * Get event display name from eventData (loaded in HTML)
+ * Obfuscates future events for spoiler protection
+ */
+function getEventDisplayName(eventNumber, forceReveal = false) {
+    // Check spoiler protection
+    if (!forceReveal && !canSeeEventName(eventNumber)) {
+        return `Stage ${eventNumber}`;
+    }
+
     if (window.eventData && window.eventData[eventNumber]) {
         return window.eventData[eventNumber].name;
     }
     return `Event ${eventNumber}`;
+}
+
+/**
+ * Fetch current user's progress (highest completed event)
+ */
+async function fetchUserProgress(user) {
+    if (!user) {
+        currentUserProgress = null;
+        return;
+    }
+
+    try {
+        const userQuery = query(
+            collection(db, 'users'),
+            where('email', '==', user.email),
+            limit(1)
+        );
+        const userSnapshot = await getDocs(userQuery);
+
+        if (!userSnapshot.empty) {
+            const userData = userSnapshot.docs[0].data();
+
+            // Find highest completed event (check event15Results down to event1Results)
+            let highestCompleted = 0;
+            for (let i = 15; i >= 1; i--) {
+                if (userData[`event${i}Results`]) {
+                    highestCompleted = i;
+                    break;
+                }
+            }
+
+            currentUserProgress = highestCompleted;
+            console.log(`[FEED] User progress: completed up to event ${highestCompleted}`);
+        } else {
+            // User exists in auth but not in users collection yet
+            currentUserProgress = 0;
+        }
+    } catch (error) {
+        console.error('[FEED] Error fetching user progress:', error);
+        currentUserProgress = 0;
+    }
 }
 
 /**
@@ -508,13 +575,34 @@ function initControls() {
     }
 }
 
+// Track if DOM is ready
+let domReady = false;
+let pendingAuthLoad = false;
+
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
+    domReady = true;
     initControls();
-    loadInitialResults();
+
+    // If auth already fired before DOM was ready, load now
+    if (pendingAuthLoad) {
+        pendingAuthLoad = false;
+        loadInitialResults();
+    }
 });
 
-// Auth state listener (page is public but we track auth for potential future features)
-onAuthStateChanged(auth, (user) => {
-    // Results feed is public, no auth-specific logic needed for now
+// Auth state listener - fetch user progress for spoiler protection
+onAuthStateChanged(auth, async (user) => {
+    currentUser = user;
+
+    // Fetch user progress if logged in
+    await fetchUserProgress(user);
+
+    // Load/reload results with appropriate spoiler protection
+    if (domReady) {
+        loadInitialResults();
+    } else {
+        // DOM not ready yet, mark for loading when ready
+        pendingAuthLoad = true;
+    }
 });
