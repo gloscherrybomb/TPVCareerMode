@@ -2753,6 +2753,14 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
   let earnedSmoothOperator = false;
   let earnedBunchKick = false;
 
+  // Career/streak awards (checked later in the code)
+  let earnedPodiumStreak = false;
+  let earnedBackToBack = false;
+  let earnedTrophyCollector = false;
+  let earnedWeekendWarrior = false;
+  let earnedOverrated = false;
+  let earnedTechnicalIssues = false;
+
   if (!isDNF) {
     // Prediction awards
     if (predictedPosition) {
@@ -3539,6 +3547,7 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
           console.log('   📈 PODIUM STREAK! 5 consecutive top 3 finishes');
           updateData['awards.podiumStreak'] = admin.firestore.FieldValue.increment(1);
           eventResults.earnedAwards.push({ awardId: 'podiumStreak', category: 'performance', intensity: 'flashy' });
+          earnedPodiumStreak = true;
         }
       }
     }
@@ -3556,6 +3565,7 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
       console.log('   🔁 BACK TO BACK! 2 consecutive wins');
       updateData['awards.backToBack'] = admin.firestore.FieldValue.increment(1);
       eventResults.earnedAwards.push({ awardId: 'backToBack', category: 'performance', intensity: 'flashy' });
+      earnedBackToBack = true;
     }
   }
 
@@ -3566,6 +3576,7 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
       console.log('   🏆 TROPHY COLLECTOR! 5+ podium finishes');
       updateData['awards.trophyCollector'] = 1;
       eventResults.earnedAwards.push({ awardId: 'trophyCollector', category: 'performance', intensity: 'moderate' });
+      earnedTrophyCollector = true;
     }
   }
 
@@ -3576,6 +3587,7 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
     console.log('   🏁 WEEKEND WARRIOR! 5+ events completed');
     updateData['awards.weekendWarrior'] = 1;
     eventResults.earnedAwards.push({ awardId: 'weekendWarrior', category: 'performance', intensity: 'moderate' });
+    earnedWeekendWarrior = true;
   }
 
   // OVERRATED - Finish worse than predicted 5+ times (one-time award)
@@ -3593,6 +3605,7 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
       console.log('   📉 OVERRATED! Finished worse than predicted 5+ times');
       updateData['awards.overrated'] = 1;
       eventResults.earnedAwards.push({ awardId: 'overrated', category: 'event_special', intensity: 'subtle' });
+      earnedOverrated = true;
     }
   }
 
@@ -3610,6 +3623,7 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
       console.log('   🔧 TECHNICAL ISSUES! 3+ DNFs');
       updateData['awards.technicalIssues'] = 1;
       eventResults.earnedAwards.push({ awardId: 'technicalIssues', category: 'event_special', intensity: 'subtle' });
+      earnedTechnicalIssues = true;
     }
   }
 
@@ -3694,7 +3708,17 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
     if (earnedBlastOff) { earnedCC += AWARD_CREDIT_MAP.blastOff || 50; awardList.push('blastOff'); }
     if (earnedSmoothOperator) { earnedCC += AWARD_CREDIT_MAP.smoothOperator || 30; awardList.push('smoothOperator'); }
     if (earnedBunchKick) { earnedCC += AWARD_CREDIT_MAP.bunchKick || 30; awardList.push('bunchKick'); }
+
+    // Career/streak awards CC
+    if (earnedPodiumStreak) { earnedCC += AWARD_CREDIT_MAP.podiumStreak || 50; awardList.push('podiumStreak'); }
+    if (earnedBackToBack) { earnedCC += AWARD_CREDIT_MAP.backToBack || 50; awardList.push('backToBack'); }
+    if (earnedTrophyCollector) { earnedCC += AWARD_CREDIT_MAP.trophyCollector || 20; awardList.push('trophyCollector'); }
+    if (earnedWeekendWarrior) { earnedCC += AWARD_CREDIT_MAP.weekendWarrior || 20; awardList.push('weekendWarrior'); }
+    if (earnedOverrated) { earnedCC += AWARD_CREDIT_MAP.overrated || 5; awardList.push('overrated'); }
   }
+
+  // Technical issues is earned on DNF, so add CC outside the !isDNF block
+  if (earnedTechnicalIssues) { earnedCC += AWARD_CREDIT_MAP.technicalIssues || 5; awardList.push('technicalIssues'); }
 
   // Special event awards CC (use parseInt for type-safe comparison)
   if (parseInt(eventNumber) === 102) {
