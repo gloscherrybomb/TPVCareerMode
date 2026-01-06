@@ -125,62 +125,52 @@
                             <label class="toggle-label">
                                 <input type="checkbox" id="discordEnabled">
                                 <span class="toggle-switch"></span>
-                                <span class="toggle-text">Enable Discord notifications when race results are processed</span>
+                                <span class="toggle-text">Enable Discord DM notifications when race results are processed</span>
                             </label>
                         </div>
 
-                        <!-- Webhook URL Section (hidden until enabled) -->
-                        <div id="webhookSection" class="webhook-section" style="display: none;">
-                            <div class="form-group">
-                                <label for="discordWebhookUrl">
-                                    Webhook URL
-                                </label>
-                                <input type="url" id="discordWebhookUrl" placeholder="https://discord.com/api/webhooks/...">
-                                <p class="form-help">Your personal Discord channel webhook URL</p>
+                        <!-- Discord Link Section -->
+                        <div id="discordLinkSection" class="discord-link-section" style="display: none;">
+                            <!-- Unlinked State -->
+                            <div id="discordUnlinkedState" class="discord-state">
+                                <div class="link-instructions">
+                                    <h3>Link Your Discord Account</h3>
+                                    <p>To receive race notifications as Discord DMs, link your account using our bot:</p>
+                                    <ol>
+                                        <li>
+                                            Copy your TPV UID:
+                                            <code id="userUidDisplay">Loading...</code>
+                                            <button class="btn-copy" id="copyUidBtn" title="Copy UID">
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                                </svg>
+                                            </button>
+                                        </li>
+                                        <li>Open Discord and start a DM with the TPV Career Mode bot</li>
+                                        <li>Send the command: <code>/link YOUR_UID</code></li>
+                                    </ol>
+                                </div>
+                                <p class="discord-hint">Don't have Discord? <a href="https://discord.com/download" target="_blank">Download it here</a> - it's free!</p>
                             </div>
 
-                            <div class="webhook-actions">
-                                <button class="btn btn-secondary" id="saveWebhookBtn">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
-                                        <polyline points="17 21 17 13 7 13 7 21"></polyline>
-                                        <polyline points="7 3 7 8 15 8"></polyline>
+                            <!-- Linked State -->
+                            <div id="discordLinkedState" class="discord-state" style="display: none;">
+                                <div class="link-status linked">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
                                     </svg>
-                                    Save Webhook
-                                </button>
-                                <button class="btn btn-outline" id="testWebhookBtn">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                                    </svg>
-                                    Send Test
-                                </button>
+                                    <div>
+                                        <strong>Discord Linked</strong>
+                                        <p id="discordLinkedInfo">You'll receive DM notifications for race results</p>
+                                    </div>
+                                </div>
+                                <p class="unlink-hint">To unlink your account, DM the bot with <code>/unlink</code></p>
                             </div>
-
-                            <div id="webhookStatus" class="webhook-status" style="display: none;"></div>
                         </div>
 
-                        <!-- Setup Instructions -->
-                        <div class="setup-guide">
-                            <button class="setup-guide-toggle" id="setupGuideToggle">
-                                <span>How to create a Discord webhook</span>
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="chevron">
-                                    <polyline points="6 9 12 15 18 9"></polyline>
-                                </svg>
-                            </button>
-                            <div class="setup-guide-content" id="setupGuideContent" style="display: none;">
-                                <ol>
-                                    <li>Open Discord and go to a server you own or manage</li>
-                                    <li>Create a private channel for your notifications (or use an existing one)</li>
-                                    <li>Right-click the channel and select <strong>"Edit Channel"</strong></li>
-                                    <li>Go to <strong>"Integrations"</strong> tab, then click <strong>"Webhooks"</strong></li>
-                                    <li>Click <strong>"New Webhook"</strong> and give it a name (e.g., "TPV Career Mode")</li>
-                                    <li>Click <strong>"Copy Webhook URL"</strong> and paste it in the field above</li>
-                                </ol>
-                                <p class="setup-note">
-                                    <strong>Note:</strong> Keep your webhook URL private. Anyone with this URL can send messages to your channel.
-                                </p>
-                            </div>
-                        </div>
+                        <div id="discordStatus" class="discord-status" style="display: none;"></div>
                     </div>
                 </div>
             </div>

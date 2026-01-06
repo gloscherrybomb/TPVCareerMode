@@ -98,40 +98,66 @@ function getPositionColor(position) {
 }
 
 /**
- * Send personalized Discord notification to user's webhook
+ * Send personalized Discord DM notification to user
+ * Uses Discord API to send direct messages (requires bot token)
  * @param {Object} userData - User's Firestore document data
  * @param {Object} eventResults - Processed event results
  * @param {number} eventNumber - Event number
  * @param {number} seasonNumber - Season number
  */
 async function sendUserDiscordNotification(userData, eventResults, eventNumber, seasonNumber) {
-  // Check if user has Discord notifications enabled
-  if (!userData.discordNotificationsEnabled || !userData.discordWebhookUrl) {
+  // Check if user has Discord notifications enabled AND has linked their Discord
+  if (!userData.discordNotificationsEnabled || !userData.discordUserId) {
+    return;
+  }
+
+  const botToken = process.env.DISCORD_BOT_TOKEN;
+  if (!botToken) {
+    // Silently skip if bot token not configured
     return;
   }
 
   try {
-    // Get event name
-    const eventName = EVENT_DISPLAY_NAMES[eventNumber] || `Event ${eventNumber}`;
+    // Step 1: Create DM channel with user
+    const dmChannelResponse = await fetch('https://discord.com/api/v10/users/@me/channels', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bot ${botToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        recipient_id: userData.discordUserId
+      })
+    });
 
-    // Build position display
+    if (!dmChannelResponse.ok) {
+      const errorText = await dmChannelResponse.text();
+      if (dmChannelResponse.status === 403) {
+        console.log(`   ⚠️ Cannot DM ${userData.name} (DMs disabled or bot blocked)`);
+      } else {
+        console.log(`   ⚠️ Failed to create DM channel for ${userData.name}: ${dmChannelResponse.status}`);
+      }
+      return;
+    }
+
+    const dmChannel = await dmChannelResponse.json();
+
+    // Step 2: Build embed message
+    const eventName = EVENT_DISPLAY_NAMES[eventNumber] || `Event ${eventNumber}`;
     const position = eventResults.position;
     const positionText = position === 'DNF' ? 'DNF' : `${position}${getOrdinalSuffix(position)}`;
 
     // Truncate story for Discord (max ~300 chars for embed field)
     let storyExcerpt = null;
     if (eventResults.story) {
-      // Get first paragraph or first 300 chars
       const firstParagraph = eventResults.story.split('\n\n')[0];
       storyExcerpt = firstParagraph.length > 300
         ? firstParagraph.substring(0, 297) + '...'
         : firstParagraph;
     }
 
-    // Build results URL
     const resultsUrl = `https://tpvcareermode.com/event-detail.html?event=${eventNumber}&season=${seasonNumber}`;
 
-    // Build Discord embed
     const embed = {
       title: `Race Results: ${eventName}`,
       color: getPositionColor(position),
@@ -153,7 +179,6 @@ async function sendUserDiscordNotification(userData, eventResults, eventNumber, 
       timestamp: new Date().toISOString()
     };
 
-    // Add story excerpt if available
     if (storyExcerpt) {
       embed.fields.push({
         name: 'Race Recap',
@@ -162,10 +187,13 @@ async function sendUserDiscordNotification(userData, eventResults, eventNumber, 
       });
     }
 
-    // Send webhook
-    const response = await fetch(userData.discordWebhookUrl, {
+    // Step 3: Send message to DM channel
+    const messageResponse = await fetch(`https://discord.com/api/v10/channels/${dmChannel.id}/messages`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Authorization': `Bot ${botToken}`,
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify({
         embeds: [embed],
         components: [{
@@ -180,15 +208,21 @@ async function sendUserDiscordNotification(userData, eventResults, eventNumber, 
       })
     });
 
-    if (!response.ok) {
-      console.log(`   ⚠️ Discord notification failed for ${userData.name}: ${response.status}`);
+    if (!messageResponse.ok) {
+      if (messageResponse.status === 403) {
+        console.log(`   ⚠️ Cannot DM ${userData.name} (DMs disabled or bot blocked)`);
+      } else if (messageResponse.status === 429) {
+        console.log(`   ⚠️ Rate limited sending DM to ${userData.name}`);
+      } else {
+        console.log(`   ⚠️ Discord DM failed for ${userData.name}: ${messageResponse.status}`);
+      }
     } else {
-      console.log(`   📨 Discord notification sent to ${userData.name}`);
+      console.log(`   📨 Discord DM sent to ${userData.name}`);
     }
 
   } catch (error) {
     // Log but don't fail - Discord notifications should not break result processing
-    console.error(`   ⚠️ Discord notification error for ${userData.name}: ${error.message}`);
+    console.error(`   ⚠️ Discord DM error for ${userData.name}: ${error.message}`);
   }
 }
 

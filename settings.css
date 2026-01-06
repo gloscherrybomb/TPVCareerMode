@@ -232,42 +232,176 @@
     color: var(--text-primary);
 }
 
-/* Webhook Section */
-.webhook-section {
+/* Discord Link Section */
+.discord-link-section {
     padding-top: 1.5rem;
     border-top: 1px solid rgba(255, 255, 255, 0.05);
     margin-top: 0.5rem;
 }
 
-.webhook-actions {
-    display: flex;
-    gap: 0.75rem;
-    margin-top: 1rem;
+.discord-state {
+    margin-top: 0.5rem;
 }
 
-.webhook-status {
+/* Link Instructions */
+.link-instructions {
+    background: var(--dark-elevated);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+}
+
+.link-instructions h3 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 0.75rem 0;
+}
+
+.link-instructions p {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    margin: 0 0 1rem 0;
+}
+
+.link-instructions ol {
+    margin: 0;
+    padding-left: 1.25rem;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 2;
+}
+
+.link-instructions li {
+    margin-bottom: 0.5rem;
+}
+
+.link-instructions code {
+    display: inline-block;
+    background: rgba(88, 101, 242, 0.15);
+    border: 1px solid rgba(88, 101, 242, 0.3);
+    border-radius: 4px;
+    padding: 0.2rem 0.5rem;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 0.85rem;
+    color: #a5b4fc;
+}
+
+/* Copy UID Button */
+.btn-copy {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    vertical-align: middle;
+    margin-left: 0.5rem;
+}
+
+.btn-copy:hover {
+    background: rgba(88, 101, 242, 0.2);
+    border-color: rgba(88, 101, 242, 0.4);
+    color: #a5b4fc;
+}
+
+.btn-copy svg {
+    width: 16px;
+    height: 16px;
+}
+
+/* Discord Hint */
+.discord-hint {
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.discord-hint a {
+    color: #5865f2;
+    text-decoration: none;
+}
+
+.discord-hint a:hover {
+    text-decoration: underline;
+}
+
+/* Link Status (Linked State) */
+.link-status {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    border-radius: 12px;
+    background: var(--dark-elevated);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.link-status.linked {
+    background: rgba(34, 197, 94, 0.08);
+    border-color: rgba(34, 197, 94, 0.25);
+}
+
+.link-status.linked svg {
+    color: #22c55e;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+.link-status strong {
+    display: block;
+    color: #22c55e;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+}
+
+.link-status p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+/* Unlink Hint */
+.unlink-hint {
+    margin-top: 1rem;
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+.unlink-hint code {
+    background: rgba(88, 101, 242, 0.15);
+    border: 1px solid rgba(88, 101, 242, 0.3);
+    border-radius: 4px;
+    padding: 0.15rem 0.4rem;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 0.8rem;
+    color: #a5b4fc;
+}
+
+/* Discord Status Messages */
+.discord-status {
     margin-top: 1rem;
     padding: 0.75rem 1rem;
     border-radius: 8px;
     font-size: 0.9rem;
 }
 
-.webhook-status.success {
+.discord-status.success {
     background: rgba(34, 197, 94, 0.1);
     border: 1px solid rgba(34, 197, 94, 0.3);
     color: #22c55e;
 }
 
-.webhook-status.error {
+.discord-status.error {
     background: rgba(239, 68, 68, 0.1);
     border: 1px solid rgba(239, 68, 68, 0.3);
     color: #ef4444;
-}
-
-.webhook-status.loading {
-    background: rgba(59, 130, 246, 0.1);
-    border: 1px solid rgba(59, 130, 246, 0.3);
-    color: #3b82f6;
 }
 
 /* Setup Guide */
@@ -398,13 +532,12 @@
         width: 100%;
     }
 
-    .webhook-actions {
-        flex-direction: column;
+    .link-instructions {
+        padding: 1rem;
     }
 
-    .webhook-actions .btn {
-        width: 100%;
-        justify-content: center;
+    .link-instructions ol {
+        padding-left: 1rem;
     }
 }
 

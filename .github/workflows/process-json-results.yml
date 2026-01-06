@@ -99,6 +99,7 @@ jobs:
         if: steps.check-files.outputs.has_files == 'true'
         env:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
           SKIP_UNLOCKS: ${{ inputs.skip_unlocks == true && 'true' || 'false' }}
           SKIP_NARRATIVE_HISTORY: ${{ inputs.skip_narrative_history == true && 'true' || 'false' }}
         run: |

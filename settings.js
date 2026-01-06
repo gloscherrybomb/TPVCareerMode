@@ -101,22 +101,7 @@ function populateSettings(data) {
     }
 
     // Populate Discord settings
-    const discordEnabled = document.getElementById('discordEnabled');
-    const webhookUrl = document.getElementById('discordWebhookUrl');
-    const webhookSection = document.getElementById('webhookSection');
-
-    if (discordEnabled) {
-        discordEnabled.checked = data.discordNotificationsEnabled || false;
-
-        // Show/hide webhook section based on toggle state
-        if (webhookSection) {
-            webhookSection.style.display = discordEnabled.checked ? 'block' : 'none';
-        }
-    }
-
-    if (webhookUrl) {
-        webhookUrl.value = data.discordWebhookUrl || '';
-    }
+    populateDiscordSettings(data);
 }
 
 // ============================================================================
@@ -233,120 +218,89 @@ function initPhotoUpload() {
 }
 
 // ============================================================================
-// DISCORD WEBHOOK SETTINGS
+// DISCORD BOT LINKING
 // ============================================================================
 
-// Validate Discord webhook URL format
-function isValidDiscordWebhook(url) {
-    if (!url) return false;
-    const pattern = /^https:\/\/discord\.com\/api\/webhooks\/\d+\/[\w-]+$/;
-    return pattern.test(url);
+function populateDiscordSettings(data) {
+    const discordEnabled = document.getElementById('discordEnabled');
+    const discordLinkSection = document.getElementById('discordLinkSection');
+    const discordUnlinkedState = document.getElementById('discordUnlinkedState');
+    const discordLinkedState = document.getElementById('discordLinkedState');
+    const userUidDisplay = document.getElementById('userUidDisplay');
+    const discordLinkedInfo = document.getElementById('discordLinkedInfo');
+
+    // Show user's UID for copying
+    if (userUidDisplay && data.uid) {
+        userUidDisplay.textContent = data.uid;
+    }
+
+    // Set enabled toggle
+    if (discordEnabled) {
+        discordEnabled.checked = data.discordNotificationsEnabled || false;
+    }
+
+    // Show/hide link section based on toggle state
+    if (discordLinkSection) {
+        discordLinkSection.style.display = discordEnabled.checked ? 'block' : 'none';
+    }
+
+    // Show linked or unlinked state
+    if (data.discordUserId) {
+        // User has linked their Discord
+        if (discordUnlinkedState) discordUnlinkedState.style.display = 'none';
+        if (discordLinkedState) discordLinkedState.style.display = 'block';
+
+        // Show linked date if available
+        if (discordLinkedInfo && data.discordLinkedAt) {
+            const linkedDate = data.discordLinkedAt.toDate ?
+                data.discordLinkedAt.toDate() :
+                new Date(data.discordLinkedAt);
+            const formattedDate = linkedDate.toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric'
+            });
+            discordLinkedInfo.textContent = `Linked on ${formattedDate}`;
+        }
+    } else {
+        // User has not linked
+        if (discordUnlinkedState) discordUnlinkedState.style.display = 'block';
+        if (discordLinkedState) discordLinkedState.style.display = 'none';
+    }
 }
 
-async function saveDiscordSettings() {
+async function saveDiscordEnabled() {
     const discordEnabled = document.getElementById('discordEnabled').checked;
-    const webhookUrl = document.getElementById('discordWebhookUrl').value.trim();
-
-    // Validate webhook URL if enabled
-    if (discordEnabled && !isValidDiscordWebhook(webhookUrl)) {
-        showWebhookStatus('Invalid Discord webhook URL. Please check the format.', 'error');
-        return;
-    }
+    const discordLinkSection = document.getElementById('discordLinkSection');
 
     try {
         await updateDoc(doc(db, 'users', currentUser.uid), {
-            discordNotificationsEnabled: discordEnabled,
-            discordWebhookUrl: discordEnabled ? webhookUrl : null
+            discordNotificationsEnabled: discordEnabled
         });
 
         userData.discordNotificationsEnabled = discordEnabled;
-        userData.discordWebhookUrl = discordEnabled ? webhookUrl : null;
 
-        showWebhookStatus('Discord settings saved successfully', 'success');
+        // Show/hide link section
+        if (discordLinkSection) {
+            discordLinkSection.style.display = discordEnabled ? 'block' : 'none';
+        }
+
+        showDiscordStatus(
+            discordEnabled ? 'Discord notifications enabled' : 'Discord notifications disabled',
+            'success'
+        );
     } catch (error) {
         console.error('Error saving Discord settings:', error);
-        showWebhookStatus('Error saving settings. Please try again.', 'error');
+        showDiscordStatus('Error saving settings. Please try again.', 'error');
     }
 }
 
-async function sendTestNotification() {
-    const webhookUrl = document.getElementById('discordWebhookUrl').value.trim();
-
-    if (!isValidDiscordWebhook(webhookUrl)) {
-        showWebhookStatus('Please enter a valid webhook URL first', 'error');
-        return;
-    }
-
-    showWebhookStatus('Sending test notification...', 'loading');
-
-    try {
-        const testEmbed = {
-            title: 'Test Notification - TPV Career Mode',
-            description: 'Your Discord notifications are set up correctly! You will receive race result notifications here.',
-            color: 0x45CAFF, // Blue
-            fields: [
-                {
-                    name: 'Position',
-                    value: '5th',
-                    inline: true
-                },
-                {
-                    name: 'Points',
-                    value: '45 (+3 bonus)',
-                    inline: true
-                },
-                {
-                    name: 'Race Recap',
-                    value: 'This is what your race notifications will look like. The recap will include a short summary of your race performance...',
-                    inline: false
-                }
-            ],
-            footer: {
-                text: 'TPV Career Mode'
-            },
-            timestamp: new Date().toISOString()
-        };
-
-        const response = await fetch(webhookUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                embeds: [testEmbed],
-                components: [{
-                    type: 1,
-                    components: [{
-                        type: 2,
-                        style: 5,
-                        label: 'View Full Results',
-                        url: 'https://tpvcareermode.com/profile.html'
-                    }]
-                }]
-            })
-        });
-
-        if (response.ok) {
-            showWebhookStatus('Test notification sent! Check your Discord channel.', 'success');
-        } else if (response.status === 404) {
-            showWebhookStatus('Webhook not found. It may have been deleted from Discord.', 'error');
-        } else if (response.status === 429) {
-            showWebhookStatus('Rate limited. Please wait a moment and try again.', 'error');
-        } else {
-            showWebhookStatus(`Failed to send: ${response.statusText}`, 'error');
-        }
-    } catch (error) {
-        console.error('Error sending test notification:', error);
-        showWebhookStatus('Error sending test. Check that the webhook URL is correct.', 'error');
-    }
-}
-
-function showWebhookStatus(message, type) {
-    const statusEl = document.getElementById('webhookStatus');
+function showDiscordStatus(message, type) {
+    const statusEl = document.getElementById('discordStatus');
     if (!statusEl) return;
 
     statusEl.textContent = message;
-    statusEl.className = `webhook-status ${type}`;
+    statusEl.className = `discord-status ${type}`;
     statusEl.style.display = 'block';
 
     // Auto-hide success messages after 5 seconds
@@ -359,48 +313,34 @@ function showWebhookStatus(message, type) {
 
 function initDiscordSettings() {
     const discordEnabled = document.getElementById('discordEnabled');
-    const webhookSection = document.getElementById('webhookSection');
-    const saveWebhookBtn = document.getElementById('saveWebhookBtn');
-    const testWebhookBtn = document.getElementById('testWebhookBtn');
+    const copyUidBtn = document.getElementById('copyUidBtn');
 
-    // Toggle webhook section visibility
-    if (discordEnabled && webhookSection) {
-        discordEnabled.addEventListener('change', async () => {
-            webhookSection.style.display = discordEnabled.checked ? 'block' : 'none';
+    // Toggle handler
+    if (discordEnabled) {
+        discordEnabled.addEventListener('change', saveDiscordEnabled);
+    }
 
-            // If disabling, save immediately
-            if (!discordEnabled.checked) {
-                await saveDiscordSettings();
+    // Copy UID button
+    if (copyUidBtn) {
+        copyUidBtn.addEventListener('click', async () => {
+            const uid = document.getElementById('userUidDisplay').textContent;
+            if (uid && uid !== 'Loading...') {
+                try {
+                    await navigator.clipboard.writeText(uid);
+                    showDiscordStatus('UID copied to clipboard!', 'success');
+                } catch (err) {
+                    // Fallback for older browsers
+                    const textArea = document.createElement('textarea');
+                    textArea.value = uid;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    showDiscordStatus('UID copied to clipboard!', 'success');
+                }
             }
         });
     }
-
-    // Save webhook button
-    if (saveWebhookBtn) {
-        saveWebhookBtn.addEventListener('click', saveDiscordSettings);
-    }
-
-    // Test webhook button
-    if (testWebhookBtn) {
-        testWebhookBtn.addEventListener('click', sendTestNotification);
-    }
-}
-
-// ============================================================================
-// SETUP GUIDE TOGGLE
-// ============================================================================
-
-function initSetupGuide() {
-    const toggleBtn = document.getElementById('setupGuideToggle');
-    const content = document.getElementById('setupGuideContent');
-
-    if (!toggleBtn || !content) return;
-
-    toggleBtn.addEventListener('click', () => {
-        const isExpanded = content.style.display !== 'none';
-        content.style.display = isExpanded ? 'none' : 'block';
-        toggleBtn.classList.toggle('expanded', !isExpanded);
-    });
 }
 
 // ============================================================================
@@ -456,7 +396,6 @@ onAuthStateChanged(auth, async (user) => {
 document.addEventListener('DOMContentLoaded', () => {
     initPhotoUpload();
     initDiscordSettings();
-    initSetupGuide();
 
     // Name save button
     const saveNameBtn = document.getElementById('saveNameBtn');
