@@ -36,10 +36,22 @@ class NotificationQueue {
 
   /**
    * Add a notification to the queue
+   * Prevents duplicates based on awardId + eventNumber combination
    * @param {Object} notification - Notification object containing awardId, eventNumber, category, intensity
    */
   add(notification) {
-    const id = `${notification.awardId}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    // Check for duplicate: same awardId and eventNumber already in queue
+    const isDuplicate = this.queue.some(n =>
+      n.awardId === notification.awardId &&
+      n.eventNumber === notification.eventNumber
+    );
+
+    if (isDuplicate) {
+      console.log(`Notification already exists for ${notification.awardId} in event ${notification.eventNumber}, skipping`);
+      return;
+    }
+
+    const id = `${notification.awardId}_${notification.eventNumber}_${Date.now()}`;
 
     this.queue.push({
       id,
@@ -92,12 +104,24 @@ class NotificationQueue {
   }
 
   /**
-   * Clean up old shown notifications (7+ days old)
+   * Clean up old shown notifications (7+ days old) and remove duplicates
    */
   cleanup() {
-    const sevenDaysAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
     const beforeCount = this.queue.length;
+    const sevenDaysAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
 
+    // First, deduplicate based on awardId + eventNumber (keep the first occurrence)
+    const seen = new Set();
+    this.queue = this.queue.filter(n => {
+      const key = `${n.awardId}_${n.eventNumber}`;
+      if (seen.has(key)) {
+        return false; // Duplicate, remove it
+      }
+      seen.add(key);
+      return true;
+    });
+
+    // Then, remove old shown notifications
     this.queue = this.queue.filter(n => {
       // Keep unshown notifications or shown notifications less than 7 days old
       return !n.shown || n.timestamp > sevenDaysAgo;
@@ -105,7 +129,7 @@ class NotificationQueue {
 
     const removed = beforeCount - this.queue.length;
     if (removed > 0) {
-      console.log(`Cleaned up ${removed} old notification(s)`);
+      console.log(`Cleaned up ${removed} notification(s) (duplicates and/or old)`);
       this.save();
     }
   }
