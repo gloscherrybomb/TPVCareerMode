@@ -32,3 +32,6 @@ npm-debug.log*
 # Documentation files (keep local only)
 *.md
 card-preview.html
+
+# Test scripts
+test-discord-notification.js
