@@ -335,6 +335,40 @@
     font-size: 1.1rem;
 }
 
+/* Login Prompt */
+.login-prompt {
+    text-align: center;
+    padding: 4rem 2rem;
+    background: var(--dark-card);
+    border-radius: 20px;
+    border: 2px dashed rgba(69, 202, 255, 0.3);
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.login-prompt-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+.login-prompt h3 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.8rem;
+    color: var(--text-primary);
+    margin-bottom: 1rem;
+}
+
+.login-prompt p {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+}
+
+.login-prompt .login-hint {
+    font-size: 0.95rem;
+    color: var(--accent-blue);
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .page-header {

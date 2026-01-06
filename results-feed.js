@@ -31,14 +31,10 @@ let currentUser = null;
 /**
  * Calculate which events the user can see (spoiler protection)
  * Users can see events up to their last completed event + 1 (next choices)
- * Unauthenticated users can see all events (no spoilers if not playing)
  */
 function canSeeEventName(eventNumber) {
-    // Not logged in - show all (no spoilers for non-players)
-    if (!currentUser) return true;
-
-    // No progress data yet - hide future events (be conservative)
-    if (currentUserProgress === null) return eventNumber <= 2; // Show first 2 events by default
+    // No progress data yet - show first 2 events by default (be conservative)
+    if (currentUserProgress === null) return eventNumber <= 2;
 
     // Can see events up to progress + 1 (next stage choices)
     return eventNumber <= currentUserProgress + 1;
@@ -523,10 +519,37 @@ function renderResults(results, append = false) {
 }
 
 /**
+ * Show login required prompt
+ */
+function showLoginPrompt() {
+    const feedContainer = document.getElementById('resultsFeed');
+    const loadMoreContainer = document.getElementById('loadMoreContainer');
+    const emptyState = document.getElementById('emptyState');
+
+    if (loadMoreContainer) loadMoreContainer.style.display = 'none';
+    if (emptyState) emptyState.style.display = 'none';
+
+    feedContainer.innerHTML = `
+        <div class="login-prompt">
+            <div class="login-prompt-icon">&#128274;</div>
+            <h3>Login Required</h3>
+            <p>Please log in to view the results feed.</p>
+            <p class="login-hint">Click "Login" in the navigation bar to continue.</p>
+        </div>
+    `;
+}
+
+/**
  * Initial load
  */
 async function loadInitialResults() {
     const feedContainer = document.getElementById('resultsFeed');
+
+    // Require login to view results feed
+    if (!currentUser) {
+        showLoginPrompt();
+        return;
+    }
 
     // Show loading state
     feedContainer.innerHTML = `
