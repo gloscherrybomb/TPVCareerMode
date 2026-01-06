@@ -251,15 +251,34 @@ function formatTimestamp(timestamp) {
 function countAwards(result, eventResults) {
     let count = 0;
 
-    // Check result object awards
+    // Check result object awards - must match all awards from awards-config.js
     const awardFlags = [
+        // Podium awards
+        'earnedGoldMedal', 'earnedSilverMedal', 'earnedBronzeMedal',
+        // Special position awards
+        'earnedLanternRouge',
+        // Performance vs prediction awards
         'earnedPunchingMedal', 'earnedGiantKillerMedal', 'earnedBullseyeMedal',
-        'earnedHotStreakMedal', 'earnedDomination', 'earnedCloseCall',
-        'earnedPhotoFinish', 'earnedDarkHorse', 'earnedZeroToHero',
-        'earnedWindTunnel', 'earnedTheAccountant', 'earnedLanternRouge',
-        'earnedComeback', 'earnedPowerSurge', 'earnedSteadyEddie',
-        'earnedBlastOff', 'earnedSmoothOperator', 'earnedBunchKick',
-        'earnedGCGoldMedal', 'earnedGCSilverMedal', 'earnedGCBronzeMedal'
+        'earnedHotStreakMedal',
+        // Margin of victory awards
+        'earnedDomination', 'earnedCloseCall', 'earnedPhotoFinish',
+        // Prediction performance awards
+        'earnedDarkHorse',
+        // Progression awards
+        'earnedZeroToHero',
+        // GC awards
+        'earnedGCGoldMedal', 'earnedGCSilverMedal', 'earnedGCBronzeMedal',
+        // Fun/Special awards
+        'earnedComeback',
+        // Time Trial awards
+        'earnedWindTunnel',
+        // Points Race awards
+        'earnedTheAccountant',
+        // Special Event awards
+        'earnedTheEqualizer', 'earnedSingaporeSling',
+        // Power-based awards
+        'earnedPowerSurge', 'earnedSteadyEddie', 'earnedBlastOff',
+        'earnedSmoothOperator', 'earnedBunchKick'
     ];
 
     // Count from result object
