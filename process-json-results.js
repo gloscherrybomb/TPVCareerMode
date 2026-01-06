@@ -49,6 +49,149 @@ const EVENT_MAX_POINTS = {
   102: 40  // The Leveller
 };
 
+// Event name lookup for Discord notifications
+const EVENT_DISPLAY_NAMES = {
+  1: 'Coast and Roast Crit',
+  2: 'Island Classic',
+  3: 'Forest Velodrome Elimination',
+  4: 'Coastal Loop Time Challenge',
+  5: 'North Lake Points Race',
+  6: 'Easy Hill Climb',
+  7: 'Flat Eight Criterium',
+  8: 'The Grand Gilbert Fondo',
+  9: 'Base Camp Classic',
+  10: 'Beach and Pine TT',
+  11: 'South Lake Points Race',
+  12: 'Unbound - Little Egypt',
+  13: 'Local Tour Stage 1',
+  14: 'Local Tour Stage 2',
+  15: 'Local Tour Stage 3',
+  102: 'The Leveller'
+};
+
+/**
+ * Get ordinal suffix for a number (1st, 2nd, 3rd, etc.)
+ */
+function getOrdinalSuffix(num) {
+  if (!num || num === 'DNF') return '';
+  const n = Math.round(num);
+  const lastDigit = n % 10;
+  const lastTwoDigits = n % 100;
+  if (lastTwoDigits >= 11 && lastTwoDigits <= 13) return 'th';
+  switch (lastDigit) {
+    case 1: return 'st';
+    case 2: return 'nd';
+    case 3: return 'rd';
+    default: return 'th';
+  }
+}
+
+/**
+ * Get color for Discord embed based on position
+ */
+function getPositionColor(position) {
+  if (position === 1) return 0xFFD700;  // Gold
+  if (position === 2) return 0xC0C0C0;  // Silver
+  if (position === 3) return 0xCD7F32;  // Bronze
+  if (position <= 10) return 0x45CAFF;  // Blue for top 10
+  return 0x6B7280;                       // Gray for others
+}
+
+/**
+ * Send personalized Discord notification to user's webhook
+ * @param {Object} userData - User's Firestore document data
+ * @param {Object} eventResults - Processed event results
+ * @param {number} eventNumber - Event number
+ * @param {number} seasonNumber - Season number
+ */
+async function sendUserDiscordNotification(userData, eventResults, eventNumber, seasonNumber) {
+  // Check if user has Discord notifications enabled
+  if (!userData.discordNotificationsEnabled || !userData.discordWebhookUrl) {
+    return;
+  }
+
+  try {
+    // Get event name
+    const eventName = EVENT_DISPLAY_NAMES[eventNumber] || `Event ${eventNumber}`;
+
+    // Build position display
+    const position = eventResults.position;
+    const positionText = position === 'DNF' ? 'DNF' : `${position}${getOrdinalSuffix(position)}`;
+
+    // Truncate story for Discord (max ~300 chars for embed field)
+    let storyExcerpt = null;
+    if (eventResults.story) {
+      // Get first paragraph or first 300 chars
+      const firstParagraph = eventResults.story.split('\n\n')[0];
+      storyExcerpt = firstParagraph.length > 300
+        ? firstParagraph.substring(0, 297) + '...'
+        : firstParagraph;
+    }
+
+    // Build results URL
+    const resultsUrl = `https://tpvcareermode.com/event-detail.html?event=${eventNumber}&season=${seasonNumber}`;
+
+    // Build Discord embed
+    const embed = {
+      title: `Race Results: ${eventName}`,
+      color: getPositionColor(position),
+      fields: [
+        {
+          name: 'Position',
+          value: positionText,
+          inline: true
+        },
+        {
+          name: 'Points',
+          value: `${eventResults.points}${eventResults.bonusPoints > 0 ? ` (+${eventResults.bonusPoints} bonus)` : ''}`,
+          inline: true
+        }
+      ],
+      footer: {
+        text: 'TPV Career Mode'
+      },
+      timestamp: new Date().toISOString()
+    };
+
+    // Add story excerpt if available
+    if (storyExcerpt) {
+      embed.fields.push({
+        name: 'Race Recap',
+        value: storyExcerpt,
+        inline: false
+      });
+    }
+
+    // Send webhook
+    const response = await fetch(userData.discordWebhookUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        embeds: [embed],
+        components: [{
+          type: 1,
+          components: [{
+            type: 2,
+            style: 5,
+            label: 'View Full Results',
+            url: resultsUrl
+          }]
+        }]
+      })
+    });
+
+    if (!response.ok) {
+      console.log(`   ⚠️ Discord notification failed for ${userData.name}: ${response.status}`);
+    } else {
+      console.log(`   📨 Discord notification sent to ${userData.name}`);
+    }
+
+  } catch (error) {
+    // Log but don't fail - Discord notifications should not break result processing
+    console.error(`   ⚠️ Discord notification error for ${userData.name}: ${error.message}`);
+  }
+}
+
 /**
  * Check if an event is a special event (not part of regular season progression)
  */
@@ -3379,6 +3522,9 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
 
   // Update user document
   await userRef.update(updateData);
+
+  // Send personalized Discord notification (if enabled)
+  await sendUserDiscordNotification(userData, eventResults, eventNumber, season);
 
   console.log(`   ✅ Processed: Position ${isDNF ? 'DNF' : position}, Points: ${points}, CC: ${earnedCC}`);
   if (userResult.AvgPower) {

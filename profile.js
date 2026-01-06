@@ -17,12 +17,6 @@ import {
     getDocs,
     orderBy
 } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-import { 
-    getStorage, 
-    ref, 
-    uploadBytes, 
-    getDownloadURL 
-} from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 
 // Access eventData from global scope (loaded via script tag in HTML)
@@ -30,7 +24,6 @@ import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebas
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
-const storage = getStorage(app);
 
 let currentUser = null;
 let userData = null;
@@ -1784,67 +1777,6 @@ function displayCareerSummary(userData, stats) {
     }
 }
 
-// Handle photo upload
-async function handlePhotoUpload(file) {
-    if (!file) return;
-    
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-        alert('Please upload an image file');
-        return;
-    }
-    
-    // Validate file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-        alert('Image size must be less than 5MB');
-        return;
-    }
-    
-    try {
-        showLoadingState();
-        
-        // Create a reference to the storage location
-        const storageRef = ref(storage, `profile-photos/${currentUser.uid}`);
-        
-        // Upload the file
-        await uploadBytes(storageRef, file);
-        
-        // Get the download URL
-        const photoURL = await getDownloadURL(storageRef);
-        
-        // Update user document in Firestore
-        await updateDoc(doc(db, 'users', currentUser.uid), {
-            photoURL: photoURL
-        });
-        
-        // Reload profile to show new photo
-        await loadProfile(currentUser);
-        
-        alert('Profile photo updated successfully!');
-    } catch (error) {
-        console.error('Error uploading photo:', error);
-        alert('Error uploading photo. Please try again.');
-        showProfileContent();
-    }
-}
-
-// Initialize photo upload functionality
-function initPhotoUpload() {
-    const uploadBtn = document.getElementById('uploadPhotoBtn');
-    const fileInput = document.getElementById('photoUpload');
-    
-    uploadBtn.addEventListener('click', () => {
-        fileInput.click();
-    });
-    
-    fileInput.addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            handlePhotoUpload(file);
-        }
-    });
-}
-
 // Auth state observer
 onAuthStateChanged(auth, async (user) => {
     currentUser = user;
@@ -1858,7 +1790,6 @@ onAuthStateChanged(auth, async (user) => {
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
-    initPhotoUpload();
     initShareStats();
     initProfileRequestModal();
 });

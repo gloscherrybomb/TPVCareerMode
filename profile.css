@@ -164,6 +164,34 @@
     height: 18px;
 }
 
+/* Settings Button (replaces upload photo) */
+.btn-settings {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    background: var(--dark-elevated);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+}
+
+.btn-settings:hover {
+    background: var(--dark-bg);
+    border-color: var(--accent-pink);
+    color: var(--accent-pink);
+    transform: translateY(-2px);
+}
+
+.btn-settings svg {
+    width: 20px;
+    height: 20px;
+}
+
 /* Profile Info */
 .profile-info {
     display: flex;
