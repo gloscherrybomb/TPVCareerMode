@@ -340,6 +340,10 @@
     border-radius: 10px;
     border: 1px solid rgba(255, 255, 255, 0.05);
     transition: transform 0.2s ease, border-color 0.2s ease;
+    min-height: 70px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .quick-stat-link {
@@ -359,6 +363,7 @@
     background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    white-space: nowrap;
 }
 
 .quick-stat-label {
