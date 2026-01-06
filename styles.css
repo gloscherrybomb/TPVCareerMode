@@ -371,7 +371,8 @@ body {
     background: var(--dark-card);
 }
 
-.video-wrapper iframe {
+.video-wrapper iframe,
+#youtubePlayer {
     position: absolute;
     top: 0;
     left: 0;
