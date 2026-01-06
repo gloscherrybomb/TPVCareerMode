@@ -1296,11 +1296,18 @@
                     localTourStatus: 'in_progress',
                     season1CelebrationViewed: false,
                     gluttonForPunishmentAwarded: true,
-                    // Reset cadence credits
+                    // Reset cadence credits but award 100 CC for Glutton for Punishment
                     currency: {
-                        balance: 0,
-                        totalEarned: 0,
-                        transactions: []
+                        balance: 100,
+                        totalEarned: 100,
+                        transactions: [{
+                            id: 'cc_glutton_for_punishment',
+                            type: 'earn',
+                            delta: 100,
+                            source: 'award',
+                            awardId: 'gluttonForPunishment',
+                            timestamp: new Date()
+                        }]
                     },
                     // Reset unlocks (shop purchases)
                     unlocks: {
