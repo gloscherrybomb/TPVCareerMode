@@ -312,6 +312,186 @@ function generateGenericIntro(raceData, seasonData) {
 }
 
 /**
+ * CONDENSED NARRATIVES DATABASE (~82 variations)
+ * Used for Discord notifications and results feed
+ * Each narrative is ~50-70 words with template placeholders
+ */
+const CONDENSED_NARRATIVES = {
+  dnf: [
+    "{eventName} ended before you wanted it to. A DNF is never part of the plan, but racing is unforgiving. Zero points, a blank in the standings, and lessons to process.",
+    "The day at {eventName} didn't go to plan. Sometimes the race wins, leaving you with nothing but a DNF and the long drive home replaying what went wrong.",
+    "A mechanical? A crash? Whatever happened at {eventName}, the result is the same: DNF. No points, no finish, just the bitter taste of unfinished business.",
+    "Racing owes you nothing, and {eventName} proved it. A DNF cuts deep—all that preparation, all that effort, and you're left standing by the roadside watching others ride past.",
+    "{eventName} joins the list of races that didn't go your way. DNF. The letters sting, but every rider knows this feeling. It's not about falling down—it's about showing up again."
+  ],
+
+  win: {
+    darkHorse: [
+      "Nobody saw this coming. The predictions had you finishing {predictedPosition} at {eventName}—an afterthought, mid-pack at best. But racing isn't run on spreadsheets. {dynamicsText} P1. The upset of the day.",
+      "From {predictedPosition} predicted to P1 at {eventName}. You weren't supposed to be in the mix, let alone winning. Sometimes the race rewards those who refuse to accept their place in the pecking order.",
+      "The spreadsheets had you at {predictedPosition}. Reality had other ideas. {eventName} became your statement race—proving that predictions mean nothing once the flag drops. First place, against all expectations.",
+      "Call it an upset, call it a breakthrough—{eventName} rewrote the script. From {predictedPosition} predicted to standing on the top step. The kind of result that changes how others see you.",
+      "When you lined up at {eventName}, nobody was watching you. Predicted {predictedPosition}, easy to overlook. {dynamicsText} Now everyone knows your name. P1—the dark horse delivers."
+    ],
+
+    domination: [
+      "{eventName} was a statement ride. From the early kilometers, you rode with the confidence of someone who knew they had the legs. {dynamicsText} The kind of day where fitness, tactics, and timing align perfectly.",
+      "Some victories are earned in the final meters. This one at {eventName} was earned from the gun. You controlled the race, dictated the tempo, and {dynamicsText} Dominance personified.",
+      "Total control at {eventName}. You made the race look easy—not because it was, but because you were simply better today. {dynamicsText} A masterclass in racing.",
+      "{eventName} belonged to you from the moment you clipped in. When you have legs like this, the race becomes a formality. {dynamicsText} First place, never in doubt.",
+      "Days like {eventName} are what you train for. Everything clicked—the legs, the tactics, the timing. {dynamicsText} You didn't just win; you showed everyone what you're capable of."
+    ],
+
+    closeCall: [
+      "{eventName} came down to the wire in the most dramatic fashion. {dynamicsText} You emerged with the win{gapTextSuffix}. Inches separated glory from frustration, and this time, the inches went your way.",
+      "Heart-stopping doesn't begin to describe the finish at {eventName}. {dynamicsText} You got the win{gapTextSuffix}—the smallest of margins making the biggest of differences.",
+      "The kind of finish at {eventName} that makes cycling addictive. {dynamicsText} When the photo came through, your number was first{gapTextSuffix}. Breathe. You won.",
+      "{eventName} was decided by millimeters. The sprint was desperate, bodies and bikes tangled at the line. {dynamicsText} First place{gapTextSuffix}. You'll take it—narrowly.",
+      "Bike throw. Photo finish. An agonizing wait at {eventName}. {dynamicsText} Your name came up first{gapTextSuffix}. The kind of victory that ages you, but you wouldn't trade it."
+    ],
+
+    default: [
+      "{eventName} delivered the result you came for. You rode with purpose from the start, staying patient when others burned matches early, positioning yourself for the finale. {dynamicsText} First place.",
+      "Victory at {eventName}. You executed the plan, rode smart when it mattered, and finished where you wanted to be—on the top step. {dynamicsText} P1, mission accomplished.",
+      "First place at {eventName}. Not luck, not circumstance—you earned this one through smart racing and strong legs. {dynamicsText} The win goes to those who want it most.",
+      "{eventName} goes in the win column. You read the race well, stayed out of trouble, and delivered when it counted. {dynamicsText} First is first, and today first is you.",
+      "The work paid off at {eventName}. When the race reached its decisive moment, you were ready. {dynamicsText} Victory—the result that justifies all the training.",
+      "Top step at {eventName}. You raced with confidence, made the right moves at the right times, and crossed the line first. {dynamicsText} This is why you race.",
+      "{eventName} produced exactly what you came for: P1. Smart racing, good positioning, and the legs to back it up when it mattered. {dynamicsText} Winner's circle.",
+      "Another day, another victory—{eventName} proved the form is real. {dynamicsText} First place. The kind of result that builds momentum."
+    ]
+  },
+
+  podium: {
+    second: {
+      photoFinish: [
+        "So close at {eventName}. The finish came down to a desperate sprint—{dynamicsText} You crossed {gapTextSuffix}, close enough to taste victory, far enough to know you came up short. Second, but it stings.",
+        "Inches from glory at {eventName}. The photo finish went the wrong way—{dynamicsText} P2 when P1 was right there{gapTextSuffix}. Racing can be cruel.",
+        "{eventName} was decided at the line. You threw your bike, gave everything, and came up just short{gapTextSuffix}. Second place in a photo finish—so close, yet so far.",
+        "The cruelest second place at {eventName}. A bike length, a wheel, maybe less{gapTextSuffix}. {dynamicsText} P2 when victory was there for the taking."
+      ],
+      default: [
+        "Second at {eventName}. You rode a tactically smart race, positioning yourself well through the key moments. {winnerText} had the edge when it mattered{gapTextSuffix}. Still, second is second—solid points.",
+        "P2 at {eventName}. You were in the fight until the end, just not quite strong enough to take the top step. {gapTextSuffix} A podium finish and points in the bank.",
+        "Runner-up at {eventName}. The winner was slightly stronger today, but you were right there challenging. {gapTextSuffix} Second place—frustrating and encouraging in equal measure.",
+        "A strong ride at {eventName} nets you second place. {winnerText} proved too good{gapTextSuffix}, but you showed you belong at the front of this field.",
+        "{eventName} rewarded consistent, smart racing with P2. Not the win, but proof you can compete with the best. {gapTextSuffix} The podium is the podium.",
+        "Second place at {eventName}. Close enough to the victory to hurt, good enough to stand on the podium. {winnerText} had the legs today{gapTextSuffix}. Next time."
+      ]
+    },
+    third: {
+      beatPredictions: [
+        "The predictions had you finishing around {predictedPosition} at {eventName}, well off the podium. But racing doesn't follow spreadsheets. Third place—ahead of where anyone expected.",
+        "From {predictedPosition} predicted to P3 at {eventName}. You exceeded expectations and earned a podium spot through determination and smart racing. Better than anyone thought possible.",
+        "Predicted {predictedPosition}, finished third at {eventName}. The numbers said you'd be mid-pack; the race said otherwise. Form on the day matters more than pre-race predictions.",
+        "A surprise podium at {eventName}. Nobody had you finishing P3 from a prediction of {predictedPosition}, but you rode above yourself and made the box."
+      ],
+      default: [
+        "{eventName} rewarded smart, patient racing. You stayed out of trouble, moved up when it mattered, and claimed the final podium spot{gapTextSuffix}. Third isn't first, but you stood on the podium.",
+        "Third place at {eventName}. You fought for every position in the finale and secured a spot on the podium{gapTextSuffix}. Solid points and proof of good form.",
+        "P3 at {eventName}. The podium was the target, and you delivered. {dynamicsText} Three steps, and you're on one of them{gapTextSuffix}.",
+        "{eventName} yields a podium finish. You rode smart, positioned well, and took third when others faded. {gapTextSuffix} Mission accomplished.",
+        "Bronze at {eventName}. Not the color you wanted, but a podium is a podium. You raced well and earned your spot{gapTextSuffix}.",
+        "Third place at {eventName}. You gave everything in the finale and held on for a podium spot{gapTextSuffix}. Points earned, result banked."
+      ]
+    }
+  },
+
+  top10: {
+    beatPredictions: [
+      "A solid {position} at {eventName}—better than the {predictedPosition} the predictions suggested. You rode smart and finished stronger than expected.",
+      "{position} at {eventName}, well ahead of the {predictedPosition} prediction. The form is clearly better than the numbers suggested—encouraging signs.",
+      "Predicted {predictedPosition}, finished {position} at {eventName}. When the race unfolded, you were ready to capitalize and beat expectations.",
+      "The spreadsheet said {predictedPosition}. The result at {eventName} says {position}. Racing rewards those who outperform their billing.",
+      "From {predictedPosition} predicted to {position} at {eventName}. A result that shows the trajectory is upward. Better than expected, and better still to come."
+    ],
+
+    worseThanExpected: [
+      "{position} at {eventName}—not the result you were hoping for. When the race split, you couldn't quite go with the strongest riders. Still points, but below expectations.",
+      "Finishing {position} at {eventName} leaves you wanting more. Predicted {predictedPosition}, the legs just weren't there when it mattered. A day to forget.",
+      "{position} at {eventName}. The predictions had you higher at {predictedPosition}, but racing rarely goes to script. Points earned, but room for improvement.",
+      "Below expectations at {eventName} with {position}. You were predicted {predictedPosition}, and the gap between expectation and reality stings.",
+      "{position} at {eventName}—not what you came for. Predicted {predictedPosition}, you missed the key move and had to settle for chasing shadows."
+    ],
+
+    default: [
+      "{position} at {eventName}. {dynamicsText} A solid result that keeps the season moving forward.",
+      "A respectable {position} at {eventName}. Not spectacular, but far from a disaster. {dynamicsText} Points in the bank.",
+      "{position} at {eventName}. You stayed with the front selection and finished in the mix{gapTextSuffix}. Steady progress.",
+      "Finishing {position} at {eventName}. The top 10 is respectable—{dynamicsText} Building toward bigger things.",
+      "{position} at {eventName}. Neither brilliant nor disappointing—a workmanlike result that keeps things ticking over{gapTextSuffix}.",
+      "Top 10 at {eventName} with {position}. {dynamicsText} Consistent, competitive, and moving in the right direction."
+    ]
+  },
+
+  midpack: {
+    beatPredictions: [
+      "{position} at {eventName}—better than the {predictedPosition} predicted, which counts for something. Part of a day spent learning and competing.",
+      "Predicted {predictedPosition}, finished {position} at {eventName}. Not headline-worthy, but better than expected. Small victories matter.",
+      "{position} at {eventName}, beating the {predictedPosition} prediction. In the middle of the pack, but trending the right way.",
+      "A {position} that beats the {predictedPosition} prediction at {eventName}. Outperforming expectations, even if the result itself is modest."
+    ],
+
+    default: [
+      "{position} at {eventName}. Not the result you wanted, but you stayed in the race and gathered experience. Points banked, lessons learned.",
+      "Mid-pack at {eventName} with {position}. The leaders finished up the road{gapTextSuffix}. Not every race is your race, but you showed up and competed.",
+      "{position} at {eventName}. A quiet day in the bunch, finishing where the road took you. Sometimes racing is about survival as much as success.",
+      "Finishing {position} at {eventName}. The top end was out of reach today, but you're still racing, still learning, still building.",
+      "{position} at {eventName}. An anonymous result, but there's value in every finish. The experience counts even when the position doesn't."
+    ]
+  },
+
+  back: {
+    beatPredictions: [
+      "{position} at {eventName}—well ahead of the {predictedPosition} predicted. Not a headline result, but significantly better than expected. Progress is progress.",
+      "Predicted {predictedPosition}, finished {position} at {eventName}. The numbers are still modest, but you beat expectations. That's something to build on.",
+      "From {predictedPosition} predicted to {position} at {eventName}. Still toward the back, but further forward than anyone expected. Small steps.",
+      "{position} at {eventName}, beating the {predictedPosition} prediction. Not where you want to be, but better than where you were supposed to be."
+    ],
+
+    default: [
+      "A tough day at {eventName}, finishing {position}. The leaders were up the road{gapTextSuffix}. Sometimes racing delivers hard lessons. The question is what you do with them.",
+      "{position} at {eventName}. A day to forget, deep in the results sheet. But you finished, and finishing is something.",
+      "Bringing up the rear at {eventName} with {position}. The race was decided far ahead of you{gapTextSuffix}. Days like this test your resolve.",
+      "{position} at {eventName}. Well off the pace, watching the race unfold from behind. Tough, but you crossed the line.",
+      "Finishing {position} at {eventName}. A humbling result, but every finish adds to the experience bank. The road back to the front starts with showing up."
+    ]
+  }
+};
+
+/**
+ * Select a random narrative from an array and process templates
+ */
+function selectCondensedNarrative(templates, data) {
+  const index = Math.floor(Math.random() * templates.length);
+  return processCondensedTemplate(templates[index], data);
+}
+
+/**
+ * Process template placeholders in condensed narratives
+ */
+function processCondensedTemplate(template, data) {
+  const {
+    eventName,
+    position,
+    predictedPosition,
+    gapText,
+    winnerName,
+    dynamicsText,
+    gapTextSuffix
+  } = data;
+
+  return template
+    .replace(/\{eventName\}/g, eventName || 'the race')
+    .replace(/\{position\}/g, formatOrdinal(position))
+    .replace(/\{predictedPosition\}/g, formatOrdinal(predictedPosition))
+    .replace(/\{gapText\}/g, gapText || '')
+    .replace(/\{gapTextSuffix\}/g, gapTextSuffix || '')
+    .replace(/\{winnerText\}/g, winnerName && winnerName !== 'the winner' ? winnerName : 'The winner')
+    .replace(/\{dynamicsText\}/g, dynamicsText || '');
+}
+
+/**
  * Generate CONDENSED race recap (~50-70 words)
  * Shorter version without self-contained conclusions
  * Used in the two-part narrative structure
@@ -330,16 +510,62 @@ function generateRaceRecapCondensed(data) {
     earnedCloseCall
   } = data;
 
-  const eventType = EVENT_TYPES[eventNumber];
   const isDNF = position === 'DNF';
   const placeDiff = predictedPosition - position;
   const dynamics = analyzeRaceDynamics(data);
   const hasWinnerName = winnerName && winnerName !== 'the winner';
   const gapText = formatGapText(position === 1 ? winMargin : lossMargin);
 
+  // Build dynamic text based on race dynamics
+  const getDynamicsText = () => {
+    if (dynamics.type === 'bunch_sprint') {
+      const sprintTexts = [
+        'The sprint was chaos, riders everywhere, and you timed it perfectly.',
+        'When the sprint opened up, you found the gap and powered through.',
+        'The bunch sprint was a mess of elbows and wheels—you navigated it perfectly.',
+        'In the chaos of the final sprint, your positioning proved decisive.'
+      ];
+      return sprintTexts[Math.floor(Math.random() * sprintTexts.length)];
+    }
+    if (dynamics.type === 'solo_victory') {
+      if (gapText) {
+        return `You attacked and rode away solo, finishing ${gapText} clear.`;
+      }
+      return 'You attacked at the right moment and never looked back.';
+    }
+    if (dynamics.type === 'photo_finish') {
+      return 'Multiple riders hit the line together, bikes thrown forward.';
+    }
+    if (dynamics.type === 'chase_group') {
+      return gapText ? `The front group rode away with ${gapText} on the chase.` : 'You finished in the chase group.';
+    }
+    if (gapText) {
+      return `When the race reached its decisive moment, you proved strongest, winning by ${gapText}.`;
+    }
+    return 'When the race reached its decisive moment, you were ready.';
+  };
+
+  // Build gap suffix for templates
+  const getGapSuffix = () => {
+    if (!gapText) return '';
+    if (position === 1) return ` by ${gapText}`;
+    return `, ${gapText} behind`;
+  };
+
+  // Template data for narrative processing
+  const templateData = {
+    eventName,
+    position,
+    predictedPosition,
+    gapText,
+    gapTextSuffix: getGapSuffix(),
+    winnerName,
+    dynamicsText: getDynamicsText()
+  };
+
   // Handle DNF
   if (isDNF) {
-    return `${eventName} ended before you wanted it to. A DNF is never part of the plan, but racing is unforgiving. Zero points, a blank in the standings, and lessons to process.`;
+    return selectCondensedNarrative(CONDENSED_NARRATIVES.dnf, templateData);
   }
 
   // Determine tier
@@ -350,61 +576,59 @@ function generateRaceRecapCondensed(data) {
   else if (position <= 20) tier = 'midpack';
   else tier = 'back';
 
-  // WIN condensed recaps (~50-70 words)
+  // WIN condensed recaps
   if (tier === 'win') {
     if (earnedDarkHorse) {
-      return `Nobody saw this coming. The predictions had you finishing ${formatOrdinal(predictedPosition)} at ${eventName}—an afterthought, mid-pack at best. But racing isn't run on spreadsheets. ${dynamics.type === 'bunch_sprint' ? 'The sprint was chaos, riders everywhere, and somehow you timed it perfectly, bursting through to claim victory.' : dynamics.type === 'solo_victory' ? `You attacked when nobody expected it and rode away solo${gapText ? `, finishing ${gapText} clear of the field` : ', the gap growing with every pedal stroke'}.` : 'When it mattered most, you found an extra gear nobody knew you had.'} P1. The upset of the day. The result that rewrites expectations.`;
+      return selectCondensedNarrative(CONDENSED_NARRATIVES.win.darkHorse, templateData);
     }
     if (earnedDomination) {
-      return `${eventName} was a statement ride. From the early kilometers, you rode with the confidence of someone who knew they had the legs. ${dynamics.type === 'solo_victory' ? `You attacked decisively, rode away from the field, and ${gapText ? `finished ${gapText} clear` : 'never looked back'}.` : dynamics.type === 'bunch_sprint' ? 'You controlled the finale with tactical precision, then won the sprint convincingly.' : `When the race reached its decisive moment, you proved strongest${gapText ? `, winning by ${gapText}` : ''}.`} The kind of day where fitness, tactics, and timing align perfectly.`;
+      return selectCondensedNarrative(CONDENSED_NARRATIVES.win.domination, templateData);
     }
     if (earnedCloseCall) {
-      return `${eventName} came down to the wire in the most dramatic fashion. ${dynamics.type === 'photo_finish' ? 'Multiple riders hit the line together, bikes thrown forward, and they needed the photo to separate the top finishers.' : 'The sprint was desperate—everyone red-lined, throwing everything at the line, nobody willing to yield.'} You emerged with the win${gapText ? ` by ${gapText}` : ' by the narrowest of margins'}. Inches separated glory from frustration, and this time, the inches went your way.`;
+      return selectCondensedNarrative(CONDENSED_NARRATIVES.win.closeCall, templateData);
     }
-    // Default win
-    return `${eventName} delivered the result you came for. You rode with purpose from the start, staying patient when others burned matches early, positioning yourself for the finale. ${dynamics.type === 'solo_victory' ? `You attacked at the right moment and ${gapText ? `finished ${gapText} clear` : 'never looked back'}.` : dynamics.type === 'bunch_sprint' ? 'When the sprint opened up, you timed it perfectly and crossed first.' : `When the race reached its decisive moment, you proved strongest${gapText ? `, winning by ${gapText}` : ''}.`} First place. The result that matters most.`;
+    return selectCondensedNarrative(CONDENSED_NARRATIVES.win.default, templateData);
   }
 
-  // PODIUM condensed recaps (~50-70 words)
+  // PODIUM condensed recaps
   if (tier === 'podium') {
-    const winnerText = hasWinnerName ? winnerName : 'the winner';
     if (position === 2) {
       if (dynamics.type === 'photo_finish' || lossMargin < 1) {
-        return `So close at ${eventName}. The finish came down to a desperate sprint—multiple riders throwing everything at the line, nobody willing to yield. You crossed ${gapText ? `${gapText} behind ${winnerText}` : 'just behind the winner'}, close enough to taste victory, far enough to know you came up short. Second place by the smallest of margins. It stings, but it also proves you belong at the front.`;
+        return selectCondensedNarrative(CONDENSED_NARRATIVES.podium.second.photoFinish, templateData);
       }
-      return `Second at ${eventName}. You rode a tactically smart race, positioning yourself well through the key moments and staying with the strongest riders. ${hasWinnerName ? `${winnerText} proved slightly stronger in the finale` : 'The winner had the edge when it mattered'}${gapText ? `, finishing ${gapText} ahead` : ''}. You were in the fight until the end, just not quite strong enough to take the top step. Still, second is second—a podium finish and solid points.`;
+      return selectCondensedNarrative(CONDENSED_NARRATIVES.podium.second.default, templateData);
     }
     // 3rd place
     if (placeDiff >= 5) {
-      return `The predictions had you finishing around ${formatOrdinal(predictedPosition)} at ${eventName}, well off the podium. But racing doesn't follow spreadsheets. You rode with intelligence and determination, staying in contention when others faded, and when the finale came, you were there. Third place—ahead of where anyone expected, proof that form on the day matters more than pre-race predictions.`;
+      return selectCondensedNarrative(CONDENSED_NARRATIVES.podium.third.beatPredictions, templateData);
     }
-    return `${eventName} rewarded smart, patient racing. You stayed out of trouble in the early going, moved up when it mattered, and ${dynamics.type === 'bunch_sprint' ? 'battled through a chaotic sprint to secure' : 'fought hard in the finale to claim'} the final podium spot${gapText ? `, finishing ${gapText} behind the winner` : ''}. Third isn't first, but you stood on the podium, earned solid points, and showed you can compete at the front of this field.`;
+    return selectCondensedNarrative(CONDENSED_NARRATIVES.podium.third.default, templateData);
   }
 
   // TOP 10 condensed recaps
   if (tier === 'top10') {
     if (placeDiff >= 5) {
-      return `A solid ${formatOrdinal(position)} at ${eventName}—better than the ${formatOrdinal(predictedPosition)} the predictions suggested. ${dynamics.type === 'chase_group' ? `The front group rode away${gapText ? ` with ${gapText} on the chase` : ''}, but you led the chasers home.` : 'You rode smart and finished stronger than expected.'}`;
+      return selectCondensedNarrative(CONDENSED_NARRATIVES.top10.beatPredictions, templateData);
     }
     if (placeDiff <= -3) {
-      return `${formatOrdinal(position)} at ${eventName}—not the result you were hoping for. ${dynamics.type === 'chase_group' ? 'You missed the decisive move and had to settle for leading the chase.' : 'When the race split, you couldn\'t quite go with the strongest riders.'} Still points, but below expectations.`;
+      return selectCondensedNarrative(CONDENSED_NARRATIVES.top10.worseThanExpected, templateData);
     }
-    return `${formatOrdinal(position)} at ${eventName}. ${dynamics.type === 'bunch_sprint' ? 'You finished in the main group' : 'You stayed with the front selection'}${gapText ? `, ${gapText} behind the winner` : ''}. A solid result that keeps the season moving forward.`;
+    return selectCondensedNarrative(CONDENSED_NARRATIVES.top10.default, templateData);
   }
 
   // MIDPACK condensed recaps
   if (tier === 'midpack') {
     if (placeDiff >= 5) {
-      return `${formatOrdinal(position)} at ${eventName}—better than the ${formatOrdinal(predictedPosition)} predicted, which counts for something. ${gapText ? `You finished ${gapText} behind the winner, ` : ''}part of a day spent learning and competing.`;
+      return selectCondensedNarrative(CONDENSED_NARRATIVES.midpack.beatPredictions, templateData);
     }
-    return `${formatOrdinal(position)} at ${eventName}. ${dynamics.type === 'well_back' ? `The leaders finished ${gapText || 'well'} ahead, and you came home with the main group.` : 'Not the result you wanted, but you stayed in the race and gathered experience.'} Points banked, lessons learned.`;
+    return selectCondensedNarrative(CONDENSED_NARRATIVES.midpack.default, templateData);
   }
 
   // BACK condensed recaps
   if (placeDiff >= 10) {
-    return `${formatOrdinal(position)} at ${eventName}—well ahead of the ${formatOrdinal(predictedPosition)} predicted. Not a headline result, but significantly better than expected. Progress is progress.`;
+    return selectCondensedNarrative(CONDENSED_NARRATIVES.back.beatPredictions, templateData);
   }
-  return `A tough day at ${eventName}, finishing ${formatOrdinal(position)}. ${gapText ? `The leaders were ${gapText} up the road. ` : ''}Sometimes racing delivers hard lessons. The question is what you do with them.`;
+  return selectCondensedNarrative(CONDENSED_NARRATIVES.back.default, templateData);
 }
 
 /**
