@@ -349,28 +349,29 @@ function createResultCard(resultData) {
         `;
     }
 
-    // High 5 button (outside card, on the right)
+    // High 5 button (in card header)
     const canHighFive = currentUser !== null;
     const hasHighFived = userHighFives[resultDocId] || false;
     const isOwnResult = currentUserTpvUid && currentUserTpvUid === resultOwnerUid;
 
-    let highFiveSideHTML = '';
+    let highFiveHeaderHTML = '';
     if (isOwnResult) {
         // Show count only for own results (if any high 5s received)
-        highFiveSideHTML = highFiveCount > 0
-            ? `<div class="high-five-side high-five-own">
+        if (highFiveCount > 0) {
+            highFiveHeaderHTML = `
+                <div class="high-five-header high-five-own">
                     <span class="high-five-icon">&#9995;</span>
                     <span class="high-five-count">${highFiveCount}</span>
-               </div>`
-            : '<div class="high-five-side high-five-empty"></div>';
+                </div>`;
+        }
     } else {
-        highFiveSideHTML = `
-            <button class="high-five-side ${hasHighFived ? 'high-five-active' : ''}"
+        highFiveHeaderHTML = `
+            <button class="high-five-header ${hasHighFived ? 'high-five-active' : ''}"
                     onclick="toggleHighFive('${resultDocId}', '${resultOwnerUid}')"
                     ${!canHighFive ? 'disabled title="Log in to give High 5s"' : ''}
                     aria-label="${hasHighFived ? 'Remove High 5' : 'Give High 5'}">
                 <span class="high-five-icon">&#9995;</span>
-                <span class="high-five-text">${hasHighFived ? 'Given!' : 'High 5'}</span>
+                <span class="high-five-text">${hasHighFived ? 'High 5 given!' : 'Give high 5'}</span>
                 ${highFiveCount > 0 ? `<span class="high-five-count">${highFiveCount}</span>` : ''}
             </button>
         `;
@@ -381,6 +382,7 @@ function createResultCard(resultData) {
             <article class="result-card ${cardClass}">
                 <div class="result-card-header">
                     <h3 class="result-card-title">&#127937; ${riderName} - ${eventName}</h3>
+                    ${highFiveHeaderHTML}
                 </div>
                 <div class="result-card-body">
                     <div class="result-stats-grid">
@@ -402,7 +404,6 @@ function createResultCard(resultData) {
                     <span class="result-timestamp">${formatTimestamp(processedAt)}</span>
                 </div>
             </article>
-            ${highFiveSideHTML}
         </div>
     `;
 }
@@ -684,7 +685,7 @@ async function toggleHighFive(resultDocId, resultOwnerUid) {
     const hasHighFived = userHighFives[resultDocId] || false;
 
     // Get UI elements for optimistic update
-    const button = document.querySelector(`[data-result-id="${resultDocId}"] .high-five-side`);
+    const button = document.querySelector(`[data-result-id="${resultDocId}"] .high-five-header`);
     const countEl = document.querySelector(`[data-result-id="${resultDocId}"] .high-five-count`);
     const textEl = document.querySelector(`[data-result-id="${resultDocId}"] .high-five-text`);
 
@@ -694,7 +695,7 @@ async function toggleHighFive(resultDocId, resultOwnerUid) {
         if (hasHighFived) {
             // Removing high 5 - optimistic update
             button.classList.remove('high-five-active');
-            if (textEl) textEl.textContent = 'High 5';
+            if (textEl) textEl.textContent = 'Give high 5';
             if (countEl) {
                 const newCount = Math.max(0, currentCount - 1);
                 if (newCount === 0) {
@@ -706,7 +707,7 @@ async function toggleHighFive(resultDocId, resultOwnerUid) {
         } else {
             // Adding high 5 - optimistic update
             button.classList.add('high-five-active');
-            if (textEl) textEl.textContent = 'Given!';
+            if (textEl) textEl.textContent = 'High 5 given!';
             if (countEl) {
                 countEl.textContent = currentCount + 1;
             } else {
@@ -749,14 +750,14 @@ async function toggleHighFive(resultDocId, resultOwnerUid) {
             if (hasHighFived) {
                 // Was trying to remove - revert to active state
                 button.classList.add('high-five-active');
-                if (currentTextEl) currentTextEl.textContent = 'Given!';
+                if (currentTextEl) currentTextEl.textContent = 'High 5 given!';
                 if (currentCountEl) {
                     currentCountEl.textContent = currentCount + 1;
                 }
             } else {
                 // Was trying to add - revert to inactive state
                 button.classList.remove('high-five-active');
-                if (currentTextEl) currentTextEl.textContent = 'High 5';
+                if (currentTextEl) currentTextEl.textContent = 'Give high 5';
                 if (currentCountEl) {
                     const newCount = Math.max(0, currentCount - 1);
                     if (newCount === 0) {
