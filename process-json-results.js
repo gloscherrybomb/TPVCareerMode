@@ -2753,14 +2753,6 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
   let earnedSmoothOperator = false;
   let earnedBunchKick = false;
 
-  // Career/streak awards (checked later in the code)
-  let earnedPodiumStreak = false;
-  let earnedBackToBack = false;
-  let earnedTrophyCollector = false;
-  let earnedWeekendWarrior = false;
-  let earnedOverrated = false;
-  let earnedTechnicalIssues = false;
-
   if (!isDNF) {
     // Prediction awards
     if (predictedPosition) {
@@ -3547,7 +3539,6 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
           console.log('   📈 PODIUM STREAK! 5 consecutive top 3 finishes');
           updateData['awards.podiumStreak'] = admin.firestore.FieldValue.increment(1);
           eventResults.earnedAwards.push({ awardId: 'podiumStreak', category: 'performance', intensity: 'flashy' });
-          earnedPodiumStreak = true;
         }
       }
     }
@@ -3565,7 +3556,6 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
       console.log('   🔁 BACK TO BACK! 2 consecutive wins');
       updateData['awards.backToBack'] = admin.firestore.FieldValue.increment(1);
       eventResults.earnedAwards.push({ awardId: 'backToBack', category: 'performance', intensity: 'flashy' });
-      earnedBackToBack = true;
     }
   }
 
@@ -3576,7 +3566,6 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
       console.log('   🏆 TROPHY COLLECTOR! 5+ podium finishes');
       updateData['awards.trophyCollector'] = 1;
       eventResults.earnedAwards.push({ awardId: 'trophyCollector', category: 'performance', intensity: 'moderate' });
-      earnedTrophyCollector = true;
     }
   }
 
@@ -3587,7 +3576,6 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
     console.log('   🏁 WEEKEND WARRIOR! 5+ events completed');
     updateData['awards.weekendWarrior'] = 1;
     eventResults.earnedAwards.push({ awardId: 'weekendWarrior', category: 'performance', intensity: 'moderate' });
-    earnedWeekendWarrior = true;
   }
 
   // OVERRATED - Finish worse than predicted 5+ times (one-time award)
@@ -3605,7 +3593,6 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
       console.log('   📉 OVERRATED! Finished worse than predicted 5+ times');
       updateData['awards.overrated'] = 1;
       eventResults.earnedAwards.push({ awardId: 'overrated', category: 'event_special', intensity: 'subtle' });
-      earnedOverrated = true;
     }
   }
 
@@ -3623,7 +3610,6 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
       console.log('   🔧 TECHNICAL ISSUES! 3+ DNFs');
       updateData['awards.technicalIssues'] = 1;
       eventResults.earnedAwards.push({ awardId: 'technicalIssues', category: 'event_special', intensity: 'subtle' });
-      earnedTechnicalIssues = true;
     }
   }
 
@@ -3677,65 +3663,12 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
     };
   }
 
-  // Calculate Cadence Credits
-  let earnedCC = 0;
-  const awardList = [];
-
-  if (!isDNF) {
-    // Podium medals
-    if (position === 1) { earnedCC += AWARD_CREDIT_MAP.goldMedal || 0; awardList.push('goldMedal'); }
-    if (position === 2) { earnedCC += AWARD_CREDIT_MAP.silverMedal || 0; awardList.push('silverMedal'); }
-    if (position === 3) { earnedCC += AWARD_CREDIT_MAP.bronzeMedal || 0; awardList.push('bronzeMedal'); }
-
-    // Special medals
-    if (earnedPunchingMedal) { earnedCC += AWARD_CREDIT_MAP.punchingMedal || 0; awardList.push('punchingMedal'); }
-    if (earnedGiantKillerMedal) { earnedCC += AWARD_CREDIT_MAP.giantKillerMedal || 0; awardList.push('giantKillerMedal'); }
-    if (earnedBullseyeMedal) { earnedCC += AWARD_CREDIT_MAP.bullseyeMedal || 0; awardList.push('bullseyeMedal'); }
-    if (earnedHotStreakMedal) { earnedCC += AWARD_CREDIT_MAP.hotStreakMedal || 0; awardList.push('hotStreakMedal'); }
-    if (earnedDomination) { earnedCC += AWARD_CREDIT_MAP.domination || 0; awardList.push('domination'); }
-    if (earnedCloseCall) { earnedCC += AWARD_CREDIT_MAP.closeCall || 0; awardList.push('closeCall'); }
-    if (earnedPhotoFinish) { earnedCC += AWARD_CREDIT_MAP.photoFinish || 0; awardList.push('photoFinish'); }
-    if (earnedDarkHorse) { earnedCC += AWARD_CREDIT_MAP.darkHorse || 0; awardList.push('darkHorse'); }
-    if (earnedZeroToHero) { earnedCC += AWARD_CREDIT_MAP.zeroToHero || 0; awardList.push('zeroToHero'); }
-    if (earnedWindTunnel) { earnedCC += AWARD_CREDIT_MAP.windTunnel || 0; awardList.push('windTunnel'); }
-    if (earnedTheAccountant) { earnedCC += AWARD_CREDIT_MAP.theAccountant || 0; awardList.push('theAccountant'); }
-    if (earnedLanternRouge) { earnedCC += AWARD_CREDIT_MAP.lanternRouge || 0; awardList.push('lanternRouge'); }
-    if (earnedComeback) { earnedCC += AWARD_CREDIT_MAP.comeback || 0; awardList.push('comeback'); }
-
-    // Power awards CC
-    if (earnedPowerSurge) { earnedCC += AWARD_CREDIT_MAP.powerSurge || 25; awardList.push('powerSurge'); }
-    if (earnedSteadyEddie) { earnedCC += AWARD_CREDIT_MAP.steadyEddie || 30; awardList.push('steadyEddie'); }
-    if (earnedBlastOff) { earnedCC += AWARD_CREDIT_MAP.blastOff || 50; awardList.push('blastOff'); }
-    if (earnedSmoothOperator) { earnedCC += AWARD_CREDIT_MAP.smoothOperator || 30; awardList.push('smoothOperator'); }
-    if (earnedBunchKick) { earnedCC += AWARD_CREDIT_MAP.bunchKick || 30; awardList.push('bunchKick'); }
-
-    // Career/streak awards CC
-    if (earnedPodiumStreak) { earnedCC += AWARD_CREDIT_MAP.podiumStreak || 50; awardList.push('podiumStreak'); }
-    if (earnedBackToBack) { earnedCC += AWARD_CREDIT_MAP.backToBack || 50; awardList.push('backToBack'); }
-    if (earnedTrophyCollector) { earnedCC += AWARD_CREDIT_MAP.trophyCollector || 20; awardList.push('trophyCollector'); }
-    if (earnedWeekendWarrior) { earnedCC += AWARD_CREDIT_MAP.weekendWarrior || 20; awardList.push('weekendWarrior'); }
-    if (earnedOverrated) { earnedCC += AWARD_CREDIT_MAP.overrated || 5; awardList.push('overrated'); }
-  }
-
-  // Technical issues is earned on DNF, so add CC outside the !isDNF block
-  if (earnedTechnicalIssues) { earnedCC += AWARD_CREDIT_MAP.technicalIssues || 5; awardList.push('technicalIssues'); }
-
-  // Special event awards CC (use parseInt for type-safe comparison)
-  if (parseInt(eventNumber) === 102) {
-    earnedCC += AWARD_CREDIT_MAP.theEqualizer || 0;
-    awardList.push('theEqualizer');
-  }
-  if (parseInt(eventNumber) === 101 && position <= 3 && !isDNF) {
-    earnedCC += AWARD_CREDIT_MAP.singaporeSling || 0;
-    awardList.push('singaporeSling');
-  }
-
-  // GC awards CC (only on event 15)
-  if (parseInt(eventNumber) === 15 && gcAwards) {
-    if (gcAwards.gcGoldMedal) { earnedCC += AWARD_CREDIT_MAP.gcGoldMedal || 0; awardList.push('gcGoldMedal'); }
-    if (gcAwards.gcSilverMedal) { earnedCC += AWARD_CREDIT_MAP.gcSilverMedal || 0; awardList.push('gcSilverMedal'); }
-    if (gcAwards.gcBronzeMedal) { earnedCC += AWARD_CREDIT_MAP.gcBronzeMedal || 0; awardList.push('gcBronzeMedal'); }
-  }
+  // Calculate Cadence Credits from earnedAwards
+  // This approach matches process-results.js and ensures all awards in earnedAwards get their CC
+  const awardList = (eventResults.earnedAwards || []).map(a => a.awardId);
+  let earnedCC = awardList.reduce((sum, awardId) => {
+    return sum + (AWARD_CREDIT_MAP[awardId] || 0);
+  }, 0);
 
   // Special case: The Leveller (theEqualizer) always gets completion bonus on top of award
   // For other events, completion bonus is added if awards earned are below 20 CC
