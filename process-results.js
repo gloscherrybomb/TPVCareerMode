@@ -2316,7 +2316,8 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
   earnedCadenceCredits = calculateCadenceCreditsFromAwards(awardIds);
 
   // Special case: The Leveller (theEqualizer) always gets completion bonus on top of award
-  // For all other events, completion bonus is only given if no awards earned
+  // For other events, completion bonus is added if awards earned are below 20 CC
+  // This ensures riders always earn at least 20 CC from any race
   let ccSource = 'awards';
   const hasTheEqualizer = awardIds.includes('theEqualizer');
 
@@ -2324,10 +2325,11 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
     // The Leveller: 30CC award + 20CC completion bonus = 50CC total
     earnedCadenceCredits += COMPLETION_BONUS_CC;
     ccSource = 'awards'; // Still mark as awards since theEqualizer is the primary source
-  } else if (earnedCadenceCredits === 0) {
-    // Other events: completion bonus only if no awards
-    earnedCadenceCredits = COMPLETION_BONUS_CC;
-    ccSource = 'completion';
+  } else if (earnedCadenceCredits < COMPLETION_BONUS_CC) {
+    // Add completion bonus if awards earned are below the threshold
+    // e.g., overrated (5 CC) + completion bonus (20 CC) = 25 CC
+    earnedCadenceCredits += COMPLETION_BONUS_CC;
+    ccSource = earnedCadenceCredits === COMPLETION_BONUS_CC ? 'completion' : 'awards';
   }
 
   const txId = `cc_event_${eventNumber}`;

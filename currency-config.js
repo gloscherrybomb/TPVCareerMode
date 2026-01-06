@@ -16,7 +16,7 @@ const AWARD_CREDIT_MAP = {
   zeroToHero: 35,
   domination: 40,
   closeCall: 25,
-  photoFinish: 20,
+  photoFinish: 30,
   gcGoldMedal: 80,
   gcSilverMedal: 60,
   gcBronzeMedal: 45,

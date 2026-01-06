@@ -3499,7 +3499,8 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
   }
 
   // Special case: The Leveller (theEqualizer) always gets completion bonus on top of award
-  // For all other events, completion bonus is only given if no awards earned
+  // For other events, completion bonus is added if awards earned are below 20 CC
+  // This ensures riders always earn at least 20 CC from any race
   const hasTheEqualizer = awardList.includes('theEqualizer');
   let ccSource = 'awards';
 
@@ -3507,10 +3508,11 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
     // The Leveller: 30CC award + 20CC completion bonus = 50CC total
     earnedCC += COMPLETION_BONUS_CC;
     ccSource = 'awards'; // Still mark as awards since theEqualizer is the primary source
-  } else if (awardList.length === 0 && !isDNF) {
-    // Other events: completion bonus only if no awards
-    earnedCC = COMPLETION_BONUS_CC;
-    ccSource = 'completion';
+  } else if (earnedCC < COMPLETION_BONUS_CC && !isDNF) {
+    // Add completion bonus if awards earned are below the threshold
+    // e.g., overrated (5 CC) + completion bonus (20 CC) = 25 CC
+    earnedCC += COMPLETION_BONUS_CC;
+    ccSource = earnedCC === COMPLETION_BONUS_CC ? 'completion' : 'awards';
   }
 
   // Cap credits

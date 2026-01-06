@@ -293,6 +293,20 @@ const AWARD_DEFINITIONS = {
     description: 'Break 1300W max power (one-time achievement)',
     calculationType: 'career'
   },
+  smoothOperator: {
+    id: 'smoothOperator',
+    title: 'Smooth Operator',
+    icon: '🎵',
+    description: 'Smallest difference between average and normalized power in top 5',
+    calculationType: 'event'
+  },
+  bunchKick: {
+    id: 'bunchKick',
+    title: 'Bunch Kick',
+    icon: '💢',
+    description: 'Highest max power in a group sprint finish (3+ riders within 3 seconds)',
+    calculationType: 'event'
+  },
 
   // Season reset award
   gluttonForPunishment: {
