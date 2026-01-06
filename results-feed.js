@@ -11,8 +11,7 @@ import {
     limit,
     getDocs,
     startAfter,
-    doc,
-    getDoc
+    where
 } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
 const app = initializeApp(firebaseConfig);
@@ -296,10 +295,18 @@ async function fetchResults(isLoadMore = false) {
             let awardsCount = countAwards(userResult, null);
 
             // Try to fetch user profile for discordStory (condensed format)
+            // Note: userUid is the TPV player ID, but users collection is keyed by Firebase Auth UID
+            // So we need to query by the 'uid' field which stores the TPV player ID
             try {
-                const userDoc = await getDoc(doc(db, 'users', userUid));
-                if (userDoc.exists()) {
-                    const userData = userDoc.data();
+                const userQuery = query(
+                    collection(db, 'users'),
+                    where('uid', '==', userUid),
+                    limit(1)
+                );
+                const userSnapshot = await getDocs(userQuery);
+
+                if (!userSnapshot.empty) {
+                    const userData = userSnapshot.docs[0].data();
                     riderName = userData.name || riderName;
 
                     // Get event-specific results for discordStory
@@ -334,7 +341,7 @@ async function fetchResults(isLoadMore = false) {
                         awardsCount = countAwards(userResult, eventResults);
                     }
                 } else {
-                    console.log(`[FEED DEBUG] User doc does not exist for ${userUid}`);
+                    console.log(`[FEED DEBUG] No user found with TPV UID: ${userUid}`);
                 }
             } catch (err) {
                 console.warn(`[FEED DEBUG] Error fetching user data for ${userUid}:`, err);
