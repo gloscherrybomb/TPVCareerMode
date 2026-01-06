@@ -358,16 +358,18 @@ function createResultCard(resultData) {
     if (isOwnResult) {
         // Don't show high 5 button on own results
         highFiveHTML = highFiveCount > 0
-            ? `<span class="high-five-count-only"><span class="high-five-icon">&#128079;</span> <span class="high-five-count">${highFiveCount}</span></span>`
+            ? `<span class="high-five-count-only"><span class="high-five-icon">&#9995;</span> <span class="high-five-count">${highFiveCount}</span></span>`
             : '';
     } else {
+        const buttonText = hasHighFived ? 'High 5 Given' : 'Give High 5';
         highFiveHTML = `
             <button class="high-five-btn ${hasHighFived ? 'high-five-active' : ''}"
                     onclick="toggleHighFive('${resultDocId}', '${resultOwnerUid}')"
                     ${!canHighFive ? 'disabled title="Log in to give High 5s"' : ''}
                     aria-label="${hasHighFived ? 'Remove High 5' : 'Give High 5'}">
-                <span class="high-five-icon">&#128079;</span>
-                <span class="high-five-count">${highFiveCount}</span>
+                <span class="high-five-icon">&#9995;</span>
+                <span class="high-five-text">${buttonText}</span>
+                ${highFiveCount > 0 ? `<span class="high-five-count">${highFiveCount}</span>` : ''}
             </button>
         `;
     }
@@ -680,18 +682,36 @@ async function toggleHighFive(resultDocId, resultOwnerUid) {
     // Get UI elements for optimistic update
     const button = document.querySelector(`[data-result-id="${resultDocId}"] .high-five-btn`);
     const countEl = document.querySelector(`[data-result-id="${resultDocId}"] .high-five-count`);
+    const textEl = document.querySelector(`[data-result-id="${resultDocId}"] .high-five-text`);
 
-    if (button && countEl) {
-        const currentCount = parseInt(countEl.textContent) || 0;
+    if (button) {
+        const currentCount = countEl ? parseInt(countEl.textContent) || 0 : 0;
 
         if (hasHighFived) {
             // Removing high 5 - optimistic update
             button.classList.remove('high-five-active');
-            countEl.textContent = Math.max(0, currentCount - 1);
+            if (textEl) textEl.textContent = 'Give High 5';
+            if (countEl) {
+                const newCount = Math.max(0, currentCount - 1);
+                if (newCount === 0) {
+                    countEl.remove();
+                } else {
+                    countEl.textContent = newCount;
+                }
+            }
         } else {
             // Adding high 5 - optimistic update
             button.classList.add('high-five-active');
-            countEl.textContent = currentCount + 1;
+            if (textEl) textEl.textContent = 'High 5 Given';
+            if (countEl) {
+                countEl.textContent = currentCount + 1;
+            } else {
+                // Add count element if it doesn't exist
+                const newCountEl = document.createElement('span');
+                newCountEl.className = 'high-five-count';
+                newCountEl.textContent = '1';
+                button.appendChild(newCountEl);
+            }
         }
     }
 
@@ -717,14 +737,30 @@ async function toggleHighFive(resultDocId, resultOwnerUid) {
         console.error('[HIGH5] Error toggling high 5:', error);
 
         // Revert optimistic update on error
-        if (button && countEl) {
-            const currentCount = parseInt(countEl.textContent) || 0;
+        if (button) {
+            const currentCountEl = button.querySelector('.high-five-count');
+            const currentTextEl = button.querySelector('.high-five-text');
+            const currentCount = currentCountEl ? parseInt(currentCountEl.textContent) || 0 : 0;
+
             if (hasHighFived) {
+                // Was trying to remove - revert to active state
                 button.classList.add('high-five-active');
-                countEl.textContent = currentCount + 1;
+                if (currentTextEl) currentTextEl.textContent = 'High 5 Given';
+                if (currentCountEl) {
+                    currentCountEl.textContent = currentCount + 1;
+                }
             } else {
+                // Was trying to add - revert to inactive state
                 button.classList.remove('high-five-active');
-                countEl.textContent = Math.max(0, currentCount - 1);
+                if (currentTextEl) currentTextEl.textContent = 'Give High 5';
+                if (currentCountEl) {
+                    const newCount = Math.max(0, currentCount - 1);
+                    if (newCount === 0) {
+                        currentCountEl.remove();
+                    } else {
+                        currentCountEl.textContent = newCount;
+                    }
+                }
             }
         }
 

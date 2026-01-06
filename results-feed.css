@@ -266,21 +266,23 @@
 .high-five-btn {
     display: inline-flex;
     align-items: center;
-    gap: 0.35rem;
-    padding: 0.35rem 0.6rem;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
     background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: 6px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
     color: var(--text-muted);
-    font-size: 0.85rem;
+    font-size: 1rem;
     cursor: pointer;
     transition: all 0.2s ease;
+    margin-left: auto;
 }
 
 .high-five-btn:hover:not(:disabled) {
     background: rgba(255, 27, 107, 0.1);
-    border-color: rgba(255, 27, 107, 0.3);
+    border-color: rgba(255, 27, 107, 0.4);
     color: var(--accent-pink);
+    transform: scale(1.05);
 }
 
 .high-five-btn:disabled {
@@ -289,7 +291,7 @@
 }
 
 .high-five-btn.high-five-active {
-    background: rgba(255, 27, 107, 0.15);
+    background: rgba(255, 27, 107, 0.2);
     border-color: var(--accent-pink);
     color: var(--accent-pink);
 }
@@ -299,26 +301,46 @@
 }
 
 .high-five-icon {
-    font-size: 1rem;
+    font-size: 1.4rem;
     line-height: 1;
+}
+
+.high-five-text {
+    font-family: 'Exo 2', sans-serif;
+    font-weight: 600;
+    font-size: 0.9rem;
 }
 
 .high-five-count {
     font-family: 'Orbitron', sans-serif;
     font-weight: 600;
-    font-size: 0.8rem;
-    min-width: 1.2em;
+    font-size: 1rem;
+    min-width: 1.5em;
     text-align: center;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
 }
 
 /* High 5 count only (for own results) */
 .high-five-count-only {
     display: inline-flex;
     align-items: center;
-    gap: 0.35rem;
-    padding: 0.35rem 0.6rem;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
     color: var(--text-muted);
-    font-size: 0.85rem;
+    font-size: 1rem;
+    margin-left: auto;
+}
+
+.high-five-count-only .high-five-icon {
+    font-size: 1.4rem;
+}
+
+.high-five-count-only .high-five-count {
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
 }
 
 @keyframes high-five-pop {
@@ -335,15 +357,15 @@
 /* Mobile responsive adjustments for high 5 */
 @media (max-width: 480px) {
     .high-five-btn {
-        padding: 0.3rem 0.5rem;
+        padding: 0.4rem 0.8rem;
     }
 
     .high-five-icon {
-        font-size: 0.9rem;
+        font-size: 1.2rem;
     }
 
     .high-five-count {
-        font-size: 0.75rem;
+        font-size: 0.9rem;
     }
 }
 
