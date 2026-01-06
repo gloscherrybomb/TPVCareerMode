@@ -13,6 +13,7 @@ const path = require('path');
 const PROCESSED_KEYS_FILE = path.join(__dirname, '..', '..', 'processed-event-keys.json');
 const EVENT_DATA_FILE = path.join(__dirname, '..', '..', 'event-data.js');
 const RACE_RESULTS_DIR = path.join(__dirname, '..', '..', 'race_results');
+const HASH_MISMATCHES_FILE = path.join(__dirname, '..', '..', 'hash-mismatches.json');
 const SCHEDULE_API_URL = 'https://tpvirtualhub.com/api/schedule/report?o=';
 const RESULTS_API_URL = 'https://tpvirtualhub.com/api/schedule/results?scheduleKey=';
 
@@ -89,6 +90,27 @@ function saveProcessedKeys(data) {
 }
 
 /**
+ * Load hash mismatches log
+ */
+function loadHashMismatches() {
+    if (!fs.existsSync(HASH_MISMATCHES_FILE)) {
+        return { mismatches: [] };
+    }
+    const content = fs.readFileSync(HASH_MISMATCHES_FILE, 'utf8');
+    return JSON.parse(content);
+}
+
+/**
+ * Save hash mismatch to log file
+ */
+function logHashMismatch(mismatch) {
+    const data = loadHashMismatches();
+    data.mismatches.push(mismatch);
+    data.lastUpdated = new Date().toISOString();
+    fs.writeFileSync(HASH_MISMATCHES_FILE, JSON.stringify(data, null, 2), 'utf8');
+}
+
+/**
  * Extract base64 parameter from scheduleUrl
  */
 function extractBase64Param(scheduleUrl) {
@@ -126,13 +148,40 @@ async function fetchResults(scheduleKey, accessCode) {
 /**
  * Extract completed races from schedule data
  * Returns races grouped by scheduleKey with pen -> eventKey mapping
+ * Validates hash to ensure race settings haven't been modified
  */
 function extractCompletedRaces(scheduleData, careerEventId) {
     const completedRaces = [];
+    const hashMismatches = [];
     const clonedSchedules = scheduleData.clonedSchedules || [];
+    const parentOptionsHash = scheduleData.optionsHash;
 
     for (const schedule of clonedSchedules) {
         if (schedule.state === 'completed' && schedule.events) {
+            // Validate hash - scheduleOptionsHash should match parent optionsHash
+            const scheduleHash = schedule.scheduleOptionsHash;
+            if (scheduleHash !== parentOptionsHash) {
+                // Hash mismatch detected - log and skip this schedule
+                const mismatch = {
+                    detectedAt: new Date().toISOString(),
+                    careerEventId,
+                    eventName: scheduleData.name,
+                    parentScheduleKey: scheduleData.scheduleKey,
+                    clonedScheduleKey: schedule.scheduleKey,
+                    expectedHash: parentOptionsHash,
+                    actualHash: scheduleHash,
+                    scheduleName: schedule.name,
+                    scheduleStartTime: schedule.startTime,
+                    events: schedule.events.map(e => ({
+                        eventKey: e.eventKey,
+                        pen: e.pen,
+                        completedAt: e.completedAt
+                    }))
+                };
+                hashMismatches.push(mismatch);
+                continue; // Skip this schedule - do not process results
+            }
+
             // Build pen -> eventKey mapping for this schedule
             const penToEventKey = {};
             for (const event of schedule.events) {
@@ -154,7 +203,7 @@ function extractCompletedRaces(scheduleData, careerEventId) {
         }
     }
 
-    return completedRaces;
+    return { completedRaces, hashMismatches };
 }
 
 /**
@@ -225,6 +274,7 @@ async function main() {
 
     // Query each event
     const allNewRaces = [];
+    const allHashMismatches = [];
     const errors = [];
 
     for (const event of events) {
@@ -241,7 +291,14 @@ async function main() {
             const parentScheduleKey = scheduleData.scheduleKey;
             const eventInfo = SCHEDULE_KEY_TO_EVENT[parentScheduleKey] || { id: event.id, name: 'Unknown' };
 
-            const completedRaces = extractCompletedRaces(scheduleData, eventInfo.id);
+            const { completedRaces, hashMismatches } = extractCompletedRaces(scheduleData, eventInfo.id);
+
+            // Track hash mismatches for logging
+            if (hashMismatches.length > 0) {
+                console.log(`  WARNING: ${hashMismatches.length} race(s) with HASH MISMATCH (skipped)`);
+                allHashMismatches.push(...hashMismatches);
+            }
+
             const newRaces = completedRaces.filter(race => !processedKeys.has(race.eventKey));
 
             if (newRaces.length > 0) {
@@ -355,6 +412,18 @@ async function main() {
         console.log(`\nEncountered ${errors.length} error(s):`);
         for (const err of errors) {
             console.log(`  ${err.eventId || err.scheduleKey}: ${err.error}`);
+        }
+    }
+
+    // Log hash mismatches to file
+    if (allHashMismatches.length > 0) {
+        console.log(`\nHASH MISMATCHES DETECTED: ${allHashMismatches.length}`);
+        console.log('These races have been SKIPPED and logged to hash-mismatches.json');
+        for (const mismatch of allHashMismatches) {
+            console.log(`  - Event ${mismatch.careerEventId} (${mismatch.eventName}): scheduleKey ${mismatch.clonedScheduleKey}`);
+            console.log(`    Expected hash: ${mismatch.expectedHash}, Actual: ${mismatch.actualHash}`);
+            // Log each mismatch to the file
+            logHashMismatch(mismatch);
         }
     }
 
