@@ -68,7 +68,7 @@ function getEventDisplayName(eventNumber, forceReveal = false) {
             return 'Special Event';
         }
         if (regularEvent && regularEvent.mandatory === false) {
-            return 'Optional Event';
+            return "Rider's Choice Event";
         }
         return `Stage ${eventNumber}`;
     }
@@ -174,8 +174,13 @@ function getOrdinalSuffix(num) {
  * Generate a simple performance summary when discordStory is not available
  */
 function generateFallbackSummary(position, predictedPosition, eventName, points) {
+    // Handle Rider's Choice event phrasing for natural sentence flow
+    const displayEventName = eventName === "Rider's Choice Event"
+        ? "one of the Rider's Choice events"
+        : eventName;
+
     if (position === 'DNF') {
-        return `A DNF at ${eventName}. Racing can be unforgiving - zero points and lessons to process.`;
+        return `A DNF at ${displayEventName}. Racing can be unforgiving - zero points and lessons to process.`;
     }
 
     const posText = `${position}${getOrdinalSuffix(position)}`;
@@ -184,35 +189,35 @@ function generateFallbackSummary(position, predictedPosition, eventName, points)
     // Win
     if (position === 1) {
         if (diff >= 5) {
-            return `Victory at ${eventName}! Predicted ${predictedPosition}${getOrdinalSuffix(predictedPosition)}, finished 1st - a stunning upset performance.`;
+            return `Victory at ${displayEventName}! Predicted ${predictedPosition}${getOrdinalSuffix(predictedPosition)}, finished 1st - a stunning upset performance.`;
         }
-        return `Victory at ${eventName}! A well-executed race capped with a winning performance.`;
+        return `Victory at ${displayEventName}! A well-executed race capped with a winning performance.`;
     }
 
     // Podium
     if (position <= 3) {
         if (diff >= 3) {
-            return `${posText} at ${eventName}, beating predictions of ${predictedPosition}${getOrdinalSuffix(predictedPosition)}. A podium finish worth celebrating.`;
+            return `${posText} at ${displayEventName}, beating predictions of ${predictedPosition}${getOrdinalSuffix(predictedPosition)}. A podium finish worth celebrating.`;
         }
-        return `${posText} at ${eventName}. A solid podium finish with ${points} points earned.`;
+        return `${posText} at ${displayEventName}. A solid podium finish with ${points} points earned.`;
     }
 
     // Top 10
     if (position <= 10) {
         if (diff >= 5) {
-            return `${posText} at ${eventName} - well ahead of the predicted ${predictedPosition}${getOrdinalSuffix(predictedPosition)}. A strong result.`;
+            return `${posText} at ${displayEventName} - well ahead of the predicted ${predictedPosition}${getOrdinalSuffix(predictedPosition)}. A strong result.`;
         }
         if (diff <= -3) {
-            return `${posText} at ${eventName}, below the predicted ${predictedPosition}${getOrdinalSuffix(predictedPosition)}. Points earned, but room for improvement.`;
+            return `${posText} at ${displayEventName}, below the predicted ${predictedPosition}${getOrdinalSuffix(predictedPosition)}. Points earned, but room for improvement.`;
         }
-        return `${posText} at ${eventName}. A respectable top-10 finish keeping the season on track.`;
+        return `${posText} at ${displayEventName}. A respectable top-10 finish keeping the season on track.`;
     }
 
     // Midpack/Back
     if (diff >= 5) {
-        return `${posText} at ${eventName} - better than the predicted ${predictedPosition}${getOrdinalSuffix(predictedPosition)}. Progress is progress.`;
+        return `${posText} at ${displayEventName} - better than the predicted ${predictedPosition}${getOrdinalSuffix(predictedPosition)}. Progress is progress.`;
     }
-    return `${posText} at ${eventName}. Points banked and experience gained for future races.`;
+    return `${posText} at ${displayEventName}. Points banked and experience gained for future races.`;
 }
 
 /**

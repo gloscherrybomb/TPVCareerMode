@@ -505,9 +505,9 @@
                     // Optional events (6-12) handled separately
                 };
 
-                // For optional events, just say "Optional Event"
+                // For Rider's Choice events, just say "Rider's Choice Event"
                 if (eventId >= 6 && eventId <= 12) {
-                    return 'Optional Event';
+                    return "Rider's Choice Event";
                 }
 
                 return eventToStage[eventId] || `Event ${eventId}`;
