@@ -1,23 +1,24 @@
 /* News Ticker Styles */
 
-/* Base Container - Static position below fixed navbar */
+/* Base Container - Fixed position directly below navbar */
 .news-ticker {
-    position: relative;
-    margin-top: 73px; /* Height of fixed navbar */
-    background: linear-gradient(135deg, rgba(69, 202, 255, 0.12), rgba(69, 202, 255, 0.05));
-    border-bottom: 1px solid rgba(69, 202, 255, 0.3);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1001; /* Above navbar */
+    margin-top: 73px; /* Push below navbar */
+    background: rgba(10, 14, 26, 0.98);
+    border-bottom: 1px solid rgba(69, 202, 255, 0.4);
     backdrop-filter: blur(10px);
-    transition: opacity 0.3s ease-out, max-height 0.3s ease-out;
-    max-height: 200px;
-    overflow: hidden;
+    transition: opacity 0.3s ease-out, transform 0.3s ease-out;
 }
 
 /* Hidden state */
 .news-ticker.hidden {
-    max-height: 0;
     opacity: 0;
     pointer-events: none;
-    margin-top: 0;
+    transform: translateY(-100%);
 }
 
 /* Inner container */
@@ -127,9 +128,9 @@
     outline-offset: 2px;
 }
 
-/* Hero section adjustment - remove top padding when ticker is visible since ticker provides spacing */
+/* Hero section adjustment when ticker is visible */
 body.has-news-ticker .hero-section {
-    padding-top: 2rem;
+    padding-top: 12rem;
 }
 
 /* Responsive - Tablet */
@@ -148,7 +149,7 @@ body.has-news-ticker .hero-section {
     }
 
     body.has-news-ticker .hero-section {
-        padding-top: 2rem;
+        padding-top: 12rem;
     }
 }
 
@@ -173,6 +174,6 @@ body.has-news-ticker .hero-section {
     }
 
     body.has-news-ticker .hero-section {
-        padding-top: 1.5rem;
+        padding-top: 13rem;
     }
 }
