@@ -349,6 +349,102 @@ body {
     transform: perspective(1000px) rotateY(0deg) scale(1.02);
 }
 
+/* Hero Video Embed */
+.hero-media-container {
+    position: relative;
+    width: 100%;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+    transform: perspective(1000px) rotateY(-5deg);
+    transition: transform 0.5s ease;
+}
+
+.hero-media-container:hover {
+    transform: perspective(1000px) rotateY(0deg) scale(1.02);
+}
+
+.video-wrapper {
+    position: relative;
+    width: 100%;
+    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+    background: var(--dark-card);
+}
+
+.video-wrapper iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+.video-thumbnail {
+    position: relative;
+    cursor: pointer;
+}
+
+.video-thumbnail .career-graphic {
+    display: block;
+    transform: none;
+    box-shadow: none;
+    border-radius: 0;
+}
+
+.video-thumbnail:hover .career-graphic {
+    transform: none;
+}
+
+.video-play-btn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: all 0.3s ease;
+    z-index: 2;
+}
+
+.video-play-btn svg {
+    filter: drop-shadow(0 4px 20px rgba(0, 0, 0, 0.5));
+    transition: transform 0.3s ease;
+}
+
+.video-play-btn:hover svg {
+    transform: scale(1.1);
+}
+
+.video-play-btn .play-btn-bg {
+    transition: fill 0.3s ease;
+}
+
+.video-play-btn:hover .play-btn-bg {
+    fill: var(--accent-pink);
+}
+
+/* Video thumbnail overlay for better play button visibility */
+.video-thumbnail::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at center, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.4) 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 1;
+    pointer-events: none;
+}
+
+.video-thumbnail:hover::before {
+    opacity: 1;
+}
+
 @keyframes fadeInUp {
     from {
         opacity: 0;
@@ -1173,6 +1269,14 @@ body {
 
     .career-graphic {
         transform: none;
+    }
+
+    .hero-media-container {
+        transform: none;
+    }
+
+    .hero-media-container:hover {
+        transform: scale(1.02);
     }
 }
 

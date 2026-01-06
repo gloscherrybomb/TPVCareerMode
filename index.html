@@ -58,7 +58,22 @@
             </div>
         </div>
         <div class="hero-image">
-            <img src="TPV_career_v2.jpg" alt="Career Mode Progression" class="career-graphic">
+            <div class="hero-media-container" id="heroMediaContainer">
+                <!-- Video Player (initially hidden, shows on click) -->
+                <div class="video-wrapper" id="videoWrapper" style="display: none;">
+                    <div id="youtubePlayer"></div>
+                </div>
+                <!-- Thumbnail with Play Button -->
+                <div class="video-thumbnail" id="videoThumbnail">
+                    <img src="TPV_career_v2.jpg" alt="Career Mode Progression" class="career-graphic" id="heroImage">
+                    <button class="video-play-btn" id="playVideoBtn" aria-label="Play promo video">
+                        <svg viewBox="0 0 68 48" width="68" height="48">
+                            <path class="play-btn-bg" d="M66.52,7.74c-0.78-2.93-2.49-5.41-5.42-6.19C55.79,.13,34,0,34,0S12.21,.13,6.9,1.55 C3.97,2.33,2.27,4.81,1.48,7.74C0.06,13.05,0,24,0,24s0.06,10.95,1.48,16.26c0.78,2.93,2.49,5.41,5.42,6.19 C12.21,47.87,34,48,34,48s21.79-0.13,27.1-1.55c2.93-0.78,4.64-3.26,5.42-6.19C67.94,34.95,68,24,68,24S67.94,13.05,66.52,7.74z" fill="#FF0000"/>
+                            <path d="M 45,24 27,14 27,34" fill="#fff"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -348,6 +363,88 @@
         </div>
     </div>
 
+    <!-- YouTube IFrame API -->
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <script>
+        // YouTube Player Variables
+        let player;
+        const VIDEO_ID = 'AIMdEnj_9lo';
+
+        // Called automatically by YouTube IFrame API when ready
+        function onYouTubeIframeAPIReady() {
+            // Player will be created when user clicks play
+        }
+
+        // Initialize video player
+        function initializePlayer() {
+            player = new YT.Player('youtubePlayer', {
+                height: '100%',
+                width: '100%',
+                videoId: VIDEO_ID,
+                playerVars: {
+                    'autoplay': 1,
+                    'modestbranding': 1,
+                    'rel': 0,
+                    'showinfo': 0,
+                    'fs': 1
+                },
+                events: {
+                    'onReady': onPlayerReady,
+                    'onStateChange': onPlayerStateChange,
+                    'onError': onPlayerError
+                }
+            });
+        }
+
+        function onPlayerReady(event) {
+            event.target.playVideo();
+        }
+
+        function onPlayerStateChange(event) {
+            // YT.PlayerState.ENDED = 0
+            if (event.data === 0) {
+                showThumbnail();
+            }
+        }
+
+        function onPlayerError(event) {
+            console.error('YouTube player error:', event.data);
+            showThumbnail();
+        }
+
+        function showVideo() {
+            document.getElementById('videoThumbnail').style.display = 'none';
+            document.getElementById('videoWrapper').style.display = 'block';
+
+            if (!player) {
+                initializePlayer();
+            } else {
+                player.playVideo();
+            }
+        }
+
+        function showThumbnail() {
+            document.getElementById('videoWrapper').style.display = 'none';
+            document.getElementById('videoThumbnail').style.display = 'block';
+
+            if (player && typeof player.stopVideo === 'function') {
+                player.stopVideo();
+            }
+        }
+
+        // Set up click handler when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            const playBtn = document.getElementById('playVideoBtn');
+            const thumbnail = document.getElementById('videoThumbnail');
+
+            if (playBtn) {
+                playBtn.addEventListener('click', showVideo);
+            }
+            if (thumbnail) {
+                thumbnail.addEventListener('click', showVideo);
+            }
+        });
+    </script>
     <script type="module" src="app.js"></script>
 </body>
 </html>
