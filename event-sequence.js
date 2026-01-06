@@ -29,7 +29,7 @@ const eventSequence = [
     {
         stage: 3,
         type: 'choice',
-        name: 'Optional Event Choice #1',
+        name: "Rider's Choice #1",
         icon: '🎯',
         availableEvents: [6, 7, 8, 9, 10, 11, 12] // IDs of optional events
     },
@@ -50,7 +50,7 @@ const eventSequence = [
     {
         stage: 6,
         type: 'choice',
-        name: 'Optional Event Choice #2',
+        name: "Rider's Choice #2",
         icon: '🎯',
         availableEvents: [6, 7, 8, 9, 10, 11, 12]
     },
@@ -64,7 +64,7 @@ const eventSequence = [
     {
         stage: 8,
         type: 'choice',
-        name: 'Optional Event Choice #3',
+        name: "Rider's Choice #3",
         icon: '🎯',
         availableEvents: [6, 7, 8, 9, 10, 11, 12]
     },

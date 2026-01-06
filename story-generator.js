@@ -1062,11 +1062,11 @@ function generateForwardLook(seasonData, raceData) {
     const remainingCount = 7 - completedOptionals.length;
 
     if (completedOptionals.length === 0) {
-      return `Stage ${nextStageNumber} presents your first optional choice—seven different event types to pick from. Each tests different skills and reveals different aspects of your abilities. The decision is yours.`;
+      return `Stage ${nextStageNumber} presents your first Rider's Choice—seven different event types to pick from. Each tests different skills and reveals different aspects of your abilities. The decision is yours.`;
     } else if (completedOptionals.length === 1) {
-      return `Stage ${nextStageNumber} brings your second optional choice. With ${remainingCount} event types still available, consider what you've learned about your strengths and where you want to grow.`;
+      return `Stage ${nextStageNumber} brings your second Rider's Choice. With ${remainingCount} event types still available, consider what you've learned about your strengths and where you want to grow.`;
     } else {
-      return `Stage ${nextStageNumber} is your final optional choice—${remainingCount} event types remain. Pick wisely, as it's the last variable you control before the season's closing stretch.`;
+      return `Stage ${nextStageNumber} is your final Rider's Choice—${remainingCount} event types remain. Pick wisely, as it's the last variable you control before the season's closing stretch.`;
     }
   }
 
@@ -1276,15 +1276,15 @@ function generateSeasonContext(data) {
     
     if (completedOptionals.length === 0) {
       // First optional stage - all 7 available
-      choiceContext = `Stage ${nextStageNumber} presents your first optional choice. Seven different event types are available—hill climbs, time trials, criteriums, endurance challenges, points races, mountain stages, and gravel races. Each tests different skills and reveals different aspects of your abilities. `;
+      choiceContext = `Stage ${nextStageNumber} presents your first Rider's Choice. Seven different event types are available—hill climbs, time trials, criteriums, endurance challenges, points races, mountain stages, and gravel races. Each tests different skills and reveals different aspects of your abilities. `;
     } else if (completedOptionals.length === 1) {
       // Second optional stage - 6 remaining
       const completedType = OPTIONAL_EVENT_INFO[completedOptionals[0]]?.shortDesc || 'your previous choice';
-      choiceContext = `Stage ${nextStageNumber} brings your second optional choice. You've already tackled the ${completedType}, which narrows the field but leaves ${remainingCount} distinct challenges available. You can double down on a similar discipline or deliberately choose something that tests entirely different skills. `;
+      choiceContext = `Stage ${nextStageNumber} brings your second Rider's Choice. You've already tackled the ${completedType}, which narrows the field but leaves ${remainingCount} distinct challenges available. You can double down on a similar discipline or deliberately choose something that tests entirely different skills. `;
     } else if (completedOptionals.length === 2) {
       // Third optional stage - 5 remaining
       const types = completedOptionals.map(e => OPTIONAL_EVENT_INFO[e]?.shortDesc || 'event').join(' and the ');
-      choiceContext = `Stage ${nextStageNumber} is your final optional choice. With the ${types} behind you, ${remainingCount} event types remain. This is your last chance to fill a gap in your racing resume or to lean into what's been working. The decision matters more now—it's your last controlled variable before the season's final stretch. `;
+      choiceContext = `Stage ${nextStageNumber} is your final Rider's Choice. With the ${types} behind you, ${remainingCount} event types remain. This is your last chance to fill a gap in your racing resume or to lean into what's been working. The decision matters more now—it's your last controlled variable before the season's final stretch. `;
     }
     
     // Add tactical context about making choices
