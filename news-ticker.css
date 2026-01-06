@@ -1,15 +1,16 @@
 /* News Ticker Styles */
 
 /* Base Container - Fixed position directly below navbar */
+/* Navbar height: 1rem padding top (16px) + logo (~50px) + 1rem padding bottom (16px) = ~82px */
 .news-ticker {
     position: fixed;
-    top: 80px; /* Navbar height from styles.css mobile nav positioning */
+    top: 82px;
     left: 0;
     right: 0;
     z-index: 999;
-    background: rgba(10, 14, 26, 0.98);
-    border-bottom: 1px solid rgba(69, 202, 255, 0.4);
-    backdrop-filter: blur(10px);
+    background: var(--dark-elevated, #1a1f2e);
+    border-top: 1px solid rgba(69, 202, 255, 0.3);
+    border-bottom: 1px solid rgba(69, 202, 255, 0.3);
     transition: opacity 0.3s ease-out, transform 0.3s ease-out;
 }
 
