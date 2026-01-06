@@ -207,19 +207,24 @@
     background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    background-clip: text;
     margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: nowrap;
 }
 
 .profile-contributor-badge {
-    display: inline-block;
-    margin-left: 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
     font-size: 1.5rem;
     color: #ffd700;
     -webkit-text-fill-color: #ffd700;
     filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.6));
     animation: contributorStarGlow 2s ease-in-out infinite;
     cursor: help;
-    vertical-align: middle;
 }
 
 @keyframes contributorStarGlow {
@@ -268,6 +273,40 @@
     margin-top: 0.5rem;
 }
 
+/* Profile Info Button Group */
+.profile-info-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+}
+
+.btn-palmares {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
+    background: var(--dark-elevated);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: var(--text-primary);
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    min-height: 44px;
+}
+
+.btn-palmares:hover {
+    border-color: var(--accent-blue);
+    transform: translateY(-2px);
+}
+
+.btn-palmares svg {
+    width: 14px;
+    height: 14px;
+}
+
 /* Career Stats Container */
 .profile-career-stats {
     display: flex;
@@ -301,6 +340,10 @@
     border-radius: 10px;
     border: 1px solid rgba(255, 255, 255, 0.05);
     transition: transform 0.2s ease, border-color 0.2s ease;
+    min-height: 70px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .quick-stat-link {
@@ -320,6 +363,7 @@
     background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    white-space: nowrap;
 }
 
 .quick-stat-label {
@@ -1296,6 +1340,19 @@
         gap: 2rem;
     }
 
+    .profile-photo-section {
+        margin: 0 auto;
+    }
+
+    .profile-info {
+        align-items: center;
+        text-align: center;
+    }
+
+    .profile-info-buttons {
+        justify-content: center;
+    }
+
     .profile-personality-header {
         margin: 0 auto;
     }
@@ -1331,6 +1388,11 @@
 
     .profile-name {
         font-size: 2rem;
+        justify-content: center;
+    }
+
+    .profile-contributor-badge {
+        font-size: 1.3rem;
     }
 
     .profile-personality-header {
@@ -1444,12 +1506,29 @@
 
     .profile-name {
         font-size: 1.6rem;
+        justify-content: center;
+    }
+
+    .profile-contributor-badge {
+        font-size: 1.1rem;
     }
 
     .profile-meta {
         flex-direction: column;
-        align-items: flex-start;
+        align-items: center;
         gap: 0.3rem;
+    }
+
+    .profile-info-buttons {
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .profile-info-buttons .btn,
+    .profile-info-buttons .btn-palmares,
+    .profile-info-buttons .btn-share-stats {
+        width: 100%;
+        justify-content: center;
     }
 
     .profile-separator {
@@ -1501,6 +1580,10 @@
 @media (max-width: 375px) {
     .profile-name {
         font-size: 1.4rem;
+    }
+
+    .profile-contributor-badge {
+        font-size: 1rem;
     }
 
     .profile-header {
