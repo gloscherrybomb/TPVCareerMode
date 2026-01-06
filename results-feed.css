@@ -262,85 +262,92 @@
     color: var(--text-muted);
 }
 
-/* High 5 Button */
-.high-five-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    background: transparent;
-    border: 2px solid rgba(255, 255, 255, 0.2);
-    border-radius: 8px;
-    color: var(--text-muted);
-    font-size: 1rem;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    margin-left: auto;
+/* Result Card Wrapper - card + high 5 button side by side */
+.result-card-wrapper {
+    display: flex;
+    gap: 1rem;
+    align-items: stretch;
+    margin-bottom: 1.5rem;
 }
 
-.high-five-btn:hover:not(:disabled) {
-    background: rgba(255, 27, 107, 0.1);
-    border-color: rgba(255, 27, 107, 0.4);
+.result-card-wrapper .result-card {
+    flex: 1;
+    margin-bottom: 0;
+}
+
+/* High 5 Side Button - large square button on the right */
+.high-five-side {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100px;
+    min-height: 100px;
+    background: var(--dark-card);
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    border-radius: 16px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.high-five-side:hover:not(:disabled) {
+    background: rgba(255, 27, 107, 0.15);
+    border-color: rgba(255, 27, 107, 0.5);
     color: var(--accent-pink);
     transform: scale(1.05);
 }
 
-.high-five-btn:disabled {
+.high-five-side:disabled {
     cursor: not-allowed;
     opacity: 0.5;
 }
 
-.high-five-btn.high-five-active {
-    background: rgba(255, 27, 107, 0.2);
+.high-five-side.high-five-active {
+    background: rgba(255, 27, 107, 0.25);
     border-color: var(--accent-pink);
     color: var(--accent-pink);
 }
 
-.high-five-btn.high-five-active .high-five-icon {
+.high-five-side.high-five-active .high-five-icon {
     animation: high-five-pop 0.3s ease;
 }
 
-.high-five-icon {
-    font-size: 1.4rem;
+.high-five-side.high-five-own {
+    cursor: default;
+    background: rgba(255, 27, 107, 0.1);
+    border-color: rgba(255, 27, 107, 0.3);
+    color: var(--accent-pink);
+}
+
+.high-five-side.high-five-empty {
+    visibility: hidden;
+}
+
+.high-five-side .high-five-icon {
+    font-size: 2.5rem;
     line-height: 1;
 }
 
-.high-five-text {
+.high-five-side .high-five-text {
     font-family: 'Exo 2', sans-serif;
-    font-weight: 600;
-    font-size: 0.9rem;
+    font-weight: 700;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
-.high-five-count {
+.high-five-side .high-five-count {
     font-family: 'Orbitron', sans-serif;
-    font-weight: 600;
-    font-size: 1rem;
-    min-width: 1.5em;
-    text-align: center;
+    font-weight: 700;
+    font-size: 1.2rem;
     background: rgba(255, 255, 255, 0.1);
-    padding: 0.15rem 0.4rem;
-    border-radius: 4px;
-}
-
-/* High 5 count only (for own results) */
-.high-five-count-only {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    color: var(--text-muted);
-    font-size: 1rem;
-    margin-left: auto;
-}
-
-.high-five-count-only .high-five-icon {
-    font-size: 1.4rem;
-}
-
-.high-five-count-only .high-five-count {
-    font-family: 'Orbitron', sans-serif;
-    font-weight: 600;
-    font-size: 1rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 6px;
+    min-width: 2em;
+    text-align: center;
 }
 
 @keyframes high-five-pop {
@@ -349,23 +356,25 @@
     100% { transform: scale(1); }
 }
 
-/* Update footer layout for high 5 button */
-.result-card-footer {
-    gap: 0.75rem;
-}
-
 /* Mobile responsive adjustments for high 5 */
-@media (max-width: 480px) {
-    .high-five-btn {
-        padding: 0.4rem 0.8rem;
+@media (max-width: 600px) {
+    .result-card-wrapper {
+        flex-direction: column;
     }
 
-    .high-five-icon {
-        font-size: 1.2rem;
+    .high-five-side {
+        width: 100%;
+        min-height: 70px;
+        flex-direction: row;
+        gap: 1rem;
     }
 
-    .high-five-count {
-        font-size: 0.9rem;
+    .high-five-side .high-five-icon {
+        font-size: 2rem;
+    }
+
+    .high-five-side.high-five-empty {
+        display: none;
     }
 }
 
