@@ -36,18 +36,20 @@ class NotificationQueue {
 
   /**
    * Add a notification to the queue
-   * Prevents duplicates based on awardId + eventNumber combination
+   * Prevents duplicates based on awardId + eventNumber combination (only among unshown notifications)
    * @param {Object} notification - Notification object containing awardId, eventNumber, category, intensity
    */
   add(notification) {
-    // Check for duplicate: same awardId and eventNumber already in queue
+    // Check for duplicate: same awardId and eventNumber already in queue AND not yet shown
+    // This allows notifications that were previously shown to be shown again on new visits
     const isDuplicate = this.queue.some(n =>
       n.awardId === notification.awardId &&
-      n.eventNumber === notification.eventNumber
+      n.eventNumber === notification.eventNumber &&
+      !n.shown  // Only consider unshown notifications as duplicates
     );
 
     if (isDuplicate) {
-      console.log(`Notification already exists for ${notification.awardId} in event ${notification.eventNumber}, skipping`);
+      console.log(`Notification already queued (unshown) for ${notification.awardId} in event ${notification.eventNumber}, skipping`);
       return;
     }
 
