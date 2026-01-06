@@ -321,12 +321,23 @@ async function fetchResults(isLoadMore = false) {
                         console.log(`[FEED DEBUG]   - discordStory: ${eventResults.discordStory ? 'present' : 'missing'}`);
                         console.log(`[FEED DEBUG]   - story: ${eventResults.story ? 'present' : 'missing'}`);
 
-                        // Use discordStory (condensed), fallback to first paragraph of story
+                        // Use discordStory (condensed ~50-70 words), fallback to truncated first paragraph
                         story = eventResults.discordStory || null;
                         if (!story && eventResults.story) {
+                            // Fallback: use first ~100 chars of first paragraph to approximate condensed format
                             const firstParagraph = eventResults.story.split('\n\n')[0];
-                            story = firstParagraph.length > 300
-                                ? firstParagraph.substring(0, 297) + '...'
+                            // Find a good break point (end of sentence or comma) near 100 chars
+                            let truncateAt = 100;
+                            const breakPoints = ['. ', ', ', ' '];
+                            for (const bp of breakPoints) {
+                                const idx = firstParagraph.lastIndexOf(bp, 120);
+                                if (idx > 60) {
+                                    truncateAt = idx + (bp === '. ' ? 1 : 0);
+                                    break;
+                                }
+                            }
+                            story = firstParagraph.length > truncateAt
+                                ? firstParagraph.substring(0, truncateAt).trim() + '...'
                                 : firstParagraph;
                         }
 
