@@ -1,0 +1,389 @@
+/* Results Feed Page Styles */
+
+/* Page Header - reuse from standings */
+.page-header {
+    padding: 8rem 0 4rem;
+    background: linear-gradient(135deg, rgba(255, 27, 107, 0.1), rgba(69, 202, 255, 0.1));
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.header-content {
+    text-align: center;
+}
+
+.breadcrumb {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+.breadcrumb a {
+    color: var(--accent-blue);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.breadcrumb a:hover {
+    color: var(--accent-pink);
+}
+
+.page-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 4rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, var(--gradient-start), var(--gradient-mid), var(--gradient-end));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1rem;
+}
+
+.page-subtitle {
+    font-size: 1.2rem;
+    color: var(--text-secondary);
+}
+
+/* Feed Controls */
+.feed-controls {
+    background: var(--dark-card);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 1rem 0;
+}
+
+.controls-container {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: transparent;
+    border: 2px solid rgba(69, 202, 255, 0.3);
+    border-radius: 8px;
+    color: var(--accent-blue);
+    font-family: 'Exo 2', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+    background: rgba(69, 202, 255, 0.1);
+    border-color: var(--accent-blue);
+}
+
+.refresh-icon {
+    font-size: 1.2rem;
+}
+
+/* Results Feed Section */
+.results-feed-section {
+    padding: 3rem 0;
+}
+
+/* Results Feed Container */
+.results-feed {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+/* Result Card - Discord-style embed */
+.result-card {
+    background: var(--dark-card);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    border-left: 4px solid var(--accent-blue);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.result-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 30px rgba(0, 0, 0, 0.4);
+}
+
+/* Position-based left border colors */
+.result-card.position-1 { border-left-color: #FFD700; }
+.result-card.position-2 { border-left-color: #C0C0C0; }
+.result-card.position-3 { border-left-color: #CD7F32; }
+.result-card.position-top10 { border-left-color: #45CAFF; }
+.result-card.position-other { border-left-color: #6B7280; }
+
+/* Card Header (title row) */
+.result-card-header {
+    padding: 1rem 1.25rem;
+    background: linear-gradient(135deg, rgba(255, 27, 107, 0.1), rgba(69, 202, 255, 0.1));
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.result-card-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+/* Card Body */
+.result-card-body {
+    padding: 1.25rem;
+}
+
+/* Stats Grid */
+.result-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.result-stat {
+    text-align: center;
+    padding: 0.5rem;
+}
+
+.result-stat-label {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+}
+
+.result-stat-value {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+/* Position color styling */
+.position-value.gold { color: #FFD700; }
+.position-value.silver { color: #C0C0C0; }
+.position-value.bronze { color: #CD7F32; }
+.position-value.top10 { color: #45CAFF; }
+.position-value.other { color: #6B7280; }
+
+/* Points styling */
+.bonus-points {
+    color: var(--accent-pink);
+    font-size: 0.9rem;
+}
+
+/* Prediction styling */
+.prediction-positive { color: #22c55e; }
+.prediction-negative { color: #ef4444; }
+.prediction-exact { color: #FFD700; }
+
+/* Awards styling */
+.awards-value { color: var(--gradient-mid); }
+
+/* Race Recap Section */
+.result-recap {
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: 1rem;
+}
+
+.result-recap-label {
+    font-size: 0.8rem;
+    color: var(--accent-blue);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.result-recap-text {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin: 0;
+}
+
+/* Card Footer */
+.result-card-footer {
+    padding: 0.75rem 1.25rem;
+    background: rgba(0, 0, 0, 0.2);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.result-footer-brand {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+.result-timestamp {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+/* Load More */
+.load-more-container {
+    text-align: center;
+    padding: 2rem 0;
+}
+
+.btn-primary {
+    padding: 1rem 2rem;
+    background: linear-gradient(135deg, var(--gradient-start), var(--gradient-mid));
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-family: 'Exo 2', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(255, 27, 107, 0.4);
+}
+
+.btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Loading State */
+.loading-state {
+    text-align: center;
+    padding: 4rem 2rem;
+}
+
+.loading-spinner {
+    width: 50px;
+    height: 50px;
+    margin: 0 auto 1rem;
+    border: 4px solid rgba(69, 202, 255, 0.2);
+    border-top-color: var(--accent-blue);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+}
+
+.empty-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+.empty-state h3 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.5rem;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .page-header {
+        padding: 6rem 0 3rem;
+    }
+
+    .page-title {
+        font-size: 2.5rem;
+    }
+
+    .page-subtitle {
+        font-size: 1rem;
+    }
+
+    .results-feed {
+        max-width: 100%;
+        gap: 1rem;
+    }
+
+    .result-card-title {
+        font-size: 1rem;
+    }
+
+    .result-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+    }
+
+    .result-stat-value {
+        font-size: 1rem;
+    }
+
+    .result-recap {
+        padding: 0.75rem;
+    }
+
+    .result-recap-text {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-header {
+        padding: 5rem 0 2.5rem;
+    }
+
+    .page-title {
+        font-size: 2rem;
+    }
+
+    .page-subtitle {
+        font-size: 0.9rem;
+    }
+
+    .result-card-header {
+        padding: 0.75rem 1rem;
+    }
+
+    .result-card-body {
+        padding: 1rem;
+    }
+
+    .result-card-title {
+        font-size: 0.95rem;
+    }
+
+    .result-stat-label {
+        font-size: 0.75rem;
+    }
+
+    .result-stat-value {
+        font-size: 0.95rem;
+    }
+
+    .result-card-footer {
+        flex-direction: column;
+        gap: 0.25rem;
+        text-align: center;
+    }
+}

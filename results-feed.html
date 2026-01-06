@@ -3,15 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Standings - TPV Career Mode</title>
-    
+    <title>Results Feed - TPV Career Mode</title>
+
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="tpv-team-car.png">
     <link rel="apple-touch-icon" href="tpv-team-car.png">
-    
+
     <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="standings.css">
-    <link rel="stylesheet" href="season-switcher.css">
+    <link rel="stylesheet" href="results-feed.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -26,7 +25,7 @@
             <div class="nav-links">
                 <a href="index.html" class="nav-link">Home</a>
                 <a href="events.html" class="nav-link">Season</a>
-                <a href="standings.html" class="nav-link active">Standings</a>
+                <a href="standings.html" class="nav-link">Standings</a>
                 <a href="peloton.html" class="nav-link">Peloton</a>
                 <a href="profile.html" class="nav-link">Profile</a>
                 <a href="special-events.html" class="nav-link">Special Events</a>
@@ -46,118 +45,49 @@
         <div class="container">
             <div class="header-content">
                 <div class="breadcrumb">
-                    <a href="index.html">Home</a> / Standings
+                    <a href="index.html">Home</a> / <a href="standings.html">Standings</a> / Results Feed
                 </div>
-                <h1 class="page-title">Leaderboards</h1>
-                <p class="page-subtitle">Where do you stand among the competition?</p>
+                <h1 class="page-title">Results Feed</h1>
+                <p class="page-subtitle">Latest race results from across the peloton</p>
             </div>
         </div>
     </div>
 
-    <section class="standings-tabs">
+    <!-- Feed Controls -->
+    <section class="feed-controls">
         <div class="container">
-            <div class="tabs-container">
-                <button class="tab-btn active" data-tab="season">Season Standings</button>
-                <button class="tab-btn" data-tab="global">Global Rankings</button>
+            <div class="controls-container">
+                <button id="refreshBtn" class="btn btn-secondary">
+                    <span class="refresh-icon">&#8635;</span> Refresh
+                </button>
             </div>
         </div>
     </section>
 
-    <!-- Season Standings -->
-    <section class="standings-content active" id="seasonContent">
+    <!-- Results Feed Content -->
+    <section class="results-feed-section">
         <div class="container">
-            <div class="standings-header">
-                <h2 id="seasonStandingsTitle">Season 1 - Local Amateur</h2>
-                <p class="standings-description">Your personal season rankings including all racers from your events</p>
-                <!-- Season switcher for viewing historical seasons -->
-                <div id="standingsSeasonSwitcher" class="standings-season-switcher" style="margin-top: 1rem;"></div>
-            </div>
-
-            <!-- History banner shown when viewing a completed past season -->
-            <div id="standingsHistoryBanner" style="display: none;"></div>
-
-            <!-- JavaScript will populate this -->
-            <div id="seasonStandings">
+            <div id="resultsFeed" class="results-feed">
+                <!-- Loading state -->
                 <div class="loading-state">
                     <div class="loading-spinner"></div>
-                    <p>Loading standings...</p>
+                    <p>Loading results...</p>
                 </div>
+            </div>
+
+            <!-- Load More Button -->
+            <div class="load-more-container" id="loadMoreContainer" style="display: none;">
+                <button class="btn btn-primary" id="loadMoreBtn">Load More Results</button>
+            </div>
+
+            <!-- Empty State -->
+            <div id="emptyState" class="empty-state" style="display: none;">
+                <div class="empty-icon">&#127937;</div>
+                <h3>No Results Yet</h3>
+                <p>Race results will appear here once events are completed.</p>
             </div>
         </div>
     </section>
-
-    <!-- Global Rankings -->
-    <section class="standings-content" id="globalContent">
-        <div class="container">
-            <div class="standings-header">
-                <h2>Global Rankings</h2>
-                <p class="standings-description">Worldwide leaderboards of all human racers</p>
-            </div>
-
-            <!-- Results Feed Link Banner -->
-            <div class="feed-link-banner">
-                <a href="results-feed.html" class="feed-link">
-                    &#128227; View the Results Feed - See all race results as they happen &rarr;
-                </a>
-            </div>
-
-            <!-- Filters -->
-            <div class="filters-container">
-                <div class="filter-group">
-                    <label for="genderFilter">Gender</label>
-                    <select id="genderFilter" class="filter-select">
-                        <option value="all">All</option>
-                        <option value="Male">Male</option>
-                        <option value="Female">Female</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label for="ageGroupFilter">Age Group</label>
-                    <select id="ageGroupFilter" class="filter-select">
-                        <option value="all">All</option>
-                        <option value="Senior">Senior (18-34)</option>
-                        <option value="35-39">35-39</option>
-                        <option value="40-44">40-44</option>
-                        <option value="45-49">45-49</option>
-                        <option value="50-54">50-54</option>
-                        <option value="55-59">55-59</option>
-                        <option value="60-64">60-64</option>
-                    </select>
-                </div>
-                <div class="filter-group">
-                    <label for="countryFilter">Country</label>
-                    <select id="countryFilter" class="filter-select">
-                        <option value="all">All Countries</option>
-                        <!-- Will be populated dynamically -->
-                    </select>
-                </div>
-                <button id="clearFilters" class="btn-clear-filters">Clear Filters</button>
-            </div>
-
-            <!-- Sub-tabs for Individual vs Team -->
-            <div class="sub-tabs-container">
-                <button class="sub-tab-btn active" data-subtab="individual">Individual Rankings</button>
-                <button class="sub-tab-btn" data-subtab="team">Team Rankings</button>
-            </div>
-
-            <!-- Individual Rankings -->
-            <div class="sub-tab-content active" id="individualRankings">
-                <div class="loading-state">
-                    <div class="loading-spinner"></div>
-                    <p>Loading individual rankings...</p>
-                </div>
-            </div>
-
-            <!-- Team Rankings -->
-            <div class="sub-tab-content" id="teamRankings">
-                <div class="loading-state">
-                    <div class="loading-spinner"></div>
-                    <p>Loading team rankings...</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
 
     <footer class="footer">
         <div class="container">
@@ -197,7 +127,7 @@
                 <button class="modal-tab active" data-tab="login">Login</button>
                 <button class="modal-tab" data-tab="signup">Sign Up</button>
             </div>
-            
+
             <div class="tab-content active" id="loginTab">
                 <form class="auth-form" id="loginForm">
                     <div class="form-group">
@@ -242,10 +172,10 @@
                             TrainingPeaks Virtual UID
                             <span class="field-hint">Find this in your TPV profile or past race results</span>
                         </label>
-                        <input 
-                            type="text" 
-                            id="signupUID" 
-                            placeholder="e.g., 212354980F57BA1B" 
+                        <input
+                            type="text"
+                            id="signupUID"
+                            placeholder="e.g., 212354980F57BA1B"
                             pattern="[0-9A-Fa-f]{15,16}"
                             maxlength="16"
                             required
@@ -278,7 +208,6 @@
         </div>
     </div>
 
-
     <!-- UID Modal for Google Sign-In Users -->
     <div class="modal" id="uidModal">
         <div class="modal-overlay" id="uidModalOverlay"></div>
@@ -293,10 +222,10 @@
                         TrainingPeaks Virtual UID
                         <span class="field-hint">Find this in your TPV profile or past race results</span>
                     </label>
-                    <input 
-                        type="text" 
-                        id="googleUID" 
-                        placeholder="e.g., 212354980F57BA1B" 
+                    <input
+                        type="text"
+                        id="googleUID"
+                        placeholder="e.g., 212354980F57BA1B"
                         pattern="[0-9A-Fa-f]{15,16}"
                         maxlength="16"
                         required
@@ -340,10 +269,8 @@
         </div>
     </div>
 
-    <script src="season-config.js"></script>
-    <script src="season-data-helpers.js"></script>
-    <script src="season-switcher.js"></script>
+    <script src="event-data.js"></script>
     <script type="module" src="app.js"></script>
-    <script type="module" src="standings.js"></script>
+    <script type="module" src="results-feed.js"></script>
 </body>
 </html>

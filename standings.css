@@ -445,6 +445,34 @@
     margin-bottom: 2rem;
 }
 
+/* Feed Link Banner */
+.feed-link-banner {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding: 1rem 1.5rem;
+    background: linear-gradient(135deg, rgba(255, 27, 107, 0.1), rgba(69, 202, 255, 0.1));
+    border-radius: 12px;
+    border: 1px solid rgba(69, 202, 255, 0.2);
+    transition: all 0.3s ease;
+}
+
+.feed-link-banner:hover {
+    border-color: rgba(69, 202, 255, 0.4);
+    background: linear-gradient(135deg, rgba(255, 27, 107, 0.15), rgba(69, 202, 255, 0.15));
+}
+
+.feed-link {
+    color: var(--accent-blue);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1.05rem;
+    transition: color 0.3s ease;
+}
+
+.feed-link:hover {
+    color: var(--accent-pink);
+}
+
 /* Filters Container */
 .filters-container {
     display: flex;
