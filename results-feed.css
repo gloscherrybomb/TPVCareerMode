@@ -83,6 +83,34 @@
     font-size: 1.2rem;
 }
 
+.btn-discord {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background: #5865F2;
+    border: 2px solid #5865F2;
+    border-radius: 8px;
+    color: white;
+    font-family: 'Exo 2', sans-serif;
+    font-size: 1rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-discord:hover {
+    background: #4752C4;
+    border-color: #4752C4;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(88, 101, 242, 0.4);
+}
+
+.btn-discord img {
+    filter: brightness(0) invert(1);
+}
+
 /* Results Feed Section */
 .results-feed-section {
     padding: 3rem 0;
