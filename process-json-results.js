@@ -227,6 +227,99 @@ async function sendUserDiscordNotification(userData, eventResults, eventNumber, 
 }
 
 /**
+ * Send race result to public Discord channel for all users to see
+ * Uses same format as DM notifications but includes rider name and excludes personal links
+ * @param {Object} userData - User's Firestore document data
+ * @param {Object} eventResults - Processed event results
+ * @param {number} eventNumber - Event number
+ * @param {number} seasonNumber - Season number
+ */
+async function sendPublicResultNotification(userData, eventResults, eventNumber, seasonNumber) {
+  const botToken = process.env.DISCORD_BOT_TOKEN;
+  const publicChannelId = process.env.DISCORD_PUBLIC_RESULTS_CHANNEL_ID;
+
+  // Skip if not configured
+  if (!botToken || !publicChannelId) {
+    return;
+  }
+
+  try {
+    const eventName = EVENT_DISPLAY_NAMES[eventNumber] || `Event ${eventNumber}`;
+    const riderName = userData.name || 'Unknown Rider';
+    const position = eventResults.position;
+    const positionText = position === 'DNF' ? 'DNF' : `${position}${getOrdinalSuffix(position)}`;
+
+    // Truncate story for Discord (max ~300 chars for embed field)
+    let storyExcerpt = null;
+    if (eventResults.story) {
+      const firstParagraph = eventResults.story.split('\n\n')[0];
+      storyExcerpt = firstParagraph.length > 300
+        ? firstParagraph.substring(0, 297) + '...'
+        : firstParagraph;
+    }
+
+    const embed = {
+      title: `Race Results: ${riderName} - ${eventName}`,
+      color: getPositionColor(position),
+      fields: [
+        {
+          name: 'Position',
+          value: positionText,
+          inline: true
+        },
+        {
+          name: 'Points',
+          value: `${eventResults.points}${eventResults.bonusPoints > 0 ? ` (+${eventResults.bonusPoints} bonus)` : ''}`,
+          inline: true
+        }
+      ],
+      footer: {
+        text: 'TPV Career Mode'
+      },
+      timestamp: new Date().toISOString()
+    };
+
+    // Add story excerpt if available
+    if (storyExcerpt) {
+      embed.fields.push({
+        name: 'Race Recap',
+        value: storyExcerpt,
+        inline: false
+      });
+    }
+
+    // Post directly to public channel (no DM channel creation needed, no button)
+    const messageResponse = await fetch(
+      `https://discord.com/api/v10/channels/${publicChannelId}/messages`,
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bot ${botToken}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          embeds: [embed]
+        })
+      }
+    );
+
+    if (!messageResponse.ok) {
+      if (messageResponse.status === 429) {
+        console.log(`   ⚠️ Rate limited posting public result for ${riderName}`);
+      } else {
+        console.log(`   ⚠️ Public channel post failed for ${riderName}: ${messageResponse.status}`);
+      }
+    } else {
+      console.log(`   📢 Public result posted for ${riderName}`);
+    }
+
+  } catch (error) {
+    // Log but don't fail - Discord notifications should not break result processing
+    console.error(`   ⚠️ Public channel error for ${userData.name}: ${error.message}`);
+  }
+}
+
+/**
  * Check if an event is a special event (not part of regular season progression)
  */
 function isSpecialEvent(eventNumber) {
@@ -3561,6 +3654,9 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
 
   // Send personalized Discord notification (if enabled)
   await sendUserDiscordNotification(userData, eventResults, eventNumber, season);
+
+  // Send to public results channel (all users)
+  await sendPublicResultNotification(userData, eventResults, eventNumber, season);
 
   console.log(`   ✅ Processed: Position ${isDNF ? 'DNF' : position}, Points: ${points}, CC: ${earnedCC}`);
   if (userResult.AvgPower) {

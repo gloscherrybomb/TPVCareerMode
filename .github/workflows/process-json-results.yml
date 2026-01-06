@@ -100,6 +100,7 @@ jobs:
         env:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+          DISCORD_PUBLIC_RESULTS_CHANNEL_ID: ${{ secrets.DISCORD_PUBLIC_RESULTS_CHANNEL_ID }}
           SKIP_UNLOCKS: ${{ inputs.skip_unlocks == true && 'true' || 'false' }}
           SKIP_NARRATIVE_HISTORY: ${{ inputs.skip_narrative_history == true && 'true' || 'false' }}
         run: |
