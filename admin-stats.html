@@ -445,6 +445,57 @@
                 </div>
             </div>
 
+            <!-- Site Analytics (Today) -->
+            <div class="chart-section">
+                <h2 class="section-title">Site Analytics (Today)</h2>
+                <div class="stats-section" style="margin-bottom: 0;">
+                    <div class="stat-card">
+                        <div class="stat-value" id="todayPageViews">-</div>
+                        <div class="stat-label">Page Views</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value blue" id="todaySessions">-</div>
+                        <div class="stat-label">Sessions</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value blue" id="avgSessionDuration">-</div>
+                        <div class="stat-label">Avg Duration</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value blue" id="avgPagesPerSession">-</div>
+                        <div class="stat-label">Pages/Session</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page Views by Page -->
+            <div class="chart-section">
+                <h2 class="section-title">Page Views by Page (Today)</h2>
+                <div id="pageViewsChart" class="bar-chart">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>Loading page views...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page Views Trend -->
+            <div class="chart-section">
+                <div class="header-row">
+                    <h2 class="section-title">Page Views Trend</h2>
+                    <div class="chart-controls">
+                        <button class="chart-btn active" data-trend="7days">7 Days</button>
+                        <button class="chart-btn" data-trend="30days">30 Days</button>
+                    </div>
+                </div>
+                <div id="pageViewsTrendChart" class="bar-chart">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>Loading trend data...</p>
+                    </div>
+                </div>
+            </div>
+
             <!-- Registration Trend Chart -->
             <div class="chart-section">
                 <div class="header-row">

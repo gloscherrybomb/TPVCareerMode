@@ -19,6 +19,18 @@ let filteredUsers = [];
 let currentPage = 1;
 const usersPerPage = 20;
 let currentPeriod = 'weekly';
+let currentTrendDays = 7;
+let analyticsData = {};
+
+// Page name display labels
+const PAGE_LABELS = {
+    home: 'Home',
+    events: 'Events',
+    profile: 'Profile',
+    palmares: 'Palmares',
+    standings: 'Standings',
+    resultsFeed: 'Results Feed'
+};
 
 // Initialize Firebase
 async function initFirebase() {
@@ -194,9 +206,161 @@ async function loadAllUserData() {
         updateRegistrationChart();
         applyFiltersAndSearch();
 
+        // Load site analytics
+        await loadAnalyticsData();
+
     } catch (error) {
         console.error('Error loading user data:', error);
     }
+}
+
+// Get date string in YYYY-MM-DD format
+function getDateString(date) {
+    return date.toISOString().split('T')[0];
+}
+
+// Load analytics data from Firestore
+async function loadAnalyticsData() {
+    try {
+        const now = new Date();
+        const days = Math.max(currentTrendDays, 30); // Load up to 30 days
+        analyticsData = {};
+
+        // Fetch analytics docs for the past N days
+        for (let i = 0; i < days; i++) {
+            const date = new Date(now);
+            date.setDate(date.getDate() - i);
+            const dateStr = getDateString(date);
+
+            try {
+                const docSnap = await getDoc(doc(db, 'analytics', dateStr));
+                if (docSnap.exists()) {
+                    analyticsData[dateStr] = docSnap.data();
+                }
+            } catch (e) {
+                // Document doesn't exist, skip
+            }
+        }
+
+        console.log(`Loaded analytics for ${Object.keys(analyticsData).length} days`);
+
+        // Update displays
+        updateSiteAnalyticsStats();
+        updatePageViewsChart();
+        updatePageViewsTrendChart();
+
+    } catch (error) {
+        console.error('Error loading analytics data:', error);
+    }
+}
+
+// Update site analytics stats (today's data)
+function updateSiteAnalyticsStats() {
+    const today = getDateString(new Date());
+    const todayData = analyticsData[today] || {};
+
+    const pageViews = todayData.totalPageViews || 0;
+    const sessions = todayData.sessions || 0;
+    const totalDuration = todayData.totalDurationSeconds || 0;
+
+    // Calculate averages
+    const avgDuration = sessions > 0 ? Math.floor(totalDuration / sessions) : 0;
+    const avgPages = sessions > 0 ? (pageViews / sessions).toFixed(1) : '0';
+
+    // Format duration as minutes:seconds
+    const durationMinutes = Math.floor(avgDuration / 60);
+    const durationSeconds = avgDuration % 60;
+    const durationStr = `${durationMinutes}:${durationSeconds.toString().padStart(2, '0')}`;
+
+    document.getElementById('todayPageViews').textContent = pageViews;
+    document.getElementById('todaySessions').textContent = sessions;
+    document.getElementById('avgSessionDuration').textContent = durationStr;
+    document.getElementById('avgPagesPerSession').textContent = avgPages;
+}
+
+// Update page views by page chart (today)
+function updatePageViewsChart() {
+    const container = document.getElementById('pageViewsChart');
+    const today = getDateString(new Date());
+    const todayData = analyticsData[today] || {};
+    const pageViews = todayData.pageViews || {};
+
+    const pages = Object.keys(PAGE_LABELS);
+    const data = pages.map(page => ({
+        page,
+        label: PAGE_LABELS[page],
+        count: pageViews[page] || 0
+    }));
+
+    // Sort by count descending
+    data.sort((a, b) => b.count - a.count);
+
+    const maxCount = Math.max(...data.map(d => d.count), 1);
+
+    if (data.every(d => d.count === 0)) {
+        container.innerHTML = '<div class="no-data">No page view data for today</div>';
+        return;
+    }
+
+    let html = '';
+    for (const item of data) {
+        const percentage = (item.count / maxCount) * 100;
+        html += `
+            <div class="bar-row">
+                <div class="bar-label">${item.label}</div>
+                <div class="bar-container">
+                    <div class="bar-fill" style="width: ${percentage}%"></div>
+                    <div class="bar-value">${item.count}</div>
+                </div>
+            </div>
+        `;
+    }
+
+    container.innerHTML = html;
+}
+
+// Update page views trend chart
+function updatePageViewsTrendChart() {
+    const container = document.getElementById('pageViewsTrendChart');
+    const now = new Date();
+    const buckets = [];
+
+    for (let i = currentTrendDays - 1; i >= 0; i--) {
+        const date = new Date(now);
+        date.setDate(date.getDate() - i);
+        const dateStr = getDateString(date);
+        const dayData = analyticsData[dateStr] || {};
+
+        buckets.push({
+            date: dateStr,
+            label: date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }),
+            pageViews: dayData.totalPageViews || 0,
+            sessions: dayData.sessions || 0
+        });
+    }
+
+    const maxViews = Math.max(...buckets.map(b => b.pageViews), 1);
+
+    if (buckets.every(b => b.pageViews === 0)) {
+        container.innerHTML = '<div class="no-data">No page view trend data available</div>';
+        return;
+    }
+
+    let html = '';
+    for (const bucket of buckets) {
+        const percentage = (bucket.pageViews / maxViews) * 100;
+        html += `
+            <div class="bar-row">
+                <div class="bar-label">${bucket.label}</div>
+                <div class="bar-container">
+                    <div class="bar-fill" style="width: ${percentage}%"></div>
+                    <div class="bar-value">${bucket.pageViews}</div>
+                </div>
+            </div>
+        `;
+    }
+
+    container.innerHTML = html;
 }
 
 // Update key stats cards
@@ -411,13 +575,25 @@ function escapeHtml(text) {
 document.addEventListener('DOMContentLoaded', () => {
     initFirebase();
 
-    // Chart period buttons
-    document.querySelectorAll('.chart-btn').forEach(btn => {
+    // Chart period buttons (registration)
+    document.querySelectorAll('.chart-btn[data-period]').forEach(btn => {
         btn.addEventListener('click', (e) => {
-            document.querySelectorAll('.chart-btn').forEach(b => b.classList.remove('active'));
+            // Only affect buttons in the same control group
+            e.target.closest('.chart-controls').querySelectorAll('.chart-btn').forEach(b => b.classList.remove('active'));
             e.target.classList.add('active');
             currentPeriod = e.target.dataset.period;
             updateRegistrationChart();
+        });
+    });
+
+    // Chart trend buttons (page views)
+    document.querySelectorAll('.chart-btn[data-trend]').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            e.target.closest('.chart-controls').querySelectorAll('.chart-btn').forEach(b => b.classList.remove('active'));
+            e.target.classList.add('active');
+            const trend = e.target.dataset.trend;
+            currentTrendDays = trend === '30days' ? 30 : 7;
+            await loadAnalyticsData();
         });
     });
 
