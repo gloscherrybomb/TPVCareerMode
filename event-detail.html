@@ -461,6 +461,11 @@
         </div>
     </div>
 
+    <!-- Notification system must load before ES modules that use it -->
+    <script src="awards-config.js"></script>
+    <script src="notification-queue.js"></script>
+    <script src="achievement-notifications.js"></script>
+
     <script type="module" src="app.js"></script>
     <script type="module" src="event-detail-results.js"></script>
     <script>
@@ -812,9 +817,6 @@
             });
         });
     </script>
-    <script src="awards-config.js"></script>
-    <script src="notification-queue.js"></script>
-    <script src="achievement-notifications.js"></script>
     <script src="unlock-config.js"></script>
     <script src="currency-config.js"></script>
     <script src="unlock-image-loader.js"></script>

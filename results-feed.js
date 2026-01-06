@@ -303,8 +303,17 @@ async function fetchResults(isLoadMore = false) {
                     riderName = userData.name || riderName;
 
                     // Get event-specific results for discordStory
-                    const eventResults = userData[`event${eventNumber}Results`];
+                    const eventResultsKey = `event${eventNumber}Results`;
+                    const eventResults = userData[eventResultsKey];
+
+                    console.log(`[FEED DEBUG] User ${riderName} (${userUid}), Event ${eventNumber}:`);
+                    console.log(`[FEED DEBUG]   - eventResultsKey: ${eventResultsKey}`);
+                    console.log(`[FEED DEBUG]   - eventResults exists: ${!!eventResults}`);
+
                     if (eventResults) {
+                        console.log(`[FEED DEBUG]   - discordStory: ${eventResults.discordStory ? 'present' : 'missing'}`);
+                        console.log(`[FEED DEBUG]   - story: ${eventResults.story ? 'present' : 'missing'}`);
+
                         // Use discordStory (condensed), fallback to first paragraph of story
                         story = eventResults.discordStory || null;
                         if (!story && eventResults.story) {
@@ -314,6 +323,8 @@ async function fetchResults(isLoadMore = false) {
                                 : firstParagraph;
                         }
 
+                        console.log(`[FEED DEBUG]   - final story: ${story ? story.substring(0, 50) + '...' : 'none'}`);
+
                         // Update predicted position if available from profile
                         if (eventResults.predictedPosition) {
                             predictedPosition = eventResults.predictedPosition;
@@ -322,9 +333,11 @@ async function fetchResults(isLoadMore = false) {
                         // Count awards including from eventResults
                         awardsCount = countAwards(userResult, eventResults);
                     }
+                } else {
+                    console.log(`[FEED DEBUG] User doc does not exist for ${userUid}`);
                 }
             } catch (err) {
-                console.warn(`Could not fetch user data for ${userUid}:`, err);
+                console.warn(`[FEED DEBUG] Error fetching user data for ${userUid}:`, err);
             }
 
             // Get event name
