@@ -11,7 +11,12 @@ import {
     limit,
     getDocs,
     startAfter,
-    where
+    where,
+    doc,
+    updateDoc,
+    arrayUnion,
+    arrayRemove,
+    increment
 } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
 const app = initializeApp(firebaseConfig);
@@ -27,6 +32,8 @@ let isLoading = false;
 let allResultsLoaded = false;
 let currentUserProgress = null; // Highest completed event number for current user
 let currentUser = null;
+let currentUserTpvUid = null; // TPV player ID for current user
+let userHighFives = {}; // Track high 5 state per result (key: resultDocId, value: boolean)
 
 /**
  * Calculate which events the user can see (spoiler protection)
@@ -82,6 +89,7 @@ function getEventDisplayName(eventNumber, forceReveal = false) {
 async function fetchUserProgress(user) {
     if (!user) {
         currentUserProgress = null;
+        currentUserTpvUid = null;
         return;
     }
 
@@ -95,6 +103,9 @@ async function fetchUserProgress(user) {
 
         if (!userSnapshot.empty) {
             const userData = userSnapshot.docs[0].data();
+
+            // Store TPV UID for high 5 self-check
+            currentUserTpvUid = userData.uid || null;
 
             // Find highest completed event (check event15Results down to event1Results)
             let highestCompleted = 0;
@@ -110,10 +121,12 @@ async function fetchUserProgress(user) {
         } else {
             // User exists in auth but not in users collection yet
             currentUserProgress = 0;
+            currentUserTpvUid = null;
         }
     } catch (error) {
         console.error('[FEED] Error fetching user progress:', error);
         currentUserProgress = 0;
+        currentUserTpvUid = null;
     }
 }
 
@@ -272,7 +285,10 @@ function createResultCard(resultData) {
         predictedPosition,
         story,
         awardsCount,
-        processedAt
+        processedAt,
+        resultDocId,
+        highFiveCount,
+        resultOwnerUid
     } = resultData;
 
     const positionText = position === 'DNF' ? 'DNF' : `${position}${getOrdinalSuffix(position)}`;
@@ -333,8 +349,31 @@ function createResultCard(resultData) {
         `;
     }
 
+    // High 5 button
+    const canHighFive = currentUser !== null;
+    const hasHighFived = userHighFives[resultDocId] || false;
+    const isOwnResult = currentUserTpvUid && currentUserTpvUid === resultOwnerUid;
+
+    let highFiveHTML = '';
+    if (isOwnResult) {
+        // Don't show high 5 button on own results
+        highFiveHTML = highFiveCount > 0
+            ? `<span class="high-five-count-only"><span class="high-five-icon">&#128079;</span> <span class="high-five-count">${highFiveCount}</span></span>`
+            : '';
+    } else {
+        highFiveHTML = `
+            <button class="high-five-btn ${hasHighFived ? 'high-five-active' : ''}"
+                    onclick="toggleHighFive('${resultDocId}', '${resultOwnerUid}')"
+                    ${!canHighFive ? 'disabled title="Log in to give High 5s"' : ''}
+                    aria-label="${hasHighFived ? 'Remove High 5' : 'Give High 5'}">
+                <span class="high-five-icon">&#128079;</span>
+                <span class="high-five-count">${highFiveCount}</span>
+            </button>
+        `;
+    }
+
     return `
-        <article class="result-card ${cardClass}">
+        <article class="result-card ${cardClass}" data-result-id="${resultDocId}">
             <div class="result-card-header">
                 <h3 class="result-card-title">&#127937; ${riderName} - ${eventName}</h3>
             </div>
@@ -355,6 +394,7 @@ function createResultCard(resultData) {
             </div>
             <div class="result-card-footer">
                 <span class="result-footer-brand">TPV Career Mode</span>
+                ${highFiveHTML}
                 <span class="result-timestamp">${formatTimestamp(processedAt)}</span>
             </div>
         </article>
@@ -484,6 +524,16 @@ async function fetchResults(isLoadMore = false) {
                 userResult.points || 0
             );
 
+            // High 5 data
+            const resultDocId = docSnap.id;
+            const highFiveCount = data.highFiveCount || 0;
+            const highFiveUsers = data.highFiveUsers || [];
+
+            // Track if current user has high-fived this result
+            if (currentUser) {
+                userHighFives[resultDocId] = highFiveUsers.includes(currentUser.uid);
+            }
+
             results.push({
                 riderName,
                 eventName,
@@ -495,7 +545,10 @@ async function fetchResults(isLoadMore = false) {
                 predictedPosition,
                 story: finalStory,
                 awardsCount,
-                processedAt: data.processedAt
+                processedAt: data.processedAt,
+                resultDocId,
+                highFiveCount,
+                resultOwnerUid: userUid
             });
         }
 
@@ -582,6 +635,7 @@ async function loadInitialResults() {
     // Reset pagination state
     lastVisible = null;
     allResultsLoaded = false;
+    userHighFives = {}; // Reset high 5 tracking
 
     const results = await fetchResults();
     renderResults(results);
@@ -601,6 +655,85 @@ async function loadMoreResults() {
     loadMoreBtn.disabled = false;
     loadMoreBtn.textContent = 'Load More Results';
 }
+
+/**
+ * Toggle high 5 on a result
+ * @param {string} resultDocId - Firestore document ID
+ * @param {string} resultOwnerUid - TPV UID of the result owner
+ */
+async function toggleHighFive(resultDocId, resultOwnerUid) {
+    // Require authentication
+    if (!currentUser) {
+        alert('Please log in to give High 5s');
+        return;
+    }
+
+    // Prevent self high-fiving
+    if (currentUserTpvUid && currentUserTpvUid === resultOwnerUid) {
+        console.log('[HIGH5] Cannot high 5 your own result');
+        return;
+    }
+
+    const resultRef = doc(db, 'results', resultDocId);
+    const hasHighFived = userHighFives[resultDocId] || false;
+
+    // Get UI elements for optimistic update
+    const button = document.querySelector(`[data-result-id="${resultDocId}"] .high-five-btn`);
+    const countEl = document.querySelector(`[data-result-id="${resultDocId}"] .high-five-count`);
+
+    if (button && countEl) {
+        const currentCount = parseInt(countEl.textContent) || 0;
+
+        if (hasHighFived) {
+            // Removing high 5 - optimistic update
+            button.classList.remove('high-five-active');
+            countEl.textContent = Math.max(0, currentCount - 1);
+        } else {
+            // Adding high 5 - optimistic update
+            button.classList.add('high-five-active');
+            countEl.textContent = currentCount + 1;
+        }
+    }
+
+    try {
+        if (hasHighFived) {
+            // Remove high 5
+            await updateDoc(resultRef, {
+                highFiveCount: increment(-1),
+                highFiveUsers: arrayRemove(currentUser.uid)
+            });
+            userHighFives[resultDocId] = false;
+            console.log('[HIGH5] Removed high 5');
+        } else {
+            // Add high 5
+            await updateDoc(resultRef, {
+                highFiveCount: increment(1),
+                highFiveUsers: arrayUnion(currentUser.uid)
+            });
+            userHighFives[resultDocId] = true;
+            console.log('[HIGH5] Added high 5');
+        }
+    } catch (error) {
+        console.error('[HIGH5] Error toggling high 5:', error);
+
+        // Revert optimistic update on error
+        if (button && countEl) {
+            const currentCount = parseInt(countEl.textContent) || 0;
+            if (hasHighFived) {
+                button.classList.add('high-five-active');
+                countEl.textContent = currentCount + 1;
+            } else {
+                button.classList.remove('high-five-active');
+                countEl.textContent = Math.max(0, currentCount - 1);
+            }
+        }
+
+        alert('Failed to save High 5. Please try again.');
+    }
+}
+
+// Expose high 5 function globally for inline onclick handlers
+window.toggleHighFive = toggleHighFive;
 
 /**
  * Initialize controls
