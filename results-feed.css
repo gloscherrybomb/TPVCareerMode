@@ -266,7 +266,7 @@
 .result-card-wrapper {
     display: flex;
     gap: 1rem;
-    align-items: stretch;
+    align-items: center;
     margin-bottom: 1.5rem;
 }
 
