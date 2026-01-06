@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Usage Statistics - TPV Career Mode</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="tpv-team-car.png">
+    <link rel="apple-touch-icon" href="tpv-team-car.png">
+
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        .admin-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--dark-card);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #ffd700;
+        }
+
+        .stat-value.blue {
+            color: var(--accent-blue);
+        }
+
+        .stat-value.green {
+            color: var(--success);
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 0.5rem;
+        }
+
+        .stat-subtext {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            margin-top: 0.25rem;
+        }
+
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        .chart-section {
+            background: var(--dark-card);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .chart-controls {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-btn {
+            padding: 0.5rem 1rem;
+            background: var(--dark-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Exo 2', sans-serif;
+        }
+
+        .chart-btn:hover {
+            border-color: var(--accent-blue);
+            color: var(--text-primary);
+        }
+
+        .chart-btn.active {
+            background: var(--accent-blue);
+            border-color: var(--accent-blue);
+            color: #000;
+        }
+
+        .bar-chart {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .bar-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .bar-label {
+            width: 80px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .bar-container {
+            flex: 1;
+            height: 28px;
+            background: var(--dark-bg);
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-blue), var(--accent-pink));
+            border-radius: 4px;
+            transition: width 0.5s ease;
+            min-width: 2px;
+        }
+
+        .bar-value {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .user-table-section {
+            background: var(--dark-card);
+            border-radius: 12px;
+            padding: 2rem;
+        }
+
+        .table-controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 200px;
+            padding: 0.75rem 1rem;
+            background: var(--dark-bg);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            font-family: 'Exo 2', sans-serif;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+        }
+
+        .search-input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        .filter-select {
+            padding: 0.75rem 1rem;
+            background: var(--dark-bg);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            font-family: 'Exo 2', sans-serif;
+            cursor: pointer;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+        }
+
+        .user-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .user-table th,
+        .user-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .user-table th {
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+        }
+
+        .user-table td {
+            color: var(--text-primary);
+            font-size: 0.9rem;
+        }
+
+        .user-table tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .activity-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .activity-badge.active {
+            background: rgba(52, 199, 89, 0.2);
+            color: var(--success);
+        }
+
+        .activity-badge.inactive {
+            background: rgba(255, 59, 48, 0.2);
+            color: #ff3b30;
+        }
+
+        .activity-badge.new {
+            background: rgba(69, 202, 255, 0.2);
+            color: var(--accent-blue);
+        }
+
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .pagination button {
+            padding: 0.5rem 1rem;
+            background: var(--dark-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Exo 2', sans-serif;
+        }
+
+        .pagination button:hover:not(:disabled) {
+            border-color: var(--accent-blue);
+            color: var(--text-primary);
+        }
+
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .page-info {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top-color: var(--accent-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .auth-check {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 50vh;
+        }
+
+        .unauthorized {
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+
+        .unauthorized-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+        }
+
+        .refresh-btn {
+            padding: 0.5rem 1rem;
+            background: var(--dark-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Exo 2', sans-serif;
+            margin-left: auto;
+        }
+
+        .refresh-btn:hover {
+            border-color: var(--accent-blue);
+            color: var(--text-primary);
+        }
+
+        .header-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .header-row .section-title {
+            margin-bottom: 0;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <span class="logo-text">TPV</span>
+                <span class="logo-subtitle">Admin</span>
+            </div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="admin-bots.html" class="nav-link">Bot Admin</a>
+                <a href="admin-contributors.html" class="nav-link">Contributors</a>
+                <a href="admin-stats.html" class="nav-link active">Usage Stats</a>
+                <a href="#" class="nav-link nav-logout" id="logoutBtn">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Auth Check Notice -->
+    <div id="authCheck" class="auth-check">
+        <div class="spinner"></div>
+        <p>Checking authentication...</p>
+    </div>
+
+    <!-- Unauthorized Message -->
+    <div id="unauthorized" class="unauthorized" style="display: none;">
+        <div class="container">
+            <div class="unauthorized-icon">&#128274;</div>
+            <h2>Access Denied</h2>
+            <p>You must be logged in as an administrator to access this page.</p>
+            <button class="btn btn-primary" onclick="window.location.href='index.html'">Go Home</button>
+        </div>
+    </div>
+
+    <!-- Admin Content -->
+    <div id="adminContent" style="display: none;">
+        <div class="page-header">
+            <div class="container">
+                <h1 class="page-title">Usage Statistics</h1>
+                <p class="page-subtitle">User engagement and activity metrics</p>
+            </div>
+        </div>
+
+        <div class="admin-container">
+            <!-- Key Stats -->
+            <div class="stats-section">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalUsers">-</div>
+                    <div class="stat-label">Total Users</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value blue" id="active7d">-</div>
+                    <div class="stat-label">Active (7 days)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value blue" id="active30d">-</div>
+                    <div class="stat-label">Active (30 days)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value blue" id="active90d">-</div>
+                    <div class="stat-label">Active (90 days)</div>
+                </div>
+            </div>
+
+            <!-- Retention Metrics -->
+            <div class="stats-section">
+                <div class="stat-card">
+                    <div class="stat-value green" id="activationRate">-</div>
+                    <div class="stat-label">Activation Rate</div>
+                    <div class="stat-subtext">Raced at least once</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value green" id="engagementRate">-</div>
+                    <div class="stat-label">Engagement Rate</div>
+                    <div class="stat-subtext">Raced 3+ events</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value green" id="completionRate">-</div>
+                    <div class="stat-label">Season Completion</div>
+                    <div class="stat-subtext">Finished Event 15</div>
+                </div>
+            </div>
+
+            <!-- Registration Trend Chart -->
+            <div class="chart-section">
+                <div class="header-row">
+                    <h2 class="section-title">New Registrations</h2>
+                    <div class="chart-controls">
+                        <button class="chart-btn active" data-period="weekly">Weekly</button>
+                        <button class="chart-btn" data-period="monthly">Monthly</button>
+                    </div>
+                </div>
+                <div id="registrationChart" class="bar-chart">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>Loading chart data...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Activity Table -->
+            <div class="user-table-section">
+                <div class="header-row">
+                    <h2 class="section-title">User Activity</h2>
+                    <button class="refresh-btn" id="refreshBtn">Refresh Data</button>
+                </div>
+                <div class="table-controls">
+                    <input type="text" id="userSearch" class="search-input" placeholder="Search by name or UID...">
+                    <select id="activityFilter" class="filter-select">
+                        <option value="all">All Users</option>
+                        <option value="active">Active (30 days)</option>
+                        <option value="inactive">Inactive (30+ days)</option>
+                        <option value="new">New (7 days)</option>
+                    </select>
+                </div>
+                <div id="userTableContainer">
+                    <table class="user-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>UID</th>
+                                <th>Events</th>
+                                <th>Stage</th>
+                                <th>Last Activity</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userTableBody">
+                            <tr>
+                                <td colspan="6" class="loading">
+                                    <div class="spinner"></div>
+                                    <p>Loading users...</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="pagination">
+                    <button id="prevPage">Previous</button>
+                    <span class="page-info" id="pageInfo">Page 1 of 1</span>
+                    <button id="nextPage">Next</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="admin-stats.js"></script>
+</body>
+</html>
