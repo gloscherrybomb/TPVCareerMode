@@ -45,13 +45,33 @@ function canSeeEventName(eventNumber) {
  * Obfuscates future events for spoiler protection
  */
 function getEventDisplayName(eventNumber, forceReveal = false) {
-    // Check spoiler protection
+    // Check if this is a special event
+    const specialEvent = window.specialEventData && window.specialEventData[eventNumber];
+    const regularEvent = window.eventData && window.eventData[eventNumber];
+
+    // Special events with isFreeEvent always show their name (e.g., The Leveller)
+    if (specialEvent && specialEvent.isFreeEvent) {
+        return specialEvent.name;
+    }
+
+    // Check spoiler protection for other events
     if (!forceReveal && !canSeeEventName(eventNumber)) {
+        // Return appropriate placeholder based on event type
+        if (specialEvent) {
+            return 'Special Event';
+        }
+        if (regularEvent && regularEvent.mandatory === false) {
+            return 'Optional Event';
+        }
         return `Stage ${eventNumber}`;
     }
 
-    if (window.eventData && window.eventData[eventNumber]) {
-        return window.eventData[eventNumber].name;
+    // Event is visible - return actual name
+    if (specialEvent) {
+        return specialEvent.name;
+    }
+    if (regularEvent) {
+        return regularEvent.name;
     }
     return `Event ${eventNumber}`;
 }
