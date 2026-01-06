@@ -75,6 +75,51 @@ function getOrdinalSuffix(num) {
 }
 
 /**
+ * Generate a simple performance summary when discordStory is not available
+ */
+function generateFallbackSummary(position, predictedPosition, eventName, points) {
+    if (position === 'DNF') {
+        return `A DNF at ${eventName}. Racing can be unforgiving - zero points and lessons to process.`;
+    }
+
+    const posText = `${position}${getOrdinalSuffix(position)}`;
+    const diff = predictedPosition ? predictedPosition - position : 0;
+
+    // Win
+    if (position === 1) {
+        if (diff >= 5) {
+            return `Victory at ${eventName}! Predicted ${predictedPosition}${getOrdinalSuffix(predictedPosition)}, finished 1st - a stunning upset performance.`;
+        }
+        return `Victory at ${eventName}! A well-executed race capped with a winning performance.`;
+    }
+
+    // Podium
+    if (position <= 3) {
+        if (diff >= 3) {
+            return `${posText} at ${eventName}, beating predictions of ${predictedPosition}${getOrdinalSuffix(predictedPosition)}. A podium finish worth celebrating.`;
+        }
+        return `${posText} at ${eventName}. A solid podium finish with ${points} points earned.`;
+    }
+
+    // Top 10
+    if (position <= 10) {
+        if (diff >= 5) {
+            return `${posText} at ${eventName} - well ahead of the predicted ${predictedPosition}${getOrdinalSuffix(predictedPosition)}. A strong result.`;
+        }
+        if (diff <= -3) {
+            return `${posText} at ${eventName}, below the predicted ${predictedPosition}${getOrdinalSuffix(predictedPosition)}. Points earned, but room for improvement.`;
+        }
+        return `${posText} at ${eventName}. A respectable top-10 finish keeping the season on track.`;
+    }
+
+    // Midpack/Back
+    if (diff >= 5) {
+        return `${posText} at ${eventName} - better than the predicted ${predictedPosition}${getOrdinalSuffix(predictedPosition)}. Progress is progress.`;
+    }
+    return `${posText} at ${eventName}. Points banked and experience gained for future races.`;
+}
+
+/**
  * Format timestamp for display (relative time)
  */
 function formatTimestamp(timestamp) {
@@ -321,25 +366,12 @@ async function fetchResults(isLoadMore = false) {
                         console.log(`[FEED DEBUG]   - discordStory: ${eventResults.discordStory ? 'present' : 'missing'}`);
                         console.log(`[FEED DEBUG]   - story: ${eventResults.story ? 'present' : 'missing'}`);
 
-                        // Use discordStory (condensed ~50-70 words), fallback to truncated first paragraph
+                        // Use discordStory (condensed ~50-70 words) if available
                         story = eventResults.discordStory || null;
-                        if (!story && eventResults.story) {
-                            // Fallback: use first ~100 chars of first paragraph to approximate condensed format
-                            const firstParagraph = eventResults.story.split('\n\n')[0];
-                            // Find a good break point (end of sentence or comma) near 100 chars
-                            let truncateAt = 100;
-                            const breakPoints = ['. ', ', ', ' '];
-                            for (const bp of breakPoints) {
-                                const idx = firstParagraph.lastIndexOf(bp, 120);
-                                if (idx > 60) {
-                                    truncateAt = idx + (bp === '. ' ? 1 : 0);
-                                    break;
-                                }
-                            }
-                            story = firstParagraph.length > truncateAt
-                                ? firstParagraph.substring(0, truncateAt).trim() + '...'
-                                : firstParagraph;
-                        }
+
+                        // Note: We don't fallback to eventResults.story because that's the narrative intro,
+                        // not the race performance recap. The fallback summary will be generated later
+                        // using the result data if discordStory is missing.
 
                         console.log(`[FEED DEBUG]   - final story: ${story ? story.substring(0, 50) + '...' : 'none'}`);
 
@@ -361,6 +393,14 @@ async function fetchResults(isLoadMore = false) {
             // Get event name
             const eventName = getEventDisplayName(eventNumber);
 
+            // Use discordStory if available, otherwise generate a fallback summary
+            const finalStory = story || generateFallbackSummary(
+                userResult.position,
+                predictedPosition,
+                eventName,
+                userResult.points || 0
+            );
+
             results.push({
                 riderName,
                 eventName,
@@ -370,7 +410,7 @@ async function fetchResults(isLoadMore = false) {
                 points: userResult.points || 0,
                 bonusPoints: userResult.bonusPoints || 0,
                 predictedPosition,
-                story,
+                story: finalStory,
                 awardsCount,
                 processedAt: data.processedAt
             });
