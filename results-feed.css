@@ -486,6 +486,11 @@
     .result-recap-text {
         font-size: 0.9rem;
     }
+
+    /* Stack control buttons on tablet */
+    .controls-container {
+        flex-wrap: wrap;
+    }
 }
 
 @media (max-width: 480px) {
@@ -501,9 +506,23 @@
         font-size: 0.9rem;
     }
 
+    /* Stack control buttons vertically */
+    .controls-container {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 0 1rem;
+    }
+
+    .controls-container .btn-secondary,
+    .controls-container .btn-discord {
+        justify-content: center;
+    }
+
+    /* Card header - allow wrapping */
     .result-card-header {
         padding: 0.75rem 1rem;
         flex-wrap: wrap;
+        gap: 0.75rem;
     }
 
     .result-card-body {
@@ -511,9 +530,11 @@
     }
 
     .result-card-title {
-        font-size: 0.95rem;
+        font-size: 0.9rem;
+        flex: 1 1 100%;
     }
 
+    /* Compact high 5 button on mobile */
     .high-five-header {
         padding: 0.4rem 0.75rem;
         font-size: 0.8rem;
@@ -521,6 +542,10 @@
 
     .high-five-header .high-five-icon {
         font-size: 1rem;
+    }
+
+    .high-five-header .high-five-text {
+        display: none;
     }
 
     .high-five-header .high-five-count {
@@ -540,5 +565,29 @@
         flex-direction: column;
         gap: 0.25rem;
         text-align: center;
+    }
+}
+
+/* Very small screens */
+@media (max-width: 360px) {
+    .result-card-title {
+        font-size: 0.85rem;
+    }
+
+    .result-stats-grid {
+        gap: 0.5rem;
+    }
+
+    .result-stat {
+        padding: 0.25rem;
+    }
+
+    .result-stat-value {
+        font-size: 0.9rem;
+    }
+
+    .bonus-points {
+        display: block;
+        font-size: 0.8rem;
     }
 }
