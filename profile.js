@@ -863,13 +863,7 @@ function displayAwards(awards) {
         // Power-based awards
         powerSurge: awards.powerSurge || 0,
         steadyEddie: awards.steadyEddie || 0,
-        blastOff: awards.blastOff || 0,
-        // Career milestone awards
-        backToBack: awards.backToBack || 0,
-        weekendWarrior: awards.weekendWarrior || 0,
-        trophyCollector: awards.trophyCollector || 0,
-        technicalIssues: awards.technicalIssues || 0,
-        overrated: awards.overrated || 0
+        blastOff: awards.blastOff || 0
     };
 
     // Use mapped awards for the rest of the function
@@ -890,9 +884,7 @@ function displayAwards(awards) {
                         (awards.gluttonForPunishment || 0) +
                         (awards.windTunnel || 0) + (awards.theAccountant || 0) +
                         (awards.theEqualizer || 0) + (awards.singaporeSling || 0) +
-                        (awards.powerSurge || 0) + (awards.steadyEddie || 0) + (awards.blastOff || 0) +
-                        (awards.backToBack || 0) + (awards.weekendWarrior || 0) +
-                        (awards.trophyCollector || 0) + (awards.technicalIssues || 0) + (awards.overrated || 0);
+                        (awards.powerSurge || 0) + (awards.steadyEddie || 0) + (awards.blastOff || 0);
     
     if (totalAwards === 0) {
         container.innerHTML = `
@@ -1353,66 +1345,6 @@ function displayAwards(awards) {
                 <div class="award-count">${awards.blastOff}x</div>
                 <div class="award-title">Blast Off</div>
                 <div class="award-description">Broke 1300W Max Power</div>
-            </div>
-        `;
-    }
-
-    // Back to Back (2 consecutive wins)
-    if (awards.backToBack > 0) {
-        html += `
-            <div class="award-card back-to-back">
-                <div class="award-icon">🔁</div>
-                <div class="award-count">${awards.backToBack}x</div>
-                <div class="award-title">Back to Back</div>
-                <div class="award-description">Won 2 Races in a Row</div>
-            </div>
-        `;
-    }
-
-    // Weekend Warrior (5+ events completed)
-    if (awards.weekendWarrior > 0) {
-        html += `
-            <div class="award-card weekend-warrior">
-                <div class="award-icon">🏁</div>
-                <div class="award-count">${awards.weekendWarrior}x</div>
-                <div class="award-title">Weekend Warrior</div>
-                <div class="award-description">Completed 5+ Events</div>
-            </div>
-        `;
-    }
-
-    // Trophy Collector (5+ podiums)
-    if (awards.trophyCollector > 0) {
-        html += `
-            <div class="award-card trophy-collector">
-                <div class="award-icon">🏆</div>
-                <div class="award-count">${awards.trophyCollector}x</div>
-                <div class="award-title">Trophy Collector</div>
-                <div class="award-description">5+ Podium Finishes</div>
-            </div>
-        `;
-    }
-
-    // Technical Issues (3+ DNFs)
-    if (awards.technicalIssues > 0) {
-        html += `
-            <div class="award-card technical-issues">
-                <div class="award-icon">🔧</div>
-                <div class="award-count">${awards.technicalIssues}x</div>
-                <div class="award-title">Technical Issues</div>
-                <div class="award-description">3+ DNFs</div>
-            </div>
-        `;
-    }
-
-    // Overrated (worse than predicted 5+ times)
-    if (awards.overrated > 0) {
-        html += `
-            <div class="award-card overrated">
-                <div class="award-icon">📉</div>
-                <div class="award-count">${awards.overrated}x</div>
-                <div class="award-title">Overrated</div>
-                <div class="award-description">Worse Than Predicted 5+ Times</div>
             </div>
         `;
     }
