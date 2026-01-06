@@ -41,6 +41,10 @@ const commands = [
     name: 'status',
     description: 'Check your TPV Career Mode link status',
   },
+  {
+    name: 'test',
+    description: 'Send a test notification to verify DMs are working',
+  },
 ];
 
 async function registerCommands() {

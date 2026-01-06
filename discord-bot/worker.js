@@ -382,6 +382,139 @@ async function handleUnlinkCommand(interaction, env) {
 }
 
 /**
+ * Send a Discord DM to a user
+ */
+async function sendDiscordDM(env, discordUserId, embed) {
+  const botToken = env.DISCORD_BOT_TOKEN;
+
+  // Create DM channel
+  const dmChannelResponse = await fetch('https://discord.com/api/v10/users/@me/channels', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bot ${botToken}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ recipient_id: discordUserId }),
+  });
+
+  if (!dmChannelResponse.ok) {
+    console.error('Failed to create DM channel:', await dmChannelResponse.text());
+    return false;
+  }
+
+  const dmChannel = await dmChannelResponse.json();
+
+  // Send message
+  const messageResponse = await fetch(`https://discord.com/api/v10/channels/${dmChannel.id}/messages`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bot ${botToken}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      embeds: [embed],
+      components: [{
+        type: 1,
+        components: [{
+          type: 2,
+          style: 5,
+          label: 'View Full Results',
+          url: 'https://tpvcareermode.com/events.html',
+        }],
+      }],
+    }),
+  });
+
+  return messageResponse.ok;
+}
+
+/**
+ * Handle /test command - sends a sample race result notification
+ */
+async function handleTestCommand(interaction, env) {
+  const discordUserId = interaction.member?.user?.id || interaction.user?.id;
+
+  // Find user by Discord ID
+  const userDoc = await findUserByDiscordId(env, discordUserId);
+
+  if (!userDoc) {
+    return {
+      type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+      data: {
+        content: '**Not linked.**\n\nYou need to link your account first with `/link YOUR_UID` before testing notifications.',
+        flags: 64,
+      },
+    };
+  }
+
+  const userName = userDoc.fields?.name?.stringValue || 'Rider';
+  const notificationsEnabled = userDoc.fields?.discordNotificationsEnabled?.booleanValue;
+
+  if (!notificationsEnabled) {
+    return {
+      type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+      data: {
+        content: '**Notifications disabled.**\n\nYou have notifications turned off. Enable them in your [Settings](https://tpvcareermode.com/settings.html) first.',
+        flags: 64,
+      },
+    };
+  }
+
+  // Create sample race result embed
+  const embed = {
+    title: '🏁 Test Race Result',
+    color: 0x22c55e, // Green
+    fields: [
+      {
+        name: '🏆 Position',
+        value: '**3rd** out of 24 riders',
+        inline: true,
+      },
+      {
+        name: '⭐ Points',
+        value: '+15 points',
+        inline: true,
+      },
+      {
+        name: '📅 Event',
+        value: 'Season 1, Event 5\nTest Circuit Race',
+        inline: false,
+      },
+      {
+        name: '📖 Race Story',
+        value: `${userName} delivered an impressive performance today, fighting through the pack to secure a podium finish. A well-timed attack in the final kilometers proved decisive.`,
+        inline: false,
+      },
+    ],
+    footer: {
+      text: '🧪 This is a test notification • TPV Career Mode',
+    },
+    timestamp: new Date().toISOString(),
+  };
+
+  // Send the DM
+  const success = await sendDiscordDM(env, discordUserId, embed);
+
+  if (!success) {
+    return {
+      type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+      data: {
+        content: '**Failed to send test notification.**\n\nMake sure you have DMs enabled. The bot needs permission to send you direct messages.\n\n**To enable DMs:**\n1. Right-click on a server where this bot is\n2. Privacy Settings → Allow direct messages from server members',
+        flags: 64,
+      },
+    };
+  }
+
+  return {
+    type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+    data: {
+      content: '**Test notification sent!** ✅\n\nCheck your DMs - you should have received a sample race result notification.\n\nIf you didn\'t receive it, make sure DMs are enabled from server members.',
+      flags: 64,
+    },
+  };
+}
+
+/**
  * Handle /status command
  */
 async function handleStatusCommand(interaction, env) {
@@ -463,6 +596,9 @@ export default {
           break;
         case 'status':
           response = await handleStatusCommand(interaction, env);
+          break;
+        case 'test':
+          response = await handleTestCommand(interaction, env);
           break;
         default:
           response = {
