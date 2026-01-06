@@ -293,16 +293,39 @@ function countAwards(result, eventResults) {
         'earnedSmoothOperator', 'earnedBunchKick'
     ];
 
-    // Count from result object
+    // Track which awards we've already counted to avoid duplicates
+    const countedAwards = new Set();
+
+    // Count from result object (boolean flags)
     awardFlags.forEach(flag => {
-        if (result && result[flag]) count++;
+        if (result && result[flag]) {
+            countedAwards.add(flag);
+            count++;
+        }
     });
 
-    // Also check eventResults from user profile
+    // Also check eventResults from user profile (boolean flags)
     if (eventResults) {
         awardFlags.forEach(flag => {
-            if (eventResults[flag] && !(result && result[flag])) count++;
+            if (eventResults[flag] && !countedAwards.has(flag)) {
+                countedAwards.add(flag);
+                count++;
+            }
         });
+
+        // Also check earnedAwards array (some awards stored as { awardId: 'xxx' } objects)
+        if (eventResults.earnedAwards && Array.isArray(eventResults.earnedAwards)) {
+            eventResults.earnedAwards.forEach(award => {
+                if (award && award.awardId) {
+                    // Convert awardId to earnedX format for dedup check
+                    const flagName = 'earned' + award.awardId.charAt(0).toUpperCase() + award.awardId.slice(1);
+                    if (!countedAwards.has(flagName)) {
+                        countedAwards.add(flagName);
+                        count++;
+                    }
+                }
+            });
+        }
     }
 
     return count;
