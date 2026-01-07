@@ -553,7 +553,8 @@ function buildRiderProfileHTML(data, name) {
     const initials = displayName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
 
     // Get profile photo URL if exists (use high-res version for Google photos)
-    const photoURL = getHighResPhotoURL(data.photoURL, 300);
+    // 400px for 120px display (3.3x for retina)
+    const photoURL = getHighResPhotoURL(data.photoURL, 400);
     
     // Get awards from user document
     const awards = data.awards || {};

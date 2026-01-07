@@ -19,6 +19,7 @@ import {
     increment
 } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 import { initRiderProfileModal, makeRiderNameClickable } from './rider-profile-modal.js';
+import { getHighResPhotoURL } from './utils.js';
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
@@ -579,7 +580,8 @@ async function fetchResults(isLoadMore = false) {
                     firebaseAuthUid = userSnapshot.docs[0].id; // Get the Firebase Auth document ID
                     const userData = userSnapshot.docs[0].data();
                     riderName = userData.name || riderName;
-                    photoURL = userData.photoURL || null;
+                    // Get high-res photo URL (250px for 80px display, 3x for retina)
+                    photoURL = getHighResPhotoURL(userData.photoURL, 250);
 
                     // Get event-specific results for discordStory
                     const eventResultsKey = `event${eventNumber}Results`;

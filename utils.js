@@ -414,9 +414,17 @@ export function getHighResPhotoURL(photoURL, size = 400) {
 
   // Check if it's a Google profile photo (googleusercontent.com)
   if (photoURL.includes('googleusercontent.com')) {
-    // Remove any existing size parameter and add new one
-    // Google photos end with =s96-c or similar
-    const baseURL = photoURL.replace(/=s\d+-c.*$/, '');
+    // Remove any existing size/quality parameters
+    // Handles: =s96-c, =s96, =w96-h96, =s96-c-k-no, etc.
+    let baseURL = photoURL;
+
+    // Remove existing size parameter (=s96, =s96-c, =s96-c-k-no, etc.)
+    baseURL = baseURL.replace(/=s\d+(-[a-z0-9-]*)?$/i, '');
+
+    // Remove width/height parameters (=w96-h96, etc.)
+    baseURL = baseURL.replace(/=w\d+-h\d+(-[a-z0-9-]*)?$/i, '');
+
+    // Add high-res size parameter
     return `${baseURL}=s${size}-c`;
   }
 
