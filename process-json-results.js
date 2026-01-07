@@ -2734,7 +2734,7 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
 
   if (usersQuery.empty) {
     console.log(`❌ User with uid ${uid} not found in database`);
-    return { unlockBonusPoints: 0, unlockBonusesApplied: [] };
+    return { unlockBonusPoints: 0, unlockBonusesApplied: [], userFound: false };
   }
 
   const userDoc = usersQuery.docs[0];
@@ -2745,14 +2745,14 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
   const userResult = results.find(r => r.UID === uid);
   if (!userResult) {
     console.log(`User ${uid} not found in results, skipping`);
-    return { unlockBonusPoints: 0, unlockBonusesApplied: [] };
+    return { unlockBonusPoints: 0, unlockBonusesApplied: [], userFound: false };
   }
 
   // Check if already processed (before logging "Found user" to avoid false positives in Discord notifications)
   const existingResults = userData[`event${eventNumber}Results`];
   if (existingResults && existingResults.position === parseInt(userResult.Position)) {
     console.log(`   ⏭️ Event ${eventNumber} already processed for ${userData.name || uid}, skipping`);
-    return { unlockBonusPoints: 0, unlockBonusesApplied: [] };
+    return { unlockBonusPoints: 0, unlockBonusesApplied: [], userFound: false };
   }
 
   // Now we know this is a new result - log the user with event info for Discord notifications
@@ -2774,7 +2774,7 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
 
   if (!validation.valid) {
     console.log(`❌ Event ${eventNumber} not valid for user at stage ${currentStage}: ${validation.reason}`);
-    return { unlockBonusPoints: 0, unlockBonusesApplied: [] };
+    return { unlockBonusPoints: 0, unlockBonusesApplied: [], userFound: false };
   }
 
   if (isSpecialEventResult) {
@@ -3815,7 +3815,7 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
   }
 
   // Return unlock data for updateResultsSummary
-  return { unlockBonusPoints, unlockBonusesApplied };
+  return { unlockBonusPoints, unlockBonusesApplied, userFound: true };
 }
 
 /**
@@ -3960,10 +3960,12 @@ async function processJSONResults(jsonFiles) {
         // Process each human's result within this pen's context
         for (const uid of humanUids) {
           // Pass penResults (not allResults) so calculations are pen-specific
-          const { unlockBonusPoints, unlockBonusesApplied } = await processUserResult(uid, eventInfo, penResults, raceTimestamp);
+          const { unlockBonusPoints, unlockBonusesApplied, userFound } = await processUserResult(uid, eventInfo, penResults, raceTimestamp);
 
-          // Update results summary for this user with pen-specific results
-          await updateResultsSummary(eventInfo.season, eventInfo.event, penResults, uid, unlockBonusPoints || 0, unlockBonusesApplied || []);
+          // Only update results summary if user was found and processed
+          if (userFound) {
+            await updateResultsSummary(eventInfo.season, eventInfo.event, penResults, uid, unlockBonusPoints || 0, unlockBonusesApplied || []);
+          }
         }
       }
 
