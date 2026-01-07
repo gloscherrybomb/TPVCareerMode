@@ -102,19 +102,22 @@
     position: relative;
     width: 150px;
     height: 150px;
+    border-radius: 50%;
+    border: 4px solid var(--dark-elevated);
+    box-shadow: 0 0 0 2px rgba(255, 27, 107, 0.3);
+    overflow: hidden;
 }
 
 .profile-photo,
 .profile-photo-placeholder {
-    width: 150px;
-    height: 150px;
+    width: 100%;
+    height: 100%;
     border-radius: 50%;
-    border: 4px solid var(--dark-elevated);
-    box-shadow: 0 0 0 2px rgba(255, 27, 107, 0.3);
 }
 
 .profile-photo {
     object-fit: cover;
+    object-position: center;
     display: none;
 }
 
@@ -1375,9 +1378,7 @@
         padding: 2rem;
     }
 
-    .profile-photo-wrapper,
-    .profile-photo,
-    .profile-photo-placeholder {
+    .profile-photo-wrapper {
         width: 120px;
         height: 120px;
     }
@@ -1493,9 +1494,7 @@
         padding: 1.5rem;
     }
 
-    .profile-photo-wrapper,
-    .profile-photo,
-    .profile-photo-placeholder {
+    .profile-photo-wrapper {
         width: 100px;
         height: 100px;
     }

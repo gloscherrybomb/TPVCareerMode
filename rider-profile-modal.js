@@ -118,13 +118,14 @@ function initializeRiderModal() {
                 color: var(--text-primary);
                 border: 3px solid var(--accent-blue);
                 flex-shrink: 0;
+                overflow: hidden;
             }
-            
+
             .rider-profile-avatar img {
                 width: 100%;
                 height: 100%;
                 object-fit: cover;
-                border-radius: 50%;
+                object-position: center;
             }
             
             .rider-profile-info {
