@@ -297,7 +297,7 @@ const AWARD_DEFINITIONS = {
     id: 'smoothOperator',
     title: 'Smooth Operator',
     icon: '🎵',
-    description: 'Smallest difference between average and normalized power in top 5',
+    description: 'Smallest percentage difference between average and normalized power in top 5',
     calculationType: 'event'
   },
   bunchKick: {

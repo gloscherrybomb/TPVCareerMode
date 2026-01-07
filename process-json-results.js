@@ -2937,7 +2937,7 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
       if (earnedSteadyEddie) console.log(`   📊 Steady Eddie earned!`);
       if (earnedBlastOff) console.log(`   🚀 BLAST OFF earned! (${userResult.MaxPower}W)`);
 
-      // Smooth Operator: smallest AP-NP difference in top 5
+      // Smooth Operator: smallest percentage AP-NP difference in top 5
       // Skip for elimination races, time-based events, time trials, and Easy Hill Climb (event 6)
       const eventTypeForPowerAwards = EVENT_TYPES[eventNumber] || 'road race';
       const isIndividualTimedEffort = eventTypeForPowerAwards === 'time trial' || eventNumber === 6;
@@ -2948,12 +2948,12 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
           .filter(r => r.AvgPower && r.NrmPower);
 
         if (top5WithPower.length >= 3) {
-          const userDiff = Math.abs(parseFloat(userResult.AvgPower) - parseFloat(userResult.NrmPower));
-          const smallestDiff = Math.min(...top5WithPower.map(r =>
-            Math.abs(parseFloat(r.AvgPower) - parseFloat(r.NrmPower))
+          const userDiffPercent = Math.abs(parseFloat(userResult.AvgPower) - parseFloat(userResult.NrmPower)) / parseFloat(userResult.AvgPower) * 100;
+          const smallestDiffPercent = Math.min(...top5WithPower.map(r =>
+            Math.abs(parseFloat(r.AvgPower) - parseFloat(r.NrmPower)) / parseFloat(r.AvgPower) * 100
           ));
-          earnedSmoothOperator = (userDiff === smallestDiff);
-          if (earnedSmoothOperator) console.log(`   🔋 Smooth Operator earned! (AP-NP diff: ${userDiff.toFixed(1)}W)`);
+          earnedSmoothOperator = (userDiffPercent === smallestDiffPercent);
+          if (earnedSmoothOperator) console.log(`   🔋 Smooth Operator earned! (AP-NP diff: ${userDiffPercent.toFixed(1)}%)`);
         }
       }
 
