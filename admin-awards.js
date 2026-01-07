@@ -17,48 +17,48 @@ let currentUser = null;
 let awardStats = {};
 let filteredAwards = [];
 
-// Award definitions (matching awards-config.js)
+// Award definitions (matching awards-config.js and currency-config.js)
 const AWARD_DEFINITIONS = {
-    goldMedal: { id: 'goldMedal', title: 'Gold Medal', icon: '🥇', description: 'Win a race', calculationType: 'event', storageKey: 'gold' },
-    silverMedal: { id: 'silverMedal', title: 'Silver Medal', icon: '🥈', description: 'Finish 2nd', calculationType: 'event', storageKey: 'silver' },
-    bronzeMedal: { id: 'bronzeMedal', title: 'Bronze Medal', icon: '🥉', description: 'Finish 3rd', calculationType: 'event', storageKey: 'bronze' },
-    lanternRouge: { id: 'lanternRouge', title: 'Lantern Rouge', icon: '🏮', description: 'Finish last among finishers', calculationType: 'event', storageKey: 'lanternRouge' },
-    punchingMedal: { id: 'punchingMedal', title: 'Punching Above', icon: '🥊', description: 'Beat prediction by 10+ places', calculationType: 'event', storageKey: 'punchingMedal' },
-    giantKillerMedal: { id: 'giantKillerMedal', title: 'Giant Killer', icon: '⚔️', description: 'Beat the highest-rated rider', calculationType: 'event', storageKey: 'giantKiller' },
-    bullseyeMedal: { id: 'bullseyeMedal', title: 'Bullseye', icon: '🎯', description: 'Finish exactly at predicted position', calculationType: 'event', storageKey: 'bullseye' },
-    hotStreakMedal: { id: 'hotStreakMedal', title: 'Hot Streak', icon: '🔥', description: 'Beat prediction 3 races in a row', calculationType: 'event', storageKey: 'hotStreak' },
-    domination: { id: 'domination', title: 'Domination', icon: '💪', description: 'Win by more than a minute', calculationType: 'event', storageKey: 'domination' },
-    closeCall: { id: 'closeCall', title: 'Close Call', icon: '😅', description: 'Win by less than 0.5 seconds', calculationType: 'event', storageKey: 'closeCall' },
-    photoFinish: { id: 'photoFinish', title: 'Photo Finish', icon: '📸', description: 'Finish within 0.2s of winner', calculationType: 'event', storageKey: 'photoFinish' },
-    overrated: { id: 'overrated', title: 'Overrated', icon: '📉', description: 'Finish worse than predicted 5+ times', calculationType: 'career', storageKey: 'overrated' },
-    darkHorse: { id: 'darkHorse', title: 'Dark Horse', icon: '🐴', description: 'Win when predicted 15th or worse', calculationType: 'event', storageKey: 'darkHorse' },
-    backToBack: { id: 'backToBack', title: 'Back to Back', icon: '🔁', description: 'Win 2 races in a row', calculationType: 'career', storageKey: 'backToBack' },
-    weekendWarrior: { id: 'weekendWarrior', title: 'Weekend Warrior', icon: '🏁', description: 'Complete 5+ events on weekends', calculationType: 'career', storageKey: 'weekendWarrior' },
-    zeroToHero: { id: 'zeroToHero', title: 'Zero to Hero', icon: '🦸', description: 'Bottom 20% one event, top 20% next', calculationType: 'career', storageKey: 'zeroToHero' },
-    trophyCollector: { id: 'trophyCollector', title: 'Trophy Collector', icon: '🏆', description: 'Podium 5+ times', calculationType: 'career', storageKey: 'trophyCollector' },
-    technicalIssues: { id: 'technicalIssues', title: 'Technical Issues', icon: '🔧', description: 'DNF 3+ times', calculationType: 'career', storageKey: 'technicalIssues' },
-    gcGoldMedal: { id: 'gcGoldMedal', title: 'GC Winner', icon: '🏆', description: 'Win the overall General Classification', calculationType: 'event', storageKey: 'gcGold' },
-    gcSilverMedal: { id: 'gcSilverMedal', title: 'GC Second', icon: '🥈', description: 'Finish 2nd in GC', calculationType: 'event', storageKey: 'gcSilver' },
-    gcBronzeMedal: { id: 'gcBronzeMedal', title: 'GC Third', icon: '🥉', description: 'Finish 3rd in GC', calculationType: 'event', storageKey: 'gcBronze' },
-    seasonChampion: { id: 'seasonChampion', title: 'Season Champion', icon: '🏆', description: 'Win the overall season standings', calculationType: 'season', storageKey: 'seasonChampion' },
-    seasonRunnerUp: { id: 'seasonRunnerUp', title: 'Season Runner-Up', icon: '🥈', description: 'Finish 2nd in season', calculationType: 'season', storageKey: 'seasonRunnerUp' },
-    seasonThirdPlace: { id: 'seasonThirdPlace', title: 'Season Third Place', icon: '🥉', description: 'Finish 3rd in season', calculationType: 'season', storageKey: 'seasonThirdPlace' },
-    perfectSeason: { id: 'perfectSeason', title: 'Perfect Season', icon: '💯', description: 'Win every event in a season', calculationType: 'season', storageKey: 'perfectSeason' },
-    podiumStreak: { id: 'podiumStreak', title: 'Podium Streak', icon: '📈', description: 'Top 3 in 5+ consecutive races', calculationType: 'career', storageKey: 'podiumStreak' },
-    specialist: { id: 'specialist', title: 'Specialist', icon: '⭐', description: 'Win 3+ events of the same type', calculationType: 'career', storageKey: 'specialist' },
-    allRounder: { id: 'allRounder', title: 'All-Rounder', icon: '🌟', description: 'Win at least one event of 5+ different types', calculationType: 'career', storageKey: 'allRounder' },
-    comeback: { id: 'comeback', title: 'Comeback Kid', icon: '🔄', description: 'Finish top 5 after bottom half previous race', calculationType: 'event', storageKey: 'comeback' },
-    windTunnel: { id: 'windTunnel', title: 'Wind Tunnel', icon: '🌬️', description: 'Top 5 in TT when predicted outside top 5', calculationType: 'event', storageKey: 'windTunnel' },
-    theAccountant: { id: 'theAccountant', title: 'The Accountant', icon: '🧮', description: 'Score more points than the line winner', calculationType: 'event', storageKey: 'theAccountant' },
-    theEqualizer: { id: 'theEqualizer', title: 'The Equalizer', icon: '🎚️', description: 'Complete The Leveller special event', calculationType: 'event', storageKey: 'theEqualizer' },
-    singaporeSling: { id: 'singaporeSling', title: 'Singapore Sling', icon: '🍸', description: 'Podium at the Singapore Criterium', calculationType: 'event', storageKey: 'singaporeSling' },
-    powerSurge: { id: 'powerSurge', title: 'Power Surge', icon: '💥', description: 'Max power 30%+ above average, top 10', calculationType: 'event', storageKey: 'powerSurge' },
-    steadyEddie: { id: 'steadyEddie', title: 'Steady Eddie', icon: '📊', description: 'NP within 1% of average power', calculationType: 'event', storageKey: 'steadyEddie' },
-    blastOff: { id: 'blastOff', title: 'Blast Off', icon: '🚀', description: 'Break 1300W max power (one-time)', calculationType: 'career', storageKey: 'blastOff' },
-    smoothOperator: { id: 'smoothOperator', title: 'Smooth Operator', icon: '🎵', description: 'Smallest % diff between AP and NP in top 5', calculationType: 'event', storageKey: 'smoothOperator' },
-    bunchKick: { id: 'bunchKick', title: 'Bunch Kick', icon: '💢', description: 'Highest max power in group sprint', calculationType: 'event', storageKey: 'bunchKick' },
-    fanFavourite: { id: 'fanFavourite', title: 'Fan Favourite', icon: '💜', description: 'Receive 100 high-5s from community', calculationType: 'career', storageKey: 'fanFavourite' },
-    gluttonForPunishment: { id: 'gluttonForPunishment', title: 'Glutton for Punishment', icon: '🎖️', description: 'Reset and restart after completing season', calculationType: 'career', storageKey: 'gluttonForPunishment' }
+    goldMedal: { id: 'goldMedal', title: 'Gold Medal', icon: '🥇', description: 'Win a race', calculationType: 'event', storageKey: 'gold', ccBonus: 50 },
+    silverMedal: { id: 'silverMedal', title: 'Silver Medal', icon: '🥈', description: 'Finish 2nd', calculationType: 'event', storageKey: 'silver', ccBonus: 35 },
+    bronzeMedal: { id: 'bronzeMedal', title: 'Bronze Medal', icon: '🥉', description: 'Finish 3rd', calculationType: 'event', storageKey: 'bronze', ccBonus: 25 },
+    lanternRouge: { id: 'lanternRouge', title: 'Lantern Rouge', icon: '🏮', description: 'Finish last among finishers', calculationType: 'event', storageKey: 'lanternRouge', ccBonus: 10 },
+    punchingMedal: { id: 'punchingMedal', title: 'Punching Above', icon: '🥊', description: 'Beat prediction by 10+ places', calculationType: 'event', storageKey: 'punchingMedal', ccBonus: 30 },
+    giantKillerMedal: { id: 'giantKillerMedal', title: 'Giant Killer', icon: '⚔️', description: 'Beat the highest-rated rider', calculationType: 'event', storageKey: 'giantKiller', ccBonus: 40 },
+    bullseyeMedal: { id: 'bullseyeMedal', title: 'Bullseye', icon: '🎯', description: 'Finish exactly at predicted position', calculationType: 'event', storageKey: 'bullseye', ccBonus: 15 },
+    hotStreakMedal: { id: 'hotStreakMedal', title: 'Hot Streak', icon: '🔥', description: 'Beat prediction 3 races in a row', calculationType: 'event', storageKey: 'hotStreak', ccBonus: 25 },
+    domination: { id: 'domination', title: 'Domination', icon: '💪', description: 'Win by more than a minute', calculationType: 'event', storageKey: 'domination', ccBonus: 40 },
+    closeCall: { id: 'closeCall', title: 'Close Call', icon: '😅', description: 'Win by less than 0.5 seconds', calculationType: 'event', storageKey: 'closeCall', ccBonus: 25 },
+    photoFinish: { id: 'photoFinish', title: 'Photo Finish', icon: '📸', description: 'Finish within 0.2s of winner', calculationType: 'event', storageKey: 'photoFinish', ccBonus: 30 },
+    overrated: { id: 'overrated', title: 'Overrated', icon: '📉', description: 'Finish worse than predicted 5+ times', calculationType: 'career', storageKey: 'overrated', ccBonus: 5 },
+    darkHorse: { id: 'darkHorse', title: 'Dark Horse', icon: '🐴', description: 'Win when predicted 15th or worse', calculationType: 'event', storageKey: 'darkHorse', ccBonus: 35 },
+    backToBack: { id: 'backToBack', title: 'Back to Back', icon: '🔁', description: 'Win 2 races in a row', calculationType: 'career', storageKey: 'backToBack', ccBonus: 50 },
+    weekendWarrior: { id: 'weekendWarrior', title: 'Weekend Warrior', icon: '🏁', description: 'Complete 5+ events on weekends', calculationType: 'career', storageKey: 'weekendWarrior', ccBonus: 20 },
+    zeroToHero: { id: 'zeroToHero', title: 'Zero to Hero', icon: '🦸', description: 'Bottom 20% one event, top 20% next', calculationType: 'career', storageKey: 'zeroToHero', ccBonus: 35 },
+    trophyCollector: { id: 'trophyCollector', title: 'Trophy Collector', icon: '🏆', description: 'Podium 5+ times', calculationType: 'career', storageKey: 'trophyCollector', ccBonus: 20 },
+    technicalIssues: { id: 'technicalIssues', title: 'Technical Issues', icon: '🔧', description: 'DNF 3+ times', calculationType: 'career', storageKey: 'technicalIssues', ccBonus: 5 },
+    gcGoldMedal: { id: 'gcGoldMedal', title: 'GC Winner', icon: '🏆', description: 'Win the overall General Classification', calculationType: 'event', storageKey: 'gcGold', ccBonus: 80 },
+    gcSilverMedal: { id: 'gcSilverMedal', title: 'GC Second', icon: '🥈', description: 'Finish 2nd in GC', calculationType: 'event', storageKey: 'gcSilver', ccBonus: 60 },
+    gcBronzeMedal: { id: 'gcBronzeMedal', title: 'GC Third', icon: '🥉', description: 'Finish 3rd in GC', calculationType: 'event', storageKey: 'gcBronze', ccBonus: 45 },
+    seasonChampion: { id: 'seasonChampion', title: 'Season Champion', icon: '🏆', description: 'Win the overall season standings', calculationType: 'season', storageKey: 'seasonChampion', ccBonus: 120 },
+    seasonRunnerUp: { id: 'seasonRunnerUp', title: 'Season Runner-Up', icon: '🥈', description: 'Finish 2nd in season', calculationType: 'season', storageKey: 'seasonRunnerUp', ccBonus: 80 },
+    seasonThirdPlace: { id: 'seasonThirdPlace', title: 'Season Third Place', icon: '🥉', description: 'Finish 3rd in season', calculationType: 'season', storageKey: 'seasonThirdPlace', ccBonus: 60 },
+    perfectSeason: { id: 'perfectSeason', title: 'Perfect Season', icon: '💯', description: 'Win every event in a season', calculationType: 'season', storageKey: 'perfectSeason', ccBonus: 150 },
+    podiumStreak: { id: 'podiumStreak', title: 'Podium Streak', icon: '📈', description: 'Top 3 in 5+ consecutive races', calculationType: 'career', storageKey: 'podiumStreak', ccBonus: 50 },
+    specialist: { id: 'specialist', title: 'Specialist', icon: '⭐', description: 'Win 3+ events of the same type', calculationType: 'career', storageKey: 'specialist', ccBonus: 20 },
+    allRounder: { id: 'allRounder', title: 'All-Rounder', icon: '🌟', description: 'Win at least one event of 5+ different types', calculationType: 'career', storageKey: 'allRounder', ccBonus: 25 },
+    comeback: { id: 'comeback', title: 'Comeback Kid', icon: '🔄', description: 'Finish top 5 after bottom half previous race', calculationType: 'event', storageKey: 'comeback', ccBonus: 25 },
+    windTunnel: { id: 'windTunnel', title: 'Wind Tunnel', icon: '🌬️', description: 'Top 5 in TT when predicted outside top 5', calculationType: 'event', storageKey: 'windTunnel', ccBonus: 25 },
+    theAccountant: { id: 'theAccountant', title: 'The Accountant', icon: '🧮', description: 'Score more points than the line winner', calculationType: 'event', storageKey: 'theAccountant', ccBonus: 30 },
+    theEqualizer: { id: 'theEqualizer', title: 'The Equalizer', icon: '🎚️', description: 'Complete The Leveller special event', calculationType: 'event', storageKey: 'theEqualizer', ccBonus: 30 },
+    singaporeSling: { id: 'singaporeSling', title: 'Singapore Sling', icon: '🍸', description: 'Podium at the Singapore Criterium', calculationType: 'event', storageKey: 'singaporeSling', ccBonus: 30 },
+    powerSurge: { id: 'powerSurge', title: 'Power Surge', icon: '💥', description: 'Max power 30%+ above average, top 10', calculationType: 'event', storageKey: 'powerSurge', ccBonus: 25 },
+    steadyEddie: { id: 'steadyEddie', title: 'Steady Eddie', icon: '📊', description: 'NP within 1% of average power', calculationType: 'event', storageKey: 'steadyEddie', ccBonus: 30 },
+    blastOff: { id: 'blastOff', title: 'Blast Off', icon: '🚀', description: 'Break 1300W max power (one-time)', calculationType: 'career', storageKey: 'blastOff', ccBonus: 50 },
+    smoothOperator: { id: 'smoothOperator', title: 'Smooth Operator', icon: '🎵', description: 'Smallest % diff between AP and NP in top 5', calculationType: 'event', storageKey: 'smoothOperator', ccBonus: 30 },
+    bunchKick: { id: 'bunchKick', title: 'Bunch Kick', icon: '💢', description: 'Highest max power in group sprint', calculationType: 'event', storageKey: 'bunchKick', ccBonus: 30 },
+    fanFavourite: { id: 'fanFavourite', title: 'Fan Favourite', icon: '💜', description: 'Receive 100 high-5s from community', calculationType: 'career', storageKey: 'fanFavourite', ccBonus: 50 },
+    gluttonForPunishment: { id: 'gluttonForPunishment', title: 'Glutton for Punishment', icon: '🎖️', description: 'Reset and restart after completing season', calculationType: 'career', storageKey: 'gluttonForPunishment', ccBonus: 100 }
 };
 
 // Initialize Firebase
@@ -246,7 +246,10 @@ function renderAwardsGrid() {
                 <div class="award-icon">${award.icon}</div>
                 <div class="award-title-section">
                     <div class="award-title">${escapeHtml(award.title)}</div>
-                    <span class="award-type-badge ${award.calculationType}">${award.calculationType}</span>
+                    <div class="award-badges">
+                        <span class="award-type-badge ${award.calculationType}">${award.calculationType}</span>
+                        <span class="award-cc-badge">+${award.ccBonus} CC</span>
+                    </div>
                 </div>
             </div>
             <div class="award-description">${escapeHtml(award.description)}</div>
