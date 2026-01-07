@@ -607,6 +607,8 @@ async function handleTestCommand(interaction, env) {
   }
 
   const userName = userDoc.fields?.name?.stringValue || 'Rider';
+  const tpvUid = userDoc.fields?.uid?.stringValue;
+  const firebaseUid = userDoc.name.split('/').pop(); // Extract doc ID from full path
   const notificationsEnabled = userDoc.fields?.discordNotificationsEnabled?.booleanValue;
 
   if (!notificationsEnabled) {
@@ -652,9 +654,58 @@ async function handleTestCommand(interaction, env) {
   };
 
   // Send the DM
-  const success = await sendDiscordDM(env, discordUserId, embed);
+  const dmSuccess = await sendDiscordDM(env, discordUserId, embed);
 
-  if (!success) {
+  // Also post to public channel with High 5 button for testing
+  let publicSuccess = false;
+  const publicChannelId = env.DISCORD_PUBLIC_RESULTS_CHANNEL_ID;
+
+  if (publicChannelId && tpvUid && firebaseUid) {
+    const publicEmbed = {
+      title: `🏁 ${userName} - Test Event`,
+      color: 0x22c55e,
+      fields: [
+        { name: '🥇 Position', value: '3rd', inline: true },
+        { name: '⭐ Points', value: '+15', inline: true },
+        { name: '📖 Race Recap', value: 'This is a test notification to verify the High 5 button works correctly.', inline: false },
+      ],
+      footer: { text: '🧪 Test notification • TPV Career Mode' },
+      timestamp: new Date().toISOString(),
+    };
+
+    const high5CustomId = `high5_1_99_${tpvUid}_${firebaseUid}`;
+
+    try {
+      const response = await fetch(
+        `https://discord.com/api/v10/channels/${publicChannelId}/messages`,
+        {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bot ${env.DISCORD_BOT_TOKEN}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            embeds: [publicEmbed],
+            components: [{
+              type: 1,
+              components: [{
+                type: 2,
+                style: 2,
+                label: 'High 5',
+                emoji: { name: '✋' },
+                custom_id: high5CustomId,
+              }],
+            }],
+          }),
+        }
+      );
+      publicSuccess = response.ok;
+    } catch (e) {
+      console.error('Failed to post test to public channel:', e);
+    }
+  }
+
+  if (!dmSuccess) {
     return {
       type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
       data: {
@@ -664,10 +715,14 @@ async function handleTestCommand(interaction, env) {
     };
   }
 
+  const publicMsg = publicSuccess
+    ? '\n\n**High 5 test:** A test message was also posted to the public results channel with a High 5 button.'
+    : '';
+
   return {
     type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
     data: {
-      content: '**Test notification sent!** ✅\n\nCheck your DMs - you should have received a sample race result notification.\n\nIf you didn\'t receive it, make sure DMs are enabled from server members.',
+      content: `**Test notification sent!** ✅\n\nCheck your DMs - you should have received a sample race result notification.\n\nIf you didn\'t receive it, make sure DMs are enabled from server members.${publicMsg}`,
       flags: 64,
     },
   };
