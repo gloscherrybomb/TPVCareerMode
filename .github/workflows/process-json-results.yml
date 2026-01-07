@@ -141,11 +141,14 @@ jobs:
           # Add JSON files that have changed
           git add race_results/**/*.json || true
 
+          # Add bot profile requests file if it exists
+          git add bot-profile-requests/requests.txt || true
+
           # Check if there are staged changes
           if git diff --cached --quiet; then
             echo "No files to commit (already processed or no changes)"
           else
-            git commit -m "Auto: Add timestamps to processed JSON result files"
+            git commit -m "Auto: Process JSON results and bot profile requests"
             git push
             echo "Committed processed files"
           fi
