@@ -433,7 +433,7 @@ function createResultCard(resultData) {
     } else {
         highFiveHeaderHTML = `
             <button class="high-five-header ${hasHighFived ? 'high-five-active' : ''}"
-                    onclick="toggleHighFive('${resultDocId}', '${resultOwnerUid}')"
+                    onclick="toggleHighFive('${resultDocId}', '${resultOwnerUid}', ${profileUid ? `'${profileUid}'` : 'null'})"
                     ${!canHighFive ? 'disabled title="Log in to give High 5s"' : ''}
                     aria-label="${hasHighFived ? 'Remove High 5' : 'Give High 5'}">
                 <span class="high-five-icon">&#9995;</span>
@@ -768,8 +768,9 @@ async function loadMoreResults() {
  * Toggle high 5 on a result
  * @param {string} resultDocId - Firestore document ID
  * @param {string} resultOwnerUid - TPV UID of the result owner
+ * @param {string|null} resultOwnerFirebaseUid - Firebase Auth UID of the result owner (for updating their total)
  */
-async function toggleHighFive(resultDocId, resultOwnerUid) {
+async function toggleHighFive(resultDocId, resultOwnerUid, resultOwnerFirebaseUid = null) {
     // Require authentication
     if (!currentUser) {
         alert('Please log in to give High 5s');
@@ -828,6 +829,15 @@ async function toggleHighFive(resultDocId, resultOwnerUid) {
                 highFiveCount: increment(-1),
                 highFiveUsers: arrayRemove(currentUser.uid)
             });
+
+            // Update the result owner's total high 5s count (if we have their Firebase UID)
+            if (resultOwnerFirebaseUid) {
+                const userRef = doc(db, 'users', resultOwnerFirebaseUid);
+                await updateDoc(userRef, {
+                    totalHighFivesReceived: increment(-1)
+                });
+            }
+
             userHighFives[resultDocId] = false;
             console.log('[HIGH5] Removed high 5');
         } else {
@@ -836,6 +846,15 @@ async function toggleHighFive(resultDocId, resultOwnerUid) {
                 highFiveCount: increment(1),
                 highFiveUsers: arrayUnion(currentUser.uid)
             });
+
+            // Update the result owner's total high 5s count (if we have their Firebase UID)
+            if (resultOwnerFirebaseUid) {
+                const userRef = doc(db, 'users', resultOwnerFirebaseUid);
+                await updateDoc(userRef, {
+                    totalHighFivesReceived: increment(1)
+                });
+            }
+
             userHighFives[resultDocId] = true;
             console.log('[HIGH5] Added high 5');
         }

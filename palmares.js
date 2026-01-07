@@ -432,6 +432,7 @@ function displayKeyStats() {
     document.getElementById('statPoints').textContent = userData.careerPoints || 0;
     document.getElementById('statCadenceCoins').textContent = userData.currency?.totalEarned || 0;
     document.getElementById('statARR').textContent = userData.arr || 0;
+    document.getElementById('statHighFives').textContent = userData.totalHighFivesReceived || 0;
 }
 
 // Display key achievements
@@ -944,6 +945,9 @@ function displayDetailedStats() {
 
     const totalCareerCC = userData.currency?.totalEarned || 0;
     document.getElementById('totalCareerCC').textContent = `${totalCareerCC.toLocaleString()} CC`;
+
+    const totalHighFives = userData.totalHighFivesReceived || 0;
+    document.getElementById('totalHighFives').textContent = totalHighFives.toLocaleString();
 
     // Performance (using career stats)
     const winRate = userData.careerWinRate || 0;
