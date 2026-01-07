@@ -103,17 +103,14 @@ async function initAnalytics() {
     if (isInitialized) return;
 
     try {
-        // Check if Firebase is already initialized
-        try {
-            app = initializeApp(firebaseConfig, 'analytics');
-        } catch (e) {
-            // App might already exist, try to get it
-            const { getApp } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js');
-            try {
-                app = getApp('analytics');
-            } catch (e2) {
-                app = getApp();
-            }
+        // Import getApp to check for existing Firebase instance
+        const { getApp, getApps } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js');
+
+        // Use existing Firebase app if available, otherwise initialize
+        if (getApps().length > 0) {
+            app = getApp();
+        } else {
+            app = initializeApp(firebaseConfig);
         }
 
         db = getFirestore(app);
@@ -144,6 +141,10 @@ async function initAnalytics() {
 async function trackPageView() {
     const pageName = getCurrentPageName();
     if (!pageName) return; // Not a tracked page
+    if (!db) {
+        console.warn('Analytics: Firestore not initialized, skipping page view tracking');
+        return;
+    }
 
     const session = getSession();
     const isNewSession = session.isNew;
@@ -211,6 +212,8 @@ async function handleBeforeUnload() {
 
 // Record session duration
 async function recordSessionDuration() {
+    if (!db) return; // Firestore not initialized
+
     const stored = sessionStorage.getItem('tpv_analytics_session');
     if (!stored) return;
 
