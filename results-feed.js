@@ -352,6 +352,7 @@ function createResultCard(resultData) {
         resultDocId,
         highFiveCount,
         resultOwnerUid,
+        profileUid,
         photoURL
     } = resultData;
 
@@ -441,16 +442,25 @@ function createResultCard(resultData) {
         `;
     }
 
-    // Build profile image HTML (clickable to open rider profile)
-    const profileImageHTML = photoURL
-        ? `<img src="${photoURL}" alt="${riderName}" class="rider-name-link" data-rider-uid="${resultOwnerUid}" data-rider-name="${riderName}">`
-        : `<div class="result-profile-placeholder rider-name-link" data-rider-uid="${resultOwnerUid}" data-rider-name="${riderName}">🚴</div>`;
+    // Build profile image HTML (clickable to open rider profile if profileUid exists)
+    const profileImageHTML = profileUid
+        ? (photoURL
+            ? `<img src="${photoURL}" alt="${riderName}" class="rider-name-link" data-rider-uid="${profileUid}" data-rider-name="${riderName}">`
+            : `<div class="result-profile-placeholder rider-name-link" data-rider-uid="${profileUid}" data-rider-name="${riderName}">🚴</div>`)
+        : (photoURL
+            ? `<img src="${photoURL}" alt="${riderName}">`
+            : `<div class="result-profile-placeholder">🚴</div>`);
+
+    // Make rider name clickable only if we have a valid profileUid
+    const riderNameHTML = profileUid
+        ? makeRiderNameClickable(riderName, profileUid)
+        : riderName;
 
     return `
         <div class="result-card-wrapper" data-result-id="${resultDocId}">
             <article class="result-card ${cardClass}">
                 <div class="result-card-header">
-                    <h3 class="result-card-title">&#127937; ${makeRiderNameClickable(riderName, resultOwnerUid)} - ${eventName}</h3>
+                    <h3 class="result-card-title">&#127937; ${riderNameHTML} - ${eventName}</h3>
                     ${highFiveHeaderHTML}
                 </div>
                 <div class="result-card-body">
@@ -549,6 +559,7 @@ async function fetchResults(isLoadMore = false) {
             let predictedPosition = userResult.predictedPosition || null;
             let awardsCount = countAwards(userResult, null);
             let photoURL = null;
+            let firebaseAuthUid = null; // Firebase Auth UID for profile modal
 
             // Try to fetch user profile for discordStory (condensed format)
             // Note: userUid is the TPV player ID, but users collection is keyed by Firebase Auth UID
@@ -562,6 +573,7 @@ async function fetchResults(isLoadMore = false) {
                 const userSnapshot = await getDocs(userQuery);
 
                 if (!userSnapshot.empty) {
+                    firebaseAuthUid = userSnapshot.docs[0].id; // Get the Firebase Auth document ID
                     const userData = userSnapshot.docs[0].data();
                     riderName = userData.name || riderName;
                     photoURL = userData.photoURL || null;
@@ -637,7 +649,8 @@ async function fetchResults(isLoadMore = false) {
                 processedAt: data.processedAt,
                 resultDocId,
                 highFiveCount,
-                resultOwnerUid: userUid,
+                resultOwnerUid: userUid, // TPV UID for high-five self-check
+                profileUid: firebaseAuthUid, // Firebase Auth UID for profile modal (null if not found)
                 photoURL
             });
         }
