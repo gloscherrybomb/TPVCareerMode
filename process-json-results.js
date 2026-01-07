@@ -3650,13 +3650,42 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
     }
   }
 
-  // WEEKEND WARRIOR - Complete 5+ events (one-time award)
-  const totalEventsCompleted = (userData.totalEvents || 0) + 1;
+  // WEEKEND WARRIOR - Complete 5+ weekend events (Saturday/Sunday)
   const currentWeekendWarrior = userData.awards?.weekendWarrior || 0;
-  if (currentWeekendWarrior === 0 && totalEventsCompleted >= 5) {
-    console.log('   🏁 WEEKEND WARRIOR! 5+ events completed');
-    updateData['awards.weekendWarrior'] = 1;
-    eventResults.earnedAwards.push({ awardId: 'weekendWarrior', category: 'performance', intensity: 'moderate' });
+  if (currentWeekendWarrior === 0) {
+    let weekendEventCount = 0;
+
+    // Count weekend events from previous results
+    for (let i = 1; i <= 15; i++) {
+      const evtData = userData[`event${i}Results`];
+      if (evtData) {
+        let date = null;
+        if (evtData.raceDate) {
+          date = new Date(evtData.raceDate);
+        } else if (evtData.processedAt) {
+          date = evtData.processedAt.toDate ? evtData.processedAt.toDate() : new Date(evtData.processedAt);
+        }
+        if (date) {
+          const dayOfWeek = date.getDay();
+          if (dayOfWeek === 0 || dayOfWeek === 6) { // Sunday = 0, Saturday = 6
+            weekendEventCount++;
+          }
+        }
+      }
+    }
+
+    // Check if current event is on weekend
+    const currentRaceDate = raceTimestamp ? new Date(raceTimestamp) : new Date();
+    const currentDayOfWeek = currentRaceDate.getDay();
+    if (currentDayOfWeek === 0 || currentDayOfWeek === 6) {
+      weekendEventCount++;
+    }
+
+    if (weekendEventCount >= 5) {
+      console.log(`   🏁 WEEKEND WARRIOR! ${weekendEventCount} weekend events completed`);
+      updateData['awards.weekendWarrior'] = 1;
+      eventResults.earnedAwards.push({ awardId: 'weekendWarrior', category: 'performance', intensity: 'moderate' });
+    }
   }
 
   // OVERRATED - Finish worse than predicted 5+ times (one-time award)
