@@ -3915,13 +3915,6 @@ async function processJSONResults(jsonFiles) {
         console.error(`   ⚠️ Bot ARR update error: ${botArrError.message}`);
       }
 
-      // Process any pending bot profile requests
-      try {
-        await processBotProfileRequests();
-      } catch (botProfileError) {
-        console.error(`   ⚠️ Bot profile request error: ${botProfileError.message}`);
-      }
-
     } catch (error) {
       console.error(`❌ Error processing ${filePath}:`, error);
     }
@@ -4137,6 +4130,11 @@ async function updateResultsSummary(season, event, results, userUid, unlockBonus
     }
 
     await processJSONResults(jsonFiles);
+
+    // Process any pending bot profile requests (once after all files processed)
+    console.log('\n--- Processing Bot Profile Requests ---');
+    await processBotProfileRequests();
+
     process.exit(0);
   } catch (error) {
     console.error('Fatal error:', error);
