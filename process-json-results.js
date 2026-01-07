@@ -2908,10 +2908,16 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
       const prevEventResults = userData[`event${eventNumber - 1}Results`];
       if (prevEventResults && prevEventResults.position && prevEventResults.position !== 'DNF') {
         const currentFinishers = finishers.length;
+        const prevFinishers = prevEventResults.totalFinishers || currentFinishers;
         earnedZeroToHero = awardsCalc.checkZeroToHero(
-          { position: prevEventResults.position, totalFinishers: 50 }, // Approximate prev
+          { position: prevEventResults.position, totalFinishers: prevFinishers },
           { position: position, totalFinishers: currentFinishers }
         );
+        if (earnedZeroToHero) {
+          const prevPct = ((prevEventResults.position / prevFinishers) * 100).toFixed(0);
+          const currPct = ((position / currentFinishers) * 100).toFixed(0);
+          console.log(`   🦸 Zero to Hero! ${prevEventResults.position}/${prevFinishers} (${prevPct}%) -> ${position}/${currentFinishers} (${currPct}%)`);
+        }
       }
     }
 
