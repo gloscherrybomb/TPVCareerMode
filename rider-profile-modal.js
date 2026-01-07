@@ -549,6 +549,7 @@ function buildRiderProfileHTML(data, name) {
     const careerWinRate = data.careerWinRate;
     const careerPodiumRate = data.careerPodiumRate;
     const totalCCEarned = data.currency?.totalEarned || 0;
+    const totalHighFivesReceived = data.totalHighFivesReceived || 0;
 
     // Get initials for avatar placeholder
     const initials = displayName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
@@ -690,13 +691,17 @@ function buildRiderProfileHTML(data, name) {
                             <span class="rider-profile-meta-value">${team}</span>
                         </div>
                         <div class="rider-profile-meta-item">
+                            <span class="rider-profile-meta-label">High 5s</span>
+                            <span class="rider-profile-meta-value">&#9995; ${totalHighFivesReceived}</span>
+                        </div>
+                        <div class="rider-profile-meta-item">
                             <span class="rider-profile-meta-label">Season</span>
                             <span class="rider-profile-meta-value">${season}</span>
                         </div>
                     </div>
                 </div>
             </div>
-            
+
             <div class="rider-profile-progress">
                 <div class="rider-profile-meta-item" style="margin-bottom: 1rem;">
                     <span class="rider-profile-meta-label">Seasons Completed</span>
