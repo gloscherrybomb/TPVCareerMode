@@ -18,10 +18,14 @@ import {
     arrayRemove,
     increment
 } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { initRiderProfileModal, makeRiderNameClickable } from './rider-profile-modal.js';
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+
+// Initialize rider profile modal for clickable rider names/photos
+initRiderProfileModal(db);
 
 // Configuration
 const RESULTS_PER_PAGE = 15;
@@ -437,16 +441,16 @@ function createResultCard(resultData) {
         `;
     }
 
-    // Build profile image HTML
+    // Build profile image HTML (clickable to open rider profile)
     const profileImageHTML = photoURL
-        ? `<img src="${photoURL}" alt="${riderName}">`
-        : `<div class="result-profile-placeholder">🚴</div>`;
+        ? `<img src="${photoURL}" alt="${riderName}" class="rider-name-link" data-rider-uid="${resultOwnerUid}" data-rider-name="${riderName}">`
+        : `<div class="result-profile-placeholder rider-name-link" data-rider-uid="${resultOwnerUid}" data-rider-name="${riderName}">🚴</div>`;
 
     return `
         <div class="result-card-wrapper" data-result-id="${resultDocId}">
             <article class="result-card ${cardClass}">
                 <div class="result-card-header">
-                    <h3 class="result-card-title">&#127937; ${riderName} - ${eventName}</h3>
+                    <h3 class="result-card-title">&#127937; ${makeRiderNameClickable(riderName, resultOwnerUid)} - ${eventName}</h3>
                     ${highFiveHeaderHTML}
                 </div>
                 <div class="result-card-body">
