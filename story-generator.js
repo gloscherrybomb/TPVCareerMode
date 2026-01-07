@@ -372,10 +372,10 @@ const CONDENSED_NARRATIVES = {
       ],
       default: [
         "Second at {eventName}. You rode a tactically smart race, positioning yourself well through the key moments. {winnerText} had the edge when it mattered{gapTextSuffix}. Still, second is second—solid points.",
-        "P2 at {eventName}. You were in the fight until the end, just not quite strong enough to take the top step. {gapTextSuffix} A podium finish and points in the bank.",
-        "Runner-up at {eventName}. The winner was slightly stronger today, but you were right there challenging. {gapTextSuffix} Second place—frustrating and encouraging in equal measure.",
+        "P2 at {eventName}. You were in the fight until the end, just not quite strong enough to take the top step{gapTextSuffix}. A podium finish and points in the bank.",
+        "Runner-up at {eventName}. The winner was slightly stronger today, but you were right there challenging{gapTextSuffix}. Second place—frustrating and encouraging in equal measure.",
         "A strong ride at {eventName} nets you second place. {winnerText} proved too good{gapTextSuffix}, but you showed you belong at the front of this field.",
-        "{eventName} rewarded consistent, smart racing with P2. Not the win, but proof you can compete with the best. {gapTextSuffix} The podium is the podium.",
+        "{eventName} rewarded consistent, smart racing with P2. Not the win, but proof you can compete with the best{gapTextSuffix}. The podium is the podium.",
         "Second place at {eventName}. Close enough to the victory to hurt, good enough to stand on the podium. {winnerText} had the legs today{gapTextSuffix}. Next time."
       ]
     },
@@ -390,7 +390,7 @@ const CONDENSED_NARRATIVES = {
         "{eventName} rewarded smart, patient racing. You stayed out of trouble, moved up when it mattered, and claimed the final podium spot{gapTextSuffix}. Third isn't first, but you stood on the podium.",
         "Third place at {eventName}. You fought for every position in the finale and secured a spot on the podium{gapTextSuffix}. Solid points and proof of good form.",
         "P3 at {eventName}. The podium was the target, and you delivered. {dynamicsText} Three steps, and you're on one of them{gapTextSuffix}.",
-        "{eventName} yields a podium finish. You rode smart, positioned well, and took third when others faded. {gapTextSuffix} Mission accomplished.",
+        "{eventName} yields a podium finish. You rode smart, positioned well, and took third when others faded{gapTextSuffix}. Mission accomplished.",
         "Bronze at {eventName}. Not the color you wanted, but a podium is a podium. You raced well and earned your spot{gapTextSuffix}.",
         "Third place at {eventName}. You gave everything in the finale and held on for a podium spot{gapTextSuffix}. Points earned, result banked."
       ]
