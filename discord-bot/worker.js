@@ -341,6 +341,47 @@ async function commitHighFiveUpdates(env, resultDocPath, userDocPath, discordUse
 }
 
 /**
+ * Edit Discord message to update high-5 count on button
+ */
+async function updateDiscordMessageHighFiveCount(env, channelId, messageId, newCount, customId) {
+  const botToken = env.DISCORD_BOT_TOKEN;
+
+  if (!botToken || !channelId || !messageId) {
+    return false;
+  }
+
+  try {
+    const response = await fetch(
+      `https://discord.com/api/v10/channels/${channelId}/messages/${messageId}`,
+      {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bot ${botToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          components: [{
+            type: 1, // Action Row
+            components: [{
+              type: 2, // Button
+              style: 2, // Secondary (grey)
+              label: `High 5 (${newCount})`,
+              emoji: { name: '✋' },
+              custom_id: customId
+            }]
+          }]
+        })
+      }
+    );
+
+    return response.ok;
+  } catch (error) {
+    console.error('Failed to update Discord message:', error);
+    return false;
+  }
+}
+
+/**
  * Handle High 5 button click
  */
 async function handleHighFiveButton(interaction, env) {
@@ -395,6 +436,11 @@ async function handleHighFiveButton(interaction, env) {
     };
   }
 
+  // Get current high-5 count and Discord message info for updating the button
+  const currentResultHighFives = parseInt(resultDoc.fields?.highFiveCount?.integerValue || '0');
+  const discordMessageId = resultDoc.fields?.discordMessageId?.stringValue;
+  const discordChannelId = resultDoc.fields?.discordChannelId?.stringValue;
+
   // Check Fan Favourite eligibility before committing
   const userDoc = await getDocument(env, userDocPath);
   const currentHighFives = parseInt(userDoc?.fields?.totalHighFivesReceived?.integerValue || '0');
@@ -412,6 +458,12 @@ async function handleHighFiveButton(interaction, env) {
         flags: 64,
       },
     };
+  }
+
+  // Update the Discord message button with new count
+  const newCount = currentResultHighFives + 1;
+  if (discordMessageId && discordChannelId) {
+    await updateDiscordMessageHighFiveCount(env, discordChannelId, discordMessageId, newCount, customId);
   }
 
   // Special message if Fan Favourite award was earned

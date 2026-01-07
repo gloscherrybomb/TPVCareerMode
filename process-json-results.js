@@ -292,7 +292,7 @@ async function sendPublicResultNotification(userData, eventResults, eventNumber,
 
   // Skip if not configured
   if (!botToken || !publicChannelId) {
-    return;
+    return null;
   }
 
   try {
@@ -425,13 +425,22 @@ async function sendPublicResultNotification(userData, eventResults, eventNumber,
       } else {
         console.log(`   ⚠️ Public channel post failed for ${riderName}: ${messageResponse.status}`);
       }
-    } else {
-      console.log(`   📢 Public result posted for ${riderName}`);
+      return null;
     }
+
+    // Parse response to get message ID for high-5 count updates
+    const messageData = await messageResponse.json();
+    console.log(`   📢 Public result posted for ${riderName} (message ID: ${messageData.id})`);
+
+    return {
+      messageId: messageData.id,
+      channelId: publicChannelId
+    };
 
   } catch (error) {
     // Log but don't fail - Discord notifications should not break result processing
     console.error(`   ⚠️ Public channel error for ${userData.name}: ${error.message}`);
+    return null;
   }
 }
 
@@ -3807,7 +3816,20 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
   await sendUserDiscordNotification(userData, eventResults, eventNumber, season);
 
   // Send to public results channel (all users)
-  await sendPublicResultNotification(userData, eventResults, eventNumber, season, userDoc.id);
+  const discordMessageInfo = await sendPublicResultNotification(userData, eventResults, eventNumber, season, userDoc.id);
+
+  // Save Discord message ID to result document for high-5 count updates
+  if (discordMessageInfo && discordMessageInfo.messageId) {
+    try {
+      const resultDocRef = db.collection('results').doc(`season${season}_event${eventNumber}_${userData.uid}`);
+      await resultDocRef.update({
+        discordMessageId: discordMessageInfo.messageId,
+        discordChannelId: discordMessageInfo.channelId
+      });
+    } catch (discordSaveError) {
+      console.log(`   ⚠️ Could not save Discord message ID: ${discordSaveError.message}`);
+    }
+  }
 
   console.log(`   ✅ Processed: Position ${isDNF ? 'DNF' : position}, Points: ${points}, CC: ${earnedCC}`);
   if (userResult.AvgPower) {
