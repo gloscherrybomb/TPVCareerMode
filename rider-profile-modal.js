@@ -84,6 +84,13 @@ function initializeRiderModal() {
         const styles = document.createElement('style');
         styles.id = 'rider-modal-additional-styles';
         styles.textContent = `
+            /* Modal size override for rider profiles */
+            .profile-modal-content {
+                max-width: 700px;
+                max-height: 90vh;
+                overflow-y: auto;
+            }
+
             .rider-profile-card {
                 background: linear-gradient(135deg, var(--card-gradient-start), var(--card-gradient-end));
                 border-radius: 12px;
