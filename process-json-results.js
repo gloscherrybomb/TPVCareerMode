@@ -3819,13 +3819,14 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
   const discordMessageInfo = await sendPublicResultNotification(userData, eventResults, eventNumber, season, userDoc.id);
 
   // Save Discord message ID to result document for high-5 count updates
+  // Use set with merge since the result document may not exist yet (created later by updateResultsSummary)
   if (discordMessageInfo && discordMessageInfo.messageId) {
     try {
       const resultDocRef = db.collection('results').doc(`season${season}_event${eventNumber}_${userData.uid}`);
-      await resultDocRef.update({
+      await resultDocRef.set({
         discordMessageId: discordMessageInfo.messageId,
         discordChannelId: discordMessageInfo.channelId
-      });
+      }, { merge: true });
     } catch (discordSaveError) {
       console.log(`   ⚠️ Could not save Discord message ID: ${discordSaveError.message}`);
     }
