@@ -1699,40 +1699,39 @@ async function processBotProfileRequests() {
   try {
     console.log('\n📋 Checking for pending bot profile requests...');
 
-    const requestsSnapshot = await db.collection('botProfileRequests')
-      .where('processed', '==', false)
-      .get();
-
-    if (requestsSnapshot.empty) {
-      console.log('   No pending bot profile requests');
-      return;
-    }
-
-    console.log(`   Found ${requestsSnapshot.size} pending request(s)`);
-
     const requestsFilePath = path.join(__dirname, 'bot-profile-requests', 'requests.txt');
     const dirPath = path.dirname(requestsFilePath);
     if (!fs.existsSync(dirPath)) {
       fs.mkdirSync(dirPath, { recursive: true });
     }
 
-    let appendedCount = 0;
-    let deletedCount = 0;
+    // Process new Firestore requests
+    const requestsSnapshot = await db.collection('botProfileRequests')
+      .where('processed', '==', false)
+      .get();
 
-    for (const doc of requestsSnapshot.docs) {
-      const request = doc.data();
+    if (requestsSnapshot.empty) {
+      console.log('   No pending bot profile requests in Firestore');
+    } else {
+      console.log(`   Found ${requestsSnapshot.size} pending request(s) in Firestore`);
 
-      const botProfileDoc = await db.collection('botProfiles').doc(request.botUid).get();
+      let appendedCount = 0;
+      let deletedCount = 0;
 
-      if (botProfileDoc.exists) {
-        console.log(`   Bot profile already exists for ${request.botName}, removing request...`);
-        await db.collection('botProfileRequests').doc(doc.id).delete();
-        deletedCount++;
-        continue;
-      }
+      for (const doc of requestsSnapshot.docs) {
+        const request = doc.data();
 
-      const timestamp = new Date(request.timestamp).toISOString().replace('T', ' ').split('.')[0] + ' UTC';
-      const entry = `
+        const botProfileDoc = await db.collection('botProfiles').doc(request.botUid).get();
+
+        if (botProfileDoc.exists) {
+          console.log(`   Bot profile already exists for ${request.botName}, removing request...`);
+          await db.collection('botProfileRequests').doc(doc.id).delete();
+          deletedCount++;
+          continue;
+        }
+
+        const timestamp = new Date(request.timestamp).toISOString().replace('T', ' ').split('.')[0] + ' UTC';
+        const entry = `
 ================================================================================
 Request submitted: ${timestamp}
 Firestore Document ID: ${doc.id}
@@ -1746,23 +1745,25 @@ Interesting Fact: ${request.interestFact}
 ================================================================================
 `;
 
-      fs.appendFileSync(requestsFilePath, entry, 'utf8');
+        fs.appendFileSync(requestsFilePath, entry, 'utf8');
 
-      await db.collection('botProfileRequests').doc(doc.id).update({
-        processed: true,
-        processedAt: admin.firestore.FieldValue.serverTimestamp()
-      });
+        await db.collection('botProfileRequests').doc(doc.id).update({
+          processed: true,
+          processedAt: admin.firestore.FieldValue.serverTimestamp()
+        });
 
-      appendedCount++;
-      console.log(`   Processed request for ${request.botName} (${request.botUid})`);
-    }
+        appendedCount++;
+        console.log(`   Processed request for ${request.botName} (${request.botUid})`);
+      }
 
-    console.log(`   Appended ${appendedCount} request(s) to ${requestsFilePath}`);
-    if (deletedCount > 0) {
-      console.log(`   Removed ${deletedCount} duplicate request(s) from Firestore`);
+      console.log(`   Appended ${appendedCount} request(s) to ${requestsFilePath}`);
+      if (deletedCount > 0) {
+        console.log(`   Removed ${deletedCount} duplicate request(s) from Firestore`);
+      }
     }
 
     // Clean up requests.txt - remove entries for bots that now have profiles
+    // This runs regardless of whether there were new Firestore requests
     if (fs.existsSync(requestsFilePath)) {
       console.log('   Checking requests.txt for completed profiles...');
 
@@ -1809,6 +1810,8 @@ Interesting Fact: ${request.interestFact}
           fs.writeFileSync(requestsFilePath, '', 'utf8');
         }
         console.log(`   Removed ${removedFromFile} completed request(s) from requests.txt`);
+      } else {
+        console.log('   No completed profiles to remove from requests.txt');
       }
     }
 

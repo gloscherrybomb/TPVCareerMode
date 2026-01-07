@@ -3843,18 +3843,6 @@ async function processBotProfileRequests() {
   try {
     console.log('\n📋 Checking for pending bot profile requests...');
 
-    // Get all unprocessed bot profile requests
-    const requestsSnapshot = await db.collection('botProfileRequests')
-      .where('processed', '==', false)
-      .get();
-
-    if (requestsSnapshot.empty) {
-      console.log('   No pending bot profile requests');
-      return;
-    }
-
-    console.log(`   Found ${requestsSnapshot.size} pending request(s)`);
-
     // Prepare the text file path
     const requestsFilePath = path.join(__dirname, 'bot-profile-requests', 'requests.txt');
 
@@ -3864,33 +3852,43 @@ async function processBotProfileRequests() {
       fs.mkdirSync(dirPath, { recursive: true });
     }
 
-    // Append each request to the file
-    let appendedCount = 0;
-    let skippedCount = 0;
-    let deletedCount = 0;
+    // Get all unprocessed bot profile requests
+    const requestsSnapshot = await db.collection('botProfileRequests')
+      .where('processed', '==', false)
+      .get();
 
-    for (const doc of requestsSnapshot.docs) {
-      const request = doc.data();
+    if (requestsSnapshot.empty) {
+      console.log('   No pending bot profile requests in Firestore');
+    } else {
+      console.log(`   Found ${requestsSnapshot.size} pending request(s) in Firestore`);
 
-      // Check if bot profile already exists
-      const botProfileDoc = await db.collection('botProfiles').doc(request.botUid).get();
+      // Append each request to the file
+      let appendedCount = 0;
+      let skippedCount = 0;
+      let deletedCount = 0;
 
-      if (botProfileDoc.exists) {
-        console.log(`   ⏭️  Bot profile already exists for ${request.botName} (${request.botUid}), removing request...`);
+      for (const doc of requestsSnapshot.docs) {
+        const request = doc.data();
 
-        // Delete the request from Firestore
-        await db.collection('botProfileRequests').doc(doc.id).delete();
+        // Check if bot profile already exists
+        const botProfileDoc = await db.collection('botProfiles').doc(request.botUid).get();
 
-        deletedCount++;
-        skippedCount++;
-        continue;
-      }
+        if (botProfileDoc.exists) {
+          console.log(`   ⏭️  Bot profile already exists for ${request.botName} (${request.botUid}), removing request...`);
 
-      // Format timestamp
-      const timestamp = new Date(request.timestamp).toISOString().replace('T', ' ').split('.')[0] + ' UTC';
+          // Delete the request from Firestore
+          await db.collection('botProfileRequests').doc(doc.id).delete();
 
-      // Format the request entry
-      const entry = `
+          deletedCount++;
+          skippedCount++;
+          continue;
+        }
+
+        // Format timestamp
+        const timestamp = new Date(request.timestamp).toISOString().replace('T', ' ').split('.')[0] + ' UTC';
+
+        // Format the request entry
+        const entry = `
 ================================================================================
 Request submitted: ${timestamp}
 Firestore Document ID: ${doc.id}
@@ -3904,25 +3902,27 @@ Interesting Fact: ${request.interestFact}
 ================================================================================
 `;
 
-      // Append to file
-      fs.appendFileSync(requestsFilePath, entry, 'utf8');
+        // Append to file
+        fs.appendFileSync(requestsFilePath, entry, 'utf8');
 
-      // Mark as processed in Firestore
-      await db.collection('botProfileRequests').doc(doc.id).update({
-        processed: true,
-        processedAt: admin.firestore.FieldValue.serverTimestamp()
-      });
+        // Mark as processed in Firestore
+        await db.collection('botProfileRequests').doc(doc.id).update({
+          processed: true,
+          processedAt: admin.firestore.FieldValue.serverTimestamp()
+        });
 
-      appendedCount++;
-      console.log(`   ✅ Processed request for ${request.botName} (${request.botUid})`);
-    }
+        appendedCount++;
+        console.log(`   ✅ Processed request for ${request.botName} (${request.botUid})`);
+      }
 
-    console.log(`   📝 Appended ${appendedCount} request(s) to ${requestsFilePath}`);
-    if (deletedCount > 0) {
-      console.log(`   🗑️  Removed ${deletedCount} duplicate request(s) from Firestore`);
+      console.log(`   📝 Appended ${appendedCount} request(s) to ${requestsFilePath}`);
+      if (deletedCount > 0) {
+        console.log(`   🗑️  Removed ${deletedCount} duplicate request(s) from Firestore`);
+      }
     }
 
     // Clean up requests.txt - remove entries for bots that now have profiles
+    // This runs regardless of whether there were new Firestore requests
     if (fs.existsSync(requestsFilePath)) {
       console.log('   🔍 Checking requests.txt for completed profiles...');
 
@@ -3969,6 +3969,8 @@ Interesting Fact: ${request.interestFact}
           fs.writeFileSync(requestsFilePath, '', 'utf8');
         }
         console.log(`   ✅ Removed ${removedFromFile} completed request(s) from requests.txt`);
+      } else {
+        console.log('   No completed profiles to remove from requests.txt');
       }
     }
 
