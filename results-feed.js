@@ -442,14 +442,17 @@ function createResultCard(resultData) {
         `;
     }
 
+    // Generate initials for avatar placeholder (same as profile modal)
+    const initials = riderName.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+
     // Build profile image HTML (clickable to open rider profile if profileUid exists)
     const profileImageHTML = profileUid
         ? (photoURL
             ? `<img src="${photoURL}" alt="${riderName}" class="rider-name-link" data-rider-uid="${profileUid}" data-rider-name="${riderName}">`
-            : `<div class="result-profile-placeholder rider-name-link" data-rider-uid="${profileUid}" data-rider-name="${riderName}">🚴</div>`)
+            : `<div class="result-profile-placeholder rider-name-link" data-rider-uid="${profileUid}" data-rider-name="${riderName}">${initials}</div>`)
         : (photoURL
             ? `<img src="${photoURL}" alt="${riderName}">`
-            : `<div class="result-profile-placeholder">🚴</div>`);
+            : `<div class="result-profile-placeholder">${initials}</div>`);
 
     // Make rider name clickable only if we have a valid profileUid
     const riderNameHTML = profileUid
