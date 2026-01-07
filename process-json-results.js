@@ -2903,35 +2903,44 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
       earnedHotStreakMedal = streak >= 3;
     }
 
-    // Zero to Hero: bottom 20% one event, top 20% next
-    if (eventNumber > 1) {
-      const prevEventResults = userData[`event${eventNumber - 1}Results`];
-      if (prevEventResults && prevEventResults.position && prevEventResults.position !== 'DNF') {
-        const currentFinishers = finishers.length;
-        const prevFinishers = prevEventResults.totalFinishers || currentFinishers;
-        earnedZeroToHero = awardsCalc.checkZeroToHero(
-          { position: prevEventResults.position, totalFinishers: prevFinishers },
-          { position: position, totalFinishers: currentFinishers }
-        );
-        if (earnedZeroToHero) {
-          const prevPct = ((prevEventResults.position / prevFinishers) * 100).toFixed(0);
-          const currPct = ((position / currentFinishers) * 100).toFixed(0);
-          console.log(`   🦸 Zero to Hero! ${prevEventResults.position}/${prevFinishers} (${prevPct}%) -> ${position}/${currentFinishers} (${currPct}%)`);
-        }
+    // Build list of previously completed events sorted by timestamp (for Zero to Hero & Comeback)
+    // Events are NOT completed in numerical order, so we must use chronological ordering
+    const previousEventsChronological = [];
+    for (let i = 1; i <= 15; i++) {
+      if (i !== eventNumber && userData[`event${i}Results`]) {
+        const evtData = userData[`event${i}Results`];
+        const timestamp = evtData.raceDate || evtData.processedAt;
+        const timestampMs = timestamp ? (timestamp.toDate ? timestamp.toDate().getTime() : new Date(timestamp).getTime()) : 0;
+        previousEventsChronological.push({ eventNum: i, timestamp: timestampMs, data: evtData });
+      }
+    }
+    // Sort by timestamp descending (most recent first)
+    previousEventsChronological.sort((a, b) => b.timestamp - a.timestamp);
+    const mostRecentPrevEvent = previousEventsChronological.length > 0 ? previousEventsChronological[0].data : null;
+
+    // Zero to Hero: bottom 20% one event, top 20% next (chronological order, not event number)
+    if (mostRecentPrevEvent && mostRecentPrevEvent.position && mostRecentPrevEvent.position !== 'DNF') {
+      const currentFinishers = finishers.length;
+      const prevFinishers = mostRecentPrevEvent.totalFinishers || currentFinishers;
+      earnedZeroToHero = awardsCalc.checkZeroToHero(
+        { position: mostRecentPrevEvent.position, totalFinishers: prevFinishers },
+        { position: position, totalFinishers: currentFinishers }
+      );
+      if (earnedZeroToHero) {
+        const prevPct = ((mostRecentPrevEvent.position / prevFinishers) * 100).toFixed(0);
+        const currPct = ((position / currentFinishers) * 100).toFixed(0);
+        console.log(`   🦸 Zero to Hero! ${mostRecentPrevEvent.position}/${prevFinishers} (${prevPct}%) -> ${position}/${currentFinishers} (${currPct}%)`);
       }
     }
 
-    // Comeback: top 5 after bottom half finish in PREVIOUS event
-    if (position <= 5 && eventNumber > 1) {
-      const prevEventResults = userData[`event${eventNumber - 1}Results`];
-      if (prevEventResults && prevEventResults.position && prevEventResults.position !== 'DNF') {
-        // Use PREVIOUS event's totalFinishers to determine if they were in bottom half
-        const prevTotalRiders = prevEventResults.totalFinishers || finishers.length;
-        const prevBottomHalf = prevTotalRiders / 2;
-        if (prevEventResults.position > prevBottomHalf) {
-          earnedComeback = true;
-          console.log(`   🔄 Comeback Kid! Prev position ${prevEventResults.position}/${prevTotalRiders} -> now ${position}`);
-        }
+    // Comeback: top 5 after bottom half finish in PREVIOUS event (chronological order)
+    if (position <= 5 && mostRecentPrevEvent && mostRecentPrevEvent.position && mostRecentPrevEvent.position !== 'DNF') {
+      // Use PREVIOUS event's totalFinishers to determine if they were in bottom half
+      const prevTotalRiders = mostRecentPrevEvent.totalFinishers || finishers.length;
+      const prevBottomHalf = prevTotalRiders / 2;
+      if (mostRecentPrevEvent.position > prevBottomHalf) {
+        earnedComeback = true;
+        console.log(`   🔄 Comeback Kid! Prev position ${mostRecentPrevEvent.position}/${prevTotalRiders} -> now ${position}`);
       }
     }
 

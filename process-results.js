@@ -1417,19 +1417,31 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
       earnedTheAccountant = awardsCalc.checkTheAccountant(userTime, userEventPoints, results);
     }
 
-    // Zero to Hero requires previous event data
-    if (eventNumber > 1) {
-      const prevEventResults = userData[`event${eventNumber - 1}Results`];
-      if (prevEventResults && prevEventResults.position && prevEventResults.position !== 'DNF') {
-        // Get total finishers for both events from results
-        const currentFinishers = results.filter(r => r.Position !== 'DNF' && !isNaN(parseInt(r.Position))).length;
-        // Use stored totalFinishers from previous event if available, otherwise use current event's count as estimate
-        const prevFinishers = prevEventResults.totalFinishers || currentFinishers;
-        earnedZeroToHero = awardsCalc.checkZeroToHero(
-          { position: prevEventResults.position, totalFinishers: prevFinishers },
-          { position: position, totalFinishers: currentFinishers }
-        );
+    // Build list of previously completed events sorted by timestamp (for Zero to Hero & Hot Streak)
+    // Events are NOT completed in numerical order, so we must use chronological ordering
+    const previousEventsChronological = [];
+    for (let i = 1; i <= 15; i++) {
+      if (i !== eventNumber && userData[`event${i}Results`]) {
+        const evtData = userData[`event${i}Results`];
+        const timestamp = evtData.raceDate || evtData.processedAt;
+        const timestampMs = timestamp ? (timestamp.toDate ? timestamp.toDate().getTime() : new Date(timestamp).getTime()) : 0;
+        previousEventsChronological.push({ eventNum: i, timestamp: timestampMs, data: evtData });
       }
+    }
+    // Sort by timestamp descending (most recent first)
+    previousEventsChronological.sort((a, b) => b.timestamp - a.timestamp);
+    const mostRecentPrevEvent = previousEventsChronological.length > 0 ? previousEventsChronological[0].data : null;
+
+    // Zero to Hero requires previous event data (chronological order, not event number)
+    if (mostRecentPrevEvent && mostRecentPrevEvent.position && mostRecentPrevEvent.position !== 'DNF') {
+      // Get total finishers for both events from results
+      const currentFinishers = results.filter(r => r.Position !== 'DNF' && !isNaN(parseInt(r.Position))).length;
+      // Use stored totalFinishers from previous event if available, otherwise use current event's count as estimate
+      const prevFinishers = mostRecentPrevEvent.totalFinishers || currentFinishers;
+      earnedZeroToHero = awardsCalc.checkZeroToHero(
+        { position: mostRecentPrevEvent.position, totalFinishers: prevFinishers },
+        { position: position, totalFinishers: currentFinishers }
+      );
     }
 
     // Bullseye - exact predicted position match
@@ -1438,11 +1450,12 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
       console.log('   🎯 BULLSEYE! Finished exactly at predicted position');
     }
 
-    // Hot Streak - 3 consecutive wins
+    // Hot Streak - 3 consecutive wins (chronological order, not event number)
     if (position === 1) {
       let consecutiveWins = 1; // Current win counts
-      for (let i = eventNumber - 1; i >= 1; i--) {
-        const prevResult = userData[`event${i}Results`];
+      // Check previous events in chronological order (most recent first)
+      for (let i = 0; i < previousEventsChronological.length; i++) {
+        const prevResult = previousEventsChronological[i].data;
         if (prevResult && prevResult.position === 1) {
           consecutiveWins++;
         } else {
