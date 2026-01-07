@@ -2915,14 +2915,16 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
       }
     }
 
-    // Comeback: top 5 after bottom half finish
+    // Comeback: top 5 after bottom half finish in PREVIOUS event
     if (position <= 5 && eventNumber > 1) {
       const prevEventResults = userData[`event${eventNumber - 1}Results`];
       if (prevEventResults && prevEventResults.position && prevEventResults.position !== 'DNF') {
-        const totalRiders = finishers.length;
-        const bottomHalf = totalRiders / 2;
-        if (prevEventResults.position > bottomHalf) {
+        // Use PREVIOUS event's totalFinishers to determine if they were in bottom half
+        const prevTotalRiders = prevEventResults.totalFinishers || finishers.length;
+        const prevBottomHalf = prevTotalRiders / 2;
+        if (prevEventResults.position > prevBottomHalf) {
           earnedComeback = true;
+          console.log(`   🔄 Comeback Kid! Prev position ${prevEventResults.position}/${prevTotalRiders} -> now ${position}`);
         }
       }
     }
