@@ -691,12 +691,12 @@ function buildRiderProfileHTML(data, name) {
                             <span class="rider-profile-meta-value">${team}</span>
                         </div>
                         <div class="rider-profile-meta-item">
-                            <span class="rider-profile-meta-label">High 5s</span>
-                            <span class="rider-profile-meta-value">&#9995; ${totalHighFivesReceived}</span>
-                        </div>
-                        <div class="rider-profile-meta-item">
                             <span class="rider-profile-meta-label">Season</span>
                             <span class="rider-profile-meta-value">${season}</span>
+                        </div>
+                        <div class="rider-profile-meta-item">
+                            <span class="rider-profile-meta-label">High 5s</span>
+                            <span class="rider-profile-meta-value">&#9995; ${totalHighFivesReceived}</span>
                         </div>
                     </div>
                 </div>
