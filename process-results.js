@@ -3853,21 +3853,26 @@ async function processBotProfileRequests() {
     }
 
     // Get all unprocessed bot profile requests
-    const requestsSnapshot = await db.collection('botProfileRequests')
-      .where('processed', '==', false)
-      .get();
+    // Query all documents and filter in code to catch docs without 'processed' field
+    const allRequestsSnapshot = await db.collection('botProfileRequests').get();
 
-    if (requestsSnapshot.empty) {
+    // Filter for unprocessed requests (processed === false OR processed field doesn't exist)
+    const pendingDocs = allRequestsSnapshot.docs.filter(doc => {
+      const data = doc.data();
+      return data.processed === false || data.processed === undefined;
+    });
+
+    if (pendingDocs.length === 0) {
       console.log('   No pending bot profile requests in Firestore');
     } else {
-      console.log(`   Found ${requestsSnapshot.size} pending request(s) in Firestore`);
+      console.log(`   Found ${pendingDocs.length} pending request(s) in Firestore`);
 
       // Append each request to the file
       let appendedCount = 0;
       let skippedCount = 0;
       let deletedCount = 0;
 
-      for (const doc of requestsSnapshot.docs) {
+      for (const doc of pendingDocs) {
         const request = doc.data();
 
         // Check if bot profile already exists
