@@ -284,8 +284,9 @@ async function sendUserDiscordNotification(userData, eventResults, eventNumber, 
  * @param {Object} eventResults - Processed event results
  * @param {number} eventNumber - Event number
  * @param {number} seasonNumber - Season number
+ * @param {string} firebaseUid - Firebase Auth UID of the user (for high 5 button)
  */
-async function sendPublicResultNotification(userData, eventResults, eventNumber, seasonNumber) {
+async function sendPublicResultNotification(userData, eventResults, eventNumber, seasonNumber, firebaseUid) {
   const botToken = process.env.DISCORD_BOT_TOKEN;
   const publicChannelId = process.env.DISCORD_PUBLIC_RESULTS_CHANNEL_ID;
 
@@ -390,7 +391,10 @@ async function sendPublicResultNotification(userData, eventResults, eventNumber,
       });
     }
 
-    // Post directly to public channel (no DM channel creation needed, no button)
+    // Build High 5 button custom_id: high5_{season}_{event}_{tpvUid}_{firebaseUid}
+    const high5CustomId = `high5_${seasonNumber}_${eventNumber}_${userData.uid}_${firebaseUid}`;
+
+    // Post to public channel with High 5 button
     const messageResponse = await fetch(
       `https://discord.com/api/v10/channels/${publicChannelId}/messages`,
       {
@@ -400,7 +404,17 @@ async function sendPublicResultNotification(userData, eventResults, eventNumber,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          embeds: [embed]
+          embeds: [embed],
+          components: [{
+            type: 1, // Action Row
+            components: [{
+              type: 2, // Button
+              style: 2, // Secondary (grey)
+              label: 'High 5',
+              emoji: { name: '✋' },
+              custom_id: high5CustomId
+            }]
+          }]
         })
       }
     );
@@ -3785,7 +3799,7 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
   await sendUserDiscordNotification(userData, eventResults, eventNumber, season);
 
   // Send to public results channel (all users)
-  await sendPublicResultNotification(userData, eventResults, eventNumber, season);
+  await sendPublicResultNotification(userData, eventResults, eventNumber, season, userDoc.id);
 
   console.log(`   ✅ Processed: Position ${isDNF ? 'DNF' : position}, Points: ${points}, CC: ${earnedCC}`);
   if (userResult.AvgPower) {

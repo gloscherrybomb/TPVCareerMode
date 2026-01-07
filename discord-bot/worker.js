@@ -14,6 +14,7 @@
 const InteractionType = {
   PING: 1,
   APPLICATION_COMMAND: 2,
+  MESSAGE_COMPONENT: 3,
 };
 
 // Discord interaction response types
@@ -239,6 +240,164 @@ async function updateUserDocument(env, documentPath, fields) {
   );
 
   return response.ok;
+}
+
+/**
+ * Get a Firestore document by path
+ */
+async function getDocument(env, documentPath) {
+  const accessToken = await getAccessToken(env);
+
+  const response = await fetch(
+    `https://firestore.googleapis.com/v1/${documentPath}`,
+    {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    }
+  );
+
+  if (!response.ok) {
+    return null;
+  }
+
+  return await response.json();
+}
+
+/**
+ * Perform atomic updates using Firestore commit with field transforms
+ * Used for incrementing counters and appending to arrays atomically
+ */
+async function commitHighFiveUpdates(env, resultDocPath, userDocPath, discordUserId) {
+  const accessToken = await getAccessToken(env);
+  const projectId = env.FIREBASE_PROJECT_ID;
+
+  const commitBody = {
+    writes: [
+      // Update result document: increment highFiveCount, add to highFiveUsers array
+      {
+        transform: {
+          document: resultDocPath,
+          fieldTransforms: [
+            {
+              fieldPath: 'highFiveCount',
+              increment: { integerValue: '1' }
+            },
+            {
+              fieldPath: 'highFiveUsers',
+              appendMissingElements: {
+                values: [{ stringValue: discordUserId }]
+              }
+            }
+          ]
+        }
+      },
+      // Update user document: increment totalHighFivesReceived
+      {
+        transform: {
+          document: userDocPath,
+          fieldTransforms: [
+            {
+              fieldPath: 'totalHighFivesReceived',
+              increment: { integerValue: '1' }
+            }
+          ]
+        }
+      }
+    ]
+  };
+
+  const response = await fetch(
+    `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents:commit`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(commitBody),
+    }
+  );
+
+  return response.ok;
+}
+
+/**
+ * Handle High 5 button click
+ */
+async function handleHighFiveButton(interaction, env) {
+  const discordUserId = interaction.user?.id || interaction.member?.user?.id;
+  const customId = interaction.data.custom_id;
+
+  // Parse custom_id: high5_{season}_{event}_{tpvUid}_{firebaseUid}
+  const parts = customId.split('_');
+  if (parts.length < 5) {
+    return {
+      type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+      data: {
+        content: '❌ Invalid button data.',
+        flags: 64, // Ephemeral
+      },
+    };
+  }
+
+  const season = parts[1];
+  const event = parts[2];
+  const tpvUid = parts[3];
+  const firebaseUid = parts[4];
+
+  const projectId = env.FIREBASE_PROJECT_ID;
+  const resultDocPath = `projects/${projectId}/databases/(default)/documents/results/season${season}_event${event}_${tpvUid}`;
+  const userDocPath = `projects/${projectId}/databases/(default)/documents/users/${firebaseUid}`;
+
+  // Get the result document to check if user already gave a high 5
+  const resultDoc = await getDocument(env, resultDocPath);
+
+  if (!resultDoc) {
+    return {
+      type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+      data: {
+        content: '❌ Could not find this result.',
+        flags: 64,
+      },
+    };
+  }
+
+  // Check if this Discord user already high-fived this result
+  const highFiveUsers = resultDoc.fields?.highFiveUsers?.arrayValue?.values || [];
+  const alreadyHighFived = highFiveUsers.some(v => v.stringValue === discordUserId);
+
+  if (alreadyHighFived) {
+    return {
+      type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+      data: {
+        content: '✋ You already gave a High 5 for this result!',
+        flags: 64,
+      },
+    };
+  }
+
+  // Perform atomic updates
+  const success = await commitHighFiveUpdates(env, resultDocPath, userDocPath, discordUserId);
+
+  if (!success) {
+    return {
+      type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+      data: {
+        content: '❌ Failed to save High 5. Please try again.',
+        flags: 64,
+      },
+    };
+  }
+
+  return {
+    type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+    data: {
+      content: '✋ High 5 sent!',
+      flags: 64,
+    },
+  };
 }
 
 /**
@@ -611,6 +770,30 @@ export default {
       }
 
       return new Response(JSON.stringify(response), {
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    // Handle button clicks (MESSAGE_COMPONENT)
+    if (interaction.type === InteractionType.MESSAGE_COMPONENT) {
+      const customId = interaction.data.custom_id;
+
+      // Handle High 5 button
+      if (customId.startsWith('high5_')) {
+        const response = await handleHighFiveButton(interaction, env);
+        return new Response(JSON.stringify(response), {
+          headers: { 'Content-Type': 'application/json' },
+        });
+      }
+
+      // Unknown button
+      return new Response(JSON.stringify({
+        type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+        data: {
+          content: 'Unknown button.',
+          flags: 64,
+        },
+      }), {
         headers: { 'Content-Type': 'application/json' },
       });
     }
