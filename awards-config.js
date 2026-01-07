@@ -308,6 +308,15 @@ const AWARD_DEFINITIONS = {
     calculationType: 'event'
   },
 
+  // Community award
+  fanFavourite: {
+    id: 'fanFavourite',
+    title: 'Fan Favourite',
+    icon: '💜',
+    description: 'Receive 100 high-5s from the community',
+    calculationType: 'career'
+  },
+
   // Season reset award
   gluttonForPunishment: {
     id: 'gluttonForPunishment',

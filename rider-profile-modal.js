@@ -623,7 +623,10 @@ function buildRiderProfileHTML(data, name) {
         weekendWarrior: { icon: '🏁', name: 'Weekend Warrior' },
         trophyCollector: { icon: '🏆', name: 'Trophy Collector' },
         technicalIssues: { icon: '🔧', name: 'Technical Issues' },
-        overrated: { icon: '📉', name: 'Overrated' }
+        overrated: { icon: '📉', name: 'Overrated' },
+
+        // Community awards
+        fanFavourite: { icon: '💜', name: 'Fan Favourite' }
     };
     
     // Build awards list with counts

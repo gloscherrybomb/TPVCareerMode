@@ -842,6 +842,7 @@ function displayAwards(awards) {
         zeroToHero: awards.zeroToHero || 0,
         trophyCollector: awards.trophyCollector || 0,
         technicalIssues: awards.technicalIssues || 0,
+        fanFavourite: awards.fanFavourite || 0,
         gcGoldMedal: awards.gcGold || 0,
         gcSilverMedal: awards.gcSilver || 0,
         gcBronzeMedal: awards.gcBronze || 0,
@@ -876,7 +877,7 @@ function displayAwards(awards) {
                         (awards.domination || 0) + (awards.closeCall || 0) + (awards.photoFinish || 0) +
                         (awards.overrated || 0) + (awards.darkHorse || 0) + (awards.backToBack || 0) +
                         (awards.weekendWarrior || 0) + (awards.zeroToHero || 0) +
-                        (awards.trophyCollector || 0) + (awards.technicalIssues || 0) +
+                        (awards.trophyCollector || 0) + (awards.technicalIssues || 0) + (awards.fanFavourite || 0) +
                         (awards.gcGoldMedal || 0) + (awards.gcSilverMedal || 0) + (awards.gcBronzeMedal || 0) +
                         (awards.seasonChampion || 0) + (awards.seasonRunnerUp || 0) + (awards.seasonThirdPlace || 0) +
                         (awards.perfectSeason || 0) + (awards.podiumStreak || 0) +
@@ -1190,7 +1191,19 @@ function displayAwards(awards) {
             </div>
         `;
     }
-    
+
+    // Fan Favourite (100+ high-5s received)
+    if (awards.fanFavourite > 0) {
+        html += `
+            <div class="award-card fan-favourite">
+                <div class="award-icon">💜</div>
+                <div class="award-count">${awards.fanFavourite}x</div>
+                <div class="award-title">Fan Favourite</div>
+                <div class="award-description">Received 100 High-5s</div>
+            </div>
+        `;
+    }
+
     // NEW SPECIAL AWARDS
     
     // Perfect Season (win every event)

@@ -44,6 +44,8 @@ const AWARD_CREDIT_MAP = {
   blastOff: 50,
   smoothOperator: 30,
   bunchKick: 30,
+  // Community award
+  fanFavourite: 50,
   // Season reset award
   gluttonForPunishment: 100
 };

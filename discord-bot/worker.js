@@ -269,9 +269,31 @@ async function getDocument(env, documentPath) {
  * Perform atomic updates using Firestore commit with field transforms
  * Used for incrementing counters and appending to arrays atomically
  */
-async function commitHighFiveUpdates(env, resultDocPath, userDocPath, discordUserId) {
+async function commitHighFiveUpdates(env, resultDocPath, userDocPath, discordUserId, shouldAwardFanFavourite = false) {
   const accessToken = await getAccessToken(env);
   const projectId = env.FIREBASE_PROJECT_ID;
+
+  // Build user document field transforms
+  const userFieldTransforms = [
+    {
+      fieldPath: 'totalHighFivesReceived',
+      increment: { integerValue: '1' }
+    }
+  ];
+
+  // If Fan Favourite threshold reached, add award and Cadence Credits
+  if (shouldAwardFanFavourite) {
+    userFieldTransforms.push(
+      {
+        fieldPath: 'awards.fanFavourite',
+        increment: { integerValue: '1' }
+      },
+      {
+        fieldPath: 'cadenceCredits',
+        increment: { integerValue: '50' }
+      }
+    );
+  }
 
   const commitBody = {
     writes: [
@@ -293,16 +315,11 @@ async function commitHighFiveUpdates(env, resultDocPath, userDocPath, discordUse
           ]
         }
       },
-      // Update user document: increment totalHighFivesReceived
+      // Update user document: increment totalHighFivesReceived (and award if eligible)
       {
         transform: {
           document: userDocPath,
-          fieldTransforms: [
-            {
-              fieldPath: 'totalHighFivesReceived',
-              increment: { integerValue: '1' }
-            }
-          ]
+          fieldTransforms: userFieldTransforms
         }
       }
     ]
@@ -378,14 +395,31 @@ async function handleHighFiveButton(interaction, env) {
     };
   }
 
+  // Check Fan Favourite eligibility before committing
+  const userDoc = await getDocument(env, userDocPath);
+  const currentHighFives = parseInt(userDoc?.fields?.totalHighFivesReceived?.integerValue || '0');
+  const currentFanFavourite = parseInt(userDoc?.fields?.awards?.mapValue?.fields?.fanFavourite?.integerValue || '0');
+  const shouldAwardFanFavourite = (currentHighFives + 1) >= 100 && currentFanFavourite === 0;
+
   // Perform atomic updates
-  const success = await commitHighFiveUpdates(env, resultDocPath, userDocPath, discordUserId);
+  const success = await commitHighFiveUpdates(env, resultDocPath, userDocPath, discordUserId, shouldAwardFanFavourite);
 
   if (!success) {
     return {
       type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
       data: {
         content: '❌ Failed to save High 5. Please try again.',
+        flags: 64,
+      },
+    };
+  }
+
+  // Special message if Fan Favourite award was earned
+  if (shouldAwardFanFavourite) {
+    return {
+      type: InteractionResponseType.CHANNEL_MESSAGE_WITH_SOURCE,
+      data: {
+        content: '✋ High 5 sent! 💜 You just helped this rider earn the **Fan Favourite** award!',
         flags: 64,
       },
     };

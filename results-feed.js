@@ -10,6 +10,7 @@ import {
     orderBy,
     limit,
     getDocs,
+    getDoc,
     startAfter,
     where,
     doc,
@@ -850,9 +851,27 @@ async function toggleHighFive(resultDocId, resultOwnerUid, resultOwnerFirebaseUi
             // Update the result owner's total high 5s count (if we have their Firebase UID)
             if (resultOwnerFirebaseUid) {
                 const userRef = doc(db, 'users', resultOwnerFirebaseUid);
-                await updateDoc(userRef, {
-                    totalHighFivesReceived: increment(1)
-                });
+
+                // Check Fan Favourite eligibility before updating
+                const userSnap = await getDoc(userRef);
+                const userData = userSnap.data() || {};
+                const currentHighFives = userData.totalHighFivesReceived || 0;
+                const currentFanFavourite = userData.awards?.fanFavourite || 0;
+                const shouldAwardFanFavourite = (currentHighFives + 1) >= 100 && currentFanFavourite === 0;
+
+                if (shouldAwardFanFavourite) {
+                    // Award Fan Favourite with 50 Cadence Credits
+                    await updateDoc(userRef, {
+                        totalHighFivesReceived: increment(1),
+                        'awards.fanFavourite': increment(1),
+                        cadenceCredits: increment(50)
+                    });
+                    console.log('[HIGH5] Awarded Fan Favourite! (+50 CC)');
+                } else {
+                    await updateDoc(userRef, {
+                        totalHighFivesReceived: increment(1)
+                    });
+                }
             }
 
             userHighFives[resultDocId] = true;

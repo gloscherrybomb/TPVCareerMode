@@ -128,7 +128,10 @@ const AWARD_NAMES = {
     backToBack: { name: "Back to Back", icon: "🔁" },
     weekendWarrior: { name: "Weekend Warrior", icon: "🏁" },
     trophyCollector: { name: "Trophy Collector", icon: "🏆" },
-    technicalIssues: { name: "Technical Issues", icon: "🔧" }
+    technicalIssues: { name: "Technical Issues", icon: "🔧" },
+
+    // Community awards
+    fanFavourite: { name: "Fan Favourite", icon: "💜" }
 };
 
 // Helper function to get stage number for an event
