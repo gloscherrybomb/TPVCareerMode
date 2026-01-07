@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Award Statistics - TPV Career Mode</title>
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="tpv-team-car.png">
+    <link rel="apple-touch-icon" href="tpv-team-car.png">
+
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        .admin-container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .stats-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--dark-card);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #ffd700;
+        }
+
+        .stat-value.blue {
+            color: var(--accent-blue);
+        }
+
+        .stat-value.green {
+            color: var(--success);
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 0.5rem;
+        }
+
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.3rem;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        .controls-section {
+            background: var(--dark-card);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .sort-select, .filter-select {
+            padding: 0.75rem 1rem;
+            background: var(--dark-bg);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            font-family: 'Exo 2', sans-serif;
+            cursor: pointer;
+        }
+
+        .sort-select:focus, .filter-select:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+        }
+
+        .awards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .award-card {
+            background: var(--dark-card);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border-left: 4px solid var(--accent-blue);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .award-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        }
+
+        .award-card.type-event {
+            border-left-color: var(--accent-blue);
+        }
+
+        .award-card.type-career {
+            border-left-color: var(--success);
+        }
+
+        .award-card.type-season {
+            border-left-color: #ffd700;
+        }
+
+        .award-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .award-icon {
+            font-size: 2.5rem;
+            line-height: 1;
+        }
+
+        .award-title-section {
+            flex: 1;
+        }
+
+        .award-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .award-type-badge {
+            display: inline-block;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .award-type-badge.event {
+            background: rgba(69, 202, 255, 0.2);
+            color: var(--accent-blue);
+        }
+
+        .award-type-badge.career {
+            background: rgba(52, 199, 89, 0.2);
+            color: var(--success);
+        }
+
+        .award-type-badge.season {
+            background: rgba(255, 215, 0, 0.2);
+            color: #ffd700;
+        }
+
+        .award-description {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 1rem;
+        }
+
+        .award-stats {
+            display: flex;
+            gap: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .award-stat {
+            text-align: center;
+        }
+
+        .award-stat-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .award-stat-label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top-color: var(--accent-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .auth-check {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 50vh;
+        }
+
+        .unauthorized {
+            text-align: center;
+            padding: 4rem 2rem;
+        }
+
+        .unauthorized-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .header-row {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .header-row .section-title {
+            margin-bottom: 0;
+        }
+
+        .refresh-btn {
+            padding: 0.5rem 1rem;
+            background: var(--dark-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Exo 2', sans-serif;
+            margin-left: auto;
+        }
+
+        .refresh-btn:hover {
+            border-color: var(--accent-blue);
+            color: var(--text-primary);
+        }
+
+        @media (max-width: 768px) {
+            .awards-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .controls-section {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <span class="logo-text">TPV</span>
+                <span class="logo-subtitle">Admin</span>
+            </div>
+            <div class="nav-links">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="admin-bots.html" class="nav-link">Bot Admin</a>
+                <a href="admin-contributors.html" class="nav-link">Contributors</a>
+                <a href="admin-stats.html" class="nav-link">Usage Stats</a>
+                <a href="admin-awards.html" class="nav-link active">Awards</a>
+                <a href="#" class="nav-link nav-logout" id="logoutBtn">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Auth Check Notice -->
+    <div id="authCheck" class="auth-check">
+        <div class="spinner"></div>
+        <p>Checking authentication...</p>
+    </div>
+
+    <!-- Unauthorized Message -->
+    <div id="unauthorized" class="unauthorized" style="display: none;">
+        <div class="container">
+            <div class="unauthorized-icon">&#128274;</div>
+            <h2>Access Denied</h2>
+            <p>You must be logged in as an administrator to access this page.</p>
+            <button class="btn btn-primary" onclick="window.location.href='index.html'">Go Home</button>
+        </div>
+    </div>
+
+    <!-- Admin Content -->
+    <div id="adminContent" style="display: none;">
+        <div class="page-header">
+            <div class="container">
+                <h1 class="page-title">Award Statistics</h1>
+                <p class="page-subtitle">Overview of all awards and how many riders have earned them</p>
+            </div>
+        </div>
+
+        <div class="admin-container">
+            <!-- Summary Stats -->
+            <div class="stats-section">
+                <div class="stat-card">
+                    <div class="stat-value" id="totalAwardTypes">-</div>
+                    <div class="stat-label">Award Types</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value blue" id="totalAwarded">-</div>
+                    <div class="stat-label">Total Awarded</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value green" id="uniqueEarners">-</div>
+                    <div class="stat-label">Unique Earners</div>
+                </div>
+            </div>
+
+            <!-- Controls -->
+            <div class="controls-section">
+                <label style="color: var(--text-secondary);">Sort by:</label>
+                <select id="sortSelect" class="sort-select">
+                    <option value="total-desc">Most Earned</option>
+                    <option value="total-asc">Rarest (Fewest Earned)</option>
+                    <option value="riders-desc">Most Unique Riders</option>
+                    <option value="riders-asc">Fewest Unique Riders</option>
+                    <option value="name-asc">Name (A-Z)</option>
+                </select>
+                <label style="color: var(--text-secondary);">Filter:</label>
+                <select id="filterSelect" class="filter-select">
+                    <option value="all">All Awards</option>
+                    <option value="event">Event Awards</option>
+                    <option value="career">Career Awards</option>
+                    <option value="season">Season Awards</option>
+                    <option value="earned">Earned Only</option>
+                    <option value="unearned">Never Earned</option>
+                </select>
+                <button class="refresh-btn" id="refreshBtn">Refresh Data</button>
+            </div>
+
+            <!-- Awards Grid -->
+            <div class="header-row">
+                <h2 class="section-title">All Awards</h2>
+                <span id="filteredCount" style="color: var(--text-secondary);"></span>
+            </div>
+            <div id="awardsGrid" class="awards-grid">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Loading award statistics...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="admin-awards.js"></script>
+</body>
+</html>
