@@ -3919,7 +3919,57 @@ Interesting Fact: ${request.interestFact}
 
     console.log(`   📝 Appended ${appendedCount} request(s) to ${requestsFilePath}`);
     if (deletedCount > 0) {
-      console.log(`   🗑️  Removed ${deletedCount} duplicate request(s) (bot profiles already exist)`);
+      console.log(`   🗑️  Removed ${deletedCount} duplicate request(s) from Firestore`);
+    }
+
+    // Clean up requests.txt - remove entries for bots that now have profiles
+    if (fs.existsSync(requestsFilePath)) {
+      console.log('   🔍 Checking requests.txt for completed profiles...');
+
+      const fileContent = fs.readFileSync(requestsFilePath, 'utf8');
+      const separator = '================================================================================';
+      const entries = fileContent.split(separator).filter(entry => entry.trim());
+
+      let removedFromFile = 0;
+      const remainingEntries = [];
+
+      for (const entry of entries) {
+        // Extract Bot UID from entry
+        const botUidMatch = entry.match(/Bot UID:\s*(\S+)/);
+        if (!botUidMatch) {
+          // Keep entries we can't parse
+          remainingEntries.push(entry);
+          continue;
+        }
+
+        const botUid = botUidMatch[1];
+        const botProfileDoc = await db.collection('botProfiles').doc(botUid).get();
+
+        if (botProfileDoc.exists) {
+          // Bot profile exists, remove this entry
+          const botNameMatch = entry.match(/Bot Name:\s*(.+)/);
+          const botName = botNameMatch ? botNameMatch[1].trim() : botUid;
+          console.log(`   🗑️  Removing completed request for ${botName} (${botUid}) from file`);
+          removedFromFile++;
+        } else {
+          // Keep this entry
+          remainingEntries.push(entry);
+        }
+      }
+
+      if (removedFromFile > 0) {
+        // Rewrite the file with remaining entries
+        if (remainingEntries.length > 0) {
+          const newContent = remainingEntries.map(entry =>
+            separator + entry + separator
+          ).join('\n');
+          fs.writeFileSync(requestsFilePath, newContent, 'utf8');
+        } else {
+          // All entries removed, write empty file
+          fs.writeFileSync(requestsFilePath, '', 'utf8');
+        }
+        console.log(`   ✅ Removed ${removedFromFile} completed request(s) from requests.txt`);
+      }
     }
 
   } catch (error) {
