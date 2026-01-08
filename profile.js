@@ -787,8 +787,9 @@ function displayRecentResults(results) {
             }
         }
 
-        // Format date using shared utility function
-        const formattedDate = formatDate(result.date);
+        // Format date using shared utility function - prefer raceDate over processedAt
+        const displayDate = result.raceDate || result.processedAt;
+        const formattedDate = formatDate(displayDate?.toDate?.() || displayDate);
 
         html += `
             <a href="event-detail.html?id=${result.eventNum}" class="result-card-link">
