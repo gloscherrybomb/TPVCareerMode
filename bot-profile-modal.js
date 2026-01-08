@@ -362,9 +362,10 @@ async function openBotProfile(botUid) {
         
     } catch (error) {
         console.error('Error loading bot profile:', error);
+        const warningIcon = window.TPVIcons ? window.TPVIcons.getIcon('warning', {size: 'xxl'}) : '⚠️';
         modalBody.innerHTML = `
             <div style="padding: 3rem; text-align: center;">
-                <div style="font-size: 4rem; margin-bottom: 1rem;">⚠️</div>
+                <div style="font-size: 4rem; margin-bottom: 1rem;">${warningIcon}</div>
                 <h3 style="color: var(--text-primary); margin-bottom: 0.5rem;">Error Loading Profile</h3>
                 <p style="color: var(--text-secondary);">${escapeHtml(error.message)}</p>
             </div>

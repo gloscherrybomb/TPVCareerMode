@@ -2106,6 +2106,34 @@ document.getElementById('filterCategory')?.addEventListener('change', applyFilte
 // Pagination event listener
 document.getElementById('loadMoreBtn')?.addEventListener('click', loadMoreResults);
 
+// Initialize achievement icons with new icon system
+function initAchievementIcons() {
+    if (!window.TPVIcons) {
+        console.warn('TPVIcons not loaded');
+        return;
+    }
+
+    const iconMappings = [
+        { id: 'achievementBestPred', icon: 'trophy' },
+        { id: 'achievementBiggestWin', icon: 'goldMedal' },
+        { id: 'achievementHighestARR', icon: 'power' },
+        { id: 'achievementBiggestGiant', icon: 'giantKiller' }
+    ];
+
+    iconMappings.forEach(mapping => {
+        const element = document.getElementById(mapping.id);
+        if (element) {
+            const iconSpan = element.querySelector('.achievement-icon');
+            if (iconSpan) {
+                iconSpan.innerHTML = window.TPVIcons.getIcon(mapping.icon, { size: 'sm' });
+            }
+        }
+    });
+}
+
+// Initialize icons on load
+initAchievementIcons();
+
 // Sortable table headers
 document.querySelectorAll('.palmares-table th.sortable').forEach(th => {
     th.addEventListener('click', () => {

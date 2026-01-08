@@ -22,6 +22,23 @@ let currentUser = null;
 let eventNumber = null;
 
 /**
+ * Helper function to get icon from icon system with fallback
+ */
+function getIcon(iconId, size = 'md') {
+    if (window.TPVIcons) {
+        return window.TPVIcons.getIcon(iconId, { size });
+    }
+    // Fallback emojis
+    const fallbacks = {
+        trophy: '🏆', warning: '⚠️', stats: '📊', goldMedal: '🥇', silverMedal: '🥈', bronzeMedal: '🥉',
+        punchingAbove: '🥊', giantKiller: '⚔️', bullseye: '🎯', domination: '💪',
+        closeCall: '😅', photoFinish: '📸', darkHorse: '🐴', hotStreak: '🔥',
+        zeroToHero: '🚀', powerSurge: '💥', steadyEddie: '📊', blastOff: '🚀'
+    };
+    return fallbacks[iconId] || '';
+}
+
+/**
  * Get event number from URL parameters
  */
 function getEventNumber() {
@@ -170,7 +187,7 @@ async function displayTourOverview(eventNumber, userData, userUid) {
     let html = `
         <div class="tour-overview-section">
             <h3 class="tour-title">
-                <span class="tour-icon">🏆</span>
+                <span class="tour-icon">${getIcon('trophy', 'sm')}</span>
                 Local Tour Progress
             </h3>
             <p class="tour-subtitle">${progress} of 3 stages completed</p>
@@ -203,7 +220,7 @@ async function displayTourOverview(eventNumber, userData, userUid) {
                 
                 ${isDNS ? `
                     <div class="stage-dns-badge">
-                        <div class="dns-icon">⚠️</div>
+                        <div class="dns-icon">${getIcon('warning', 'sm')}</div>
                         <div class="dns-text">
                             <strong>DNS</strong>
                             <span class="dns-reason">${dnsReason || 'Did not start within 36-hour window'}</span>
@@ -326,7 +343,7 @@ function generateTourCompletionStory(userData, gcResults) {
     if (seasonComplete) {
         seasonWrapUp = `
             <div class="story-section" style="background: linear-gradient(135deg, #1a472a 0%, #2d5a3d 100%); border: 2px solid #00ff88; border-radius: 8px; padding: 1.5rem; margin-top: 1.5rem;">
-                <h4>🏆 Season 1 Complete</h4>
+                <h4>${getIcon('trophy', 'sm')} Season 1 Complete</h4>
                 <p>The Local Tour was the final chapter of Season 1, and now the season is officially complete. `;
         
         if (seasonRank === 1) {
@@ -428,7 +445,7 @@ function addTourTimingWarning(eventNumber) {
     // Create warning message
     const warningHTML = `
         <div class="tour-timing-warning">
-            <div class="warning-icon">⚠️</div>
+            <div class="warning-icon">${getIcon('warning', 'md')}</div>
             <div class="warning-content">
                 <h4>Multi-Stage Race Timing Requirements</h4>
                 <p><strong>Important:</strong> All tour stages must be completed within strict time windows:</p>
@@ -475,13 +492,13 @@ async function displayGCResults(gcData, currentUserUid, eventNumber) {
     // Determine title and description based on stage
     let title, description;
     if (eventNumber === 13) {
-        title = '📊 General Classification - After Stage 1';
+        title = `${getIcon('stats', 'sm')} General Classification - After Stage 1`;
         description = 'Current GC standings after the opening stage. Two stages remain.';
     } else if (eventNumber === 14) {
-        title = '📊 General Classification - After Stage 2';  
+        title = `${getIcon('stats', 'sm')} General Classification - After Stage 2`;
         description = 'Current GC standings after two stages. One stage remains - the GC battle continues tomorrow!';
     } else {
-        title = '🏆 General Classification - Final Overall Results';
+        title = `${getIcon('trophy', 'sm')} General Classification - Final Overall Results`;
         description = 'Final GC standings after all three stages of the Local Tour';
     }
     
@@ -507,7 +524,7 @@ async function displayGCResults(gcData, currentUserUid, eventNumber) {
     let html = `
         <div class="gc-results-section ${isProvisional ? 'provisional' : 'final'}">
             <div class="gc-header-banner">
-                <div class="gc-header-icon">🏆</div>
+                <div class="gc-header-icon">${getIcon('trophy', 'lg')}</div>
                 <div class="gc-header-content">
                     <h2 class="gc-section-title">LOCAL TOUR GENERAL CLASSIFICATION</h2>
                     <h3 class="gc-title">${title}</h3>
@@ -540,13 +557,13 @@ async function displayGCResults(gcData, currentUserUid, eventNumber) {
         if (!isProvisional) {
             if (rider.gcPosition === 1) {
                 rankClass = 'rank-gold';
-                trophyIcon = ' 🏆';
+                trophyIcon = ' ' + getIcon('gcGold', 'sm');
             } else if (rider.gcPosition === 2) {
                 rankClass = 'rank-silver';
-                trophyIcon = ' 🥈';
+                trophyIcon = ' ' + getIcon('gcSilver', 'sm');
             } else if (rider.gcPosition === 3) {
                 rankClass = 'rank-bronze';
-                trophyIcon = ' 🥉';
+                trophyIcon = ' ' + getIcon('gcBronze', 'sm');
             }
         }
         
@@ -834,38 +851,38 @@ async function loadEventResults() {
                     bonusHTML += `<span class="bonus-points unlock-bonus" title="Bonus from triggered unlocks">+${unlockBonus}</span>`;
                 }
                 if (result.earnedPunchingMedal) {
-                    bonusHTML += `<span class="medal-icon punching" title="Beat prediction by 10+ places">🥊</span>`;
+                    bonusHTML += `<span class="medal-icon punching" title="Beat prediction by 10+ places">${getIcon('punchingAbove', 'sm')}</span>`;
                 }
                 if (result.earnedGiantKillerMedal) {
-                    bonusHTML += `<span class="medal-icon giant-killer" title="Beat highest-rated rider">⚔️</span>`;
+                    bonusHTML += `<span class="medal-icon giant-killer" title="Beat highest-rated rider">${getIcon('giantKiller', 'sm')}</span>`;
                 }
                 if (result.earnedBullseyeMedal) {
-                    bonusHTML += `<span class="medal-icon bullseye" title="Finished exactly as predicted">🎯</span>`;
+                    bonusHTML += `<span class="medal-icon bullseye" title="Finished exactly as predicted">${getIcon('bullseye', 'sm')}</span>`;
                 }
                 if (result.earnedDomination) {
-                    bonusHTML += `<span class="medal-icon domination" title="Won by 60+ seconds">💪</span>`;
+                    bonusHTML += `<span class="medal-icon domination" title="Won by 60+ seconds">${getIcon('domination', 'sm')}</span>`;
                 }
                 if (result.earnedCloseCall) {
-                    bonusHTML += `<span class="medal-icon close-call" title="Won by less than 0.5s">😅</span>`;
+                    bonusHTML += `<span class="medal-icon close-call" title="Won by less than 0.5s">${getIcon('closeCall', 'sm')}</span>`;
                 }
                 if (result.earnedPhotoFinish) {
-                    bonusHTML += `<span class="medal-icon photo-finish" title="Within 0.2s of winner">📸</span>`;
+                    bonusHTML += `<span class="medal-icon photo-finish" title="Within 0.2s of winner">${getIcon('photoFinish', 'sm')}</span>`;
                 }
                 if (result.earnedDarkHorse) {
-                    bonusHTML += `<span class="medal-icon dark-horse" title="Won when predicted 15th+">🐴</span>`;
+                    bonusHTML += `<span class="medal-icon dark-horse" title="Won when predicted 15th+">${getIcon('darkHorse', 'sm')}</span>`;
                 }
                 if (result.earnedZeroToHero) {
-                    bonusHTML += `<span class="medal-icon zero-to-hero" title="Bottom 20% to top 20%">🚀</span>`;
+                    bonusHTML += `<span class="medal-icon zero-to-hero" title="Bottom 20% to top 20%">${getIcon('zeroToHero', 'sm')}</span>`;
                 }
                 // Power awards
                 if (result.earnedPowerSurge) {
-                    bonusHTML += `<span class="medal-icon power-surge" title="Max power 30%+ above avg, top 10">💥</span>`;
+                    bonusHTML += `<span class="medal-icon power-surge" title="Max power 30%+ above avg, top 10">${getIcon('powerSurge', 'sm')}</span>`;
                 }
                 if (result.earnedSteadyEddie) {
-                    bonusHTML += `<span class="medal-icon steady-eddie" title="NP within 1% of avg power">📊</span>`;
+                    bonusHTML += `<span class="medal-icon steady-eddie" title="NP within 1% of avg power">${getIcon('steadyEddie', 'sm')}</span>`;
                 }
                 if (result.earnedBlastOff) {
-                    bonusHTML += `<span class="medal-icon blast-off" title="Broke 1300W max power">🚀</span>`;
+                    bonusHTML += `<span class="medal-icon blast-off" title="Broke 1300W max power">${getIcon('blastOff', 'sm')}</span>`;
                 }
             }
             if (!bonusHTML) {

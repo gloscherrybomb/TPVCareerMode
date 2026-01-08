@@ -738,36 +738,36 @@ function displayRecentResults(results) {
             bonusHTML += `<span class="bonus-indicator unlock-bonus" title="Bonus from triggered unlocks">+${unlockBonus} unlock</span>`;
         }
         if (result.earnedPunchingMedal) {
-            bonusHTML += `<span class="medal-indicator punching" title="Beat prediction by 10+ places">🥊</span>`;
+            bonusHTML += `<span class="medal-indicator punching" title="Beat prediction by 10+ places">${getAwardIcon('punchingAbove', 'sm')}</span>`;
         }
         if (result.earnedGiantKillerMedal) {
-            bonusHTML += `<span class="medal-indicator giant-killer" title="Beat highest-rated rider">⚔️</span>`;
+            bonusHTML += `<span class="medal-indicator giant-killer" title="Beat highest-rated rider">${getAwardIcon('giantKiller', 'sm')}</span>`;
         }
         if (result.earnedBullseyeMedal) {
-            bonusHTML += `<span class="medal-indicator bullseye" title="Finished exactly as predicted">🎯</span>`;
+            bonusHTML += `<span class="medal-indicator bullseye" title="Finished exactly as predicted">${getAwardIcon('bullseye', 'sm')}</span>`;
         }
         if (result.earnedHotStreakMedal) {
-            bonusHTML += `<span class="medal-indicator hot-streak" title="Beat prediction 3 events in a row">🔥</span>`;
+            bonusHTML += `<span class="medal-indicator hot-streak" title="Beat prediction 3 events in a row">${getAwardIcon('hotStreak', 'sm')}</span>`;
         }
         if (result.earnedDomination) {
-            bonusHTML += `<span class="medal-indicator domination" title="Won by 60+ seconds">💪</span>`;
+            bonusHTML += `<span class="medal-indicator domination" title="Won by 60+ seconds">${getAwardIcon('domination', 'sm')}</span>`;
         }
         if (result.earnedCloseCall) {
-            bonusHTML += `<span class="medal-indicator close-call" title="Won by less than 0.5s">😅</span>`;
+            bonusHTML += `<span class="medal-indicator close-call" title="Won by less than 0.5s">${getAwardIcon('closeCall', 'sm')}</span>`;
         }
         if (result.earnedPhotoFinish) {
-            bonusHTML += `<span class="medal-indicator photo-finish" title="Within 0.2s of winner">📸</span>`;
+            bonusHTML += `<span class="medal-indicator photo-finish" title="Within 0.2s of winner">${getAwardIcon('photoFinish', 'sm')}</span>`;
         }
         if (result.earnedDarkHorse) {
-            bonusHTML += `<span class="medal-indicator dark-horse" title="Won when predicted 15th+">🐴</span>`;
+            bonusHTML += `<span class="medal-indicator dark-horse" title="Won when predicted 15th+">${getAwardIcon('darkHorse', 'sm')}</span>`;
         }
         if (result.earnedZeroToHero) {
-            bonusHTML += `<span class="medal-indicator zero-to-hero" title="Bottom 20% to top 20%">🚀</span>`;
+            bonusHTML += `<span class="medal-indicator zero-to-hero" title="Bottom 20% to top 20%">${getAwardIcon('zeroToHero', 'sm')}</span>`;
         }
 
         // Add Cadence Coins earned
         if (result.earnedCadenceCredits > 0) {
-            const ccIcon = result.ccSource === 'completion' ? '🏁' : '⚡';
+            const ccIcon = result.ccSource === 'completion' ? getAwardIcon('eventCriterium', 'sm') : getAwardIcon('power', 'sm');
             const ccTitle = result.ccSource === 'completion' ? 'Race completion bonus' : 'Cadence Credits earned';
             bonusHTML += `<span class="cc-earned" title="${ccTitle}">${ccIcon}${result.earnedCadenceCredits} CC</span>`;
         }
@@ -814,6 +814,15 @@ function displayRecentResults(results) {
 }
 
 // Display awards (placeholder for future implementation)
+// Helper function to get award icon HTML
+function getAwardIcon(iconId, size = 'lg') {
+    if (window.TPVIcons) {
+        return window.TPVIcons.getIcon(iconId, { size });
+    }
+    // Fallback if icon system not loaded
+    return '';
+}
+
 function displayAwards(awards) {
     const container = document.getElementById('awardsContainer');
 
@@ -891,7 +900,7 @@ function displayAwards(awards) {
     if (totalAwards === 0) {
         container.innerHTML = `
             <div class="awards-empty">
-                <div class="awards-empty-icon">🏆</div>
+                <div class="awards-empty-icon">${getAwardIcon('trophy')}</div>
                 <p>No awards yet. Keep racing to earn achievements!</p>
             </div>
         `;
@@ -905,31 +914,31 @@ function displayAwards(awards) {
     if (awards.goldMedals > 0) {
         html += `
             <div class="award-card gold">
-                <div class="award-icon">🥇</div>
+                <div class="award-icon">${getAwardIcon('goldMedal')}</div>
                 <div class="award-count">${awards.goldMedals}x</div>
                 <div class="award-title">Gold Medal</div>
                 <div class="award-description">1st Place Finish</div>
             </div>
         `;
     }
-    
+
     // Silver medals (2nd place)
     if (awards.silverMedals > 0) {
         html += `
             <div class="award-card silver">
-                <div class="award-icon">🥈</div>
+                <div class="award-icon">${getAwardIcon('silverMedal')}</div>
                 <div class="award-count">${awards.silverMedals}x</div>
                 <div class="award-title">Silver Medal</div>
                 <div class="award-description">2nd Place Finish</div>
             </div>
         `;
     }
-    
+
     // Bronze medals (3rd place)
     if (awards.bronzeMedals > 0) {
         html += `
             <div class="award-card bronze">
-                <div class="award-icon">🥉</div>
+                <div class="award-icon">${getAwardIcon('bronzeMedal')}</div>
                 <div class="award-count">${awards.bronzeMedals}x</div>
                 <div class="award-title">Bronze Medal</div>
                 <div class="award-description">3rd Place Finish</div>
@@ -941,31 +950,31 @@ function displayAwards(awards) {
     if (awards.gcGoldMedal > 0) {
         html += `
             <div class="award-card gc-gold">
-                <div class="award-icon">🏆</div>
+                <div class="award-icon">${getAwardIcon('gcGold')}</div>
                 <div class="award-count">${awards.gcGoldMedal}x</div>
                 <div class="award-title">GC Winner</div>
                 <div class="award-description">Tour Overall Champion</div>
             </div>
         `;
     }
-    
+
     // GC Second (Tour overall)
     if (awards.gcSilverMedal > 0) {
         html += `
             <div class="award-card gc-silver">
-                <div class="award-icon">🥈</div>
+                <div class="award-icon">${getAwardIcon('gcSilver')}</div>
                 <div class="award-count">${awards.gcSilverMedal}x</div>
                 <div class="award-title">GC Second</div>
                 <div class="award-description">Tour Overall 2nd Place</div>
             </div>
         `;
     }
-    
+
     // GC Third (Tour overall)
     if (awards.gcBronzeMedal > 0) {
         html += `
             <div class="award-card gc-bronze">
-                <div class="award-icon">🥉</div>
+                <div class="award-icon">${getAwardIcon('gcBronze')}</div>
                 <div class="award-count">${awards.gcBronzeMedal}x</div>
                 <div class="award-title">GC Third</div>
                 <div class="award-description">Tour Overall 3rd Place</div>
@@ -979,31 +988,31 @@ function displayAwards(awards) {
     if (awards.seasonChampion > 0) {
         html += `
             <div class="award-card season-champion">
-                <div class="award-icon">🏆</div>
+                <div class="award-icon">${getAwardIcon('seasonGold')}</div>
                 <div class="award-count">${awards.seasonChampion}x</div>
                 <div class="award-title">Season Champion</div>
                 <div class="award-description">1st Place Overall Season Standings</div>
             </div>
         `;
     }
-    
+
     // Season Runner-Up (2nd place in season standings)
     if (awards.seasonRunnerUp > 0) {
         html += `
             <div class="award-card season-runnerup">
-                <div class="award-icon">🥈</div>
+                <div class="award-icon">${getAwardIcon('seasonSilver')}</div>
                 <div class="award-count">${awards.seasonRunnerUp}x</div>
                 <div class="award-title">Season Runner-Up</div>
                 <div class="award-description">2nd Place Overall Season Standings</div>
             </div>
         `;
     }
-    
+
     // Season Third Place (3rd place in season standings)
     if (awards.seasonThirdPlace > 0) {
         html += `
             <div class="award-card season-third">
-                <div class="award-icon">🥉</div>
+                <div class="award-icon">${getAwardIcon('seasonBronze')}</div>
                 <div class="award-count">${awards.seasonThirdPlace}x</div>
                 <div class="award-title">Season Third Place</div>
                 <div class="award-description">3rd Place Overall Season Standings</div>
@@ -1015,55 +1024,55 @@ function displayAwards(awards) {
     if (awards.lanternRouge > 0) {
         html += `
             <div class="award-card lantern">
-                <div class="award-icon">🏮</div>
+                <div class="award-icon">${getAwardIcon('lanternRouge')}</div>
                 <div class="award-count">${awards.lanternRouge}x</div>
                 <div class="award-title">Lantern Rouge</div>
                 <div class="award-description">Last Place Finish</div>
             </div>
         `;
     }
-    
+
     // Punching medal (beat prediction by 10+ places)
     if (awards.punchingMedals > 0) {
         html += `
             <div class="award-card punching">
-                <div class="award-icon">🥊</div>
+                <div class="award-icon">${getAwardIcon('punchingAbove')}</div>
                 <div class="award-count">${awards.punchingMedals}x</div>
                 <div class="award-title">Punching Up</div>
                 <div class="award-description">Beat Prediction by 10+ Places</div>
             </div>
         `;
     }
-    
+
     // Giant Killer medal (beat highest-rated rider)
     if (awards.giantKillerMedals > 0) {
         html += `
             <div class="award-card giant-killer">
-                <div class="award-icon">⚔️</div>
+                <div class="award-icon">${getAwardIcon('giantKiller')}</div>
                 <div class="award-count">${awards.giantKillerMedals}x</div>
                 <div class="award-title">Giant Killer</div>
                 <div class="award-description">Beat Highest-Rated Rider</div>
             </div>
         `;
     }
-    
+
     // Bullseye medal (finish exactly at predicted position)
     if (awards.bullseyeMedals > 0) {
         html += `
             <div class="award-card bullseye">
-                <div class="award-icon">🎯</div>
+                <div class="award-icon">${getAwardIcon('bullseye')}</div>
                 <div class="award-count">${awards.bullseyeMedals}x</div>
                 <div class="award-title">Bullseye</div>
                 <div class="award-description">Finished Exactly as Predicted</div>
             </div>
         `;
     }
-    
+
     // Hot Streak medal (beat prediction 3 events in a row)
     if (awards.hotStreakMedals > 0) {
         html += `
             <div class="award-card hot-streak">
-                <div class="award-icon">🔥</div>
+                <div class="award-icon">${getAwardIcon('hotStreak')}</div>
                 <div class="award-count">${awards.hotStreakMedals}x</div>
                 <div class="award-title">Hot Streak</div>
                 <div class="award-description">Beat Prediction 3x in a Row</div>
@@ -1077,115 +1086,115 @@ function displayAwards(awards) {
     if (awards.domination > 0) {
         html += `
             <div class="award-card domination">
-                <div class="award-icon">💪</div>
+                <div class="award-icon">${getAwardIcon('domination')}</div>
                 <div class="award-count">${awards.domination}x</div>
                 <div class="award-title">Domination</div>
                 <div class="award-description">Won by 60+ Seconds</div>
             </div>
         `;
     }
-    
+
     // Close Call (win by less than 0.5s)
     if (awards.closeCall > 0) {
         html += `
             <div class="award-card close-call">
-                <div class="award-icon">😅</div>
+                <div class="award-icon">${getAwardIcon('closeCall')}</div>
                 <div class="award-count">${awards.closeCall}x</div>
                 <div class="award-title">Close Call</div>
                 <div class="award-description">Won by Less Than 0.5s</div>
             </div>
         `;
     }
-    
+
     // Photo Finish (within 0.2s of winner)
     if (awards.photoFinish > 0) {
         html += `
             <div class="award-card photo-finish">
-                <div class="award-icon">📸</div>
+                <div class="award-icon">${getAwardIcon('photoFinish')}</div>
                 <div class="award-count">${awards.photoFinish}x</div>
                 <div class="award-title">Photo Finish</div>
                 <div class="award-description">Within 0.2s of Winner</div>
             </div>
         `;
     }
-    
+
     // Dark Horse (win when predicted 15th or worse)
     if (awards.darkHorse > 0) {
         html += `
             <div class="award-card dark-horse">
-                <div class="award-icon">🐴</div>
+                <div class="award-icon">${getAwardIcon('darkHorse')}</div>
                 <div class="award-count">${awards.darkHorse}x</div>
                 <div class="award-title">Dark Horse</div>
                 <div class="award-description">Won When Predicted 15th+</div>
             </div>
         `;
     }
-    
+
     // Zero to Hero (bottom 20% to top 20%)
     if (awards.zeroToHero > 0) {
         html += `
             <div class="award-card zero-to-hero">
-                <div class="award-icon">🚀</div>
+                <div class="award-icon">${getAwardIcon('zeroToHero')}</div>
                 <div class="award-count">${awards.zeroToHero}x</div>
                 <div class="award-title">Zero to Hero</div>
                 <div class="award-description">Bottom 20% to Top 20%</div>
             </div>
         `;
     }
-    
+
     // Back to Back (2 wins in a row)
     if (awards.backToBack > 0) {
         html += `
             <div class="award-card back-to-back">
-                <div class="award-icon">🔁</div>
+                <div class="award-icon">${getAwardIcon('backToBack')}</div>
                 <div class="award-count">${awards.backToBack}x</div>
                 <div class="award-title">Back to Back</div>
                 <div class="award-description">Won 2 Races in a Row</div>
             </div>
         `;
     }
-    
+
     // Trophy Collector (5+ podiums)
     if (awards.trophyCollector > 0) {
         html += `
             <div class="award-card trophy-collector">
-                <div class="award-icon">🏆</div>
+                <div class="award-icon">${getAwardIcon('trophy')}</div>
                 <div class="award-count">${awards.trophyCollector}x</div>
                 <div class="award-title">Trophy Collector</div>
                 <div class="award-description">5+ Podium Finishes</div>
             </div>
         `;
     }
-    
+
     // Weekend Warrior (5+ weekend events)
     if (awards.weekendWarrior > 0) {
         html += `
             <div class="award-card weekend-warrior">
-                <div class="award-icon">🏁</div>
+                <div class="award-icon">${getAwardIcon('weekendWarrior')}</div>
                 <div class="award-count">${awards.weekendWarrior}x</div>
                 <div class="award-title">Weekend Warrior</div>
                 <div class="award-description">Completed 5+ Weekend Events</div>
             </div>
         `;
     }
-    
+
     // Overrated (worse than predicted 5+ times)
     if (awards.overrated > 0) {
         html += `
             <div class="award-card overrated">
-                <div class="award-icon">📉</div>
+                <div class="award-icon">${getAwardIcon('overrated')}</div>
                 <div class="award-count">${awards.overrated}x</div>
                 <div class="award-title">Overrated</div>
                 <div class="award-description">Worse Than Predicted 5+ Times</div>
             </div>
         `;
     }
-    
+
     // Technical Issues (3+ DNFs)
     if (awards.technicalIssues > 0) {
         html += `
             <div class="award-card technical-issues">
-                <div class="award-icon">🔧</div>
+                <div class="award-icon">${getAwardIcon('technicalIssues')}</div>
                 <div class="award-count">${awards.technicalIssues}x</div>
                 <div class="award-title">Technical Issues</div>
                 <div class="award-description">3+ DNFs</div>
@@ -1197,7 +1206,7 @@ function displayAwards(awards) {
     if (awards.fanFavourite > 0) {
         html += `
             <div class="award-card fan-favourite">
-                <div class="award-icon">💜</div>
+                <div class="award-icon">${getAwardIcon('fanFavourite')}</div>
                 <div class="award-count">${awards.fanFavourite}x</div>
                 <div class="award-title">Fan Favourite</div>
                 <div class="award-description">Received 100 High-5s</div>
@@ -1211,55 +1220,55 @@ function displayAwards(awards) {
     if (awards.perfectSeason > 0) {
         html += `
             <div class="award-card perfect-season">
-                <div class="award-icon">💯</div>
+                <div class="award-icon">${getAwardIcon('perfectSeason')}</div>
                 <div class="award-count">${awards.perfectSeason}x</div>
                 <div class="award-title">Perfect Season</div>
                 <div class="award-description">Won Every Event in a Season</div>
             </div>
         `;
     }
-    
+
     // Podium Streak (5+ consecutive top 3 finishes)
     if (awards.podiumStreak > 0) {
         html += `
             <div class="award-card podium-streak">
-                <div class="award-icon">📈</div>
+                <div class="award-icon">${getAwardIcon('podiumStreak')}</div>
                 <div class="award-count">${awards.podiumStreak}x</div>
                 <div class="award-title">Podium Streak</div>
                 <div class="award-description">5+ Consecutive Top 3 Finishes</div>
             </div>
         `;
     }
-    
+
     // Specialist (win 3+ of same type)
     if (awards.specialist > 0) {
         html += `
             <div class="award-card specialist">
-                <div class="award-icon">⭐</div>
+                <div class="award-icon">${getAwardIcon('specialist')}</div>
                 <div class="award-count">${awards.specialist}x</div>
                 <div class="award-title">Specialist</div>
                 <div class="award-description">Won 3+ Events of Same Type</div>
             </div>
         `;
     }
-    
+
     // All-Rounder (win 5+ different event types)
     if (awards.allRounder > 0) {
         html += `
             <div class="award-card all-rounder">
-                <div class="award-icon">🌟</div>
+                <div class="award-icon">${getAwardIcon('allRounder')}</div>
                 <div class="award-count">${awards.allRounder}x</div>
                 <div class="award-title">All-Rounder</div>
                 <div class="award-description">Won 5+ Different Event Types</div>
             </div>
         `;
     }
-    
+
     // Comeback Kid (top 5 after bottom half)
     if (awards.comeback > 0) {
         html += `
             <div class="award-card comeback">
-                <div class="award-icon">🔄</div>
+                <div class="award-icon">${getAwardIcon('comeback')}</div>
                 <div class="award-count">${awards.comeback}x</div>
                 <div class="award-title">Comeback Kid</div>
                 <div class="award-description">Top 5 After Bottom Half Finish</div>
@@ -1271,7 +1280,7 @@ function displayAwards(awards) {
     if (awards.gluttonForPunishment > 0) {
         html += `
             <div class="award-card glutton-for-punishment">
-                <div class="award-icon">🎖️</div>
+                <div class="award-icon">${getAwardIcon('gluttonForPunishment')}</div>
                 <div class="award-count">${awards.gluttonForPunishment}x</div>
                 <div class="award-title">Glutton for Punishment</div>
                 <div class="award-description">Reset Season & Started Over</div>
@@ -1283,7 +1292,7 @@ function displayAwards(awards) {
     if (awards.windTunnel > 0) {
         html += `
             <div class="award-card wind-tunnel">
-                <div class="award-icon">🌬️</div>
+                <div class="award-icon">${getAwardIcon('windTunnel')}</div>
                 <div class="award-count">${awards.windTunnel}x</div>
                 <div class="award-title">Wind Tunnel</div>
                 <div class="award-description">Top 5 in TT When Predicted Lower</div>
@@ -1295,7 +1304,7 @@ function displayAwards(awards) {
     if (awards.theAccountant > 0) {
         html += `
             <div class="award-card the-accountant">
-                <div class="award-icon">🧮</div>
+                <div class="award-icon">${getAwardIcon('theAccountant')}</div>
                 <div class="award-count">${awards.theAccountant}x</div>
                 <div class="award-title">The Accountant</div>
                 <div class="award-description">Outscored the Line Winner</div>
@@ -1307,7 +1316,7 @@ function displayAwards(awards) {
     if (awards.theEqualizer > 0) {
         html += `
             <div class="award-card the-equalizer">
-                <div class="award-icon">🎚️</div>
+                <div class="award-icon">${getAwardIcon('theEqualizer')}</div>
                 <div class="award-count">${awards.theEqualizer}x</div>
                 <div class="award-title">The Equalizer</div>
                 <div class="award-description">Completed The Leveller</div>
@@ -1319,7 +1328,7 @@ function displayAwards(awards) {
     if (awards.singaporeSling > 0) {
         html += `
             <div class="award-card singapore-sling">
-                <div class="award-icon">🍸</div>
+                <div class="award-icon">${getAwardIcon('singaporeSling')}</div>
                 <div class="award-count">${awards.singaporeSling}x</div>
                 <div class="award-title">Singapore Sling</div>
                 <div class="award-description">Podium at Singapore Criterium</div>
@@ -1331,7 +1340,7 @@ function displayAwards(awards) {
     if (awards.powerSurge > 0) {
         html += `
             <div class="award-card power-surge">
-                <div class="award-icon">💥</div>
+                <div class="award-icon">${getAwardIcon('powerSurge')}</div>
                 <div class="award-count">${awards.powerSurge}x</div>
                 <div class="award-title">Power Surge</div>
                 <div class="award-description">Max Power 30%+ Above Average</div>
@@ -1343,7 +1352,7 @@ function displayAwards(awards) {
     if (awards.steadyEddie > 0) {
         html += `
             <div class="award-card steady-eddie">
-                <div class="award-icon">📊</div>
+                <div class="award-icon">${getAwardIcon('steadyEddie')}</div>
                 <div class="award-count">${awards.steadyEddie}x</div>
                 <div class="award-title">Steady Eddie</div>
                 <div class="award-description">Perfectly Paced Effort</div>
@@ -1355,7 +1364,7 @@ function displayAwards(awards) {
     if (awards.blastOff > 0) {
         html += `
             <div class="award-card blast-off">
-                <div class="award-icon">🚀</div>
+                <div class="award-icon">${getAwardIcon('blastOff')}</div>
                 <div class="award-count">${awards.blastOff}x</div>
                 <div class="award-title">Blast Off</div>
                 <div class="award-description">Broke 1300W Max Power</div>
@@ -1393,7 +1402,8 @@ async function displayRivals(userData) {
 
         if (!data) continue;
 
-        const rankLabel = ['🥇 #1', '🥈 #2', '🥉 #3'][i];
+        const rankIcons = [getAwardIcon('goldMedal', 'sm'), getAwardIcon('silverMedal', 'sm'), getAwardIcon('bronzeMedal', 'sm')];
+        const rankLabel = `${rankIcons[i]} #${i + 1}`;
         const record = `${data.userWins}-${data.botWins}`;
         const winPercentage = data.races > 0 ? ((data.userWins / data.races) * 100).toFixed(0) : 0;
 
@@ -1735,8 +1745,36 @@ onAuthStateChanged(auth, async (user) => {
     }
 });
 
+// Initialize stat card icons with new icon system
+function initStatCardIcons() {
+    if (!window.TPVIcons) {
+        console.warn('TPVIcons not loaded');
+        return;
+    }
+
+    // Map of stat card containers to their icon IDs
+    const statIconMappings = [
+        { selector: '.stat-card:nth-child(1) .stat-icon', iconId: 'trophy', size: 'md' }, // Season Ranking
+        { selector: '.stat-card:nth-child(2) .stat-icon', iconId: 'podiumStreak', size: 'md' }, // Avg Finish
+        { selector: '.stat-card:nth-child(3) .stat-icon', iconId: 'eventCriterium', size: 'md' }, // Races
+        { selector: '.stat-card:nth-child(4) .stat-icon', iconId: 'achievement', size: 'md' }, // Points
+        { selector: '.stat-card:nth-child(5) .stat-icon', iconId: 'goldMedal', size: 'md' }, // Wins
+        { selector: '.stat-card:nth-child(6) .stat-icon', iconId: 'stats', size: 'md' }, // Win Rate
+        { selector: '.stat-card:nth-child(7) .stat-icon', iconId: 'goldMedal', size: 'md' }, // Podiums
+        { selector: '.stat-card:nth-child(8) .stat-icon', iconId: 'bullseye', size: 'md' } // Podium Rate
+    ];
+
+    statIconMappings.forEach(mapping => {
+        const iconElement = document.querySelector(mapping.selector);
+        if (iconElement) {
+            iconElement.innerHTML = window.TPVIcons.getIcon(mapping.iconId, { size: mapping.size });
+        }
+    });
+}
+
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
+    initStatCardIcons();
     initShareStats();
     initProfileRequestModal();
 });

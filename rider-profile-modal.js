@@ -564,69 +564,89 @@ function buildRiderProfileHTML(data, name) {
     // Convert awards object to array format for display
     const awardsList = [];
     
+    // Helper function to get award icon
+    const getAwardIcon = (iconId) => {
+        if (window.TPVIcons) {
+            return window.TPVIcons.getIcon(iconId, { size: 'sm' });
+        }
+        // Fallback emoji map
+        const fallbacks = {
+            gold: '🥇', silver: '🥈', bronze: '🥉', gcGold: '🏆', gcSilver: '🥈', gcBronze: '🥉',
+            seasonGold: '🏆', seasonSilver: '🥈', seasonBronze: '🥉', punchingAbove: '🥊',
+            giantKiller: '⚔️', bullseye: '🎯', hotStreak: '🔥', domination: '💪',
+            closeCall: '😅', photoFinish: '📸', darkHorse: '🐴', zeroToHero: '🦸',
+            lanternRouge: '🏮', perfectSeason: '💯', podiumStreak: '📈', specialist: '⭐',
+            allRounder: '🌟', comeback: '🔄', windTunnel: '🌬️', theAccountant: '🧮',
+            theEqualizer: '🎚️', singaporeSling: '🍸', powerSurge: '💥', steadyEddie: '📊',
+            blastOff: '🚀', gluttonForPunishment: '🎖️', backToBack: '🔁', weekendWarrior: '🏁',
+            trophy: '🏆', technicalIssues: '🔧', overrated: '📉', fanFavourite: '💜'
+        };
+        return fallbacks[iconId] || '🏆';
+    };
+
     // Award configuration with icons and names
     const awardConfig = {
         // Race medals
-        gold: { icon: '🥇', name: 'Gold Medal' },
-        silver: { icon: '🥈', name: 'Silver Medal' },
-        bronze: { icon: '🥉', name: 'Bronze Medal' },
-        
+        gold: { icon: getAwardIcon('goldMedal'), name: 'Gold Medal' },
+        silver: { icon: getAwardIcon('silverMedal'), name: 'Silver Medal' },
+        bronze: { icon: getAwardIcon('bronzeMedal'), name: 'Bronze Medal' },
+
         // GC trophies
-        gcGold: { icon: '🏆', name: 'GC Winner' },
-        gcSilver: { icon: '🥈', name: 'GC Second' },
-        gcBronze: { icon: '🥉', name: 'GC Third' },
-        
+        gcGold: { icon: getAwardIcon('gcGold'), name: 'GC Winner' },
+        gcSilver: { icon: getAwardIcon('gcSilver'), name: 'GC Second' },
+        gcBronze: { icon: getAwardIcon('gcBronze'), name: 'GC Third' },
+
         // Season trophies (MOST PRESTIGIOUS!)
-        seasonChampion: { icon: '🏆', name: 'Season Champion' },
-        seasonRunnerUp: { icon: '🥈', name: 'Season Runner-Up' },
-        seasonThirdPlace: { icon: '🥉', name: 'Season Third Place' },
-        
+        seasonChampion: { icon: getAwardIcon('seasonGold'), name: 'Season Champion' },
+        seasonRunnerUp: { icon: getAwardIcon('seasonSilver'), name: 'Season Runner-Up' },
+        seasonThirdPlace: { icon: getAwardIcon('seasonBronze'), name: 'Season Third Place' },
+
         // Special achievements
-        punchingMedal: { icon: '🥊', name: 'Punching Above Weight' },
-        giantKiller: { icon: '⚔️', name: 'Giant Killer' },
-        bullseye: { icon: '🎯', name: 'Bullseye' },
-        hotStreak: { icon: '🔥', name: 'Hot Streak' },
-        domination: { icon: '💪', name: 'Domination' },
-        closeCall: { icon: '😅', name: 'Close Call' },
-        photoFinish: { icon: '📸', name: 'Photo Finish' },
-        darkHorse: { icon: '🐴', name: 'Dark Horse' },
-        zeroToHero: { icon: '🦸', name: 'Zero to Hero' },
-        lanternRouge: { icon: '🏮', name: 'Lantern Rouge' },
-        
+        punchingMedal: { icon: getAwardIcon('punchingAbove'), name: 'Punching Above Weight' },
+        giantKiller: { icon: getAwardIcon('giantKiller'), name: 'Giant Killer' },
+        bullseye: { icon: getAwardIcon('bullseye'), name: 'Bullseye' },
+        hotStreak: { icon: getAwardIcon('hotStreak'), name: 'Hot Streak' },
+        domination: { icon: getAwardIcon('domination'), name: 'Domination' },
+        closeCall: { icon: getAwardIcon('closeCall'), name: 'Close Call' },
+        photoFinish: { icon: getAwardIcon('photoFinish'), name: 'Photo Finish' },
+        darkHorse: { icon: getAwardIcon('darkHorse'), name: 'Dark Horse' },
+        zeroToHero: { icon: getAwardIcon('zeroToHero'), name: 'Zero to Hero' },
+        lanternRouge: { icon: getAwardIcon('lanternRouge'), name: 'Lantern Rouge' },
+
         // New special awards
-        perfectSeason: { icon: '💯', name: 'Perfect Season' },
-        podiumStreak: { icon: '📈', name: 'Podium Streak' },
-        specialist: { icon: '⭐', name: 'Specialist' },
-        allRounder: { icon: '🌟', name: 'All-Rounder' },
-        comeback: { icon: '🔄', name: 'Comeback Kid' },
+        perfectSeason: { icon: getAwardIcon('perfectSeason'), name: 'Perfect Season' },
+        podiumStreak: { icon: getAwardIcon('podiumStreak'), name: 'Podium Streak' },
+        specialist: { icon: getAwardIcon('specialist'), name: 'Specialist' },
+        allRounder: { icon: getAwardIcon('allRounder'), name: 'All-Rounder' },
+        comeback: { icon: getAwardIcon('comeback'), name: 'Comeback Kid' },
 
         // Event-specific awards
-        windTunnel: { icon: '🌬️', name: 'Wind Tunnel' },
-        theAccountant: { icon: '🧮', name: 'The Accountant' },
+        windTunnel: { icon: getAwardIcon('windTunnel'), name: 'Wind Tunnel' },
+        theAccountant: { icon: getAwardIcon('theAccountant'), name: 'The Accountant' },
 
         // Special event awards
-        theEqualizer: { icon: '🎚️', name: 'The Equalizer' },
-        singaporeSling: { icon: '🍸', name: 'Singapore Sling' },
+        theEqualizer: { icon: getAwardIcon('theEqualizer'), name: 'The Equalizer' },
+        singaporeSling: { icon: getAwardIcon('singaporeSling'), name: 'Singapore Sling' },
 
         // Power-based awards
-        powerSurge: { icon: '💥', name: 'Power Surge' },
-        steadyEddie: { icon: '📊', name: 'Steady Eddie' },
-        blastOff: { icon: '🚀', name: 'Blast Off' },
-        smoothOperator: { icon: '🔋', name: 'Smooth Operator' },
-        bunchKick: { icon: '⚡', name: 'Bunch Kick' },
+        powerSurge: { icon: getAwardIcon('powerSurge'), name: 'Power Surge' },
+        steadyEddie: { icon: getAwardIcon('steadyEddie'), name: 'Steady Eddie' },
+        blastOff: { icon: getAwardIcon('blastOff'), name: 'Blast Off' },
+        smoothOperator: { icon: getAwardIcon('power'), name: 'Smooth Operator' },
+        bunchKick: { icon: getAwardIcon('power'), name: 'Bunch Kick' },
 
         // Other awards
-        gluttonForPunishment: { icon: '🎖️', name: 'Glutton for Punishment' },
+        gluttonForPunishment: { icon: getAwardIcon('gluttonForPunishment'), name: 'Glutton for Punishment' },
 
         // Career milestone awards
-        backToBack: { icon: '🔁', name: 'Back to Back' },
-        weekendWarrior: { icon: '🏁', name: 'Weekend Warrior' },
-        trophyCollector: { icon: '🏆', name: 'Trophy Collector' },
-        technicalIssues: { icon: '🔧', name: 'Technical Issues' },
-        overrated: { icon: '📉', name: 'Overrated' },
+        backToBack: { icon: getAwardIcon('backToBack'), name: 'Back to Back' },
+        weekendWarrior: { icon: getAwardIcon('weekendWarrior'), name: 'Weekend Warrior' },
+        trophyCollector: { icon: getAwardIcon('trophy'), name: 'Trophy Collector' },
+        technicalIssues: { icon: getAwardIcon('technicalIssues'), name: 'Technical Issues' },
+        overrated: { icon: getAwardIcon('overrated'), name: 'Overrated' },
 
         // Community awards
-        fanFavourite: { icon: '💜', name: 'Fan Favourite' }
+        fanFavourite: { icon: getAwardIcon('fanFavourite'), name: 'Fan Favourite' }
     };
     
     // Build awards list with counts
@@ -781,9 +801,10 @@ function buildRiderProfileHTML(data, name) {
 
     // Add awards section if rider has awards
     if (awardsList && awardsList.length > 0) {
+        const trophyIcon = getAwardIcon('trophy');
         html += `
             <div class="rider-awards-section">
-                <h3 class="rider-awards-title">🏆 Awards & Achievements</h3>
+                <h3 class="rider-awards-title">${trophyIcon} Awards & Achievements</h3>
                 <div class="rider-awards-grid">
         `;
         
@@ -801,9 +822,10 @@ function buildRiderProfileHTML(data, name) {
             </div>
         `;
     } else {
+        const trophyIcon = getAwardIcon('trophy');
         html += `
             <div class="rider-awards-section">
-                <h3 class="rider-awards-title">🏆 Awards & Achievements</h3>
+                <h3 class="rider-awards-title">${trophyIcon} Awards & Achievements</h3>
                 <div class="rider-no-awards">No awards earned yet. Keep racing to unlock achievements!</div>
             </div>
         `;
