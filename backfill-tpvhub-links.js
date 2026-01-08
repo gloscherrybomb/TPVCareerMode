@@ -32,13 +32,12 @@ function loadEventData() {
 
   const events = [];
 
-  // Extract scheduleUrl entries using regex
-  const eventMatches = content.matchAll(/(\d+):\s*\{[^}]*scheduleUrl:\s*["']([^"']+)["']/g);
-  for (const match of eventMatches) {
-    const eventId = parseInt(match[1]);
-    const scheduleUrl = match[2];
-    if (scheduleUrl && scheduleUrl !== 'null') {
-      events.push({ eventId, scheduleUrl });
+  // Find all scheduleUrl entries
+  const scheduleUrlMatches = content.matchAll(/scheduleUrl:\s*["']([^"']+)["']/g);
+  for (const match of scheduleUrlMatches) {
+    const scheduleUrl = match[1];
+    if (scheduleUrl && scheduleUrl.includes('tpvirtualhub.com')) {
+      events.push({ scheduleUrl });
     }
   }
 
@@ -71,28 +70,39 @@ async function fetchScheduleData(base64Param) {
 async function buildAccessCodeMap(events) {
   const accessCodeMap = {};
 
-  for (const event of events) {
+  for (let i = 0; i < events.length; i++) {
+    const event = events[i];
     const base64Param = extractBase64Param(event.scheduleUrl);
     if (!base64Param) continue;
 
     try {
-      console.log(`   Fetching schedule data for event ${event.eventId}...`);
+      // Decode base64 to get event name for logging
+      let eventName = `Event ${i + 1}`;
+      try {
+        const decoded = JSON.parse(Buffer.from(base64Param, 'base64').toString());
+        eventName = decoded.titleTemplate || eventName;
+      } catch (e) {}
+
+      console.log(`   Fetching: ${eventName}...`);
       const data = await fetchScheduleData(base64Param);
 
       // Add cloned schedules to the map
+      let count = 0;
       if (data.clonedSchedules) {
         for (const schedule of data.clonedSchedules) {
           if (schedule.scheduleKey && schedule.accessCode) {
             accessCodeMap[schedule.scheduleKey] = schedule.accessCode;
+            count++;
           }
         }
       }
+      console.log(`      Found ${count} cloned schedules`);
 
       // Small delay to avoid rate limiting
       await new Promise(resolve => setTimeout(resolve, 200));
 
     } catch (error) {
-      console.log(`   ⚠️ Error fetching event ${event.eventId}: ${error.message}`);
+      console.log(`   ⚠️ Error: ${error.message}`);
     }
   }
 
