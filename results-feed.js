@@ -503,7 +503,7 @@ function createResultCard(resultData) {
                 </div>
                 <div class="result-card-footer">
                     <span class="result-footer-brand">TPV Career Mode</span>
-                    ${tpvHubUrl ? `<a href="${tpvHubUrl}" target="_blank" rel="noopener noreferrer" class="tpvhub-link">View on TPVirtualHub</a>` : ''}
+                    ${tpvHubUrl ? `<a href="${tpvHubUrl}" target="_blank" rel="noopener noreferrer" class="tpvhub-link">View result on TPVirtualHub</a>` : ''}
                     <span class="result-timestamp">${formatTimestamp(processedAt)}</span>
                 </div>
             </article>

@@ -418,7 +418,7 @@ async function sendPublicResultNotification(userData, eventResults, eventNumber,
               ...(tpvHubUrl ? [{
                 type: 2, // Button
                 style: 5, // Link
-                label: 'View on TPVirtualHub',
+                label: 'View result on TPVirtualHub',
                 url: tpvHubUrl
               }] : [])
             ]
