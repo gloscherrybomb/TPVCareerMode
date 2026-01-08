@@ -1,0 +1,36 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Ribbon left - neon purple/cyan -->
+    <path d="M14.0346 3.55204L18.2991 10.8362L12.2834 12.5469C8.12828 11.172 5.68075 8.52904 4.20532 5.8125C3.58307 4.66681 3.58813 2.5625 6.06108 2.5625H12.3087C13.0189 2.5625 13.6758 2.93914 14.0346 3.55204Z" fill="url(#neonRibbonS1)"/>
+    <!-- Ribbon right -->
+    <path d="M17.8123 3.55204L13.5479 10.8362L19.5635 12.5469C23.7186 11.172 26.1662 8.52904 27.6416 5.8125C28.2639 4.66681 28.2588 2.5625 25.7858 2.5625H19.5383C18.828 2.5625 18.1711 2.93914 17.8123 3.55204Z" fill="url(#neonRibbonS2)"/>
+    <!-- Medal outer ring -->
+    <circle cx="16.047" cy="20.1318" r="10.0477" fill="url(#silverOuter)"/>
+    <!-- Medal inner ring -->
+    <circle cx="16.047" cy="20.1317" r="8.68832" fill="url(#silverMid)"/>
+    <!-- Medal center -->
+    <circle cx="16.047" cy="20.1317" r="7.58486" fill="url(#silverInner)"/>
+    <!-- Number 2 -->
+    <text x="16" y="24" text-anchor="middle" fill="#707070" font-size="10" font-weight="bold" font-family="Arial">2</text>
+    <defs>
+        <linearGradient id="neonRibbonS1" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#c71ae5"/>
+            <stop offset="100%" stop-color="#45caff"/>
+        </linearGradient>
+        <linearGradient id="neonRibbonS2" x1="100%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#45caff"/>
+            <stop offset="100%" stop-color="#c71ae5"/>
+        </linearGradient>
+        <linearGradient id="silverOuter" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#EFEAF6"/>
+            <stop offset="100%" stop-color="#B5A8C3"/>
+        </linearGradient>
+        <linearGradient id="silverMid" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#D3C6E2"/>
+            <stop offset="100%" stop-color="#D6C6E8"/>
+        </linearGradient>
+        <linearGradient id="silverInner" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#E0D3EF"/>
+            <stop offset="100%" stop-color="#C1B0D4"/>
+        </linearGradient>
+    </defs>
+</svg>

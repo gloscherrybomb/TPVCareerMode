@@ -1,0 +1,128 @@
+/**
+ * TPV Career Mode - Icon Styles
+ *
+ * Base styling for the centralized icon system.
+ * Uses subtle drop-shadow to match existing site styling.
+ */
+
+/* Base icon styling */
+.tpv-icon {
+    display: inline-block;
+    vertical-align: middle;
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.5));
+    transition: transform 0.3s ease;
+}
+
+/* Size variants */
+.tpv-icon-xs {
+    width: 16px;
+    height: 16px;
+}
+
+.tpv-icon-sm {
+    width: 24px;
+    height: 24px;
+}
+
+.tpv-icon-md {
+    width: 32px;
+    height: 32px;
+}
+
+.tpv-icon-lg {
+    width: 48px;
+    height: 48px;
+}
+
+.tpv-icon-xl {
+    width: 64px;
+    height: 64px;
+}
+
+.tpv-icon-xxl {
+    width: 96px;
+    height: 96px;
+}
+
+/* Hover effect - subtle scale */
+.tpv-icon-hoverable:hover {
+    transform: scale(1.1);
+}
+
+/* Float animation (matching existing feature-icon behavior) */
+.tpv-icon-float {
+    animation: iconFloat 3s ease-in-out infinite;
+}
+
+@keyframes iconFloat {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+/* Gold glow variant (for special achievements) */
+.tpv-icon-gold-glow {
+    filter: drop-shadow(0 0 8px rgba(255, 170, 0, 0.5));
+}
+
+/* Pulsing gold glow (like contributor star) */
+.tpv-icon-pulse-gold {
+    animation: iconPulseGold 2s ease-in-out infinite;
+}
+
+@keyframes iconPulseGold {
+    0%, 100% {
+        filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.6));
+    }
+    50% {
+        filter: drop-shadow(0 0 12px rgba(255, 215, 0, 1));
+    }
+}
+
+/* Context-specific styles */
+
+/* Achievement notification popup */
+.achievement-notification .tpv-icon {
+    width: 4rem;
+    height: 4rem;
+}
+
+/* Award cards in trophy cabinet */
+.award-card .tpv-icon {
+    width: 3rem;
+    height: 3rem;
+}
+
+/* Large featured award display */
+.award-featured .tpv-icon {
+    width: 5rem;
+    height: 5rem;
+}
+
+/* Event type icon in event cards */
+.event-icon .tpv-icon {
+    width: 3rem;
+    height: 3rem;
+}
+
+/* Inline icon in text */
+.tpv-icon-inline {
+    width: 1.2em;
+    height: 1.2em;
+    vertical-align: text-bottom;
+    filter: none; /* No shadow for inline icons */
+}
+
+/* Remove shadow for certain contexts */
+.tpv-icon-no-shadow {
+    filter: none;
+}
+
+/* Disabled/locked state */
+.tpv-icon-disabled {
+    opacity: 0.4;
+    filter: grayscale(100%) drop-shadow(0 4px 12px rgba(0, 0, 0, 0.3));
+}

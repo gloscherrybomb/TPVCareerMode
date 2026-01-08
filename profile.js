@@ -502,7 +502,7 @@ async function calculateSeasonRanking(userUID, userData) {
 // Calculate global ranking (from user documents)
 async function calculateGlobalRanking(userUID) {
     try {
-        // Get all users and their career points (matches global rankings page)
+        // Get all users and their career points (matches global high scores page)
         const usersSnapshot = await getDocs(collection(db, 'users'));
         const users = [];
 
@@ -1751,6 +1751,56 @@ let selectedTemplate = 'season';
 let skipProfilePhoto = false;
 let canvasIsTainted = false;
 
+// Icon image cache for canvas rendering
+const iconImageCache = {};
+
+/**
+ * Load an icon image for canvas drawing
+ * @param {string} iconId - The icon ID from ICON_REGISTRY
+ * @returns {Promise<HTMLImageElement|null>} The loaded image or null
+ */
+async function loadIconImage(iconId) {
+    if (iconImageCache[iconId]) {
+        return iconImageCache[iconId];
+    }
+
+    const url = window.TPVIcons ? window.TPVIcons.getIconUrl(iconId) : null;
+    if (!url) return null;
+
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = () => {
+            iconImageCache[iconId] = img;
+            resolve(img);
+        };
+        img.onerror = () => resolve(null);
+        img.src = url;
+    });
+}
+
+/**
+ * Draw an icon on canvas, falling back to emoji if image fails
+ * @param {CanvasRenderingContext2D} ctx - Canvas context
+ * @param {string} iconId - The icon ID from ICON_REGISTRY
+ * @param {number} x - X position (center)
+ * @param {number} y - Y position (center)
+ * @param {number} size - Icon size in pixels
+ * @param {string} fallbackEmoji - Emoji to use if icon fails to load
+ */
+async function drawIconOnCanvas(ctx, iconId, x, y, size, fallbackEmoji) {
+    const img = await loadIconImage(iconId);
+
+    if (img) {
+        ctx.drawImage(img, x - size/2, y - size/2, size, size);
+    } else {
+        // Fallback to emoji
+        ctx.font = `${size}px sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(fallbackEmoji || '🏆', x, y);
+    }
+}
+
 function initShareStats() {
     const shareBtn = document.getElementById('shareStatsBtn');
     const modal = document.getElementById('shareStatsModal');
@@ -1954,12 +2004,13 @@ async function drawSeasonTemplate(ctx, width, height) {
         ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
         ctx.font = '600 28px "Exo 2", sans-serif';
         ctx.fillText('AWARDS', width / 2, 1380);
-        
+
         const awardStartX = width / 2 - (data.awards.length - 1) * 60;
-        data.awards.slice(0, 6).forEach((award, i) => {
-            ctx.font = '64px sans-serif';
-            ctx.fillText(award.icon, awardStartX + i * 120, 1460);
-        });
+        const awardsToShow = data.awards.slice(0, 6);
+        for (let i = 0; i < awardsToShow.length; i++) {
+            const award = awardsToShow[i];
+            await drawIconOnCanvas(ctx, award.id, awardStartX + i * 120, 1460, 64, award.icon);
+        }
     }
     
     // Team car (centered, above website text)
@@ -2021,16 +2072,16 @@ async function drawTrophyTemplate(ctx, width, height) {
         const cols = 3;
         const colWidth = width / (cols + 1);
 
-        data.awards.forEach((award, i) => {
+        for (let i = 0; i < data.awards.length; i++) {
+            const award = data.awards[i];
             const col = i % cols;
             const row = Math.floor(i / cols);
             const x = colWidth + col * colWidth;
             const y = startY + row * rowHeight;
 
             // Award icon
-            ctx.font = '80px sans-serif';
             ctx.textAlign = 'center';
-            ctx.fillText(award.icon, x, y);
+            await drawIconOnCanvas(ctx, award.id, x, y, 80, award.icon);
 
             // Count
             ctx.fillStyle = '#8a2be2';
@@ -2040,7 +2091,7 @@ async function drawTrophyTemplate(ctx, width, height) {
             // Title (fitted to column width)
             ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
             drawFittedText(ctx, award.title.toUpperCase(), x, y + 100, 240, 20, 14, '600', '"Exo 2", sans-serif');
-        });
+        }
     } else {
         ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
         ctx.font = '32px "Exo 2", sans-serif';
@@ -2123,10 +2174,11 @@ async function drawChampionTemplate(ctx, width, height) {
     // Awards
     if (data.awards.length > 0) {
         const awardStartX = width / 2 - (Math.min(data.awards.length, 5) - 1) * 70;
-        ctx.font = '72px sans-serif';
-        data.awards.slice(0, 5).forEach((award, i) => {
-            ctx.fillText(award.icon, awardStartX + i * 140, 1420);
-        });
+        const awardsToShow = data.awards.slice(0, 5);
+        for (let i = 0; i < awardsToShow.length; i++) {
+            const award = awardsToShow[i];
+            await drawIconOnCanvas(ctx, award.id, awardStartX + i * 140, 1420, 72, award.icon);
+        }
     }
     
     // Team car (centered, above website text)

@@ -1,0 +1,12 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M16 28C16 28 4 20 4 12C4 8 7 4 11 4C13.5 4 15.5 5.5 16 7C16.5 5.5 18.5 4 21 4C25 4 28 8 28 12C28 20 16 28 16 28Z" fill="url(#greenHeartGrad)"/>
+    <!-- Shine -->
+    <ellipse cx="10" cy="10" rx="2" ry="3" fill="white" opacity="0.3"/>
+    <defs>
+        <linearGradient id="greenHeartGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#00ff88"/>
+            <stop offset="50%" stop-color="#00cc66"/>
+            <stop offset="100%" stop-color="#45caff"/>
+        </linearGradient>
+    </defs>
+</svg>

@@ -1,0 +1,29 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<!-- Top arrow (pointing right) -->
+<path d="M16 4L12 10H14L10 16L16 16L14 12H18L16 4Z" fill="url(#recycleArrow1)"/>
+<!-- Bottom-left arrow (pointing down-left) -->
+<path d="M8 18L6 26L12 24L10 22L16 18L12 14L12 18L8 18Z" fill="url(#recycleArrow2)"/>
+<!-- Bottom-right arrow (pointing up-right) -->
+<path d="M24 18L26 26L20 24L22 22L16 18L20 14L20 18L24 18Z" fill="url(#recycleArrow3)"/>
+<!-- Center triangle outline -->
+<path d="M16 8L10 20H22L16 8Z" stroke="url(#recycleCenterStroke)" stroke-width="2" fill="none"/>
+<defs>
+    <linearGradient id="recycleArrow1" x1="10" y1="4" x2="18" y2="16" gradientUnits="userSpaceOnUse">
+        <stop stop-color="#45caff"/>
+        <stop offset="1" stop-color="#c71ae5"/>
+    </linearGradient>
+    <linearGradient id="recycleArrow2" x1="6" y1="14" x2="16" y2="26" gradientUnits="userSpaceOnUse">
+        <stop stop-color="#c71ae5"/>
+        <stop offset="1" stop-color="#ff1b6b"/>
+    </linearGradient>
+    <linearGradient id="recycleArrow3" x1="16" y1="14" x2="26" y2="26" gradientUnits="userSpaceOnUse">
+        <stop stop-color="#ff1b6b"/>
+        <stop offset="1" stop-color="#45caff"/>
+    </linearGradient>
+    <linearGradient id="recycleCenterStroke" x1="10" y1="8" x2="22" y2="20" gradientUnits="userSpaceOnUse">
+        <stop stop-color="#45caff"/>
+        <stop offset="0.5" stop-color="#c71ae5"/>
+        <stop offset="1" stop-color="#ff1b6b"/>
+    </linearGradient>
+</defs>
+</svg>

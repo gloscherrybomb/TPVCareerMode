@@ -1,0 +1,25 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<!-- Lock body -->
+<rect x="6" y="14" width="20" height="14" rx="3" fill="url(#lockBody)"/>
+<!-- Lock shackle -->
+<path d="M10 14V10C10 6.68629 12.6863 4 16 4C19.3137 4 22 6.68629 22 10V14" stroke="url(#lockShackle)" stroke-width="3" stroke-linecap="round"/>
+<!-- Keyhole -->
+<circle cx="16" cy="20" r="2.5" fill="url(#keyhole)"/>
+<path d="M15 20L14 25H18L17 20" fill="url(#keyhole)"/>
+<defs>
+    <linearGradient id="lockBody" x1="6" y1="14" x2="26" y2="28" gradientUnits="userSpaceOnUse">
+        <stop stop-color="#c71ae5"/>
+        <stop offset="0.5" stop-color="#ff1b6b"/>
+        <stop offset="1" stop-color="#c71ae5"/>
+    </linearGradient>
+    <linearGradient id="lockShackle" x1="10" y1="4" x2="22" y2="14" gradientUnits="userSpaceOnUse">
+        <stop stop-color="#45caff"/>
+        <stop offset="0.5" stop-color="#c71ae5"/>
+        <stop offset="1" stop-color="#45caff"/>
+    </linearGradient>
+    <radialGradient id="keyhole" cx="0.5" cy="0.3" r="0.7" gradientUnits="objectBoundingBox">
+        <stop stop-color="#0a0e1a"/>
+        <stop offset="1" stop-color="#1a1f2e"/>
+    </radialGradient>
+</defs>
+</svg>

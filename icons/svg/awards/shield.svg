@@ -1,0 +1,22 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Shield shape -->
+    <path d="M16 2L4 6V14C4 22 10 28 16 30C22 28 28 22 28 14V6L16 2Z" fill="url(#shieldBase)"/>
+    <!-- Inner shield -->
+    <path d="M16 5L7 8V14C7 20 11.5 25 16 27C20.5 25 25 20 25 14V8L16 5Z" fill="url(#shieldInner)"/>
+    <!-- Center emblem -->
+    <circle cx="16" cy="15" r="5" fill="url(#shieldEmblem)"/>
+    <defs>
+        <linearGradient id="shieldBase" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#ff1b6b"/>
+            <stop offset="100%" stop-color="#c71ae5"/>
+        </linearGradient>
+        <linearGradient id="shieldInner" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#c71ae5"/>
+            <stop offset="100%" stop-color="#45caff"/>
+        </linearGradient>
+        <radialGradient id="shieldEmblem" cx="0.5" cy="0.5" r="0.5">
+            <stop offset="0%" stop-color="#ffffff"/>
+            <stop offset="100%" stop-color="#45caff"/>
+        </radialGradient>
+    </defs>
+</svg>

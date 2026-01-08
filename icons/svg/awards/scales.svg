@@ -1,0 +1,39 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Center post -->
+    <rect x="15" y="4" width="2" height="24" fill="url(#scalesPost)"/>
+    <!-- Top beam -->
+    <rect x="4" y="6" width="24" height="2" rx="1" fill="url(#scalesBeam)"/>
+    <!-- Left pan chain -->
+    <line x1="6" y1="8" x2="6" y2="16" stroke="url(#scalesChain)" stroke-width="1"/>
+    <!-- Right pan chain -->
+    <line x1="26" y1="8" x2="26" y2="16" stroke="url(#scalesChain)" stroke-width="1"/>
+    <!-- Left pan -->
+    <ellipse cx="6" cy="18" rx="5" ry="2" fill="url(#scalesPan)"/>
+    <!-- Right pan -->
+    <ellipse cx="26" cy="18" rx="5" ry="2" fill="url(#scalesPan)"/>
+    <!-- Base -->
+    <path d="M10 28H22L20 26H12L10 28Z" fill="url(#scalesBase)"/>
+    <defs>
+        <linearGradient id="scalesPost" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#c71ae5"/>
+            <stop offset="100%" stop-color="#45caff"/>
+        </linearGradient>
+        <linearGradient id="scalesBeam" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#ff1b6b"/>
+            <stop offset="50%" stop-color="#c71ae5"/>
+            <stop offset="100%" stop-color="#45caff"/>
+        </linearGradient>
+        <linearGradient id="scalesChain" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#c71ae5"/>
+            <stop offset="100%" stop-color="#45caff"/>
+        </linearGradient>
+        <linearGradient id="scalesPan" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#FFD700"/>
+            <stop offset="100%" stop-color="#B8860B"/>
+        </linearGradient>
+        <linearGradient id="scalesBase" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#c71ae5"/>
+            <stop offset="100%" stop-color="#ff1b6b"/>
+        </linearGradient>
+    </defs>
+</svg>

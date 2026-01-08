@@ -1180,7 +1180,8 @@ function displayAwardsTable() {
         const nameCell = document.createElement('td');
         const awardInfo = AWARD_NAMES[key];
         if (awardInfo) {
-            nameCell.textContent = `${awardInfo.icon} ${awardInfo.name}`;
+            const iconHtml = window.TPVIcons ? window.TPVIcons.getIcon(key, {size: 'sm'}) : awardInfo.icon;
+            nameCell.innerHTML = `${iconHtml} ${awardInfo.name}`;
         } else {
             nameCell.textContent = key;
         }

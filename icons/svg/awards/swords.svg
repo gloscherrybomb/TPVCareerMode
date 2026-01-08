@@ -1,0 +1,34 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Left sword -->
+    <path d="M6 4L18 16L16 18L4 6L6 4Z" fill="url(#swordBlade1)"/>
+    <path d="M4 6L6 4L3 3L4 6Z" fill="url(#swordHilt)"/>
+    <rect x="14" y="16" width="4" height="2" rx="0.5" transform="rotate(-45 14 16)" fill="url(#swordGuard)"/>
+    <!-- Right sword -->
+    <path d="M26 4L14 16L16 18L28 6L26 4Z" fill="url(#swordBlade2)"/>
+    <path d="M28 6L26 4L29 3L28 6Z" fill="url(#swordHilt)"/>
+    <rect x="14" y="16" width="4" height="2" rx="0.5" transform="rotate(45 14 16)" fill="url(#swordGuard)"/>
+    <!-- Central clash effect -->
+    <circle cx="16" cy="16" r="3" fill="url(#clashGlow)" opacity="0.8"/>
+    <defs>
+        <linearGradient id="swordBlade1" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#45caff"/>
+            <stop offset="100%" stop-color="#c71ae5"/>
+        </linearGradient>
+        <linearGradient id="swordBlade2" x1="100%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#ff1b6b"/>
+            <stop offset="100%" stop-color="#c71ae5"/>
+        </linearGradient>
+        <linearGradient id="swordHilt" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#FFD700"/>
+            <stop offset="100%" stop-color="#B8860B"/>
+        </linearGradient>
+        <linearGradient id="swordGuard" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#c71ae5"/>
+            <stop offset="100%" stop-color="#ff1b6b"/>
+        </linearGradient>
+        <radialGradient id="clashGlow" cx="0.5" cy="0.5" r="0.5">
+            <stop offset="0%" stop-color="#ffffff"/>
+            <stop offset="100%" stop-color="#45caff"/>
+        </radialGradient>
+    </defs>
+</svg>

@@ -1,0 +1,18 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+<!-- Warning triangle -->
+<path d="M14.4 6.5L1.8 28.4C1.3 29.3 1.9 30.4 2.9 30.4H28.3C29.3 30.4 29.9 29.3 29.4 28.4L16.8 6.5C16.3 5.6 15 5.6 14.4 6.5Z" fill="url(#warningBg)"/>
+<!-- Exclamation mark -->
+<path d="M14.2 22.1C14.2 22.9 14.8 23.5 15.6 23.5C16.4 23.5 17 22.9 17 22.1V13C17 12.2 16.4 11.6 15.6 11.6C14.8 11.6 14.2 12.2 14.2 13V22.1Z" fill="url(#exclamationMark)"/>
+<circle cx="15.6" cy="26.1" r="1.4" fill="url(#exclamationMark)"/>
+<defs>
+    <linearGradient id="warningBg" x1="15.6" y1="5.8" x2="15.6" y2="30.4" gradientUnits="userSpaceOnUse">
+        <stop stop-color="#ff1b6b"/>
+        <stop offset="0.5" stop-color="#c71ae5"/>
+        <stop offset="1" stop-color="#45caff"/>
+    </linearGradient>
+    <linearGradient id="exclamationMark" x1="15.6" y1="11.6" x2="15.6" y2="27.5" gradientUnits="userSpaceOnUse">
+        <stop stop-color="#ffffff"/>
+        <stop offset="1" stop-color="#e0e0e0"/>
+    </linearGradient>
+</defs>
+</svg>

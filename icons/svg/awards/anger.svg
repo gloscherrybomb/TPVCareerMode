@@ -1,0 +1,23 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Anger symbol (curved lines radiating) -->
+    <path d="M8 8C12 12 12 16 8 20" stroke="url(#angerGrad)" stroke-width="3" stroke-linecap="round" fill="none"/>
+    <path d="M24 8C20 12 20 16 24 20" stroke="url(#angerGrad)" stroke-width="3" stroke-linecap="round" fill="none"/>
+    <path d="M12 4C16 8 16 12 12 16" stroke="url(#angerGrad2)" stroke-width="3" stroke-linecap="round" fill="none"/>
+    <path d="M20 4C16 8 16 12 20 16" stroke="url(#angerGrad2)" stroke-width="3" stroke-linecap="round" fill="none"/>
+    <!-- Center impact -->
+    <circle cx="16" cy="20" r="4" fill="url(#angerCenter)"/>
+    <defs>
+        <linearGradient id="angerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#ff1b6b"/>
+            <stop offset="100%" stop-color="#c71ae5"/>
+        </linearGradient>
+        <linearGradient id="angerGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#c71ae5"/>
+            <stop offset="100%" stop-color="#45caff"/>
+        </linearGradient>
+        <radialGradient id="angerCenter" cx="0.5" cy="0.5" r="0.5">
+            <stop offset="0%" stop-color="#ffffff"/>
+            <stop offset="100%" stop-color="#ff1b6b"/>
+        </radialGradient>
+    </defs>
+</svg>

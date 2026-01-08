@@ -90,10 +90,11 @@ export function displayPersonalityAwards(personalityAwards, personality) {
 function renderDominantAward(award, personality) {
   const traitValue = personality[award.trait] || 50;
   const traitName = getTraitDisplayName(award.trait);
+  const iconHtml = window.TPVIcons ? window.TPVIcons.getPersonalityIcon(award.id, 'xxl') : award.icon;
 
   return `
     <div class="personality-award-dominant">
-      <div class="award-icon-large">${award.icon}</div>
+      <div class="award-icon-large">${iconHtml}</div>
       <div class="award-content-dominant">
         <div class="award-name-dominant">${award.name}</div>
         <div class="award-description">${award.description}</div>
@@ -117,10 +118,11 @@ function renderCombinationAward(award, traitValues, personality) {
   const trait2 = award.traits[1];
   const value1 = traitValues?.[trait1] || personality[trait1] || 50;
   const value2 = traitValues?.[trait2] || personality[trait2] || 50;
+  const iconHtml = window.TPVIcons ? window.TPVIcons.getPersonalityIcon(award.id, 'xl') : award.icon;
 
   return `
     <div class="personality-award-combination">
-      <div class="award-icon">${award.icon}</div>
+      <div class="award-icon">${iconHtml}</div>
       <div class="award-content">
         <div class="award-name">${award.name}</div>
         <div class="award-description-small">${award.description}</div>
@@ -137,9 +139,10 @@ function renderCombinationAward(award, traitValues, personality) {
  * Render special award (compact card, no traits)
  */
 function renderSpecialAward(award) {
+  const iconHtml = window.TPVIcons ? window.TPVIcons.getPersonalityIcon(award.id, 'lg') : award.icon;
   return `
     <div class="personality-award-special">
-      <div class="award-icon">${award.icon}</div>
+      <div class="award-icon">${iconHtml}</div>
       <div class="award-content">
         <div class="award-name">${award.name}</div>
         <div class="award-description-small">${award.description}</div>

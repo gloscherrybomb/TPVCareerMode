@@ -331,9 +331,10 @@ class AchievementNotifications {
     // Get Cadence Credits value for this award
     const ccValue = window.currencyConfig?.AWARD_CREDIT_MAP?.[notification.awardId] || 0;
 
+    const iconHtml = window.TPVIcons ? window.TPVIcons.getIcon(award.id, {size: 'xl'}) : award.icon;
     const cardHTML = `
       <div class="achievement-card" data-intensity="${notification.intensity}" style="animation-delay: ${index * 0.1}s">
-        <div class="achievement-icon">${award.icon}</div>
+        <div class="achievement-icon">${iconHtml}</div>
         <div class="achievement-content">
           <h4 class="achievement-title">${award.title}${ccValue > 0 ? ` <span class="achievement-cc">⚡${ccValue} CC</span>` : ''}</h4>
           <p class="achievement-description">${award.description}</p>
@@ -400,15 +401,16 @@ class AchievementNotifications {
    * @returns {string}
    */
   getCategoryIcon(category) {
-    const icons = {
-      podium: '🏅',
-      event_special: '⭐',
-      performance: '💪',
-      gc: '🏆',
-      season: '👑',
-      personality: '🎭'
+    const iconMap = {
+      podium: 'goldMedal',
+      event_special: 'specialist',
+      performance: 'specialist',
+      gc: 'trophy',
+      season: 'trophy',
+      personality: 'polarizing'
     };
-    return icons[category] || '🏆';
+    const iconId = iconMap[category] || 'trophy';
+    return window.TPVIcons ? window.TPVIcons.getIcon(iconId, {size: 'lg'}) : '🏆';
   }
 
   /**

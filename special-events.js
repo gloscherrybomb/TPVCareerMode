@@ -109,9 +109,10 @@ function createEventCard(event, isFreeEvent = false) {
     card.className = 'special-event-card unlocked';
 
     const badgeText = isFreeEvent ? 'Available' : 'Unlocked';
+    const iconHtml = window.TPVIcons ? window.TPVIcons.getEventIcon(event, 'xl') : event.icon;
     card.innerHTML = `
         <div class="event-badge available">${badgeText}</div>
-        <div class="event-icon">${event.icon}</div>
+        <div class="event-icon">${iconHtml}</div>
         <h3 class="event-title">${event.name}</h3>
         <p class="event-description">${event.description}</p>
         <div class="event-meta">

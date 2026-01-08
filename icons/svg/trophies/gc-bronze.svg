@@ -1,0 +1,37 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Handles -->
+    <path d="M24.5 6.8C23.6 6.5 22.7 7.1 22.4 8L20.8 7.5C21.3 5.7 23.2 4.6 25 5.1L25.2 5.2C27.6 6 27.8 9.4 25.6 10.6L20.6 13.4C20.2 13.6 19.7 13.4 19.4 13C19.2 12.6 19.4 12.1 19.8 11.8L24.7 9.1C25.7 8.5 25.6 7.1 24.6 6.8L24.5 6.8Z" fill="url(#gcBronzeHandle)"/>
+    <path d="M6.3 5.1C8.1 4.6 10 5.7 10.5 7.5L8.8 8C8.5 7.1 7.6 6.5 6.7 6.8L6.6 6.8C5.7 7.1 5.5 8.5 6.5 9.1L11.4 11.8C11.9 12.1 12 12.6 11.8 13C11.6 13.4 11 13.6 10.6 13.4L5.6 10.6C3.4 9.4 3.6 6 6.1 5.2L6.3 5.1Z" fill="url(#gcBronzeHandle)"/>
+    <!-- Stem -->
+    <path d="M17.3 17.5V13.3H13.9V17.5C13.9 18.2 13.6 18.9 13 19.4L11.1 21H20.1L18.2 19.4C17.6 18.9 17.3 18.2 17.3 17.5Z" fill="url(#gcBronzeStem)"/>
+    <!-- Cup body -->
+    <path d="M15.6 16.5C11.8 16.5 8.6 13.4 8.6 9.5V2.7C8.6 2.3 9 2 9.3 2H21.9C22.3 2 22.6 2.3 22.6 2.7V9.5C22.6 13.4 19.5 16.5 15.6 16.5Z" fill="url(#gcBronzeCup)"/>
+    <!-- Base - neon purple/cyan -->
+    <path d="M22.5 21H8.7C8 21 7.3 21.5 7.2 22.2L5.7 29.3C5.6 29.6 5.8 29.9 6.2 29.9H25C25.4 29.9 25.6 29.6 25.6 29.3L24 22.2C23.9 21.5 23.3 21 22.5 21Z" fill="url(#gcBronzeBase)"/>
+    <!-- Plaque -->
+    <rect x="12" y="23.7" width="7.3" height="3.1" rx="0.4" fill="url(#gcBronzePlaque)"/>
+    <!-- GC text -->
+    <text x="15.6" y="11" text-anchor="middle" fill="#6B4423" font-size="5" font-weight="bold" font-family="Arial">GC</text>
+    <defs>
+        <linearGradient id="gcBronzeHandle" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#CD7F32"/>
+            <stop offset="100%" stop-color="#A66E2C"/>
+        </linearGradient>
+        <linearGradient id="gcBronzeStem" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#B87333"/>
+            <stop offset="100%" stop-color="#8B4513"/>
+        </linearGradient>
+        <radialGradient id="gcBronzeCup" cx="0.5" cy="0.2" r="0.8">
+            <stop offset="0%" stop-color="#DEB887"/>
+            <stop offset="100%" stop-color="#A0522D"/>
+        </radialGradient>
+        <linearGradient id="gcBronzeBase" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#c71ae5"/>
+            <stop offset="100%" stop-color="#45caff"/>
+        </linearGradient>
+        <linearGradient id="gcBronzePlaque" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#DEB887"/>
+            <stop offset="100%" stop-color="#CD853F"/>
+        </linearGradient>
+    </defs>
+</svg>

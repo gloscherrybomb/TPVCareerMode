@@ -187,6 +187,7 @@ It's a clean, controlled time trial that rewards discipline over explosiveness�
         format: "3 laps",
         maxPoints: 70,
         icon: "💨",
+        iconId: "eventFastCrit",
         description: `The Flat Eight Criterium is a fast-paced local circuit race known for its smooth flow and constant changes in speed as riders rotate through the looping course.
 
 With frequent accelerations and tight pack dynamics, it rewards quick reactions, confident cornering, and the ability to hold position when the pace lifts.
@@ -214,6 +215,7 @@ It's a straightforward but energetic crit—an ideal proving ground for riders l
         format: "1 lap",
         maxPoints: 185,
         icon: "🏔️",
+        iconId: "eventSnowMountain",
         description: `Covering more than fifty kilometers of varied terrain around Gilbert Island, the Grand Gilbert Fondo is one of the most demanding challenges available at the local level.
 
 The route strings together a series of steady climbs, rolling stretches, and exposed coastal roads, turning the event into a true endurance test rather than a single-effort effort. Riders can expect long periods of sustained work punctuated by decisive rises that gradually wear down the field.
@@ -241,6 +243,7 @@ It's the kind of event where pacing matters just as much as strength, and finish
         format: "2 laps",
         maxPoints: 85,
         icon: "🏕️",
+        iconId: "eventCamping",
         description: `The Base Camp Classic is a pure climbing-focused road race designed to challenge developing riders with a steady procession of uphill efforts.
 
 The course gradually grinds the field down and rewards those who can stay composed as the gradients accumulate. There's little shelter and few opportunities to hide—every rise forces a decision, every false flat tests pacing, and every summit invites someone to attack.
@@ -268,6 +271,7 @@ For riders looking to prove their climbing potential early in their career, the 
         format: "1 lap",
         maxPoints: 70,
         icon: "🌊",
+        iconId: "eventCoastal",
         description: `The Beach and Pine TT is a longer, coast-hugging time trial that rewards steady pacing and aerodynamic discipline.
 
 The route follows flat shoreline roads bordered by open water on one side and dense pine stretches on the other, creating a mix of calm sheltered sections and breezier exposed straights.
@@ -445,6 +449,7 @@ const specialEventData = {
         format: "TBD",
         maxPoints: 60,
         icon: "🇸🇬",
+        iconId: "eventNightRace",
         description: `The Singapore Criterium is an exclusive night race through the illuminated streets of Marina Bay. Reserved for riders who have proven their dedication to the sport, this prestigious event offers a unique racing experience under the city lights.
 
 Racing under floodlights with the Singapore skyline as your backdrop, you'll navigate a technical circuit that demands both speed and precision. The humid tropical conditions add an extra layer of challenge to this already demanding event.

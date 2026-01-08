@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="achievement-notifications.css">
     <link rel="stylesheet" href="cadence-credits.css">
     <link rel="stylesheet" href="season-switcher.css">
+    <link rel="stylesheet" href="icons/icons.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
@@ -364,6 +365,7 @@
         </div>
     </div>
 
+    <script src="icons/icons.js"></script>
     <script src="event-data.js"></script>
     <script src="season-config.js"></script>
     <script src="season-data-helpers.js"></script>
@@ -517,12 +519,12 @@
                                 ${selectedEvent ? `
                                 <div class="event-image">
                                     <div class="event-image-placeholder">
-                                        <span>${selectedEvent.icon}</span>
+                                        ${window.TPVIcons ? window.TPVIcons.getEventIcon(selectedEvent, 'xxl') : selectedEvent.icon}
                                     </div>
                                 </div>
                                 ` : ''}
                                 <div class="stage-card-content">
-                                    ${!selectedEvent ? `<div class="stage-icon-large">${stage.icon}</div>` : ''}
+                                    ${!selectedEvent ? `<div class="stage-icon-large">${window.TPVIcons && stage.iconId ? window.TPVIcons.getIcon(stage.iconId, {size: 'xxl'}) : stage.icon}</div>` : ''}
                                     <h3 class="stage-title">${selectedEvent ? selectedEvent.name : stage.name}</h3>
                                     <p class="stage-description">
                                         ${selectedEventId ? 
@@ -579,7 +581,7 @@
                                 ${isTourEvent ? tourProgressBadge : ''}
                                 <div class="event-image">
                                     <div class="event-image-placeholder">
-                                        <span>${event.icon}</span>
+                                        ${window.TPVIcons ? window.TPVIcons.getEventIcon(event, 'xxl') : event.icon}
                                     </div>
                                 </div>
                                 <div class="stage-card-content">
@@ -903,9 +905,10 @@
             
             grid.innerHTML = availableEvents.map(eventId => {
                 const event = getEvent(eventId);
+                const iconHtml = window.TPVIcons ? window.TPVIcons.getEventIcon(event, 'xl') : event.icon;
                 return `
                     <div class="choice-event-card" onclick="selectChoiceEvent(${stage}, ${eventId})">
-                        <div class="choice-event-icon">${event.icon}</div>
+                        <div class="choice-event-icon">${iconHtml}</div>
                         <h4>${event.name}</h4>
                         <p>${event.subtitle}</p>
                         <div class="choice-event-stats">

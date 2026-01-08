@@ -546,7 +546,7 @@ const GLOBAL_RANKINGS_TIMESTAMP_KEY = 'globalRankingsTimestamp';
 const SEASON_STANDINGS_CACHE_KEY = 'seasonStandings';
 const SEASON_STANDINGS_TIMESTAMP_KEY = 'seasonStandingsTimestamp';
 
-// Render Global Rankings
+// Render Global High Scores
 async function renderGlobalRankings(forceRefresh = false) {
     const globalContent = document.getElementById('individualRankings');
 
@@ -562,14 +562,14 @@ async function renderGlobalRankings(forceRefresh = false) {
             if (cachedData && cacheTimestamp) {
                 const cacheAge = now - parseInt(cacheTimestamp);
                 if (cacheAge < CACHE_DURATION) {
-                    console.log(`📦 Using cached global rankings (${Math.round(cacheAge / 1000)}s old)`);
+                    console.log(`📦 Using cached global high scores (${Math.round(cacheAge / 1000)}s old)`);
                     rankings = JSON.parse(cachedData);
 
                     // Filter out bots from cached data (in case cache has old data with bots)
                     rankings = rankings.filter(r => !r.uid.startsWith('Bot'));
 
-                    console.log('Global Rankings - Total racers:', rankings.length);
-                    console.log('Global Rankings - First racer:', rankings[0]);
+                    console.log('Global High Scores - Total racers:', rankings.length);
+                    console.log('Global High Scores - First racer:', rankings[0]);
 
                     // Mark current user
                     if (currentUser) {
@@ -587,7 +587,7 @@ async function renderGlobalRankings(forceRefresh = false) {
         }
 
         // Cache miss or expired - fetch from Firestore
-        console.log('🔄 Fetching fresh global rankings from Firestore...');
+        console.log('🔄 Fetching fresh global high scores from Firestore...');
 
         // Fetch top 100 users by careerPoints (lifetime achievement across all seasons)
         const usersQuery = query(
@@ -603,12 +603,12 @@ async function renderGlobalRankings(forceRefresh = false) {
         usersSnapshot.forEach((doc) => {
             const data = doc.data();
 
-            // Skip bots - global rankings are for human riders only
+            // Skip bots - global high scores are for human riders only
             if (doc.id.startsWith('Bot')) {
                 return;
             }
 
-            // Use careerPoints for global rankings (lifetime achievement)
+            // Use careerPoints for global high scores (lifetime achievement)
             const points = data.careerPoints || 0;
             const currentSeason = data.currentSeason || 1;
 
@@ -644,9 +644,9 @@ async function renderGlobalRankings(forceRefresh = false) {
         if (rankings.length > 0) {
             localStorage.setItem(GLOBAL_RANKINGS_CACHE_KEY, JSON.stringify(rankings));
             localStorage.setItem(GLOBAL_RANKINGS_TIMESTAMP_KEY, Date.now().toString());
-            console.log(`✅ Cached ${rankings.length} global rankings`);
+            console.log(`✅ Cached ${rankings.length} global high scores`);
         } else {
-            console.warn('⚠️ Not caching global rankings - no data returned from Firestore');
+            console.warn('⚠️ Not caching global high scores - no data returned from Firestore');
         }
 
         // Populate country filter with available countries
@@ -656,7 +656,7 @@ async function renderGlobalRankings(forceRefresh = false) {
         renderGlobalRankingsTable(rankings, globalContent);
         return rankings; // Return rankings for team calculations
     } catch (error) {
-        console.error('Error loading global rankings:', error);
+        console.error('Error loading global high scores:', error);
         globalContent.innerHTML = `
             <div class="error-state">
                 <p>Error loading rankings. Please try again later.</p>
@@ -666,7 +666,7 @@ async function renderGlobalRankings(forceRefresh = false) {
     }
 }
 
-// Separate function to render the global rankings table
+// Separate function to render the global high scores table
 function renderGlobalRankingsTable(rankings, globalContent) {
     console.log('renderGlobalRankingsTable - Input rankings:', rankings.length);
     console.log('renderGlobalRankingsTable - Current filters:', filters);
@@ -1016,7 +1016,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initFilters();
     initStandingsSeasonSwitcher(); // Initialize season switcher
     renderSeasonStandings();
-    renderGlobalRankings().catch(err => console.error('Error rendering global rankings:', err));
+    renderGlobalRankings().catch(err => console.error('Error rendering global high scores:', err));
     renderTeamRankings();
 });
 
@@ -1030,19 +1030,19 @@ function initFilters() {
     // Gender filter change
     genderFilter.addEventListener('change', () => {
         filters.gender = genderFilter.value;
-        renderGlobalRankings().catch(err => console.error('Error rendering global rankings:', err));
+        renderGlobalRankings().catch(err => console.error('Error rendering global high scores:', err));
     });
 
     // Age group filter change
     ageGroupFilter.addEventListener('change', () => {
         filters.ageGroup = ageGroupFilter.value;
-        renderGlobalRankings().catch(err => console.error('Error rendering global rankings:', err));
+        renderGlobalRankings().catch(err => console.error('Error rendering global high scores:', err));
     });
 
     // Country filter change
     countryFilter.addEventListener('change', () => {
         filters.country = countryFilter.value;
-        renderGlobalRankings().catch(err => console.error('Error rendering global rankings:', err));
+        renderGlobalRankings().catch(err => console.error('Error rendering global high scores:', err));
     });
 
     // Clear all filters
@@ -1055,7 +1055,7 @@ function initFilters() {
         genderFilter.value = 'all';
         ageGroupFilter.value = 'all';
         countryFilter.value = 'all';
-        renderGlobalRankings().catch(err => console.error('Error rendering global rankings:', err));
+        renderGlobalRankings().catch(err => console.error('Error rendering global high scores:', err));
     });
 }
 
