@@ -1,5 +1,5 @@
 {
-  "lastUpdated": "2026-01-08T13:20:13.299Z",
+  "lastUpdated": "2026-01-08T14:20:14.119Z",
   "description": "Tracks eventKeys that have already been processed from CSV files",
   "processedEventKeys": [
     91955,
@@ -63,6 +63,7 @@
     96283,
     96302,
     96313,
-    96331
+    96331,
+    96342
   ]
 }
