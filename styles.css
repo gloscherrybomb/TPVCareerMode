@@ -23,19 +23,19 @@
 
 /* Increase font sizes when readable font is enabled (palmares page) */
 .readable-font .stat-value {
-    font-size: 1.4rem;
+    font-size: 1.3rem;
 }
 
 .readable-font .stat-row-value {
-    font-size: 1.05rem;
+    font-size: 1rem;
 }
 
 .readable-font .power-record-card .record-value {
-    font-size: 1.65rem;
+    font-size: 1.55rem;
 }
 
 .readable-font .season-stat-value {
-    font-size: 1rem;
+    font-size: 0.95rem;
 }
 
 * {
