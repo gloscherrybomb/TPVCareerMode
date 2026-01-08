@@ -1,4 +1,5 @@
 // Bot Profile Admin Page
+import { escapeHtml } from './utils.js';
 import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 import { getFirestore, collection, getDocs, doc, getDoc, setDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
@@ -282,7 +283,7 @@ function showError(message) {
     document.getElementById('authCheck').innerHTML = `
         <div style="text-align: center;">
             <div style="font-size: 3rem; margin-bottom: 1rem;">⚠️</div>
-            <p style="color: var(--text-primary);">${message}</p>
+            <p style="color: var(--text-primary);">${escapeHtml(message)}</p>
         </div>
     `;
 }
@@ -343,9 +344,9 @@ function renderProfilesList(profiles) {
                     }
                 </div>
                 <div class="profile-item-info">
-                    <div class="profile-item-name">${profile.name}</div>
+                    <div class="profile-item-name">${escapeHtml(profile.name)}</div>
                     <div class="profile-item-meta">
-                        <span>${profile.team}</span>
+                        <span>${escapeHtml(profile.team)}</span>
                         <span class="${arrBadge.class}">${profile.arr}</span>
                         <span class="profile-flag">${flagHtml}</span>
                     </div>
@@ -495,8 +496,8 @@ window.confirmDeleteProfile = function(profileId) {
     const deleteInfo = document.getElementById('deleteProfileInfo');
     
     deleteInfo.innerHTML = `
-        <strong>${profile.name}</strong><br>
-        <small style="color: var(--text-secondary);">${profile.team} • ARR ${profile.arr}</small>
+        <strong>${escapeHtml(profile.name)}</strong><br>
+        <small style="color: var(--text-secondary);">${escapeHtml(profile.team)} • ARR ${profile.arr}</small>
     `;
     
     modal.classList.add('active');
@@ -850,7 +851,7 @@ document.getElementById('previewBtn').addEventListener('click', () => {
     const arrBadge = getARRBadge(arr);
     const flagHtml = getCountryFlag(nationality);
     const nationalityName = getCountryName(nationality);
-    const backstoryParagraphs = backstory.split('\n\n').map(p => `<p>${p}</p>`).join('');
+    const backstoryParagraphs = backstory.split('\n\n').map(p => `<p>${escapeHtml(p)}</p>`).join('');
     
     const previewImageSrc = selectedImage 
         ? URL.createObjectURL(selectedImage) 
@@ -859,17 +860,17 @@ document.getElementById('previewBtn').addEventListener('click', () => {
     const modalBody = document.getElementById('previewModalBody');
     modalBody.innerHTML = `
         <div class="modal-profile-header">
-            ${previewImageSrc 
-                ? `<img src="${previewImageSrc}" alt="${name}">` 
+            ${previewImageSrc
+                ? `<img src="${previewImageSrc}" alt="${escapeHtml(name)}">`
                 : `<div class="modal-profile-header-placeholder">🚴</div>`
             }
         </div>
         <div class="modal-profile-details">
-            <h2 class="modal-profile-name">${name}</h2>
+            <h2 class="modal-profile-name">${escapeHtml(name)}</h2>
             <div class="modal-profile-meta">
                 <div class="modal-meta-item">
                     <div class="modal-meta-label">Team</div>
-                    <div class="modal-meta-value">${team}</div>
+                    <div class="modal-meta-value">${escapeHtml(team)}</div>
                 </div>
                 <div class="modal-meta-item">
                     <div class="modal-meta-label">ARR</div>
@@ -879,19 +880,19 @@ document.getElementById('previewBtn').addEventListener('click', () => {
                     <div class="modal-meta-label">Nationality</div>
                     <div class="modal-meta-value">
                         <span class="profile-flag">${flagHtml}</span>
-                        <span>${nationalityName}</span>
+                        <span>${escapeHtml(nationalityName)}</span>
                     </div>
                 </div>
                 ${age ? `
                 <div class="modal-meta-item">
                     <div class="modal-meta-label">Age</div>
-                    <div class="modal-meta-value">${age}</div>
+                    <div class="modal-meta-value">${escapeHtml(age)}</div>
                 </div>
                 ` : ''}
                 ${ridingStyle ? `
                 <div class="modal-meta-item">
                     <div class="modal-meta-label">Riding Style</div>
-                    <div class="modal-meta-value">${ridingStyle}</div>
+                    <div class="modal-meta-value">${escapeHtml(ridingStyle)}</div>
                 </div>
                 ` : ''}
             </div>
@@ -1206,7 +1207,7 @@ async function batchUploadProfiles(profiles) {
     // Display results
     resultsSection.innerHTML = results.map(result => `
         <div class="csv-result-item ${result.success ? 'success' : 'error'}">
-            <strong>${result.name}:</strong> ${result.message}
+            <strong>${escapeHtml(result.name)}:</strong> ${escapeHtml(result.message)}
         </div>
     `).join('');
     

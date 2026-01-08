@@ -431,3 +431,23 @@ export function getHighResPhotoURL(photoURL, size = 400) {
   // For other URLs (like Firebase Storage), return as-is
   return photoURL;
 }
+
+/**
+ * Escapes HTML special characters to prevent XSS attacks
+ * @param {string} str - The string to escape
+ * @returns {string} - The escaped string safe for innerHTML
+ */
+export function escapeHtml(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+// Export escapeHtml to window for non-module scripts
+if (typeof window !== 'undefined') {
+  window.escapeHtml = escapeHtml;
+}

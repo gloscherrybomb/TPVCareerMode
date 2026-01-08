@@ -1,7 +1,7 @@
 // Profile Page Logic for TPV Career Mode
 
 import { firebaseConfig } from './firebase-config.js';
-import { getInitials, formatTime, getOrdinalSuffix, getARRBand, formatDate, getCountryCode2, getHighResPhotoURL } from './utils.js';
+import { getInitials, formatTime, getOrdinalSuffix, getARRBand, formatDate, getCountryCode2, getHighResPhotoURL, escapeHtml } from './utils.js';
 import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 import { displayPersonality } from './profile-personality.js';
 import { displayPersonalityAwards } from './personality-awards-display.js';
@@ -1675,8 +1675,9 @@ function displayCareerSummary(userData, stats) {
     if (seasonComplete && window.seasonCompletion) {
         try {
             const reviewText = window.seasonCompletion.generateProfileSeasonReview(userData);
-            // Convert markdown-style text to HTML
-            const htmlText = reviewText
+            // Escape HTML first, then convert markdown-style text to HTML
+            const escapedText = escapeHtml(reviewText);
+            const htmlText = escapedText
                 .replace(/## (.*)/g, '<h2>$1</h2>')
                 .replace(/### (.*)/g, '<h3>$1</h3>')
                 .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')

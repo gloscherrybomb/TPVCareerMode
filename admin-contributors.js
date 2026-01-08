@@ -1,5 +1,6 @@
 // Contributor Admin Page
 import { firebaseConfig } from './firebase-config.js';
+import { escapeHtml } from './utils.js';
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 import {
@@ -185,7 +186,7 @@ async function searchUsers(searchTerm) {
         });
 
         if (matchingUsers.length === 0) {
-            container.innerHTML = '<div class="no-results">No users found matching "' + searchTerm + '"</div>';
+            container.innerHTML = '<div class="no-results">No users found matching "' + escapeHtml(searchTerm) + '"</div>';
             return;
         }
 
@@ -220,12 +221,12 @@ function renderUserCard(user) {
             <div class="user-info">
                 <div class="user-avatar">
                     ${user.photoURL
-                        ? `<img src="${user.photoURL}" alt="${user.name}" onerror="this.parentElement.textContent='${initials}'">`
-                        : initials}
+                        ? `<img src="${user.photoURL}" alt="${escapeHtml(user.name)}" onerror="this.parentElement.textContent='${escapeHtml(initials)}'">`
+                        : escapeHtml(initials)}
                 </div>
                 <div class="user-details">
-                    <h3>${user.name || 'Unknown'} ${user.isContributor ? '<span style="color: #ffd700;">&#9733;</span>' : ''}</h3>
-                    <p>UID: ${user.uid || 'N/A'}</p>
+                    <h3>${escapeHtml(user.name || 'Unknown')} ${user.isContributor ? '<span style="color: #ffd700;">&#9733;</span>' : ''}</h3>
+                    <p>UID: ${escapeHtml(user.uid || 'N/A')}</p>
                     ${contributorSince ? `<div class="contributor-since">Contributor since: ${contributorSince}</div>` : ''}
                 </div>
             </div>

@@ -1,6 +1,7 @@
 // Reusable Bot Profile Modal
 // Import this module on any page to enable bot profile viewing
 import { getFirestore, doc, getDoc, collection, query, where, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { escapeHtml } from './utils.js';
 
 let db;
 let modalInitialized = false;
@@ -307,23 +308,23 @@ async function openBotProfile(botUid) {
         // Render profile
         const arrBadge = getARRBadge(profile.arr);
         const flag = getCountryFlag(profile.nationality);
-        const backstoryParagraphs = profile.backstory 
-            ? profile.backstory.split('\n\n').map(p => `<p>${p}</p>`).join('') 
+        const backstoryParagraphs = profile.backstory
+            ? profile.backstory.split('\n\n').map(p => `<p>${escapeHtml(p)}</p>`).join('')
             : '<p>No backstory available.</p>';
         
         modalBody.innerHTML = `
             <div class="modal-profile-header">
-                ${profile.imageUrl 
-                    ? `<img src="${profile.imageUrl}" alt="${profile.name}">` 
+                ${profile.imageUrl
+                    ? `<img src="${profile.imageUrl}" alt="${escapeHtml(profile.name)}">`
                     : `<div class="modal-profile-header-placeholder">🚴</div>`
                 }
             </div>
             <div class="modal-profile-details">
-                <h2 class="modal-profile-name">${profile.name}</h2>
+                <h2 class="modal-profile-name">${escapeHtml(profile.name)}</h2>
                 <div class="modal-profile-meta">
                     <div class="modal-meta-item">
                         <div class="modal-meta-label">Team</div>
-                        <div class="modal-meta-value">${profile.team || 'No Team'}</div>
+                        <div class="modal-meta-value">${escapeHtml(profile.team || 'No Team')}</div>
                     </div>
                     <div class="modal-meta-item">
                         <div class="modal-meta-label">ARR</div>
@@ -332,19 +333,19 @@ async function openBotProfile(botUid) {
                     ${profile.nationality ? `
                     <div class="modal-meta-item">
                         <div class="modal-meta-label">Nationality</div>
-                        <div class="modal-meta-value">${flag} ${profile.nationality}</div>
+                        <div class="modal-meta-value">${flag} ${escapeHtml(profile.nationality)}</div>
                     </div>
                     ` : ''}
                     ${profile.age ? `
                     <div class="modal-meta-item">
                         <div class="modal-meta-label">Age</div>
-                        <div class="modal-meta-value">${profile.age}</div>
+                        <div class="modal-meta-value">${escapeHtml(String(profile.age))}</div>
                     </div>
                     ` : ''}
                     ${profile.ridingStyle ? `
                     <div class="modal-meta-item">
                         <div class="modal-meta-label">Riding Style</div>
-                        <div class="modal-meta-value">${profile.ridingStyle}</div>
+                        <div class="modal-meta-value">${escapeHtml(profile.ridingStyle)}</div>
                     </div>
                     ` : ''}
                 </div>
@@ -365,7 +366,7 @@ async function openBotProfile(botUid) {
             <div style="padding: 3rem; text-align: center;">
                 <div style="font-size: 4rem; margin-bottom: 1rem;">⚠️</div>
                 <h3 style="color: var(--text-primary); margin-bottom: 0.5rem;">Error Loading Profile</h3>
-                <p style="color: var(--text-secondary);">${error.message}</p>
+                <p style="color: var(--text-secondary);">${escapeHtml(error.message)}</p>
             </div>
         `;
     }
@@ -391,9 +392,9 @@ function isBot(uid, isBotFlag) {
 function makeNameClickable(name, uid, isBotFlag) {
     if (isBot(uid, isBotFlag)) {
         console.log('Making bot name clickable:', name, uid);
-        return `<span class="bot-name-link" onclick="window.openBotProfile('${uid}')">${name}</span>`;
+        return `<span class="bot-name-link" onclick="window.openBotProfile('${escapeHtml(uid)}')">${escapeHtml(name)}</span>`;
     }
-    return name;
+    return escapeHtml(name);
 }
 
 // Helper functions

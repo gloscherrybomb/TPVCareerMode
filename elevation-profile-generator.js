@@ -118,7 +118,6 @@ class ElevationProfileGenerator {
         try {
             console.log('Fetching ExportedWorld.json...');
             const response = await fetch('ExportedWorld.json', {
-                cache: 'no-cache',
                 headers: {
                     'Content-Type': 'application/json'
                 }
