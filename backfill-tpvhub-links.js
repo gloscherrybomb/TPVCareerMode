@@ -1,5 +1,5 @@
 // backfill-tpvhub-links.js - Backfill existing Firestore results with TPVirtualHub link data
-// This script reads JSON files and updates existing result documents with scheduleKey and eventKey
+// This script queries the schedule API to get accessCodes and updates result documents
 
 const fs = require('fs');
 const path = require('path');
@@ -20,148 +20,149 @@ admin.initializeApp({
 
 const db = admin.firestore();
 
-/**
- * Parse event path to extract season and event number
- */
-function parseEventPath(filePath) {
-  const match = filePath.match(/season_(\d+)[\/\\]event_(\d+)/);
-  if (!match) {
-    throw new Error(`Could not parse season/event from path: ${filePath}`);
-  }
-  return {
-    season: parseInt(match[1]),
-    event: parseInt(match[2])
-  };
-}
+// Schedule API URL
+const SCHEDULE_API_URL = 'https://tpvirtualhub.com/api/schedule/report?o=';
 
 /**
- * Find all JSON files in race_results directory
+ * Load event data to get scheduleUrls
  */
-function findJsonFiles(dir) {
-  const results = [];
+function loadEventData() {
+  const eventDataPath = path.join(__dirname, 'event-data.js');
+  const content = fs.readFileSync(eventDataPath, 'utf8');
 
-  function walkDir(currentDir) {
-    const files = fs.readdirSync(currentDir);
-    for (const file of files) {
-      const filePath = path.join(currentDir, file);
-      const stat = fs.statSync(filePath);
-      if (stat.isDirectory()) {
-        walkDir(filePath);
-      } else if (file.endsWith('.json')) {
-        results.push(filePath);
-      }
+  const events = [];
+
+  // Extract scheduleUrl entries using regex
+  const eventMatches = content.matchAll(/(\d+):\s*\{[^}]*scheduleUrl:\s*["']([^"']+)["']/g);
+  for (const match of eventMatches) {
+    const eventId = parseInt(match[1]);
+    const scheduleUrl = match[2];
+    if (scheduleUrl && scheduleUrl !== 'null') {
+      events.push({ eventId, scheduleUrl });
     }
   }
 
-  walkDir(dir);
-  return results;
+  return events;
+}
+
+/**
+ * Extract base64 parameter from scheduleUrl
+ */
+function extractBase64Param(scheduleUrl) {
+  const match = scheduleUrl.match(/\?o=(.+)$/);
+  return match ? match[1] : null;
+}
+
+/**
+ * Fetch schedule data from API
+ */
+async function fetchScheduleData(base64Param) {
+  const url = SCHEDULE_API_URL + base64Param;
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}`);
+  }
+  return response.json();
+}
+
+/**
+ * Build a map of scheduleKey -> accessCode from all events
+ */
+async function buildAccessCodeMap(events) {
+  const accessCodeMap = {};
+
+  for (const event of events) {
+    const base64Param = extractBase64Param(event.scheduleUrl);
+    if (!base64Param) continue;
+
+    try {
+      console.log(`   Fetching schedule data for event ${event.eventId}...`);
+      const data = await fetchScheduleData(base64Param);
+
+      // Add cloned schedules to the map
+      if (data.clonedSchedules) {
+        for (const schedule of data.clonedSchedules) {
+          if (schedule.scheduleKey && schedule.accessCode) {
+            accessCodeMap[schedule.scheduleKey] = schedule.accessCode;
+          }
+        }
+      }
+
+      // Small delay to avoid rate limiting
+      await new Promise(resolve => setTimeout(resolve, 200));
+
+    } catch (error) {
+      console.log(`   ⚠️ Error fetching event ${event.eventId}: ${error.message}`);
+    }
+  }
+
+  return accessCodeMap;
 }
 
 /**
  * Main backfill function
  */
 async function backfillTpvHubLinks() {
-  const raceResultsDir = path.join(__dirname, 'race_results');
+  console.log('📋 Loading event data...');
+  const events = loadEventData();
+  console.log(`   Found ${events.length} events with scheduleUrls\n`);
 
-  if (!fs.existsSync(raceResultsDir)) {
-    console.error('❌ race_results directory not found');
-    process.exit(1);
-  }
+  console.log('🌐 Fetching access codes from TPVirtualHub API...');
+  const accessCodeMap = await buildAccessCodeMap(events);
+  console.log(`   Built map with ${Object.keys(accessCodeMap).length} scheduleKey -> accessCode mappings\n`);
 
-  console.log('🔍 Finding JSON files in race_results...');
-  const jsonFiles = findJsonFiles(raceResultsDir);
-  console.log(`   Found ${jsonFiles.length} JSON files\n`);
+  console.log('🔥 Querying Firestore for results documents...');
+  const resultsSnapshot = await db.collection('results').get();
+  console.log(`   Found ${resultsSnapshot.size} result documents\n`);
 
   let totalUpdated = 0;
   let totalSkipped = 0;
+  let totalNoAccessCode = 0;
   let totalErrors = 0;
 
-  for (const filePath of jsonFiles) {
+  for (const doc of resultsSnapshot.docs) {
+    const docId = doc.id;
+    const data = doc.data();
+
+    // Check if already has correct accessCode
+    if (data.tpvHubScheduleKey && data.tpvHubAccessCode) {
+      totalSkipped++;
+      continue;
+    }
+
+    // Get scheduleKey from existing data or skip
+    const scheduleKey = data.tpvHubScheduleKey;
+    if (!scheduleKey) {
+      totalSkipped++;
+      continue;
+    }
+
+    // Look up accessCode
+    const accessCode = accessCodeMap[scheduleKey];
+    if (!accessCode) {
+      console.log(`   ⚠️ No accessCode found for scheduleKey ${scheduleKey} (${docId})`);
+      totalNoAccessCode++;
+      continue;
+    }
+
     try {
-      console.log(`📄 Processing: ${path.basename(filePath)}`);
-
-      // Parse season and event from path
-      const { season, event } = parseEventPath(filePath);
-
-      // Read and parse JSON
-      const jsonContent = fs.readFileSync(filePath, 'utf8');
-      const parsedJson = JSON.parse(jsonContent);
-
-      // Check for metadata
-      if (!parsedJson.metadata) {
-        console.log(`   ⚠️ No metadata found, skipping`);
-        totalSkipped++;
-        continue;
-      }
-
-      const { scheduleKey, eventKey } = parsedJson.metadata;
-
-      if (!scheduleKey || !eventKey) {
-        console.log(`   ⚠️ Missing scheduleKey or eventKey, skipping`);
-        totalSkipped++;
-        continue;
-      }
-
-      console.log(`   Season ${season}, Event ${event}`);
-      console.log(`   scheduleKey: ${scheduleKey}, eventKey: ${eventKey}`);
-
-      // Get results array
-      const results = parsedJson.results || parsedJson;
-      if (!Array.isArray(results)) {
-        console.log(`   ⚠️ No results array found, skipping`);
-        totalSkipped++;
-        continue;
-      }
-
-      // Find human UIDs (non-bot players)
-      const humanUids = results
-        .filter(r => !r.isBot && r.playerId && !r.playerId.startsWith('Bot'))
-        .map(r => r.playerId)
-        .filter((uid, index, self) => uid && self.indexOf(uid) === index);
-
-      console.log(`   Found ${humanUids.length} human racer(s)`);
-
-      // Update each user's result document
-      for (const uid of humanUids) {
-        const docId = `season${season}_event${event}_${uid}`;
-        const docRef = db.collection('results').doc(docId);
-
-        try {
-          const doc = await docRef.get();
-
-          if (!doc.exists) {
-            console.log(`      ⚠️ Document ${docId} not found`);
-            continue;
-          }
-
-          const data = doc.data();
-
-          // Check if already has the data
-          if (data.tpvHubScheduleKey && data.tpvHubEventKey) {
-            console.log(`      ⏭️ ${docId} already has TPVHub data`);
-            continue;
-          }
-
-          // Update the document
-          if (DRY_RUN) {
-            console.log(`      🔍 Would update ${docId}`);
-          } else {
-            await docRef.update({
-              tpvHubScheduleKey: scheduleKey,
-              tpvHubEventKey: eventKey
-            });
-            console.log(`      ✅ Updated ${docId}`);
-          }
-          totalUpdated++;
-
-        } catch (docError) {
-          console.log(`      ❌ Error updating ${docId}: ${docError.message}`);
-          totalErrors++;
+      if (DRY_RUN) {
+        console.log(`   🔍 Would update ${docId}: scheduleKey=${scheduleKey}, accessCode=${accessCode}`);
+      } else {
+        // Update with correct accessCode and remove old eventKey field if present
+        const updateData = {
+          tpvHubAccessCode: accessCode
+        };
+        // Remove the old incorrect field
+        if (data.tpvHubEventKey !== undefined) {
+          updateData.tpvHubEventKey = admin.firestore.FieldValue.delete();
         }
+        await doc.ref.update(updateData);
+        console.log(`   ✅ Updated ${docId}: accessCode=${accessCode}`);
       }
-
+      totalUpdated++;
     } catch (error) {
-      console.error(`❌ Error processing ${filePath}: ${error.message}`);
+      console.log(`   ❌ Error updating ${docId}: ${error.message}`);
       totalErrors++;
     }
   }
@@ -169,7 +170,8 @@ async function backfillTpvHubLinks() {
   console.log('\n' + '='.repeat(50));
   console.log(`📊 Backfill Summary${DRY_RUN ? ' (DRY RUN)' : ''}:`);
   console.log(`   ${DRY_RUN ? '🔍 Would update' : '✅ Updated'}: ${totalUpdated} documents`);
-  console.log(`   ⏭️ Skipped: ${totalSkipped} files`);
+  console.log(`   ⏭️ Already had data: ${totalSkipped} documents`);
+  console.log(`   ⚠️ No accessCode found: ${totalNoAccessCode} documents`);
   console.log(`   ❌ Errors: ${totalErrors}`);
   console.log('='.repeat(50));
 }

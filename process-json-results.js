@@ -2786,8 +2786,8 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp, jsonMet
   const tourProgress = userData.tourProgress || {};
 
   // Build TPVirtualHub URL from JSON metadata (for public notifications)
-  const tpvHubUrl = (jsonMetadata?.scheduleKey && jsonMetadata?.eventKey)
-    ? `https://tpvirtualhub.com/${jsonMetadata.scheduleKey}?eventKey=${jsonMetadata.eventKey}`
+  const tpvHubUrl = (jsonMetadata?.scheduleKey && jsonMetadata?.accessCode)
+    ? `https://tpvirtualhub.com/${jsonMetadata.scheduleKey}?accessCode=${jsonMetadata.accessCode}`
     : null;
 
   // Validate event
@@ -4269,7 +4269,7 @@ async function updateResultsSummary(season, event, results, userUid, unlockBonus
       results: validResults,
       // TPVirtualHub link data
       tpvHubScheduleKey: jsonMetadata?.scheduleKey || null,
-      tpvHubEventKey: jsonMetadata?.eventKey || null
+      tpvHubAccessCode: jsonMetadata?.accessCode || null
     });
     console.log(`   ✅ Updated results summary for season ${season} event ${event}`);
   } catch (summaryError) {

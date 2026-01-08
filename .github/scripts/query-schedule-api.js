@@ -243,6 +243,7 @@ function saveResults(careerEventId, eventKey, pen, results, metadata) {
             pen,
             careerEventId,
             scheduleKey: metadata.scheduleKey,
+            accessCode: metadata.accessCode,
             eventName: metadata.name,
             completedAt: metadata.completedAt,
             raceDate,  // Used by process-json-results.js for ordering
@@ -357,6 +358,7 @@ async function main() {
                             penResults,
                             {
                                 scheduleKey: race.scheduleKey,
+                                accessCode: race.accessCode,
                                 name: race.name,
                                 completedAt: race.completedAt
                             }

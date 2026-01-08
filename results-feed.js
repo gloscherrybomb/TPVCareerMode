@@ -357,7 +357,7 @@ function createResultCard(resultData) {
         profileUid,
         photoURL,
         tpvHubScheduleKey,
-        tpvHubEventKey
+        tpvHubAccessCode
     } = resultData;
 
     const positionText = position === 'DNF' ? 'DNF' : `${position}${getOrdinalSuffix(position)}`;
@@ -365,8 +365,8 @@ function createResultCard(resultData) {
     const cardClass = getPositionCardClass(position);
 
     // Build TPVirtualHub URL if metadata available
-    const tpvHubUrl = (tpvHubScheduleKey && tpvHubEventKey)
-        ? `https://tpvirtualhub.com/${tpvHubScheduleKey}?eventKey=${tpvHubEventKey}`
+    const tpvHubUrl = (tpvHubScheduleKey && tpvHubAccessCode)
+        ? `https://tpvirtualhub.com/${tpvHubScheduleKey}?accessCode=${tpvHubAccessCode}`
         : null;
 
     // Build points text
@@ -557,7 +557,7 @@ async function fetchResults(isLoadMore = false) {
             const eventNumber = data.event;
             const season = data.season;
             const tpvHubScheduleKey = data.tpvHubScheduleKey || null;
-            const tpvHubEventKey = data.tpvHubEventKey || null;
+            const tpvHubAccessCode = data.tpvHubAccessCode || null;
 
             // Skip if no userUid
             if (!userUid) continue;
@@ -669,7 +669,7 @@ async function fetchResults(isLoadMore = false) {
                 profileUid: firebaseAuthUid, // Firebase Auth UID for profile modal (null if not found)
                 photoURL,
                 tpvHubScheduleKey,
-                tpvHubEventKey
+                tpvHubAccessCode
             });
         }
 
