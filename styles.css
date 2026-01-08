@@ -21,6 +21,23 @@
     --font-stat-value: 'Exo 2', sans-serif;
 }
 
+/* Increase font sizes when readable font is enabled (palmares page) */
+.readable-font .stat-value {
+    font-size: 1.4rem;
+}
+
+.readable-font .stat-row-value {
+    font-size: 1.05rem;
+}
+
+.readable-font .power-record-card .record-value {
+    font-size: 1.65rem;
+}
+
+.readable-font .season-stat-value {
+    font-size: 1rem;
+}
+
 * {
     margin: 0;
     padding: 0;
