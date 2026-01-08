@@ -344,6 +344,37 @@ function initDiscordSettings() {
 }
 
 // ============================================================================
+// READABLE FONT PREFERENCE
+// ============================================================================
+
+const READABLE_FONT_KEY = 'tpv_readable_font';
+
+function initReadableFontToggle() {
+    const toggle = document.getElementById('readableFontToggle');
+    if (!toggle) return;
+
+    // Load saved preference
+    const enabled = localStorage.getItem(READABLE_FONT_KEY) === 'true';
+    toggle.checked = enabled;
+    applyReadableFont(enabled);
+
+    // Handle toggle changes
+    toggle.addEventListener('change', (e) => {
+        const isEnabled = e.target.checked;
+        localStorage.setItem(READABLE_FONT_KEY, isEnabled);
+        applyReadableFont(isEnabled);
+        showStatus(
+            isEnabled ? 'Readable font enabled' : 'Readable font disabled',
+            'success'
+        );
+    });
+}
+
+function applyReadableFont(enabled) {
+    document.body.classList.toggle('readable-font', enabled);
+}
+
+// ============================================================================
 // STATUS NOTIFICATIONS
 // ============================================================================
 
@@ -396,6 +427,7 @@ onAuthStateChanged(auth, async (user) => {
 document.addEventListener('DOMContentLoaded', () => {
     initPhotoUpload();
     initDiscordSettings();
+    initReadableFontToggle();
 
     // Name save button
     const saveNameBtn = document.getElementById('saveNameBtn');

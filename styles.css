@@ -13,6 +13,12 @@
     --accent-purple: #c71ae5;
     --success: #00ff88;
     --warning: #ffaa00;
+    --font-stat-value: 'Orbitron', sans-serif;
+}
+
+/* Readable font preference - swaps Orbitron to Exo 2 for stat values */
+body.readable-font {
+    --font-stat-value: 'Exo 2', sans-serif;
 }
 
 * {
