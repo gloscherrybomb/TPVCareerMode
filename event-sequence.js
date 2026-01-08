@@ -149,7 +149,7 @@ class ProgressManager {
                     completedStages: userData.completedStages || [],
                     completedOptionalEvents: usedOptionalEvents,
                     choiceSelections: choiceSelections,
-                    totalPoints: userData.totalPoints || 0
+                    totalPoints: userData.season1Points || 0
                 };
                 console.log('Progress loaded from Firestore:', this.progress);
                 
