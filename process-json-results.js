@@ -286,7 +286,7 @@ async function sendUserDiscordNotification(userData, eventResults, eventNumber, 
  * @param {number} seasonNumber - Season number
  * @param {string} firebaseUid - Firebase Auth UID of the user (for high 5 button)
  */
-async function sendPublicResultNotification(userData, eventResults, eventNumber, seasonNumber, firebaseUid) {
+async function sendPublicResultNotification(userData, eventResults, eventNumber, seasonNumber, firebaseUid, tpvHubUrl = null) {
   const botToken = process.env.DISCORD_BOT_TOKEN;
   const publicChannelId = process.env.DISCORD_PUBLIC_RESULTS_CHANNEL_ID;
 
@@ -407,13 +407,21 @@ async function sendPublicResultNotification(userData, eventResults, eventNumber,
           embeds: [embed],
           components: [{
             type: 1, // Action Row
-            components: [{
-              type: 2, // Button
-              style: 2, // Secondary (grey)
-              label: 'High 5',
-              emoji: { name: '✋' },
-              custom_id: high5CustomId
-            }]
+            components: [
+              {
+                type: 2, // Button
+                style: 2, // Secondary (grey)
+                label: 'High 5',
+                emoji: { name: '✋' },
+                custom_id: high5CustomId
+              },
+              ...(tpvHubUrl ? [{
+                type: 2, // Button
+                style: 5, // Link
+                label: 'View on TPVirtualHub',
+                url: tpvHubUrl
+              }] : [])
+            ]
           }]
         })
       }
@@ -2732,7 +2740,7 @@ function parseEventPath(filePath) {
 /**
  * Process a single result for a user (JSON version with power data)
  */
-async function processUserResult(uid, eventInfo, results, raceTimestamp) {
+async function processUserResult(uid, eventInfo, results, raceTimestamp, jsonMetadata = null) {
   const { season, event: eventNumber } = eventInfo;
 
   // Query for user by uid field
@@ -2776,6 +2784,11 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
   const currentStage = userData.currentStage || 1;
   const usedOptionalEvents = userData.usedOptionalEvents || [];
   const tourProgress = userData.tourProgress || {};
+
+  // Build TPVirtualHub URL from JSON metadata (for public notifications)
+  const tpvHubUrl = (jsonMetadata?.scheduleKey && jsonMetadata?.eventKey)
+    ? `https://tpvirtualhub.com/${jsonMetadata.scheduleKey}?eventKey=${jsonMetadata.eventKey}`
+    : null;
 
   // Validate event
   const validation = isEventValidForStage(eventNumber, currentStage, usedOptionalEvents, tourProgress);
@@ -3862,7 +3875,7 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
   await sendUserDiscordNotification(userData, eventResults, eventNumber, season);
 
   // Send to public results channel (all users)
-  const discordMessageInfo = await sendPublicResultNotification(userData, eventResults, eventNumber, season, userDoc.id);
+  const discordMessageInfo = await sendPublicResultNotification(userData, eventResults, eventNumber, season, userDoc.id, tpvHubUrl);
 
   // Save Discord message ID to result document for high-5 count updates
   // Use set with merge since the result document may not exist yet (created later by updateResultsSummary)
@@ -4029,11 +4042,11 @@ async function processJSONResults(jsonFiles) {
         // Process each human's result within this pen's context
         for (const uid of humanUids) {
           // Pass penResults (not allResults) so calculations are pen-specific
-          const { unlockBonusPoints, unlockBonusesApplied, userFound } = await processUserResult(uid, eventInfo, penResults, raceTimestamp);
+          const { unlockBonusPoints, unlockBonusesApplied, userFound } = await processUserResult(uid, eventInfo, penResults, raceTimestamp, jsonMetadata);
 
           // Only update results summary if user was found and processed
           if (userFound) {
-            await updateResultsSummary(eventInfo.season, eventInfo.event, penResults, uid, unlockBonusPoints || 0, unlockBonusesApplied || []);
+            await updateResultsSummary(eventInfo.season, eventInfo.event, penResults, uid, unlockBonusPoints || 0, unlockBonusesApplied || [], jsonMetadata);
           }
         }
       }
@@ -4072,7 +4085,7 @@ async function processJSONResults(jsonFiles) {
  * Update results summary document for event-detail display
  * This stores all results per-user for displaying full race results
  */
-async function updateResultsSummary(season, event, results, userUid, unlockBonusPoints = 0, unlockBonusesApplied = []) {
+async function updateResultsSummary(season, event, results, userUid, unlockBonusPoints = 0, unlockBonusesApplied = [], jsonMetadata = null) {
   const summaryRef = db.collection('results').doc(`season${season}_event${event}_${userUid}`);
 
   // Calculate predictions for all results
@@ -4253,7 +4266,10 @@ async function updateResultsSummary(season, event, results, userUid, unlockBonus
       totalDNFs: dnfResults.length,
       hasPowerData: resultsHavePowerData,
       processedAt: admin.firestore.FieldValue.serverTimestamp(),
-      results: validResults
+      results: validResults,
+      // TPVirtualHub link data
+      tpvHubScheduleKey: jsonMetadata?.scheduleKey || null,
+      tpvHubEventKey: jsonMetadata?.eventKey || null
     });
     console.log(`   ✅ Updated results summary for season ${season} event ${event}`);
   } catch (summaryError) {

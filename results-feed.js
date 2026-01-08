@@ -355,12 +355,19 @@ function createResultCard(resultData) {
         highFiveCount,
         resultOwnerUid,
         profileUid,
-        photoURL
+        photoURL,
+        tpvHubScheduleKey,
+        tpvHubEventKey
     } = resultData;
 
     const positionText = position === 'DNF' ? 'DNF' : `${position}${getOrdinalSuffix(position)}`;
     const positionClass = getPositionClass(position);
     const cardClass = getPositionCardClass(position);
+
+    // Build TPVirtualHub URL if metadata available
+    const tpvHubUrl = (tpvHubScheduleKey && tpvHubEventKey)
+        ? `https://tpvirtualhub.com/${tpvHubScheduleKey}?eventKey=${tpvHubEventKey}`
+        : null;
 
     // Build points text
     let pointsText = `${points}`;
@@ -496,6 +503,7 @@ function createResultCard(resultData) {
                 </div>
                 <div class="result-card-footer">
                     <span class="result-footer-brand">TPV Career Mode</span>
+                    ${tpvHubUrl ? `<a href="${tpvHubUrl}" target="_blank" rel="noopener noreferrer" class="tpvhub-link">View on TPVirtualHub</a>` : ''}
                     <span class="result-timestamp">${formatTimestamp(processedAt)}</span>
                 </div>
             </article>
@@ -548,6 +556,8 @@ async function fetchResults(isLoadMore = false) {
             const userUid = data.userUid;
             const eventNumber = data.event;
             const season = data.season;
+            const tpvHubScheduleKey = data.tpvHubScheduleKey || null;
+            const tpvHubEventKey = data.tpvHubEventKey || null;
 
             // Skip if no userUid
             if (!userUid) continue;
@@ -657,7 +667,9 @@ async function fetchResults(isLoadMore = false) {
                 highFiveCount,
                 resultOwnerUid: userUid, // TPV UID for high-five self-check
                 profileUid: firebaseAuthUid, // Firebase Auth UID for profile modal (null if not found)
-                photoURL
+                photoURL,
+                tpvHubScheduleKey,
+                tpvHubEventKey
             });
         }
 

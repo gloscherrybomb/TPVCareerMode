@@ -329,6 +329,18 @@
     color: var(--text-muted);
 }
 
+.tpvhub-link {
+    font-size: 0.8rem;
+    color: #45CAFF;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.tpvhub-link:hover {
+    color: #7DDBFF;
+    text-decoration: underline;
+}
+
 /* Result Card Wrapper */
 .result-card-wrapper {
     margin-bottom: 0;
