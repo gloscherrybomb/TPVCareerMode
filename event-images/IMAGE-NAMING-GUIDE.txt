@@ -1,0 +1,36 @@
+EVENT IMAGE NAMING GUIDE
+========================
+
+Save your AI-generated images with these exact filenames.
+Format: .jpg (or .png if needed - update event-data.js accordingly)
+
+SEASON 1 FOLDER (/season1/)
+---------------------------
+riders_choice.jpg - Rider's Choice (generic choice card)
+event_1.jpg   - Coast and Roast Crit
+event_2.jpg   - Island Classic
+event_3.jpg   - The Forest Velodrome Elimination
+event_4.jpg   - Coastal Loop Time Challenge
+event_5.jpg   - North Lake Points Race
+event_6.jpg   - Easy Hill Climb
+event_7.jpg   - Flat Eight Criterium
+event_8.jpg   - The Grand Gilbert Fondo
+event_9.jpg   - Base Camp Classic
+event_10.jpg  - Beach and Pine TT
+event_11.jpg  - South Lake Points Race
+event_12.jpg  - Unbound - Little Egypt
+event_13.jpg  - Local Tour Stage 1
+event_14.jpg  - Local Tour Stage 2
+event_15.jpg  - Local Tour Stage 3
+
+SPECIAL FOLDER (/special/)
+--------------------------
+event_101.jpg - Singapore Criterium
+event_102.jpg - The Leveller
+
+IMAGE SPECS
+-----------
+- Aspect Ratio: 16:9
+- Resolution: 1024 x 576 (or similar 16:9)
+- Format: JPG preferred
+- File Size: Keep under 150KB if possible

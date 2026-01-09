@@ -14,6 +14,7 @@ const eventData = {
         maxPoints: 65,
         icon: "🔄",
         iconId: "eventCriterium",
+        headerImage: "event-images/season1/event_1.jpg",
         description: `Hosted each spring in the coastal town of Georgetown, the Coast and Roast Crit is a short, fast circuit race known for its sweeping waterfront stretch and a handful of tight corners that keep the bunch on edge. 
 
 The course rewards efficient pack movement and quick accelerations, especially in the final laps when the pace traditionally lifts with the ocean breeze at riders' backs. 
@@ -42,6 +43,7 @@ It's a straightforward but energetic event—an ideal early-season chance to tes
         maxPoints: 95,
         icon: "🚴",
         iconId: "eventRoadRace",
+        headerImage: "event-images/season1/event_2.jpg",
         description: `A local classic that has earned its reputation as a proving ground for aspiring riders. This medium length race is where many careers have taken their first meaningful step forward—consistent performances here catch the attention of scouts and bigger teams.
 
 The course's deceptive nature is part of its legend: riders who underestimate it rarely finish well, while those who respect the accumulated difficulty often surprise themselves with strong results.
@@ -70,6 +72,7 @@ It's the kind of race where experience counts, but raw talent can still shine th
         maxPoints: 50,
         icon: "🏟️",
         iconId: "eventTrack",
+        headerImage: "event-images/season1/event_3.jpg",
         description: `Held every year under the lights of the Forest Velodrome, this 10 km elimination race challenges riders with a simple rule: the last rider each lap is withdrawn until only one remains.
 
 The atmosphere is always lively, but the focus stays on sharp positioning and repeated high-intensity efforts. It's a compact, tactical event where smart wheel choice and timing matter just as much as raw speed.
@@ -110,6 +113,7 @@ This makes it a key early test for any rider entering the local racing scene—y
         maxPoints: 50,
         icon: "⏱️",
         iconId: "eventTimeTrial",
+        headerImage: "event-images/season1/event_4.jpg",
         description: `The ultimate test of pure power and pacing discipline. Every local rider knows the Coastal Loop—it's where reputations are built on numbers alone. Twenty minutes, perfectly flat, nowhere to hide. This is your FTP laid bare for scouts, coaches, and rival riders to see.
 
 The challenge is deceptively simple: hold your threshold for the full duration and see how far you get. Go out too hard and you'll crack spectacularly in the final five minutes. Too conservative and you'll leave watts on the table.
@@ -138,6 +142,7 @@ Nail the pacing and you'll set a personal best that becomes your calling card. T
         maxPoints: 85,
         icon: "🎯",
         iconId: "eventPointsRace",
+        headerImage: "event-images/season1/event_5.jpg",
         description: `A local specialty that has riders grimacing before they even clip in. The North Lake Loop Reverse is relentlessly rolling—there's no such thing as cruising here, it's always either up or down.
 
 What makes it brutal is the points banner placement: they're positioned at the worst possible moments, forcing you to dig deep when your legs are already screaming. Sprint for points on a climb, recover on a descent, then immediately sprint again. Repeat until someone cracks.
@@ -166,6 +171,7 @@ This race rewards riders who can produce power repeatedly under fatigue—exactl
         maxPoints: 50,
         icon: "⛰️",
         iconId: "eventHillClimb",
+        headerImage: "event-images/season1/event_6.jpg",
         description: `The Easy Hill Climb TT is a straightforward test of pacing on a two-part course: a fast, flat opening section followed by a steady 3—4% climb to the line.
 
 With no technical features and no sharp gradients, the challenge is entirely in how evenly you can meter your effort. Riders who go too hard early pay for it the moment the road tilts upward, while those who hold back too much lose free speed on the flats.
@@ -194,6 +200,7 @@ It's a clean, controlled time trial that rewards discipline over explosiveness�
         maxPoints: 70,
         icon: "💨",
         iconId: "eventFastCrit",
+        headerImage: "event-images/season1/event_7.jpg",
         description: `The Flat Eight Criterium is a fast-paced local circuit race known for its smooth flow and constant changes in speed as riders rotate through the looping course.
 
 With frequent accelerations and tight pack dynamics, it rewards quick reactions, confident cornering, and the ability to hold position when the pace lifts.
@@ -222,6 +229,7 @@ It's a straightforward but energetic crit—an ideal proving ground for riders l
         maxPoints: 185,
         icon: "🏔️",
         iconId: "eventSnowMountain",
+        headerImage: "event-images/season1/event_8.jpg",
         description: `Covering more than fifty kilometers of varied terrain around Gilbert Island, the Grand Gilbert Fondo is one of the most demanding challenges available at the local level.
 
 The route strings together a series of steady climbs, rolling stretches, and exposed coastal roads, turning the event into a true endurance test rather than a single-effort effort. Riders can expect long periods of sustained work punctuated by decisive rises that gradually wear down the field.
@@ -250,6 +258,7 @@ It's the kind of event where pacing matters just as much as strength, and finish
         maxPoints: 85,
         icon: "🏕️",
         iconId: "eventCamping",
+        headerImage: "event-images/season1/event_9.jpg",
         description: `The Base Camp Classic is a pure climbing-focused road race designed to challenge developing riders with a steady procession of uphill efforts.
 
 The course gradually grinds the field down and rewards those who can stay composed as the gradients accumulate. There's little shelter and few opportunities to hide—every rise forces a decision, every false flat tests pacing, and every summit invites someone to attack.
@@ -278,6 +287,7 @@ For riders looking to prove their climbing potential early in their career, the 
         maxPoints: 70,
         icon: "🌊",
         iconId: "eventCoastal",
+        headerImage: "event-images/season1/event_10.jpg",
         description: `The Beach and Pine TT is a longer, coast-hugging time trial that rewards steady pacing and aerodynamic discipline.
 
 The route follows flat shoreline roads bordered by open water on one side and dense pine stretches on the other, creating a mix of calm sheltered sections and breezier exposed straights.
@@ -306,6 +316,7 @@ With no climbs or technical turns to hide behind, it's a pure test of sustained 
         maxPoints: 60,
         icon: "🎯",
         iconId: "eventPointsRace",
+        headerImage: "event-images/season1/event_11.jpg",
         description: `The South Lake Points Race is one of the most recognizable fixtures on the local calendar—a multi-lap event built around a classic loop that every rider in the region knows by heart.
 
 Each lap features the course's signature elements: a short, punchy rise that tempts repeated attacks and a notoriously tight corner that demands full attention as the bunch funnels through.
@@ -334,6 +345,7 @@ With points awarded at regular sprint laps, the pace surges constantly, making t
         maxPoints: 145,
         icon: "🚵",
         iconId: "eventGravel",
+        headerImage: "event-images/season1/event_12.jpg",
         description: `Unbound — Little Egypt sends riders into one of the most rugged and respected sections of the larger Unbound course, a hilly and technical stretch that demands sharp handling, constant focus, and a willingness to grind through whatever the terrain throws at you.
 
 For this special Fondo-style edition, riders take on the Little Egypt segment as a standalone challenge—open to developing athletes who want to taste the atmosphere of a major event while still racing for position and pride.
@@ -362,6 +374,7 @@ For many newcomers, this race carries personal meaning. In your case, your famil
         maxPoints: 120,
         icon: "🏆",
         iconId: "eventStageRace",
+        headerImage: "event-images/season1/event_13.jpg",
         description: `Stage 1 of the Local Tour sets the tone for the entire three-day race. The Figure of 8 course is a flowing opener that isn't overly difficult, but every second counts—positioning and time gaps earned here will matter for the overall GC.
 
 This opening stage is about finding your rhythm and avoiding mistakes. It's not the hardest day, but it's crucial. Start conservatively, settle into the race, and finish with something left in the tank. The real battles are still to come, but a solid performance here puts you in the mix.
@@ -393,6 +406,7 @@ This is your first taste of multi-day stage racing. Focus on clean execution and
         maxPoints: 95,
         icon: "🏆",
         iconId: "eventStageRace",
+        headerImage: "event-images/season1/event_14.jpg",
         description: `Stage 2 of the Local Tour is shorter and punchier than the opening stage. The Loop the Loop course features technical sections and opportunities for aggressive racing.
 
 This is where attacks happen. Riders looking to make up time from Stage 1 will be on the offensive, while race leaders must stay vigilant to protect their advantage.
@@ -424,6 +438,7 @@ Time bonuses are available for stage placings, and every second counts in the ov
         maxPoints: 135,
         icon: "🏆",
         iconId: "eventStageRace",
+        headerImage: "event-images/season1/event_15.jpg",
         description: `The queen stage of the Local Tour. This is where the overall classification will be decided. With 471m of climbing on tired legs from the previous two days, only the strongest will survive.
 
 This stage lives up to its name - you'll encounter everything: climbs, descents, flats, and technical sections. The significant elevation gain makes this the hardest stage of the tour.
@@ -461,6 +476,7 @@ const specialEventData = {
         maxPoints: 60,
         icon: "🇸🇬",
         iconId: "eventNightRace",
+        headerImage: "event-images/special/event_101.jpg",
         description: `The Singapore Criterium is an exclusive night race through the illuminated streets of Marina Bay. Reserved for riders who have proven their dedication to the sport, this prestigious event offers a unique racing experience under the city lights.
 
 Racing under floodlights with the Singapore skyline as your backdrop, you'll navigate a technical circuit that demands both speed and precision. The humid tropical conditions add an extra layer of challenge to this already demanding event.
@@ -496,6 +512,7 @@ This is more than just a race—it's a statement. Being here means you've earned
         maxPoints: 40,
         icon: "⚖️",
         iconId: "steadyEddie",
+        headerImage: "event-images/special/event_102.jpg",
         description: `The Leveller is an all-rounder challenging points race, that is great for new racers to find their appropriate ranking fast. It will take all of your skills to do well in this race - endurance, sprint, time trial and climbing.
 
 We recommend doing this event early on in your career to bag some extra Career Points and Cadence Credits and ensure you are in the right races as your career takes off.`,

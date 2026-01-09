@@ -110,9 +110,30 @@ function createEventCard(event, isFreeEvent = false) {
 
     const badgeText = isFreeEvent ? 'Available' : 'Unlocked';
     const iconHtml = window.TPVIcons ? window.TPVIcons.getEventIcon(event, 'xl') : event.icon;
+
+    // Get headerImage from specialEventData if available
+    const specialEventDataItem = window.specialEventData ? window.specialEventData[event.id] : null;
+    const headerImage = specialEventDataItem?.headerImage || null;
+
+    // Build header image or icon HTML
+    const headerHtml = headerImage ? `
+        <div class="event-header-image-container">
+            <img
+                src="${headerImage}"
+                alt="${event.name}"
+                class="event-header-image"
+                loading="lazy"
+                onerror="this.parentElement.style.display='none'; this.parentElement.nextElementSibling.style.display='block';"
+            >
+        </div>
+        <div class="event-icon" style="display: none;">${iconHtml}</div>
+    ` : `
+        <div class="event-icon">${iconHtml}</div>
+    `;
+
     card.innerHTML = `
         <div class="event-badge available">${badgeText}</div>
-        <div class="event-icon">${iconHtml}</div>
+        ${headerHtml}
         <h3 class="event-title">${event.name}</h3>
         <p class="event-description">${event.description}</p>
         <div class="event-meta">

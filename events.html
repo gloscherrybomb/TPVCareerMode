@@ -517,14 +517,46 @@
                                     <span class="stage-type-badge choice">Rider's Choice</span>
                                 </div>
                                 ${selectedEvent ? `
+                                ${selectedEvent.headerImage ? `
+                                <div class="event-header-image-container">
+                                    <img
+                                        src="${selectedEvent.headerImage}"
+                                        alt="${selectedEvent.name}"
+                                        class="event-header-image"
+                                        loading="lazy"
+                                        onerror="this.parentElement.style.display='none'; this.parentElement.nextElementSibling.style.display='flex';"
+                                    >
+                                </div>
+                                <div class="event-image" style="display: none;">
+                                    <div class="event-image-placeholder">
+                                        ${window.TPVIcons ? window.TPVIcons.getEventIcon(selectedEvent, 'xxl') : selectedEvent.icon}
+                                    </div>
+                                </div>
+                                ` : `
                                 <div class="event-image">
                                     <div class="event-image-placeholder">
                                         ${window.TPVIcons ? window.TPVIcons.getEventIcon(selectedEvent, 'xxl') : selectedEvent.icon}
                                     </div>
                                 </div>
-                                ` : ''}
+                                `}
+                                ` : `
+                                <div class="event-header-image-container">
+                                    <img
+                                        src="event-images/season1/riders_choice.jpg"
+                                        alt="Rider's Choice"
+                                        class="event-header-image"
+                                        loading="lazy"
+                                        onerror="this.parentElement.style.display='none'; this.parentElement.nextElementSibling.style.display='flex';"
+                                    >
+                                </div>
+                                <div class="event-image" style="display: none;">
+                                    <div class="event-image-placeholder">
+                                        ${window.TPVIcons && stage.iconId ? window.TPVIcons.getIcon(stage.iconId, {size: 'xxl'}) : stage.icon}
+                                    </div>
+                                </div>
+                                `}
                                 <div class="stage-card-content">
-                                    ${!selectedEvent ? `<div class="stage-icon-large">${window.TPVIcons && stage.iconId ? window.TPVIcons.getIcon(stage.iconId, {size: 'xxl'}) : stage.icon}</div>` : ''}
+                                    ${!selectedEvent ? `` : ''}
                                     <h3 class="stage-title">${selectedEvent ? selectedEvent.name : stage.name}</h3>
                                     <p class="stage-description">
                                         ${selectedEventId ? 
@@ -579,11 +611,28 @@
                                     <span class="stage-type-badge mandatory">Mandatory</span>
                                 </div>
                                 ${isTourEvent ? tourProgressBadge : ''}
+                                ${event.headerImage ? `
+                                <div class="event-header-image-container">
+                                    <img
+                                        src="${event.headerImage}"
+                                        alt="${event.name}"
+                                        class="event-header-image"
+                                        loading="lazy"
+                                        onerror="this.parentElement.style.display='none'; this.parentElement.nextElementSibling.style.display='flex';"
+                                    >
+                                </div>
+                                <div class="event-image" style="display: none;">
+                                    <div class="event-image-placeholder">
+                                        ${window.TPVIcons ? window.TPVIcons.getEventIcon(event, 'xxl') : event.icon}
+                                    </div>
+                                </div>
+                                ` : `
                                 <div class="event-image">
                                     <div class="event-image-placeholder">
                                         ${window.TPVIcons ? window.TPVIcons.getEventIcon(event, 'xxl') : event.icon}
                                     </div>
                                 </div>
+                                `}
                                 <div class="stage-card-content">
                                     <h3 class="stage-title">${event.name}</h3>
                                     <p class="stage-description">${event.subtitle}</p>
@@ -906,17 +955,36 @@
             grid.innerHTML = availableEvents.map(eventId => {
                 const event = getEvent(eventId);
                 const iconHtml = window.TPVIcons ? window.TPVIcons.getEventIcon(event, 'xl') : event.icon;
+
+                // Build header image or fallback to icon
+                const headerHtml = event.headerImage ? `
+                    <div class="choice-event-image-container">
+                        <img
+                            src="${event.headerImage}"
+                            alt="${event.name}"
+                            class="choice-event-image"
+                            loading="lazy"
+                            onerror="this.parentElement.style.display='none'; this.parentElement.nextElementSibling.style.display='block';"
+                        >
+                    </div>
+                    <div class="choice-event-icon" style="display: none;">${iconHtml}</div>
+                ` : `
+                    <div class="choice-event-icon">${iconHtml}</div>
+                `;
+
                 return `
                     <div class="choice-event-card" onclick="selectChoiceEvent(${stage}, ${eventId})">
-                        <div class="choice-event-icon">${iconHtml}</div>
-                        <h4>${event.name}</h4>
-                        <p>${event.subtitle}</p>
-                        <div class="choice-event-stats">
-                            <span>📍 ${event.distance}</span>
-                            <span>${window.TPVIcons ? window.TPVIcons.getIcon('mountain', {size: 'sm'}) : '⛰️'} ${event.climbing}</span>
-                            <span>${window.TPVIcons ? window.TPVIcons.getIcon('achievement', {size: 'sm'}) : '⭐'} ${event.maxPoints} pts</span>
+                        ${headerHtml}
+                        <div class="choice-event-content">
+                            <h4>${event.name}</h4>
+                            <p>${event.subtitle}</p>
+                            <div class="choice-event-stats">
+                                <span>📍 ${event.distance}</span>
+                                <span>${window.TPVIcons ? window.TPVIcons.getIcon('mountain', {size: 'sm'}) : '⛰️'} ${event.climbing}</span>
+                                <span>${window.TPVIcons ? window.TPVIcons.getIcon('achievement', {size: 'sm'}) : '⭐'} ${event.maxPoints} pts</span>
+                            </div>
+                            <button class="btn btn-primary btn-small">Select</button>
                         </div>
-                        <button class="btn btn-primary btn-small">Select</button>
                     </div>
                 `;
             }).join('');
