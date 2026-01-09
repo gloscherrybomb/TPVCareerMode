@@ -5,14 +5,3 @@ This file contains all bot profile requests submitted by users.
 Each request is automatically appended by the GitHub Actions workflow when users submit requests via the website.
 
 ================================================================================
-================================================================================
-Request submitted: 2026-01-08 14:03:23 UTC
-Firestore Document ID: Bot9591_1767881003858
-Submitted by User UID: I63Hb7E0kKgLfQ39ZG6ZjaxTYpC3
-Bot UID: Bot9591
-Bot Name: Mollie Potter
-Bot Team: Independent
-Bot ARR: 634
-Bot Country: SGP
-Interesting Fact: None provided
-================================================================================
