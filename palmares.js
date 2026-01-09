@@ -95,9 +95,9 @@ const AWARD_NAMES = {
     photoFinish: { name: "Photo Finish", icon: "📸" },
     darkHorse: { name: "Dark Horse", icon: "🐴" },
     zeroToHero: { name: "Zero to Hero", icon: "🦸" },
-    gcGold: { name: "GC Gold Trophy", icon: "🏆" },
-    gcSilver: { name: "GC Silver Trophy", icon: "🥈" },
-    gcBronze: { name: "GC Bronze Trophy", icon: "🥉" },
+    gcGold: { name: "GC Gold Trophy", icon: "🏆" },  // Fallback - actual icon is special gold GC trophy
+    gcSilver: { name: "GC Silver Trophy", icon: "🏆" },  // Fallback - actual icon is special silver GC trophy
+    gcBronze: { name: "GC Bronze Trophy", icon: "🏆" },  // Fallback - actual icon is special bronze GC trophy
     gluttonForPunishment: { name: "Glutton for Punishment", icon: "🎖️" },
     // Power awards
     powerSurge: { name: "Power Surge", icon: "💥" },
@@ -114,9 +114,9 @@ const AWARD_NAMES = {
 
     // Career/Season awards
     lanternRouge: { name: "Lantern Rouge", icon: "🏮" },
-    seasonChampion: { name: "Season Champion", icon: "🏆" },
-    seasonRunnerUp: { name: "Season Runner-Up", icon: "🥈" },
-    seasonThirdPlace: { name: "Season Third Place", icon: "🥉" },
+    seasonChampion: { name: "Season Champion", icon: "🏆" },  // Fallback - actual icon is special gold season trophy
+    seasonRunnerUp: { name: "Season Runner-Up", icon: "🏆" },  // Fallback - actual icon is special silver season trophy
+    seasonThirdPlace: { name: "Season Third Place", icon: "🏆" },  // Fallback - actual icon is special bronze season trophy
     perfectSeason: { name: "Perfect Season", icon: "💯" },
     podiumStreak: { name: "Podium Streak", icon: "📈" },
     specialist: { name: "Specialist", icon: "⭐" },

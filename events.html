@@ -113,28 +113,28 @@
             <!-- Progress Stats -->
             <div class="progress-grid">
                 <div class="progress-card">
-                    <div class="progress-icon">🎯</div>
+                    <div class="progress-icon" id="progressIconStage"></div>
                     <div class="progress-info">
                         <div class="progress-label">Current Stage</div>
                         <div class="progress-value" id="currentStageText">Stage 1</div>
                     </div>
                 </div>
                 <div class="progress-card">
-                    <div class="progress-icon">✓</div>
+                    <div class="progress-icon" id="progressIconCompleted"></div>
                     <div class="progress-info">
                         <div class="progress-label">Stages Completed</div>
                         <div class="progress-value" id="completedStagesText">0 / 9</div>
                     </div>
                 </div>
                 <div class="progress-card">
-                    <div class="progress-icon">⭐</div>
+                    <div class="progress-icon" id="progressIconPoints"></div>
                     <div class="progress-info">
                         <div class="progress-label">Points Earned</div>
                         <div class="progress-value" id="pointsEarnedText">0</div>
                     </div>
                 </div>
                 <div class="progress-card">
-                    <div class="progress-icon">🏆</div>
+                    <div class="progress-icon" id="progressIconRank"></div>
                     <div class="progress-info">
                         <div class="progress-label">Season Rank</div>
                         <div class="progress-value" id="seasonRankText">-</div>
@@ -539,11 +539,11 @@
                                             <span>${selectedEvent.distance}</span>
                                         </div>
                                         <div class="stat-item">
-                                            <span class="stat-icon">⛰️</span>
+                                            <span class="stat-icon">${window.TPVIcons ? window.TPVIcons.getIcon('mountain', {size: 'sm'}) : '⛰️'}</span>
                                             <span>${selectedEvent.climbing}</span>
                                         </div>
                                         <div class="stat-item">
-                                            <span class="stat-icon">⭐</span>
+                                            <span class="stat-icon">${window.TPVIcons ? window.TPVIcons.getIcon('achievement', {size: 'sm'}) : '⭐'}</span>
                                             <span>${selectedEvent.maxPoints} pts</span>
                                         </div>
                                     </div>
@@ -554,7 +554,7 @@
                                     ${isCompleted && selectedEventId ? `<button class="btn btn-secondary btn-full" onclick="location.href='event-detail.html?id=${selectedEventId}'">View Results</button>` : ''}
                                     ${isCompleted ? '<span class="completed-badge">✓ Completed</span>' : ''}
                                 </div>
-                                ${isLocked ? '<div class="locked-overlay"><span>🔒</span><p>Complete previous stage to unlock</p></div>' : ''}
+                                ${isLocked ? `<div class="locked-overlay"><span>${window.TPVIcons ? window.TPVIcons.getIcon('locked', {size: 'lg'}) : '🔒'}</span><p>Complete previous stage to unlock</p></div>` : ''}
                             </div>
                         </div>
                     `;
@@ -593,11 +593,11 @@
                                             <span>${event.distance}</span>
                                         </div>
                                         <div class="stat-item">
-                                            <span class="stat-icon">⛰️</span>
+                                            <span class="stat-icon">${window.TPVIcons ? window.TPVIcons.getIcon('mountain', {size: 'sm'}) : '⛰️'}</span>
                                             <span>${event.climbing}</span>
                                         </div>
                                         <div class="stat-item">
-                                            <span class="stat-icon">⭐</span>
+                                            <span class="stat-icon">${window.TPVIcons ? window.TPVIcons.getIcon('achievement', {size: 'sm'}) : '⭐'}</span>
                                             <span>${event.maxPoints} pts</span>
                                         </div>
                                     </div>
@@ -606,7 +606,7 @@
                                     ${!isLocked ? `<button class="btn btn-secondary btn-full" onclick="location.href='${isTourEvent ? 'local-tour.html' : `event-detail.html?id=${stage.eventId}`}'">${isCompleted ? 'View Results' : 'View Details'}</button>` : ''}
                                     ${isCompleted && tourProgress.completed === 3 ? '<span class="completed-badge">✓ Completed</span>' : isCompleted && !isTourEvent ? '<span class="completed-badge">✓ Completed</span>' : ''}
                                 </div>
-                                ${isLocked ? '<div class="locked-overlay"><span>🔒</span><p>Complete previous stage to unlock</p></div>' : ''}
+                                ${isLocked ? `<div class="locked-overlay"><span>${window.TPVIcons ? window.TPVIcons.getIcon('locked', {size: 'lg'}) : '🔒'}</span><p>Complete previous stage to unlock</p></div>` : ''}
                             </div>
                         </div>
                     `;
@@ -913,8 +913,8 @@
                         <p>${event.subtitle}</p>
                         <div class="choice-event-stats">
                             <span>📍 ${event.distance}</span>
-                            <span>⛰️ ${event.climbing}</span>
-                            <span>⭐ ${event.maxPoints} pts</span>
+                            <span>${window.TPVIcons ? window.TPVIcons.getIcon('mountain', {size: 'sm'}) : '⛰️'} ${event.climbing}</span>
+                            <span>${window.TPVIcons ? window.TPVIcons.getIcon('achievement', {size: 'sm'}) : '⭐'} ${event.maxPoints} pts</span>
                         </div>
                         <button class="btn btn-primary btn-small">Select</button>
                     </div>

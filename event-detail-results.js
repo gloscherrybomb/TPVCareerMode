@@ -30,7 +30,9 @@ function getIcon(iconId, size = 'md') {
     }
     // Fallback emojis
     const fallbacks = {
-        trophy: '🏆', warning: '⚠️', stats: '📊', goldMedal: '🥇', silverMedal: '🥈', bronzeMedal: '🥉',
+        trophy: '🏆', warning: '⚠️', stats: '📊',
+        goldMedal: '🥇', silverMedal: '🥈', bronzeMedal: '🥉',
+        gcGold: '🏆', gcSilver: '🏆', gcBronze: '🏆',  // Special GC trophies
         punchingAbove: '🥊', giantKiller: '⚔️', bullseye: '🎯', domination: '💪',
         closeCall: '😅', photoFinish: '📸', darkHorse: '🐴', hotStreak: '🔥',
         zeroToHero: '🚀', powerSurge: '💥', steadyEddie: '📊', blastOff: '🚀'
