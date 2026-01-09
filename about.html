@@ -58,22 +58,22 @@
         <div class="content-section">
             <h2>How It Works</h2>
             
-            <h3>🚴 Sequential Racing</h3>
+            <h3><span class="section-icon" id="icon-racing"></span> Sequential Racing</h3>
             <p>Your career progresses one race at a time. Complete Event 1 to unlock Event 2. Master Event 2 to tackle Event 3. Each event builds on your performance, creating a genuine sense of progression and achievement.</p>
             
-            <h3>📊 Performance-Based Rewards</h3>
+            <h3><span class="section-icon" id="icon-stats"></span> Performance-Based Rewards</h3>
             <p>Points aren't just handed out - they're earned through smart racing:</p>
             <ul>
                 <li><strong>Base Points:</strong> Position-based rewards with bonuses for podium finishes</li>
                 <li><strong>Bonus Points:</strong> Beat your predicted position to earn 1-5 extra points</li>
             </ul>
 
-            <h3>🎯 Smart Competition</h3>
+            <h3><span class="section-icon" id="icon-target"></span> Smart Competition</h3>
             <p>Race against a diverse field of TrainingPeaks Virtual bot racers. These aren't just static names - they're riders with unique strengths, weaknesses, and racing styles. High-rated climbers dominate hilly courses, while sprinters excel in flat criteriums.</p>
             
             <p>Our intelligent backfilling system ensures every bot competes in every event (through simulation when needed), so the season-long standings reflect true performance, not just who showed up most often.</p>
 
-            <h3>🏆 Comprehensive Career Tracking</h3>
+            <h3><span class="section-icon" id="icon-trophy"></span> Comprehensive Career Tracking</h3>
             <p>Your profile page tells the complete story of your racing career:</p>
             <ul>
                 <li>Total points and events completed</li>
@@ -244,6 +244,23 @@
         </div>
     </div>
 
+    <script src="icons/icons.js"></script>
     <script type="module" src="app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.TPVIcons) {
+                const iconMap = {
+                    'icon-racing': 'eventRoadRace',
+                    'icon-stats': 'stats',
+                    'icon-target': 'bullseye',
+                    'icon-trophy': 'trophy'
+                };
+                Object.entries(iconMap).forEach(([id, iconId]) => {
+                    const el = document.getElementById(id);
+                    if (el) el.innerHTML = window.TPVIcons.getIcon(iconId, { size: 'sm' });
+                });
+            }
+        });
+    </script>
 </body>
 </html>

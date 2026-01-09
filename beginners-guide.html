@@ -76,7 +76,7 @@
         <div class="content-section">
             <h2>Core Features</h2>
 
-            <h3>🏁 Race & Progress</h3>
+            <h3><span class="section-icon" id="icon-race"></span> Race & Progress</h3>
             <p><strong>How Racing Works:</strong></p>
             <ol>
                 <li>Complete races on TrainingPeaks Virtual as normal</li>
@@ -102,7 +102,7 @@
         </div>
 
         <div class="content-section">
-            <h3>🎯 Awards & Achievements</h3>
+            <h3><span class="section-icon" id="icon-awards"></span> Awards & Achievements</h3>
             <p>Earn awards for exceptional performances:</p>
 
             <p><strong>Race Performance Awards:</strong></p>
@@ -118,7 +118,7 @@
         </div>
 
         <div class="content-section">
-            <h3>🎤 Post-Race Interviews & Personality</h3>
+            <h3><span class="section-icon" id="icon-interview"></span> Post-Race Interviews & Personality</h3>
             <p>After each race, you'll face a post-race interview with 3 response options. Your choices shape your <strong>Media Personality</strong> across 6 traits:</p>
             <ul>
                 <li><strong>Confidence</strong> - Bold vs. Modest</li>
@@ -147,7 +147,7 @@
         </div>
 
         <div class="content-section">
-            <h3>💰 Cadence Credits & The Store</h3>
+            <h3><span class="section-icon" id="icon-credits"></span> Cadence Credits & The Store</h3>
             <p><strong>Earning Cadence Credits (CC):</strong></p>
             <ul>
                 <li>Win awards to earn Cadence Credits</li>
@@ -175,7 +175,7 @@
         </div>
 
         <div class="content-section">
-            <h3>📊 Standings & Competition</h3>
+            <h3><span class="section-icon" id="icon-standings"></span> Standings & Competition</h3>
             <p><strong>Who are you racing against?</strong></p>
             <ul>
                 <li>Real players like yourself</li>
@@ -193,7 +193,7 @@
         </div>
 
         <div class="content-section">
-            <h3>🏆 Profile & Stats</h3>
+            <h3><span class="section-icon" id="icon-profile"></span> Profile & Stats</h3>
             <p>Your profile page is your career dashboard:</p>
 
             <p><strong>Statistics Tracked:</strong></p>
@@ -339,14 +339,14 @@
         <div class="content-section" style="text-align: center; padding: 3rem 0; border-top: 1px solid rgba(255, 255, 255, 0.1); margin-top: 3rem;">
             <h2>Ready to Start Your Career?</h2>
             <p style="font-size: 1.1rem; margin-bottom: 1.5rem;">You now have everything you need to begin your journey from Local Amateur to cycling legend! Remember:</p>
-            <ul style="list-style: none; padding: 0; margin-bottom: 2rem;">
-                <li style="margin: 0.5rem 0;">✅ Complete races on TrainingPeaks Virtual</li>
-                <li style="margin: 0.5rem 0;">✅ Check Career Mode for your results and progression</li>
-                <li style="margin: 0.5rem 0;">✅ Answer post-race interviews to develop your personality</li>
-                <li style="margin: 0.5rem 0;">✅ Earn awards and Cadence Credits</li>
-                <li style="margin: 0.5rem 0;">✅ Purchase strategic upgrades</li>
-                <li style="margin: 0.5rem 0;">✅ Compete for the top of the season standings</li>
-                <li style="margin: 0.5rem 0;">✅ Complete all 9 stages to finish your season</li>
+            <ul style="list-style: none; padding: 0; margin-bottom: 2rem;" class="checkmark-list">
+                <li style="margin: 0.5rem 0;"><span class="check-icon"></span> Complete races on TrainingPeaks Virtual</li>
+                <li style="margin: 0.5rem 0;"><span class="check-icon"></span> Check Career Mode for your results and progression</li>
+                <li style="margin: 0.5rem 0;"><span class="check-icon"></span> Answer post-race interviews to develop your personality</li>
+                <li style="margin: 0.5rem 0;"><span class="check-icon"></span> Earn awards and Cadence Credits</li>
+                <li style="margin: 0.5rem 0;"><span class="check-icon"></span> Purchase strategic upgrades</li>
+                <li style="margin: 0.5rem 0;"><span class="check-icon"></span> Compete for the top of the season standings</li>
+                <li style="margin: 0.5rem 0;"><span class="check-icon"></span> Complete all 9 stages to finish your season</li>
             </ul>
             <p style="font-size: 1.2rem; margin-bottom: 2rem;"><strong>Good luck, and see you on the virtual roads!</strong></p>
             <a href="index.html" class="btn btn-primary btn-large">Get Started</a>
@@ -417,6 +417,29 @@
         </div>
     </div>
 
+    <script src="icons/icons.js"></script>
     <script type="module" src="app.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.TPVIcons) {
+                const iconMap = {
+                    'icon-race': 'eventCriterium',
+                    'icon-awards': 'bullseye',
+                    'icon-interview': 'microphone',
+                    'icon-credits': 'moneyBag',
+                    'icon-standings': 'stats',
+                    'icon-profile': 'trophy'
+                };
+                Object.entries(iconMap).forEach(([id, iconId]) => {
+                    const el = document.getElementById(id);
+                    if (el) el.innerHTML = window.TPVIcons.getIcon(iconId, { size: 'sm' });
+                });
+                // Replace checkmarks
+                document.querySelectorAll('.check-icon').forEach(el => {
+                    el.innerHTML = window.TPVIcons.getIcon('checkmark', { size: 'sm' });
+                });
+            }
+        });
+    </script>
 </body>
 </html>

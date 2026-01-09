@@ -47,7 +47,7 @@
                 <div class="breadcrumb">
                     <a href="index.html">Home</a> / <a href="events.html">Season</a> / Local Tour
                 </div>
-                <h1 class="page-title">🏆 Local Tour</h1>
+                <h1 class="page-title"><span id="icon-title"></span> Local Tour</h1>
                 <p class="page-subtitle">Three-day stage race testing consistency and tactics</p>
             </div>
         </div>
@@ -57,7 +57,7 @@
         <div class="container">
             <!-- Tour Introduction -->
             <div class="tour-intro-section">
-                <div class="tour-intro-icon">🚴</div>
+                <div class="tour-intro-icon" id="icon-intro"></div>
                 <div class="tour-intro-text">
                     <h2>Welcome to the Local Tour</h2>
                     <p>The Local Tour is a three-day stage race that tests everything: endurance, tactics, consistency, and mental fortitude. Each stage presents unique challenges, and overall success requires performing well across all disciplines.</p>
@@ -105,7 +105,7 @@
             <!-- GC Standings -->
             <div class="gc-section" id="gcSection" style="display: none;">
                 <div class="gc-header-banner">
-                    <div class="gc-header-icon">🏆</div>
+                    <div class="gc-header-icon" id="icon-gc"></div>
                     <div class="gc-header-content">
                         <h2 class="gc-section-title">GENERAL CLASSIFICATION</h2>
                         <p class="gc-description" id="gcDescription">Overall standings based on cumulative time</p>
@@ -180,9 +180,25 @@
     </div>
 
     <!-- Firebase and App Scripts -->
+    <script src="icons/icons.js"></script>
     <script type="module" src="app.js"></script>
     <script src="event-data.js"></script>
     <script src="elevation-profile-generator.js"></script>
     <script type="module" src="local-tour.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.TPVIcons) {
+                const iconMap = {
+                    'icon-title': { id: 'trophy', size: 'md' },
+                    'icon-intro': { id: 'eventRoadRace', size: 'xl' },
+                    'icon-gc': { id: 'trophy', size: 'lg' }
+                };
+                Object.entries(iconMap).forEach(([elemId, config]) => {
+                    const el = document.getElementById(elemId);
+                    if (el) el.innerHTML = window.TPVIcons.getIcon(config.id, { size: config.size });
+                });
+            }
+        });
+    </script>
 </body>
 </html>

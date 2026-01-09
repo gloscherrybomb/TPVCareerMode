@@ -26,8 +26,9 @@ export function displayPersonalityAwards(personalityAwards, personality) {
 
   container.style.display = 'block';
 
+  const polarizingIcon = window.TPVIcons ? window.TPVIcons.getIcon('polarizing', { size: 'md' }) : '🎭';
   let html = '<div class="personality-awards-container">';
-  html += '<h2 class="personality-awards-title">🎭 Media Personality Awards</h2>';
+  html += `<h2 class="personality-awards-title">${polarizingIcon} Media Personality Awards</h2>`;
 
   // Dominant Award (featured prominently)
   if (hasDominant) {

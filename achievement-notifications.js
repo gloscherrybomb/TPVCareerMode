@@ -336,7 +336,7 @@ class AchievementNotifications {
       <div class="achievement-card" data-intensity="${notification.intensity}" style="animation-delay: ${index * 0.1}s">
         <div class="achievement-icon">${iconHtml}</div>
         <div class="achievement-content">
-          <h4 class="achievement-title">${award.title}${ccValue > 0 ? ` <span class="achievement-cc">⚡${ccValue} CC</span>` : ''}</h4>
+          <h4 class="achievement-title">${award.title}${ccValue > 0 ? ` <span class="achievement-cc">${window.TPVIcons ? window.TPVIcons.getIcon('power', { size: 'sm' }) : '⚡'}${ccValue} CC</span>` : ''}</h4>
           <p class="achievement-description">${award.description}</p>
           <p class="achievement-event">Event ${notification.eventNumber}: ${eventName}</p>
         </div>

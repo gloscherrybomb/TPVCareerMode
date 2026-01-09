@@ -62,22 +62,22 @@
         <div class="container">
             <div class="overview-grid">
                 <div class="overview-card">
-                    <div class="overview-icon">📍</div>
+                    <div class="overview-icon" id="icon-distance"></div>
                     <div class="overview-label">Distance</div>
                     <div class="overview-value">45 km</div>
                 </div>
                 <div class="overview-card">
-                    <div class="overview-icon">⏱️</div>
+                    <div class="overview-icon" id="icon-time"></div>
                     <div class="overview-label">Est. Time</div>
                     <div class="overview-value">~75 min</div>
                 </div>
                 <div class="overview-card">
-                    <div class="overview-icon">⛰️</div>
+                    <div class="overview-icon" id="icon-elevation"></div>
                     <div class="overview-label">Elevation</div>
                     <div class="overview-value">420 m</div>
                 </div>
                 <div class="overview-card">
-                    <div class="overview-icon">🎯</div>
+                    <div class="overview-icon" id="icon-difficulty"></div>
                     <div class="overview-label">Difficulty</div>
                     <div class="overview-value">Moderate</div>
                 </div>
@@ -91,7 +91,7 @@
             <div class="cc-section-header">
                 <div class="cc-section-title-area">
                     <h2 class="section-title-medium">
-                        <span class="cc-section-icon">⚡</span>
+                        <span class="cc-section-icon" id="icon-upgrades"></span>
                         Bonus Upgrades
                     </h2>
                     <p class="cc-section-subtitle">Choose upgrades to apply for a potential points bonus</p>
@@ -139,7 +139,7 @@
                     <p>Today, you take your first pedal stroke toward greatness. The road is long, and the journey has just begun. But in this moment, on this familiar circuit, you have everything you need: your bike, your determination, and the courage to start.</p>
 
                     <div class="story-callout">
-                        <div class="callout-icon">💡</div>
+                        <div class="callout-icon" id="icon-strategy"></div>
                         <div class="callout-text">
                             <strong>Race Strategy:</strong> Pace yourself carefully. The temptation to go out fast is strong, but conservation is key. Stay in the draft, watch for attacks in the final 10km, and save your sprint for when it counts.
                         </div>
@@ -420,6 +420,7 @@
         </div>
     </div>
 
+    <script src="icons/icons.js"></script>
     <script src="event-data.js"></script>
     <script src="event-config.js"></script>
     <script src="elevation-profile-generator.js"></script>
@@ -482,6 +483,34 @@
 
         // Update page content
         document.addEventListener('DOMContentLoaded', async () => {
+            // Helper function to get icon with emoji fallback
+            const getIcon = (iconId, size = 'md') => {
+                if (window.TPVIcons) {
+                    return window.TPVIcons.getIcon(iconId, { size });
+                }
+                // Emoji fallbacks
+                const fallbacks = {
+                    location: '📍', timer: '⏱️', mountain: '⛰️', bullseye: '🎯',
+                    tag: '🏷️', eventCriterium: '🔄', trophy: '🏆', achievement: '⭐',
+                    statusRed: '🔴', statusGreen: '🟢', lightbulb: '💡', warning: '⚠️', power: '⚡'
+                };
+                return fallbacks[iconId] || '📍';
+            };
+
+            // Initialize static icons
+            const staticIcons = {
+                'icon-distance': 'location',
+                'icon-time': 'timer',
+                'icon-elevation': 'mountain',
+                'icon-difficulty': 'bullseye',
+                'icon-upgrades': 'power',
+                'icon-strategy': 'lightbulb'
+            };
+            Object.entries(staticIcons).forEach(([elemId, iconId]) => {
+                const el = document.getElementById(elemId);
+                if (el) el.innerHTML = getIcon(iconId, 'md');
+            });
+
             // Update title
             document.title = `${event.name} - TPV Career Mode`;
 
@@ -537,27 +566,27 @@
                 // Special event overview - same format as regular events
                 overviewGrid.innerHTML = `
                     <div class="overview-card">
-                        <div class="overview-icon">📍</div>
+                        <div class="overview-icon">${getIcon('location')}</div>
                         <div class="overview-label">Distance</div>
                         <div class="overview-value">${event.distance}</div>
                     </div>
                     <div class="overview-card">
-                        <div class="overview-icon">⛰️</div>
+                        <div class="overview-icon">${getIcon('mountain')}</div>
                         <div class="overview-label">Climbing</div>
                         <div class="overview-value">${event.climbing}</div>
                     </div>
                     <div class="overview-card">
-                        <div class="overview-icon">🏷️</div>
+                        <div class="overview-icon">${getIcon('tag')}</div>
                         <div class="overview-label">Type</div>
                         <div class="overview-value">${event.type}</div>
                     </div>
                     <div class="overview-card">
-                        <div class="overview-icon">🔄</div>
+                        <div class="overview-icon">${getIcon('eventCriterium')}</div>
                         <div class="overview-label">Format</div>
                         <div class="overview-value">${event.format}</div>
                     </div>
                     <div class="overview-card">
-                        <div class="overview-icon">🏆</div>
+                        <div class="overview-icon">${getIcon('trophy')}</div>
                         <div class="overview-label">Career Points</div>
                         <div class="overview-value">${event.rewards?.careerPoints || event.maxPoints}</div>
                     </div>
@@ -566,32 +595,32 @@
                 // Regular season event overview
                 overviewGrid.innerHTML = `
                     <div class="overview-card">
-                        <div class="overview-icon">📍</div>
+                        <div class="overview-icon">${getIcon('location')}</div>
                         <div class="overview-label">Distance</div>
                         <div class="overview-value">${event.distance}</div>
                     </div>
                     <div class="overview-card">
-                        <div class="overview-icon">⛰️</div>
+                        <div class="overview-icon">${getIcon('mountain')}</div>
                         <div class="overview-label">Climbing</div>
                         <div class="overview-value">${event.climbing}</div>
                     </div>
                     <div class="overview-card">
-                        <div class="overview-icon">🏷️</div>
+                        <div class="overview-icon">${getIcon('tag')}</div>
                         <div class="overview-label">Type</div>
                         <div class="overview-value">${event.type}</div>
                     </div>
                     <div class="overview-card">
-                        <div class="overview-icon">⭐</div>
+                        <div class="overview-icon">${getIcon('achievement')}</div>
                         <div class="overview-label">Max Points</div>
                         <div class="overview-value">${event.maxPoints}</div>
                     </div>
                     <div class="overview-card">
-                        <div class="overview-icon">${event.mandatory ? '🔴' : '🟢'}</div>
+                        <div class="overview-icon">${event.mandatory ? getIcon('statusRed') : getIcon('statusGreen')}</div>
                         <div class="overview-label">Status</div>
                         <div class="overview-value">${event.mandatory ? 'Mandatory' : 'Optional'}</div>
                     </div>
                     <div class="overview-card">
-                        <div class="overview-icon">🔄</div>
+                        <div class="overview-icon">${getIcon('eventCriterium')}</div>
                         <div class="overview-label">Format</div>
                         <div class="overview-value">${event.format}</div>
                     </div>
@@ -607,7 +636,7 @@
             if (event.strategy) {
                 storyHTML += `
                     <div class="story-callout">
-                        <div class="callout-icon">💡</div>
+                        <div class="callout-icon">${getIcon('lightbulb')}</div>
                         <div class="callout-text">
                             <strong>Race Strategy:</strong> ${event.strategy}
                         </div>
@@ -619,12 +648,12 @@
             if (event.isStageRace && event.stages) {
                 storyHTML += `
                     <div class="story-callout story-callout-warning">
-                        <div class="callout-icon">⚠️</div>
+                        <div class="callout-icon">${getIcon('warning')}</div>
                         <div class="callout-text">
                             <strong>Important Stage Race Rules:</strong> Stages must be completed on consecutive days. If you miss a day, you will not be eligible to enter the next stage and your tour will be over. Plan your schedule carefully!
                         </div>
                     </div>
-                    
+
                     <div class="stage-race-breakdown">
                         <h3>Stage Breakdown</h3>
                         ${event.stages.map((stage, i) => `
@@ -635,8 +664,8 @@
                                 </div>
                                 <h4>${stage.name}</h4>
                                 <div class="stage-detail-stats">
-                                    <span>📍 ${stage.distance}</span>
-                                    <span>⛰️ ${stage.climbing}</span>
+                                    <span>${getIcon('location', 'sm')} ${stage.distance}</span>
+                                    <span>${getIcon('mountain', 'sm')} ${stage.climbing}</span>
                                 </div>
                                 <p>${stage.description}</p>
                             </div>
@@ -750,7 +779,7 @@
                 ctaBox.innerHTML = `
                     <h2>Ready to Race?</h2>
                     <p class="cta-warning">
-                        <strong>⚠️ Important:</strong> Stages must be completed on <strong>consecutive days</strong>. 
+                        <strong>${getIcon('warning', 'sm')} Important:</strong> Stages must be completed on <strong>consecutive days</strong>.
                         Missing a day disqualifies you from continuing the tour.
                     </p>
                     <div class="stage-cta-grid">
@@ -759,9 +788,9 @@
                                 <div class="stage-number-badge">Day ${idx + 1}</div>
                                 <h3>${stage.name}</h3>
                                 <div class="stage-cta-details">
-                                    <span>📍 ${stage.distance}</span>
-                                    <span>⛰️ ${stage.climbing}</span>
-                                    <span>⭐ ${stage.points} pts</span>
+                                    <span>${getIcon('location', 'sm')} ${stage.distance}</span>
+                                    <span>${getIcon('mountain', 'sm')} ${stage.climbing}</span>
+                                    <span>${getIcon('achievement', 'sm')} ${stage.points} pts</span>
                                 </div>
                                 <button class="btn btn-primary" onclick="alert('Schedule Stage ${idx + 1} on TPV')">
                                     Schedule Stage ${idx + 1}

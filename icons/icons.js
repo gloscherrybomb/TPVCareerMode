@@ -548,6 +548,72 @@ const ICON_REGISTRY = {
         path: 'icons/svg/events/mountain.svg',
         fallback: '⛰️',
         category: 'ui'
+    },
+    location: {
+        type: 'local-svg',
+        path: 'icons/svg/ui/location.svg',
+        fallback: '📍',
+        category: 'ui'
+    },
+    lightbulb: {
+        type: 'local-svg',
+        path: 'icons/svg/ui/lightbulb.svg',
+        fallback: '💡',
+        category: 'ui'
+    },
+    microphone: {
+        type: 'local-svg',
+        path: 'icons/svg/ui/microphone.svg',
+        fallback: '🎤',
+        category: 'ui'
+    },
+    moneyBag: {
+        type: 'local-svg',
+        path: 'icons/svg/ui/money-bag.svg',
+        fallback: '💰',
+        category: 'ui'
+    },
+    checkmark: {
+        type: 'local-svg',
+        path: 'icons/svg/ui/checkmark.svg',
+        fallback: '✅',
+        category: 'ui'
+    },
+    crossmark: {
+        type: 'local-svg',
+        path: 'icons/svg/ui/crossmark.svg',
+        fallback: '❌',
+        category: 'ui'
+    },
+    tag: {
+        type: 'local-svg',
+        path: 'icons/svg/ui/tag.svg',
+        fallback: '🏷️',
+        category: 'ui'
+    },
+    statusGreen: {
+        type: 'local-svg',
+        path: 'icons/svg/ui/status-green.svg',
+        fallback: '🟢',
+        category: 'ui'
+    },
+    statusRed: {
+        type: 'local-svg',
+        path: 'icons/svg/ui/status-red.svg',
+        fallback: '🔴',
+        category: 'ui'
+    },
+    globe: {
+        type: 'local-svg',
+        path: 'icons/svg/ui/globe.svg',
+        fallback: '🌍',
+        category: 'ui'
+    },
+    book: {
+        type: 'local-svg',
+        path: 'icons/svg/ui/book.svg',
+        fallback: '📖',
+        category: 'ui'
     }
 };
 

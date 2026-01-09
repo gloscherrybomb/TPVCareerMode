@@ -567,7 +567,7 @@ function buildRiderProfileHTML(data, name) {
     // Helper function to get award icon
     const getAwardIcon = (iconId) => {
         if (window.TPVIcons) {
-            return window.TPVIcons.getIcon(iconId, { size: 'sm' });
+            return window.TPVIcons.getIcon(iconId, { size: 'lg' });
         }
         // Fallback emoji map
         const fallbacks = {
@@ -685,9 +685,10 @@ function buildRiderProfileHTML(data, name) {
     // Check Money Bags flair status
     const hasMoneyBags = data.hasHighRollerFlair || false;
     const moneyBagsClass = hasMoneyBags ? ' money-bags-card' : '';
+    const moneyBagsIcon = window.TPVIcons ? window.TPVIcons.getIcon('moneyBag', { size: 'md' }) : '💰';
     const moneyBagsRow = hasMoneyBags ? `
         <div class="money-bags-flair-row">
-            <span class="money-bags-icon">💰</span>
+            <span class="money-bags-icon">${moneyBagsIcon}</span>
             <span class="money-bags-label">Money Bags</span>
         </div>
     ` : '';

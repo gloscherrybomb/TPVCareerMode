@@ -45,7 +45,7 @@
     <div class="news-ticker hidden" id="newsTicker">
         <div class="news-ticker-container">
             <div class="news-ticker-icon" aria-hidden="true">
-                <span>📢</span>
+                <span id="icon-news"></span>
             </div>
             <div class="news-ticker-content">
                 <span class="news-ticker-label">Latest</span>
@@ -102,7 +102,7 @@
             <div class="stages-grid">
                 <div class="stage-card stage-active" data-stage="1">
                     <div class="stage-number">01</div>
-                    <div class="stage-icon">🚴</div>
+                    <div class="stage-icon" id="icon-stage1"></div>
                     <h3 class="stage-name">Local Amateur</h3>
                     <p class="stage-desc">Begin your journey in regional circuits. Learn the fundamentals and prove your worth.</p>
                     <div class="stage-status">
@@ -112,7 +112,7 @@
 
                 <div class="stage-card stage-locked" data-stage="2">
                     <div class="stage-number">02</div>
-                    <div class="stage-icon">🏁</div>
+                    <div class="stage-icon" id="icon-stage2"></div>
                     <h3 class="stage-name">Continental Pro</h3>
                     <p class="stage-desc">Step up to continental racing. Face tougher competition and longer events.</p>
                     <div class="stage-status">
@@ -123,7 +123,7 @@
 
                 <div class="stage-card stage-locked" data-stage="3">
                     <div class="stage-number">03</div>
-                    <div class="stage-icon">⚡</div>
+                    <div class="stage-icon" id="icon-stage3"></div>
                     <h3 class="stage-name">Pro Continental</h3>
                     <p class="stage-desc">Join the professional ranks. Compete in prestigious races across the continent.</p>
                     <div class="stage-status">
@@ -134,7 +134,7 @@
 
                 <div class="stage-card stage-locked" data-stage="4">
                     <div class="stage-number">04</div>
-                    <div class="stage-icon">🌟</div>
+                    <div class="stage-icon" id="icon-stage4"></div>
                     <h3 class="stage-name">World Tour</h3>
                     <p class="stage-desc">The pinnacle of cycling. Race against the world's elite in legendary events.</p>
                     <div class="stage-status">
@@ -145,7 +145,7 @@
 
                 <div class="stage-card stage-locked" data-stage="5">
                     <div class="stage-number">05</div>
-                    <div class="stage-icon">👑</div>
+                    <div class="stage-icon" id="icon-stage5"></div>
                     <h3 class="stage-name">Legends</h3>
                     <p class="stage-desc">Enter cycling immortality. Only the greatest ever reach this stage.</p>
                     <div class="stage-status">
@@ -161,22 +161,22 @@
         <div class="container">
             <div class="features-grid">
                 <div class="feature-card">
-                    <div class="feature-icon">📊</div>
+                    <div class="feature-icon" id="icon-feature1"></div>
                     <h3>Track Progress</h3>
                     <p>Monitor your performance across all events and see your ranking climb as you earn points.</p>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon">🏆</div>
+                    <div class="feature-icon" id="icon-feature2"></div>
                     <h3>Earn Recognition</h3>
                     <p>Unlock achievements and build your reputation as you complete stages and conquer challenges.</p>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon">🌍</div>
+                    <div class="feature-icon" id="icon-feature3"></div>
                     <h3>Global Competition</h3>
                     <p>Compete against riders worldwide. Compare your results on global and season standings.</p>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon">📖</div>
+                    <div class="feature-icon" id="icon-feature4"></div>
                     <h3>Story-Driven</h3>
                     <p>Each event comes with its own narrative, immersing you in the world of professional cycling.</p>
                 </div>
@@ -380,6 +380,7 @@
         </div>
     </div>
 
+    <script src="icons/icons.js"></script>
     <!-- YouTube IFrame API -->
     <script src="https://www.youtube.com/iframe_api"></script>
     <script>
@@ -466,5 +467,27 @@
     <script type="module" src="app.js"></script>
     <script src="news-ticker.js"></script>
     <script type="module" src="analytics.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.TPVIcons) {
+                const iconMap = {
+                    'icon-news': { id: 'announcement', size: 'sm' },
+                    'icon-stage1': { id: 'eventRoadRace', size: 'xl' },
+                    'icon-stage2': { id: 'eventCriterium', size: 'xl' },
+                    'icon-stage3': { id: 'power', size: 'xl' },
+                    'icon-stage4': { id: 'allRounder', size: 'xl' },
+                    'icon-stage5': { id: 'domination', size: 'xl' },
+                    'icon-feature1': { id: 'stats', size: 'lg' },
+                    'icon-feature2': { id: 'trophy', size: 'lg' },
+                    'icon-feature3': { id: 'globe', size: 'lg' },
+                    'icon-feature4': { id: 'book', size: 'lg' }
+                };
+                Object.entries(iconMap).forEach(([elemId, config]) => {
+                    const el = document.getElementById(elemId);
+                    if (el) el.innerHTML = window.TPVIcons.getIcon(config.id, { size: config.size });
+                });
+            }
+        });
+    </script>
 </body>
 </html>

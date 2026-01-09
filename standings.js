@@ -332,9 +332,10 @@ async function renderSeasonStandings(forceRefresh = false) {
 
     if (!currentUser) {
         // User not logged in
+        const lockedIcon = window.TPVIcons ? window.TPVIcons.getIcon('locked', { size: 'xl' }) : '🔒';
         seasonContent.innerHTML = `
             <div class="login-prompt">
-                <div class="login-prompt-icon">🔒</div>
+                <div class="login-prompt-icon">${lockedIcon}</div>
                 <h3>Please Log In</h3>
                 <p>You need to be logged in to view your season standings.</p>
                 <button class="btn btn-primary" onclick="document.getElementById('loginBtn').click()">
@@ -464,9 +465,10 @@ async function renderSeasonStandingsTable(standings, userData, seasonContent) {
     }
     
     if (standings.length === 0) {
+        const statsIcon = window.TPVIcons ? window.TPVIcons.getIcon('stats', { size: 'xl' }) : '📊';
         seasonContent.innerHTML = `
             <div style="text-align: center; padding: 3rem;">
-                <div style="font-size: 4rem; margin-bottom: 1rem;">📊</div>
+                <div style="font-size: 4rem; margin-bottom: 1rem;">${statsIcon}</div>
                 <h3 style="color: var(--text-primary); margin-bottom: 0.5rem;">No Results Yet</h3>
                 <p style="color: var(--text-secondary);">Season standings will appear once events are completed</p>
             </div>
@@ -696,10 +698,11 @@ function renderGlobalRankingsTable(rankings, globalContent) {
         `;
 
         if (filteredRankings.length === 0) {
+            const emptyStatsIcon = window.TPVIcons ? window.TPVIcons.getIcon('stats', { size: 'lg' }) : '📊';
             tableHTML += `
                 <tr>
                     <td colspan="5" class="empty-state">
-                        <div class="empty-icon">📊</div>
+                        <div class="empty-icon">${emptyStatsIcon}</div>
                         <p>No riders match the selected filters.</p>
                     </td>
                 </tr>
@@ -739,7 +742,8 @@ function renderGlobalRankingsTable(rankings, globalContent) {
                 const contributorBadge = racer.isContributor ? '<span class="contributor-badge" title="TPV Contributor">&#9733;</span>' : '';
 
                 // Money Bags indicator
-                const moneyBagsIndicator = racer.hasMoneyBags ? '<span class="money-bags-indicator" title="Money Bags">💰</span>' : '';
+                const moneyBagsIcon = window.TPVIcons ? window.TPVIcons.getIcon('moneyBag', { size: 'sm' }) : '💰';
+                const moneyBagsIndicator = racer.hasMoneyBags ? `<span class="money-bags-indicator" title="Money Bags">${moneyBagsIcon}</span>` : '';
 
                 tableHTML += `
                     <tr class="${rowClass}">
@@ -853,10 +857,11 @@ async function renderTeamRankings() {
         `;
         
         if (teamRankings.length === 0) {
+            const emptyTrophyIcon = window.TPVIcons ? window.TPVIcons.getIcon('trophy', { size: 'lg' }) : '🏆';
             tableHTML += `
                 <tr>
                     <td colspan="4" class="empty-state">
-                        <div class="empty-icon">🏆</div>
+                        <div class="empty-icon">${emptyTrophyIcon}</div>
                         <p>No teams yet. Join a team to compete!</p>
                     </td>
                 </tr>
