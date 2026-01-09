@@ -614,6 +614,24 @@ const ICON_REGISTRY = {
         path: 'icons/svg/ui/book.svg',
         fallback: '📖',
         category: 'ui'
+    },
+    coffee: {
+        type: 'local-svg',
+        path: 'icons/svg/ui/coffee.svg',
+        fallback: '☕',
+        category: 'ui'
+    },
+    contributorStar: {
+        type: 'local-svg',
+        path: 'icons/svg/awards/glowing-star.svg',
+        fallback: '⭐',
+        category: 'ui'
+    },
+    sparkles: {
+        type: 'local-svg',
+        path: 'icons/svg/awards/sparkles.svg',
+        fallback: '✨',
+        category: 'ui'
     }
 };
 

@@ -739,7 +739,7 @@ function renderGlobalRankingsTable(rankings, globalContent) {
                 }
 
                 // Contributor badge
-                const contributorBadge = racer.isContributor ? '<span class="contributor-badge" title="TPV Contributor">&#9733;</span>' : '';
+                const contributorBadge = racer.isContributor ? '<span class="contributor-badge" title="TPV Contributor">' + (window.TPVIcons ? window.TPVIcons.getIcon('contributorStar', { size: 'xs' }) : '⭐') + '</span>' : '';
 
                 // Money Bags indicator
                 const moneyBagsIcon = window.TPVIcons ? window.TPVIcons.getIcon('moneyBag', { size: 'sm' }) : '💰';

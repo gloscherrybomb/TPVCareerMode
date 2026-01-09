@@ -605,7 +605,7 @@ function displayProfileInfo(user, userData, stats, seasonRanking, globalRanking)
     const profileNameEl = document.getElementById('profileName');
     const displayName = userData.name || user.displayName || 'Unknown';
     const contributorBadge = userData.isContributor
-        ? ' <span class="profile-contributor-badge" title="Thank you for your contribution to support TPV Career Mode">&#9733;</span>'
+        ? ' <span class="profile-contributor-badge" title="Thank you for your contribution to support TPV Career Mode">' + (window.TPVIcons ? window.TPVIcons.getIcon('contributorStar', { size: 'sm' }) : '⭐') + '</span>'
         : '';
     profileNameEl.innerHTML = displayName + contributorBadge;
 

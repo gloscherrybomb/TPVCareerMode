@@ -225,14 +225,14 @@ function renderUserCard(user) {
                         : escapeHtml(initials)}
                 </div>
                 <div class="user-details">
-                    <h3>${escapeHtml(user.name || 'Unknown')} ${user.isContributor ? '<span style="color: #ffd700;">&#9733;</span>' : ''}</h3>
+                    <h3>${escapeHtml(user.name || 'Unknown')} ${user.isContributor ? '<span style="color: #ffd700;">' + (window.TPVIcons ? window.TPVIcons.getIcon('contributorStar', { size: 'sm' }) : '⭐') + '</span>' : ''}</h3>
                     <p>UID: ${escapeHtml(user.uid || 'N/A')}</p>
                     ${contributorSince ? `<div class="contributor-since">Contributor since: ${contributorSince}</div>` : ''}
                 </div>
             </div>
             <div class="user-status">
                 <div class="contributor-badge ${user.isContributor ? '' : 'inactive'}">
-                    ${user.isContributor ? '&#9733; Contributor' : 'Not a contributor'}
+                    ${user.isContributor ? (window.TPVIcons ? window.TPVIcons.getIcon('contributorStar', { size: 'xs' }) : '⭐') + ' Contributor' : 'Not a contributor'}
                 </div>
                 ${user.isContributor
                     ? `<button class="btn-toggle btn-revoke" data-action="revoke" data-user-id="${user.id}" data-user-name="${user.name}">Revoke</button>`

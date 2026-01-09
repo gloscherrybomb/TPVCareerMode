@@ -417,7 +417,7 @@ function createResultCard(resultData) {
     if (story) {
         recapHTML = `
             <div class="result-recap">
-                <div class="result-recap-label"><span>&#128214;</span> Race Recap</div>
+                <div class="result-recap-label"><span>${window.TPVIcons ? window.TPVIcons.getIcon('book', { size: 'sm' }) : '📖'}</span> Race Recap</div>
                 <p class="result-recap-text">${story}</p>
             </div>
         `;

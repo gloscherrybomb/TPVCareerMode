@@ -591,3 +591,14 @@
         order: 0;
     }
 }
+
+/* Login Prompt Icon */
+.login-prompt-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+.login-prompt-icon img {
+    width: 64px;
+    height: 64px;
+}

@@ -183,6 +183,12 @@ body {
     transform: scale(1.2);
 }
 
+.nav-support-icon {
+    width: 24px;
+    height: 24px;
+    vertical-align: middle;
+}
+
 /* Contributor star style (when user is a contributor) */
 .nav-support.is-contributor {
     color: #ffd700;
@@ -1036,6 +1042,11 @@ body {
     animation: supportStarFloat 3s ease-in-out infinite;
 }
 
+.support-modal-icon img {
+    width: 64px;
+    height: 64px;
+}
+
 @keyframes supportStarFloat {
     0%, 100% { transform: translateY(0) rotate(0deg); }
     50% { transform: translateY(-10px) rotate(5deg); }
@@ -1088,6 +1099,13 @@ body {
     flex-shrink: 0;
 }
 
+.reward-icon img {
+    width: 20px;
+    height: 20px;
+    vertical-align: middle;
+    filter: drop-shadow(0 0 3px rgba(255, 215, 0, 0.5));
+}
+
 .support-note {
     font-size: 0.9rem;
     color: var(--text-secondary);
@@ -1120,6 +1138,12 @@ body {
     transform: translateY(-3px);
     box-shadow: 0 12px 35px rgba(255, 27, 107, 0.6);
     color: white;
+}
+
+.kofi-icon {
+    width: 20px;
+    height: 20px;
+    vertical-align: middle;
 }
 
 .modal-tabs {

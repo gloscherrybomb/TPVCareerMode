@@ -680,7 +680,7 @@ function buildRiderProfileHTML(data, name) {
     // Check contributor status
     const isContributor = data.isContributor || false;
     const contributorClass = isContributor ? ' contributor-profile' : '';
-    const contributorBadge = isContributor ? '<span class="contributor-star-badge" title="TPV Contributor">&#9733;</span>' : '';
+    const contributorBadge = isContributor ? '<span class="contributor-star-badge" title="TPV Contributor">' + (window.TPVIcons ? window.TPVIcons.getIcon('contributorStar', { size: 'sm' }) : '⭐') + '</span>' : '';
 
     // Check Money Bags flair status
     const hasMoneyBags = data.hasHighRollerFlair || false;
