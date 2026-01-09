@@ -762,12 +762,24 @@ async function loadEventResults() {
 
         // Build results table
         let tableHTML = '';
-        
+
         // Add "Back to Local Tour" button for tour events
         if (eventNumber === 13 || eventNumber === 14 || eventNumber === 15) {
             addBackToTourButton();
         }
-        
+
+        // Add replay awards button if there are earned awards (appears at top, before interview)
+        if (userEventResults?.earnedAwards && userEventResults.earnedAwards.length > 0) {
+            tableHTML += `
+                <div class="replay-awards-section">
+                    <button class="replay-awards-btn" id="replayAwardsBtn" data-event="${eventNumber}">
+                        <span class="replay-icon">↻</span>
+                        <span class="replay-text">Replay Award Animations</span>
+                    </button>
+                </div>
+            `;
+        }
+
         // Add tour completion story ONLY for event 15 (after all 3 stages)
         if (eventNumber === 15 && userEventResults?.gcResults) {
             tableHTML += generateTourCompletionStory(userData, userEventResults.gcResults);
@@ -959,18 +971,6 @@ async function loadEventResults() {
         // Add GC (General Classification) table if this is a tour event (13, 14, or 15)
         if ((eventNumber === 13 || eventNumber === 14 || eventNumber === 15) && userEventResults?.gcResults) {
             tableHTML += await displayGCResults(userEventResults.gcResults, userUid, eventNumber);
-        }
-
-        // Add replay awards button if there are earned awards (appears before interview)
-        if (userEventResults?.earnedAwards && userEventResults.earnedAwards.length > 0) {
-            tableHTML += `
-                <div class="replay-awards-section">
-                    <button class="replay-awards-btn" id="replayAwardsBtn" data-event="${eventNumber}">
-                        <span class="replay-icon">↻</span>
-                        <span class="replay-text">Replay Award Animations</span>
-                    </button>
-                </div>
-            `;
         }
 
         eventResultsContent.innerHTML = tableHTML;
