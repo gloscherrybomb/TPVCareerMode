@@ -797,18 +797,6 @@ async function loadEventResults() {
             `;
         }
 
-        // Add replay awards button if there are earned awards
-        if (userEventResults?.earnedAwards && userEventResults.earnedAwards.length > 0) {
-            tableHTML += `
-                <div class="replay-awards-section">
-                    <button class="replay-awards-btn" id="replayAwardsBtn" data-event="${eventNumber}">
-                        <span class="replay-icon">↻</span>
-                        <span class="replay-text">Replay Award Animations</span>
-                    </button>
-                </div>
-            `;
-        }
-
         // Check if this is a time-based event (show distance instead of time)
         const isTimeBasedEvent = getTimeBasedEvents().includes(eventNumber);
         console.log(`Event ${eventNumber}: isTimeBasedEvent=${isTimeBasedEvent}, TIME_BASED_EVENTS=${JSON.stringify(getTimeBasedEvents())}`);
@@ -971,6 +959,18 @@ async function loadEventResults() {
         // Add GC (General Classification) table if this is a tour event (13, 14, or 15)
         if ((eventNumber === 13 || eventNumber === 14 || eventNumber === 15) && userEventResults?.gcResults) {
             tableHTML += await displayGCResults(userEventResults.gcResults, userUid, eventNumber);
+        }
+
+        // Add replay awards button if there are earned awards (appears before interview)
+        if (userEventResults?.earnedAwards && userEventResults.earnedAwards.length > 0) {
+            tableHTML += `
+                <div class="replay-awards-section">
+                    <button class="replay-awards-btn" id="replayAwardsBtn" data-event="${eventNumber}">
+                        <span class="replay-icon">↻</span>
+                        <span class="replay-text">Replay Award Animations</span>
+                    </button>
+                </div>
+            `;
         }
 
         eventResultsContent.innerHTML = tableHTML;
