@@ -36,20 +36,19 @@ class NotificationQueue {
 
   /**
    * Add a notification to the queue
-   * Prevents duplicates based on awardId + eventNumber combination (only among unshown notifications)
+   * Prevents duplicates based on awardId + eventNumber combination
    * @param {Object} notification - Notification object containing awardId, eventNumber, category, intensity
    */
   add(notification) {
-    // Check for duplicate: same awardId and eventNumber already in queue AND not yet shown
-    // This allows notifications that were previously shown to be shown again on new visits
+    // Check for duplicate: same awardId and eventNumber already in queue
+    // This prevents the same award from being added multiple times (even if already shown)
     const isDuplicate = this.queue.some(n =>
       n.awardId === notification.awardId &&
-      n.eventNumber === notification.eventNumber &&
-      !n.shown  // Only consider unshown notifications as duplicates
+      n.eventNumber === notification.eventNumber
     );
 
     if (isDuplicate) {
-      console.log(`Notification already queued (unshown) for ${notification.awardId} in event ${notification.eventNumber}, skipping`);
+      console.log(`Notification already exists for ${notification.awardId} in event ${notification.eventNumber}, skipping`);
       return;
     }
 
@@ -103,6 +102,24 @@ class NotificationQueue {
   markAllAsShown() {
     this.queue.forEach(n => n.shown = true);
     this.save();
+  }
+
+  /**
+   * Reset shown status for awards from a specific event to allow replay
+   * @param {number} eventNumber - Event number to replay awards for
+   * @returns {number} Number of awards reset for replay
+   */
+  replayEventAwards(eventNumber) {
+    let count = 0;
+    this.queue.forEach(n => {
+      if (n.eventNumber === eventNumber && n.shown) {
+        n.shown = false;
+        count++;
+      }
+    });
+    this.save();
+    console.log(`Reset ${count} award(s) for event ${eventNumber} for replay`);
+    return count;
   }
 
   /**

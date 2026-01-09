@@ -797,6 +797,18 @@ async function loadEventResults() {
             `;
         }
 
+        // Add replay awards button if there are earned awards
+        if (userEventResults?.earnedAwards && userEventResults.earnedAwards.length > 0) {
+            tableHTML += `
+                <div class="replay-awards-section">
+                    <button class="replay-awards-btn" id="replayAwardsBtn" data-event="${eventNumber}">
+                        <span class="replay-icon">↻</span>
+                        <span class="replay-text">Replay Award Animations</span>
+                    </button>
+                </div>
+            `;
+        }
+
         // Check if this is a time-based event (show distance instead of time)
         const isTimeBasedEvent = getTimeBasedEvents().includes(eventNumber);
         console.log(`Event ${eventNumber}: isTimeBasedEvent=${isTimeBasedEvent}, TIME_BASED_EVENTS=${JSON.stringify(getTimeBasedEvents())}`);
@@ -962,6 +974,30 @@ async function loadEventResults() {
         }
 
         eventResultsContent.innerHTML = tableHTML;
+
+        // Add replay button event listener
+        const replayBtn = document.getElementById('replayAwardsBtn');
+        if (replayBtn) {
+            replayBtn.addEventListener('click', function() {
+                const eventNum = parseInt(this.dataset.event);
+                console.log(`[AWARD REPLAY] Replay button clicked for event ${eventNum}`);
+
+                if (window.notificationQueue && window.achievementNotifications) {
+                    // Reset shown status for this event's awards
+                    const resetCount = window.notificationQueue.replayEventAwards(eventNum);
+
+                    if (resetCount > 0) {
+                        console.log(`[AWARD REPLAY] Replaying ${resetCount} award(s)`);
+                        // Display the awards
+                        window.achievementNotifications.display();
+                    } else {
+                        console.log('[AWARD REPLAY] No awards found to replay');
+                    }
+                } else {
+                    console.error('[AWARD REPLAY] Notification system not initialized');
+                }
+            });
+        }
 
         // Display post-race interview if user has results (including DNF)
         if (userEventResults && (userEventResults.position || userEventResults.position === 'DNF')) {
