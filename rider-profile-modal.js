@@ -802,10 +802,10 @@ function buildRiderProfileHTML(data, name) {
 
     // Add awards section if rider has awards
     if (awardsList && awardsList.length > 0) {
-        const trophyIcon = getAwardIcon('trophy');
+        const headerTrophyIcon = window.TPVIcons ? window.TPVIcons.getIcon('trophy', { size: 'sm' }) : '🏆';
         html += `
             <div class="rider-awards-section">
-                <h3 class="rider-awards-title">${trophyIcon} Awards & Achievements</h3>
+                <h3 class="rider-awards-title">${headerTrophyIcon} Awards & Achievements</h3>
                 <div class="rider-awards-grid">
         `;
         
@@ -823,10 +823,10 @@ function buildRiderProfileHTML(data, name) {
             </div>
         `;
     } else {
-        const trophyIcon = getAwardIcon('trophy');
+        const headerTrophyIcon = window.TPVIcons ? window.TPVIcons.getIcon('trophy', { size: 'sm' }) : '🏆';
         html += `
             <div class="rider-awards-section">
-                <h3 class="rider-awards-title">${trophyIcon} Awards & Achievements</h3>
+                <h3 class="rider-awards-title">${headerTrophyIcon} Awards & Achievements</h3>
                 <div class="rider-no-awards">No awards earned yet. Keep racing to unlock achievements!</div>
             </div>
         `;

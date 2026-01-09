@@ -123,10 +123,11 @@ class SeasonSwitcher {
    * @returns {string} - HTML string
    */
   renderFull(seasons) {
+    const trophyIcon = window.TPVIcons ? window.TPVIcons.getIcon('trophy', { size: 'sm' }) : '&#127942;';
     return `
       <div class="season-switcher season-switcher--full">
         <label class="season-switcher__label">
-          <span class="season-switcher__icon">&#127942;</span>
+          <span class="season-switcher__icon">${trophyIcon}</span>
           <span>Viewing:</span>
         </label>
         <div class="season-switcher__select-container">

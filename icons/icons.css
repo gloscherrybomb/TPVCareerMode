@@ -116,6 +116,19 @@
     filter: none; /* No shadow for inline icons */
 }
 
+/* Make icons in labels/headers match text size */
+.result-stat-label .tpv-icon,
+.result-card-title .tpv-icon,
+h3 .tpv-icon,
+h4 .tpv-icon,
+label .tpv-icon,
+.section-icon .tpv-icon {
+    width: 1em;
+    height: 1em;
+    vertical-align: -0.125em; /* Slight offset to align with text baseline */
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
 /* Remove shadow for certain contexts */
 .tpv-icon-no-shadow {
     filter: none;

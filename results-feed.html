@@ -88,7 +88,7 @@
 
             <!-- Empty State -->
             <div id="emptyState" class="empty-state" style="display: none;">
-                <div class="empty-icon">&#127937;</div>
+                <div class="empty-icon" id="emptyStateIcon"></div>
                 <h3>No Results Yet</h3>
                 <p>Race results will appear here once events are completed.</p>
             </div>
@@ -279,5 +279,16 @@
     <script type="module" src="app.js"></script>
     <script type="module" src="results-feed.js"></script>
     <script type="module" src="analytics.js"></script>
+    <script>
+        // Initialize empty state icon
+        document.addEventListener('DOMContentLoaded', () => {
+            if (window.TPVIcons) {
+                const emptyIcon = document.getElementById('emptyStateIcon');
+                if (emptyIcon) {
+                    emptyIcon.innerHTML = window.TPVIcons.getIcon('eventCriterium', { size: 'xl' });
+                }
+            }
+        });
+    </script>
 </body>
 </html>

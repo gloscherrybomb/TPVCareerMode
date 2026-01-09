@@ -472,7 +472,7 @@ function createResultCard(resultData) {
         <div class="result-card-wrapper" data-result-id="${resultDocId}">
             <article class="result-card ${cardClass}">
                 <div class="result-card-header">
-                    <h3 class="result-card-title">&#127937; ${riderNameHTML} - ${eventName}</h3>
+                    <h3 class="result-card-title">${window.TPVIcons ? window.TPVIcons.getIcon('eventCriterium', { size: 'sm' }) : '&#127937;'} ${riderNameHTML} - ${eventName}</h3>
                     ${highFiveHeaderHTML}
                 </div>
                 <div class="result-card-body">
@@ -485,11 +485,11 @@ function createResultCard(resultData) {
                         <div class="result-stats-column">
                             <div class="result-stats-grid">
                                 <div class="result-stat">
-                                    <div class="result-stat-label"><span>&#129351;</span> Position</div>
+                                    <div class="result-stat-label"><span>${window.TPVIcons ? window.TPVIcons.getIcon('goldMedal', { size: 'sm' }) : '&#129351;'}</span> Position</div>
                                     <div class="result-stat-value position-value ${positionClass}">${positionText}</div>
                                 </div>
                                 <div class="result-stat">
-                                    <div class="result-stat-label"><span>&#11088;</span> Points</div>
+                                    <div class="result-stat-label"><span>${window.TPVIcons ? window.TPVIcons.getIcon('achievement', { size: 'sm' }) : '&#11088;'}</span> Points</div>
                                     <div class="result-stat-value">${pointsText}</div>
                                 </div>
                                 ${predictionHTML}
@@ -723,9 +723,10 @@ function showLoginPrompt() {
     if (loadMoreContainer) loadMoreContainer.style.display = 'none';
     if (emptyState) emptyState.style.display = 'none';
 
+    const lockedIcon = window.TPVIcons ? window.TPVIcons.getIcon('locked', { size: 'xl' }) : '&#128274;';
     feedContainer.innerHTML = `
         <div class="login-prompt">
-            <div class="login-prompt-icon">&#128274;</div>
+            <div class="login-prompt-icon">${lockedIcon}</div>
             <h3>Login Required</h3>
             <p>Please log in to view the results feed.</p>
             <p class="login-hint">Click "Login" in the navigation bar to continue.</p>

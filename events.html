@@ -945,7 +945,21 @@
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', () => {
             console.log('DOMContentLoaded fired');
-            
+
+            // Initialize progress card icons
+            if (window.TPVIcons) {
+                const progressIcons = {
+                    'progressIconStage': 'eventRoadRace',
+                    'progressIconCompleted': 'checkmark',
+                    'progressIconPoints': 'achievement',
+                    'progressIconRank': 'trophy'
+                };
+                Object.entries(progressIcons).forEach(([elemId, iconId]) => {
+                    const el = document.getElementById(elemId);
+                    if (el) el.innerHTML = window.TPVIcons.getIcon(iconId, { size: 'lg' });
+                });
+            }
+
             // Setup modal close handlers
             document.getElementById('choiceModalClose').addEventListener('click', closeChoiceModal);
             document.getElementById('choiceModalOverlay').addEventListener('click', closeChoiceModal);

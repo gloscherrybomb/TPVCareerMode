@@ -17,20 +17,23 @@ const eventSequence = [
         type: 'mandatory',
         eventId: 1,
         name: 'Coast and Roast Crit',
-        icon: '🔄'
+        icon: '🔄',
+        iconId: 'eventCriterium'
     },
     {
         stage: 2,
         type: 'mandatory',
         eventId: 2,
         name: 'Island Classic',
-        icon: '🚴'
+        icon: '🚴',
+        iconId: 'eventRoadRace'
     },
     {
         stage: 3,
         type: 'choice',
         name: "Rider's Choice #1",
         icon: '🎯',
+        iconId: 'bullseye',
         availableEvents: [6, 7, 8, 9, 10, 11, 12] // IDs of optional events
     },
     {
@@ -38,20 +41,23 @@ const eventSequence = [
         type: 'mandatory',
         eventId: 3,
         name: 'The Forest Velodrome Elimination',
-        icon: '🏟️'
+        icon: '🏟️',
+        iconId: 'eventTrack'
     },
     {
         stage: 5,
         type: 'mandatory',
         eventId: 4,
         name: 'Coastal Loop Time Challenge',
-        icon: '⏱️'
+        icon: '⏱️',
+        iconId: 'timer'
     },
     {
         stage: 6,
         type: 'choice',
         name: "Rider's Choice #2",
         icon: '🎯',
+        iconId: 'bullseye',
         availableEvents: [6, 7, 8, 9, 10, 11, 12]
     },
     {
@@ -59,13 +65,15 @@ const eventSequence = [
         type: 'mandatory',
         eventId: 5,
         name: 'North Lake Points Race',
-        icon: '🎯'
+        icon: '🎯',
+        iconId: 'bullseye'
     },
     {
         stage: 8,
         type: 'choice',
         name: "Rider's Choice #3",
         icon: '🎯',
+        iconId: 'bullseye',
         availableEvents: [6, 7, 8, 9, 10, 11, 12]
     },
     {
@@ -73,7 +81,8 @@ const eventSequence = [
         type: 'mandatory',
         eventId: 13,
         name: 'Local Tour',
-        icon: '🏆'
+        icon: '🏆',
+        iconId: 'trophy'
     }
 ];
 
