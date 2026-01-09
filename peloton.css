@@ -380,7 +380,7 @@
 /* Responsive */
 @media (max-width: 768px) {
     .page-header {
-        padding: 6rem 0 3rem;
+        padding: 7.5rem 0 3rem;
     }
 
     .search-wrapper {
