@@ -948,10 +948,13 @@
 
 /* Replay Awards Section */
 .replay-awards-section {
+    padding: 2rem 0;
+    background: var(--dark-bg);
+}
+
+.replay-awards-section .container {
     display: flex;
     justify-content: center;
-    padding: 2rem 0;
-    margin: 1.5rem 0;
 }
 
 .replay-awards-btn {
