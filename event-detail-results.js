@@ -769,12 +769,12 @@ async function loadEventResults() {
 
         // Build results table
         let tableHTML = '';
-        
+
         // Add "Back to Local Tour" button for tour events
         if (eventNumber === 13 || eventNumber === 14 || eventNumber === 15) {
             addBackToTourButton();
         }
-        
+
         // Add tour completion story ONLY for event 15 (after all 3 stages)
         if (eventNumber === 15 && userEventResults?.gcResults) {
             tableHTML += generateTourCompletionStory(userData, userEventResults.gcResults);
@@ -969,6 +969,58 @@ async function loadEventResults() {
         }
 
         eventResultsContent.innerHTML = tableHTML;
+
+        // Add replay awards button before interview section if there are earned awards
+        if (userEventResults?.earnedAwards && userEventResults.earnedAwards.length > 0) {
+            // Remove any existing replay button first
+            const existingReplaySection = document.getElementById('replayAwardsSection');
+            if (existingReplaySection) {
+                existingReplaySection.remove();
+            }
+
+            // Create replay button section
+            const replaySection = document.createElement('section');
+            replaySection.id = 'replayAwardsSection';
+            replaySection.className = 'replay-awards-section';
+            replaySection.innerHTML = `
+                <div class="container">
+                    <button class="replay-awards-btn" id="replayAwardsBtn" data-event="${eventNumber}">
+                        <span class="replay-icon">↻</span>
+                        <span class="replay-text">Replay Award Animations</span>
+                    </button>
+                </div>
+            `;
+
+            // Insert before the interview section
+            const interviewSection = document.getElementById('postRaceInterviewSection');
+            if (interviewSection) {
+                interviewSection.parentNode.insertBefore(replaySection, interviewSection);
+            }
+
+            // Add replay button event listener
+            const replayBtn = document.getElementById('replayAwardsBtn');
+            if (replayBtn) {
+                replayBtn.addEventListener('click', function() {
+                    const eventNum = parseInt(this.dataset.event);
+                    console.log(`[AWARD REPLAY] Replay button clicked for event ${eventNum}`);
+
+                    if (window.notificationQueue && window.achievementNotifications) {
+                        // Reset shown status for this event's awards
+                        const resetCount = window.notificationQueue.replayEventAwards(eventNum);
+
+                        if (resetCount > 0) {
+                            console.log(`[AWARD REPLAY] Replaying ${resetCount} award(s)`);
+                            // Display the awards
+                            window.achievementNotifications.display();
+                        } else {
+                            console.log('[AWARD REPLAY] No awards found to replay');
+                        }
+                    } else {
+                        console.error('[AWARD REPLAY] Notification system not initialized');
+                    }
+                });
+            }
+        }
 
         // Display post-race interview if user has results (including DNF)
         if (userEventResults && (userEventResults.position || userEventResults.position === 'DNF')) {

@@ -348,8 +348,6 @@
         // Initialize video player
         function initializePlayer() {
             player = new YT.Player('youtubePlayer', {
-                height: '100%',
-                width: '100%',
                 videoId: VIDEO_ID,
                 playerVars: {
                     'autoplay': 1,
@@ -441,6 +439,61 @@
                     if (el) el.innerHTML = window.TPVIcons.getIcon(config.id, { size: config.size });
                 });
             }
+
+            // Apply mobile video fixes via JavaScript
+            setTimeout(() => {
+                if (window.innerWidth <= 1024) {
+                    const heroImage = document.querySelector('.hero-image');
+                    const heroMediaContainer = document.querySelector('.hero-media-container');
+                    const thumbnail = document.getElementById('videoThumbnail');
+                    const wrapper = document.getElementById('videoWrapper');
+                    const image = document.querySelector('.career-graphic');
+
+                    // Fix hero-image parent width
+                    if (heroImage) {
+                        heroImage.style.width = '100%';
+                        heroImage.style.maxWidth = '100%';
+                    }
+
+                    // Fix hero-media-container dimensions
+                    if (heroMediaContainer) {
+                        heroMediaContainer.style.position = 'relative';
+                        heroMediaContainer.style.width = '100%';
+                        heroMediaContainer.style.paddingBottom = '56.25%';
+                        heroMediaContainer.style.height = '0';
+                        heroMediaContainer.style.overflow = 'visible';
+                        heroMediaContainer.style.transform = 'none';
+                        heroMediaContainer.style.borderRadius = '0';
+                    }
+
+                    // Fix thumbnail positioning
+                    if (thumbnail) {
+                        thumbnail.style.position = 'absolute';
+                        thumbnail.style.top = '0';
+                        thumbnail.style.left = '0';
+                        thumbnail.style.width = '100%';
+                        thumbnail.style.height = '100%';
+                        thumbnail.style.zIndex = '2';
+                    }
+
+                    // Fix thumbnail image sizing
+                    if (image) {
+                        image.style.width = '100%';
+                        image.style.height = '100%';
+                        image.style.objectFit = 'cover';
+                    }
+
+                    // Fix video wrapper positioning
+                    if (wrapper) {
+                        wrapper.style.position = 'absolute';
+                        wrapper.style.top = '0';
+                        wrapper.style.left = '0';
+                        wrapper.style.width = '100%';
+                        wrapper.style.height = '100%';
+                        wrapper.style.zIndex = '1';
+                    }
+                }
+            }, 100);
         });
     </script>
 </body>
