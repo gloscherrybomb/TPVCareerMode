@@ -453,6 +453,7 @@
                 const wrapper = document.getElementById('videoWrapper');
                 const ytPlayer = document.getElementById('youtubePlayer');
                 const iframe = ytPlayer?.querySelector('iframe');
+                const heroMediaContainer = document.querySelector('.hero-media-container');
                 const panel = document.getElementById('diagnosticPanel');
                 const content = document.getElementById('diagnosticContent');
 
@@ -460,16 +461,26 @@
 
                 const wrapperStyles = window.getComputedStyle(wrapper);
                 const iframeStyles = iframe ? window.getComputedStyle(iframe) : null;
+                const heroStyles = heroMediaContainer ? window.getComputedStyle(heroMediaContainer) : null;
 
                 let html = '<div style="line-height: 1.4;">';
-                html += '<strong>Wrapper:</strong><br>';
+                html += '<strong>Hero Media Container:</strong><br>';
+                html += `• dimensions: ${heroMediaContainer?.offsetWidth}x${heroMediaContainer?.offsetHeight}px<br>`;
+                html += `• display: ${heroStyles?.display}<br>`;
+                html += '<br><strong>Wrapper:</strong><br>';
                 html += `• display: ${wrapper?.style.display}<br>`;
                 html += `• dimensions: ${wrapper?.offsetWidth}x${wrapper?.offsetHeight}px<br>`;
+                html += `• computed width: ${wrapperStyles.width}<br>`;
                 html += `• overflow: ${wrapperStyles.overflow}<br>`;
                 html += `• clip-path: ${wrapperStyles.clipPath}<br>`;
                 html += `• border-radius: ${wrapperStyles.borderRadius}<br>`;
                 html += '<br><strong>YT Player div:</strong><br>';
                 html += `• exists: ${ytPlayer ? 'YES' : 'NO'}<br>`;
+                if (ytPlayer) {
+                    const ytStyles = window.getComputedStyle(ytPlayer);
+                    html += `• dimensions: ${ytPlayer.offsetWidth}x${ytPlayer.offsetHeight}px<br>`;
+                    html += `• display: ${ytStyles.display}<br>`;
+                }
                 html += '<br><strong>Iframe:</strong><br>';
                 html += `• exists: ${iframe ? 'YES' : 'NO'}<br>`;
                 if (iframe) {
@@ -487,7 +498,7 @@
                 panel.style.display = 'block';
 
                 // Also log to console for remote debugging
-                console.log('=== VIDEO DIAGNOSTIC ===', {wrapper, ytPlayer, iframe, wrapperStyles, iframeStyles});
+                console.log('=== VIDEO DIAGNOSTIC ===', {wrapper, ytPlayer, iframe, heroMediaContainer, wrapperStyles, iframeStyles, heroStyles});
             }, 2000);
         }
 
