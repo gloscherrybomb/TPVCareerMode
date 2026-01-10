@@ -541,3 +541,155 @@
     margin: 0;
 }
 
+/* Admin Preview Badge and Card Styling */
+.event-badge.admin-preview {
+    background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    font-weight: 700;
+}
+
+.special-event-card.admin-preview {
+    border-color: rgba(255, 107, 107, 0.5);
+    background: linear-gradient(135deg, rgba(255, 107, 107, 0.05), var(--dark-card));
+}
+
+.special-event-card.admin-preview:hover {
+    border-color: rgba(255, 107, 107, 0.8);
+    box-shadow: 0 8px 32px rgba(255, 107, 107, 0.2);
+}
+
+/* Completed Events Section */
+.completed-events-section {
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.section-subtitle {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    text-align: center;
+    margin-top: -0.5rem;
+    margin-bottom: 2rem;
+}
+
+.event-badge.completed {
+    background: linear-gradient(135deg, #22c55e, #10b981);
+    color: #fff;
+}
+
+.special-event-card.completed {
+    opacity: 0.9;
+}
+
+.special-event-card.completed:hover {
+    opacity: 1;
+}
+
+/* Timeslot Selection UI (for event detail page) */
+.timeslot-grid {
+    margin-top: 2rem;
+}
+
+.timeslot-day-section {
+    margin-bottom: 2rem;
+}
+
+.timeslot-day-header {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.3rem;
+    color: var(--accent-blue);
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid rgba(69, 202, 255, 0.3);
+}
+
+.timeslot-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.timeslot-card {
+    background: rgba(69, 202, 255, 0.05);
+    border: 2px solid rgba(69, 202, 255, 0.3);
+    border-radius: 12px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.timeslot-card:hover {
+    border-color: rgba(69, 202, 255, 0.6);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(69, 202, 255, 0.2);
+}
+
+.timeslot-datetime {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.timeslot-date {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.5rem;
+}
+
+.timeslot-time {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--accent-blue);
+}
+
+.timeslot-signup-btn {
+    width: 100%;
+    padding: 0.75rem;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.timeslot-signup-btn:not(:disabled) {
+    background: linear-gradient(135deg, var(--accent-blue), #0891b2);
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+.timeslot-signup-btn:not(:disabled):hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 12px rgba(69, 202, 255, 0.3);
+}
+
+.timeslot-signup-btn:disabled {
+    background: var(--dark-card);
+    color: var(--text-muted);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+/* Valentine's Event Specific Styling */
+.special-event-card[data-event-id="103"] .timeslot-card {
+    background: rgba(255, 107, 138, 0.05);
+    border-color: rgba(255, 107, 138, 0.3);
+}
+
+.special-event-card[data-event-id="103"] .timeslot-card:hover {
+    border-color: rgba(255, 107, 138, 0.6);
+    box-shadow: 0 8px 24px rgba(255, 107, 138, 0.2);
+}
+
+.special-event-card[data-event-id="103"] .timeslot-time {
+    color: #ff6b8a;
+}
+
+.special-event-card[data-event-id="103"] .timeslot-signup-btn:not(:disabled) {
+    background: linear-gradient(135deg, #ff6b8a, #ee5a6f);
+}
+

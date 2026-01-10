@@ -763,19 +763,65 @@
                 // Single event: standard flow
                 // Hide stage switcher
                 document.getElementById('stageSwitcher').style.display = 'none';
-                
-                // Populate standard CTA
+
+                // Populate CTA based on event type
                 const ctaBox = document.getElementById('ctaBox');
                 const backLink = isSpecialEvent ? 'special-events.html' : 'events.html';
                 const backText = isSpecialEvent ? 'Back to Special Events' : 'Back to Events';
-                ctaBox.innerHTML = `
-                    <h2>Ready to Race?</h2>
-                    <p>Schedule this event on TrainingPeaks Virtual and complete it to earn Career Points.</p>
-                    <div class="cta-buttons">
-                        <button class="btn btn-primary btn-large" id="scheduleButton">Schedule Event</button>
-                        <button class="btn btn-secondary btn-large" onclick="location.href='${backLink}'">${backText}</button>
-                    </div>
-                `;
+
+                // Check if event has multiple timeslots
+                if (event.hasMultipleTimeslots && event.timeslots && event.timeslots.length > 0) {
+                    // Multi-timeslot event (e.g., Valentine's Invitational)
+                    const timeslotsByDay = {};
+                    event.timeslots.forEach(slot => {
+                        if (!timeslotsByDay[slot.day]) {
+                            timeslotsByDay[slot.day] = [];
+                        }
+                        timeslotsByDay[slot.day].push(slot);
+                    });
+
+                    ctaBox.innerHTML = `
+                        <h2>Choose Your Race Time</h2>
+                        <p>Select a timeslot to sign up for this pre-scheduled event. Each timeslot features automatic pen assignments for competitive racing.</p>
+                        <div class="timeslot-grid">
+                            ${Object.entries(timeslotsByDay).map(([day, slots]) => `
+                                <div class="timeslot-day-section">
+                                    <h3 class="timeslot-day-header">${day}</h3>
+                                    <div class="timeslot-cards">
+                                        ${slots.map(slot => `
+                                            <div class="timeslot-card">
+                                                <div class="timeslot-datetime">
+                                                    <div class="timeslot-date">${slot.date}</div>
+                                                    <div class="timeslot-time">${slot.time}</div>
+                                                </div>
+                                                <button
+                                                    class="btn btn-primary timeslot-signup-btn"
+                                                    ${slot.signupUrl ? '' : 'disabled'}
+                                                    onclick="${slot.signupUrl ? `window.open('${slot.signupUrl}', '_blank')` : 'alert(\'Coming Soon\')'}"
+                                                >
+                                                    ${slot.signupUrl ? 'Sign Up' : 'Coming Soon'}
+                                                </button>
+                                            </div>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <div class="cta-buttons" style="margin-top: 2rem;">
+                            <button class="btn btn-secondary btn-large" onclick="location.href='${backLink}'">${backText}</button>
+                        </div>
+                    `;
+                } else {
+                    // Standard single-timeslot event
+                    ctaBox.innerHTML = `
+                        <h2>Ready to Race?</h2>
+                        <p>Schedule this event on TrainingPeaks Virtual and complete it to earn Career Points.</p>
+                        <div class="cta-buttons">
+                            <button class="btn btn-primary btn-large" id="scheduleButton">Schedule Event</button>
+                            <button class="btn btn-secondary btn-large" onclick="location.href='${backLink}'">${backText}</button>
+                        </div>
+                    `;
+                }
                 
                 // Generate elevation profile
                 const laps = parseInt(event.format.match(/(\d+)\s*lap/i)?.[1] || 1);

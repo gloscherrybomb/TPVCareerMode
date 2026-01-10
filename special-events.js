@@ -40,6 +40,20 @@ const SPECIAL_EVENTS = [
         type: 'Criterium',
         unlockMethod: 'store', // 'store', 'achievement', 'seasonal'
         cost: 800
+    },
+    {
+        id: 103,
+        unlockId: null,
+        unlockField: null,
+        name: 'Valentine\'s Invitational',
+        icon: '💝',
+        description: 'An exclusive bimonthly event where passion for racing meets the spirit of February. Choose from multiple pre-scheduled timeslots across two days.',
+        reward: '+80 Career Points',
+        bonusCC: 'TBC',
+        type: 'Road Race',
+        unlockMethod: 'admin-only',  // Only visible to admins in Coming Soon
+        cost: 0,
+        hasMultipleTimeslots: true
     }
 ];
 
@@ -83,24 +97,78 @@ async function loadUserData(uid) {
 
 // Render special events based on unlock status
 function renderSpecialEvents() {
-    // Find the container for available events
+    // Find the containers
     const availableSection = document.getElementById('availableEventsSection');
+    const comingSoonSection = document.querySelector('.coming-soon-placeholder');
     if (!availableSection) return;
 
-    // Clear and rebuild the available events section
+    // Clear and rebuild sections
     availableSection.innerHTML = '';
+
+    // Check if user is admin
+    const isAdmin = currentUserData?.isAdmin === true;
+
+    // Track events for different sections
+    let comingSoonEvents = [];
+    let completedEvents = [];
 
     SPECIAL_EVENTS.forEach(event => {
         // Free events are always available, others check the unlock field
         const isFreeEvent = event.unlockMethod === 'free';
+        const isAdminOnly = event.unlockMethod === 'admin-only';
         const isUnlocked = isFreeEvent || (currentUserData && currentUserData[event.unlockField]);
 
-        // Only show events that are available (free or purchased)
-        if (isUnlocked) {
+        // Check if user has completed this event
+        const hasCompleted = currentUserData && currentUserData[`event${event.id}Results`];
+
+        if (isAdminOnly && isAdmin) {
+            // Admin-only events shown in Coming Soon for admins
+            comingSoonEvents.push(event);
+        } else if (hasCompleted) {
+            // Completed events go to Completed section
+            completedEvents.push(event);
+        } else if (isUnlocked) {
+            // Regular unlocked events shown in Available Now
             const card = createEventCard(event, isFreeEvent);
             availableSection.appendChild(card);
         }
     });
+
+    // Render Coming Soon section
+    if (comingSoonSection) {
+        if (comingSoonEvents.length > 0) {
+            // Replace placeholder with admin preview events
+            const comingSoonGrid = document.createElement('div');
+            comingSoonGrid.className = 'special-events-grid';
+            comingSoonEvents.forEach(event => {
+                const card = createComingSoonCard(event, true); // true = admin preview
+                comingSoonGrid.appendChild(card);
+            });
+            comingSoonSection.innerHTML = '';
+            comingSoonSection.appendChild(comingSoonGrid);
+        } else {
+            // Show default placeholder
+            comingSoonSection.innerHTML = '<p>More special events coming soon!</p>';
+        }
+    }
+
+    // Render Completed Events section
+    const completedSection = document.getElementById('completedEventsSection');
+    const completedGrid = document.getElementById('completedEventsGrid');
+    if (completedSection && completedGrid) {
+        if (completedEvents.length > 0) {
+            // Show completed events section
+            completedSection.style.display = 'block';
+            completedGrid.innerHTML = '';
+            completedEvents.forEach(event => {
+                const card = createCompletedEventCard(event);
+                completedGrid.appendChild(card);
+            });
+        } else {
+            // Hide section if no completed events
+            completedSection.style.display = 'none';
+        }
+    }
 }
 
 // Create an event card element for available events
@@ -146,6 +214,120 @@ function createEventCard(event, isFreeEvent = false) {
     `;
 
     // Add click handler to navigate to event detail
+    card.addEventListener('click', () => {
+        window.location.href = `event-detail.html?id=${event.id}`;
+    });
+    card.style.cursor = 'pointer';
+
+    return card;
+}
+
+// Create a Coming Soon event card (for admin preview)
+function createComingSoonCard(event, isAdminPreview = false) {
+    const card = document.createElement('div');
+    card.className = isAdminPreview ? 'special-event-card admin-preview' : 'special-event-card coming-soon';
+
+    const badgeText = isAdminPreview ? 'Admin Preview' : 'Coming Soon';
+    const iconHtml = window.TPVIcons ? window.TPVIcons.getEventIcon(event, 'xl') : event.icon;
+
+    // Get headerImage from specialEventData if available
+    const specialEventDataItem = window.specialEventData ? window.specialEventData[event.id] : null;
+    const headerImage = specialEventDataItem?.headerImage || null;
+
+    // Build header image or icon HTML
+    const headerHtml = headerImage ? `
+        <div class="event-header-image-container">
+            <img
+                src="${headerImage}"
+                alt="${event.name}"
+                class="event-header-image"
+                loading="lazy"
+                onerror="this.parentElement.style.display='none'; this.parentElement.nextElementSibling.style.display='block';"
+            >
+        </div>
+        <div class="event-icon" style="display: none;">${iconHtml}</div>
+    ` : `
+        <div class="event-icon">${iconHtml}</div>
+    `;
+
+    card.innerHTML = `
+        <div class="event-badge ${isAdminPreview ? 'admin-preview' : 'coming-soon'}">${badgeText}</div>
+        ${headerHtml}
+        <h3 class="event-title">${event.name}</h3>
+        <p class="event-description">${event.description}</p>
+        <div class="event-meta">
+            <span class="event-reward">🏆 ${event.reward}</span>
+            <span class="event-type">${event.type}</span>
+        </div>
+        ${isAdminPreview ? `
+            <div class="event-status">
+                <button class="btn btn-primary btn-view-event">View Event (Admin)</button>
+            </div>
+        ` : `
+            <div class="event-status">
+                <span class="coming-soon-text">Details coming soon</span>
+            </div>
+        `}
+    `;
+
+    // Add click handler only for admin preview
+    if (isAdminPreview) {
+        card.addEventListener('click', () => {
+            window.location.href = `event-detail.html?id=${event.id}`;
+        });
+        card.style.cursor = 'pointer';
+    }
+
+    return card;
+}
+
+// Create a Completed event card
+function createCompletedEventCard(event) {
+    const card = document.createElement('div');
+    card.className = 'special-event-card completed';
+
+    const iconHtml = window.TPVIcons ? window.TPVIcons.getEventIcon(event, 'xl') : event.icon;
+
+    // Get headerImage and results from specialEventData
+    const specialEventDataItem = window.specialEventData ? window.specialEventData[event.id] : null;
+    const headerImage = specialEventDataItem?.headerImage || null;
+    const userResults = currentUserData ? currentUserData[`event${event.id}Results`] : null;
+
+    // Build header image or icon HTML
+    const headerHtml = headerImage ? `
+        <div class="event-header-image-container">
+            <img
+                src="${headerImage}"
+                alt="${event.name}"
+                class="event-header-image"
+                loading="lazy"
+                onerror="this.parentElement.style.display='none'; this.parentElement.nextElementSibling.style.display='block';"
+            >
+        </div>
+        <div class="event-icon" style="display: none;">${iconHtml}</div>
+    ` : `
+        <div class="event-icon">${iconHtml}</div>
+    `;
+
+    // Format completion info
+    const position = userResults?.position || 'N/A';
+    const points = userResults?.points || 0;
+
+    card.innerHTML = `
+        <div class="event-badge completed">Completed</div>
+        ${headerHtml}
+        <h3 class="event-title">${event.name}</h3>
+        <p class="event-description">${event.description}</p>
+        <div class="event-meta">
+            <span class="event-reward">📊 Position: ${position}</span>
+            <span class="event-type">🏆 ${points} pts</span>
+        </div>
+        <div class="event-status">
+            <button class="btn btn-secondary btn-view-event">View Results</button>
+        </div>
+    `;
+
+    // Add click handler to view results
     card.addEventListener('click', () => {
         window.location.href = `event-detail.html?id=${event.id}`;
     });

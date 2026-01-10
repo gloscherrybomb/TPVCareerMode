@@ -1,0 +1,27 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Valentine Heart Icon for Event -->
+  <!-- Heart with cycling theme -->
+
+  <!-- Main heart shape -->
+  <path d="M32 54 C20 42 8 42 8 28 C8 18 16 14 22 14 C27 14 30 17 32 22 C34 17 37 14 42 14 C48 14 56 18 56 28 C56 42 44 42 32 54 Z"
+        fill="#FF1744"
+        stroke="#C41230"
+        stroke-width="2"/>
+
+  <!-- Inner highlight -->
+  <path d="M32 50 C22 40 12 40 12 28 C12 20 18 17 23 17 C27 17 29.5 19 32 23 C34.5 19 37 17 41 17 C46 17 52 20 52 28 C52 40 42 40 32 50 Z"
+        fill="#FF4081"
+        opacity="0.6"/>
+
+  <!-- Bike wheel element integrated into heart -->
+  <circle cx="24" cy="30" r="4" fill="none" stroke="#FFF" stroke-width="1.5" opacity="0.7"/>
+  <circle cx="40" cy="30" r="4" fill="none" stroke="#FFF" stroke-width="1.5" opacity="0.7"/>
+  <line x1="24" y1="30" x2="40" y2="30" stroke="#FFF" stroke-width="1" opacity="0.5"/>
+
+  <!-- Sparkle effects -->
+  <circle cx="18" cy="20" r="1.5" fill="#FFF"/>
+  <circle cx="46" cy="20" r="1.5" fill="#FFF"/>
+  <circle cx="32" cy="16" r="1" fill="#FFF"/>
+  <circle cx="26" cy="24" r="1" fill="#FFB3C6"/>
+  <circle cx="38" cy="24" r="1" fill="#FFB3C6"/>
+</svg>

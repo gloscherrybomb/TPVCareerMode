@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valentine's Invitational Award Icons Preview</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #1a1a1a;
+            color: white;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 40px;
+        }
+        h1 {
+            text-align: center;
+            color: #FF6B8A;
+        }
+        .icons-container {
+            display: flex;
+            gap: 60px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .icon-card {
+            background: #2a2a2a;
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            border: 2px solid rgba(255, 107, 138, 0.3);
+        }
+        .icon-display {
+            width: 128px;
+            height: 128px;
+            margin: 0 auto 20px;
+        }
+        .icon-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .icon-subtitle {
+            font-size: 14px;
+            color: #999;
+        }
+        .champion {
+            border-color: rgba(255, 215, 0, 0.5);
+        }
+        .podium {
+            border-color: rgba(255, 107, 138, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <h1>Valentine's Invitational Award Icons</h1>
+
+    <div class="icons-container">
+        <div class="icon-card champion">
+            <div class="icon-display">
+                <svg width="128" height="128" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M16 28C16 28 4 20 4 12C4 8 7 4 11 4C13.5 4 15.5 5.5 16 7C16.5 5.5 18.5 4 21 4C25 4 28 8 28 12C28 20 16 28 16 28Z" fill="url(#valentineChampionGrad)"/>
+                    <ellipse cx="10" cy="10" rx="2" ry="3" fill="white" opacity="0.4"/>
+                    <circle cx="21" cy="9" r="1.5" fill="#FFD700" opacity="0.8"/>
+                    <path d="M13 12 L16 19 L19 12" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.9"/>
+                    <defs>
+                        <linearGradient id="valentineChampionGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#FFD700"/>
+                            <stop offset="40%" stop-color="#FF6B6B"/>
+                            <stop offset="100%" stop-color="#FF1744"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </div>
+            <div class="icon-title">🏆 Champion Award</div>
+            <div class="icon-subtitle">1st Place Only</div>
+            <div class="icon-subtitle" style="margin-top: 10px; color: #FFD700;">Gold-to-Red Gradient</div>
+        </div>
+
+        <div class="icon-card podium">
+            <div class="icon-display">
+                <svg width="128" height="128" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M16 28C16 28 4 20 4 12C4 8 7 4 11 4C13.5 4 15.5 5.5 16 7C16.5 5.5 18.5 4 21 4C25 4 28 8 28 12C28 20 16 28 16 28Z" fill="url(#valentinePodiumGrad)"/>
+                    <ellipse cx="10" cy="10" rx="2" ry="3" fill="white" opacity="0.3"/>
+                    <circle cx="21" cy="9" r="1.5" fill="#FFC0CB" opacity="0.6"/>
+                    <path d="M13 12 L16 19 L19 12" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.85"/>
+                    <defs>
+                        <linearGradient id="valentinePodiumGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stop-color="#FF6B8A"/>
+                            <stop offset="50%" stop-color="#E91E63"/>
+                            <stop offset="100%" stop-color="#C2185B"/>
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </div>
+            <div class="icon-title">🥈 Podium Award</div>
+            <div class="icon-subtitle">2nd & 3rd Place</div>
+            <div class="icon-subtitle" style="margin-top: 10px; color: #FF6B8A;">Pink-to-Rose Gradient</div>
+        </div>
+    </div>
+
+    <div style="text-align: center; margin-top: 20px; color: #999; max-width: 600px;">
+        <p><strong>Key Features:</strong></p>
+        <ul style="text-align: left; line-height: 1.8;">
+            <li>Both icons feature a distinctive white <strong>'V'</strong> in the center</li>
+            <li>Fluent design system heart shape (matches existing awards)</li>
+            <li>Champion: Gold sparkle accent in upper right</li>
+            <li>Podium: Softer pink accent for celebratory feel</li>
+            <li>Mutually exclusive awards (can't win both)</li>
+        </ul>
+    </div>
+</body>
+</html>

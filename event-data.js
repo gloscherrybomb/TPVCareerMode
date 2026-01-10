@@ -527,6 +527,78 @@ We recommend doing this event early on in your career to bag some extra Career P
             careerPoints: 40
         },
         scheduleUrl: "https://tpvirtualhub.com/clone?o=eyJzY2hlZHVsZUtleSI6NTMzMjEsImFjY2Vzc0NvZGUiOjE4NjA2MCwicmVxdWlyZUFjY2Vzc0NvZGUiOnRydWUsInRpdGxlVGVtcGxhdGUiOiJUaGUgTGV2ZWxsZXIifQ=="
+    },
+    103: {
+        id: 103,
+        number: "SE03",
+        name: "Valentine's Invitational",
+        subtitle: "Where hearts race faster than legs",
+        type: "Road Race",
+        level: "Special Event",
+        isSpecialEvent: true,
+        isFreeEvent: false,
+        requiresAdminVisibility: true,  // Only visible to admins initially
+        hasMultipleTimeslots: true,  // Shows multiple signup buttons instead of single schedule button
+        isPreScheduled: true,  // Timeslots are pre-scheduled, not user-scheduled
+        unlockId: null,
+        distance: "35 km",
+        climbing: "350 m",
+        course: "Valentine's Circuit",
+        format: "Rolling road race",
+        maxPoints: 80,  // TBC
+        icon: "💝",
+        iconId: "eventValentine",
+        headerImage: "event-images/special/event_103.jpg",
+        description: `The Valentine's Invitational is an exclusive bimonthly special event where passion for racing meets the spirit of February 14th. This isn't about flowers and chocolates—it's about proving your dedication when others are celebrating romance.
+
+Over two days, riders will compete in multiple pre-scheduled timeslots across rolling terrain that tests both climbing ability and flat speed. Each race features automatic pen assignments to ensure competitive, fair racing against riders of similar ability.
+
+This is more than a race—it's a statement. While the world celebrates hearts and flowers, you're choosing pain and glory. Results contribute to your career legacy, with exclusive Valentine-themed awards for those who stand on the podium.`,
+        strategy: "The rolling 35km course with 350m of climbing demands a balanced approach. Conserve energy on the early climbs and position yourself well for the flat sections. The final 5km will be decisive—stay near the front and be ready to respond to attacks. Multiple timeslots mean fresh legs every race, so don't hold back.",
+        routeDetails: {
+            start: "Valentine's Circuit",
+            keyPoint: "Rolling terrain with punchy climbs",
+            difficulty: "Tests climbing and flat speed",
+            finish: "Valentine's Circuit"
+        },
+        rewards: {
+            careerPoints: 80  // TBC - contributes to career only, not season
+        },
+        timeslots: [
+            {
+                id: 1,
+                day: "Day 1",
+                date: "Feb 15, 2026",  // TBC - placeholder
+                time: "10:00 AM",  // TBC - placeholder, uses user's system timezone
+                signupUrl: null  // TBC - will be TPV signup URL
+            },
+            {
+                id: 2,
+                day: "Day 1",
+                date: "Feb 15, 2026",  // TBC - placeholder
+                time: "2:00 PM",  // TBC - placeholder
+                signupUrl: null  // TBC - will be TPV signup URL
+            },
+            {
+                id: 3,
+                day: "Day 2",
+                date: "Feb 16, 2026",  // TBC - placeholder
+                time: "10:00 AM",  // TBC - placeholder
+                signupUrl: null  // TBC - will be TPV signup URL
+            },
+            {
+                id: 4,
+                day: "Day 2",
+                date: "Feb 16, 2026",  // TBC - placeholder
+                time: "2:00 PM",  // TBC - placeholder
+                signupUrl: null  // TBC - will be TPV signup URL
+            }
+        ],
+        scheduleUrl: null,  // Not used for multi-timeslot events
+        recurringEvent: {
+            frequency: "bimonthly",  // Every 2 months
+            nextOccurrence: "2026-02-15"  // TBC
+        }
     }
 };
 

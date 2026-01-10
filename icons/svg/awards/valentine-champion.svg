@@ -1,0 +1,19 @@
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Valentine Champion - Gold heart with romantic accents and 'V' -->
+    <path d="M16 28C16 28 4 20 4 12C4 8 7 4 11 4C13.5 4 15.5 5.5 16 7C16.5 5.5 18.5 4 21 4C25 4 28 8 28 12C28 20 16 28 16 28Z" fill="url(#valentineChampionGrad)"/>
+    <!-- Gold shine for champion -->
+    <ellipse cx="10" cy="10" rx="2" ry="3" fill="white" opacity="0.4"/>
+    <!-- Winner sparkle -->
+    <circle cx="21" cy="9" r="1.5" fill="#FFD700" opacity="0.8"/>
+
+    <!-- 'V' letter in center -->
+    <path d="M13 12 L16 19 L19 12" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.9"/>
+
+    <defs>
+        <linearGradient id="valentineChampionGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#FFD700"/>
+            <stop offset="40%" stop-color="#FF6B6B"/>
+            <stop offset="100%" stop-color="#FF1744"/>
+        </linearGradient>
+    </defs>
+</svg>

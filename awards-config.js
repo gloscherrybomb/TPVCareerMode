@@ -271,6 +271,28 @@ const AWARD_DEFINITIONS = {
     calculationType: 'event'
   },
 
+  // Valentine's Invitational Awards (Event 103)
+  valentineChampion2026: {
+    id: 'valentineChampion2026',
+    title: '2026 Valentine\'s Invitational 1st Place',
+    icon: '💘',
+    iconId: 'valentine-champion',
+    description: 'Win the 2026 Valentine\'s Invitational',
+    calculationType: 'event',
+    eventSpecific: 103,
+    mutuallyExclusiveWith: ['valentinePodium2026']
+  },
+  valentinePodium2026: {
+    id: 'valentinePodium2026',
+    title: '2026 Valentine\'s Invitational Podium',
+    icon: '💝',
+    iconId: 'valentine-podium',
+    description: 'Finish 2nd or 3rd at the 2026 Valentine\'s Invitational',
+    calculationType: 'event',
+    eventSpecific: 103,
+    mutuallyExclusiveWith: ['valentineChampion2026']
+  },
+
   // Power-based awards (requires JSON results with power data)
   powerSurge: {
     id: 'powerSurge',

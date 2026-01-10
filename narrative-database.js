@@ -2807,6 +2807,98 @@ const NARRATIVE_DATABASE = {
       text: "The Leveller earned its name today. Whatever strengths you brought to the start line, your weaknesses were exposed just as clearly. The points you couldn't contest, the climbs where you lost ground, the moments when specialists pulled away and you couldn't follow—all of it adds up to a clear picture of where you need to improve. Painful, perhaps, but invaluable information for a developing rider.",
       triggers: { eventNumber: 102, performanceTier: ["back"] },
       weight: 0.7
+    },
+
+    // ===== VALENTINE'S INVITATIONAL (Event 103) =====
+    {
+      id: "valentine_intro_dedication",
+      text: "Valentine's Day. Some riders brought their partners to watch from the sidelines, hearts and flowers in hand. You brought your bike and a race number. Love is temporary—results are forever. Or so you tell yourself as you line up for the Valentine's Invitational, where dedication to cycling trumps dedication to romance.",
+      triggers: { eventNumber: 103, performanceTier: ["any"] },
+      weight: 0.9
+    },
+    {
+      id: "valentine_intro_cynical",
+      text: "The Valentine's Invitational. Named for the day, not for the sentiment. There's nothing romantic about pushing your body to its limit, nothing sweet about the burn in your legs as you fight for position on rolling hills. But there's something honest about it—pain doesn't lie, and neither do race results. Today, you race.",
+      triggers: { eventNumber: 103, performanceTier: ["any"] },
+      weight: 0.8
+    },
+    {
+      id: "valentine_couples_racing",
+      text: "A few couples are racing together today—partners in life, rivals on the road. You watch them warming up side by side and wonder what that must be like, sharing both the passion for cycling and the passion for each other. Today, though, romance ends at the start line. On the bike, there are no valentines, only competitors.",
+      triggers: { eventNumber: 103, performanceTier: ["any"] },
+      weight: 0.7
+    },
+    {
+      id: "valentine_february_challenge",
+      text: "February isn't the easiest month for outdoor racing. The weather can be unpredictable, the training has been tough through winter, and your body is still shaking off the off-season rust. But the Valentine's Invitational doesn't wait for perfect conditions. It demands you show up and race, regardless of the calendar or the elements. Love may be patient, but racing isn't.",
+      triggers: { eventNumber: 103, performanceTier: ["any"] },
+      weight: 0.7
+    },
+    {
+      id: "valentine_invitational_prestige",
+      text: "The Valentine's Invitational carries a certain prestige. It's not just another race on the calendar—it's a bimonthly special event that attracts riders who choose suffering over sentiment. Being here means you prioritized racing over chocolates and candlelit dinners. The field is full of dedicated cyclists who made the same choice. This is your kind of Valentine's Day.",
+      triggers: { eventNumber: 103, performanceTier: ["any"] },
+      weight: 0.8
+    },
+    {
+      id: "valentine_heartbreak_hill",
+      text: "They say love hurts, but so do these rolling hills. Each climb tests your resolve, each descent offers brief relief before the next uphill grind. The 350 meters of climbing spread across 35 kilometers means constant pressure on your legs and lungs. If your heart isn't racing from romance today, it's definitely racing from the effort. Either way, someone's getting their heart rate up.",
+      triggers: { eventNumber: 103, performanceTier: ["any"] },
+      weight: 0.75
+    },
+    {
+      id: "valentine_win_love_found",
+      text: "Who needs flowers when you have a first-place finish? The Valentine's Invitational win feels like finding love—unexpected, exhilarating, and worth all the effort it took to get here. You crossed the line ahead of everyone else on a day when most people were celebrating romance, and you chose to celebrate racing instead. Today, victory is your valentine.",
+      triggers: { eventNumber: 103, performanceTier: ["win"] },
+      weight: 0.95
+    },
+    {
+      id: "valentine_podium_bittersweet",
+      text: "Second or third place at the Valentine's Invitational—close to perfection, but not quite there. It's fitting, really. Like love, podium spots are bittersweet when you're not on top. But you're still here, still standing among the best, still proving that racing matters more than roses. The podium may not be first, but it's far better than flowers.",
+      triggers: { eventNumber: 103, performanceTier: ["podium"] },
+      weight: 0.9
+    },
+    {
+      id: "valentine_top10_respectable",
+      text: "A top-10 finish at the Valentine's Invitational is nothing to dismiss. You held your own against a strong field on rolling terrain, proved your dedication to the sport on a day when most people were focused elsewhere. Love might make the world go round, but hard work and racing brought you here. You'll take the result and the career points it brings.",
+      triggers: { eventNumber: 103, performanceTier: ["top10"] },
+      weight: 0.8
+    },
+    {
+      id: "valentine_midpack_honest_effort",
+      text: "Midpack at the Valentine's Invitational. Not the fairy tale ending you hoped for, but racing rarely delivers storybook finishes. You showed up, you raced hard, you gave what you had on the day. That's more honest than any greeting card sentiment. The rolling hills took their toll, but you finished, earned your career points, and proved your dedication. Sometimes that's enough.",
+      triggers: { eventNumber: 103, performanceTier: ["midpack"] },
+      weight: 0.75
+    },
+    {
+      id: "valentine_back_heartbreak",
+      text: "Finishing at the back of the Valentine's Invitational stings more than any romantic heartbreak. The rolling course exposed your weaknesses, the strong field left you behind, and the result is a reminder that love isn't the only thing that can hurt. But you finished. You showed up on Valentine's Day to race instead of celebrate, and that dedication counts for something, even when the result doesn't reflect it.",
+      triggers: { eventNumber: 103, performanceTier: ["back"] },
+      weight: 0.8
+    },
+    {
+      id: "valentine_bimonthly_tradition",
+      text: "The Valentine's Invitational happens every two months, creating a rhythm to the special event calendar. This recurring opportunity means you'll get another chance, another race, another shot at proving yourself. Like any good relationship, consistency matters. Keep showing up, keep racing, keep chasing those Valentine podiums. The next one is just weeks away.",
+      triggers: { eventNumber: 103, performanceTier: ["any"] },
+      weight: 0.6
+    },
+    {
+      id: "valentine_career_points_legacy",
+      text: "The Valentine's Invitational contributes to career points, not season standings. That makes every result part of your permanent legacy, not just this season's tally. Racing for career points feels more meaningful somehow—like you're building something that lasts beyond a single competitive year. Today's effort becomes part of your lifelong palmares. That's a valentine that doesn't expire.",
+      triggers: { eventNumber: 103, performanceTier: ["any"] },
+      weight: 0.7
+    },
+    {
+      id: "valentine_multiple_chances",
+      text: "With multiple timeslots spread across two days, the Valentine's Invitational offers options. Different race times, different competitors, different pens—all part of the same event. You chose your timeslot, showed up, and raced. Some riders are doing this tomorrow, some already finished yesterday. The shared experience connects you all, even if you never raced the same pen. Community through competition, the cycling way.",
+      triggers: { eventNumber: 103, performanceTier: ["any"] },
+      weight: 0.65
+    },
+    {
+      id: "valentine_anti_romance",
+      text: "Nothing says anti-romance like voluntarily suffering through a rolling road race on Valentine's Day. While restaurants overflow with couples and flower shops sell out, you're here, pushing watts, climbing hills, and fighting for position. Some people find this dedication strange. You find it essential. Racing is the relationship that never lets you down—it's always honest about where you stand.",
+      triggers: { eventNumber: 103, performanceTier: ["any"] },
+      weight: 0.7
     }
   ]
 };
