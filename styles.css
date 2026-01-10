@@ -1419,6 +1419,9 @@ body {
     .hero-media-container {
         transform: none !important;
         overflow: visible !important;
+        /* Give parent container proper dimensions using aspect-ratio */
+        width: 100%;
+        aspect-ratio: 16 / 9;
     }
 
     .hero-media-container:hover {
@@ -1427,10 +1430,11 @@ body {
 
     /* Fix for YouTube video on mobile */
     .video-wrapper {
-        position: relative;
+        position: absolute;
+        top: 0;
+        left: 0;
         width: 100%;
-        padding-bottom: 56.25% !important; /* Force 16:9 aspect ratio */
-        height: 0;
+        height: 100%;
         /* Use clip-path instead of overflow:hidden to avoid iframe rendering bug */
         -webkit-clip-path: inset(0 round 20px);
         clip-path: inset(0 round 20px);
@@ -1449,6 +1453,11 @@ body {
     }
 
     .video-thumbnail {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
         border-radius: 20px;
         overflow: hidden;
     }
