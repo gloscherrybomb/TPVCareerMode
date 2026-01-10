@@ -5,3 +5,26 @@ This file contains all bot profile requests submitted by users.
 Each request is automatically appended by the GitHub Actions workflow when users submit requests via the website.
 
 ================================================================================
+================================================================================
+Request submitted: 2026-01-10 17:28:51 UTC
+Firestore Document ID: Bot4916_1768066131611
+Submitted by User UID: I63Hb7E0kKgLfQ39ZG6ZjaxTYpC3
+Bot UID: Bot4916
+Bot Name: Kamilla Petersen
+Bot Team: Fiber Shot
+Bot ARR: 857
+Bot Country: DEN
+Interesting Fact: None provided
+================================================================================
+
+================================================================================
+Request submitted: 2026-01-10 17:27:26 UTC
+Firestore Document ID: Bot8583_1768066046640
+Submitted by User UID: I63Hb7E0kKgLfQ39ZG6ZjaxTYpC3
+Bot UID: Bot8583
+Bot Name: Sheena Harrigan
+Bot Team: Independent
+Bot ARR: 816
+Bot Country: AIA
+Interesting Fact: None provided
+================================================================================
