@@ -1431,8 +1431,10 @@ body {
         width: 100%;
         padding-bottom: 56.25% !important; /* Force 16:9 aspect ratio */
         height: 0;
-        overflow: hidden;
-        border-radius: 20px; /* Apply border-radius here instead of parent */
+        /* Use clip-path instead of overflow:hidden to avoid iframe rendering bug */
+        -webkit-clip-path: inset(0 round 20px);
+        clip-path: inset(0 round 20px);
+        z-index: 1;
     }
 
     .video-wrapper iframe,
