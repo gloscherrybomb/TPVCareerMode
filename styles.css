@@ -1417,6 +1417,7 @@ body {
 
     /* CRITICAL: Remove 3D transform and overflow:hidden on mobile to fix YouTube video rendering */
     .hero-media-container {
+        position: relative;
         transform: none !important;
         overflow: visible !important;
         /* Give parent container proper dimensions using aspect-ratio */
@@ -1460,6 +1461,7 @@ body {
         height: 100%;
         border-radius: 20px;
         overflow: hidden;
+        z-index: 2;
     }
 
     .nav-links {
