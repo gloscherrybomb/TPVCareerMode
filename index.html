@@ -438,6 +438,32 @@
             } else {
                 player.playVideo();
             }
+
+            // DIAGNOSTIC: Log iframe status after a delay
+            setTimeout(() => {
+                const wrapper = document.getElementById('videoWrapper');
+                const ytPlayer = document.getElementById('youtubePlayer');
+                const iframe = ytPlayer?.querySelector('iframe');
+
+                console.log('=== VIDEO DIAGNOSTIC ===');
+                console.log('Wrapper display:', wrapper?.style.display);
+                console.log('Wrapper computed:', window.getComputedStyle(wrapper));
+                console.log('Wrapper dimensions:', {
+                    width: wrapper?.offsetWidth,
+                    height: wrapper?.offsetHeight,
+                    clientHeight: wrapper?.clientHeight
+                });
+                console.log('YT Player div:', ytPlayer);
+                console.log('Iframe element:', iframe);
+                if (iframe) {
+                    console.log('Iframe dimensions:', {
+                        width: iframe.offsetWidth,
+                        height: iframe.offsetHeight,
+                        computedStyle: window.getComputedStyle(iframe)
+                    });
+                }
+                console.log('=== END DIAGNOSTIC ===');
+            }, 2000);
         }
 
         function showThumbnail() {
