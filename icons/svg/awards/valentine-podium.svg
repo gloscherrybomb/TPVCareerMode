@@ -1,18 +1,15 @@
-<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Placeholder Valentine Podium Award Icon -->
-  <!-- Pink/silver medal with heart motif -->
-
-  <!-- Medal circle -->
-  <circle cx="32" cy="36" r="16" fill="#E91E63" stroke="#C2185B" stroke-width="2"/>
-  <circle cx="32" cy="36" r="13" fill="#F06292" stroke="#E91E63" stroke-width="1"/>
-
-  <!-- Ribbon -->
-  <path d="M28 20 L28 28 L32 32 L36 28 L36 20 L32 24 Z" fill="#FF4081" stroke="#E91E63" stroke-width="1"/>
-
-  <!-- Heart in center -->
-  <path d="M32 44 C29 41 26 41 26 38 C26 36 27.5 35 29 35 C30.5 35 31 36 32 37.5 C33 36 33.5 35 35 35 C36.5 35 38 36 38 38 C38 41 35 41 32 44 Z" fill="#FFF" stroke="#F8BBD0" stroke-width="0.5"/>
-
-  <!-- Decorative stars -->
-  <path d="M20 32 L21 34 L23 34 L21.5 35.5 L22 37.5 L20 36 L18 37.5 L18.5 35.5 L17 34 L19 34 Z" fill="#FFD700" opacity="0.8"/>
-  <path d="M44 32 L45 34 L47 34 L45.5 35.5 L46 37.5 L44 36 L42 37.5 L42.5 35.5 L41 34 L43 34 Z" fill="#FFD700" opacity="0.8"/>
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <!-- Valentine Podium - Pink/red heart for 2nd/3rd place -->
+    <path d="M16 28C16 28 4 20 4 12C4 8 7 4 11 4C13.5 4 15.5 5.5 16 7C16.5 5.5 18.5 4 21 4C25 4 28 8 28 12C28 20 16 28 16 28Z" fill="url(#valentinePodiumGrad)"/>
+    <!-- Shine -->
+    <ellipse cx="10" cy="10" rx="2" ry="3" fill="white" opacity="0.3"/>
+    <!-- Podium accent -->
+    <circle cx="21" cy="9" r="1.5" fill="#FFC0CB" opacity="0.6"/>
+    <defs>
+        <linearGradient id="valentinePodiumGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#FF6B8A"/>
+            <stop offset="50%" stop-color="#E91E63"/>
+            <stop offset="100%" stop-color="#C2185B"/>
+        </linearGradient>
+    </defs>
 </svg>
