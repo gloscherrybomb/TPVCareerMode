@@ -57,15 +57,6 @@
         </div>
     </div>
 
-    <!-- DIAGNOSTIC PANEL (remove after debugging) -->
-    <div id="diagnosticPanel" style="position: fixed; bottom: 10px; left: 10px; right: 10px; background: rgba(0,0,0,0.9); color: #0f0; padding: 10px; font-family: monospace; font-size: 11px; max-height: 300px; overflow-y: auto; z-index: 9999; display: block; border: 2px solid #0f0;">
-        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
-            <strong>🔍 Page Load Diagnostics</strong>
-            <button onclick="document.getElementById('diagnosticPanel').style.display='none'" style="background: #f00; color: #fff; border: none; padding: 2px 8px; cursor: pointer;">✕</button>
-        </div>
-        <div id="diagnosticContent">Loading...</div>
-    </div>
-
     <div class="hero-section">
         <div class="hero-gradient"></div>
         <div class="hero-content">
@@ -447,59 +438,6 @@
             } else {
                 player.playVideo();
             }
-
-            // DIAGNOSTIC: Show iframe status in visible panel
-            setTimeout(() => {
-                const wrapper = document.getElementById('videoWrapper');
-                const ytPlayer = document.getElementById('youtubePlayer');
-                const iframe = ytPlayer?.querySelector('iframe');
-                const heroMediaContainer = document.querySelector('.hero-media-container');
-                const panel = document.getElementById('diagnosticPanel');
-                const content = document.getElementById('diagnosticContent');
-
-                if (!panel || !content) return;
-
-                const wrapperStyles = window.getComputedStyle(wrapper);
-                const iframeStyles = iframe ? window.getComputedStyle(iframe) : null;
-                const heroStyles = heroMediaContainer ? window.getComputedStyle(heroMediaContainer) : null;
-
-                let html = '<div style="line-height: 1.4;">';
-                html += '<strong>Hero Media Container:</strong><br>';
-                html += `• dimensions: ${heroMediaContainer?.offsetWidth}x${heroMediaContainer?.offsetHeight}px<br>`;
-                html += `• display: ${heroStyles?.display}<br>`;
-                html += '<br><strong>Wrapper:</strong><br>';
-                html += `• display: ${wrapper?.style.display}<br>`;
-                html += `• dimensions: ${wrapper?.offsetWidth}x${wrapper?.offsetHeight}px<br>`;
-                html += `• computed width: ${wrapperStyles.width}<br>`;
-                html += `• overflow: ${wrapperStyles.overflow}<br>`;
-                html += `• clip-path: ${wrapperStyles.clipPath}<br>`;
-                html += `• border-radius: ${wrapperStyles.borderRadius}<br>`;
-                html += '<br><strong>YT Player div:</strong><br>';
-                html += `• exists: ${ytPlayer ? 'YES' : 'NO'}<br>`;
-                if (ytPlayer) {
-                    const ytStyles = window.getComputedStyle(ytPlayer);
-                    html += `• dimensions: ${ytPlayer.offsetWidth}x${ytPlayer.offsetHeight}px<br>`;
-                    html += `• display: ${ytStyles.display}<br>`;
-                }
-                html += '<br><strong>Iframe:</strong><br>';
-                html += `• exists: ${iframe ? 'YES' : 'NO'}<br>`;
-                if (iframe) {
-                    html += `• dimensions: ${iframe.offsetWidth}x${iframe.offsetHeight}px<br>`;
-                    html += `• position: ${iframeStyles.position}<br>`;
-                    html += `• top/left: ${iframeStyles.top} / ${iframeStyles.left}<br>`;
-                    html += `• width/height: ${iframeStyles.width} / ${iframeStyles.height}<br>`;
-                    html += `• visibility: ${iframeStyles.visibility}<br>`;
-                    html += `• opacity: ${iframeStyles.opacity}<br>`;
-                    html += `• z-index: ${iframeStyles.zIndex}<br>`;
-                }
-                html += '</div>';
-
-                content.innerHTML = html;
-                panel.style.display = 'block';
-
-                // Also log to console for remote debugging
-                console.log('=== VIDEO DIAGNOSTIC ===', {wrapper, ytPlayer, iframe, heroMediaContainer, wrapperStyles, iframeStyles, heroStyles});
-            }, 2000);
         }
 
         function showThumbnail() {
@@ -548,24 +486,22 @@
                 });
             }
 
-            // DIAGNOSTIC: Show initial state on page load
+            // Apply mobile video fixes via JavaScript
             setTimeout(() => {
-                const heroImage = document.querySelector('.hero-image');
-                const heroMediaContainer = document.querySelector('.hero-media-container');
-                const thumbnail = document.getElementById('videoThumbnail');
-                const wrapper = document.getElementById('videoWrapper');
-                const image = document.querySelector('.career-graphic');
-                const playBtn = document.getElementById('playVideoBtn');
-                const content = document.getElementById('diagnosticContent');
-
-                // FORCE FIX: Apply styles directly via JavaScript as fallback
                 if (window.innerWidth <= 1024) {
-                    // Fix hero-image first (parent of hero-media-container)
+                    const heroImage = document.querySelector('.hero-image');
+                    const heroMediaContainer = document.querySelector('.hero-media-container');
+                    const thumbnail = document.getElementById('videoThumbnail');
+                    const wrapper = document.getElementById('videoWrapper');
+                    const image = document.querySelector('.career-graphic');
+
+                    // Fix hero-image parent width
                     if (heroImage) {
                         heroImage.style.width = '100%';
                         heroImage.style.maxWidth = '100%';
                     }
 
+                    // Fix hero-media-container dimensions
                     if (heroMediaContainer) {
                         heroMediaContainer.style.position = 'relative';
                         heroMediaContainer.style.width = '100%';
@@ -575,6 +511,8 @@
                         heroMediaContainer.style.transform = 'none';
                         heroMediaContainer.style.borderRadius = '0';
                     }
+
+                    // Fix thumbnail positioning
                     if (thumbnail) {
                         thumbnail.style.position = 'absolute';
                         thumbnail.style.top = '0';
@@ -583,11 +521,15 @@
                         thumbnail.style.height = '100%';
                         thumbnail.style.zIndex = '2';
                     }
+
+                    // Fix thumbnail image sizing
                     if (image) {
                         image.style.width = '100%';
                         image.style.height = '100%';
                         image.style.objectFit = 'cover';
                     }
+
+                    // Fix video wrapper positioning
                     if (wrapper) {
                         wrapper.style.position = 'absolute';
                         wrapper.style.top = '0';
@@ -597,61 +539,7 @@
                         wrapper.style.zIndex = '1';
                     }
                 }
-
-                if (!content) return;
-
-                const heroImageStyles = heroImage ? window.getComputedStyle(heroImage) : null;
-                const heroStyles = heroMediaContainer ? window.getComputedStyle(heroMediaContainer) : null;
-                const thumbStyles = thumbnail ? window.getComputedStyle(thumbnail) : null;
-                const imageStyles = image ? window.getComputedStyle(image) : null;
-
-                let html = '<div style="line-height: 1.4; font-size: 10px;">';
-                html += '<strong>INITIAL PAGE LOAD:</strong><br>';
-                html += `<br><strong>Viewport:</strong><br>`;
-                html += `• width: ${window.innerWidth}px<br>`;
-                html += `• height: ${window.innerHeight}px<br>`;
-                html += `• devicePixelRatio: ${window.devicePixelRatio}<br>`;
-                html += '<br><strong>Hero Image (parent):</strong><br>';
-                html += `• exists: ${heroImage ? 'YES' : 'NO'}<br>`;
-                if (heroImage) {
-                    html += `• dimensions: ${heroImage.offsetWidth}x${heroImage.offsetHeight}px<br>`;
-                    html += `• width: ${heroImageStyles.width}<br>`;
-                    html += `• max-width: ${heroImageStyles.maxWidth}<br>`;
-                }
-                html += '<br><strong>Hero Media Container:</strong><br>';
-                html += `• exists: ${heroMediaContainer ? 'YES' : 'NO'}<br>`;
-                if (heroMediaContainer) {
-                    html += `• dimensions: ${heroMediaContainer.offsetWidth}x${heroMediaContainer.offsetHeight}px<br>`;
-                    html += `• position: ${heroStyles.position}<br>`;
-                    html += `• display: ${heroStyles.display}<br>`;
-                    html += `• padding-bottom: ${heroStyles.paddingBottom}<br>`;
-                    html += `• aspect-ratio: ${heroStyles.aspectRatio}<br>`;
-                }
-                html += '<br><strong>Thumbnail:</strong><br>';
-                html += `• exists: ${thumbnail ? 'YES' : 'NO'}<br>`;
-                if (thumbnail) {
-                    html += `• dimensions: ${thumbnail.offsetWidth}x${thumbnail.offsetHeight}px<br>`;
-                    html += `• position: ${thumbStyles.position}<br>`;
-                    html += `• display: ${thumbStyles.display}<br>`;
-                    html += `• z-index: ${thumbStyles.zIndex}<br>`;
-                    html += `• visibility: ${thumbStyles.visibility}<br>`;
-                }
-                html += '<br><strong>Thumbnail Image:</strong><br>';
-                html += `• exists: ${image ? 'YES' : 'NO'}<br>`;
-                if (image) {
-                    html += `• dimensions: ${image.offsetWidth}x${image.offsetHeight}px<br>`;
-                    html += `• naturalSize: ${image.naturalWidth}x${image.naturalHeight}px<br>`;
-                    html += `• loaded: ${image.complete ? 'YES' : 'NO'}<br>`;
-                    html += `• src: ${image.src}<br>`;
-                }
-                html += '<br><strong>Play Button:</strong><br>';
-                html += `• exists: ${playBtn ? 'YES' : 'NO'}<br>`;
-                html += '<br><strong>Wrapper (should be hidden):</strong><br>';
-                html += `• display: ${wrapper?.style.display || 'not set'}<br>`;
-                html += '</div>';
-
-                content.innerHTML = html;
-            }, 500);
+            }, 100);
         });
     </script>
 </body>
