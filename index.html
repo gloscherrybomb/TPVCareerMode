@@ -57,6 +57,15 @@
         </div>
     </div>
 
+    <!-- DIAGNOSTIC PANEL (remove after debugging) -->
+    <div id="diagnosticPanel" style="position: fixed; bottom: 10px; left: 10px; right: 10px; background: rgba(0,0,0,0.9); color: #0f0; padding: 10px; font-family: monospace; font-size: 11px; max-height: 200px; overflow-y: auto; z-index: 9999; display: none; border: 2px solid #0f0;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+            <strong>🔍 Video Diagnostics</strong>
+            <button onclick="document.getElementById('diagnosticPanel').style.display='none'" style="background: #f00; color: #fff; border: none; padding: 2px 8px; cursor: pointer;">✕</button>
+        </div>
+        <div id="diagnosticContent"></div>
+    </div>
+
     <div class="hero-section">
         <div class="hero-gradient"></div>
         <div class="hero-content">
@@ -438,6 +447,48 @@
             } else {
                 player.playVideo();
             }
+
+            // DIAGNOSTIC: Show iframe status in visible panel
+            setTimeout(() => {
+                const wrapper = document.getElementById('videoWrapper');
+                const ytPlayer = document.getElementById('youtubePlayer');
+                const iframe = ytPlayer?.querySelector('iframe');
+                const panel = document.getElementById('diagnosticPanel');
+                const content = document.getElementById('diagnosticContent');
+
+                if (!panel || !content) return;
+
+                const wrapperStyles = window.getComputedStyle(wrapper);
+                const iframeStyles = iframe ? window.getComputedStyle(iframe) : null;
+
+                let html = '<div style="line-height: 1.4;">';
+                html += '<strong>Wrapper:</strong><br>';
+                html += `• display: ${wrapper?.style.display}<br>`;
+                html += `• dimensions: ${wrapper?.offsetWidth}x${wrapper?.offsetHeight}px<br>`;
+                html += `• overflow: ${wrapperStyles.overflow}<br>`;
+                html += `• clip-path: ${wrapperStyles.clipPath}<br>`;
+                html += `• border-radius: ${wrapperStyles.borderRadius}<br>`;
+                html += '<br><strong>YT Player div:</strong><br>';
+                html += `• exists: ${ytPlayer ? 'YES' : 'NO'}<br>`;
+                html += '<br><strong>Iframe:</strong><br>';
+                html += `• exists: ${iframe ? 'YES' : 'NO'}<br>`;
+                if (iframe) {
+                    html += `• dimensions: ${iframe.offsetWidth}x${iframe.offsetHeight}px<br>`;
+                    html += `• position: ${iframeStyles.position}<br>`;
+                    html += `• top/left: ${iframeStyles.top} / ${iframeStyles.left}<br>`;
+                    html += `• width/height: ${iframeStyles.width} / ${iframeStyles.height}<br>`;
+                    html += `• visibility: ${iframeStyles.visibility}<br>`;
+                    html += `• opacity: ${iframeStyles.opacity}<br>`;
+                    html += `• z-index: ${iframeStyles.zIndex}<br>`;
+                }
+                html += '</div>';
+
+                content.innerHTML = html;
+                panel.style.display = 'block';
+
+                // Also log to console for remote debugging
+                console.log('=== VIDEO DIAGNOSTIC ===', {wrapper, ytPlayer, iframe, wrapperStyles, iframeStyles});
+            }, 2000);
         }
 
         function showThumbnail() {
