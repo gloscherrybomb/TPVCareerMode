@@ -1,84 +1,15 @@
 <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-<!-- Valentine Podium - Fluent 3D Pink/Rose Heart with 'V' -->
-
-<!-- Main heart shape with 3D depth -->
-<g filter="url(#heart_shadow_podium)">
-  <path d="M16 28C16 28 4 20 4 12C4 8 7 4 11 4C13.5 4 15.5 5.5 16 7C16.5 5.5 18.5 4 21 4C25 4 28 8 28 12C28 20 16 28 16 28Z"
-        fill="url(#heart_base_grad_podium)"/>
-
-  <!-- Heart top layer for 3D effect -->
-  <path d="M16 28C16 28 4 20 4 12C4 8 7 4 11 4C13.5 4 15.5 5.5 16 7C16.5 5.5 18.5 4 21 4C25 4 28 8 28 12C28 20 16 28 16 28Z"
-        fill="url(#heart_shine_grad_podium)"/>
-
-  <!-- Inner heart shadow for depth -->
-  <path d="M16 26.5C16 26.5 5.5 19 5.5 12.5C5.5 9 8 5.5 11 5.5C13.2 5.5 15 6.8 16 8.5C17 6.8 18.8 5.5 21 5.5C24 5.5 26.5 9 26.5 12.5C26.5 19 16 26.5 16 26.5Z"
-        fill="url(#heart_inner_shadow_podium)"/>
-</g>
-
-<!-- Heart highlights and sparkles -->
-<ellipse cx="10" cy="10" rx="2.5" ry="3.5" fill="url(#heart_highlight_podium)" opacity="0.6"/>
-<circle cx="22" cy="9" r="1.3" fill="#FFB3C6" opacity="0.9">
-  <animate attributeName="opacity" values="0.7;1;0.7" dur="2s" repeatCount="indefinite"/>
-</circle>
-<circle cx="25" cy="13" r="1" fill="#FFB3C6" opacity="0.7"/>
-
-<!-- 'V' letter in center with glow -->
-<g filter="url(#v_glow_podium)">
-  <path d="M13 12L16 19L19 12"
-        stroke="white"
-        stroke-width="2.2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        fill="none"
-        opacity="0.95"/>
-</g>
-
-<defs>
-  <!-- Heart gradients for 3D effect -->
-  <radialGradient id="heart_base_grad_podium" cx="50%" cy="30%">
-    <stop offset="0%" stop-color="#FFB3D9"/>
-    <stop offset="30%" stop-color="#FF6B8A"/>
-    <stop offset="60%" stop-color="#E91E63"/>
-    <stop offset="100%" stop-color="#C2185B"/>
-  </radialGradient>
-
-  <radialGradient id="heart_shine_grad_podium" cx="35%" cy="25%">
-    <stop offset="0%" stop-color="#FFCCE5" stop-opacity="0.8"/>
-    <stop offset="40%" stop-color="#FF99B8" stop-opacity="0.4"/>
-    <stop offset="70%" stop-color="transparent"/>
-  </radialGradient>
-
-  <radialGradient id="heart_inner_shadow_podium" cx="50%" cy="60%">
-    <stop offset="0%" stop-color="transparent"/>
-    <stop offset="50%" stop-color="#AD1457" stop-opacity="0.2"/>
-    <stop offset="100%" stop-color="#880E4F" stop-opacity="0.4"/>
-  </radialGradient>
-
-  <radialGradient id="heart_highlight_podium" cx="50%" cy="30%">
-    <stop offset="0%" stop-color="white"/>
-    <stop offset="60%" stop-color="white" stop-opacity="0.5"/>
-    <stop offset="100%" stop-color="transparent"/>
-  </radialGradient>
-
-  <!-- Filters for 3D depth -->
-  <filter id="heart_shadow_podium" x="-20%" y="-10%" width="140%" height="130%">
-    <feGaussianBlur in="SourceAlpha" stdDeviation="0.8"/>
-    <feOffset dx="0" dy="1.5" result="offsetblur"/>
-    <feComponentTransfer>
-      <feFuncA type="linear" slope="0.3"/>
-    </feComponentTransfer>
-    <feMerge>
-      <feMergeNode/>
-      <feMergeNode in="SourceGraphic"/>
-    </feMerge>
-  </filter>
-
-  <filter id="v_glow_podium" x="-50%" y="-50%" width="200%" height="200%">
-    <feGaussianBlur in="SourceGraphic" stdDeviation="0.6" result="blur"/>
-    <feMerge>
-      <feMergeNode in="blur"/>
-      <feMergeNode in="SourceGraphic"/>
-    </feMerge>
-  </filter>
-</defs>
+    <!-- Based on purple-heart.svg, customized for Valentine's Podium -->
+    <path d="M16 28C16 28 4 20 4 12C4 8 7 4 11 4C13.5 4 15.5 5.5 16 7C16.5 5.5 18.5 4 21 4C25 4 28 8 28 12C28 20 16 28 16 28Z" fill="url(#valentinePodiumGrad)"/>
+    <!-- Shine -->
+    <ellipse cx="10" cy="10" rx="2" ry="3" fill="white" opacity="0.3"/>
+    <!-- 'V' letter in center -->
+    <path d="M13 12L16 19L19 12" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.9"/>
+    <defs>
+        <linearGradient id="valentinePodiumGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#FF6B8A"/>
+            <stop offset="50%" stop-color="#E91E63"/>
+            <stop offset="100%" stop-color="#FF1B6B"/>
+        </linearGradient>
+    </defs>
 </svg>

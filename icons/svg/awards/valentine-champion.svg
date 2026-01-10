@@ -1,147 +1,40 @@
 <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-<!-- Valentine Champion - Fluent 3D Gold/Red Heart with Trophy and 'V' -->
-
-<!-- Trophy base (bottom) -->
-<g filter="url(#trophy_shadow)">
-  <rect x="12" y="26.5" width="8" height="2" rx="1" fill="url(#trophy_base_grad)"/>
-  <rect x="11" y="28.5" width="10" height="1.5" rx="0.75" fill="url(#trophy_base_dark)"/>
-</g>
-
-<!-- Trophy cup -->
-<g filter="url(#trophy_filter)">
-  <path d="M10 17L10 21.5Q10 24 16 24Q22 24 22 21.5L22 17Z" fill="url(#trophy_cup_main)"/>
-  <path d="M10 17L10 21.5Q10 24 16 24Q22 24 22 21.5L22 17Z" fill="url(#trophy_cup_shine)"/>
-
-  <!-- Trophy handles -->
-  <path d="M10 18.5Q7.5 18.5 7.5 20.5Q7.5 22 10 22" stroke="url(#trophy_handle_grad)" stroke-width="1.5" fill="none"/>
-  <path d="M22 18.5Q24.5 18.5 24.5 20.5Q24.5 22 22 22" stroke="url(#trophy_handle_grad)" stroke-width="1.5" fill="none"/>
-
-  <!-- Trophy shine highlight -->
-  <ellipse cx="13.5" cy="19" rx="1.5" ry="2.5" fill="white" opacity="0.4"/>
-</g>
-
-<!-- Main heart shape with 3D depth -->
-<g filter="url(#heart_shadow)">
-  <path d="M16 16C16 16 8.5 10.5 8.5 5.5C8.5 2.5 10.5 1 13 1C14.8 1 15.5 2 16 3.5C16.5 2 17.2 1 19 1C21.5 1 23.5 2.5 23.5 5.5C23.5 10.5 16 16 16 16Z"
-        fill="url(#heart_base_grad)"/>
-
-  <!-- Heart top layer for 3D effect -->
-  <path d="M16 16C16 16 8.5 10.5 8.5 5.5C8.5 2.5 10.5 1 13 1C14.8 1 15.5 2 16 3.5C16.5 2 17.2 1 19 1C21.5 1 23.5 2.5 23.5 5.5C23.5 10.5 16 16 16 16Z"
-        fill="url(#heart_shine_grad)"/>
-
-  <!-- Inner heart shadow for depth -->
-  <path d="M16 15C16 15 9.5 10 9.5 5.8C9.5 3.2 11.2 2 13 2C14.5 2 15.2 2.8 16 4C16.8 2.8 17.5 2 19 2C20.8 2 22.5 3.2 22.5 5.8C22.5 10 16 15 16 15Z"
-        fill="url(#heart_inner_shadow)"/>
-</g>
-
-<!-- Heart highlights and sparkles -->
-<ellipse cx="12" cy="5" rx="2" ry="3" fill="url(#heart_highlight)" opacity="0.6"/>
-<circle cx="20.5" cy="4" r="1.2" fill="#FFD700" opacity="0.9">
-  <animate attributeName="opacity" values="0.7;1;0.7" dur="2s" repeatCount="indefinite"/>
-</circle>
-<circle cx="23" cy="7" r="0.9" fill="#FFD700" opacity="0.8"/>
-
-<!-- 'V' letter in center with glow -->
-<g filter="url(#v_glow)">
-  <path d="M13 5.5L16 11.5L19 5.5"
-        stroke="white"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        fill="none"
-        opacity="0.95"/>
-</g>
-
-<defs>
-  <!-- Trophy gradients -->
-  <linearGradient id="trophy_base_grad" x1="0%" y1="0%" x2="0%" y2="100%">
-    <stop offset="0%" stop-color="#C77700"/>
-    <stop offset="100%" stop-color="#9A5000"/>
-  </linearGradient>
-
-  <linearGradient id="trophy_base_dark" x1="0%" y1="0%" x2="0%" y2="100%">
-    <stop offset="0%" stop-color="#9A5000"/>
-    <stop offset="100%" stop-color="#6B3600"/>
-  </linearGradient>
-
-  <radialGradient id="trophy_cup_main" cx="50%" cy="30%">
-    <stop offset="0%" stop-color="#FFD93D"/>
-    <stop offset="50%" stop-color="#FFC107"/>
-    <stop offset="100%" stop-color="#FF8F00"/>
-  </radialGradient>
-
-  <radialGradient id="trophy_cup_shine" cx="40%" cy="20%">
-    <stop offset="0%" stop-color="#FFEB3B" stop-opacity="0.6"/>
-    <stop offset="40%" stop-color="#FFC107" stop-opacity="0.3"/>
-    <stop offset="100%" stop-color="transparent"/>
-  </radialGradient>
-
-  <linearGradient id="trophy_handle_grad">
-    <stop offset="0%" stop-color="#FFB300"/>
-    <stop offset="100%" stop-color="#FFA000"/>
-  </linearGradient>
-
-  <!-- Heart gradients for 3D effect -->
-  <radialGradient id="heart_base_grad" cx="50%" cy="30%">
-    <stop offset="0%" stop-color="#FFD700"/>
-    <stop offset="30%" stop-color="#FF8A65"/>
-    <stop offset="60%" stop-color="#FF6B6B"/>
-    <stop offset="100%" stop-color="#E53935"/>
-  </radialGradient>
-
-  <radialGradient id="heart_shine_grad" cx="35%" cy="25%">
-    <stop offset="0%" stop-color="#FFE57F" stop-opacity="0.8"/>
-    <stop offset="40%" stop-color="#FFB74D" stop-opacity="0.4"/>
-    <stop offset="70%" stop-color="transparent"/>
-  </radialGradient>
-
-  <radialGradient id="heart_inner_shadow" cx="50%" cy="60%">
-    <stop offset="0%" stop-color="transparent"/>
-    <stop offset="50%" stop-color="#C62828" stop-opacity="0.2"/>
-    <stop offset="100%" stop-color="#B71C1C" stop-opacity="0.4"/>
-  </radialGradient>
-
-  <radialGradient id="heart_highlight" cx="50%" cy="30%">
-    <stop offset="0%" stop-color="white"/>
-    <stop offset="60%" stop-color="white" stop-opacity="0.5"/>
-    <stop offset="100%" stop-color="transparent"/>
-  </radialGradient>
-
-  <!-- Filters for 3D depth -->
-  <filter id="heart_shadow" x="-20%" y="-10%" width="140%" height="130%">
-    <feGaussianBlur in="SourceAlpha" stdDeviation="0.5"/>
-    <feOffset dx="0" dy="1" result="offsetblur"/>
-    <feComponentTransfer>
-      <feFuncA type="linear" slope="0.3"/>
-    </feComponentTransfer>
-    <feMerge>
-      <feMergeNode/>
-      <feMergeNode in="SourceGraphic"/>
-    </feMerge>
-  </filter>
-
-  <filter id="trophy_shadow" x="-10%" y="0%" width="120%" height="120%">
-    <feGaussianBlur in="SourceAlpha" stdDeviation="0.4"/>
-    <feOffset dx="0" dy="0.5" result="offsetblur"/>
-    <feComponentTransfer>
-      <feFuncA type="linear" slope="0.4"/>
-    </feComponentTransfer>
-    <feMerge>
-      <feMergeNode/>
-      <feMergeNode in="SourceGraphic"/>
-    </feMerge>
-  </filter>
-
-  <filter id="trophy_filter">
-    <feGaussianBlur in="SourceGraphic" stdDeviation="0.1"/>
-  </filter>
-
-  <filter id="v_glow" x="-50%" y="-50%" width="200%" height="200%">
-    <feGaussianBlur in="SourceGraphic" stdDeviation="0.5" result="blur"/>
-    <feMerge>
-      <feMergeNode in="blur"/>
-      <feMergeNode in="SourceGraphic"/>
-    </feMerge>
-  </filter>
-</defs>
+    <!-- Based on trophy-gold.svg, customized for Valentine's Champion -->
+    <!-- Handles -->
+    <path d="M24.5547 6.83447C23.655 6.5831 22.7199 7.10489 22.4607 8.00883L20.795 7.53115C21.3145 5.71931 23.1919 4.6618 25.0083 5.16197L25.1718 5.208C27.6648 6.03899 27.8632 9.42185 25.6273 10.6581L20.6573 13.4081C20.2386 13.6398 19.7114 13.4882 19.4797 13.0695C19.248 12.6508 19.3996 12.1235 19.8183 11.8919L24.7883 9.14186C25.7703 8.59903 25.6113 7.18632 24.6295 6.85386L24.5547 6.83447Z" fill="#FFD340"/>
+    <path d="M6.30736 5.16197C8.12378 4.6618 10.0011 5.71931 10.5207 7.53115L8.85492 8.00883C8.59571 7.10489 7.6606 6.5831 6.76097 6.83447L6.68619 6.85386C5.70431 7.18632 5.54504 8.59886 6.527 9.14169L11.4973 11.8919C11.916 12.1235 12.0676 12.6508 11.836 13.0695C11.6043 13.4882 11.077 13.6398 10.6583 13.4081L5.68863 10.6583C3.4528 9.42202 3.65082 6.03899 6.14382 5.20799L6.30736 5.16197Z" fill="#EAA73A"/>
+    <!-- Stem -->
+    <path d="M17.3279 17.5199V13.2999H13.9878V17.5199C13.9878 18.2599 13.6578 18.9699 13.0878 19.4399L11.1678 21.0399H20.1478L18.2278 19.4399C17.6578 18.9599 17.3279 18.2599 17.3279 17.5199Z" fill="url(#trophyStem)"/>
+    <!-- Cup body -->
+    <path d="M15.6579 16.55C11.8079 16.55 8.68787 13.43 8.68787 9.58V2.72C8.68787 2.33 9.00786 2.01001 9.39786 2.01001H21.9279C22.3179 2.01001 22.6379 2.33 22.6379 2.72V9.58C22.6379 13.43 19.5179 16.55 15.6579 16.55Z" fill="url(#trophyCup)"/>
+    <!-- Base - Valentine pink/red -->
+    <path d="M22.5779 21.04H8.73785C8.00785 21.04 7.38786 21.55 7.24786 22.26L5.71786 29.35C5.64786 29.68 5.89785 29.99 6.23785 29.99H25.0879C25.4279 29.99 25.6779 29.68 25.6079 29.35L24.0779 22.26C23.9279 21.55 23.3079 21.04 22.5779 21.04Z" fill="url(#trophyBase)"/>
+    <!-- Plaque with heart -->
+    <rect x="12" y="23.7" width="7.3" height="3.1" rx="0.4" fill="url(#trophyPlaque)"/>
+    <!-- Valentine heart on plaque -->
+    <path d="M15.66 27.2C15.66 27.2 13.3 26.1 13.3 24.9C13.3 24.3 13.7 23.9 14.2 23.9C14.5 23.9 14.8 24.05 15.66 24.5C16.52 24.05 16.82 23.9 17.12 23.9C17.62 23.9 18.02 24.3 18.02 24.9C18.02 26.1 15.66 27.2 15.66 27.2Z" fill="url(#valentineHeartSmall)"/>
+    <!-- 'V' letter on cup -->
+    <path d="M14 7L15.66 11L17.32 7" stroke="white" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.6"/>
+    <defs>
+        <linearGradient id="trophyStem" x1="11%" y1="0%" x2="89%" y2="100%">
+            <stop offset="0%" stop-color="#FBC33A"/>
+            <stop offset="100%" stop-color="#DB7B3C"/>
+        </linearGradient>
+        <radialGradient id="trophyCup" cx="0.5" cy="0.2" r="0.8">
+            <stop offset="0%" stop-color="#FFFA73"/>
+            <stop offset="100%" stop-color="#EA873A"/>
+        </radialGradient>
+        <linearGradient id="trophyBase" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#FF6B8A"/>
+            <stop offset="100%" stop-color="#E91E63"/>
+        </linearGradient>
+        <linearGradient id="trophyPlaque" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#FFE767"/>
+            <stop offset="100%" stop-color="#FEBB5B"/>
+        </linearGradient>
+        <linearGradient id="valentineHeartSmall" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#FF1744"/>
+            <stop offset="100%" stop-color="#C2185B"/>
+        </linearGradient>
+    </defs>
 </svg>
