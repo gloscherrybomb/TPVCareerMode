@@ -557,6 +557,37 @@
                 const playBtn = document.getElementById('playVideoBtn');
                 const content = document.getElementById('diagnosticContent');
 
+                // FORCE FIX: Apply styles directly via JavaScript as fallback
+                if (heroMediaContainer && window.innerWidth <= 1024) {
+                    heroMediaContainer.style.position = 'relative';
+                    heroMediaContainer.style.width = '100%';
+                    heroMediaContainer.style.paddingBottom = '56.25%';
+                    heroMediaContainer.style.height = '0';
+                    heroMediaContainer.style.overflow = 'visible';
+                    heroMediaContainer.style.transform = 'none';
+                }
+                if (thumbnail && window.innerWidth <= 1024) {
+                    thumbnail.style.position = 'absolute';
+                    thumbnail.style.top = '0';
+                    thumbnail.style.left = '0';
+                    thumbnail.style.width = '100%';
+                    thumbnail.style.height = '100%';
+                    thumbnail.style.zIndex = '2';
+                }
+                if (image && window.innerWidth <= 1024) {
+                    image.style.width = '100%';
+                    image.style.height = '100%';
+                    image.style.objectFit = 'cover';
+                }
+                if (wrapper && window.innerWidth <= 1024) {
+                    wrapper.style.position = 'absolute';
+                    wrapper.style.top = '0';
+                    wrapper.style.left = '0';
+                    wrapper.style.width = '100%';
+                    wrapper.style.height = '100%';
+                    wrapper.style.zIndex = '1';
+                }
+
                 if (!content) return;
 
                 const heroStyles = heroMediaContainer ? window.getComputedStyle(heroMediaContainer) : null;
