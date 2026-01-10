@@ -565,6 +565,10 @@
 
                 let html = '<div style="line-height: 1.4; font-size: 10px;">';
                 html += '<strong>INITIAL PAGE LOAD:</strong><br>';
+                html += `<br><strong>Viewport:</strong><br>`;
+                html += `• width: ${window.innerWidth}px<br>`;
+                html += `• height: ${window.innerHeight}px<br>`;
+                html += `• devicePixelRatio: ${window.devicePixelRatio}<br>`;
                 html += '<br><strong>Hero Media Container:</strong><br>';
                 html += `• exists: ${heroMediaContainer ? 'YES' : 'NO'}<br>`;
                 if (heroMediaContainer) {
