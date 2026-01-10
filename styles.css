@@ -1415,9 +1415,10 @@ body {
         padding: 7.5rem 2rem 4rem;
     }
 
-    /* CRITICAL: Remove 3D transform on mobile to fix YouTube video rendering */
+    /* CRITICAL: Remove 3D transform and overflow:hidden on mobile to fix YouTube video rendering */
     .hero-media-container {
         transform: none !important;
+        overflow: visible !important;
     }
 
     .hero-media-container:hover {
@@ -1431,6 +1432,7 @@ body {
         padding-bottom: 56.25% !important; /* Force 16:9 aspect ratio */
         height: 0;
         overflow: hidden;
+        border-radius: 20px; /* Apply border-radius here instead of parent */
     }
 
     .video-wrapper iframe,
@@ -1442,6 +1444,11 @@ body {
         width: 100% !important;
         height: 100% !important;
         border: none;
+    }
+
+    .video-thumbnail {
+        border-radius: 20px;
+        overflow: hidden;
     }
 
     .nav-links {
