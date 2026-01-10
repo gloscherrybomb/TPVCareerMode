@@ -36,6 +36,45 @@ const googleProvider = new GoogleAuthProvider();
 // admin-bots.js waits for `window.firebaseApp` before initializing.
 window.firebaseApp = app;
 
+// Component loader for centralized navbar and footer
+async function loadComponents() {
+  // Load navbar
+  const navbarPlaceholder = document.getElementById('navbar-placeholder');
+  if (navbarPlaceholder) {
+    try {
+      const response = await fetch('components/navbar.html');
+      if (response.ok) {
+        navbarPlaceholder.outerHTML = await response.text();
+
+        // Set active link based on current page
+        const currentPage = window.location.pathname.split('/').pop().replace('.html', '') || 'index';
+        const activeLink = document.querySelector(`[data-page="${currentPage}"]`);
+        if (activeLink) {
+          activeLink.classList.add('active');
+        }
+      }
+    } catch (error) {
+      console.error('Error loading navbar:', error);
+    }
+  }
+
+  // Load footer
+  const footerPlaceholder = document.getElementById('footer-placeholder');
+  if (footerPlaceholder) {
+    try {
+      const response = await fetch('components/footer.html');
+      if (response.ok) {
+        footerPlaceholder.outerHTML = await response.text();
+      }
+    } catch (error) {
+      console.error('Error loading footer:', error);
+    }
+  }
+}
+
+// Load components first, then initialize everything
+await loadComponents();
+
 // Modal functionality
 const loginModal = document.getElementById('loginModal');
 const loginBtn = document.getElementById('loginBtn');
@@ -609,6 +648,11 @@ onAuthStateChanged(auth, async (user) => {
           const kofiMessage = encodeURIComponent(`TPV UID: ${tpvUid} | Name: ${userName}`);
           // Replace YOUR_KOFI_USERNAME with your actual Ko-fi username
           kofiBtn.href = `https://ko-fi.com/jeastwood?message=${kofiMessage}`;
+        }
+
+        // Check for new race results and show notification if any
+        if (window.resultNotificationManager) {
+          window.resultNotificationManager.checkForNewResults(user, userData);
         }
       }
     } catch (error) {

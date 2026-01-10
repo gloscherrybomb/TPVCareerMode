@@ -435,7 +435,7 @@ document.getElementById('botProfileForm').addEventListener('submit', async (e) =
         
         // Reset form
         setTimeout(() => {
-            resetForm();
+            window.resetForm();
             loadProfiles();
         }, 1500);
         
@@ -547,7 +547,7 @@ window.resetForm = function() {
     updateCharCount();
 };
 
-document.getElementById('resetForm').addEventListener('click', resetForm);
+document.getElementById('resetForm').addEventListener('click', window.resetForm);
 
 // ===== AI IMAGE PROMPT GENERATOR =====
 
@@ -668,9 +668,9 @@ window.generateImagePrompt = function() {
 };
 
 // Copy prompt to clipboard
-window.copyPromptToClipboard = function() {
+window.copyPromptToClipboard = function(event) {
     const prompt = document.getElementById('generatedPrompt').textContent;
-    
+
     navigator.clipboard.writeText(prompt).then(() => {
         const btn = event.target;
         const originalText = btn.textContent;

@@ -653,7 +653,8 @@ function generateRaceRecap(data) {
     winnerName,
     secondPlaceName,
     gcPosition,
-    gcGap
+    gcGap,
+    recentResults
   } = data;
 
   const eventType = EVENT_TYPES[eventNumber];
@@ -943,7 +944,7 @@ function generateRaceRecap(data) {
     });
     
     // VALIDATE Zero to Hero: Check that previous result was actually bad (> 20th place)
-    const previousResult = seasonData.recentResults?.[seasonData.recentResults.length - 2];
+    const previousResult = recentResults?.[recentResults.length - 2];
     const genuineComebackContext = previousResult && previousResult > 20;
 
     if (earnedZeroToHero && genuineComebackContext) {

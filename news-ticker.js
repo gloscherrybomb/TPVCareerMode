@@ -16,13 +16,10 @@
 
     // News items (newest first)
     const NEWS_ITEMS = [
-           {
-            date: '6th Jan 2026',
-            text: 'Results feed added (global standings)'
-        },
+   
         {
-            date: '6th Jan 2026',
-            text: 'Settings page added to profile with Discord bot for results notifications'
+            date: '10th Jan 2026',
+            text: 'New event images, results feed and notifications'
         },
         {
             date: '5th Jan 2026',

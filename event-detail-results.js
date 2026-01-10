@@ -671,6 +671,13 @@ async function loadEventResults() {
         // Show results section
         eventResultsSection.style.display = 'block';
 
+        // Mark this result as viewed (for result notification system)
+        if (window.resultNotificationManager) {
+            const currentSeason = userData?.currentSeason || 1;
+            const resultKey = window.resultNotificationManager.getResultKey(currentSeason, eventNumber);
+            window.resultNotificationManager.markAsViewed(resultKey);
+        }
+
         // Hide pre-race sections when results are available
         const sectionsToHide = [
             '.event-story',
