@@ -282,11 +282,11 @@ class ResultNotificationManager {
 
     // Navigate to appropriate page
     if (results.length === 1) {
-      // Single result - go to event detail
+      // Single result - go straight to event detail
       window.location.href = `event-detail.html?id=${results[0].eventNumber}`;
     } else {
-      // Multiple results - go to results feed
-      window.location.href = 'results-feed.html';
+      // Multiple results - go to season/events page
+      window.location.href = 'events.html';
     }
   }
 
