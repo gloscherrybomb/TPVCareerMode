@@ -1,0 +1,23 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Placeholder Valentine Champion Award Icon -->
+  <!-- Gold trophy with heart motif -->
+
+  <!-- Trophy cup -->
+  <path d="M20 25 L20 35 Q20 42 32 42 Q44 42 44 35 L44 25 Z" fill="#FFD700" stroke="#FFA500" stroke-width="2"/>
+
+  <!-- Trophy handles -->
+  <path d="M20 28 Q15 28 15 32 Q15 36 20 36" fill="none" stroke="#FFD700" stroke-width="2"/>
+  <path d="M44 28 Q49 28 49 32 Q49 36 44 36" fill="none" stroke="#FFD700" stroke-width="2"/>
+
+  <!-- Trophy base -->
+  <rect x="26" y="42" width="12" height="4" fill="#FFD700" stroke="#FFA500" stroke-width="1"/>
+  <rect x="22" y="46" width="20" height="6" rx="2" fill="#FFD700" stroke="#FFA500" stroke-width="1"/>
+
+  <!-- Heart in center of trophy -->
+  <path d="M32 36 C28 32 24 32 24 28 C24 25 26 24 28 24 C30 24 31 25 32 27 C33 25 34 24 36 24 C38 24 40 25 40 28 C40 32 36 32 32 36 Z" fill="#FF1744" stroke="#C41230" stroke-width="1"/>
+
+  <!-- Sparkles -->
+  <circle cx="16" cy="20" r="1.5" fill="#FFF"/>
+  <circle cx="48" cy="22" r="1.5" fill="#FFF"/>
+  <circle cx="38" cy="18" r="1" fill="#FFF"/>
+</svg>

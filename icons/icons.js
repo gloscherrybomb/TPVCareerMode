@@ -491,6 +491,12 @@ const ICON_REGISTRY = {
         fallback: '🌃',
         category: 'event'
     },
+    eventValentine: {
+        type: 'local-svg',
+        path: 'icons/svg/events/valentine-heart.svg',
+        fallback: '💝',
+        category: 'event'
+    },
 
     // ==========================================
     // UI ELEMENTS
