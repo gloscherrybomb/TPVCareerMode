@@ -1420,9 +1420,19 @@ body {
         position: relative;
         transform: none !important;
         overflow: visible !important;
-        /* Give parent container proper dimensions using aspect-ratio */
+        /* Give parent container proper dimensions using padding-bottom fallback + aspect-ratio */
         width: 100%;
+        padding-bottom: 56.25%; /* Fallback for browsers without aspect-ratio support */
+        height: 0;
         aspect-ratio: 16 / 9;
+    }
+
+    /* If aspect-ratio is supported, override padding-bottom */
+    @supports (aspect-ratio: 16 / 9) {
+        .hero-media-container {
+            padding-bottom: 0;
+            height: auto;
+        }
     }
 
     .hero-media-container:hover {
