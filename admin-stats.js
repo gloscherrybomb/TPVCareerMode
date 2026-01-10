@@ -287,6 +287,10 @@ async function loadRacesData() {
         });
 
         console.log(`Loaded ${allRaces.length} processed races`);
+
+        // Update total races stat
+        document.getElementById('totalRaces').textContent = allRaces.length;
+
         updateRacesChart();
 
     } catch (error) {
