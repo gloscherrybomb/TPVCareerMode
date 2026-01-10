@@ -1,56 +1,147 @@
 <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <!-- Valentine Champion - Heart on Trophy -->
+<!-- Valentine Champion - Fluent 3D Gold/Red Heart with Trophy and 'V' -->
 
-    <!-- Trophy base -->
-    <rect x="13" y="26" width="6" height="2" rx="1" fill="url(#trophyBaseGrad)"/>
-    <rect x="11" y="28" width="10" height="2" rx="1" fill="url(#trophyBaseGrad)"/>
+<!-- Trophy base (bottom) -->
+<g filter="url(#trophy_shadow)">
+  <rect x="12" y="26.5" width="8" height="2" rx="1" fill="url(#trophy_base_grad)"/>
+  <rect x="11" y="28.5" width="10" height="1.5" rx="0.75" fill="url(#trophy_base_dark)"/>
+</g>
 
-    <!-- Trophy cup -->
-    <path d="M10 16 L10 21 Q10 24 16 24 Q22 24 22 21 L22 16 Z" fill="url(#trophyCupGrad)"/>
+<!-- Trophy cup -->
+<g filter="url(#trophy_filter)">
+  <path d="M10 17L10 21.5Q10 24 16 24Q22 24 22 21.5L22 17Z" fill="url(#trophy_cup_main)"/>
+  <path d="M10 17L10 21.5Q10 24 16 24Q22 24 22 21.5L22 17Z" fill="url(#trophy_cup_shine)"/>
 
-    <!-- Trophy handles -->
-    <path d="M10 18 Q7 18 7 20 Q7 22 10 22" fill="none" stroke="url(#trophyHandleGrad)" stroke-width="1.5"/>
-    <path d="M22 18 Q25 18 25 20 Q25 22 22 22" fill="none" stroke="url(#trophyHandleGrad)" stroke-width="1.5"/>
+  <!-- Trophy handles -->
+  <path d="M10 18.5Q7.5 18.5 7.5 20.5Q7.5 22 10 22" stroke="url(#trophy_handle_grad)" stroke-width="1.5" fill="none"/>
+  <path d="M22 18.5Q24.5 18.5 24.5 20.5Q24.5 22 22 22" stroke="url(#trophy_handle_grad)" stroke-width="1.5" fill="none"/>
 
-    <!-- Trophy shine -->
-    <ellipse cx="13" cy="19" rx="1.5" ry="2" fill="white" opacity="0.3"/>
+  <!-- Trophy shine highlight -->
+  <ellipse cx="13.5" cy="19" rx="1.5" ry="2.5" fill="white" opacity="0.4"/>
+</g>
 
-    <!-- Valentine heart on top of trophy -->
-    <path d="M16 16C16 16 9 11 9 6C9 3.5 10.5 2 12.5 2C14 2 15 3 16 4.5C17 3 18 2 19.5 2C21.5 2 23 3.5 23 6C23 11 16 16 16 16Z" fill="url(#valentineChampionGrad)"/>
+<!-- Main heart shape with 3D depth -->
+<g filter="url(#heart_shadow)">
+  <path d="M16 16C16 16 8.5 10.5 8.5 5.5C8.5 2.5 10.5 1 13 1C14.8 1 15.5 2 16 3.5C16.5 2 17.2 1 19 1C21.5 1 23.5 2.5 23.5 5.5C23.5 10.5 16 16 16 16Z"
+        fill="url(#heart_base_grad)"/>
 
-    <!-- Heart shine -->
-    <ellipse cx="12" cy="5.5" rx="1.5" ry="2" fill="white" opacity="0.5"/>
+  <!-- Heart top layer for 3D effect -->
+  <path d="M16 16C16 16 8.5 10.5 8.5 5.5C8.5 2.5 10.5 1 13 1C14.8 1 15.5 2 16 3.5C16.5 2 17.2 1 19 1C21.5 1 23.5 2.5 23.5 5.5C23.5 10.5 16 16 16 16Z"
+        fill="url(#heart_shine_grad)"/>
 
-    <!-- Gold sparkles -->
-    <circle cx="20" cy="4" r="1" fill="#FFD700" opacity="0.9"/>
-    <circle cx="24" cy="7" r="0.8" fill="#FFD700" opacity="0.7"/>
+  <!-- Inner heart shadow for depth -->
+  <path d="M16 15C16 15 9.5 10 9.5 5.8C9.5 3.2 11.2 2 13 2C14.5 2 15.2 2.8 16 4C16.8 2.8 17.5 2 19 2C20.8 2 22.5 3.2 22.5 5.8C22.5 10 16 15 16 15Z"
+        fill="url(#heart_inner_shadow)"/>
+</g>
 
-    <!-- 'V' letter in center of heart -->
-    <path d="M13.5 6 L16 11 L18.5 6" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.95"/>
+<!-- Heart highlights and sparkles -->
+<ellipse cx="12" cy="5" rx="2" ry="3" fill="url(#heart_highlight)" opacity="0.6"/>
+<circle cx="20.5" cy="4" r="1.2" fill="#FFD700" opacity="0.9">
+  <animate attributeName="opacity" values="0.7;1;0.7" dur="2s" repeatCount="indefinite"/>
+</circle>
+<circle cx="23" cy="7" r="0.9" fill="#FFD700" opacity="0.8"/>
 
-    <defs>
-        <!-- Heart gradient -->
-        <linearGradient id="valentineChampionGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#FFD700"/>
-            <stop offset="40%" stop-color="#FF6B6B"/>
-            <stop offset="100%" stop-color="#FF1744"/>
-        </linearGradient>
+<!-- 'V' letter in center with glow -->
+<g filter="url(#v_glow)">
+  <path d="M13 5.5L16 11.5L19 5.5"
+        stroke="white"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        fill="none"
+        opacity="0.95"/>
+</g>
 
-        <!-- Trophy gradients -->
-        <linearGradient id="trophyCupGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stop-color="#FFC107"/>
-            <stop offset="50%" stop-color="#FFB300"/>
-            <stop offset="100%" stop-color="#FF8F00"/>
-        </linearGradient>
+<defs>
+  <!-- Trophy gradients -->
+  <linearGradient id="trophy_base_grad" x1="0%" y1="0%" x2="0%" y2="100%">
+    <stop offset="0%" stop-color="#C77700"/>
+    <stop offset="100%" stop-color="#9A5000"/>
+  </linearGradient>
 
-        <linearGradient id="trophyBaseGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stop-color="#FF8F00"/>
-            <stop offset="100%" stop-color="#E65100"/>
-        </linearGradient>
+  <linearGradient id="trophy_base_dark" x1="0%" y1="0%" x2="0%" y2="100%">
+    <stop offset="0%" stop-color="#9A5000"/>
+    <stop offset="100%" stop-color="#6B3600"/>
+  </linearGradient>
 
-        <linearGradient id="trophyHandleGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stop-color="#FFB300"/>
-            <stop offset="100%" stop-color="#FFC107"/>
-        </linearGradient>
-    </defs>
+  <radialGradient id="trophy_cup_main" cx="50%" cy="30%">
+    <stop offset="0%" stop-color="#FFD93D"/>
+    <stop offset="50%" stop-color="#FFC107"/>
+    <stop offset="100%" stop-color="#FF8F00"/>
+  </radialGradient>
+
+  <radialGradient id="trophy_cup_shine" cx="40%" cy="20%">
+    <stop offset="0%" stop-color="#FFEB3B" stop-opacity="0.6"/>
+    <stop offset="40%" stop-color="#FFC107" stop-opacity="0.3"/>
+    <stop offset="100%" stop-color="transparent"/>
+  </radialGradient>
+
+  <linearGradient id="trophy_handle_grad">
+    <stop offset="0%" stop-color="#FFB300"/>
+    <stop offset="100%" stop-color="#FFA000"/>
+  </linearGradient>
+
+  <!-- Heart gradients for 3D effect -->
+  <radialGradient id="heart_base_grad" cx="50%" cy="30%">
+    <stop offset="0%" stop-color="#FFD700"/>
+    <stop offset="30%" stop-color="#FF8A65"/>
+    <stop offset="60%" stop-color="#FF6B6B"/>
+    <stop offset="100%" stop-color="#E53935"/>
+  </radialGradient>
+
+  <radialGradient id="heart_shine_grad" cx="35%" cy="25%">
+    <stop offset="0%" stop-color="#FFE57F" stop-opacity="0.8"/>
+    <stop offset="40%" stop-color="#FFB74D" stop-opacity="0.4"/>
+    <stop offset="70%" stop-color="transparent"/>
+  </radialGradient>
+
+  <radialGradient id="heart_inner_shadow" cx="50%" cy="60%">
+    <stop offset="0%" stop-color="transparent"/>
+    <stop offset="50%" stop-color="#C62828" stop-opacity="0.2"/>
+    <stop offset="100%" stop-color="#B71C1C" stop-opacity="0.4"/>
+  </radialGradient>
+
+  <radialGradient id="heart_highlight" cx="50%" cy="30%">
+    <stop offset="0%" stop-color="white"/>
+    <stop offset="60%" stop-color="white" stop-opacity="0.5"/>
+    <stop offset="100%" stop-color="transparent"/>
+  </radialGradient>
+
+  <!-- Filters for 3D depth -->
+  <filter id="heart_shadow" x="-20%" y="-10%" width="140%" height="130%">
+    <feGaussianBlur in="SourceAlpha" stdDeviation="0.5"/>
+    <feOffset dx="0" dy="1" result="offsetblur"/>
+    <feComponentTransfer>
+      <feFuncA type="linear" slope="0.3"/>
+    </feComponentTransfer>
+    <feMerge>
+      <feMergeNode/>
+      <feMergeNode in="SourceGraphic"/>
+    </feMerge>
+  </filter>
+
+  <filter id="trophy_shadow" x="-10%" y="0%" width="120%" height="120%">
+    <feGaussianBlur in="SourceAlpha" stdDeviation="0.4"/>
+    <feOffset dx="0" dy="0.5" result="offsetblur"/>
+    <feComponentTransfer>
+      <feFuncA type="linear" slope="0.4"/>
+    </feComponentTransfer>
+    <feMerge>
+      <feMergeNode/>
+      <feMergeNode in="SourceGraphic"/>
+    </feMerge>
+  </filter>
+
+  <filter id="trophy_filter">
+    <feGaussianBlur in="SourceGraphic" stdDeviation="0.1"/>
+  </filter>
+
+  <filter id="v_glow" x="-50%" y="-50%" width="200%" height="200%">
+    <feGaussianBlur in="SourceGraphic" stdDeviation="0.5" result="blur"/>
+    <feMerge>
+      <feMergeNode in="blur"/>
+      <feMergeNode in="SourceGraphic"/>
+    </feMerge>
+  </filter>
+</defs>
 </svg>
