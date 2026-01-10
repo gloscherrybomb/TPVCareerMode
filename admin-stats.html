@@ -444,6 +444,11 @@
                     <div class="stat-label">Season Completion</div>
                     <div class="stat-subtext">Finished Event 15</div>
                 </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="totalRaces">-</div>
+                    <div class="stat-label">Total Races</div>
+                    <div class="stat-subtext">Processed results</div>
+                </div>
             </div>
 
             <!-- Site Analytics (Today) -->
@@ -510,6 +515,23 @@
                     <div class="loading">
                         <div class="spinner"></div>
                         <p>Loading chart data...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Processed Races Trend Chart -->
+            <div class="chart-section">
+                <div class="header-row">
+                    <h2 class="section-title">Processed Races</h2>
+                    <div class="chart-controls">
+                        <button class="chart-btn active" data-races-period="weekly">Weekly</button>
+                        <button class="chart-btn" data-races-period="monthly">Monthly</button>
+                    </div>
+                </div>
+                <div id="racesChart" class="bar-chart">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        <p>Loading race data...</p>
                     </div>
                 </div>
             </div>

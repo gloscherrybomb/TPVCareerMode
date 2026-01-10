@@ -21,6 +21,8 @@ const usersPerPage = 20;
 let currentPeriod = 'weekly';
 let currentTrendDays = 7;
 let analyticsData = {};
+let allRaces = [];
+let currentRacesPeriod = 'weekly';
 
 // Page name display labels
 const PAGE_LABELS = {
@@ -209,6 +211,9 @@ async function loadAllUserData() {
         // Load site analytics
         await loadAnalyticsData();
 
+        // Load race data
+        await loadRacesData();
+
     } catch (error) {
         console.error('Error loading user data:', error);
     }
@@ -252,6 +257,88 @@ async function loadAnalyticsData() {
     } catch (error) {
         console.error('Error loading analytics data:', error);
     }
+}
+
+// Load all processed races from Firestore
+async function loadRacesData() {
+    try {
+        const racesSnapshot = await getDocs(collection(db, 'results'));
+        allRaces = [];
+
+        racesSnapshot.forEach(docSnapshot => {
+            const raceData = docSnapshot.data();
+
+            // Extract processedAt timestamp
+            let processedDate = null;
+            if (raceData.processedAt) {
+                processedDate = raceData.processedAt.toDate
+                    ? raceData.processedAt.toDate()
+                    : new Date(raceData.processedAt);
+            }
+
+            allRaces.push({
+                id: docSnapshot.id,
+                season: raceData.season,
+                event: raceData.event,
+                userUid: raceData.userUid,
+                processedAt: processedDate,
+                totalParticipants: raceData.totalParticipants || 0
+            });
+        });
+
+        console.log(`Loaded ${allRaces.length} processed races`);
+
+        // Update total races stat
+        document.getElementById('totalRaces').textContent = allRaces.length;
+
+        updateRacesChart();
+
+    } catch (error) {
+        console.error('Error loading races data:', error);
+        document.getElementById('racesChart').innerHTML =
+            '<div class="no-data">Error loading race data</div>';
+    }
+}
+
+// Update races chart
+function updateRacesChart() {
+    const container = document.getElementById('racesChart');
+    const periods = currentRacesPeriod === 'weekly' ? 12 : 6;
+    const periodDays = currentRacesPeriod === 'weekly' ? 7 : 30;
+
+    const now = new Date();
+    const buckets = [];
+
+    for (let i = periods - 1; i >= 0; i--) {
+        const periodEnd = new Date(now.getTime() - i * periodDays * 24 * 60 * 60 * 1000);
+        const periodStart = new Date(periodEnd.getTime() - periodDays * 24 * 60 * 60 * 1000);
+
+        const count = allRaces.filter(race => {
+            if (!race.processedAt) return false;
+            return race.processedAt >= periodStart && race.processedAt < periodEnd;
+        }).length;
+
+        const label = formatPeriodLabel(periodStart, currentRacesPeriod);
+        buckets.push({ label, count, start: periodStart, end: periodEnd });
+    }
+
+    const maxCount = Math.max(...buckets.map(b => b.count), 1);
+
+    let html = '';
+    for (const bucket of buckets) {
+        const percentage = (bucket.count / maxCount) * 100;
+        html += `
+            <div class="bar-row">
+                <div class="bar-label">${bucket.label}</div>
+                <div class="bar-container">
+                    <div class="bar-fill" style="width: ${percentage}%"></div>
+                    <div class="bar-value">${bucket.count}</div>
+                </div>
+            </div>
+        `;
+    }
+
+    container.innerHTML = html || '<div class="no-data">No race data available</div>';
 }
 
 // Update site analytics stats (today's data)
@@ -583,6 +670,16 @@ document.addEventListener('DOMContentLoaded', () => {
             e.target.classList.add('active');
             currentPeriod = e.target.dataset.period;
             updateRegistrationChart();
+        });
+    });
+
+    // Chart period buttons (races)
+    document.querySelectorAll('.chart-btn[data-races-period]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.target.closest('.chart-controls').querySelectorAll('.chart-btn').forEach(b => b.classList.remove('active'));
+            e.target.classList.add('active');
+            currentRacesPeriod = e.target.dataset.racesPeriod;
+            updateRacesChart();
         });
     });
 
