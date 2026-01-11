@@ -1,0 +1,2396 @@
+================================================================================
+SEASON 1 RIDER STANDINGS REPORT
+================================================================================
+
+Found 16 events to process
+
+Processing Event 1: Coast and Roast Crit...
+  Found 1855 race finishers
+  Processed 1364 unique riders
+Processing Event 2: Island Classic...
+  Found 429 race finishers
+  Processed 358 unique riders
+Processing Event 3: The Forest Velodrome Elimination...
+  Found 76 race finishers
+  Processed 76 unique riders
+Processing Event 4: Coastal Loop Time Challenge...
+  Found 80 race finishers
+  Processed 80 unique riders
+Processing Event 5: North Lake Points Race...
+  Found 116 race finishers
+  Processed 114 unique riders
+Processing Event 6: Easy Hill Climb...
+  Found 40 race finishers
+  Processed 40 unique riders
+Processing Event 7: Flat Eight Criterium...
+  Found 117 race finishers
+  Processed 112 unique riders
+Processing Event 8: The Grand Gilbert Fondo...
+  Found 39 race finishers
+  Processed 39 unique riders
+Processing Event 9: Base Camp Classic...
+  No results found
+Processing Event 10: Beach and Pine TT...
+  No results found
+Processing Event 11: South Lake Points Race...
+  No results found
+Processing Event 12: Unbound - Little Egypt...
+  Found 78 race finishers
+  Processed 77 unique riders
+Processing Event 13: Local Tour Stage 1...
+  Found 39 race finishers
+  Processed 39 unique riders
+Processing Event 14: Local Tour Stage 2...
+  Found 39 race finishers
+  Processed 39 unique riders
+Processing Event 15: Local Tour Stage 3...
+  Found 56 race finishers
+  Processed 56 unique riders
+Processing Event 102: The Leveller...
+  Found 351 race finishers
+  Processed 312 unique riders
+
+
+================================================================================
+FINAL STANDINGS
+================================================================================
+
+Total Riders: 2207
+Bots: 2151
+Human Riders: 56
+
+----------------------------------------------------------------------------------------------------
+Rank  Rider Name                    Team                ARR   Events  Points  Type
+----------------------------------------------------------------------------------------------------
+1     Julien Helleputte             Riders Givrés du T  200   7       498     Human
+2     Gregory Frison                Mashup Collective   1817  4       395     Human
+3     Forrest Beck                                      1310  4       376     Bot
+4     Lasse Schmidt                                     1443  6       311     Bot
+5     Richard Kramer                                    1271  4       310     Bot
+6     Ian Ortiz                     AMO Solutions       1433  4       298     Bot
+7     Emmanuel Mensah                                   1375  4       296     Bot
+8     Marcel Bourgeois                                  1445  4       295     Bot
+9     Mansour Salem                                     1508  4       290     Bot
+10    Neal Marshall                                     1152  3       283     Bot
+11    Ryan Yates                    Allkin Racing       1267  3       283     Human
+12    Rob Miller                    Race3R              1172  4       277     Human
+13    Eric Lemoine                                      1405  3       273     Bot
+14    Gilbert Meyer                                     1367  3       273     Bot
+15    Jochen Hübner                                     1402  3       268     Bot
+16    Arthur Le Gros                                    1332  3       267     Bot
+17    Yurui Ten                     Windsail            1356  3       263     Bot
+18    Luca Pinna                                        1316  3       257     Bot
+19    Rick McDonald                 YES                 1084  4       257     Bot
+20    Ulyana Miroshnichenko         Saint               919   3       247     Bot
+21    Emilio Dougherty              Titans              1254  3       240     Bot
+22    Ciprian Badea                                     1096  3       232     Bot
+23    Max Roman                     Aguda               1440  4       230     Bot
+24    Florian Girard                                    1373  3       229     Bot
+25    Lon Huber                     AI Thunder          1642  4       224     Bot
+26    Elijah Smith                  Patriot             1361  3       222     Bot
+27    Koa Jibas                     Douvan              1134  3       219     Bot
+28    Samuel Pires                                      1444  4       218     Bot
+29    Lenny Shaffer                 Hector              1260  3       217     Bot
+30    Fazeel Zuhair                 AI Thunder          1120  3       214     Bot
+31    Marco Fortin                                      1363  2       213     Bot
+32    Arthur Seymour                                    1349  2       211     Bot
+33    Philippe Fabre                                    1343  2       211     Bot
+34    Jamie Bishop                  Newhall.cc          1173  4       211     Human
+35    Joshua Burgess                Titans              1353  2       208     Bot
+36    Ron Crane                                         1392  2       207     Bot
+37    Maxime Fontaine                                   1352  2       207     Bot
+38    Anthony Arnaud                                    1352  2       205     Bot
+39    Filip Černý                                       1572  4       203     Bot
+40    Eelis Pitkänen                                    1202  3       202     Bot
+41    Tun Win                                           1114  2       200     Bot
+42    Julie Morin                   Saint               1106  3       200     Bot
+43    Hiro Kinoshita                                    1436  4       198     Bot
+44    Erwin Dougherty                                   1207  3       197     Bot
+45    Mussie Araya                                      1245  3       197     Bot
+46    Arseni Koplowitz              Hinal               1643  4       196     Bot
+47    Joaquin Perez                 Delta               1208  3       194     Bot
+48    Emmanuel Contreras                                1081  3       194     Bot
+49    Guy McCall                    Roklit              1648  4       193     Bot
+50    Arseni Košarac                                    1115  3       192     Bot
+51    Joshua Atkins                                     1343  2       190     Bot
+52    Daler Saidov                  Fable               1353  2       190     Bot
+53    Keven Kaiser                                      1153  2       190     Bot
+54    Wendell Shannon                                   1600  3       190     Bot
+55    Tingtai Khong                                     1738  4       190     Bot
+56    Jassim Al Baker                                   1339  2       189     Bot
+57    Dieter Mayer                                      1347  2       189     Bot
+58    Santos Giles                  Optech              1567  4       189     Bot
+59    Florian Bertrand              Heat                1572  4       189     Bot
+60    Rory Robertson                Titans              1379  2       188     Bot
+61    Glenn Lindberg                Orbit               1275  2       187     Bot
+62    Jovan Kulyk                   AI Thunder          1208  3       187     Bot
+63    Patrick Jansen                HCOM                1217  2       186     Bot
+64    Salim Al-Riyami                                   1139  3       185     Bot
+65    Manuel Castro                                     1346  2       184     Bot
+66    Dobroslav Pulszky             Aspire              1369  2       183     Bot
+67    Thierno Sylla                                     1197  2       183     Bot
+68    Erik Gunnarsson                                   1157  2       181     Bot
+69    Mohamed Silva                 Douvan              1114  2       181     Bot
+70    Jebediah Nielsen              Douvan              1464  4       181     Bot
+71    Szabolcs Nagy                 YES                 1353  2       180     Bot
+72    Edgars Krūmiņš                                    1411  3       180     Bot
+73    Yahya Krishnan                                    1276  3       179     Bot
+74    Ianto Bennett                                     1289  2       178     Bot
+75    Rusty White                   Dashix              1553  4       178     Bot
+76    Borys Nesterenko              Meisterkuhl         1511  4       178     Bot
+77    Pierre Mba                                        1141  3       177     Bot
+78    Otso Lappalainen                                  1192  3       177     Bot
+79    Arjan Huisman                 Hector              1170  2       175     Bot
+80    Christodoulos Constantinides  eVOX                1418  3       175     Bot
+81    Elvis Noble                   Pioma               1229  3       174     Bot
+82    Lasse Ikonen                  Sherpa              1568  4       174     Bot
+83    Leopoldo Nunez                                    1147  2       172     Bot
+84    Josiane Irakoze                                   862   2       171     Bot
+85    Jonathon Deleon                                   1346  2       169     Bot
+86    George Clucas                 Monova              1389  2       169     Bot
+87    Brock Ingram                  Optech              1449  3       168     Bot
+88    Deo Nsengiyumva               HCOM                1274  2       167     Bot
+89    Yongsun Beom                  Fiber Shot          1107  2       167     Bot
+90    Igor Ibišević                                     1358  3       167     Bot
+91    Shivansh Khanna               Formix              1059  2       166     Bot
+92    Toni Seifert                                      1034  2       165     Bot
+93    Borys Shvets                  Roklit              1331  2       164     Bot
+94    Barry Church                  True Form           1544  4       164     Bot
+95    Adam Stuart                                       1346  1       162     Bot
+96    Jerald Barker                                     1357  2       162     Bot
+97    Elbert Nava                                       931   2       161     Bot
+98    Ludvig Karlberg               Mashup Collective   1639  2       160     Human
+99    piggy dwarf                                       100   2       160     Human
+100   Mykhailo Miroshnichenko       Eckleson            1514  4       160     Bot
+101   Bryan Carneiro                                    984   2       158     Bot
+102   Joon Yeop                     Eckleson            1333  2       158     Bot
+103   Michael Franke                                    1530  3       158     Bot
+104   Doug Hart                     Ilkley CC           1467  2       157     Human
+105   Wout Mathieu                                      1446  3       155     Bot
+106   Luis Guerrero                                     1643  4       155     Bot
+107   Robert Kennedy                HCOM                1594  4       155     Bot
+108   Denis David                                       1234  2       153     Bot
+109   Kyaw Min                                          1074  2       153     Bot
+110   Birger Hedegaard              eVOX                1315  2       152     Bot
+111   Gerald Allard                 Kumori              1137  2       151     Bot
+112   Seppo Oksanen                                     1092  2       151     Bot
+113   Ritsu Sasaki                  Saitama             1459  3       151     Bot
+114   Allan Reyna                   Saitama             1371  3       151     Bot
+115   Albert Krause                 Fable               1451  3       150     Bot
+116   Thad Daugherty                                    1241  2       148     Bot
+117   Valentin Martinez             Roklit              1187  2       148     Bot
+118   Emil Kanev                                        1433  3       148     Bot
+119   Kurt Förster                                      1164  2       147     Bot
+120   Gustav Iiyambo                                    1155  2       147     Bot
+121   Zalan Kocsis                                      1086  2       147     Bot
+122   Danylo Semenyuk               Delta               1000  3       147     Bot
+123   Ruojie Ten                    Saint               928   2       146     Bot
+124   Greg Trujillo                                     1305  2       146     Bot
+125   Kamil Ješić                                       1127  3       146     Bot
+126   Guadalupe Robles                                  1578  4       146     Bot
+127   Adam Dąbrowski                                    992   2       145     Bot
+128   Elie Ndayizeye                Windsail            1111  2       145     Bot
+129   Andreas Ziegler                                   1457  3       143     Bot
+130   Adam De                                           1128  2       142     Bot
+131   Zhiyu Shak                    Delta               1028  2       142     Bot
+132   Guillermo Santamaria                              1191  1       141     Bot
+133   Viljami Heikkilä              Sherpa              960   2       141     Bot
+134   Ousmane Keita                                     1157  2       141     Bot
+135   Joon Cheon                    Hector              1120  2       140     Bot
+136   Fraser Kinnaird                                   1424  3       140     Bot
+137   Chad Moody                                        1039  1       139     Bot
+138   Sammy Griffin                                     1229  1       139     Bot
+139   Daeho Baek                                        1361  2       139     Bot
+140   Louis Pierre                                      1153  2       139     Bot
+141   Kenneth Pettersson            Ampex               1347  2       138     Bot
+142   Heiko Lang                                        1193  2       138     Bot
+143   Erwin Müller                  Systech             1223  2       138     Bot
+144   Rune Skov                     Roklit              1088  2       138     Bot
+145   Minjun Ran                                        1439  3       138     Bot
+146   Noel Toone KCC                Northampton & Dist  673   3       138     Human
+147   Jabari Meade                                      1226  2       137     Bot
+148   Michael Bell                                      1101  2       137     Bot
+149   Anastasia Crawford                                855   2       137     Bot
+150   Nabil Anwar                                       1448  4       137     Bot
+151   Mustapha Yahiaoui             Aspire              654   2       136     Bot
+152   Andy Hall                     Ilkley CC           1390  2       136     Human
+153   Kaique Correia                                    1211  2       135     Bot
+154   Anthony Alexander                                 1261  2       134     Bot
+155   AleX GoLd                     Race3R              1210  2       134     Human
+156   Branko Ljubojević                                 1164  1       133     Bot
+157   Karl Bjerre                   Nuvio               1055  2       133     Bot
+158   Dennis Edwards                                    1403  2       133     Bot
+159   Linus Fischer                                     1144  2       133     Bot
+160   Emma Johnson                                      991   2       133     Bot
+161   Oliver Lloyd                                      1286  2       132     Bot
+162   Lionel Martel                                     1317  2       132     Bot
+163   Hans Watson                                       1020  2       132     Bot
+164   Hassan Al-Khatib                                  1429  2       132     Bot
+165   Walter Melendez                                   1113  2       132     Bot
+166   Georges Jackson               Aspire              1106  1       131     Bot
+167   Tomas Mendez                                      1152  1       131     Bot
+168   Joe Giannone                                      559   2       131     Human
+169   Dwayne Williams               eVOX                1378  2       131     Bot
+170   Stefanos Panagiotopoulos      Eckleson            1330  2       131     Bot
+171   Faro Guidi                                        1046  2       131     Bot
+172   Vicente Chung                                     1264  2       130     Bot
+173   Niraj Tamang                                      1268  2       130     Bot
+174   Perry Massey                                      1275  2       130     Bot
+175   Ryan Hamilton                 Wadenterror         1274  2       130     Human
+176   Sanford Casey                                     1185  2       130     Bot
+177   Pooja Bhattarai               Meisterkuhl         817   2       130     Bot
+178   Rolf Eriksson                 Monova              1119  2       130     Bot
+179   George De Garis               Fable               1072  2       129     Bot
+180   Thomas Macleod                HCOM                1173  1       128     Bot
+181   Monroe Pacheco                Patriot             1278  2       128     Bot
+182   Jame Wood                                         1388  2       128     Bot
+183   Kazuo Fujii                   Eckleson            1210  2       128     Bot
+184   Craig Friesen                                     1103  2       128     Bot
+185   Mahmoud Khatib                Fujikai             857   2       128     Bot
+186   Nasser Pillai                                     1067  2       127     Bot
+187   Herman Espinosa                                   1173  2       127     Bot
+188   Audrey Bourgeois              Titans              938   2       127     Bot
+189   Lukas Tuominen                                    1427  2       127     Bot
+190   Eugene Alexander                                  1220  2       127     Bot
+191   George Kenny                                      1118  2       127     Bot
+192   Ronald De Boer                                    1140  2       127     Bot
+193   Alberto Gutierrez                                 1130  3       127     Bot
+194   Eduardo Gallego               Windsail            1087  1       126     Bot
+195   Berry Wilkerson               Capital             1227  2       126     Bot
+196   Jovana Pašalić                Aspire              698   2       126     Bot
+197   Leonidas Dimitriadis                              814   2       126     Bot
+198   Santino Juarez                eVOX                1118  1       124     Bot
+199   Remo Spina                    AI Thunder          1321  1       124     Bot
+200   Thomas Gérard                                     1195  1       124     Bot
+201   Miguel Carrillo               Monova              1052  2       124     Bot
+202   Jakob Hilti                                       1411  2       124     Bot
+203   Eigil Svendsen                                    852   1       123     Bot
+204   Giovanni Pinna                                    1103  2       123     Bot
+205   Ezra Short                    Formix              1049  2       122     Bot
+206   Lucca Cardoso                 Patriot             1177  2       122     Bot
+207   Edwin Argueta                                     1174  2       122     Bot
+208   Nico Winkler                  Douvan              1218  2       122     Bot
+209   Elvis Hodge                   Fable               1102  2       121     Bot
+210   Diego Theisen                                     937   2       121     Bot
+211   Hyuk So                                           1065  1       120     Bot
+212   Matej Zukanović               True Form           1168  2       120     Bot
+213   Kamal Hassan                                      1143  2       120     Bot
+214   Julian Simon                                      1200  2       120     Bot
+215   Bart Vermeulen                                    1138  2       120     Bot
+216   Francisco Matsinhe                                1421  3       120     Bot
+217   Paul Levoa                    Roklit              1179  1       119     Bot
+218   Antony Preston                                    1006  3       119     Bot
+219   Syed Ibrahim                                      1082  1       118     Bot
+220   Gemma Hamilton                                    100   2       118     Human
+221   Vernon Peck                                       1123  2       118     Bot
+222   Stephen Burgess               Formix              1267  2       118     Bot
+223   Haruto Sugahara               eVOX                1162  2       118     Bot
+224   Francis Garcia                Saint               1121  2       118     Bot
+225   Sher Pillai                   Pioma               1103  1       117     Bot
+226   Jaime Ibañez                  YES                 924   2       117     Bot
+227   Anneke Peters                                     704   2       117     Bot
+228   Nikola Serdarušić                                 1436  3       117     Bot
+229   Jess Benitez                                      953   1       116     Bot
+230   Emerson Beck                  Capital             1145  1       116     Bot
+231   Mika Walter                   Kumori              1252  2       116     Bot
+232   Sascha Walter                                     1319  2       115     Bot
+233   Jérôme Renard                                     1022  2       115     Bot
+234   Martin Mehmed                 Sherpa              1033  2       115     Bot
+235   Serge Muller                  Heat                1145  2       115     Bot
+236   Theodore Burton                                   1496  3       115     Bot
+237   Reinhold Schmitz                                  1096  1       114     Bot
+238   Eetu Saarinen                                     894   1       114     Bot
+239   Patrick Huber                                     1149  1       114     Bot
+240   Romain Devos                                      1198  2       114     Bot
+241   Roberto Rivas                                     1178  2       114     Bot
+242   Richard De Jonge                                  1278  2       114     Bot
+243   Jerry Elliott                                     1301  2       114     Bot
+244   Brian McIntosh                                    1129  2       113     Bot
+245   Roger Craig                                       1280  2       113     Bot
+246   Ethan Damme                                       1224  2       113     Bot
+247   Salvador Mangue               Kumori              1151  2       113     Bot
+248   Werner Schwarz                                    1139  2       113     Bot
+249   Koji Ōtsuka                                       1102  1       112     Bot
+250   George Young                  Kumori              1103  2       112     Bot
+251   Philippe Masson                                   1046  2       112     Bot
+252   Bart De Groot                                     1129  2       112     Bot
+253   Vladimir Rockova              Aspire              1136  2       112     Bot
+254   Maria Carrillo                                    926   1       111     Bot
+255   Victor Garcia                 Orbit               1081  1       111     Bot
+256   Christopher Dixon             Titans              1125  2       111     Bot
+257   Juliette Laurent                                  869   2       111     Bot
+258   David Prakash                                     1277  2       111     Bot
+259   Chunghee Cha                                      1266  2       111     Bot
+260   Edi Rahman                                        1145  2       111     Bot
+261   Carlos Valencia               Nitro               1261  2       111     Bot
+262   Bas Van der Veen              Kumori              1106  2       111     Bot
+263   Kai Wong                                          934   2       111     Bot
+264   Christine Abraham             Fiber Shot          768   2       110     Bot
+265   Johnny Bilodeau               True Form           1180  2       110     Bot
+266   Ludovic Giorgi                                    1222  2       110     Bot
+267   Clement Etienne                                   1144  2       110     Bot
+268   Yuto Okada                    Fiber Shot          955   2       110     Bot
+269   Yuri Shevchuk                 Windsail            876   2       110     Bot
+270   Malong Thon                   Eckleson            1117  1       109     Bot
+271   Sofia Calleja                                     804   2       109     Bot
+272   Dagbjartur Guðmundsson                            1186  2       109     Bot
+273   Junjian Thien                                     1115  2       109     Bot
+274   Simon Anderson                                    993   2       109     Bot
+275   Junaid Al-Muhairi             Fable               831   2       109     Bot
+276   Jun’ichi Okada                                    1224  2       108     Bot
+277   Bashir Khan                                       1107  2       108     Bot
+278   Mark Henningsen                                   894   2       108     Bot
+279   Adrian Lorenzo                Dashix              1124  2       108     Bot
+280   Darryl Powell                                     917   1       107     Bot
+281   Josiah Sherman                                    1111  1       107     Bot
+282   Denis Giles                                       1091  2       107     Bot
+283   Karsten Kristiansen                               1298  2       107     Bot
+284   Tad Hardy                     Base                1189  1       106     Bot
+285   Michael Papp                  Nitro               1233  2       106     Bot
+286   Dario Bernardi                                    1083  2       106     Bot
+287   Benjamin Healy                Aria Olefson        878   1       105     Bot
+288   Jonathan Berger               Optech              1130  1       105     Bot
+289   Norris Arnold                 Fujikai             1263  2       105     Bot
+290   Thanh Castro                                      1192  2       105     Bot
+291   Aleksandar Šančić                                 1072  2       105     Bot
+292   Willis Kelly                  Eckleson            608   2       105     Bot
+293   Arnold Tanner                                     742   2       105     Bot
+294   Claudia D'Agostino            Dashix              808   2       105     Bot
+295   Eric Ayers                    Aria Olefson        944   3       105     Bot
+296   Irwin Hebert                  Kumori              880   1       104     Bot
+297   Hugh Carlson                                      1126  2       104     Bot
+298   Ralf Scholz                                       1055  1       103     Bot
+299   Christian Svensson                                1290  2       103     Bot
+300   Arvid Nyman                                       927   1       102     Bot
+301   Aldo Esposito                                     1356  2       102     Bot
+302   Judson Cook                                       1212  2       102     Bot
+303   Brandi Anthony                Kumori              838   2       102     Bot
+304   Luboslaw Živulić                                  1122  1       101     Bot
+305   Juan Cervantes                Monova              1220  2       101     Bot
+306   Adél Vass                                         649   2       101     Bot
+307   Sonia Gayle                   Optech              756   2       101     Bot
+308   Jerrod Welch                  Base                863   2       101     Bot
+309   Dongsun Mi                                        1121  1       100     Bot
+310   Aleksander Sandvik                                1229  2       100     Bot
+311   James Roche                                       1182  2       100     Bot
+312   Fernand Brunet                                    897   2       100     Bot
+313   Ian Winchester                Paramount CRT       100   2       100     Human
+314   Jia-Li Luo                    Patriot             1037  1       99      Bot
+315   Miguel Bedoya                 Ampex               1275  2       99      Bot
+316   Thad Franklin                                     1234  2       99      Bot
+317   Jan Smets                                         1092  1       98      Bot
+318   Keven Krause                  Aguda               1198  1       98      Bot
+319   Vanessa Walker                Systech             906   1       98      Bot
+320   Xavier Travesset                                  1203  2       98      Bot
+321   Arjan Visser                  Fiber Shot          911   2       98      Bot
+322   Théo Martin                                       570   2       98      Bot
+323   André Diogo                                       965   1       97      Bot
+324   Lowell Knox                                       901   1       97      Bot
+325   Elia Venturi                                      1235  2       97      Bot
+326   Dominique Roche                                   1145  2       97      Bot
+327   Shelton Montes                Fujikai             1102  2       97      Bot
+328   Chen Leung                    Optech              1109  2       96      Bot
+329   Aleksandar Brašanac           Krowen              1119  2       96      Bot
+330   Bart De Jong                  Aguda               1035  2       96      Bot
+331   Eino Niskanen                 Monova              618   1       95      Bot
+332   Goran Tsyplakov               Zonkify             840   1       95      Bot
+333   Jan Ström                                         1091  1       95      Bot
+334   Wim Dijkstra                                      1118  1       95      Bot
+335   Ralf Sommer                                       945   1       95      Bot
+336   Arthur Clercq                                     1100  2       94      Bot
+337   Eemil Saarinen                Saitama             1115  2       94      Bot
+338   Tomislav Sinkovits            Orbit               1142  2       94      Bot
+339   Graciela Zimmerman                                1023  2       94      Bot
+340   Bryce Morris                                      1195  1       93      Bot
+341   Nicolas Jung                                      1147  2       93      Bot
+342   Wendell Hall                  Krowen              1153  2       93      Bot
+343   Eeli Huttunen                 True Form           1195  2       93      Bot
+344   Emmanuel Leclercq                                 1121  2       93      Bot
+345   Marta Harmon                  Heat                591   1       92      Bot
+346   Andreas König                                     713   1       92      Bot
+347   Peter Jensen                  Kumori              850   1       92      Bot
+348   Timéo Schumacher                                  821   1       92      Bot
+349   Sri Astuti                                        926   1       92      Bot
+350   Román Cardozo                                     1053  1       92      Bot
+351   William Axelsson                                  1259  2       92      Bot
+352   Judson Richard                                    965   2       92      Bot
+353   Wyatt Barrera                                     820   2       92      Bot
+354   Niyaz Shaheen                                     1134  2       92      Bot
+355   Lorenzo Roldan                                    924   2       92      Bot
+356   Merlin Stokes                 Pioma               802   2       91      Bot
+357   Curt Winters                                      1121  2       91      Bot
+358   Jaap Van der Linden                               1128  2       91      Bot
+359   Elwood Hancock                Hinal               1226  2       91      Bot
+360   Ethan Flynn                   Hinal               1234  2       91      Bot
+361   Emiliano Martini                                  1224  2       91      Bot
+362   Balam Dang                                        659   1       90      Bot
+363   Tom Lambert                   Windsail            872   1       90      Bot
+364   Jolanda Schütz                                    748   1       90      Bot
+365   Mauro McLean                  Aguda               825   1       90      Bot
+366   Rafael de La Cruz             AI Thunder          1139  1       90      Bot
+367   Thomas Moen                                       1170  1       90      Bot
+368   Gregor Baumann                                    1014  1       90      Bot
+369   Ian Bright                    Coalition           466   2       90      Human
+370   Julian Clercq                                     1266  2       90      Bot
+371   Petar Hladki                                      1217  2       90      Bot
+372   Igor Mraz                                         1080  2       90      Bot
+373   Hilda Korhonen                Eckleson            848   2       89      Bot
+374   Ali Hosseini                                      1119  2       89      Bot
+375   Tyree Nicholson                                   1104  2       89      Bot
+376   Linn Strøm                                        904   1       88      Bot
+377   Youssouf Abdallah                                 1117  1       88      Bot
+378   Krisztián Máté                Krowen              884   1       88      Bot
+379   Hugo Schmitt                                      1029  1       88      Bot
+380   Stig Wallin                   Capital             1080  2       88      Bot
+381   Nobutoshi Takahashi                               1187  2       88      Bot
+382   Jack Mahy                     Base                1285  2       88      Bot
+383   John Pettersson                                   1090  1       87      Bot
+384   Anne Vos                                          958   1       87      Bot
+385   Clarissa Greene                                   751   1       87      Bot
+386   Cecilia Ibrahim                                   700   1       87      Bot
+387   Andrew Crisostomo             Meisterkuhl         1110  1       87      Bot
+388   Chad Maynard                  Dashix              865   1       87      Bot
+389   Hina Hu                       Fable               659   2       87      Bot
+390   Ivan Lorenzen                 eVOX                643   1       86      Bot
+391   Vasileios Lamprou             Formix              1012  1       86      Bot
+392   Ayoub Renard                  Krowen              609   1       86      Bot
+393   Dallas Mejia                                      609   1       86      Bot
+394   Nolan Harvey                  Zonkify             1067  1       86      Bot
+395   Linus Langer                                      1023  1       86      Bot
+396   Dennis Verhoeven                                  462   2       86      Bot
+397   Jack Thomas                                       1147  2       86      Bot
+398   Karolina Albrecht                                 1008  2       86      Bot
+399   Frankie Maher                                     633   2       86      Bot
+400   Emil Pilc                     Systech             1104  2       86      Bot
+401   Mirna Henriquez               YES                 637   1       85      Bot
+402   Isabelle Salgado              Systech             833   1       85      Bot
+403   Chana Shachar                                     748   1       85      Bot
+404   Nicole Schouten                                   792   1       85      Bot
+405   Daisy Nyaga                                       952   1       85      Bot
+406   Ravi Abdulla                  Windsail            1051  1       85      Bot
+407   Habib Alam                                        1168  1       85      Bot
+408   Kilian Hahn                   eVOX                961   1       85      Bot
+409   Sheikh Nair                                       929   1       84      Bot
+410   Nobutoshi Nakashima                               1005  1       84      Bot
+411   Menachem Levy                                     1142  2       84      Bot
+412   Yosyp Melnichuk                                   1180  2       84      Bot
+413   Claude Nguema                                     821   2       84      Bot
+414   Eddie Kemp                    Sherpa              655   1       83      Bot
+415   Francois Thomson                                  1011  1       83      Bot
+416   Andreas Schumann                                  805   1       83      Bot
+417   Leila Rachidi                                     740   1       83      Bot
+418   Klaus Busch                   Ampex               940   1       83      Bot
+419   Qingjin Wan                                       899   1       83      Bot
+420   Michael Srensen                                   914   1       83      Bot
+421   Kenneth Fuentes               Pioma               935   2       83      Bot
+422   Harrison Bridges                                  1195  2       83      Bot
+423   Sofia Herasymenko             Aria Olefson        646   2       83      Bot
+424   Nico Schmidt                                      1039  2       83      Bot
+425   Oleg Winograd                                     967   2       83      Bot
+426   Atsuki Ueda                                       1123  1       82      Bot
+427   Paula Diogo                                       616   1       82      Bot
+428   Yamikani Tembo                                    784   1       82      Bot
+429   Olli Laaksonen                Dashix              640   1       82      Bot
+430   Stefan Mohamed                                    785   1       82      Bot
+431   Philipp Marxer                Saitama             802   1       82      Bot
+432   Johan Londoño                                     1017  1       81      Bot
+433   Betty Wright                                      362   1       81      Bot
+434   Michael Griffith                                  1037  1       81      Bot
+435   Gabriela Domínguez            eVOX                611   1       81      Bot
+436   Thomas Schulte                                    539   1       81      Bot
+437   Emilie Lambert                Patriot             914   1       81      Bot
+438   Sebastian Berglund            Meisterkuhl         1106  1       81      Bot
+439   Tiyamike Kasiya                                   1000  2       81      Bot
+440   Joshua Hendrickx                                  1160  2       81      Bot
+441   Tim Jansen                                        1004  2       81      Bot
+442   Agustin Hickman                                   651   1       80      Bot
+443   Christoffer Arvidsson                             1182  1       80      Bot
+444   Vira Yurchenko                Aria Olefson        602   1       80      Bot
+445   Kamil Kukharchuk                                  986   1       80      Bot
+446   Morten Isaksen                Patriot             903   1       80      Bot
+447   Sandra Stein                                      448   2       80      Bot
+448   Joyce Nichols                                     616   1       79      Bot
+449   Kelly Wolf                                        1171  1       79      Bot
+450   Annabelle Wenzel                                  694   1       79      Bot
+451   Maj Wallin                                        586   1       79      Bot
+452   Gianni de                     YES                 939   1       79      Bot
+453   Birgir Gunnarsdóttir          Aspire              1131  1       79      Bot
+454   Kenzo Ichikawa                Titans              1002  1       79      Bot
+455   Ariel Leibowitz                                   882   1       79      Bot
+456   Marcos Soriano                                    1291  2       79      Bot
+457   Rob Ford                                          996   2       79      Bot
+458   Tukua Ha'apai                 AMO Solutions       995   1       78      Bot
+459   Leao Kramer                   Fiber Shot          862   1       78      Bot
+460   Eleanor Culmer                                    541   1       78      Bot
+461   Jose Galvez                                       676   1       78      Bot
+462   Evi Baumann                                       933   1       78      Bot
+463   Rafael Aguirre                                    1135  1       78      Bot
+464   Grace Lawson                                      969   1       78      Bot
+465   Attila Vida                   HCOM                865   1       78      Bot
+466   Mason Clague                                      1247  2       78      Bot
+467   Bert Jacobs                   Fujikai             1065  2       78      Bot
+468   Juan Segura                   Hector              865   1       77      Bot
+469   Vira Shvets                   Aspire              674   1       77      Bot
+470   Alastair Somerville           Optech              1064  1       77      Bot
+471   Tanner Dominguez                                  853   1       77      Bot
+472   Ingrid Pettersen                                  624   1       77      Bot
+473   Yukinari Nakayama                                 1035  1       77      Bot
+474   Heiko Schmid                  Windsail            958   1       77      Bot
+475   Faro D'Amico                                      895   1       77      Bot
+476   Greta McIntyre                Titans              661   2       77      Bot
+477   Aviv Adri                                         1180  2       77      Bot
+478   Dean Harding                  Itchy Trout Racing  656   2       77      Human
+479   Olli Vainio                   YES                 1198  2       77      Bot
+480   Espen Lie                                         1151  2       77      Bot
+481   Mathéo Desmet                                     1185  1       76      Bot
+482   Risto Rissanen                                    835   1       76      Bot
+483   Cynthia Liu                                       896   1       76      Bot
+484   Nicolas Smets                 Ampex               894   1       76      Bot
+485   Laura Van der Veen                                1005  1       76      Bot
+486   Allan Plante                                      991   1       76      Bot
+487   Kaj Laugesen                  Orbit               914   1       76      Bot
+488   bálint Illés                                      913   1       76      Bot
+489   Antoine Henry                                     646   1       75      Bot
+490   Hank Ross                                         1208  1       75      Bot
+491   Elmo Tosi                                         1255  1       75      Bot
+492   Julia Kalieva                                     803   1       75      Bot
+493   Augusto Embalo                Krowen              694   1       75      Bot
+494   Noel Bennett                                      1050  1       75      Bot
+495   Edwardo Hobbs                 eVOX                799   1       75      Bot
+496   Gretchen Wallace              Systech             769   2       75      Bot
+497   Emiliano Ceccarelli           Zonkify             1222  2       75      Bot
+498   Rune Martin                                       746   2       75      Bot
+499   William Samuelu               Patriot             1041  2       75      Bot
+500   Noah Leclercq                                     865   1       74      Bot
+501   Christian Schumann                                634   1       74      Bot
+502   Eemil Mäkelä                  Saint               1088  1       74      Bot
+503   Isabella Rossi                Hinal               717   1       74      Bot
+504   Elisa Marchese                Hector              491   1       74      Bot
+505   Alejandro Giraldo                                 857   1       74      Bot
+506   Ludovic Ceccarelli            Ampex               866   1       74      Bot
+507   Raymonde Thomas               Capital             548   2       74      Bot
+508   Yousef Ansari                 Sherpa              934   2       74      Bot
+509   Tommie Lloyd                                      939   1       73      Bot
+510   Doris Taitano                                     667   1       73      Bot
+511   Duncan Burke                                      1202  1       73      Bot
+512   Linglu Sim                                        625   1       73      Bot
+513   Alfreda Ruiz                                      595   1       73      Bot
+514   Zione Kamanga                                     876   1       73      Bot
+515   Herman Hoffman                True Form           971   1       73      Bot
+516   Radmila Mijušković            Saitama             623   2       73      Bot
+517   Birgit S                      WATTFabrik          813   2       73      Human
+518   Kentaro Gotō                                      1185  2       73      Bot
+519   Dietmar Lindner               Formix              1114  1       72      Bot
+520   Latifa Hajar                                      1006  1       72      Bot
+521   Katerina Mićin                                    608   2       72      Bot
+522   Maurice Bell                                      1028  1       71      Bot
+523   Benvolio Meloni               Hector              622   1       71      Bot
+524   Manuel Rademacher             True Form           940   1       71      Bot
+525   Dominic Charbonneau                               906   1       71      Bot
+526   Alonzo Caruso                                     801   1       71      Bot
+527   Enzo Angelini                                     1062  1       71      Bot
+528   Yoobin Pi                                         1058  1       71      Bot
+529   Germaine Moreau               Heat                933   1       71      Bot
+530   Olav Eide                                         953   1       71      Bot
+531   Thabit Goh                                        1165  2       71      Bot
+532   Eve Maher                                         610   1       70      Bot
+533   Fanqia Ma                                         992   1       70      Bot
+534   Inunnguaq Egede               Monova              585   1       70      Bot
+535   Emmanuel Escobar              Fable               647   1       70      Bot
+536   Markuss Gailītis                                  930   1       70      Bot
+537   Giovanni Ferrari                                  845   1       70      Bot
+538   Rolland Jimenez               Krowen              737   2       70      Bot
+539   Saif Che                      Nuvio               951   1       69      Bot
+540   Logan Cochran                                     694   1       69      Bot
+541   Darijo Vanek                  Aguda               792   1       69      Bot
+542   Mauricio Richards                                 1174  1       69      Bot
+543   Patricia Lemoine              Fable               653   1       69      Bot
+544   Hajoon Jang                                       846   1       69      Bot
+545   Joey Robinson                                     830   1       69      Bot
+546   Freddie Gillespie                                 1012  1       69      Bot
+547   Ervin Glenn                                       648   1       68      Bot
+548   Seung Hyeong                  Fable               975   1       68      Bot
+549   Iris Bonilla                                      685   1       68      Bot
+550   Eldon Trujillo                                    1112  1       68      Bot
+551   Vicky Kalsakau                                    642   1       68      Bot
+552   Kenzo Shimizu                                     891   1       68      Bot
+553   Mauri Lehtonen                Patriot             1154  1       68      Bot
+554   Niklas Axelsson               Meisterkuhl         1123  1       68      Bot
+555   Brandon Harrison              eVOX                1068  1       68      Bot
+556   Marc Jensen                                       884   1       68      Bot
+557   Mousa Salem                                       943   1       67      Bot
+558   Abraham Bond                                      1047  1       67      Bot
+559   Eva Bondarenko                Krowen              568   1       67      Bot
+560   Christian Weiß                Monova              1157  1       67      Bot
+561   Adam Backer                   Douvan              623   1       67      Bot
+562   Runchu Lim                    AI Thunder          820   1       67      Bot
+563   Major Salas                                       1190  1       67      Bot
+564   Janusz Tomaszewski            Windsail            886   1       67      Bot
+565   Lina Martens                                      904   1       67      Bot
+566   Lesa Logan                                        500   2       67      Bot
+567   Encarnacion Vicente                               872   3       67      Bot
+568   Daniel Caron                  Aria Olefson        896   1       66      Bot
+569   Qinru Li                                          620   1       66      Bot
+570   Angelina Conner               eVOX                633   1       66      Bot
+571   Peter Kraus                   Fujikai             841   1       66      Bot
+572   Sandra Richter                True Form           622   1       66      Bot
+573   Théo Collard                  Ampex               922   1       66      Bot
+574   Avis Warren                   Hector              887   1       66      Bot
+575   Nitai Levy                                        857   1       66      Bot
+576   Gabriel Brianti                                   862   2       66      Bot
+577   Rene Van den Berg                                 817   1       65      Bot
+578   Grigorios Athanasiou          Heat                900   1       65      Bot
+579   J D O                         DIRT                1537  1       65      Human
+580   Paul Babu                     YES                 627   1       65      Bot
+581   Sergio Martin                 Dashix              1284  1       65      Bot
+582   Gianni Palumbo                Ampex               924   1       65      Bot
+583   Allan Ottosen                 True Form           788   1       65      Bot
+584   Ross Collins                                      1180  1       65      Human
+585   Afet Kaya                     Douvan              411   1       65      Bot
+586   Oliver Fraser                 Roklit              1233  1       65      Bot
+587   Quentin Paquot                Profitivisme        1173  1       65      Human
+588   Cody Stephenson               Your Group Ride     1009  1       65      Human
+589   Steve Lopro                                       100   1       65      Human
+590   Dan Stimson                   Race3R              1221  1       65      Human
+591   Thomas Davison                Warriors            1388  1       65      Human
+592   Yingtai Loh                                       1000  1       65      Bot
+593   Cornelia Fuller               Hinal               429   1       65      Bot
+594   Milán Németh                                      1076  1       65      Bot
+595   Olivier Faure                 Nuvio               744   1       65      Bot
+596   Jeff Baumgardner              Dirty Rascals       1366  1       65      Human
+597   Morten Jarlund                indieVelo Founders  1423  1       65      Human
+598   Richard Jones                                     100   1       65      Human
+599   Alfredo Monaco                Krowen              646   1       65      Bot
+600   Julian Burren                                     1347  1       65      Human
+601   Cassandra Bass                                    396   1       65      Bot
+602   Christian Belka                                   100   1       65      Human
+603   Daniel Nyström                                    100   1       65      Human
+604   Beniamin Wójcik               Eckleson            868   1       65      Bot
+605   Wendi Munoz                                       606   1       65      Bot
+606   Roger Blanc                   Fujikai             1062  1       65      Bot
+607   Dunja Bergmann                Meisterkuhl         630   1       65      Bot
+608   Isla Le Tissier                                   571   1       65      Bot
+609   Stanford Truong               Meisterkuhl         977   1       65      Bot
+610   Pylyp Polishchuk                                  1282  1       65      Bot
+611   Jiyoon Yu                                         811   1       65      Bot
+612   Sandra Ström                  Fable               863   2       65      Bot
+613   Even Johansen                                     1007  1       64      Bot
+614   Berit Engström                                    444   1       64      Bot
+615   Bert Van Leeuwen                                  1179  1       64      Bot
+616   Natalia Garzon                                    645   1       64      Bot
+617   Holger Mayer                  Hector              538   1       64      Bot
+618   Emilia Ekström                                    978   1       64      Bot
+619   Lionel Perrin                 Meisterkuhl         942   1       64      Bot
+620   Josefina Thomas                                   376   2       64      Bot
+621   Alexander Desmet                                  858   1       63      Bot
+622   Seoyeon Yong                                      653   1       63      Bot
+623   Katerina Ljubičić             Fiber Shot          631   1       63      Bot
+624   Matthew Salazar               Titans              1249  1       63      Bot
+625   Frederic Simpson              Nuvio               1119  1       63      Bot
+626   Diana Jakobsen                                    785   1       63      Bot
+627   Iris Pohl                                         777   1       63      Bot
+628   Bjørn Larsen                  Windsail            932   1       63      Bot
+629   Minho Ryu                     Delta               1042  1       63      Bot
+630   Frank Williams                                    830   1       62      Bot
+631   Jose Carmona                                      721   1       62      Bot
+632   Grant Bradley                                     1237  1       62      Bot
+633   Mitsuaki Kobayashi                                1236  1       62      Bot
+634   Witold Baran                                      540   1       62      Bot
+635   Jules Jacobs                                      619   1       62      Bot
+636   Ivanka Abramowicz                                 987   1       62      Bot
+637   Toms Gailītis                 Heat                712   1       62      Bot
+638   Sanna Ahola                   Douvan              454   1       62      Bot
+639   Lasse Busch                                       1206  1       62      Bot
+640   Fiorenzo Spina                                    1231  1       62      Bot
+641   Katie Picard                  eVOX                611   1       62      Bot
+642   kudos games                   DIRT                1408  1       62      Human
+643   Amparo Aranda                 eVOX                912   1       62      Bot
+644   Christian Nistri              Allkin CC           792   1       62      Human
+645   Khalid Al-Maskari                                 422   1       62      Bot
+646   Sten Michaelsen                                   1073  1       62      Bot
+647   Rudolf Dolezal                                    100   1       62      Human
+648   Léo Bernard                                       754   1       62      Bot
+649   Jackie Ventura                                    1254  1       62      Bot
+650   Elizabete Gailis                                  508   1       62      Bot
+651   Lidia Casas                                       668   1       62      Bot
+652   Keoni Loeak                   Delta               1190  1       62      Bot
+653   Grigorios Pappas              Kumori              350   1       62      Bot
+654   Klaus König                   Delta               884   1       62      Bot
+655   Magdalena Baumann                                 525   1       62      Bot
+656   Lore Desmet                   Orbit               689   1       62      Bot
+657   Hanneke Janssen                                   714   1       62      Bot
+658   Lisa Köhler                   Fable               637   1       62      Bot
+659   Tommy Jensen                                      1011  1       62      Bot
+660   Stephan Hahn                  YES                 765   1       62      Bot
+661   Henry Gumbs                                       1208  1       62      Bot
+662   Eliel Niskanen                Optech              1077  1       62      Bot
+663   Mika Maes                                         1243  1       62      Bot
+664   Carmen De                     Nuvio               536   2       62      Bot
+665   Daniel Holdener               indieVelo Founders  653   1       61      Human
+666   Javier Fuentes                Fiber Shot          875   1       61      Bot
+667   Dobroslav Bilous              Zonkify             1190  1       61      Bot
+668   André Guerin                                      1297  1       61      Bot
+669   Ludovic Giuliani                                  572   1       61      Bot
+670   Sherry Cano                                       615   1       61      Bot
+671   Neil Erickson                                     936   1       61      Bot
+672   Eduardo Moreira                                   768   1       61      Bot
+673   Arthur Paquet                                     1125  1       61      Bot
+674   Nola Macdonald                                    446   1       61      Bot
+675   Petar Hladki                  Patriot             1127  1       61      Bot
+676   Tommy Parra                                       1169  1       61      Bot
+677   Lucie Evrard                  Aria Olefson        629   1       61      Bot
+678   Willem De Brujin              Aria Olefson        1247  1       61      Bot
+679   Emil Lučić                    Roklit              428   1       61      Bot
+680   Dobroslav Košarac             Meisterkuhl         906   1       61      Bot
+681   Mathias Peters                                    707   1       61      Bot
+682   Felix Krüger                                      780   1       61      Bot
+683   Stefano Battaglia                                 478   1       61      Bot
+684   Berry Bailey                                      649   1       61      Bot
+685   Emily Flores                  Douvan              373   1       61      Bot
+686   Moises Hernandez              Heat                901   1       61      Bot
+687   Javier Roman                                      894   1       61      Bot
+688   Blaine Cain                                       1032  1       61      Bot
+689   Antonia Viola                                     552   1       61      Bot
+690   Madeleine Mitchell                                651   1       61      Bot
+691   Lindsey Pacheco                                   1163  1       61      Bot
+692   Kārlis Balodis                True Form           558   1       61      Bot
+693   Liepa Visockas                                    677   1       61      Bot
+694   Klaus Danielsen                                   906   1       61      Bot
+695   Tapio Salminen                Meisterkuhl         1217  1       61      Bot
+696   Nathan Mota                                       833   1       61      Bot
+697   Luna Chaves                   Patriot             558   2       61      Bot
+698   Lazaro Miller                                     1018  1       60      Bot
+699   Ahmad Oconnell                                    1024  1       60      Bot
+700   Ashraf Ramadan                                    1204  1       60      Bot
+701   Lachlan Crawford                                  1017  1       60      Bot
+702   Fetu Tufuga                   AMO Solutions       1121  1       60      Bot
+703   Fetu Vaha'akolo               Optech              969   1       59      Bot
+704   Raina Melunović               Capital             412   1       59      Bot
+705   Rayan Fontaine                                    967   1       59      Bot
+706   Virpi Mikkola                                     581   1       59      Bot
+707   Alice Blanchard               Zonkify             612   1       59      Bot
+708   Zuhair Al-Naqbi               Ampex               796   1       59      Bot
+709   Steve Campbell                                    1321  1       59      Bot
+710   Christopher Diaz              Douvan              1020  1       59      Bot
+711   Nadirah Nasir                                     821   1       59      Bot
+712   Elian Albrecht                Delta               1037  2       59      Bot
+713   Pierre Kasongo                Eckleson            1309  2       59      Bot
+714   Sophie Vibert                                     623   2       59      Bot
+715   Perry Nelson                  Meisterkuhl         784   1       58      Bot
+716   Thomas Cameron                                    1200  1       58      Bot
+717   Angel Martin                                      1182  1       58      Bot
+718   Megan Skelly                                      596   1       58      Bot
+719   Ton Dekker                                        1256  1       58      Bot
+720   Burl Gould                                        902   1       58      Bot
+721   Stephen Wilcox                AI Thunder          772   1       58      Bot
+722   Jacqueline Chambers           YES                 405   1       58      Bot
+723   Jose Santos                   Base                1215  1       58      Bot
+724   Serge Blanc                                       1029  1       58      Bot
+725   Mariah Caldeira               True Form           624   1       58      Bot
+726   Gabrielius Kazlauskas         HCOM                1317  1       58      Bot
+727   Matthew Felix                                     779   1       58      Bot
+728   Xander Thomas                                     1203  1       58      Bot
+729   Bjørn Pettersen               Eckleson            1181  1       58      Bot
+730   Dieter Herrmann                                   762   1       58      Bot
+731   Kitty Faulkner                                    447   1       58      Bot
+732   Frances Peters                AMO Solutions       879   1       58      Bot
+733   Susanna Hobbs                                     760   1       58      Bot
+734   Yeonatan Katz                 Aria Olefson        725   1       58      Bot
+735   Adrian Wolf                                       1165  1       58      Bot
+736   Frederic Girard                                   448   1       58      Bot
+737   Laura Lūsis                                       637   1       58      Bot
+738   Inga Kristoffersen                                318   1       58      Bot
+739   Matej Rebić                   Monova              811   1       58      Bot
+740   Elias Goossens                                    1139  1       58      Bot
+741   Borysko Levchenko                                 936   1       58      Bot
+742   Jay Shannon                   Aguda               877   1       58      Bot
+743   Noor Hermans                  Nitro               443   1       58      Bot
+744   Vittorio Ferrero                                  1152  1       58      Bot
+745   Willem Van Dam                                    1081  1       58      Bot
+746   Fidel Roth                                        548   1       58      Bot
+747   Germaine Gauthier                                 562   1       58      Bot
+748   Rebecca Luna                  Zonkify             846   1       58      Bot
+749   Oliver Koch                   Titans              1166  1       58      Bot
+750   Cristian Castaño                                  1164  1       58      Bot
+751   Koa Rapu                                          957   1       58      Bot
+752   Ali Usmanov                                       820   1       57      Bot
+753   Eliyahu Shemesh               Eckleson            863   1       57      Bot
+754   Amit Ashknaziy                Nuvio               1013  1       57      Bot
+755   Emil Rockov                                       1247  1       57      Bot
+756   Werner Kaiser                                     1351  1       57      Bot
+757   Henk De Jong                                      578   1       57      Bot
+758   Raimo Mustonen                Systech             629   1       57      Bot
+759   Felipe Paredes                Base                945   1       57      Bot
+760   Mickey Hogan                                      731   1       57      Bot
+761   Twila Horne                   Fujikai             398   1       57      Bot
+762   Brock Todd                    Douvan              1212  1       57      Bot
+763   Laurie Kramer                                     905   1       57      Bot
+764   Horace Hogan                  Optech              1195  1       57      Bot
+765   Ethan Appadoo                 Capital             1170  1       57      Bot
+766   Francisco Araújo                                  781   1       57      Bot
+767   Edward Stanley                                    391   1       57      Bot
+768   Erik Sund                     Coalition           794   1       57      Human
+769   Nurhayati Susanto             AI Thunder          734   1       57      Bot
+770   Mar Calderon                  Capital             777   1       57      Bot
+771   Beatriz Bernal                                    511   1       57      Bot
+772   Alice Norberg                                     722   1       57      Bot
+773   Garth Love                                        1154  1       57      Bot
+774   Louise Stanton                Optech              365   1       57      Bot
+775   Bence László                                      874   1       57      Bot
+776   Valentino Rojas               Delta               900   1       57      Bot
+777   Anu Laur                                          1008  1       57      Bot
+778   Josefa Hidalgo                Windsail            497   1       57      Bot
+779   Ilay Masarweh                 Ampex               991   1       57      Bot
+780   Olivier Denis                 Douvan              498   1       57      Bot
+781   Felix Hurst                                       1217  1       57      Bot
+782   Esther Van der Heijden                            687   1       57      Bot
+783   Christopher Bartholomew       HCOM                794   1       57      Bot
+784   Josue Mosquera                                    845   1       57      Bot
+785   Gail Crane                    Delta               1172  1       57      Bot
+786   Willy Atkins                                      1050  1       57      Bot
+787   Antonio Lima                                      1084  1       57      Bot
+788   Innocent Ndayishimiye                             1089  1       57      Bot
+789   Seren Phillips                                    663   2       57      Bot
+790   Diedie Fam                                        792   1       56      Bot
+791   Lyman Duarte                                      759   1       56      Bot
+792   Petar Šančić                                      761   1       56      Bot
+793   Paul Rajan                                        1096  1       56      Bot
+794   Luan Vasconcelos                                  1075  1       56      Bot
+795   Danny Connor                  Pioma               1084  1       56      Bot
+796   Keith Ballard                                     1278  1       56      Bot
+797   Danielle Lemaire                                  479   1       56      Bot
+798   Maria Marquez                                     506   1       56      Bot
+799   Sofia Medina                  Hinal               609   1       56      Bot
+800   Madeleine Meunier             Aguda               592   1       56      Bot
+801   Numbers Orozco                Monova              1010  1       56      Bot
+802   Miriam Alfaro                                     847   1       56      Bot
+803   Mini Ahmad                    Ampex               616   1       56      Bot
+804   Nena Schmidt                  True Form           799   1       56      Bot
+805   Dariusz Nowicki               Douvan              1092  1       56      Bot
+806   Albin Jonsson                                     1000  1       56      Bot
+807   Hilde Kristiansen             Fable               378   1       56      Bot
+808   Anita Zakrzewska                                  403   1       56      Bot
+809   Scott Wright                                      1194  1       56      Bot
+810   Xander Fontaine                                   1225  1       56      Bot
+811   Timo Neumann                                      1151  1       56      Bot
+812   Graham Erskine                Aguda               1207  1       56      Bot
+813   Lotte Claes                   Fujikai             526   1       56      Bot
+814   Katie Hudson                  Monova              605   1       56      Bot
+815   Russ Ashley                                       1326  1       56      Bot
+816   Marek Brozović                Fiber Shot          858   1       56      Bot
+817   Karell Hodge                  Dashix              749   1       56      Bot
+818   Angus Galloway                                    1131  1       56      Bot
+819   Jim Macleod                                       1285  1       56      Bot
+820   Robert Peters                 YES                 1007  1       56      Bot
+821   Lucas Hermans                 Douvan              984   1       56      Bot
+822   Veronique Lacroix             Fable               462   1       56      Bot
+823   Rosa Rizzi                    Heat                439   1       56      Bot
+824   Marianne Bates                                    865   1       56      Bot
+825   Ellen Kramer                  Sherpa              948   1       56      Bot
+826   Mette Solberg                                     728   1       56      Bot
+827   Jackson Short                 Douvan              803   1       56      Bot
+828   Guillaume Faure                                   785   1       56      Bot
+829   Martin Krajewski              True Form           768   1       56      Bot
+830   Bhargava Rai                  Zonkify             1184  1       56      Bot
+831   Ronald De Haan                                    1097  1       56      Bot
+832   Younghee Bae                  Eckleson            480   1       56      Bot
+833   Christi Rollins                                   457   1       56      Bot
+834   Dorian Velazquez                                  676   1       56      Bot
+835   Beeri Kadosh                                      531   1       56      Bot
+836   Kevin Medina                                      1031  1       56      Bot
+837   Jacob Robinson                Roklit              1139  1       56      Bot
+838   Amna Chaudhry                                     379   1       56      Bot
+839   Lea Riedel                                        289   1       56      Bot
+840   thimo willems                                     100   1       56      Human
+841   Celestin Mbayo                                    770   1       56      Bot
+842   Ulysses Cantu                 Heat                1075  1       56      Bot
+843   Daniel Kanku                                      1046  1       56      Bot
+844   Alphonse Madden               Fujikai             1151  1       56      Bot
+845   Haojin Sii                                        675   1       56      Bot
+846   Viktor Magnusson                                  963   1       56      Bot
+847   Bjarke Mouritsen                                  698   1       56      Bot
+848   Andre Willems                                     1183  1       56      Bot
+849   Katrina Brennan                                   549   1       56      Bot
+850   Jose Avila                                        443   1       56      Bot
+851   Ismo Suominen                 Fiber Shot          917   1       56      Bot
+852   Earl Ellison                                      1236  1       56      Bot
+853   Sarah Lacroix                                     787   1       56      Bot
+854   Alejo Aguirre                                     690   1       55      Bot
+855   Bert Verhoeven                Dashix              1158  1       55      Bot
+856   Jes Clemmensen                Meisterkuhl         1041  1       55      Bot
+857   Yeong Paeng                                       1288  1       55      Bot
+858   Reda Al-Taniji                                    609   1       55      Bot
+859   Jasmin Hartmann                                   626   1       55      Bot
+860   Clara Garcia                                      784   1       55      Bot
+861   Scotty Alexander                                  1017  1       55      Bot
+862   Hawa Kollie                   Eckleson            414   1       55      Bot
+863   Giotto D'Angelo                                   1207  1       55      Bot
+864   Nikolaj Laugesen                                  1115  1       55      Bot
+865   Yiting Cheong                                     539   1       55      Bot
+866   Adam Leroy                                        856   1       55      Bot
+867   Momchil Mustafa                                   1177  1       55      Bot
+868   Kian Fuchs                                        829   1       55      Bot
+869   Callum Taylor                                     768   1       55      Bot
+870   Lucie Claeys                  Systech             701   1       55      Bot
+871   Sara Laustsen                 Hinal               790   1       55      Bot
+872   André Martinez                                    1243  1       55      Bot
+873   Wilmer Amaya                  Roklit              1242  1       55      Bot
+874   Errol Bryan                                       569   1       55      Bot
+875   Laura Virtanen                Sherpa              684   1       55      Bot
+876   Seojoon Rim                   Aria Olefson        1329  1       55      Bot
+877   Valentín Rojas                                    993   1       55      Bot
+878   Florence Morin                                    372   1       55      Bot
+879   Benjamin Sauer                YES                 904   1       55      Bot
+880   Salvatore Galli               Meisterkuhl         1007  1       55      Bot
+881   Trey Foley                                        1088  1       55      Bot
+882   Jan Foser                                         1056  1       55      Bot
+883   Anne-Marie Walsh                                  593   1       55      Bot
+884   Jim Wilson                                        1015  1       55      Bot
+885   Anna Tuominen                 Monova              923   1       55      Bot
+886   Robin Seifert                 Douvan              458   1       55      Bot
+887   Valentina Szervánszky                             897   1       55      Bot
+888   Roderick Malone               Fiber Shot          988   1       55      Bot
+889   Curt McCullough               Heat                1205  1       55      Bot
+890   Urho Järvinen                 Systech             850   1       55      Bot
+891   Valarie Reynolds              Krowen              728   1       54      Bot
+892   Carla Visser                                      830   1       54      Bot
+893   Helena Graf                                       866   1       54      Bot
+894   Yumi Pyeon                                        759   1       54      Bot
+895   Birger Olesen                                     1218  1       54      Bot
+896   Nitai Ezra                                        1112  1       54      Bot
+897   Loretta Stark                                     1038  1       54      Bot
+898   Denis Quinn                                       606   1       54      Bot
+899   Kerstin Friedrich                                 578   1       54      Bot
+900   Rostyslav Kostenko            Hinal               676   1       54      Bot
+901   Connie Klein                                      644   1       54      Bot
+902   Henri Olivier                 eVOX                820   1       54      Bot
+903   Madeline Trejo                Nuvio               701   1       54      Bot
+904   Ignacio Woods                                     619   1       54      Bot
+905   Larry Grant                                       779   1       54      Bot
+906   Siwoo Bu                                          986   1       54      Bot
+907   Joey Morgan                                       1047  1       54      Bot
+908   Ella Owen                                         350   1       54      Bot
+909   Suzette Simpson                                   450   1       54      Bot
+910   Hyeon Sang                    Saitama             1180  1       54      Bot
+911   Hans Nagel                    Krowen              597   1       54      Bot
+912   Róisín Smith                  Pioma               659   1       54      Bot
+913   Cherie Garrett                Nitro               940   1       54      Bot
+914   Louane Simon                  Ampex               845   1       54      Bot
+915   Filip Đurišić                 Fujikai             1020  1       54      Bot
+916   Pavel Semenov                                     791   1       54      Bot
+917   Tupou Funaki                                      428   1       54      Bot
+918   Camila Jesus                  Heat                459   1       54      Bot
+919   Corina Yang                   Delta               774   1       54      Bot
+920   Polly Matthews                Systech             881   1       54      Bot
+921   Alea Keller                                       770   1       54      Bot
+922   Pablo Reyes                   Systech             579   1       54      Bot
+923   Amine Backer                  Titans              713   1       54      Bot
+924   Chinhwa Deungjeong            AI Thunder          754   1       54      Bot
+925   David Almeida                 Patriot             1279  1       54      Bot
+926   Juan Mamani                   True Form           1313  1       54      Bot
+927   Juan Montes                                       1075  1       54      Bot
+928   Thomas French                 Base                1052  1       54      Bot
+929   William Thomas                Pioma               451   1       54      Bot
+930   Giuliana Grillo                                   509   1       54      Bot
+931   Peter Schmid                                      578   1       54      Bot
+932   Carmen Gordon                                     671   1       54      Bot
+933   Ange PESSION                  Riders Givrés du T  1271  1       54      Human
+934   Maarten Van der Linden        Dashix              1099  1       54      Bot
+935   Lev Spivak                                        1187  1       54      Bot
+936   Martin Armstrong                                  937   1       54      Bot
+937   Haewon Ye                     Aguda               280   1       54      Bot
+938   Barbara Elliott                                   376   1       54      Bot
+939   Janko Kucka                   Krowen              1240  1       54      Bot
+940   Gabriel Garnier               AMO Solutions       952   1       54      Bot
+941   Stepan Yshchenko              Monova              1129  1       54      Bot
+942   Arvid Nilsson                 Heat                985   1       54      Bot
+943   Fred Liu                                          1102  1       54      Bot
+944   Leon Laugesen                                     858   1       54      Bot
+945   Mina Yun                                          635   1       54      Bot
+946   Goran Ješić                   Orbit               1199  1       54      Bot
+947   Claire Leduc                                      583   1       54      Bot
+948   Stan Barajas                                      1016  1       54      Bot
+949   John Blom                     Aguda               1113  1       54      Bot
+950   Kate Collins                                      944   1       54      Bot
+951   Lewis Robertson                                   916   2       54      Bot
+952   Luis Prieto                   Patriot             863   1       53      Bot
+953   Normand Martel                                    593   1       53      Bot
+954   Vanessa Mosley                                    895   1       53      Bot
+955   Alva Baker                                        1177  1       53      Bot
+956   Xavier Silva                                      1228  1       53      Bot
+957   Andreas Neumann                                   1054  1       53      Bot
+958   Rune Aerts                                        505   1       53      Bot
+959   Vilma Franco                                      623   1       53      Bot
+960   Sergey Novik                  Dashix              688   1       53      Bot
+961   Noa Iwasaki                                       451   1       53      Bot
+962   Bonhwa Mu                     Sherpa              1153  1       53      Bot
+963   Stefan Groß                                       1129  1       53      Bot
+964   Gabriela Jansen                                   653   1       53      Bot
+965   Susanne Krog                                      1016  1       53      Bot
+966   Kristaps Rudzītis                                 1255  1       53      Bot
+967   Felix Eberle                                      1217  1       53      Bot
+968   Helena Carlsson                                   443   1       53      Bot
+969   Lars Dahl                     Krowen              711   1       53      Bot
+970   Nita Dennis                   Douvan              818   1       53      Bot
+971   Micah Harmon                                      1303  1       53      Bot
+972   Lennart Jansson                                   1078  1       53      Bot
+973   Amanda Przybylska                                 509   1       53      Bot
+974   Alexandre Damme                                   1082  1       53      Bot
+975   Hitomi Wada                   Heat                358   1       53      Bot
+976   George Friesen                                    1270  1       53      Bot
+977   David Sele                                        997   1       53      Bot
+978   Sergio Martini                Systech             865   1       53      Bot
+979   Madeleine Gauthier                                879   1       53      Bot
+980   Anu Bat                       Meisterkuhl         441   1       53      Bot
+981   Janki Naidu                                       590   1       53      Bot
+982   Gale Orr                                          534   1       53      Bot
+983   Michelle Simon                                    725   1       53      Bot
+984   Ryu Sasaki                    Nitro               925   1       53      Bot
+985   Leao Kramer                   Base                1064  1       53      Bot
+986   Timur Barat                   eVOX                1143  1       53      Bot
+987   Colin York                                        1050  1       53      Bot
+988   Jimin Paeng                   Roklit              784   1       53      Bot
+989   Darryl Brown                  GPC Squad           100   2       53      Human
+990   Thomas Jansen                 eVOX                692   1       52      Bot
+991   Abdoulie Bahs                 Ampex               897   1       52      Bot
+992   Giulia Barbieri               Fable               949   1       52      Bot
+993   Jan Peters                                        894   1       52      Bot
+994   Jokūbas Petrauskas                                1093  1       52      Bot
+995   Khurram Salem                 AI Thunder          1261  1       52      Bot
+996   Bert Jacobs                   Hinal               1081  1       52      Bot
+997   Lucien Lalonde                                    1301  1       52      Bot
+998   Astrid Nordström              Monova              1088  1       52      Bot
+999   Menachem Eliyahu              Base                565   1       52      Bot
+1000  Vaine Hosking                                     523   1       52      Bot
+1001  Alisa Chan                                        624   1       52      Bot
+1002  Petter Hagen                                      664   1       52      Bot
+1003  Enrique Medina                Aguda               977   1       52      Bot
+1004  Jamaal Andrews                                    815   1       52      Bot
+1005  Jean Blanc                                        647   1       52      Bot
+1006  Esteban Parks                                     685   1       52      Bot
+1007  Malik Singh                                       1112  1       52      Bot
+1008  David Clercq                                      1182  1       52      Bot
+1009  Marta Perišić                                     388   1       52      Bot
+1010  Kristin Lindström             Kumori              421   1       52      Bot
+1011  Tapio Partanen                                    1167  1       52      Bot
+1012  Roy Harrison                                      1199  1       52      Bot
+1013  Rajeev Al Romaihi                                 1192  1       52      Bot
+1014  Maui Vaihotu                                      1187  1       52      Bot
+1015  Kazimir Plakalović                                1066  1       52      Bot
+1016  Rod West                      AMO Solutions       1102  1       52      Bot
+1017  Marguerite Rasmussen                              621   1       52      Bot
+1018  Louise Claeys                                     574   1       52      Bot
+1019  Frédéric Roche                Monova              1364  1       52      Bot
+1020  Pascal Dupont                 Zonkify             966   1       52      Bot
+1021  Jordan Kühn                                       756   1       52      Bot
+1022  Joshua Mohit                  Ampex               1234  1       52      Bot
+1023  Benjamin Mizrahi                                  861   1       52      Bot
+1024  Patricia De Jonge             Hector              889   1       52      Bot
+1025  Pieteer De Jong               True Form           418   1       52      Bot
+1026  Nina Schröder                 True Form           459   1       52      Bot
+1027  Levi Scott                                        776   1       52      Bot
+1028  Shirley Ruiz                                      794   1       52      Bot
+1029  Angela Fernandes                                  668   1       52      Bot
+1030  Susan Aro                                         785   1       52      Bot
+1031  Per Olav Meder Kalvaa         Allkin Racing       1280  1       52      Human
+1032  David Beck                                        1074  1       52      Bot
+1033  Angel Banks                                       1015  1       52      Bot
+1034  Dorthe Hansen                                     500   1       52      Bot
+1035  Antoinette Moody                                  440   1       52      Bot
+1036  Delphine Gaillard             Eckleson            575   1       52      Bot
+1037  Lola Michel                   Meisterkuhl         566   1       52      Bot
+1038  Luke Mizzi                                        1035  1       52      Bot
+1039  Jens Lenz                                         1011  1       52      Bot
+1040  Alina Kunz                                        378   1       52      Bot
+1041  Mariama Adamou                                    861   1       52      Bot
+1042  Adrian Albrecht                                   973   1       52      Bot
+1043  Bauro Tamuera                                     1194  1       52      Bot
+1044  Shuto Masuda                  Fable               1036  1       52      Bot
+1045  Niklas Fredriksson                                883   1       52      Bot
+1046  Ruby Du Feu                                       360   1       52      Bot
+1047  Oona Kärkkäinen                                   630   1       52      Bot
+1048  Eevi Peltonen                                     459   1       52      Bot
+1049  Aleksander Lie                                    735   1       52      Bot
+1050  Milos Valeska                                     1041  1       52      Bot
+1051  Alea Berger                                       818   1       52      Bot
+1052  Verner Krog                                       753   1       51      Bot
+1053  Paola Rosso                                       743   1       51      Bot
+1054  Rocky Palmieri                                    997   1       51      Bot
+1055  Andrea Napolitano                                 1164  1       51      Bot
+1056  Frits Kristensen              Heat                1316  1       51      Bot
+1057  Egon Mogensen                 Saint               1153  1       51      Bot
+1058  Violante Martino                                  580   1       51      Bot
+1059  Caroline Verhoeven                                659   1       51      Bot
+1060  Boyd Townsend                 AMO Solutions       998   1       51      Bot
+1061  Tohar Ezra                    Aspire              694   1       51      Bot
+1062  Logan Quirk                                       426   1       51      Bot
+1063  Enzo Andre                    Orbit               1019  1       51      Bot
+1064  Betty Singh                   Nitro               522   1       51      Bot
+1065  Oliver Glover                                     918   1       51      Bot
+1066  Radmila Sojka                 Heat                833   1       51      Bot
+1067  Fiorella Rossi                                    441   1       51      Bot
+1068  Ronald Bacchus                eVOX                734   1       51      Bot
+1069  Leah Mackenzie                                    612   1       51      Bot
+1070  Sophia Kunz                                       494   1       51      Bot
+1071  Mollie Lewis                                      521   1       51      Bot
+1072  Susan Bodden                  Monova              385   1       51      Bot
+1073  Otto Winther                                      925   1       51      Bot
+1074  Mykhailo Olyinyk              Nitro               1214  1       51      Bot
+1075  Marietta Haynes                                   902   1       51      Bot
+1076  Will Felix                    Saint               843   1       51      Bot
+1077  Jamila Abdul                  Fable               289   1       51      Bot
+1078  Edmund Miles                                      1020  1       51      Bot
+1079  Helena Resende                                    543   1       51      Bot
+1080  Ramon Schulz                                      1163  1       51      Bot
+1081  Ella Clarke                   Monova              859   1       51      Bot
+1082  Feruza Nurmatova                                  792   1       51      Bot
+1083  Zhiyu Foo                                         1041  1       51      Bot
+1084  Marshall Tucker               Hinal               1194  1       51      Bot
+1085  Amanuel Tesfayl                                   1042  1       51      Bot
+1086  Gilles Langlois               Delta               777   1       51      Bot
+1087  Hikari Hara                   Windsail            674   1       50      Bot
+1088  Hugo Mathieu                                      1272  1       50      Bot
+1089  Weston Summers                Base                981   1       50      Bot
+1090  Charlotte Rey                 Base                554   1       50      Bot
+1091  Amanda Dahlberg                                   658   1       50      Bot
+1092  Thomas Hwells                                     947   1       50      Bot
+1093  Darva Hadžiosmanović                              590   1       50      Bot
+1094  Tom Davies                                        1119  1       50      Bot
+1095  Nanette Tran                  AMO Solutions       446   1       50      Bot
+1096  Arkady Olyinyk                                    942   1       50      Bot
+1097  Adut Bol                      Titans              581   1       50      Bot
+1098  Lazaro Delgado                                    1317  1       50      Bot
+1099  Josh Wambui                                       1009  1       50      Bot
+1100  Mirko Kovačević               Roklit              1246  1       50      Bot
+1101  Raquel Livingston             Fable               454   1       50      Bot
+1102  Francisco Luna                Nitro               599   1       50      Bot
+1103  Elio Ricci                                        616   1       50      Bot
+1104  Viola Carbone                                     768   1       50      Bot
+1105  Andres Romero                                     1304  1       50      Bot
+1106  Adam Blais                                        1278  1       50      Bot
+1107  Ayesha Malik                  Optech              460   1       50      Bot
+1108  Koki Matsuda                  Hinal               689   1       50      Bot
+1109  Marcus McMahon                                    1000  1       50      Bot
+1110  Cristina Negri                                    333   1       50      Bot
+1111  Buwan Cruz                                        958   1       50      Bot
+1112  Ben Power                     AMO Solutions       1041  1       50      Bot
+1113  Boyd Hill                                         811   1       50      Bot
+1114  Joseph Greenidge                                  1051  1       50      Bot
+1115  Hannah Doyle                  eVOX                528   1       50      Bot
+1116  Tapio Anttila                                     1108  1       50      Bot
+1117  Barbro Danielsson                                 597   1       50      Bot
+1118  Stavroula Konstantinidis                          793   1       50      Bot
+1119  Roscoe Faulkner               Titans              1105  1       50      Bot
+1120  Judson Erickson                                   1054  1       50      Bot
+1121  Tomas Miranda                 Krowen              991   1       50      Bot
+1122  Goran Lulić                                       1134  1       50      Bot
+1123  Tomislav Rebić                Eckleson            1200  2       50      Bot
+1124  Davide Castella               Aria Olefson        721   1       49      Bot
+1125  Kesa Liku                                         682   1       49      Bot
+1126  Emma Schumann                                     809   1       49      Bot
+1127  Cristian Castro                                   722   1       49      Bot
+1128  Hendrik Becker                                    1121  1       49      Bot
+1129  Sven Nordin                   Saitama             1209  1       49      Bot
+1130  Raymond Duenas                                    1265  1       49      Bot
+1131  Jean-Claude Robert                                1047  1       49      Bot
+1132  Shirley Gill                                      1091  1       49      Bot
+1133  Anastasia Kuznetsova                              382   1       49      Bot
+1134  Jim Cunningham                                    471   1       49      Bot
+1135  Sandra Jung                                       643   1       49      Bot
+1136  Vanessa Molina                Aguda               638   1       49      Bot
+1137  Chamroeun Sat                 Kumori              834   1       49      Bot
+1138  Alexandre Laurent                                 899   1       49      Bot
+1139  Cristian Jimenez                                  561   1       49      Bot
+1140  Antoni Laskowski                                  1052  1       49      Bot
+1141  Isamu Noguchi                                     1001  1       49      Bot
+1142  Christopher Eskildsen                             449   1       49      Bot
+1143  Sadie Healy                                       433   1       49      Bot
+1144  Ronald Verhoeven                                  1194  1       49      Bot
+1145  Willy Frederiksen                                 1002  1       49      Bot
+1146  Martina Robinson              Kumori              456   1       49      Bot
+1147  Joseph Stein                                      1301  1       49      Bot
+1148  Hyeon Ye                                          897   1       49      Bot
+1149  Ahmed Mokhtari                Formix              881   1       49      Bot
+1150  Sirje Kallas                  Monova              1130  1       49      Bot
+1151  Ned Burnett                   Pioma               739   1       49      Bot
+1152  Daniela Fontes                                    786   1       49      Bot
+1153  Jerrold Wilson                Dashix              415   1       49      Bot
+1154  Aihan Kok                                         412   1       49      Bot
+1155  Evelyn Smith                                      851   1       49      Bot
+1156  Bianca Kramer                 Aspire              883   1       49      Bot
+1157  Romeo Grasso                  Nuvio               879   1       49      Bot
+1158  Phillip Smith                 Hinal               726   1       49      Bot
+1159  Andrew Turnbull                                   627   1       49      Bot
+1160  Wilson Lewis                                      1307  1       49      Bot
+1161  Sabah Syed                                        431   1       49      Bot
+1162  Annemarie Janssen                                 445   1       49      Bot
+1163  Ulrika Nordström                                  679   1       49      Bot
+1164  Bev St-Pierre                                     655   1       49      Bot
+1165  Dennis Van Dam                Heat                1157  1       49      Bot
+1166  Tyrone Montes                                     1122  1       49      Bot
+1167  Alfonso Garofalo              Saint               1060  1       49      Bot
+1168  Anna Taloikwai                True Form           372   1       49      Bot
+1169  Paulius Žiogas                                    330   1       49      Bot
+1170  Petar Živulić                                     802   1       49      Bot
+1171  Mikael Lahtinen                                   829   1       49      Bot
+1172  Rosa Marinho                  Sherpa              760   1       49      Bot
+1173  Sammy Fowler                                      1020  1       49      Bot
+1174  Tom Kenny                                         1087  1       49      Bot
+1175  Joël Boyer                    Base                789   1       49      Bot
+1176  James Dionne                                      1082  1       49      Bot
+1177  Bitten Brodersen                                  647   1       48      Bot
+1178  Arjan Peters                  Roklit              1205  1       48      Bot
+1179  Aadarsh Shrestha                                  1290  1       48      Bot
+1180  Robin Porter                  Eckleson            1082  1       48      Bot
+1181  Pete Villarreal                                   575   1       48      Bot
+1182  Akari Ōno                     Fiber Shot          654   1       48      Bot
+1183  Sebastian Ziółkowski                              1347  1       48      Bot
+1184  Guerino Becciu                                    922   1       48      Bot
+1185  Viola Pastore                                     808   1       48      Bot
+1186  Andreea Popa                  Aspire              428   1       48      Bot
+1187  Erick Xiong                   HCOM                1116  1       48      Bot
+1188  Roger Engen                   Hinal               1132  1       48      Bot
+1189  Janna Wall                    Meisterkuhl         645   1       48      Bot
+1190  Eliyahu Amsalem               Formix              761   1       48      Bot
+1191  Sascha Hoffmann                                   761   1       48      Bot
+1192  Monique Meyer                 True Form           439   1       48      Bot
+1193  Alexander Smet                                    1127  1       48      Bot
+1194  Raymond Bowman                                    729   1       48      Bot
+1195  Ada Zavala                                        745   1       48      Bot
+1196  Petar Liebowitz               Eckleson            1315  1       48      Bot
+1197  Nils Sæter                    Patriot             1283  1       48      Bot
+1198  Isaiah Villanueva                                 1113  1       48      Bot
+1199  Aoi Saitō                                         453   1       48      Bot
+1200  Cherie Woodward                                   685   1       48      Bot
+1201  Willow Quintal                                    380   1       48      Bot
+1202  Rena Walton                                       741   1       48      Bot
+1203  Richard De Groot                                  1118  1       48      Bot
+1204  Lilian Stevens                                    693   1       48      Bot
+1205  Maximilian Jäger              eVOX                1101  1       48      Bot
+1206  Uri Vaknin                                        1066  1       48      Bot
+1207  Chiara Ferraro                Fable               568   1       47      Bot
+1208  Lily Reynolds                 True Form           578   1       47      Bot
+1209  Lingling Cheah                                    623   1       47      Bot
+1210  Oliwier Jasiński                                  1094  1       47      Bot
+1211  Ronald Van den Berg                               1199  1       47      Bot
+1212  Sascha Baumann                                    1131  1       47      Bot
+1213  Gilbert Fontaine              Nitro               1224  1       47      Bot
+1214  Ryan Guerrero                 AI Thunder          1049  1       47      Bot
+1215  Ryung Jin                     Capital             1037  1       47      Bot
+1216  Eeva Huttunen                                     557   1       47      Bot
+1217  Jeannie Byrd                  Kumori              494   1       47      Bot
+1218  Oleg Subašić                  Systech             1309  1       47      Bot
+1219  Sultan Bolatbek               Monova              747   1       47      Bot
+1220  Reshma Thani                  Fujikai             860   1       47      Bot
+1221  Majed Islam                                       794   1       47      Bot
+1222  Lily Norris                   Nitro               757   1       47      Bot
+1223  Birgitte Håland                                   436   1       47      Bot
+1224  Mirjam Bakker                                     396   1       47      Bot
+1225  Alex Dorsey                                       1188  1       47      Bot
+1226  Eoin Graham                   eVOX                1060  1       47      Bot
+1227  Denys Petrenko                                    1034  1       47      Bot
+1228  Olga Wilson                                       583   1       47      Bot
+1229  Anastassia Polycarpou                             424   1       47      Bot
+1230  Bianca Kaufmann               Delta               942   1       47      Bot
+1231  David Abad                                        1280  1       47      Bot
+1232  Julius König                                      824   1       47      Bot
+1233  Georgios Charalambous                             772   1       47      Bot
+1234  Lila Weir                                         303   1       47      Bot
+1235  Jiefan Khiew                  Delta               451   1       47      Bot
+1236  Gennaro D'Angelo              eVOX                1014  1       47      Bot
+1237  Yannick Thiry                                     787   1       47      Bot
+1238  Anna Shcherbina                                   663   1       47      Bot
+1239  Caiji Mo                                          519   1       47      Bot
+1240  Marcin Pawlak                                     1289  1       47      Bot
+1241  Aatos Hakkarainen                                 1127  1       47      Bot
+1242  Federica Berti                Capital             394   1       47      Bot
+1243  Betina Beck                                       507   1       47      Bot
+1244  Georges Olivier               Fiber Shot          507   1       47      Bot
+1245  Federico Anthony                                  602   1       47      Bot
+1246  Yong West                                         998   1       47      Bot
+1247  Olli Mikkonen                                     927   1       47      Bot
+1248  Manuela Yu                    Monova              336   1       47      Bot
+1249  Stepan Kostenko               Meisterkuhl         1311  1       47      Bot
+1250  Mariola Nowicki               Aguda               939   1       47      Bot
+1251  Andżelika Kucharska                               637   1       47      Bot
+1252  Dennis Paquet                                     1089  1       47      Bot
+1253  Benvolio Venturi              True Form           1074  1       47      Bot
+1254  Aase Svenningsen              Fujikai             700   1       47      Bot
+1255  Trym Isaksen                  Roklit              816   1       47      Bot
+1256  Carlo Venturi                 AMO Solutions       764   1       47      Bot
+1257  Byron Henson                                      1148  1       47      Bot
+1258  Jacob Andersen                YES                 1036  1       47      Bot
+1259  Jose Santiago                 Nitro               681   1       46      Bot
+1260  Wioletta Michalak             HCOM                696   1       46      Bot
+1261  Matej Đurasović                                   1310  1       46      Bot
+1262  Linus Keller                                      1293  1       46      Bot
+1263  Ulf Sundström                 Patriot             1079  1       46      Bot
+1264  Poppy Rowlands                Monova              530   1       46      Bot
+1265  Anja Van Vliet                                    579   1       46      Bot
+1266  Chinhwa Myeong                Base                1331  1       46      Bot
+1267  Emmanouil Athanasiadis                            869   1       46      Bot
+1268  Annick Laurent                Meisterkuhl         788   1       46      Bot
+1269  Aaron Higgins                 Windsail            347   1       46      Bot
+1270  Pietro Benedetti              Dashix              1248  1       46      Bot
+1271  Ian Lloyd                                         1164  1       46      Bot
+1272  Gregory Ray                   Nuvio               1023  1       46      Bot
+1273  Unni Ali                                          544   1       46      Bot
+1274  Amira Benitez                                     741   1       46      Bot
+1275  Barbara Leblanc               Douvan              925   1       46      Bot
+1276  Chiara Catalano               Ampex               366   1       46      Bot
+1277  Royce Murphy                                      810   1       46      Bot
+1278  Antonio Vazquez                                   1079  1       46      Bot
+1279  Frauke Kraus                                      428   1       46      Bot
+1280  Emilie Mouritsen                                  691   1       46      Bot
+1281  Aatos Partanen                Patriot             945   1       46      Bot
+1282  Luz Florez                    Eckleson            313   1       46      Bot
+1283  Sabina Mariani                Pioma               814   1       46      Bot
+1284  Po Testa                                          1141  1       46      Bot
+1285  Trinidad Baxter                                   1071  1       46      Bot
+1286  Mirosław Kalinowski           eVOX                1114  1       46      Bot
+1287  Ralph Gosselin                                    778   1       46      Bot
+1288  Ronald Jansen                 Roklit              1153  1       46      Bot
+1289  Théo Roy                                          1101  1       46      Bot
+1290  Oiva Mäkinen                                      886   1       45      Bot
+1291  Daniel Veres                  Douvan              1103  1       45      Bot
+1292  Matviy Melnichuk                                  1270  1       45      Bot
+1293  Maria Soriano                                     1030  1       45      Bot
+1294  Erna Karlsen                                      459   1       45      Bot
+1295  Max Stein                                         436   1       45      Bot
+1296  Anton Obradović                                   1283  1       45      Bot
+1297  Luboslaw Šunjić                                   1021  1       45      Bot
+1298  Alba Benitez                  Meisterkuhl         673   1       45      Bot
+1299  Xander Van                    Aguda               1150  1       45      Bot
+1300  Inês Monteiro                 YES                 443   1       45      Bot
+1301  Fotios Ioannou                Fujikai             1051  1       45      Bot
+1302  Emma Mayer                    Saint               629   1       45      Bot
+1303  Mariana Lima                                      680   1       45      Bot
+1304  Laura Hurtado                                     1210  1       45      Bot
+1305  Nick Armstrong                Aria Olefson        1146  1       45      Bot
+1306  Ute Kern                      Orbit               924   1       45      Bot
+1307  Olga Ivanova                  Ampex               374   1       45      Bot
+1308  Elmer Shah                    Patriot             812   1       45      Bot
+1309  Johnathan Knapp                                   796   1       45      Bot
+1310  Mahdi Ghasemi                 Orbit               1301  1       45      Bot
+1311  Xianquan Chau                                     1043  1       45      Bot
+1312  Rossana Marchi                Aspire              425   1       45      Bot
+1313  Angela Brathwaite             Sherpa              533   1       45      Bot
+1314  Max Baudains                                      883   1       45      Bot
+1315  Helena Mateus                                     348   1       45      Bot
+1316  Aakar Bhandari                Heat                715   1       45      Bot
+1317  Igor Černý                                        705   1       45      Bot
+1318  Dunja Köhler                                      981   1       45      Bot
+1319  Benjamin Moore                                    1107  1       45      Bot
+1320  Leonardo Mosca                                    1071  1       45      Bot
+1321  Peter Neumann                                     726   1       44      Bot
+1322  Damion Noble                  Dashix              674   1       44      Bot
+1323  Gabija Šimkus                                     698   1       44      Bot
+1324  Valeria Cruz                                      580   1       44      Bot
+1325  Esther Asumu                  Aspire              992   1       44      Bot
+1326  Edgars Vanags                 Saint               961   1       44      Bot
+1327  David Wallin                  Titans              1287  1       44      Bot
+1328  Olof Eriksson                                     1077  1       44      Bot
+1329  Jaap Van Dijk                 Kumori              1292  1       44      Bot
+1330  Leonardo Marino               Capital             1337  1       44      Bot
+1331  Lutz Pleuter                  Wadenterror         1262  1       44      Human
+1332  Junpei Ishikawa                                   1027  1       44      Bot
+1333  Pinelopi Angelopoulos                             553   1       44      Bot
+1334  Tamira Becker                 AI Thunder          477   1       44      Bot
+1335  Lola Noël                                         621   1       44      Bot
+1336  Isabella Mansilla                                 867   1       44      Bot
+1337  Clint Leblanc                 Ampex               727   1       44      Bot
+1338  Dafne Locatelli               Titans              685   1       44      Bot
+1339  Anastasija Riekstiņš                              717   1       44      Bot
+1340  Kim Van Dam                                       425   1       44      Bot
+1341  Jewel Blankenship             Patriot             443   1       44      Bot
+1342  Stephan Kaiser                                    1241  1       44      Bot
+1343  Sung Holt                                         1117  1       44      Bot
+1344  Duri Myeong                                       1165  1       44      Bot
+1345  Ayumi Harada                  Saint               434   1       44      Bot
+1346  Willy Juhl                    Titans              602   1       44      Bot
+1347  Mollie Potter                                     634   1       44      Bot
+1348  Stacy Barnes                                      1241  1       44      Bot
+1349  Estelle Cook                  Eckleson            796   1       44      Bot
+1350  Isabel Ramirez                                    440   1       44      Bot
+1351  Stéphanie Legrand             Monova              439   1       44      Bot
+1352  Irving Ruiz                                       826   1       44      Bot
+1353  Roberta Ruggiero                                  912   1       44      Bot
+1354  Dorian Gonzalez               Fiber Shot          697   1       44      Bot
+1355  Gladys Vance                  Saint               741   1       44      Bot
+1356  chilly willy                  Dirty Rascals       1576  1       44      Human
+1357  Kadija Bah                    Windsail            679   1       44      Bot
+1358  Daniel Pereira                Capital             1335  1       44      Bot
+1359  Lars Ødegård                                      1033  1       44      Bot
+1360  Lorena Rojas                                      550   1       44      Bot
+1361  Merle Bravo                                       472   1       44      Bot
+1362  Sandra Morgan                                     453   1       44      Bot
+1363  Octavio Craig                 Aguda               1065  1       44      Bot
+1364  Nuha Shafeeq                  Pioma               982   1       44      Bot
+1365  Seung Gal                     eVOX                1222  1       44      Bot
+1366  Ilseong Pi                                        980   1       44      Bot
+1367  Eva André                                         671   1       44      Bot
+1368  Itai Suissa                                       1088  1       44      Bot
+1369  Mohammad Caron                                    933   1       44      Bot
+1370  Kyle Scott                    Patriot             927   1       44      Bot
+1371  May Kelley                                        752   1       44      Bot
+1372  Martijn Blom                                      875   1       44      Bot
+1373  Paul Hendriks                                     1111  1       44      Bot
+1374  Vladimir Šećerović                                1143  1       44      Bot
+1375  Pascal Robert                 YES                 1019  1       44      Bot
+1376  Espen Hagen                                       997   1       44      Bot
+1377  Ariel Jabarin                                     1175  1       44      Bot
+1378  Alexander Wouters                                 1057  1       44      Bot
+1379  Marcel Hoekstra               Saint               724   1       43      Bot
+1380  Benjamin Leclerc              Pioma               971   1       43      Bot
+1381  Kim Blom                                          442   1       43      Bot
+1382  Theo Wilson                   HCOM                478   1       43      Bot
+1383  Ethan Baptiste                Pioma               773   1       43      Bot
+1384  Nalu Lanwi                                        784   1       43      Bot
+1385  Daniel Johansson              Pioma               467   1       43      Bot
+1386  Andrey Petrov                                     1209  1       43      Bot
+1387  Hans Wolf                                         1125  1       43      Bot
+1388  Kai Schulz                                        1066  1       43      Bot
+1389  Youra Eogeum                                      729   1       43      Bot
+1390  René Bertrand                                     1237  1       43      Bot
+1391  Ieuan Hughes                                      655   1       43      Bot
+1392  Carol Berger                  eVOX                346   1       43      Bot
+1393  Eula Park                                         899   1       43      Bot
+1394  Teri Morrison                 AMO Solutions       500   1       43      Bot
+1395  Lorenzo Sullivan              Zonkify             1324  1       43      Bot
+1396  Roger Isaksen                 Aguda               1229  1       43      Bot
+1397  Nitai Masarweh                                    1048  1       43      Bot
+1398  Marie-Christine Gagne         True Form           388   1       43      Bot
+1399  Rosa Bruni                                        388   1       43      Bot
+1400  Gösta Bergström                                   366   1       43      Bot
+1401  Gilles Fabre                  HCOM                1154  1       43      Bot
+1402  Shari Lucas                                       813   1       43      Bot
+1403  Jeffrey Spears                                    759   1       43      Bot
+1404  Raymond Morel                                     1280  1       43      Bot
+1405  Otávio Mendes                                     844   1       43      Bot
+1406  Desislav Dobrev                                   1044  1       43      Bot
+1407  Ralf Kaufmann                                     1103  1       43      Bot
+1408  Grigorios Konstantinidis      Ampex               969   1       43      Bot
+1409  Mark Hinds                                        987   1       43      Bot
+1410  Xijing Voon                   Eckleson            862   1       42      Bot
+1411  Sandra Kirkegaard                                 673   1       42      Bot
+1412  Jean Boyer                                        570   1       42      Bot
+1413  Milla Gavrilyuk               Hector              553   1       42      Bot
+1414  Wim Vermeulen                                     894   1       42      Bot
+1415  Arline Schwartz               eVOX                965   1       42      Bot
+1416  Dávid Dudás                                       1270  1       42      Bot
+1417  Alexander Bisgaard                                1264  1       42      Bot
+1418  Shaoruo Kwok                                      1030  1       42      Bot
+1419  Jamar Olsen                                       1146  1       42      Bot
+1420  Kristjana Guðmundsson         Pioma               391   1       42      Bot
+1421  Tina Pfeifer                                      477   1       42      Bot
+1422  Darva Moscowitz                                   617   1       42      Bot
+1423  Donna Watler                  Aria Olefson        429   1       42      Bot
+1424  Yuma Murata                                       789   1       42      Bot
+1425  Sebastian Caicedo             Base                1017  1       42      Bot
+1426  Bogdana Kostić                Nuvio               529   1       42      Bot
+1427  Karine Bergeron                                   533   1       42      Bot
+1428  Pieteer Bos                   Zonkify             1199  1       42      Bot
+1429  Arjan Hendriks                                    1109  1       42      Bot
+1430  Kalina Milunović              Sherpa              317   1       42      Bot
+1431  Johannes Jonsson                                  1185  1       42      Bot
+1432  Francisco Garcia                                  1126  1       42      Bot
+1433  Tommy Mayer                                       1018  1       42      Bot
+1434  Thomas Martin                                     1044  1       42      Bot
+1435  Paula Brock                                       407   1       42      Bot
+1436  Beniamin Duda                                     525   1       42      Bot
+1437  Phumzile Mabuza               Base                763   1       42      Bot
+1438  Heidi Wenzel                                      663   1       42      Bot
+1439  Andrej Moszkovicz                                 1177  1       42      Bot
+1440  Georgi Stefanov                                   804   1       42      Bot
+1441  Inara Abdullah                AMO Solutions       456   1       42      Bot
+1442  Elisabeth Bernard                                 413   1       42      Bot
+1443  Vasil Gnjatić                 Ampex               659   1       42      Bot
+1444  Marthe Lemoine                Krowen              936   1       42      Bot
+1445  Alma Gentile                  Fable               643   1       42      Bot
+1446  Emilia Engström               Saint               654   1       42      Bot
+1447  Nuwan Gunawardena                                 432   1       42      Bot
+1448  Arianna Marino                                    491   1       42      Bot
+1449  Galo Alvarez                  Sherpa              1042  1       42      Bot
+1450  Saskia De Vries                                   543   1       42      Bot
+1451  Linda Fleming                                     409   1       42      Bot
+1452  Emilio Medina                                     1115  1       42      Bot
+1453  Charles Friesen                                   1159  1       42      Bot
+1454  Lucio Hubbard                 Fable               922   1       42      Bot
+1455  Louise Bernard                Sherpa              408   1       42      Bot
+1456  Eleftheria Efthymiou          HCOM                374   1       42      Bot
+1457  Milos Pašalić                                     785   1       42      Bot
+1458  Sabine Aboud                                      947   1       42      Bot
+1459  Ane Boesen                                        1102  1       42      Bot
+1460  Stephane Plante                                   1069  1       42      Bot
+1461  Åke Lindberg                                      775   1       42      Bot
+1462  Hussein Alam                  Douvan              753   1       42      Bot
+1463  Romeo Melis                   YES                 1027  1       42      Bot
+1464  Charles Perrin                                    987   1       42      Bot
+1465  Gavin Michael                 Dashix              892   1       41      Bot
+1466  Timo Schwarz                  Douvan              875   1       41      Bot
+1467  Oliver Cockburn                                   926   1       41      Bot
+1468  Matias Rivera                 AI Thunder          1064  1       41      Bot
+1469  Faustino Meyer                                    1021  1       41      Bot
+1470  Jeanne Alves                                      338   1       41      Bot
+1471  Kent Branch                                       598   1       41      Bot
+1472  Nicolas Smet                  Ampex               873   1       41      Bot
+1473  Emy Faber                                         605   1       41      Bot
+1474  Chana Klein                   Douvan              369   1       41      Bot
+1475  Dewayne Bass                  Aspire              1199  1       41      Bot
+1476  Quentin Lambert                                   1232  1       41      Bot
+1477  Christian Campbell            Patriot             1058  1       41      Bot
+1478  Judy Velazquez                Sherpa              612   1       41      Bot
+1479  Hugo Clement                  Delta               706   1       41      Bot
+1480  Sanzhar Asanov                                    1244  1       41      Bot
+1481  Keith George                  Fiber Shot          829   1       41      Bot
+1482  Claudine Fox                                      397   1       41      Bot
+1483  Simone Albrecht                                   788   1       41      Bot
+1484  Alice Janssen                                     790   1       41      Bot
+1485  Nadia Klimovets               Sherpa              632   1       41      Bot
+1486  Tadhg Reilly                                      1250  1       41      Bot
+1487  Elvis Esparza                                     1106  1       41      Bot
+1488  Emīlija Grīnbergs                                 403   1       41      Bot
+1489  Drago Hadžić                  Kumori              659   1       41      Bot
+1490  Fannie Delgado                                    979   1       41      Bot
+1491  Simone Petit                                      282   1       41      Bot
+1492  Costanza Ventura              Eckleson            985   1       41      Bot
+1493  May Ayers                                         1014  1       41      Bot
+1494  Chadwick Esquivel             Titans              847   1       41      Bot
+1495  Luis Morales                                      1181  1       41      Bot
+1496  Elena Turcotte                                    684   1       41      Bot
+1497  Clint Gonzalez                Optech              1070  1       41      Bot
+1498  Liam Cuthbert                 YES                 1023  1       41      Bot
+1499  Helmi Lahtinen                                    985   1       41      Bot
+1500  Matthew Ekwona                                    1364  2       41      Bot
+1501  Vivien Keller                                     553   1       40      Bot
+1502  Christoffer Berggren                              562   1       40      Bot
+1503  Felix Schumann                AI Thunder          736   1       40      Bot
+1504  Ben Jansen                    Monova              690   1       40      Bot
+1505  Lea Schulz                    Meisterkuhl         1002  1       40      Bot
+1506  Isabel Reyes                                      424   1       40      Bot
+1507  Yosyp Kozak                                       546   1       40      Bot
+1508  Jade Lambert                  Hector              420   1       40      Bot
+1509  Julius Jung                   Optech              614   1       40      Bot
+1510  Ciro Martinelli                                   1262  1       40      Bot
+1511  Laura Galloway                True Form           861   1       40      Bot
+1512  Felicitas Arias               True Form           955   1       40      Bot
+1513  Niels Henriksen                                   635   1       40      Bot
+1514  Eunjoo Geum                                       440   1       40      Bot
+1515  Knud Gade                                         1106  1       40      Bot
+1516  Melanie Nixon                                     307   1       40      Bot
+1517  Natalia Morales               Hector              316   1       40      Bot
+1518  Khalil Younis                                     1008  1       40      Bot
+1519  Erika Kandjii                 Sherpa              419   1       40      Bot
+1520  Kyeong Yeong                                      1353  1       40      Bot
+1521  Chungha Hwangmok                                  780   1       40      Bot
+1522  Yanai Shachar                 Nuvio               1141  1       40      Bot
+1523  Aarni Rantanen                                    593   1       40      Bot
+1524  Quentin Martin                                    904   1       40      Bot
+1525  Lata Kala'apai                                    338   1       40      Bot
+1526  Nea Laaksonen                 Fiber Shot          319   1       40      Bot
+1527  Elisa D'Amico                                     719   1       40      Bot
+1528  Flora Crane                   Patriot             673   1       40      Bot
+1529  Viljo Kärkkäinen                                  601   1       40      Bot
+1530  Hayoon Dongbang               Ampex               575   1       40      Bot
+1531  Linnea Koskinen               Hector              605   1       40      Bot
+1532  Doris McDonald                                    454   1       40      Bot
+1533  Boris Livaja                                      1037  1       40      Bot
+1534  Carson Cordova                                    1003  1       40      Bot
+1535  Malka Mimun                                       326   1       40      Bot
+1536  Tami Webb                     Delta               340   1       40      Bot
+1537  Rachelle Thompson                                 465   1       40      Bot
+1538  Yeona Ga                                          373   1       40      Bot
+1539  Anuson Inthavong                                  934   1       40      Bot
+1540  Boris Hayden                                      281   1       40      Bot
+1541  Éabha Lyons                   AMO Solutions       244   1       40      Bot
+1542  Annemarie Mulder              Monova              694   1       40      Bot
+1543  Elin Pedersen                                     684   1       40      Bot
+1544  Jakob Lundberg                                    1065  1       40      Bot
+1545  Cosimo Fiore                  Pioma               1009  1       40      Bot
+1546  Lumi Räsänen                  Ampex               709   1       40      Bot
+1547  Corrado Fusco                                     1214  1       40      Bot
+1548  Youngmi Man                                       727   1       40      Bot
+1549  Raymond Tate                                      1013  1       40      Bot
+1550  Santos Mejia                                      1069  1       40      Bot
+1551  Michael Brandt                                    1043  1       40      Bot
+1552  Ibrahim Mwalimu               Optech              1116  1       40      Bot
+1553  Osvaldo Griffin                                   1071  1       40      Bot
+1554  Vito Durham                                       1096  1       40      Bot
+1555  Joey Gonzalez                                     1202  1       40      Bot
+1556  Filip Pankow                                      978   1       40      Bot
+1557  Josh Harris                                       1912  1       40      Human
+1558  Woojin Seomun                                     1132  1       40      Bot
+1559  Marine Renaud                 Douvan              576   1       39      Bot
+1560  Maria Ivanov                  Hinal               769   1       39      Bot
+1561  Marion Grant                                      944   1       39      Bot
+1562  Thomas Hogan                  Formix              1112  1       39      Bot
+1563  Jordan Sosa                   Orbit               1015  1       39      Bot
+1564  Meritxell Coll                                    489   1       39      Bot
+1565  Hana Miyamoto                                     540   1       39      Bot
+1566  Goran Pantić                                      989   1       39      Bot
+1567  Melba Portillo                Nitro               479   1       39      Bot
+1568  André Caron                                       1071  1       39      Bot
+1569  Karin Busch                                       442   1       39      Bot
+1570  Stan Choi                                         1226  1       39      Bot
+1571  Christian Möller                                  1232  1       39      Bot
+1572  Maisie Murphy                                     357   1       39      Bot
+1573  Dagbjart Jónsson              Kumori              1341  1       39      Bot
+1574  Manon Schmit                  Roklit              675   1       39      Bot
+1575  Daigo Mori                    Zonkify             1147  1       39      Bot
+1576  Takashi Kondō                                     1181  1       39      Bot
+1577  Katerina Soloveitchik                             494   1       39      Bot
+1578  Karla McClain                                     651   1       39      Bot
+1579  Davi Nascimento                                   813   1       39      Bot
+1580  Dovile Šimkus                 Formix              382   1       39      Bot
+1581  Cassio Conti                                      1086  1       39      Bot
+1582  Jacqueline Andre                                  408   1       39      Bot
+1583  Lisa Berger                                       405   1       39      Bot
+1584  Gregory Stark                                     1122  1       39      Bot
+1585  Clara Garcia                  Nitro               262   1       39      Bot
+1586  Joost De Boer                                     996   1       39      Bot
+1587  Marty Wright                  Fujikai             1067  1       39      Bot
+1588  Dwayne Day                    Ampex               844   1       39      Bot
+1589  Melvin Fuller                                     912   1       39      Bot
+1590  Martin Bouba                                      536   1       39      Bot
+1591  Yannick Stevens                                   1175  1       39      Bot
+1592  Martijn Smit                                      654   1       39      Bot
+1593  Duncan Clements               Kumori              756   1       39      Bot
+1594  Kenneth Nyaga                                     985   1       39      Bot
+1595  Thiago Soares                                     1073  1       39      Bot
+1596  Gerhard Schubert                                  1136  1       39      Bot
+1597  Mamadou Sow                                       972   1       39      Bot
+1598  Julia Schulte                 True Form           574   1       38      Bot
+1599  Bora Ju                                           602   1       38      Bot
+1600  Adam Mizzi                    Kumori              1303  1       38      Bot
+1601  Fuyuhiko Kondō                                    1035  1       38      Bot
+1602  Scot Peralta                                      602   1       38      Bot
+1603  Marta Hanák                                       445   1       38      Bot
+1604  Jose Pascual                                      1338  1       38      Bot
+1605  Denver Bradshaw               Optech              699   1       38      Bot
+1606  Maxime Picard                 Optech              1172  1       38      Bot
+1607  Sharmin Akter                 Titans              455   1       38      Bot
+1608  Kari Heiskanen                                    1149  1       38      Bot
+1609  Theresa Baptiste                                  467   1       38      Bot
+1610  Polina Mukasheva              Orbit               790   1       38      Bot
+1611  Nicolas Reyes                                     1108  1       38      Bot
+1612  Tarek Khalil                                      1150  1       38      Bot
+1613  Kelera Cakau                                      792   1       38      Bot
+1614  Oskar Svensson                Saitama             469   1       38      Bot
+1615  Elsa Macias                   Orbit               812   1       38      Bot
+1616  Hala Al-Salem                                     530   1       38      Bot
+1617  Louane Pereira                                    374   1       38      Bot
+1618  Mathys Aerts                  Fiber Shot          1097  1       38      Bot
+1619  Lea Arellano                                      352   1       38      Bot
+1620  Aleksandar Banič                                  508   1       38      Bot
+1621  Lourdes Proctor                                   1154  1       38      Bot
+1622  Iseul Ok                                          935   1       38      Bot
+1623  Steven Howe                   HP3                 100   1       38      Human
+1624  Hugo Villar                   Saitama             711   1       38      Bot
+1625  George Chetty                 Saitama             742   1       38      Bot
+1626  Marta Roman                                       674   1       38      Bot
+1627  Christos Constantinou                             561   1       38      Bot
+1628  Nikki Kamau                                       967   1       38      Bot
+1629  Dorthy Schmitt                                    1059  1       38      Bot
+1630  Jovana Kostiuchenko                               1142  1       38      Bot
+1631  Georges Lecomte                                   1182  1       38      Bot
+1632  Milos Volny                                       1079  1       38      Bot
+1633  Luboslaw Wronski              HCOM                1011  1       38      Bot
+1634  Juan Carlos Rosendo           Capital             1059  1       38      Bot
+1635  Albin Isaksson                Fujikai             786   1       38      Bot
+1636  Anatoliy Romanyuk             Aria Olefson        933   2       38      Bot
+1637  Rocco Dal                                         1053  2       38      Bot
+1638  Charity Powers                Saint               549   1       37      Bot
+1639  Bobae Eun                                         669   1       37      Bot
+1640  Sofía Ferreyra                                    695   1       37      Bot
+1641  Bertha Gregory                                    940   1       37      Bot
+1642  Edvin Peltola                                     1085  1       37      Bot
+1643  Carl Leduc                    Nuvio               1337  1       37      Bot
+1644  Jerald Walters                                    1034  1       37      Bot
+1645  Kian König                                        1233  1       37      Bot
+1646  Gösta Lindholm                Nitro               626   1       37      Bot
+1647  Luisa António                                     398   1       37      Bot
+1648  Henri Robin                                       390   1       37      Bot
+1649  Olivia Weir                   Eckleson            703   1       37      Bot
+1650  Themba Mthethwa               HCOM                1257  1       37      Bot
+1651  Kizza Nalwanga                                    1263  1       37      Bot
+1652  Ivanka Svoboda                Capital             680   1       37      Bot
+1653  Alice Olofsson                                    467   1       37      Bot
+1654  Laisa Vakaloloma              Krowen              398   1       37      Bot
+1655  Haojin Cheah                                      1023  1       37      Bot
+1656  Arthur Bernard                                    1082  1       37      Bot
+1657  Doi Miyamoto                                      325   1       37      Bot
+1658  Martine Dumont                Zonkify             433   1       37      Bot
+1659  Enzo Fontaine                                     1205  1       37      Bot
+1660  Alfredo Herrero                                   997   1       37      Bot
+1661  Mateo Martinez                                    1052  1       37      Bot
+1662  Emil Žigić                                        411   1       37      Bot
+1663  Bianca Fuchs                                      387   1       37      Bot
+1664  Joseph Masson                 Hector              735   1       37      Bot
+1665  Jiyansh Anand                                     603   1       37      Bot
+1666  Pavlos Christou                                   1091  1       37      Bot
+1667  Craig Bilodeau                                    1145  1       37      Bot
+1668  Safia Sam                     AI Thunder          655   1       37      Bot
+1669  Dolores Redondo                                   589   1       37      Bot
+1670  Nayao Kwok                                        202   1       37      Bot
+1671  Elena Arena                                       220   1       37      Bot
+1672  Adam Simon                                        710   1       37      Bot
+1673  Megan Clarke                                      701   1       37      Bot
+1674  Zara Byrne                                        540   1       37      Bot
+1675  Shaira Lozano                 Saint               552   1       37      Bot
+1676  Astrid Blom                                       443   1       37      Bot
+1677  Serena Merritt                Pioma               343   1       37      Bot
+1678  Isabella Caldeira             Eckleson            388   1       37      Bot
+1679  Josefina Maddox               Nitro               406   1       37      Bot
+1680  Junseo Hyeong                                     1171  1       37      Bot
+1681  Lars Lund                     Heat                1170  1       37      Bot
+1682  Ettore Serafini                                   1003  1       37      Bot
+1683  Christine Seemann             Race3R              1040  1       37      Human
+1684  Angel Reyes                   Systech             408   1       37      Bot
+1685  Robin Marin                   Roklit              344   1       37      Bot
+1686  Isao Kikuchi                                      1048  1       37      Bot
+1687  Jun Kobayashi                                     1133  1       37      Bot
+1688  Tasha Patrick                 Eckleson            756   1       37      Bot
+1689  Goran Pasternak                                   754   1       37      Bot
+1690  Bojidar Yankov                                    1210  1       37      Bot
+1691  Gerry Dupuis                                      1165  1       37      Bot
+1692  Natalia Gutierrez             Aria Olefson        918   1       37      Bot
+1693  Isla Bowen                    Sherpa              584   1       37      Bot
+1694  Marek Sabsovich               Saitama             912   1       37      Bot
+1695  Tane Faumuina                                     1108  1       37      Bot
+1696  Edward James                  Formix              1121  1       37      Bot
+1697  Darrel Warren                                     1167  1       37      Bot
+1698  Corrado Moretti               Kumori              1020  1       37      Bot
+1699  Astrid De Graaf                                   516   1       36      Bot
+1700  Ester Garcia                                      502   1       36      Bot
+1701  Jorge Gutierrez               Zonkify             927   1       36      Bot
+1702  Toby Hetherington             Newhall.cc          1125  1       36      Human
+1703  Elvia Marquez                 True Form           308   1       36      Bot
+1704  Evi Sommer                                        358   1       36      Bot
+1705  Benicio Torres                                    1261  1       36      Bot
+1706  Priscilla Mwansa              Nuvio               820   1       36      Bot
+1707  Bnaya Abramov                                     607   1       36      Bot
+1708  Petra Pliskin                                     998   1       36      Bot
+1709  Yujun Gwok                    Douvan              256   1       36      Bot
+1710  Dominique Bonnet              Aspire              493   1       36      Bot
+1711  Onni Kettunen                                     1325  1       36      Bot
+1712  Charlotte Hermans             Dashix              594   1       36      Bot
+1713  Helena Calado                                     692   1       36      Bot
+1714  Stanislav Myshchenko          Capital             477   1       36      Bot
+1715  Rune Van                      Meisterkuhl         787   1       36      Bot
+1716  Catalina Ruiz                 Capital             588   1       36      Bot
+1717  Esther Van Leeuwen            Dashix              383   1       36      Bot
+1718  Yutai Koong                                       1062  1       36      Bot
+1719  Yolanda Martínez              Hector              476   1       36      Bot
+1720  Igor Jastrow                  AMO Solutions       1157  1       36      Bot
+1721  Emad Sharma                                       998   1       36      Bot
+1722  Astrid Holm                                       316   1       36      Bot
+1723  Roman Swanson                                     1080  1       36      Bot
+1724  Slavko Janikovszky            Heat                1052  1       36      Bot
+1725  Rhonwen Rogers                                    793   1       36      Bot
+1726  Stig Jakobsen                 Nuvio               568   1       36      Bot
+1727  Jan Svensson                  Nuvio               946   1       36      Bot
+1728  Niilo Pulkkinen               True Form           1119  1       36      Bot
+1729  Martina Nagel                                     599   1       36      Bot
+1730  Léa Roussel                   Aguda               970   1       36      Bot
+1731  Annie David                   AI Thunder          1031  1       36      Bot
+1732  Toivo Ikonen                                      1043  1       36      Bot
+1733  Julio Orellana                Ampex               893   1       36      Bot
+1734  Cesar Arroyo                  Pioma               923   1       36      Bot
+1735  Desmond Pugh                  Meisterkuhl         816   1       36      Bot
+1736  Artem Kushnir                                     638   1       36      Bot
+1737  Josef Jäger                   Fiber Shot          1227  2       36      Bot
+1738  Ivy Nolan                                         468   1       35      Bot
+1739  Mavis Nelson                  Meisterkuhl         438   1       35      Bot
+1740  Inger Ødegård                                     533   1       35      Bot
+1741  Marzia Orlando                                    617   1       35      Bot
+1742  Kenzo Fujita                                      904   1       35      Bot
+1743  Jose Rodriguez                                    962   1       35      Bot
+1744  Osvaldo Wyatt                                     1064  1       35      Bot
+1745  Dan Beaudoin                                      1241  1       35      Bot
+1746  Petter Kristiansen                                1265  1       35      Bot
+1747  Branko Pjanić                                     1081  1       35      Bot
+1748  Given Banda                                       1065  1       35      Bot
+1749  Inge De Bruin                 HCOM                279   1       35      Bot
+1750  Yuri Yuk                                          230   1       35      Bot
+1751  Lily Rees                                         419   1       35      Bot
+1752  Rosario Collins                                   559   1       35      Bot
+1753  Conny Gade                                        689   1       35      Bot
+1754  Isaiah McMillan               Base                715   1       35      Bot
+1755  Jacqueline Colin                                  607   1       35      Bot
+1756  Mía Romero                    Nuvio               487   1       35      Bot
+1757  Leandro Simone                                    1030  1       35      Bot
+1758  Robert Van den Berg                               1091  1       35      Bot
+1759  Kurt Lamprecht                                    100   1       35      Human
+1760  Dominique Barbier                                 269   1       35      Bot
+1761  Damien Fournier               Fujikai             1146  1       35      Bot
+1762  Edward Plante                 Hinal               1104  1       35      Bot
+1763  Dom Feitosa                                       946   1       35      Bot
+1764  Nooa Saari                                        1036  1       35      Bot
+1765  Ida Bergman                                       289   1       35      Bot
+1766  Kobe Simon                    Hinal               1301  1       35      Bot
+1767  Van Montgomery                                    1372  1       35      Bot
+1768  Finn Cockburn                                     643   1       35      Bot
+1769  Jan Sadowski                                      1215  1       35      Bot
+1770  Anita De Vries                Fujikai             732   1       35      Bot
+1771  Alaia Rojas                                       602   1       35      Bot
+1772  Greg George                                       719   1       35      Bot
+1773  Alisa Halonen                 Zonkify             653   1       35      Bot
+1774  Mathéo Ferreira                                   636   1       35      Bot
+1775  Freddie Jenkins                                   723   1       35      Bot
+1776  Daishi Abe                                        1333  1       35      Bot
+1777  Nikki Love                                        360   1       35      Bot
+1778  Kenshin Hashimoto             Fable               1264  1       35      Bot
+1779  Jason Lowe                    YES                 1236  1       35      Bot
+1780  Clifton Wyatt                                     1139  1       35      Bot
+1781  Gina Jordan                                       368   1       35      Bot
+1782  Germaine Faure                Systech             234   1       35      Bot
+1783  Toto LeKoala                  Riders Givrés du T  1188  1       35      Human
+1784  Olen Lambert                                      1003  1       35      Bot
+1785  Yaroslava Živulić             Fujikai             1005  1       35      Bot
+1786  Melati Tan                                        1087  1       35      Bot
+1787  Cyril Flores                  Fiber Shot          1075  1       35      Bot
+1788  Greta Ventura                 Kumori              985   1       35      Bot
+1789  Chikako Ōno                                       996   1       35      Bot
+1790  Aamir Abdul                                       1203  1       35      Bot
+1791  Alejandra Varela              AI Thunder          748   1       35      Bot
+1792  Attila Vajda                                      631   1       35      Bot
+1793  Alfredo Boyer                                     904   1       35      Bot
+1794  Jamila Pillai                                     932   1       35      Bot
+1795  Anderson Harewood             Sherpa              950   2       35      Bot
+1796  Mark Szűcs                    Nitro               851   1       34      Bot
+1797  Carter Salinas                Ampex               1073  1       34      Bot
+1798  Haruki Watanabe               AI Thunder          1285  1       34      Bot
+1799  Peer Lauritsen                Sherpa              1069  1       34      Bot
+1800  Hannah Sinclair                                   402   1       34      Bot
+1801  Susanna Woods                                     693   1       34      Bot
+1802  Osuke Yokoyama                Ampex               1105  1       34      Bot
+1803  Raymonde Gauthier                                 260   1       34      Bot
+1804  Enchen Vong                   Monova              1127  1       34      Bot
+1805  Vivaan Sengupta                                   1016  1       34      Bot
+1806  Carlos Carmona                                    1378  1       34      Bot
+1807  Kristin Wilson                                    755   1       34      Bot
+1808  Naoko Iwasaki                                     597   1       34      Bot
+1809  Alfredo Gutierrez                                 714   1       34      Bot
+1810  Kazimir Jursitzky                                 1304  1       34      Bot
+1811  Demeter Andreev               Patriot             1295  1       34      Bot
+1812  Aakar Poudel                                      1224  1       34      Bot
+1813  Bas Van Dijk                  Orbit               1123  1       34      Bot
+1814  John Smith                                        990   1       34      Bot
+1815  Manuel Hübner                                     855   1       34      Bot
+1816  Darijo Slutsky                Delta               849   1       34      Bot
+1817  Andrey Dobrev                 Saint               1170  1       34      Bot
+1818  Willy Bertelsen                                   1111  1       34      Bot
+1819  Burian Tishchenko                                 887   1       34      Bot
+1820  Bunothyan San                 Aria Olefson        1114  1       34      Bot
+1821  George Pinder                                     732   1       34      Bot
+1822  Daniel Galindo                                    1018  1       34      Bot
+1823  Alexander Janssens            Nuvio               864   1       34      Bot
+1824  Raul Espinoza                                     875   1       34      Bot
+1825  Mohammed Amrani                                   974   1       34      Bot
+1826  Lili Morgan                                       605   1       33      Bot
+1827  Anja Saarinen                                     933   1       33      Bot
+1828  Alfredo Serrano               Pioma               1072  1       33      Bot
+1829  Thaddeus Gordon                                   1235  1       33      Bot
+1830  Monroe Farmer                                     1105  1       33      Bot
+1831  Domingos Pereira                                  1262  1       33      Bot
+1832  Sayuri Aoki                                       723   1       33      Bot
+1833  Rachelle St-Pierre                                243   1       33      Bot
+1834  Burim Marku                                       1153  1       33      Bot
+1835  Sharlene French               Systech             1017  1       33      Bot
+1836  Stan Richard                                      1291  1       33      Bot
+1837  Emma Colin                                        715   1       33      Bot
+1838  Peter Vermeulen               Aspire              1138  1       33      Bot
+1839  Freddie Hurst                                     1057  1       33      Bot
+1840  Gerardo Alvarado              Base                1152  1       33      Bot
+1841  Wolfgang Schmitz                                  1032  1       33      Bot
+1842  Elaine Walker                 Dashix              918   1       33      Bot
+1843  Ada Whelan                    Base                890   1       33      Bot
+1844  Dusty Ayala                                       873   1       33      Bot
+1845  Jietang Fung                  Systech             897   1       33      Bot
+1846  Benjamin Dudás                                    1105  1       33      Bot
+1847  Anthony Lewis                                     1048  1       33      Bot
+1848  Sungmin Choe                  Windsail            973   1       33      Bot
+1849  Bas Vermeulen                 AMO Solutions       824   1       33      Bot
+1850  Eliyahu Awad                                      775   1       33      Bot
+1851  Lasse Nicolaisen              Fiber Shot          944   1       33      Bot
+1852  Fraser Kinnaird               Aspire              817   1       33      Bot
+1853  Titas Giedraitis                                  895   1       33      Bot
+1854  Celina Hahn                                       918   1       33      Bot
+1855  Jules Scholtes                Fable               780   1       33      Bot
+1856  Wangmo Rai                                        796   1       33      Bot
+1857  Katrine Johannessen           Hinal               816   1       33      Bot
+1858  Hugo Valente                                      736   1       33      Bot
+1859  Nooa Lindholm                                     945   1       33      Bot
+1860  Eric Jansen                                       743   1       33      Bot
+1861  Jamie Macrae                                      696   1       33      Bot
+1862  Betsan Price                  Aspire              904   1       33      Bot
+1863  Milos Vishnevetsky                                680   1       32      Bot
+1864  Sophia Beck                   Aguda               612   1       32      Bot
+1865  Anja Niemelä                                      611   1       32      Bot
+1866  Stine Eskildsen                                   896   1       32      Bot
+1867  Bart Van der Heijden                              841   1       32      Bot
+1868  Arthur Desmet                 Aguda               931   1       32      Bot
+1869  Nicolas Pires                                     896   1       32      Bot
+1870  Paul Person                   AMO Solutions       868   1       32      Bot
+1871  Viktoria Eklund                                   750   1       32      Bot
+1872  Bennett Farrell                                   753   1       32      Bot
+1873  Borysko Popovich              Nitro               739   1       32      Bot
+1874  Germain Walsh                                     742   1       32      Bot
+1875  Lewis Kinnaird                                    800   1       32      Bot
+1876  Luís Trindade                                     766   1       32      Bot
+1877  Emma Schmid                                       803   1       32      Bot
+1878  Sheena Harrigan                                   816   1       32      Bot
+1879  Kamilla Petersen              Fiber Shot          857   1       32      Bot
+1880  Kieth Moran                                       566   1       32      Bot
+1881  Sven Lundqvist                Titans              696   1       32      Bot
+1882  Jorge Caballero                                   691   1       32      Bot
+1883  Lauren Sandoval               Ampex               738   1       32      Bot
+1884  Yeruo Fam                                         705   1       32      Bot
+1885  Kushaan Malhotra                                  769   1       32      Bot
+1886  Rudra Deshpande                                   766   1       32      Bot
+1887  Fatoumata Coulibaly                               889   1       32      Bot
+1888  Moshe Mizrahi                                     853   1       32      Bot
+1889  Giuseppe Santoro                                  1171  1       31      Bot
+1890  William Roberts                                   1139  1       31      Bot
+1891  Evi Schubert                  Nitro               630   1       31      Bot
+1892  Raymond Benoit                                    1089  1       31      Bot
+1893  Marcel Lemaire                                    603   1       31      Bot
+1894  Connie Roy                                        775   1       31      Bot
+1895  Chad Marshall                                     790   1       31      Bot
+1896  Morris Tamba                                      697   1       31      Bot
+1897  Sylvia Davis                  True Form           756   1       31      Bot
+1898  Julie Arnaud                  Hector              586   1       31      Bot
+1899  Antonia Fumagalli                                 658   1       31      Bot
+1900  Eva Johnsson                                      637   1       31      Bot
+1901  Lynne Todd                                        952   1       31      Bot
+1902  Betty Hughes                                      886   1       31      Bot
+1903  Nathan Boeri                                      1033  1       30      Bot
+1904  Peter Roth                    Windsail            678   1       30      Bot
+1905  Ulrik Andersson               eVOX                1152  1       30      Bot
+1906  Leo Larsen                    Saitama             1147  1       30      Bot
+1907  Carolina Wilkerson                                537   1       30      Bot
+1908  Gloria Flowers                                    582   1       30      Bot
+1909  Carlos Augusto                Fujikai             872   1       30      Bot
+1910  Mikael Ikonen                                     797   1       30      Bot
+1911  Nicolo D'Amico                                    829   1       30      Bot
+1912  Said Olimov                                       811   1       30      Bot
+1913  Hélène Dubois                                     780   1       30      Bot
+1914  Lauri Roy                                         648   1       30      Bot
+1915  Marion Felix                  Titans              884   1       30      Bot
+1916  Jasper Burch                  Monova              677   1       30      Bot
+1917  Buford Winters                Fiber Shot          694   1       30      Bot
+1918  Rafael Tavares                                    782   1       30      Bot
+1919  Madeline Lester                                   876   1       30      Bot
+1920  Katherine Benitez                                 871   1       30      Bot
+1921  Dudley McCann                                     495   1       30      Bot
+1922  Nora Wolf                                         802   1       30      Bot
+1923  Carmen Melendez               eVOX                546   1       30      Bot
+1924  Azzurra Costantini            Delta               626   1       30      Bot
+1925  Raul Alvares                  Dashix              493   1       30      Bot
+1926  Petra Espinosa                Eckleson            665   1       30      Bot
+1927  Yumi Pyeong                   HCOM                810   1       30      Bot
+1928  Alana Sampaio                 Formix              872   1       30      Bot
+1929  Cristina Godinho                                  792   1       30      Bot
+1930  Risto Toivonen                                    1219  1       29      Bot
+1931  Fran Faulkner                                     712   1       29      Bot
+1932  Joseph Vrolijk                                    477   1       29      Bot
+1933  Bol Garang                                        803   1       29      Bot
+1934  Mario Moreno                  Delta               908   1       29      Bot
+1935  Luciano Cavallo               Nuvio               992   1       29      Bot
+1936  Rute Ramalho                                      653   1       29      Bot
+1937  Thomas Stevens                Capital             849   1       29      Bot
+1938  Vicki Adkins                                      783   1       29      Bot
+1939  Bogdana Moscovich                                 688   1       29      Bot
+1940  Nadia Pollard                                     805   1       29      Bot
+1941  Annick Fontaine                                   586   1       29      Bot
+1942  Gabriel Roche                 Saitama             501   1       29      Bot
+1943  Jesus Benito                                      488   1       29      Bot
+1944  Astrid Van Vliet              Saitama             698   1       29      Bot
+1945  Elisabeth Clement                                 693   1       28      Bot
+1946  Nargiza Abdullaeva            Nitro               651   1       28      Bot
+1947  Janko Romanski                Optech              514   1       28      Bot
+1948  Alfreda Green                 Eckleson            800   1       28      Bot
+1949  Kostiantyn Kostenko                               775   1       28      Bot
+1950  Willie Berg                   Patriot             824   1       28      Bot
+1951  Raymundo Washington                               809   1       28      Bot
+1952  Tatsuki Maeda                 Aria Olefson        610   1       28      Bot
+1953  Hifumi Murakami                                   669   1       28      Bot
+1954  Sheila Booker                                     762   1       28      Bot
+1955  Erica Cavallo                                     770   1       28      Bot
+1956  Nakato Ssempala               Pioma               717   1       28      Bot
+1957  Yvette Roussel                                    985   1       28      Bot
+1958  Silvia Guerrero                                   684   1       28      Bot
+1959  Dominique Marchand            AMO Solutions       551   1       28      Bot
+1960  Aurora Vainio                 Aria Olefson        534   1       28      Bot
+1961  Emilie Bertrand               Dashix              676   1       28      Bot
+1962  Timmy Pruitt                                      604   1       28      Bot
+1963  Vuthy Moau                    Pioma               640   1       28      Bot
+1964  Matilda Sandström             Aria Olefson        807   1       28      Bot
+1965  Colette Valencia                                  841   1       28      Bot
+1966  Charlotte Lecomte             Aspire              728   1       28      Bot
+1967  Alejandro Guzman              Titans              856   1       27      Bot
+1968  Fredrik Sandström                                 630   1       27      Bot
+1969  Gael Cabral                                       1246  1       27      Bot
+1970  Kemi Oladipo                                      519   1       27      Bot
+1971  Anna Kiss                     Ampex               480   1       27      Bot
+1972  Bom Da                        Kumori              759   1       27      Bot
+1973  Milagros Sellers              Aria Olefson        849   1       27      Bot
+1974  Rocco Negri                                       1024  1       27      Bot
+1975  Germain Dionne                AI Thunder          976   1       27      Bot
+1976  Riley Paterson                Nuvio               822   1       27      Bot
+1977  Aleksandra Savchenko                              615   1       27      Bot
+1978  Virginie Lefevre                                  551   1       27      Bot
+1979  Susanne Lund                                      748   1       27      Bot
+1980  Shrika Gupta                                      771   1       27      Bot
+1981  Emma Valentini                                    771   1       27      Bot
+1982  Camille Smets                 Dashix              805   1       27      Bot
+1983  Mata Marsters                                     598   1       27      Bot
+1984  Caroline Van Dijk             Meisterkuhl         637   1       27      Bot
+1985  Gloria Shannon                                    591   1       27      Bot
+1986  Angela Gallardo                                   528   1       27      Bot
+1987  Lilou Hansen                                      613   1       27      Bot
+1988  Ria Schumann                                      630   1       27      Bot
+1989  Michal Moskowitz                                  672   1       27      Bot
+1990  Shiman Choo                   Delta               717   1       27      Bot
+1991  Helga Hübner                  HCOM                659   1       27      Bot
+1992  Noe Mcbride                                       1227  1       26      Bot
+1993  Akshara Ganguly                                   430   1       26      Bot
+1994  Andre Soares                  Heat                912   1       26      Bot
+1995  Lev Hrepka                                        982   1       26      Bot
+1996  Olga Hester                                       849   1       26      Bot
+1997  Laura Lara                                        834   1       26      Bot
+1998  Robt Benn                     Heat                537   1       26      Bot
+1999  Zoé Thomas                    Hector              543   1       26      Bot
+2000  Chloé Collard                                     791   1       26      Bot
+2001  Jerry Patrick                                     635   1       26      Bot
+2002  Ada Curtis                    Hinal               737   1       26      Bot
+2003  Malebogo Phiri                                    708   1       26      Bot
+2004  Evan Perkins                  Sherpa              583   1       26      Bot
+2005  Robin Bryan                   AI Thunder          563   1       26      Bot
+2006  Beverley Jones                                    661   1       26      Bot
+2007  Kwan Dae                      Fujikai             642   1       26      Bot
+2008  Lucie Dumont                                      719   1       26      Bot
+2009  Ty Portillo                                       1060  1       25      Bot
+2010  Polina Kostenko                                   663   1       25      Bot
+2011  Rosalyn Roberson              Delta               409   1       25      Bot
+2012  Sahil Kulkarni                Formix              895   1       25      Bot
+2013  Ulpu Toivonen                 Windsail            831   1       25      Bot
+2014  Millie Baker                                      806   1       25      Bot
+2015  Yuanling Ngiam                Patriot             910   1       25      Bot
+2016  Janne Laakso                                      531   1       25      Bot
+2017  Bongcha Jong                  Systech             639   1       25      Bot
+2018  Ingrid Isaksen                Nuvio               578   1       25      Bot
+2019  Sondre Pedersen                                   774   1       25      Bot
+2020  Paz Sanchez                   Formix              739   1       25      Bot
+2021  Lizzie Valentine                                  660   1       25      Bot
+2022  Phil Vance                                        874   1       25      Bot
+2023  Greta Kern                                        696   1       25      Bot
+2024  Edith Paterson                Sherpa              592   1       25      Bot
+2025  Ilse Hendriks                 Base                513   1       25      Bot
+2026  Aaron Sutherland                                  477   1       25      Bot
+2027  Kirsty Melville                                   571   1       25      Bot
+2028  Linwood York                                      473   1       25      Bot
+2029  Anita Huisman                 YES                 578   1       25      Bot
+2030  Ada Mazza                                         749   1       25      Bot
+2031  Jade Gérard                   Delta               898   1       24      Bot
+2032  Albert Krause                                     485   1       24      Bot
+2033  Wendy Herrera                 HCOM                629   1       24      Bot
+2034  Sophia Parry                                      611   1       24      Bot
+2035  Chessa Kukharchuk             Optech              709   1       24      Bot
+2036  Nadia Lulić                   AI Thunder          572   1       24      Bot
+2037  Inge Hendriks                 Fiber Shot          481   1       24      Bot
+2038  Dae Bi                                            478   1       24      Bot
+2039  Marie Renard                  Hinal               535   1       24      Bot
+2040  Aava Kemppainen                                   610   1       24      Bot
+2041  Charlotte Månsson             Eckleson            560   1       24      Bot
+2042  Marie-France Zhang                                562   1       24      Bot
+2043  Xianquan Lai                                      1006  1       23      Bot
+2044  Antonia Hartmann              Heat                620   1       23      Bot
+2045  Piero Luca                                        1075  1       23      Bot
+2046  Giuliana Venturi                                  803   1       23      Bot
+2047  Conrad Snow                                       811   1       23      Bot
+2048  Jacqueline Williams                               813   1       23      Bot
+2049  Anthony Snyder                                    757   1       23      Bot
+2050  Nasser Salman                 True Form           492   1       23      Bot
+2051  Ian Parris                                        434   1       23      Bot
+2052  Kerstin Vogt                                      627   1       23      Bot
+2053  Rosemary Dabwido              Roklit              771   1       23      Bot
+2054  Arline Holloway               Fujikai             561   1       23      Bot
+2055  Yaroslava Levitsky                                706   1       23      Bot
+2056  Jean-Pierre Brunet                                871   1       23      Bot
+2057  Luann McKee                   Hinal               427   1       23      Bot
+2058  Mari Eide                                         419   1       23      Bot
+2059  Moises Burnett                                    677   1       23      Bot
+2060  Marzhan Sadykova              Hinal               481   1       23      Bot
+2061  Keely Hamilton                                    100   1       23      Human
+2062  Jacklyn Serrano                                   584   1       23      Bot
+2063  Petra Vidić                                       515   1       23      Bot
+2064  Ingrid Lundin                                     819   1       22      Bot
+2065  Louise Roberts                                    424   1       22      Bot
+2066  Joyce Jacobs                  Pioma               514   1       22      Bot
+2067  Mia Dalton                    Sherpa              508   1       22      Bot
+2068  Mary Mutuku                                       489   1       22      Bot
+2069  Ayame Sakamoto                                    456   1       22      Bot
+2070  Hanneke Verhoeven                                 771   1       22      Bot
+2071  Aastha Koirala                Fujikai             544   1       22      Bot
+2072  Bernadette Martinez                               513   1       22      Bot
+2073  Deann Patrick                 Systech             388   1       22      Bot
+2074  Jeannine Bourgeois            Zonkify             369   1       22      Bot
+2075  Jerri Martinez                                    453   1       22      Bot
+2076  Eve Salinas                   Dashix              465   1       22      Bot
+2077  Saif Patel                    Formix              751   1       22      Bot
+2078  Gracie Singh                                      534   1       22      Bot
+2079  Amelie Kern                                       587   1       22      Bot
+2080  Aleksandra Stabiņš            Roklit              617   1       22      Bot
+2081  Peter Lafaele                                     1072  1       21      Bot
+2082  Cristina Messina              Nitro               502   1       21      Bot
+2083  Antonio Martins               Nuvio               1088  1       21      Bot
+2084  Michael Deireragea            eVOX                808   1       21      Bot
+2085  Salvador Morales              Titans              860   1       21      Bot
+2086  Leone Bruno                                       403   1       21      Bot
+2087  Rosa Groß                     Orbit               712   1       21      Bot
+2088  Connie Wilkinson                                  622   1       21      Bot
+2089  Irene Trevisan                                    653   1       21      Bot
+2090  Theresa Darville                                  515   1       21      Bot
+2091  Lorna Price                                       528   1       21      Bot
+2092  Noémie Arend                                      318   1       21      Bot
+2093  Flavia Esposito               Formix              605   1       21      Bot
+2094  Antonella Diaz                                    577   1       21      Bot
+2095  André Leclercq                                    566   2       21      Bot
+2096  Guy Mercier                                       787   1       20      Bot
+2097  Marie Stein                                       433   1       20      Bot
+2098  Jon Wakefield                 New Ways            1526  1       20      Human
+2099  Miglė Zubrickas               Systech             576   1       20      Bot
+2100  Simona Kirilova                                   502   1       20      Bot
+2101  Maria Tereshchenko                                960   1       19      Bot
+2102  Camille Andre                 Orbit               707   1       19      Bot
+2103  Carlo Lawrence                                    1081  1       19      Bot
+2104  Anaïs Michel                  Base                1080  1       17      Bot
+2105  Amelia Cattaneo                                   522   1       17      Bot
+2106  Alan Cruz                     Roklit              921   1       17      Bot
+2107  Martha Boudreau                                   822   1       16      Bot
+2108  Lene Pettersen                Krowen              552   1       16      Bot
+2109  Alexa Medina                                      1022  1       16      Bot
+2110  Thiago Rodriguez                                  1122  1       14      Bot
+2111  Sergio Mantovani                                  460   1       14      Bot
+2112  Lars Collard                  Kumori              1048  1       14      Bot
+2113  Angeles Romero                Saint               901   1       12      Bot
+2114  Travis Chen                   Kumori              401   1       12      Bot
+2115  Caterina Serra                                    1061  1       12      Bot
+2116  Itai Chided                   Formix              684   1       0       Bot
+2117  Georges Caron                                     565   1       0       Bot
+2118  Maria Villar                                      308   1       0       Bot
+2119  Molly Bishop                                      573   1       0       Bot
+2120  Emmanuel Nshimiyimana                             539   1       0       Bot
+2121  Beate Berg                    eVOX                353   1       0       Bot
+2122  Marie Thomas                  Formix              543   1       0       Bot
+2123  MasterMatej Matej                                 1425  1       0       Human
+2124  Rian Rustvold                 indieVelo Founders  1480  1       0       Human
+2125  Rob Dekker                    Roklit              515   1       0       Bot
+2126  Senne Vos                                         338   1       0       Bot
+2127  Joshua Griffin                                    662   1       0       Bot
+2128  Winston Murray                                    764   1       0       Bot
+2129  Kira Sayko                                        100   1       0       Human
+2130  Iina Nurmi                                        126   1       0       Bot
+2131  Hanhua Fam                                        495   1       0       Bot
+2132  Bryon Esparza                                     313   1       0       Bot
+2133  Antone McGuire                                    749   1       0       Bot
+2134  Isla Watkins                                      569   1       0       Bot
+2135  Rossana Riva                                      462   1       0       Bot
+2136  Lori Jacobson                                     569   1       0       Bot
+2137  Mabel Stone                                       464   1       0       Bot
+2138  Eva Solberg                                       434   1       0       Bot
+2139  Charlotte Thomas              Capital             167   1       0       Bot
+2140  Saskia De Jong                                    257   1       0       Bot
+2141  Julie Morin                   Fujikai             228   1       0       Bot
+2142  Lerato Nkosi                  Patriot             280   1       0       Bot
+2143  Maggie Cantrell               Base                267   1       0       Bot
+2144  Jeremy Marie                  Riders Givrés du T  1546  1       0       Human
+2145  Gavin Bailey                                      100   1       0       Human
+2146  Wilford Schneider             Fable               411   1       0       Bot
+2147  Adele Kern                                        402   1       0       Bot
+2148  Catherine Wallace                                 367   1       0       Bot
+2149  Remo Spinelli                                     662   1       0       Bot
+2150  Sarah Zammit                  Hector              794   1       0       Bot
+2151  Carsten Andreasen                                 784   1       0       Bot
+2152  Ilseong Mun                                       813   1       0       Bot
+2153  Allegra Gomez                 Capital             810   1       0       Bot
+2154  Bhavanya Raj                                      825   1       0       Bot
+2155  Sophie Boucher                                    340   1       0       Bot
+2156  Matilda Quillin                                   400   1       0       Bot
+2157  Mária Xavier                  Pioma               380   1       0       Bot
+2158  Ina Sommer                    Titans              365   1       0       Bot
+2159  Whitney McCarthy                                  415   1       0       Bot
+2160  Sylvia De Brujin              True Form           367   1       0       Bot
+2161  Jovana Vemić                  Hinal               406   1       0       Bot
+2162  Lucy Marks                                        320   1       0       Bot
+2163  Hannah Weir                                       390   1       0       Bot
+2164  Cristina Mancini                                  391   1       0       Bot
+2165  Eric Verhoeven                                    404   1       0       Bot
+2166  Aergul Çoban                                      396   1       0       Bot
+2167  Josefa Tawake                                     344   1       0       Bot
+2168  Jennifer Schröder                                 558   1       0       Bot
+2169  Myrtle Lester                 Roklit              549   1       0       Bot
+2170  Heiran Ha                     Capital             571   1       0       Bot
+2171  Maksymilian Wysocki                               657   1       0       Bot
+2172  Trym Johannessen              AMO Solutions       693   1       0       Bot
+2173  Chun Jo                                           762   1       0       Bot
+2174  Chessa Koffka                                     663   1       0       Bot
+2175  Salma Dlimi                                       427   1       0       Bot
+2176  Neil Atherton                 Coalition           1298  1       0       Human
+2177  Samuel Shah                                       982   1       0       Bot
+2178  Judy Poulin                                       285   1       0       Bot
+2179  Hyeon Mun                     Capital             605   1       0       Bot
+2180  Saimi Järvinen                Fujikai             638   1       0       Bot
+2181  Lucia Martino                                     500   1       0       Bot
+2182  Hanan Al-Shehhi               Dashix              543   1       0       Bot
+2183  Irma Moses                                        877   1       0       Bot
+2184  Cristian Contreras            Nitro               1110  1       0       Bot
+2185  Heriberto Harrell             Douvan              1104  1       0       Bot
+2186  Marek Konopka                                     1124  1       0       Bot
+2187  Tobias Abrahamsson            AI Thunder          986   1       0       Bot
+2188  Arturo Lugo                                       1173  1       0       Bot
+2189  Clair Davila                                      1020  1       0       Bot
+2190  Bojidar Osman                                     1190  1       0       Bot
+2191  Katerina Moskovits                                948   1       0       Bot
+2192  Otso Vainio                   Meisterkuhl         1111  1       0       Bot
+2193  Nelson Lucas                  HCOM                1038  1       0       Bot
+2194  Ty Schultz                                        869   1       0       Bot
+2195  Antti Hänninen                Windsail            888   1       0       Bot
+2196  Dorottya Gulyás               Ampex               970   1       0       Bot
+2197  Hiram Cain                                        1061  1       0       Bot
+2198  Felipe Manzano                                    927   1       0       Bot
+2199  Viktor Axelsson                                   927   1       0       Bot
+2200  Trude Isaksen                                     958   1       0       Bot
+2201  Tommy Strand                  Ampex               906   1       0       Bot
+2202  Niels De Bruin                                    908   1       0       Bot
+2203  Jérémy Boyer                                      957   1       0       Bot
+2204  Maryse Champagne              Hector              752   1       0       Bot
+2205  Adriana Rios                  Krowen              486   1       0       Bot
+2206  Edwin Dekker                  Systech             431   1       0       Bot
+2207  Anton Baumann                 Heat                714   2       0       Bot
+----------------------------------------------------------------------------------------------------
+
+================================================================================
+TOP 10 RIDERS - DETAILED BREAKDOWN
+================================================================================
+
+
+1. Julien Helleputte (Human)
+   Team: Riders Givrés du Trainer
+   ARR: 200
+   Total Points: 498
+   Events Completed: 7
+   Event History:
+     Event 5: Position 7 - 70 points
+     Event 6: Position 22 - 34 points
+     Event 12: Position 34 - 83 points
+     Event 13: Position 9 - 104 points
+     Event 14: Position 4 - 87 points
+     Event 15: Position 21 - 98 points
+     Event 102: Position 34 - 22 points
+
+2. Gregory Frison (Human)
+   Team: Mashup Collective
+   ARR: 1817
+   Total Points: 395
+   Events Completed: 4
+   Event History:
+     Event 1: Position 1 - 65 points
+     Event 2: Position 1 - 95 points
+     Event 3: Position 1 - 50 points
+     Event 8: Position 1 - 185 points
+
+3. Forrest Beck (Bot)
+   Team: Independent
+   ARR: 1310
+   Total Points: 376
+   Events Completed: 4
+   Event History:
+     Event 1: Position 5 - 57 points
+     Event 3: Position 4 - 39 points
+     Event 8: Position 21 - 135 points
+     Event 12: Position 1 - 145 points
+
+4. Lasse Schmidt (Bot)
+   Team: Independent
+   ARR: 1443
+   Total Points: 311
+   Events Completed: 6
+   Event History:
+     Event 1: Position 35 - 36 points
+     Event 2: Position 25 - 64 points
+     Event 3: Position 11 - 27 points
+     Event 4: Position 1 - 50 points
+     Event 8: Position 36 - 101 points
+     Event 102: Position 6 - 33 points
+
+5. Richard Kramer (Bot)
+   Team: Independent
+   ARR: 1271
+   Total Points: 310
+   Events Completed: 4
+   Event History:
+     Event 1: Position 1 - 65 points
+     Event 2: Position 30 - 58 points
+     Event 4: Position 3 - 46 points
+     Event 12: Position 2 - 141 points
+
+6. Ian Ortiz (Bot)
+   Team: AMO Solutions
+   ARR: 1433
+   Total Points: 298
+   Events Completed: 4
+   Event History:
+     Event 1: Position 23 - 44 points
+     Event 2: Position 29 - 59 points
+     Event 8: Position 4 - 173 points
+     Event 102: Position 34 - 22 points
+
+7. Emmanuel Mensah (Bot)
+   Team: Independent
+   ARR: 1375
+   Total Points: 296
+   Events Completed: 4
+   Event History:
+     Event 1: Position 26 - 42 points
+     Event 7: Position 24 - 47 points
+     Event 8: Position 6 - 169 points
+     Event 102: Position 2 - 38 points
+
+8. Marcel Bourgeois (Bot)
+   Team: Independent
+   ARR: 1445
+   Total Points: 295
+   Events Completed: 4
+   Event History:
+     Event 1: Position 25 - 43 points
+     Event 2: Position 37 - 51 points
+     Event 8: Position 3 - 178 points
+     Event 102: Position 32 - 23 points
+
+9. Mansour Salem (Bot)
+   Team: Independent
+   ARR: 1508
+   Total Points: 290
+   Events Completed: 4
+   Event History:
+     Event 1: Position 37 - 35 points
+     Event 2: Position 38 - 50 points
+     Event 8: Position 2 - 181 points
+     Event 102: Position 30 - 24 points
+
+10. Neal Marshall (Bot)
+   Team: Independent
+   ARR: 1152
+   Total Points: 283
+   Events Completed: 3
+   Event History:
+     Event 1: Position 30 - 40 points
+     Event 12: Position 4 - 135 points
+     Event 13: Position 6 - 108 points
+
+
+================================================================================
+REPORT COMPLETE
+================================================================================
