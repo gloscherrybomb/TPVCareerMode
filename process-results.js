@@ -425,7 +425,8 @@ const EVENT_MAX_POINTS = {
   14: 95,  // Local Tour Stage 2
   15: 135, // Local Tour Stage 3
   // Special events (IDs > 100)
-  102: 40  // The Leveller
+  102: 40,  // The Leveller
+  103: 80   // Valentine's Invitational
 };
 
 /**
