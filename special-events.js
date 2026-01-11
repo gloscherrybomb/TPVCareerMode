@@ -47,7 +47,7 @@ const SPECIAL_EVENTS = [
         unlockField: null,
         name: 'Valentine\'s Invitational',
         icon: '💝',
-        description: 'Race the iconic Bosberg climb on Belgian roads alongside human competitors. Our first fixed-schedule event with multiple timeslots to choose from.',
+        description: 'Race the iconic Bosberg climb on Belgian roads alongside human competitors.',
         reward: '+80 Career Points',
         bonusCC: 'TBC',
         type: 'Road Race',
@@ -146,9 +146,12 @@ function renderSpecialEvents() {
             });
             comingSoonSection.innerHTML = '';
             comingSoonSection.appendChild(comingSoonGrid);
+            // Add class to reset placeholder styles (fallback for browsers without :has() support)
+            comingSoonSection.classList.add('has-events');
         } else {
             // Show default placeholder
             comingSoonSection.innerHTML = '<p>More special events coming soon!</p>';
+            comingSoonSection.classList.remove('has-events');
         }
     }
 
