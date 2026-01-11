@@ -704,3 +704,22 @@
     opacity: 0.5;
 }
 
+/* Valentine's Event Specific Styling */
+.special-event-card[data-event-id="103"] .timeslot-card {
+    background: rgba(255, 107, 138, 0.05);
+    border-color: rgba(255, 107, 138, 0.3);
+}
+
+.special-event-card[data-event-id="103"] .timeslot-card:hover {
+    border-color: rgba(255, 107, 138, 0.6);
+    box-shadow: 0 8px 24px rgba(255, 107, 138, 0.2);
+}
+
+.special-event-card[data-event-id="103"] .timeslot-time {
+    color: #ff6b8a;
+}
+
+.special-event-card[data-event-id="103"] .timeslot-signup-btn:not(:disabled) {
+    background: linear-gradient(135deg, #ff6b8a, #ee5a6f);
+}
+
