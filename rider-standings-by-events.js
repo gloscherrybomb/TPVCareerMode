@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
 /**
- * Generate Season 1 Rider Standings Report
- * Analyzes all race results and creates a comprehensive standings report
+ * Generate Rider Position Report - By Events Completed
+ * Shows each human rider's position within their respective event count group
  */
 
 const fs = require('fs');
@@ -28,25 +28,6 @@ const EVENT_MAX_POINTS = {
   102: 40  // The Leveller
 };
 
-const EVENT_DISPLAY_NAMES = {
-  1: 'Coast and Roast Crit',
-  2: 'Island Classic',
-  3: 'The Forest Velodrome Elimination',
-  4: 'Coastal Loop Time Challenge',
-  5: 'North Lake Points Race',
-  6: 'Easy Hill Climb',
-  7: 'Flat Eight Criterium',
-  8: 'The Grand Gilbert Fondo',
-  9: 'Base Camp Classic',
-  10: 'Beach and Pine TT',
-  11: 'South Lake Points Race',
-  12: 'Unbound - Little Egypt',
-  13: 'Local Tour Stage 1',
-  14: 'Local Tour Stage 2',
-  15: 'Local Tour Stage 3',
-  102: 'The Leveller'
-};
-
 /**
  * Calculate points based on finishing position
  */
@@ -54,7 +35,6 @@ function calculatePoints(position, eventNumber) {
   const maxPoints = EVENT_MAX_POINTS[eventNumber];
 
   if (!maxPoints) {
-    console.warn(`No max points defined for event ${eventNumber}, using 100`);
     return Math.max(0, 100 - (position - 1) * 2);
   }
 
@@ -120,19 +100,13 @@ function buildStandings() {
     })
     .sort((a, b) => a.eventNum - b.eventNum);
 
-  console.log(`Found ${eventDirs.length} events to process\n`);
-
   // Process each event
   for (const { dir, eventNum } of eventDirs) {
-    console.log(`Processing Event ${eventNum}: ${EVENT_DISPLAY_NAMES[eventNum] || 'Unknown'}...`);
     const results = readEventResults(dir);
 
     if (results.length === 0) {
-      console.log(`  No results found`);
       continue;
     }
-
-    console.log(`  Found ${results.length} race finishers`);
 
     // Track unique riders in this event
     const uniqueRiders = new Set();
@@ -163,8 +137,7 @@ function buildStandings() {
           arr,
           isBot,
           totalPoints: 0,
-          eventsCompleted: 0,
-          eventResults: []
+          eventsCompleted: 0
         });
       }
 
@@ -175,116 +148,157 @@ function buildStandings() {
         uniqueRiders.add(playerId);
         rider.totalPoints += points;
         rider.eventsCompleted++;
-        rider.eventResults.push({
-          eventNum,
-          position,
-          points
-        });
 
         // Update ARR and team to latest
         rider.arr = arr;
         if (team) rider.team = team;
       }
     }
-
-    console.log(`  Processed ${uniqueRiders.size} unique riders`);
   }
 
-  // Convert to array and sort by total points
-  const standings = Array.from(riderMap.values())
-    .sort((a, b) => {
-      if (b.totalPoints !== a.totalPoints) {
-        return b.totalPoints - a.totalPoints;
-      }
-      // Tie-breaker: fewer events is better (higher points per event)
-      return a.eventsCompleted - b.eventsCompleted;
-    });
+  // Convert to array
+  const allRiders = Array.from(riderMap.values());
 
-  return standings;
+  return allRiders;
+}
+
+/**
+ * Get ordinal suffix (1st, 2nd, 3rd, etc.)
+ */
+function getOrdinalSuffix(num) {
+  const j = num % 10;
+  const k = num % 100;
+
+  if (j === 1 && k !== 11) {
+    return 'st';
+  }
+  if (j === 2 && k !== 12) {
+    return 'nd';
+  }
+  if (j === 3 && k !== 13) {
+    return 'rd';
+  }
+  return 'th';
 }
 
 /**
  * Generate the report
  */
 function generateReport() {
-  console.log('='.repeat(80));
-  console.log('SEASON 1 RIDER STANDINGS REPORT');
-  console.log('='.repeat(80));
+  console.log('================================================================================');
+  console.log('SEASON 1 - HUMAN RIDER STANDINGS BY EVENTS COMPLETED');
+  console.log('Each rider\'s position within their respective event count group');
+  console.log('================================================================================');
   console.log();
 
-  const standings = buildStandings();
+  const allRiders = buildStandings();
 
-  console.log('\n');
-  console.log('='.repeat(80));
-  console.log('FINAL STANDINGS');
-  console.log('='.repeat(80));
+  // Filter to only humans
+  const humanRiders = allRiders.filter(r => !r.isBot);
+
+  console.log(`Total Human Riders: ${humanRiders.length}`);
   console.log();
 
-  console.log(`Total Riders: ${standings.length}`);
-  console.log(`Bots: ${standings.filter(r => r.isBot).length}`);
-  console.log(`Human Riders: ${standings.filter(r => !r.isBot).length}`);
-  console.log();
+  // Group riders by number of events completed
+  const ridersByEventCount = new Map();
+
+  for (const rider of allRiders) {
+    const eventCount = rider.eventsCompleted;
+    if (!ridersByEventCount.has(eventCount)) {
+      ridersByEventCount.set(eventCount, []);
+    }
+    ridersByEventCount.get(eventCount).push(rider);
+  }
+
+  // Sort each group by total points
+  for (const [eventCount, riders] of ridersByEventCount.entries()) {
+    riders.sort((a, b) => {
+      if (b.totalPoints !== a.totalPoints) {
+        return b.totalPoints - a.totalPoints;
+      }
+      return a.name.localeCompare(b.name);
+    });
+  }
 
   // Print header
   console.log('-'.repeat(100));
   console.log(
-    'Rank'.padEnd(6) +
-    'Rider Name'.padEnd(30) +
-    'Team'.padEnd(20) +
-    'ARR'.padEnd(6) +
-    'Events'.padEnd(8) +
-    'Points'.padEnd(8) +
-    'Type'
+    'Rider Name'.padEnd(35) +
+    'Team'.padEnd(25) +
+    'Races'.padEnd(8) +
+    'Points'.padEnd(10) +
+    'Position'
   );
   console.log('-'.repeat(100));
 
-  // Print all riders
-  standings.forEach((rider, index) => {
-    const rank = (index + 1).toString();
-    const name = rider.name.substring(0, 28);
-    const team = (rider.team || '').substring(0, 18);
-    const arr = rider.arr.toString();
-    const events = rider.eventsCompleted.toString();
-    const points = rider.totalPoints.toString();
-    const type = rider.isBot ? 'Bot' : 'Human';
+  // Print each human rider with their position in their event count group
+  humanRiders
+    .sort((a, b) => {
+      // Sort by points descending
+      if (b.totalPoints !== a.totalPoints) {
+        return b.totalPoints - a.totalPoints;
+      }
+      return a.name.localeCompare(b.name);
+    })
+    .forEach(rider => {
+      const eventCount = rider.eventsCompleted;
+      const groupRiders = ridersByEventCount.get(eventCount);
+      const position = groupRiders.findIndex(r => r.playerId === rider.playerId) + 1;
+      const totalInGroup = groupRiders.length;
+      const suffix = getOrdinalSuffix(position);
 
-    console.log(
-      rank.padEnd(6) +
-      name.padEnd(30) +
-      team.padEnd(20) +
-      arr.padEnd(6) +
-      events.padEnd(8) +
-      points.padEnd(8) +
-      type
-    );
-  });
+      const name = rider.name.substring(0, 33);
+      const team = (rider.team || 'Independent').substring(0, 23);
+      const races = rider.eventsCompleted.toString();
+      const points = rider.totalPoints.toString();
+      const positionDisplay = `${position}${suffix} of ${totalInGroup}`;
+
+      console.log(
+        name.padEnd(35) +
+        team.padEnd(25) +
+        races.padEnd(8) +
+        points.padEnd(10) +
+        positionDisplay
+      );
+    });
 
   console.log('-'.repeat(100));
   console.log();
 
-  // Print top 10 detail
-  console.log('='.repeat(80));
-  console.log('TOP 10 RIDERS - DETAILED BREAKDOWN');
-  console.log('='.repeat(80));
+  // Print summary by event count
+  console.log('================================================================================');
+  console.log('SUMMARY BY EVENTS COMPLETED');
+  console.log('================================================================================');
   console.log();
 
-  standings.slice(0, 10).forEach((rider, index) => {
-    console.log(`\n${index + 1}. ${rider.name} (${rider.isBot ? 'Bot' : 'Human'})`);
-    console.log(`   Team: ${rider.team || 'Independent'}`);
-    console.log(`   ARR: ${rider.arr}`);
-    console.log(`   Total Points: ${rider.totalPoints}`);
-    console.log(`   Events Completed: ${rider.eventsCompleted}`);
-    console.log(`   Event History:`);
+  const eventCounts = Array.from(ridersByEventCount.keys()).sort((a, b) => b - a);
 
-    rider.eventResults.forEach(result => {
-      console.log(`     Event ${result.eventNum}: Position ${result.position} - ${result.points} points`);
+  for (const eventCount of eventCounts) {
+    const groupRiders = ridersByEventCount.get(eventCount);
+    const humanInGroup = groupRiders.filter(r => !r.isBot);
+
+    if (humanInGroup.length === 0) continue;
+
+    console.log(`\n${eventCount} Event${eventCount !== 1 ? 's' : ''} Completed - ${humanInGroup.length} human rider${humanInGroup.length !== 1 ? 's' : ''} (out of ${groupRiders.length} total):`);
+    console.log('-'.repeat(100));
+
+    humanInGroup.forEach(rider => {
+      const position = groupRiders.findIndex(r => r.playerId === rider.playerId) + 1;
+      const suffix = getOrdinalSuffix(position);
+
+      console.log(
+        `  ${position}${suffix}`.padEnd(8) +
+        rider.name.padEnd(35) +
+        `${rider.totalPoints} points`.padEnd(15) +
+        (rider.team || 'Independent')
+      );
     });
-  });
+  }
 
   console.log('\n');
-  console.log('='.repeat(80));
+  console.log('================================================================================');
   console.log('REPORT COMPLETE');
-  console.log('='.repeat(80));
+  console.log('================================================================================');
 }
 
 // Run the report
