@@ -246,22 +246,9 @@
 }
 
 /* Coming Soon State */
+/* Coming soon cards now look the same as available cards since they're clickable */
 .special-event-card.coming-soon {
-    opacity: 0.85;
-}
-
-.special-event-card.coming-soon::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg,
-        rgba(0, 0, 0, 0.1) 0%,
-        transparent 50%,
-        rgba(0, 0, 0, 0.1) 100%);
-    pointer-events: none;
+    /* No special styling - matches unlocked cards */
 }
 
 /* Event Badge */
