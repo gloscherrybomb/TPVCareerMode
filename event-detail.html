@@ -18,6 +18,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="result-notifications.css">
+    <link rel="stylesheet" href="route-profile-modal.css">
 </head>
 <body>
     <div id="navbar-placeholder"></div>
@@ -376,6 +377,7 @@
     <script src="event-data.js"></script>
     <script src="event-config.js"></script>
     <script src="elevation-profile-generator.js"></script>
+    <script src="route-profile-modal.js"></script>
     <!-- Narrative System Scripts -->
     <script src="narrative-database.js"></script>
     <script src="story-selector.js"></script>
@@ -758,7 +760,21 @@
                 
                 // Load Stage 1 profile by default
                 await updateStageProfile(0);
-                
+
+                // Make route profile clickable to open modal (for stage races)
+                const profileContainer = document.querySelector('.route-profile-container');
+                if (profileContainer && window.openRouteProfileModal) {
+                    profileContainer.addEventListener('click', () => {
+                        const stage = event.stages[currentStage];
+                        const eventInfo = {
+                            distance: stage.distance,
+                            climbing: stage.climbing,
+                            course: stageCourses[currentStage]
+                        };
+                        window.openRouteProfileModal(stageCourses[currentStage], 1, eventInfo);
+                    });
+                }
+
             } else {
                 // Single event: standard flow
                 // Hide stage switcher
@@ -832,6 +848,19 @@
                         event.course,
                         laps
                     );
+
+                    // Make route profile clickable to open modal
+                    const profileContainer = document.querySelector('.route-profile-container');
+                    if (profileContainer && window.openRouteProfileModal) {
+                        profileContainer.addEventListener('click', () => {
+                            const eventInfo = {
+                                distance: event.distance,
+                                climbing: event.climbing,
+                                course: event.course
+                            };
+                            window.openRouteProfileModal(event.course, laps, eventInfo);
+                        });
+                    }
                 } else {
                     console.error('Elevation profile generator not loaded');
                 }
