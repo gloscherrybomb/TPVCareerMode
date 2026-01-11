@@ -47,7 +47,7 @@ const SPECIAL_EVENTS = [
         unlockField: null,
         name: 'Valentine\'s Invitational',
         icon: '💝',
-        description: 'An exclusive bimonthly event where passion for racing meets the spirit of February. Choose from multiple pre-scheduled timeslots across two days.',
+        description: 'Race the iconic Bosberg climb on Belgian roads alongside human competitors. Our first fixed-schedule event with multiple timeslots to choose from.',
         reward: '+80 Career Points',
         bonusCC: 'TBC',
         type: 'Road Race',
