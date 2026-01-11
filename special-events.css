@@ -586,6 +586,14 @@
     border-radius: 12px;
 }
 
+/* Reset placeholder styles when it contains event cards */
+.coming-soon-placeholder:has(.special-events-grid),
+.coming-soon-placeholder.has-events {
+    padding: 0;
+    background: none;
+    border: none;
+}
+
 .coming-soon-placeholder p {
     color: var(--text-muted);
     font-size: 1.1rem;
