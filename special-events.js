@@ -51,7 +51,7 @@ const SPECIAL_EVENTS = [
         reward: '+80 Career Points',
         bonusCC: 'TBC',
         type: 'Road Race',
-        unlockMethod: 'admin-only',  // Only visible to admins in Coming Soon
+        unlockMethod: 'coming-soon',  // Visible to all users in Coming Soon section
         cost: 0,
         hasMultipleTimeslots: true
     }
@@ -116,13 +116,17 @@ function renderSpecialEvents() {
         // Free events are always available, others check the unlock field
         const isFreeEvent = event.unlockMethod === 'free';
         const isAdminOnly = event.unlockMethod === 'admin-only';
+        const isComingSoon = event.unlockMethod === 'coming-soon';
         const isUnlocked = isFreeEvent || (currentUserData && currentUserData[event.unlockField]);
 
         // Check if user has completed this event
         const hasCompleted = currentUserData && currentUserData[`event${event.id}Results`];
 
-        if (isAdminOnly && isAdmin) {
-            // Admin-only events shown in Coming Soon for admins
+        if (isComingSoon) {
+            // Coming soon events shown to all users
+            comingSoonEvents.push(event);
+        } else if (isAdminOnly && isAdmin) {
+            // Admin-only events shown in Coming Soon for admins only
             comingSoonEvents.push(event);
         } else if (hasCompleted) {
             // Completed events go to Completed section
@@ -137,11 +141,12 @@ function renderSpecialEvents() {
     // Render Coming Soon section
     if (comingSoonSection) {
         if (comingSoonEvents.length > 0) {
-            // Replace placeholder with admin preview events
+            // Replace placeholder with coming soon events
             const comingSoonGrid = document.createElement('div');
             comingSoonGrid.className = 'special-events-grid';
             comingSoonEvents.forEach(event => {
-                const card = createComingSoonCard(event, true); // true = admin preview
+                const isAdminPreview = event.unlockMethod === 'admin-only' && isAdmin;
+                const card = createComingSoonCard(event, isAdminPreview);
                 comingSoonGrid.appendChild(card);
             });
             comingSoonSection.innerHTML = '';
@@ -227,12 +232,11 @@ function createEventCard(event, isFreeEvent = false) {
     return card;
 }
 
-// Create a Coming Soon event card (for admin preview)
+// Create a Coming Soon event card (for admin preview or coming-soon events)
 function createComingSoonCard(event, isAdminPreview = false) {
     const card = document.createElement('div');
     card.className = isAdminPreview ? 'special-event-card admin-preview' : 'special-event-card coming-soon';
 
-    const badgeText = isAdminPreview ? 'Admin Preview' : 'Coming Soon';
     const iconHtml = window.TPVIcons ? window.TPVIcons.getEventIcon(event, 'xl') : event.icon;
 
     // Get headerImage from specialEventData if available
@@ -255,8 +259,11 @@ function createComingSoonCard(event, isAdminPreview = false) {
         <div class="event-icon">${iconHtml}</div>
     `;
 
+    // Only show badge for admin preview
+    const badgeHtml = isAdminPreview ? `<div class="event-badge admin-preview">Admin Preview</div>` : '';
+
     card.innerHTML = `
-        <div class="event-badge ${isAdminPreview ? 'admin-preview' : 'coming-soon'}">${badgeText}</div>
+        ${badgeHtml}
         ${headerHtml}
         <div class="event-card-content">
             <h3 class="event-title">${event.name}</h3>
@@ -265,25 +272,17 @@ function createComingSoonCard(event, isAdminPreview = false) {
                 <span class="event-reward"><img src="icons/svg/trophies/trophy-gold.svg" alt="Trophy" class="meta-icon"> ${event.reward}</span>
                 <span class="event-type">${event.type}</span>
             </div>
-            ${isAdminPreview ? `
-                <div class="event-status">
-                    <button class="btn btn-primary btn-view-event">View Event (Admin)</button>
-                </div>
-            ` : `
-                <div class="event-status">
-                    <span class="coming-soon-text">Details coming soon</span>
-                </div>
-            `}
+            <div class="event-status">
+                <button class="btn btn-primary btn-view-event">${isAdminPreview ? 'View Event (Admin)' : 'View Event'}</button>
+            </div>
         </div>
     `;
 
-    // Add click handler only for admin preview
-    if (isAdminPreview) {
-        card.addEventListener('click', () => {
-            window.location.href = `event-detail.html?id=${event.id}`;
-        });
-        card.style.cursor = 'pointer';
-    }
+    // Add click handler for all coming soon cards (both admin preview and regular)
+    card.addEventListener('click', () => {
+        window.location.href = `event-detail.html?id=${event.id}`;
+    });
+    card.style.cursor = 'pointer';
 
     return card;
 }
