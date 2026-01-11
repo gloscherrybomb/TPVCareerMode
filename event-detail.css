@@ -2,7 +2,7 @@
 
 .event-hero {
     position: relative;
-    padding: 8rem 0 6rem;
+    padding: 8rem 0 4rem;
     overflow: hidden;
 }
 
@@ -512,7 +512,7 @@
 /* Responsive Design */
 @media (max-width: 768px) {
     .event-hero {
-        padding: 6rem 0 4rem;
+        padding: 7.5rem 0 3rem;
     }
 
     .event-hero-title {
