@@ -484,6 +484,73 @@ class ElevationProfileGenerator {
     }
 
     /**
+     * Generate elevation profile to a specific canvas element
+     * Used by the modal for rendering at different sizes
+     * @param {HTMLCanvasElement} canvas - Target canvas element
+     * @param {string} courseName - Course name
+     * @param {number} laps - Number of laps
+     */
+    async generateProfileToCanvas(canvas, courseName, laps = 1) {
+        console.log(`generateProfileToCanvas: course="${courseName}", laps=${laps}, size=${canvas.width}x${canvas.height}`);
+
+        if (!canvas) {
+            console.error('Canvas element not provided');
+            return;
+        }
+
+        // Check if this is a GPX route
+        const mappedName = this.courseToRouteMapping[courseName];
+        if (mappedName && mappedName.startsWith('gpx:')) {
+            const gpxFileName = mappedName.replace('gpx:', '') + '.gpx';
+            const gpxRoute = await this.loadGPXRoute(gpxFileName);
+
+            if (!gpxRoute) {
+                this.drawNoDataMessage(canvas, courseName);
+                return;
+            }
+
+            this.drawProfile(canvas, gpxRoute.distances, gpxRoute.elevations, courseName, laps);
+            return;
+        }
+
+        // Ensure routes are loaded for JSON routes
+        await this.loadRoutesData();
+
+        if (!this.routesData) {
+            this.drawNoDataMessage(canvas, courseName);
+            return;
+        }
+
+        const route = this.findRoute(courseName);
+        if (!route) {
+            this.drawNoDataMessage(canvas, courseName);
+            return;
+        }
+
+        // Build coordinates
+        const leadinCoords = route.leadin?.coordinates || [];
+        const lapCoords = route.lap?.coordinates || [];
+
+        let allCoordinates = [];
+        if (leadinCoords.length > 0) {
+            allCoordinates = [...leadinCoords];
+            if (lapCoords.length > 0 && laps > 0) {
+                for (let i = 0; i < laps; i++) {
+                    allCoordinates = allCoordinates.concat(lapCoords);
+                }
+            }
+        }
+
+        if (allCoordinates.length === 0) {
+            this.drawNoDataMessage(canvas, courseName);
+            return;
+        }
+
+        const { distances, elevations } = this.processCoordinates(allCoordinates);
+        this.drawProfile(canvas, distances, elevations, courseName, laps);
+    }
+
+    /**
      * Draw elevation profile on canvas
      */
     drawProfile(canvas, distances, elevations, courseName, laps) {

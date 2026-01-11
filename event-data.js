@@ -556,7 +556,7 @@ The Valentine's Invitational traces a storied path from Ninove toward the hallow
 As our first race away from the familiar virtual roads with fixed scheduled times, you'll be racing alongside many human competitors at pre-set timeslots rather than organizing races on demand.
 
 This is more than a race—it's a statement. While the world celebrates hearts and flowers, you're choosing pain and glory on the cobbles and climbs of Belgium. Results contribute to your career legacy, with exclusive Valentine-themed awards for those who prove their love of suffering on the podium.`,
-        strategy: "The rolling 37.5km course with 351m of climbing demands a balanced approach. Conserve energy on the early climbs and position yourself well for the flat sections. The final 5km will be decisive—stay near the front and be ready to respond to attacks. Multiple timeslots mean fresh legs every race, so don't hold back.",
+        strategy: "The rolling 37.5km course with 351m of climbing demands a balanced approach. Conserve energy on the early climbs and position yourself well for the flat sections. The final 5km will be decisive—stay near the front and be ready to respond to attacks.",
         routeDetails: {
             start: "Valentine Bosberg",
             keyPoint: "Rolling terrain with punchy climbs",
