@@ -549,7 +549,7 @@ We recommend doing this event early on in your career to bag some extra Career P
         icon: "💝",
         iconId: "eventValentine",
         headerImage: "event-images/special/event_103.jpg",
-        description: `The Valentine's Invitational is an exclusive bimonthly special event where passion for racing meets the spirit of February 14th. This isn't about flowers and chocolates—it's about proving your dedication when others are celebrating romance.
+        description: `The Valentine's Invitational is the first of the bi-monthly special events where passion for racing meets the spirit of February 14th. This isn't about flowers and chocolates—it's about proving your dedication when others are celebrating romance.
 
 The Valentine's Invitational traces a storied path from Ninove toward the hallowed slopes of the Bosberg. This route pays homage to the Flemish classics, featuring rolling terrain and steep gradients that test your heart in more ways than one. The finale centers on the iconic Bosberg, a 1.3 km brute where legends have historically secured victory with late, solo attacks.
 
