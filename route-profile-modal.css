@@ -206,19 +206,21 @@
         min-width: 80px;
     }
 
-    /* Larger close button for touch - positioned in top padding area */
+    /* Larger close button for touch - positioned below browser chrome */
     .route-profile-modal-content .modal-close {
-        top: max(0.75rem, calc(env(safe-area-inset-top) + 0.5rem));
-        right: 0.75rem;
-        background: rgba(0, 0, 0, 0.8);
+        position: fixed;
+        top: 4.5rem;
+        right: 1rem;
+        background: rgba(0, 0, 0, 0.9);
+        border: 2px solid rgba(255, 255, 255, 0.3);
         border-radius: 50%;
-        width: 44px;
-        height: 44px;
-        font-size: 1.5rem;
+        width: 48px;
+        height: 48px;
+        font-size: 1.75rem;
         display: flex;
         align-items: center;
         justify-content: center;
-        z-index: 10;
+        z-index: 2001;
     }
 
     /* Change hint text for mobile */
