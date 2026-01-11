@@ -23,6 +23,7 @@ class ElevationProfileGenerator {
             'Big Loop': 'Big Loop',
             'South Lake Loop Reverse': 'South Lake Loop Reverse',
             'Unbound Little Egypt': 'gpx:UnboundLittleEgypt', // Special marker for GPX
+            'Valentine Bosberg': 'gpx:Valentine Bosberg', // Valentine's Invitational GPX
             // Tour stage courses
             'Figure Of Eight': 'Figure Of Eight',
             'Loop the Loop': 'Loop the Loop',
