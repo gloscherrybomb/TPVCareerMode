@@ -581,7 +581,8 @@
     border: none;
 }
 
-.coming-soon-placeholder p {
+/* Only style direct paragraph children (the placeholder message), not paragraphs in event cards */
+.coming-soon-placeholder > p {
     color: var(--text-muted);
     font-size: 1.1rem;
     font-style: italic;
