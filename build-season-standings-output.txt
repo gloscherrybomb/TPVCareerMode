@@ -1,0 +1,546 @@
+🏁 Building Season Standings from Local Files
+============================================
+
+📂 Loading all event results from files...
+✅ Loaded results for events: [1, 2, 3, 4, 5, 6, 7, 8, 12, 13, 14, 15]
+
+👥 Found 53 unique human riders
+
+
+📊 Building standings for Ludvig Karlberg (DE77F095D134721E)
+   Rider has completed events: [1, 2]
+   Rider's total points: 160
+   Backfilling bot results...
+   Found 1919 unique bots across all events
+   Simulated results for 1919 bots
+   Limiting bots from 1919 to 80 with quintile stratification
+   ✅ Ludvig Karlberg: 2 races, 1st place (160 pts)
+
+📊 Building standings for Daniel Holdener (B8BBC9C64CAB2D89)
+   Rider has completed events: [1]
+   Rider's total points: 61
+   Backfilling bot results...
+   Found 1919 unique bots across all events
+   Simulated results for 1919 bots
+   Limiting bots from 1919 to 80 with quintile stratification
+   ✅ Daniel Holdener: 1 races, 40th place (61 pts)
+
+📊 Building standings for Noel Toone KCC (8E3324C446A55BFB)
+   Rider has completed events: [1, 2]
+   Rider's total points: 116
+   Backfilling bot results...
+   Found 1919 unique bots across all events
+   Simulated results for 1919 bots
+   Limiting bots from 1919 to 80 with quintile stratification
+   ✅ Noel Toone KCC: 2 races, 43rd place (116 pts)
+
+📊 Building standings for Rob Miller (5419CFD111515433)
+   Rider has completed events: [1, 2, 3, 7]
+   Rider's total points: 277
+   Backfilling bot results...
+   Found 1919 unique bots across all events
+   Simulated results for 1919 bots
+   Limiting bots from 1919 to 80 with quintile stratification
+   ✅ Rob Miller: 4 races, 1st place (277 pts)
+
+📊 Building standings for Toby Hetherington (38B077C7D857ADFE)
+   Rider has completed events: [1]
+   Rider's total points: 36
+   Backfilling bot results...
+   Found 1919 unique bots across all events
+   Simulated results for 1919 bots
+   Limiting bots from 1919 to 80 with quintile stratification
+   ✅ Toby Hetherington: 1 races, 118th place (36 pts)
+
+📊 Building standings for J D O (242BF89E66D4067D)
+   Rider has completed events: [1]
+   Rider's total points: 65
+   Backfilling bot results...
+   Found 1919 unique bots across all events
+   Simulated results for 1919 bots
+   Limiting bots from 1919 to 80 with quintile stratification
+   ✅ J D O: 1 races, 1st place (65 pts)
+
+📊 Building standings for Lutz Pleuter (C94C5C28E7C300E9)
+   Rider has completed events: [1]
+   Rider's total points: 44
+   Backfilling bot results...
+   Found 1919 unique bots across all events
+   Simulated results for 1919 bots
+   Limiting bots from 1919 to 80 with quintile stratification
+   ✅ Lutz Pleuter: 1 races, 79th place (44 pts)
+
+📊 Building standings for Ian Bright (41E66B1A2DBD4BBC)
+   Rider has completed events: [1]
+   Rider's total points: 65
+   Backfilling bot results...
+   Found 1919 unique bots across all events
+   Simulated results for 1919 bots
+   Limiting bots from 1919 to 80 with quintile stratification
+   ✅ Ian Bright: 1 races, 1st place (65 pts)
+
+📊 Building standings for Joe Giannone (2F3371F7A01DEE62)
+   Rider has completed events: [1, 2]
+   Rider's total points: 131
+   Backfilling bot results...
+   Found 1919 unique bots across all events
+   Simulated results for 1919 bots
+   Limiting bots from 1919 to 80 with quintile stratification
+   ✅ Joe Giannone: 2 races, 24th place (131 pts)
+
+📊 Building standings for Ryan Hamilton (FE6B6E687C77DA38)
+   Rider has completed events: [1, 2]
+   Rider's total points: 130
+   Backfilling bot results...
+   Found 1919 unique bots across all events
+   Simulated results for 1919 bots
+   Limiting bots from 1919 to 80 with quintile stratification
+   ✅ Ryan Hamilton: 2 races, 25th place (130 pts)
+
+📊 Building standings for Gemma Hamilton (B29C5A2E87435F20)
+   Rider has completed events: [1, 2]
+   Rider's total points: 118
+   Backfilling bot results...
+   Found 1919 unique bots across all events
+   Simulated results for 1919 bots
+   Limiting bots from 1919 to 80 with quintile stratification
+   ✅ Gemma Hamilton: 2 races, 42nd place (118 pts)
+
+📊 Building standings for Dean Harding (D7004AC4F53416F8)
+   Rider has completed events: [1]
+   Rider's total points: 49
+   Backfilling bot results...
+   Found 1919 unique bots across all events
+   Simulated results for 1919 bots
+   Limiting bots from 1919 to 80 with quintile stratification
+   ✅ Dean Harding: 1 races, 62nd place (49 pts)
+
+📊 Building standings for Ross Collins (D65DA831322E1AAB)
+   Rider has completed events: [1]
+   Rider's total points: 65
+   Backfilling bot results...
+   Found 1919 unique bots across all events
+   Simulated results for 1919 bots
+   Limiting bots from 1919 to 80 with quintile stratification
+   ✅ Ross Collins: 1 races, 1st place (65 pts)
+
+📊 Building standings for Kurt Lamprecht (9E9E82F2F6994A0F)
+   Rider has completed events: [1]
+   Rider's total points: 35
+   Backfilling bot results...
+   Found 1919 unique bots across all events
+   Simulated results for 1919 bots
+   Limiting bots from 1919 to 80 with quintile stratification
+   ✅ Kurt Lamprecht: 1 races, 121st place (35 pts)
+
+📊 Building standings for MasterMatej Matej (B41206671D301E2E)
+   Rider has completed events: [1]
+   Rider's total points: 0
+   Backfilling bot results...
+   Found 1919 unique bots across all events
+   Simulated results for 1919 bots
+   Limiting bots from 1919 to 80 with quintile stratification
+   ✅ MasterMatej Matej: 1 races, 124th place (0 pts)
+
+📊 Building standings for Andy Hall (EBD478B7F208C265)
+   Rider has completed events: [1, 2]
+   Rider's total points: 136
+   Backfilling bot results...
+   Found 1919 unique bots across all events
+   Simulated results for 1919 bots
+   Limiting bots from 1919 to 80 with quintile stratification
+   ✅ Andy Hall: 2 races, 22nd place (136 pts)
+
+📊 Building standings for Quentin Paquot (7174325A8BDCB12F)
+   Rider has completed events: [1]
+   Rider's total points: 65
+   Backfilling bot results...
+   Found 1919 unique bots across all events
+   Simulated results for 1919 bots
+   Limiting bots from 1919 to 80 with quintile stratification
+   ✅ Quentin Paquot: 1 races, 1st place (65 pts)
+
+📊 Building standings for Cody Stephenson (3DFFCCF3FFEDA5A0)
+   Rider has completed events: [1]
+   Rider's total points: 65
+   Backfilling bot results...
+   Found 1919 unique bots across all events
+   Simulated results for 1919 bots
+   Limiting bots from 1919 to 80 with quintile stratification
+   ✅ Cody Stephenson: 1 races, 1st place (65 pts)
+
+📊 Building standings for Rian Rustvold (33723B23E4414A89)
+   Rider has completed events: [1]
+   Rider's total points: 0
+   Backfilling bot results...
+   Found 1919 unique bots across all events
+   Simulated results for 1919 bots
+   Limiting bots from 1919 to 80 with quintile stratification
+   ✅ Rian Rustvold: 1 races, 124th place (0 pts)
+
+📊 Building standings for Steve Lopro (4CD14EAA6F4FCF60)
+   Rider has completed events: [1]
+   Rider's total points: 65
+   Backfilling bot results...
+   Found 1919 unique bots across all events
+   Simulated results for 1919 bots
+   Limiting bots from 1919 to 80 with quintile stratification
+   ✅ Steve Lopro: 1 races, 1st place (65 pts)
+
+📊 Building standings for kudos games (68A506652B3FF03A)
+   Rider has completed events: [1]
+   Rider's total points: 62
+   Backfilling bot results...
+   Found 1919 unique bots across all events
+   Simulated results for 1919 bots
+   Limiting bots from 1919 to 80 with quintile stratification
+   ✅ kudos games: 1 races, 37th place (62 pts)
+
+📊 Building standings for Birgit S (962336672CEDE7CD)
+   Rider has completed events: [1]
+   Rider's total points: 44
+   Backfilling bot results...
+   Found 1919 unique bots across all events
+   Simulated results for 1919 bots
+   Limiting bots from 1919 to 80 with quintile stratification
+   ✅ Birgit S: 1 races, 79th place (44 pts)
+
+📊 Building standings for Dan Stimson (99D3251383077B95)
+   Rider has completed events: [1]
+   Rider's total points: 65
+   Backfilling bot results...
+   Found 1919 unique bots across all events
+   Simulated results for 1919 bots
+   Limiting bots from 1919 to 80 with quintile stratification
+   ✅ Dan Stimson: 1 races, 1st place (65 pts)
+
+📊 Building standings for Thomas Davison (C8BCC3B69C6CFB22)
+   Rider has completed events: [1]
+   Rider's total points: 65
+   Backfilling bot results...
+   Found 1919 unique bots across all events
+   Simulated results for 1919 bots
+   Limiting bots from 1919 to 80 with quintile stratification
+   ✅ Thomas Davison: 1 races, 1st place (65 pts)
+
+📊 Building standings for Christian Nistri (E8119D8B54A4B04)
+   Rider has completed events: [1]
+   Rider's total points: 62
+   Backfilling bot results...
+   Found 1919 unique bots across all events
+   Simulated results for 1919 bots
+   Limiting bots from 1919 to 80 with quintile stratification
+   ✅ Christian Nistri: 1 races, 37th place (62 pts)
+
+📊 Building standings for Kira Sayko (557EAAE372E6656A)
+   Rider has completed events: [1]
+   Rider's total points: 0
+   Backfilling bot results...
+   Found 1919 unique bots across all events
+   Simulated results for 1919 bots
+   Limiting bots from 1919 to 80 with quintile stratification
+   ✅ Kira Sayko: 1 races, 124th place (0 pts)
+
+📊 Building standings for Erik Sund (E930EA1B86BB8DD2)
+   Rider has completed events: [1]
+   Rider's total points: 57
+   Backfilling bot results...
+   Found 1919 unique bots across all events
+   Simulated results for 1919 bots
+   Limiting bots from 1919 to 80 with quintile stratification
+   ✅ Erik Sund: 1 races, 41st place (57 pts)
+
+📊 Building standings for Gregory Frison (25238B3BC618DB07)
+   Rider has completed events: [1, 2, 3, 8]
+   Rider's total points: 395
+   Backfilling bot results...
+   Found 1919 unique bots across all events
+   Simulated results for 1919 bots
+   Limiting bots from 1919 to 80 with quintile stratification
+   ✅ Gregory Frison: 4 races, 1st place (395 pts)
+
+📊 Building standings for Rudolf Dolezal (965FD7E72D7A2D87)
+   Rider has completed events: [1]
+   Rider's total points: 62
+   Backfilling bot results...
+   Found 1919 unique bots across all events
+   Simulated results for 1919 bots
+   Limiting bots from 1919 to 80 with quintile stratification
+   ✅ Rudolf Dolezal: 1 races, 37th place (62 pts)
+
+📊 Building standings for Jeff Baumgardner (52CADB9D2C050CCA)
+   Rider has completed events: [1]
+   Rider's total points: 65
+   Backfilling bot results...
+   Found 1919 unique bots across all events
+   Simulated results for 1919 bots
+   Limiting bots from 1919 to 80 with quintile stratification
+   ✅ Jeff Baumgardner: 1 races, 1st place (65 pts)
+
+📊 Building standings for chilly willy (1AEBE2F1F4DE2B68)
+   Rider has completed events: [1]
+   Rider's total points: 44
+   Backfilling bot results...
+   Found 1919 unique bots across all events
+   Simulated results for 1919 bots
+   Limiting bots from 1919 to 80 with quintile stratification
+   ✅ chilly willy: 1 races, 79th place (44 pts)
+
+📊 Building standings for Morten Jarlund (A738AD4E7670A362)
+   Rider has completed events: [1]
+   Rider's total points: 65
+   Backfilling bot results...
+   Found 1919 unique bots across all events
+   Simulated results for 1919 bots
+   Limiting bots from 1919 to 80 with quintile stratification
+   ✅ Morten Jarlund: 1 races, 1st place (65 pts)
+
+📊 Building standings for piggy dwarf (F19FD5591C1777D5)
+   Rider has completed events: [1, 2]
+   Rider's total points: 160
+   Backfilling bot results...
+   Found 1919 unique bots across all events
+   Simulated results for 1919 bots
+   Limiting bots from 1919 to 80 with quintile stratification
+   ✅ piggy dwarf: 2 races, 1st place (160 pts)
+
+📊 Building standings for Doug Hart (11799A7C1CF76DE9)
+   Rider has completed events: [1, 2]
+   Rider's total points: 157
+   Backfilling bot results...
+   Found 1919 unique bots across all events
+   Simulated results for 1919 bots
+   Limiting bots from 1919 to 80 with quintile stratification
+   ✅ Doug Hart: 2 races, 4th place (157 pts)
+
+📊 Building standings for Per Olav Meder Kalvaa (762ACC21F2E02CE1)
+   Rider has completed events: [1]
+   Rider's total points: 52
+   Backfilling bot results...
+   Found 1919 unique bots across all events
+   Simulated results for 1919 bots
+   Limiting bots from 1919 to 80 with quintile stratification
+   ✅ Per Olav Meder Kalvaa: 1 races, 50th place (52 pts)
+
+📊 Building standings for AleX GoLd (B21357D338C98C5B)
+   Rider has completed events: [1, 2]
+   Rider's total points: 134
+   Backfilling bot results...
+   Found 1919 unique bots across all events
+   Simulated results for 1919 bots
+   Limiting bots from 1919 to 80 with quintile stratification
+   ✅ AleX GoLd: 2 races, 23rd place (134 pts)
+
+📊 Building standings for Richard Jones (6A3A6FCAAC47C327)
+   Rider has completed events: [1]
+   Rider's total points: 65
+   Backfilling bot results...
+   Found 1919 unique bots across all events
+   Simulated results for 1919 bots
+   Limiting bots from 1919 to 80 with quintile stratification
+   ✅ Richard Jones: 1 races, 1st place (65 pts)
+
+📊 Building standings for Darryl Brown (6BD1EADCED05444A)
+   Rider has completed events: [1]
+   Rider's total points: 33
+   Backfilling bot results...
+   Found 1919 unique bots across all events
+   Simulated results for 1919 bots
+   Limiting bots from 1919 to 80 with quintile stratification
+   ✅ Darryl Brown: 1 races, 123rd place (33 pts)
+
+📊 Building standings for Jeremy Marie (B8389216FB850BE9)
+   Rider has completed events: [1]
+   Rider's total points: 0
+   Backfilling bot results...
+   Found 1919 unique bots across all events
+   Simulated results for 1919 bots
+   Limiting bots from 1919 to 80 with quintile stratification
+   ✅ Jeremy Marie: 1 races, 124th place (0 pts)
+
+📊 Building standings for Ange PESSION (A5965B2D831EAE21)
+   Rider has completed events: [1]
+   Rider's total points: 54
+   Backfilling bot results...
+   Found 1919 unique bots across all events
+   Simulated results for 1919 bots
+   Limiting bots from 1919 to 80 with quintile stratification
+   ✅ Ange PESSION: 1 races, 44th place (54 pts)
+
+📊 Building standings for Toto LeKoala (CD12AEF1EA13065B)
+   Rider has completed events: [1]
+   Rider's total points: 35
+   Backfilling bot results...
+   Found 1919 unique bots across all events
+   Simulated results for 1919 bots
+   Limiting bots from 1919 to 80 with quintile stratification
+   ✅ Toto LeKoala: 1 races, 121st place (35 pts)
+
+📊 Building standings for Julian Burren (3EE22AAAE0FE66C3)
+   Rider has completed events: [1]
+   Rider's total points: 65
+   Backfilling bot results...
+   Found 1919 unique bots across all events
+   Simulated results for 1919 bots
+   Limiting bots from 1919 to 80 with quintile stratification
+   ✅ Julian Burren: 1 races, 1st place (65 pts)
+
+📊 Building standings for Christine Seemann (861638BCBDD205B7)
+   Rider has completed events: [1]
+   Rider's total points: 37
+   Backfilling bot results...
+   Found 1919 unique bots across all events
+   Simulated results for 1919 bots
+   Limiting bots from 1919 to 80 with quintile stratification
+   ✅ Christine Seemann: 1 races, 103rd place (37 pts)
+
+📊 Building standings for Gavin Bailey (D8F6BF1A739BD667)
+   Rider has completed events: [1]
+   Rider's total points: 0
+   Backfilling bot results...
+   Found 1919 unique bots across all events
+   Simulated results for 1919 bots
+   Limiting bots from 1919 to 80 with quintile stratification
+   ✅ Gavin Bailey: 1 races, 124th place (0 pts)
+
+📊 Building standings for thimo willems (6D52CDE5B95E80E3)
+   Rider has completed events: [1]
+   Rider's total points: 56
+   Backfilling bot results...
+   Found 1919 unique bots across all events
+   Simulated results for 1919 bots
+   Limiting bots from 1919 to 80 with quintile stratification
+   ✅ thimo willems: 1 races, 42nd place (56 pts)
+
+📊 Building standings for Steven Howe (6752948652B894E0)
+   Rider has completed events: [1]
+   Rider's total points: 38
+   Backfilling bot results...
+   Found 1919 unique bots across all events
+   Simulated results for 1919 bots
+   Limiting bots from 1919 to 80 with quintile stratification
+   ✅ Steven Howe: 1 races, 101st place (38 pts)
+
+📊 Building standings for Christian Belka (FE05001711E5EBC7)
+   Rider has completed events: [1]
+   Rider's total points: 65
+   Backfilling bot results...
+   Found 1919 unique bots across all events
+   Simulated results for 1919 bots
+   Limiting bots from 1919 to 80 with quintile stratification
+   ✅ Christian Belka: 1 races, 1st place (65 pts)
+
+📊 Building standings for Neil Atherton (AD10E8AF5DC93FA9)
+   Rider has completed events: [1]
+   Rider's total points: 0
+   Backfilling bot results...
+   Found 1919 unique bots across all events
+   Simulated results for 1919 bots
+   Limiting bots from 1919 to 80 with quintile stratification
+   ✅ Neil Atherton: 1 races, 124th place (0 pts)
+
+📊 Building standings for Daniel Nyström (7B04C72D2F904F52)
+   Rider has completed events: [1]
+   Rider's total points: 65
+   Backfilling bot results...
+   Found 1919 unique bots across all events
+   Simulated results for 1919 bots
+   Limiting bots from 1919 to 80 with quintile stratification
+   ✅ Daniel Nyström: 1 races, 1st place (65 pts)
+
+📊 Building standings for Jamie Bishop (F03D3F7331D34D18)
+   Rider has completed events: [3, 4, 5, 7]
+   Rider's total points: 211
+   Backfilling bot results...
+   Found 1919 unique bots across all events
+   Simulated results for 1919 bots
+   Limiting bots from 1919 to 80 with quintile stratification
+   ✅ Jamie Bishop: 4 races, 17th place (211 pts)
+
+📊 Building standings for Ian Winchester (A8DBE4F760E1C622)
+   Rider has completed events: [3, 4]
+   Rider's total points: 100
+   Backfilling bot results...
+   Found 1919 unique bots across all events
+   Simulated results for 1919 bots
+   Limiting bots from 1919 to 80 with quintile stratification
+   ✅ Ian Winchester: 2 races, 1st place (100 pts)
+
+📊 Building standings for Julien Helleputte (5F2EDC06F34578B8)
+   Rider has completed events: [5, 6, 12, 13, 14, 15]
+   Rider's total points: 476
+   Backfilling bot results...
+   Found 1919 unique bots across all events
+   Simulated results for 1919 bots
+   Limiting bots from 1919 to 80 with quintile stratification
+   ✅ Julien Helleputte: 6 races, 33rd place (476 pts)
+
+📊 Building standings for Ryan Yates (2FDBB5DD4345DCB5)
+   Rider has completed events: [5, 7, 12]
+   Rider's total points: 283
+   Backfilling bot results...
+   Found 1919 unique bots across all events
+   Simulated results for 1919 bots
+   Limiting bots from 1919 to 80 with quintile stratification
+   ✅ Ryan Yates: 3 races, 6th place (283 pts)
+
+
+📋 FINAL STANDINGS SUMMARY
+==========================
+
+Ludvig Karlberg, 2 races, 1st place
+Rob Miller, 4 races, 1st place
+J D O, 1 race, 1st place
+Ian Bright, 1 race, 1st place
+Ross Collins, 1 race, 1st place
+Quentin Paquot, 1 race, 1st place
+Cody Stephenson, 1 race, 1st place
+Steve Lopro, 1 race, 1st place
+Dan Stimson, 1 race, 1st place
+Thomas Davison, 1 race, 1st place
+Gregory Frison, 4 races, 1st place
+Jeff Baumgardner, 1 race, 1st place
+Morten Jarlund, 1 race, 1st place
+piggy dwarf, 2 races, 1st place
+Richard Jones, 1 race, 1st place
+Julian Burren, 1 race, 1st place
+Christian Belka, 1 race, 1st place
+Daniel Nyström, 1 race, 1st place
+Ian Winchester, 2 races, 1st place
+Doug Hart, 2 races, 4th place
+Ryan Yates, 3 races, 6th place
+Jamie Bishop, 4 races, 17th place
+Andy Hall, 2 races, 22nd place
+AleX GoLd, 2 races, 23rd place
+Joe Giannone, 2 races, 24th place
+Ryan Hamilton, 2 races, 25th place
+Julien Helleputte, 6 races, 33rd place
+kudos games, 1 race, 37th place
+Christian Nistri, 1 race, 37th place
+Rudolf Dolezal, 1 race, 37th place
+Daniel Holdener, 1 race, 40th place
+Erik Sund, 1 race, 41st place
+Gemma Hamilton, 2 races, 42nd place
+thimo willems, 1 race, 42nd place
+Noel Toone KCC, 2 races, 43rd place
+Ange PESSION, 1 race, 44th place
+Per Olav Meder Kalvaa, 1 race, 50th place
+Dean Harding, 1 race, 62nd place
+Lutz Pleuter, 1 race, 79th place
+Birgit S, 1 race, 79th place
+chilly willy, 1 race, 79th place
+Steven Howe, 1 race, 101st place
+Christine Seemann, 1 race, 103rd place
+Toby Hetherington, 1 race, 118th place
+Kurt Lamprecht, 1 race, 121st place
+Toto LeKoala, 1 race, 121st place
+Darryl Brown, 1 race, 123rd place
+MasterMatej Matej, 1 race, 124th place
+Rian Rustvold, 1 race, 124th place
+Kira Sayko, 1 race, 124th place
+Jeremy Marie, 1 race, 124th place
+Gavin Bailey, 1 race, 124th place
+Neil Atherton, 1 race, 124th place
+
+✅ Done!
+
