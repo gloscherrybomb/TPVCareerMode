@@ -47,7 +47,7 @@ export function getDefaultPersonality() {
 /**
  * Build race context from event results for interview question selection
  */
-export function buildRaceContext(userResult, allResults, userData, seasonData) {
+export function buildRaceContext(userResult, allResults, userData, seasonData, eventNumber) {
     const isDNF = userResult.position === 'DNF';
     const context = {
         position: userResult.position,
@@ -82,6 +82,7 @@ export function buildRaceContext(userResult, allResults, userData, seasonData) {
         recentRacesBelowExpectation: seasonData?.recentBelowExpectation || 0,
 
         // Event metadata
+        eventNumber: eventNumber || null,
         eventType: userResult.eventType || 'road race',
         eventCategory: userResult.eventCategory || 'road',
         isSeasonFinale: seasonData?.isSeasonFinale || false

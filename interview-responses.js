@@ -1563,6 +1563,142 @@ const INTERVIEW_RESPONSES = {
       professionalism: 4,
       resilience: 1
     }
+  },
+
+  // Valentine's Invitational - Win Responses
+  valentine_win_dedicated: {
+    id: 'valentine_win_dedicated',
+    text: "While everyone else was sending flowers, I was sending it up the Bosberg. This is what dedication looks like—choosing pain and glory over chocolates and romance. First Valentine's Invitational victory, and it feels better than any bouquet.",
+    style: 'confident',
+    badge: '💪 Confident',
+    personalityImpact: {
+      confidence: 4,
+      aggression: 2
+    }
+  },
+
+  valentine_win_tactical: {
+    id: 'valentine_win_tactical',
+    text: "The Bosberg demands respect—you can't just attack blindly. I conserved energy on the earlier climbs, positioned myself perfectly, and timed my move for maximum impact. The result speaks for itself.",
+    style: 'professional',
+    badge: '🎯 Professional',
+    personalityImpact: {
+      professionalism: 4,
+      confidence: 2
+    }
+  },
+
+  valentine_win_romantic: {
+    id: 'valentine_win_romantic',
+    text: "They say racing is my love language, and today proved it. Conquering the Bosberg, taking the win—this is my kind of Valentine's Day. Racing is romance when you truly love what you do.",
+    style: 'showman',
+    badge: '⚡ Showman',
+    personalityImpact: {
+      showmanship: 4,
+      confidence: 2
+    }
+  },
+
+  // Valentine's Invitational - Podium Responses
+  valentine_podium_proud: {
+    id: 'valentine_podium_proud',
+    text: "A podium at the Valentine's Invitational, our first race on Belgian soil with so many human competitors—I'm incredibly proud. The Bosberg tested me, but I proved I belong here.",
+    style: 'confident',
+    badge: '💪 Confident',
+    personalityImpact: {
+      confidence: 3,
+      humility: 2
+    }
+  },
+
+  valentine_podium_competitive: {
+    id: 'valentine_podium_competitive',
+    text: "Close to the win, but not quite there. That's the story of Valentine's Day, right? Almost perfect. But I'll take a podium over flowers any day, and next time I'm going for the top step.",
+    style: 'aggressive',
+    badge: '😤 Aggressive',
+    personalityImpact: {
+      aggression: 3,
+      confidence: 2
+    }
+  },
+
+  valentine_podium_grateful: {
+    id: 'valentine_podium_grateful',
+    text: "Racing the Bosberg, experiencing Belgian classics heritage, standing on this podium—I'm just grateful to be here. This is a special moment in my career.",
+    style: 'humble',
+    badge: '🤝 Humble',
+    personalityImpact: {
+      humility: 4,
+      resilience: 1
+    }
+  },
+
+  // Valentine's Invitational - Midpack Responses
+  valentine_mid_learning: {
+    id: 'valentine_mid_learning',
+    text: "First time racing the Bosberg, first scheduled race away from home, way more human competitors than usual—there was a lot to take in. Solid learning experience. I'll be stronger next time.",
+    style: 'professional',
+    badge: '🎯 Professional',
+    personalityImpact: {
+      professionalism: 3,
+      resilience: 2
+    }
+  },
+
+  valentine_mid_enjoyed: {
+    id: 'valentine_mid_enjoyed',
+    text: "Racing in Belgium on Valentine's Day? Absolutely loved it. The Bosberg climb is everything they say it is. Not my best result, but definitely an experience I'll remember.",
+    style: 'showman',
+    badge: '⚡ Showman',
+    personalityImpact: {
+      showmanship: 3,
+      humility: 2
+    }
+  },
+
+  valentine_mid_motivated: {
+    id: 'valentine_mid_motivated',
+    text: "The level of competition here is fierce—so many strong riders. That's exactly what I need to improve. I'm taking notes and coming back hungrier.",
+    style: 'aggressive',
+    badge: '😤 Aggressive',
+    personalityImpact: {
+      aggression: 3,
+      resilience: 2
+    }
+  },
+
+  // Valentine's Invitational - Tough Race Responses
+  valentine_tough_honest: {
+    id: 'valentine_tough_honest',
+    text: "The Bosberg didn't care that it's Valentine's Day—it showed no mercy. Those rolling hills exposed my weaknesses, and racing against so many humans made it even tougher. Tough day, but honest feedback.",
+    style: 'honest',
+    badge: '😔 Honest',
+    personalityImpact: {
+      humility: 4,
+      resilience: 1
+    }
+  },
+
+  valentine_tough_hills: {
+    id: 'valentine_tough_hills',
+    text: "I underestimated those Belgian climbs. The gradient, the frequency, the cumulative fatigue—351 meters doesn't sound like much until you're grinding through it. Lesson learned the hard way.",
+    style: 'professional',
+    badge: '🎯 Professional',
+    personalityImpact: {
+      professionalism: 3,
+      humility: 2
+    }
+  },
+
+  valentine_tough_determined: {
+    id: 'valentine_tough_determined',
+    text: "Bad result, but I'm not backing down. The Bosberg beat me today, but I'll be back for this race. Next Valentine's Invitational, I'll be ready for those hills.",
+    style: 'aggressive',
+    badge: '😤 Aggressive',
+    personalityImpact: {
+      aggression: 4,
+      resilience: 2
+    }
   }
 };
 
