@@ -406,6 +406,14 @@
     font-weight: 600;
 }
 
+/* Meta icons */
+.meta-icon {
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
+    margin-right: 0.25rem;
+}
+
 /* Event Status */
 .event-status {
     text-align: center;

@@ -206,7 +206,7 @@ function createEventCard(event, isFreeEvent = false) {
             <h3 class="event-title">${event.name}</h3>
             <p class="event-description">${event.description}</p>
             <div class="event-meta">
-                <span class="event-reward">🏆 ${event.reward}</span>
+                <span class="event-reward"><img src="icons/svg/trophies/trophy-gold.svg" alt="Trophy" class="meta-icon"> ${event.reward}</span>
                 <span class="event-type">${event.type}</span>
             </div>
             <div class="event-status">
@@ -259,7 +259,7 @@ function createComingSoonCard(event, isAdminPreview = false) {
             <h3 class="event-title">${event.name}</h3>
             <p class="event-description">${event.description}</p>
             <div class="event-meta">
-                <span class="event-reward">🏆 ${event.reward}</span>
+                <span class="event-reward"><img src="icons/svg/trophies/trophy-gold.svg" alt="Trophy" class="meta-icon"> ${event.reward}</span>
                 <span class="event-type">${event.type}</span>
             </div>
             ${isAdminPreview ? `
@@ -324,8 +324,8 @@ function createCompletedEventCard(event) {
             <h3 class="event-title">${event.name}</h3>
             <p class="event-description">${event.description}</p>
             <div class="event-meta">
-                <span class="event-reward">📊 Position: ${position}</span>
-                <span class="event-type">🏆 ${points} pts</span>
+                <span class="event-reward"><img src="icons/svg/ui/bar-chart.svg" alt="Stats" class="meta-icon"> Position: ${position}</span>
+                <span class="event-type"><img src="icons/svg/trophies/trophy-gold.svg" alt="Trophy" class="meta-icon"> ${points} pts</span>
             </div>
             <div class="event-status">
                 <button class="btn btn-secondary btn-view-event">View Results</button>
