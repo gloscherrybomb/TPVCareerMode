@@ -1,0 +1,492 @@
+# Adding a New Special Event - Complete Guide
+
+This guide documents all the files and changes needed to add a new special event to TPV Career Mode. Use Valentine's Invitational (ID: 103) and The Leveller (ID: 102) as reference implementations.
+
+## Overview
+
+Adding a new special event requires modifications to **10+ files** across the codebase. Follow this guide in order to ensure nothing is missed.
+
+---
+
+## File Update Order (Recommended Sequence)
+
+1. `event-data.js` - Define the event data first (all other files reference this)
+2. SVG icons - Create icon files
+3. `icons/icons.js` - Register the icons
+4. Header image - Add to `event-images/special/` folder
+5. `process-results.js` - Add EVENT_MAX_POINTS entry
+6. `process-json-results.js` - Add EVENT_MAX_POINTS and award logic
+7. `build-season-standings.js` - Add EVENT_MAX_POINTS entry
+8. `special-events.js` - Add to SPECIAL_EVENTS array
+9. `interview-questions.js` - Add event-specific questions
+10. `interview-responses.js` - Add all response options
+11. `narrative-database.js` - Add event narratives
+12. `awards-config.js` - Add event-specific awards (optional)
+13. `special-events.css` - Add custom styling (optional)
+
+---
+
+## 1. Event Data (`event-data.js`)
+
+**Location:** `specialEventData` object (around line 461)
+
+### Required Fields
+
+```javascript
+specialEventData = {
+    104: {  // NEW EVENT ID (use 100+ range for special events)
+        id: 104,                                    // REQUIRED: Unique integer ID
+        number: "SE04",                             // REQUIRED: Display number (SE prefix)
+        name: "Your Event Name",                    // REQUIRED: Full event name
+        subtitle: "Short tagline",                  // REQUIRED: Brief description
+        type: "Road Race",                          // REQUIRED: Race type
+        level: "Special Event",                     // REQUIRED: Always "Special Event"
+        isSpecialEvent: true,                       // REQUIRED: Must be true
+        unlockId: null,                             // OPTIONAL: Store unlock ID string
+        distance: "37.5 km",                        // REQUIRED: Distance with units
+        climbing: "351 m",                          // REQUIRED: Climbing with units
+        course: "Course Name",                      // REQUIRED: TPV course name
+        format: "Rolling road race",                // REQUIRED: Race format
+        maxPoints: 80,                              // REQUIRED: Maximum career points
+        icon: "🏆",                                 // REQUIRED: Emoji fallback
+        iconId: "eventYourEvent",                   // REQUIRED: Icon ID from icons.js
+        headerImage: "event-images/special/event_104.jpg",  // REQUIRED: Header image path
+        description: `Full event story...`,         // REQUIRED: Multi-paragraph description
+        strategy: "Race strategy tips...",          // REQUIRED: Strategy advice
+        routeDetails: {                             // REQUIRED: Route details object
+            start: "Start Location",
+            keyPoint: "Key feature",
+            difficulty: "Difficulty description",
+            finish: "Finish Location"
+        },
+        rewards: {                                  // REQUIRED: Rewards object
+            careerPoints: 80
+        },
+        scheduleUrl: "https://..."                  // REQUIRED: TPV schedule URL (null if not ready)
+    }
+}
+```
+
+### Optional/Conditional Fields
+
+```javascript
+{
+    isFreeEvent: true,              // Available to all users without purchase
+    requiresAdminVisibility: true,  // Only visible to admins initially
+
+    // For multi-timeslot events:
+    hasMultipleTimeslots: true,
+    isPreScheduled: true,
+    timeslots: [
+        {
+            id: 1,
+            day: "Day 1",
+            date: "Feb 15, 2026",
+            time: "10:00 AM",
+            signupUrl: null         // TPV signup URL
+        }
+    ],
+
+    // For recurring events:
+    recurringEvent: {
+        frequency: "bimonthly",
+        nextOccurrence: "2026-02-15"
+    }
+}
+```
+
+---
+
+## 2. Special Events Page (`special-events.js`)
+
+**Location:** `SPECIAL_EVENTS` array (around line 17)
+
+```javascript
+{
+    id: 104,                           // Must match event-data.js ID
+    unlockId: null,                    // Match event-data.js
+    unlockField: null,                 // Firestore field name if applicable
+    name: 'Your Event Name',           // Must match event-data.js
+    icon: '🏆',                        // Emoji for display
+    description: 'Short description for card display.',
+    reward: '+80 Career Points',
+    bonusCC: 'Standard CC',            // Or specific amount like '+50 CC'
+    type: 'Road Race',                 // Must match event-data.js
+    unlockMethod: 'admin-only',        // See unlock methods below
+    cost: 0,                           // CC cost (0 if free/admin-only)
+    hasMultipleTimeslots: true         // Only if applicable
+}
+```
+
+### Unlock Method Values
+| Value | Description |
+|-------|-------------|
+| `'free'` | Available immediately to all users |
+| `'store'` | Purchasable via Cadence Credits |
+| `'achievement'` | Unlocked via achievement |
+| `'seasonal'` | Available during specific seasons |
+| `'admin-only'` | Only visible to admins (Coming Soon preview) |
+
+---
+
+## 3. Results Processing (`process-results.js`)
+
+**Location:** `EVENT_MAX_POINTS` object (around line 411)
+
+```javascript
+const EVENT_MAX_POINTS = {
+    // ... existing events
+    104: 80   // Your Event Name
+};
+```
+
+**Also update these files with the same entry:**
+- `process-json-results.js` (around line 33)
+- `build-season-standings.js` (around line 10)
+
+---
+
+## 4. Interview Questions (`interview-questions.js`)
+
+**Location:** `specialEvents` section (around line 562)
+
+Add 4 questions minimum (one per performance tier):
+
+```javascript
+specialEvents: {
+    // Win question (1st place)
+    yourevent_win: {
+        id: 'yourevent_win',
+        text: "Victory! How does winning [your event] feel?",
+        triggers: {
+            eventNumber: 104,
+            position: 1
+        },
+        responses: ['yourevent_win_confident', 'yourevent_win_humble', 'yourevent_win_showman']
+    },
+
+    // Podium question (2nd-3rd)
+    yourevent_podium: {
+        id: 'yourevent_podium',
+        text: "A podium finish. What does this result mean to you?",
+        triggers: {
+            eventNumber: 104,
+            positionIn: [2, 3]
+        },
+        responses: ['yourevent_podium_proud', 'yourevent_podium_competitive', 'yourevent_podium_grateful']
+    },
+
+    // Midpack question (4th-15th)
+    yourevent_midpack: {
+        id: 'yourevent_midpack',
+        text: "How did you find the experience?",
+        triggers: {
+            eventNumber: 104,
+            positionBetween: [4, 15]
+        },
+        responses: ['yourevent_mid_learning', 'yourevent_mid_enjoyed', 'yourevent_mid_motivated']
+    },
+
+    // Tough race question (16th+)
+    yourevent_tough: {
+        id: 'yourevent_tough',
+        text: "Tough day. What made it so challenging?",
+        triggers: {
+            eventNumber: 104,
+            positionGreaterThan: 15
+        },
+        responses: ['yourevent_tough_honest', 'yourevent_tough_determined', 'yourevent_tough_analytical']
+    }
+}
+```
+
+---
+
+## 5. Interview Responses (`interview-responses.js`)
+
+**Location:** Special event responses section (around line 1294)
+
+Add responses for every ID referenced in the questions:
+
+```javascript
+yourevent_win_confident: {
+    id: 'yourevent_win_confident',
+    text: "Your confident win response text here...",
+    style: 'confident',
+    badge: 'Confident',
+    personalityImpact: {
+        confidence: 4,
+        aggression: 2
+    }
+},
+
+yourevent_win_humble: {
+    id: 'yourevent_win_humble',
+    text: "Your humble win response text here...",
+    style: 'humble',
+    badge: 'Humble',
+    personalityImpact: {
+        humility: 4,
+        professionalism: 2
+    }
+},
+
+// ... Continue for ALL response IDs
+```
+
+### Personality Impact Traits
+- `confidence` (-5 to +5)
+- `humility` (-5 to +5)
+- `aggression` (-5 to +5)
+- `professionalism` (-5 to +5)
+- `showmanship` (-5 to +5)
+- `resilience` (-5 to +5)
+
+---
+
+## 6. Narrative/Stories (`narrative-database.js`)
+
+**Location:** `specialEvents` array (around line 2685)
+
+Add 8-15 narratives per event:
+
+```javascript
+specialEvents: [
+    // Atmosphere narrative (any position)
+    {
+        id: "special_yourevent_atmosphere",
+        text: "Atmospheric description of arriving at the event...",
+        triggers: { eventNumber: 104, performanceTier: ["any"] },
+        weight: 0.9
+    },
+
+    // Win narrative
+    {
+        id: "special_yourevent_win",
+        text: "Victory narrative for winning...",
+        triggers: { eventNumber: 104, performanceTier: ["win"] },
+        weight: 0.95
+    },
+
+    // Podium narrative
+    {
+        id: "special_yourevent_podium",
+        text: "Podium narrative for 2nd/3rd...",
+        triggers: { eventNumber: 104, performanceTier: ["podium"] },
+        weight: 0.9
+    },
+
+    // Top 10 narrative
+    {
+        id: "special_yourevent_top10",
+        text: "Top 10 finish narrative...",
+        triggers: { eventNumber: 104, performanceTier: ["top10"] },
+        weight: 0.8
+    },
+
+    // Midpack narrative
+    {
+        id: "special_yourevent_midpack",
+        text: "Midpack finish narrative...",
+        triggers: { eventNumber: 104, performanceTier: ["midpack"] },
+        weight: 0.75
+    },
+
+    // Back of pack narrative
+    {
+        id: "special_yourevent_back",
+        text: "Tough day narrative...",
+        triggers: { eventNumber: 104, performanceTier: ["back"] },
+        weight: 0.8
+    }
+]
+```
+
+### Performance Tiers
+| Tier | Description |
+|------|-------------|
+| `"any"` | Any finish position |
+| `"win"` | 1st place |
+| `"podium"` | 2nd or 3rd place |
+| `"top10"` | 4th-10th place |
+| `"midpack"` | 11th-20th approx |
+| `"back"` | 21st+ |
+
+---
+
+## 7. Awards (`awards-config.js`)
+
+**Location:** Special event awards section (around line 258)
+
+```javascript
+yourEventChampion2026: {
+    id: 'yourEventChampion2026',
+    title: '2026 Your Event 1st Place',
+    icon: '🏆',
+    iconId: 'yourevent-champion',
+    description: 'Win the 2026 Your Event',
+    calculationType: 'event',
+    eventSpecific: 104,
+    mutuallyExclusiveWith: ['yourEventPodium2026']
+},
+
+yourEventPodium2026: {
+    id: 'yourEventPodium2026',
+    title: '2026 Your Event Podium',
+    icon: '🎖️',
+    iconId: 'yourevent-podium',
+    description: 'Finish 2nd or 3rd at the 2026 Your Event',
+    calculationType: 'event',
+    eventSpecific: 104,
+    mutuallyExclusiveWith: ['yourEventChampion2026']
+}
+```
+
+**Also add award logic in `process-json-results.js`** (around line 3756):
+
+```javascript
+if (eventNum === 104 && position === 1 && !isDNF) {
+    updateData['awards.yourEventChampion2026'] = admin.firestore.FieldValue.increment(1);
+    eventResults.earnedAwards.push({
+        awardId: 'yourEventChampion2026',
+        category: 'event_special',
+        intensity: 'flashy'
+    });
+} else if (eventNum === 104 && position <= 3 && !isDNF) {
+    updateData['awards.yourEventPodium2026'] = admin.firestore.FieldValue.increment(1);
+    eventResults.earnedAwards.push({
+        awardId: 'yourEventPodium2026',
+        category: 'event_special',
+        intensity: 'moderate'
+    });
+}
+```
+
+---
+
+## 8. Icons (`icons/icons.js`)
+
+**Location:** Event icons section (around line 494)
+
+```javascript
+// Event icon
+eventYourEvent: {
+    type: 'local-svg',
+    path: 'icons/svg/events/yourevent-icon.svg',
+    fallback: '🏆',
+    category: 'event'
+},
+
+// Award icons (if needed)
+'yourevent-champion': {
+    type: 'local-svg',
+    path: 'icons/svg/awards/yourevent-champion.svg',
+    fallback: '🏆',
+    category: 'award'
+}
+```
+
+### Required SVG Files
+Create in `icons/svg/events/` or `icons/svg/awards/`:
+- Event icon: 64x64px recommended
+- Award icons: 64x64px recommended
+
+---
+
+## 9. CSS Styling (`special-events.css`) - Optional
+
+**Location:** Event-specific styling section (around line 737)
+
+```css
+/* Your Event Specific Styling */
+.special-event-card[data-event-id="104"] .timeslot-card {
+    background: rgba(R, G, B, 0.05);
+    border-color: rgba(R, G, B, 0.3);
+}
+
+.special-event-card[data-event-id="104"] .timeslot-card:hover {
+    border-color: rgba(R, G, B, 0.6);
+    box-shadow: 0 8px 24px rgba(R, G, B, 0.2);
+}
+
+.special-event-card[data-event-id="104"] .timeslot-time {
+    color: #YOUR_ACCENT_COLOR;
+}
+
+.special-event-card[data-event-id="104"] .timeslot-signup-btn:not(:disabled) {
+    background: linear-gradient(135deg, #PRIMARY, #SECONDARY);
+}
+```
+
+---
+
+## 10. Header Image
+
+**Location:** `event-images/special/`
+
+- **Format:** JPEG recommended
+- **Dimensions:** Minimum 1200px wide, 16:9 aspect ratio ideal
+- **Filename:** Must match `headerImage` path in event-data.js (e.g., `event_104.jpg`)
+
+---
+
+## Common Mistakes to Avoid
+
+| Mistake | Impact | Solution |
+|---------|--------|----------|
+| ID mismatch between files | Event won't load correctly | Use same ID everywhere |
+| Missing response IDs | Interview errors | Every ID in questions must have a response |
+| Wrong iconId | Icon won't display | Must match key in icons.js |
+| Missing EVENT_MAX_POINTS | Wrong point calculations | Add to all 3 files |
+| Invalid performanceTier | Narratives won't trigger | Use valid tier values |
+| Timeslot URL not null | Links won't work | Leave null until URLs ready |
+| Award exclusivity wrong | Both awards can be earned | Reference each other correctly |
+
+---
+
+## Testing Checklist
+
+### Data Validation
+- [ ] Event appears on special-events page
+- [ ] Event detail page loads at `event-detail.html?id=XXX`
+- [ ] All card info displays correctly
+- [ ] Description and strategy text renders
+
+### Visual
+- [ ] Event icon displays (and emoji fallback works)
+- [ ] Header image loads and scales
+- [ ] Mobile responsive layout works
+
+### Interview System
+- [ ] Questions trigger for correct positions
+- [ ] All response options appear
+- [ ] Personality impacts apply correctly
+
+### Narrative System
+- [ ] Narratives appear for each performance tier
+- [ ] No duplicate narrative IDs
+
+### Results Processing
+- [ ] Points calculated correctly
+- [ ] Awards granted when conditions met
+- [ ] Career points increment (not season)
+
+---
+
+## Quick Reference: All Files to Update
+
+| File | Required | What to Add |
+|------|----------|-------------|
+| `event-data.js` | Yes | Full event definition in specialEventData |
+| `special-events.js` | Yes | Entry in SPECIAL_EVENTS array |
+| `process-results.js` | Yes | Entry in EVENT_MAX_POINTS |
+| `process-json-results.js` | Yes | EVENT_MAX_POINTS + award logic |
+| `build-season-standings.js` | Yes | Entry in EVENT_MAX_POINTS |
+| `interview-questions.js` | Yes | 4+ questions with triggers |
+| `interview-responses.js` | Yes | All responses referenced by questions |
+| `narrative-database.js` | Yes | 8-15 narratives per event |
+| `icons/icons.js` | Yes | Icon registry entries |
+| `icons/svg/events/` | Yes | SVG icon file |
+| `event-images/special/` | Yes | Header image |
+| `awards-config.js` | Optional | Event-specific awards |
+| `special-events.css` | Optional | Custom styling |
