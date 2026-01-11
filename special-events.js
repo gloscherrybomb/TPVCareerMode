@@ -202,14 +202,16 @@ function createEventCard(event, isFreeEvent = false) {
     card.innerHTML = `
         <div class="event-badge available">${badgeText}</div>
         ${headerHtml}
-        <h3 class="event-title">${event.name}</h3>
-        <p class="event-description">${event.description}</p>
-        <div class="event-meta">
-            <span class="event-reward">🏆 ${event.reward}</span>
-            <span class="event-type">${event.type}</span>
-        </div>
-        <div class="event-status">
-            <button class="btn btn-primary btn-view-event">View Event</button>
+        <div class="event-card-content">
+            <h3 class="event-title">${event.name}</h3>
+            <p class="event-description">${event.description}</p>
+            <div class="event-meta">
+                <span class="event-reward">🏆 ${event.reward}</span>
+                <span class="event-type">${event.type}</span>
+            </div>
+            <div class="event-status">
+                <button class="btn btn-primary btn-view-event">View Event</button>
+            </div>
         </div>
     `;
 
@@ -253,21 +255,23 @@ function createComingSoonCard(event, isAdminPreview = false) {
     card.innerHTML = `
         <div class="event-badge ${isAdminPreview ? 'admin-preview' : 'coming-soon'}">${badgeText}</div>
         ${headerHtml}
-        <h3 class="event-title">${event.name}</h3>
-        <p class="event-description">${event.description}</p>
-        <div class="event-meta">
-            <span class="event-reward">🏆 ${event.reward}</span>
-            <span class="event-type">${event.type}</span>
+        <div class="event-card-content">
+            <h3 class="event-title">${event.name}</h3>
+            <p class="event-description">${event.description}</p>
+            <div class="event-meta">
+                <span class="event-reward">🏆 ${event.reward}</span>
+                <span class="event-type">${event.type}</span>
+            </div>
+            ${isAdminPreview ? `
+                <div class="event-status">
+                    <button class="btn btn-primary btn-view-event">View Event (Admin)</button>
+                </div>
+            ` : `
+                <div class="event-status">
+                    <span class="coming-soon-text">Details coming soon</span>
+                </div>
+            `}
         </div>
-        ${isAdminPreview ? `
-            <div class="event-status">
-                <button class="btn btn-primary btn-view-event">View Event (Admin)</button>
-            </div>
-        ` : `
-            <div class="event-status">
-                <span class="coming-soon-text">Details coming soon</span>
-            </div>
-        `}
     `;
 
     // Add click handler only for admin preview
@@ -316,14 +320,16 @@ function createCompletedEventCard(event) {
     card.innerHTML = `
         <div class="event-badge completed">Completed</div>
         ${headerHtml}
-        <h3 class="event-title">${event.name}</h3>
-        <p class="event-description">${event.description}</p>
-        <div class="event-meta">
-            <span class="event-reward">📊 Position: ${position}</span>
-            <span class="event-type">🏆 ${points} pts</span>
-        </div>
-        <div class="event-status">
-            <button class="btn btn-secondary btn-view-event">View Results</button>
+        <div class="event-card-content">
+            <h3 class="event-title">${event.name}</h3>
+            <p class="event-description">${event.description}</p>
+            <div class="event-meta">
+                <span class="event-reward">📊 Position: ${position}</span>
+                <span class="event-type">🏆 ${points} pts</span>
+            </div>
+            <div class="event-status">
+                <button class="btn btn-secondary btn-view-event">View Results</button>
+            </div>
         </div>
     `;
 
