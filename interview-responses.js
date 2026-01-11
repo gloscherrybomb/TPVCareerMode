@@ -1606,8 +1606,8 @@ const INTERVIEW_RESPONSES = {
     style: 'confident',
     badge: '💪 Confident',
     personalityImpact: {
-      confidence: 3,
-      humility: 2
+      confidence: 4,
+      resilience: 1
     }
   },
 
