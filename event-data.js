@@ -541,20 +541,22 @@ We recommend doing this event early on in your career to bag some extra Career P
         hasMultipleTimeslots: true,  // Shows multiple signup buttons instead of single schedule button
         isPreScheduled: true,  // Timeslots are pre-scheduled, not user-scheduled
         unlockId: null,
-        distance: "35 km",
-        climbing: "350 m",
+        distance: "37.5 km",
+        climbing: "351 m",
         course: "Valentine Bosberg",
         format: "Rolling road race",
         maxPoints: 80,  // TBC
         icon: "💝",
         iconId: "eventValentine",
         headerImage: "event-images/special/event_103.jpg",
-        description: `The Valentine's Invitational is an exclusive bimonthly special event where passion for racing meets the spirit of February 14th. This isn't about flowers and chocolates—it's about proving your dedication when others are celebrating romance.
+        description: `The Valentine's Invitational is the first of the bi-monthly special events where passion for racing meets the spirit of February 14th. This isn't about flowers and chocolates—it's about proving your dedication when others are celebrating romance.
 
-Over two days, riders will compete in multiple pre-scheduled timeslots across rolling terrain that tests both climbing ability and flat speed. Each race features automatic pen assignments to ensure competitive, fair racing against riders of similar ability.
+The Valentine's Invitational traces a storied path from Ninove toward the hallowed slopes of the Bosberg. This route pays homage to the Flemish classics, featuring rolling terrain and steep gradients that test your heart in more ways than one. The finale centers on the iconic Bosberg, a 1.3 km brute where legends have historically secured victory with late, solo attacks.
 
-This is more than a race—it's a statement. While the world celebrates hearts and flowers, you're choosing pain and glory. Results contribute to your career legacy, with exclusive Valentine-themed awards for those who stand on the podium.`,
-        strategy: "The rolling 35km course with 350m of climbing demands a balanced approach. Conserve energy on the early climbs and position yourself well for the flat sections. The final 5km will be decisive—stay near the front and be ready to respond to attacks. Multiple timeslots mean fresh legs every race, so don't hold back.",
+As our first race away from the familiar virtual roads with fixed scheduled times, you'll be racing alongside many human competitors at pre-set timeslots rather than organizing races on demand.
+
+This is more than a race—it's a statement. While the world celebrates hearts and flowers, you're choosing pain and glory on the cobbles and climbs of Belgium. Results contribute to your career legacy, with exclusive Valentine-themed awards for those who prove their love of suffering on the podium.`,
+        strategy: "The rolling 37.5km course with 351m of climbing demands a balanced approach. Conserve energy on the early climbs and position yourself well for the flat sections. The final 5km will be decisive—stay near the front and be ready to respond to attacks. Multiple timeslots mean fresh legs every race, so don't hold back.",
         routeDetails: {
             start: "Valentine Bosberg",
             keyPoint: "Rolling terrain with punchy climbs",

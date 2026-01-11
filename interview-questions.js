@@ -642,6 +642,47 @@ const INTERVIEW_QUESTIONS = {
         positionGreaterThan: 15
       },
       responses: ['leveller_struggle_honest', 'leveller_struggle_determined', 'leveller_struggle_analytical']
+    },
+
+    // Valentine's Invitational (Event 103)
+    valentine_win: {
+      id: 'valentine_win',
+      text: "Victory on the Bosberg! While others celebrated Valentine's Day, you chose suffering over romance and came out on top. How does it feel to win the first Valentine's Invitational?",
+      triggers: {
+        eventNumber: 103,
+        position: 1
+      },
+      responses: ['valentine_win_dedicated', 'valentine_win_tactical', 'valentine_win_romantic']
+    },
+
+    valentine_podium: {
+      id: 'valentine_podium',
+      text: "A podium finish at the Valentine's Invitational—you conquered the Bosberg and earned your place among the best. What does this result mean to you?",
+      triggers: {
+        eventNumber: 103,
+        positionIn: [2, 3]
+      },
+      responses: ['valentine_podium_proud', 'valentine_podium_competitive', 'valentine_podium_grateful']
+    },
+
+    valentine_midpack: {
+      id: 'valentine_midpack',
+      text: "The Valentine's Invitational brought you to Belgium's hills for your first scheduled race away from home. How did you find the experience of racing the Bosberg with so many human competitors?",
+      triggers: {
+        eventNumber: 103,
+        positionBetween: [4, 15]
+      },
+      responses: ['valentine_mid_learning', 'valentine_mid_enjoyed', 'valentine_mid_motivated']
+    },
+
+    valentine_tough: {
+      id: 'valentine_tough',
+      text: "The Bosberg climb didn't show you any love today. What made this Valentine's Invitational so challenging?",
+      triggers: {
+        eventNumber: 103,
+        positionGreaterThan: 15
+      },
+      responses: ['valentine_tough_honest', 'valentine_tough_hills', 'valentine_tough_determined']
     }
   }
 };

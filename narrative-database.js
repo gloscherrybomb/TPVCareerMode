@@ -2842,7 +2842,7 @@ const NARRATIVE_DATABASE = {
     },
     {
       id: "valentine_heartbreak_hill",
-      text: "They say love hurts, but so do these rolling hills. Each climb tests your resolve, each descent offers brief relief before the next uphill grind. The 350 meters of climbing spread across 35 kilometers means constant pressure on your legs and lungs. If your heart isn't racing from romance today, it's definitely racing from the effort. Either way, someone's getting their heart rate up.",
+      text: "They say love hurts, but so do these rolling hills. Each climb tests your resolve, each descent offers brief relief before the next uphill grind. The 351 meters of climbing spread across 37.5 kilometers means constant pressure on your legs and lungs. If your heart isn't racing from romance today, it's definitely racing from the effort. Either way, someone's getting their heart rate up.",
       triggers: { eventNumber: 103, performanceTier: ["any"] },
       weight: 0.75
     },
@@ -2899,6 +2899,18 @@ const NARRATIVE_DATABASE = {
       text: "Nothing says anti-romance like voluntarily suffering through a rolling road race on Valentine's Day. While restaurants overflow with couples and flower shops sell out, you're here, pushing watts, climbing hills, and fighting for position. Some people find this dedication strange. You find it essential. Racing is the relationship that never lets you down—it's always honest about where you stand.",
       triggers: { eventNumber: 103, performanceTier: ["any"] },
       weight: 0.7
+    },
+    {
+      id: "valentine_bosberg_attack",
+      text: "The Bosberg—1.3 kilometers where legends are made. This is where the Valentine's Invitational truly begins, where the race ignites and attacks fly. Belgian cycling history runs through these cobbles and gradients. To win here, you need to conquer this climb. To attack on the Bosberg is to channel decades of classics racing, to join a lineage of riders who made their move on this iconic ascent.",
+      triggers: { eventNumber: 103, performanceTier: ["win", "podium"] },
+      weight: 0.85
+    },
+    {
+      id: "valentine_bosberg_heritage",
+      text: "The Valentine's Invitational traces its path from Ninove toward the Bosberg, paying homage to Flemish classics. This isn't just another climb—it's a piece of cycling heritage. The steep gradients, the rough surface, the knowledge that countless legends have suffered here before you. Racing the Bosberg on Valentine's Day connects you to something bigger than romance: the enduring love affair between cyclists and Belgian hills.",
+      triggers: { eventNumber: 103, performanceTier: ["any"] },
+      weight: 0.75
     }
   ]
 };

@@ -40,7 +40,7 @@ export async function displayPostRaceInterview(db, userId, eventNumber, userResu
 
         // Build race context
         const seasonContext = calculateSeasonContext(userData, eventNumber);
-        const raceContext = buildRaceContext(userResult, allResults, userData, seasonContext);
+        const raceContext = buildRaceContext(userResult, allResults, userData, seasonContext, eventNumber);
 
         // Get recent question history for repetition prevention (last 3 questions)
         const recentQuestions = userData.interviewHistory?.recentQuestions || [];
