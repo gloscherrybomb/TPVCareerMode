@@ -796,10 +796,9 @@
                                                 </div>
                                                 <button
                                                     class="btn btn-primary timeslot-signup-btn"
-                                                    ${slot.signupUrl ? '' : 'disabled'}
-                                                    onclick="${slot.signupUrl ? `window.open('${slot.signupUrl}', '_blank')` : 'alert(\'Coming Soon\')'}"
+                                                    onclick="${slot.signupUrl ? `window.open('${slot.signupUrl}', '_blank')` : 'alert(\'Signup links coming soon - check back later for race registration!\')'}"
                                                 >
-                                                    ${slot.signupUrl ? 'Sign Up' : 'Coming Soon'}
+                                                    ${slot.signupUrl ? 'Sign Up' : 'Sign Up'}
                                                 </button>
                                             </div>
                                         `).join('')}

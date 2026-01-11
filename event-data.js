@@ -537,7 +537,7 @@ We recommend doing this event early on in your career to bag some extra Career P
         level: "Special Event",
         isSpecialEvent: true,
         isFreeEvent: false,
-        requiresAdminVisibility: true,  // Only visible to admins initially
+        isComingSoon: true,  // Visible to all users in Coming Soon section
         hasMultipleTimeslots: true,  // Shows multiple signup buttons instead of single schedule button
         isPreScheduled: true,  // Timeslots are pre-scheduled, not user-scheduled
         unlockId: null,
@@ -570,30 +570,30 @@ This is more than a race—it's a statement. While the world celebrates hearts a
             {
                 id: 1,
                 day: "Day 1",
-                date: "Feb 15, 2026",  // TBC - placeholder
-                time: "10:00 AM",  // TBC - placeholder, uses user's system timezone
-                signupUrl: null  // TBC - will be TPV signup URL
+                date: "TBC",
+                time: "TBC",
+                signupUrl: null
             },
             {
                 id: 2,
                 day: "Day 1",
-                date: "Feb 15, 2026",  // TBC - placeholder
-                time: "2:00 PM",  // TBC - placeholder
-                signupUrl: null  // TBC - will be TPV signup URL
+                date: "TBC",
+                time: "TBC",
+                signupUrl: null
             },
             {
                 id: 3,
                 day: "Day 2",
-                date: "Feb 16, 2026",  // TBC - placeholder
-                time: "10:00 AM",  // TBC - placeholder
-                signupUrl: null  // TBC - will be TPV signup URL
+                date: "TBC",
+                time: "TBC",
+                signupUrl: null
             },
             {
                 id: 4,
                 day: "Day 2",
-                date: "Feb 16, 2026",  // TBC - placeholder
-                time: "2:00 PM",  // TBC - placeholder
-                signupUrl: null  // TBC - will be TPV signup URL
+                date: "TBC",
+                time: "TBC",
+                signupUrl: null
             }
         ],
         scheduleUrl: null,  // Not used for multi-timeslot events
