@@ -1,0 +1,42 @@
+name: Generate Season Standings Report
+
+on:
+  workflow_dispatch: # Manual trigger
+  schedule:
+    - cron: '0 0 * * 0' # Weekly on Sunday at midnight UTC (optional)
+
+jobs:
+  generate-report:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install firebase-admin
+
+      - name: Generate standings report
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          node report-rider-standings-positions.js > season-standings-report.txt
+
+      - name: Upload report as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: season-standings-report
+          path: season-standings-report.txt
+          retention-days: 90
+
+      - name: Display report summary
+        run: |
+          echo "=== Season Standings Report Generated ==="
+          head -20 season-standings-report.txt
+          echo ""
+          echo "Total lines: $(wc -l < season-standings-report.txt)"

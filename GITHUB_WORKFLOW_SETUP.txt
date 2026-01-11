@@ -1,0 +1,111 @@
+# GitHub Workflow Setup for Season Standings Report
+
+This workflow queries Firestore directly to generate an accurate season standings position report for all human riders.
+
+## Setup Instructions
+
+### 1. Add Firebase Service Account to GitHub Secrets
+
+1. Go to your GitHub repository: `https://github.com/gloscherrybomb/TPVCareerMode`
+2. Navigate to **Settings** → **Secrets and variables** → **Actions**
+3. Click **New repository secret**
+4. Name: `FIREBASE_SERVICE_ACCOUNT`
+5. Value: Paste your Firebase service account JSON (the entire JSON object)
+6. Click **Add secret**
+
+### 2. Run the Workflow
+
+#### Manual Trigger (Recommended):
+1. Go to **Actions** tab in your repository
+2. Select **Generate Season Standings Report** from the left sidebar
+3. Click **Run workflow** button
+4. Click the green **Run workflow** button in the dropdown
+5. Wait for the workflow to complete (~1-2 minutes)
+
+#### Automatic Schedule (Optional):
+The workflow is set to run automatically every Sunday at midnight UTC. You can:
+- Disable this by removing the `schedule` section from the workflow file
+- Change the schedule by modifying the cron expression
+
+### 3. Download the Report
+
+1. After the workflow completes, go to the workflow run page
+2. Scroll down to **Artifacts** section
+3. Click on **season-standings-report** to download
+4. Extract the `season-standings-report.txt` file
+
+## Report Format
+
+The report shows each human rider with:
+```
+Rider Name, X races, Yth place
+```
+
+Example:
+```
+Julien Helleputte, 11 races, 1st place
+Gregory Frison, 4 races, 2nd place
+Ryan Yates, 3 races, 11th place
+```
+
+## What This Does
+
+1. **Connects to Firestore** using your service account credentials
+2. **Reads all user documents** from the `users` collection
+3. **Extracts season1Standings** for each user
+4. **Calculates positions** - finds where each rider ranks in their own standings
+5. **Generates report** - outputs sorted by position
+
+## Why This Approach?
+
+- ✅ **Accurate** - Reads the exact data users see on their standings page
+- ✅ **Complete** - Includes all races, not just locally stored files
+- ✅ **Secure** - Firebase credentials stored as GitHub secret
+- ✅ **Automated** - Can run on a schedule or on-demand
+- ✅ **No bot simulation** - Uses stored standings, not recalculated
+
+## Troubleshooting
+
+### Workflow fails with "firebase-admin not found"
+The workflow automatically installs firebase-admin. If it fails, check the logs.
+
+### "FIREBASE_SERVICE_ACCOUNT not set"
+Make sure you've added the secret in GitHub repository settings.
+
+### "Permission denied" errors
+Your Firebase service account needs read access to the Firestore `users` collection.
+
+### Report shows "0 human riders"
+- Check that your Firestore has user documents
+- Verify the service account has correct permissions
+- Check the workflow logs for detailed error messages
+
+## Customization
+
+### Change Season
+To report on Season 2 instead of Season 1, modify `report-rider-standings-positions.js`:
+```javascript
+// Change this line:
+let position = userData.season1Rank || null;
+const standings = userData.season1Standings || [];
+
+// To:
+let position = userData.season2Rank || null;
+const standings = userData.season2Standings || [];
+```
+
+### Change Output Format
+Edit `report-rider-standings-positions.js` to customize the output format.
+
+### Add More Data
+You can extend the script to include:
+- Total points
+- Team names
+- ARR ratings
+- Completion status
+
+## Files Involved
+
+- `.github/workflows/generate-standings-report.yml` - GitHub Actions workflow
+- `report-rider-standings-positions.js` - Script that queries Firestore
+- `season-standings-report.txt` - Generated report (artifact)
