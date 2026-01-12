@@ -427,34 +427,6 @@
 }
 
 /* Valentine's Event CTA Styling */
-.event-cta.valentine-event {
-    background: linear-gradient(
-        135deg,
-        rgba(255, 107, 138, 0.15) 0%,
-        rgba(255, 27, 107, 0.1) 50%,
-        rgba(238, 90, 111, 0.12) 100%
-    );
-    position: relative;
-    overflow: hidden;
-}
-
-.event-cta.valentine-event::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, #ff6b8a, #ff1b6b, #ee5a6f, #ff6b8a);
-    background-size: 200% 100%;
-    animation: valentineShimmer 3s ease-in-out infinite;
-}
-
-@keyframes valentineShimmer {
-    0%, 100% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-}
-
 .event-cta.valentine-event .cta-box h2 {
     background: linear-gradient(135deg, #ff6b8a, #ff1b6b, #ff8fa3);
     -webkit-background-clip: text;
