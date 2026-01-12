@@ -29,6 +29,11 @@ let filters = {
     country: 'all'
 };
 
+// Pagination state for global rankings
+const RANKINGS_PER_PAGE = 50;
+let currentRankingsPage = 1;
+let allGlobalRankings = []; // Store full fetched data for pagination
+
 // Initialize season switcher for standings
 function initStandingsSeasonSwitcher() {
     if (!window.SeasonSwitcher) {
@@ -581,8 +586,12 @@ async function renderGlobalRankings(forceRefresh = false) {
                         }));
                     }
 
+                    // Store for pagination and reset page
+                    allGlobalRankings = rankings;
+                    currentRankingsPage = 1;
+
                     // Skip to rendering
-                    renderGlobalRankingsTable(rankings, globalContent);
+                    renderGlobalRankingsTable(globalContent);
                     return rankings;
                 }
             }
@@ -654,8 +663,12 @@ async function renderGlobalRankings(forceRefresh = false) {
         // Populate country filter with available countries
         populateCountryFilter(rankings);
 
+        // Store for pagination and reset page
+        allGlobalRankings = rankings;
+        currentRankingsPage = 1;
+
         // Render the table
-        renderGlobalRankingsTable(rankings, globalContent);
+        renderGlobalRankingsTable(globalContent);
         return rankings; // Return rankings for team calculations
     } catch (error) {
         console.error('Error loading global high scores:', error);
@@ -668,17 +681,26 @@ async function renderGlobalRankings(forceRefresh = false) {
     }
 }
 
-// Separate function to render the global high scores table
-function renderGlobalRankingsTable(rankings, globalContent) {
-    console.log('renderGlobalRankingsTable - Input rankings:', rankings.length);
+// Separate function to render the global high scores table with pagination
+function renderGlobalRankingsTable(globalContent, appendMode = false) {
+    console.log('renderGlobalRankingsTable - Total rankings:', allGlobalRankings.length);
     console.log('renderGlobalRankingsTable - Current filters:', filters);
+    console.log('renderGlobalRankingsTable - Current page:', currentRankingsPage);
 
     // Apply filters
-    const filteredRankings = applyFilters(rankings);
+    const filteredRankings = applyFilters(allGlobalRankings);
     console.log('renderGlobalRankingsTable - After filters:', filteredRankings.length);
 
     // Sort by total points (descending)
     filteredRankings.sort((a, b) => b.points - a.points);
+
+    // Calculate pagination
+    const startIndex = 0;
+    const endIndex = currentRankingsPage * RANKINGS_PER_PAGE;
+    const paginatedRankings = filteredRankings.slice(startIndex, endIndex);
+    const hasMore = endIndex < filteredRankings.length;
+
+    console.log('renderGlobalRankingsTable - Showing:', paginatedRankings.length, 'of', filteredRankings.length);
 
     // Build table HTML
     let tableHTML = `
@@ -697,7 +719,7 @@ function renderGlobalRankingsTable(rankings, globalContent) {
                         <tbody>
         `;
 
-        if (filteredRankings.length === 0) {
+        if (paginatedRankings.length === 0) {
             const emptyStatsIcon = window.TPVIcons ? window.TPVIcons.getIcon('stats', { size: 'lg' }) : '📊';
             tableHTML += `
                 <tr>
@@ -708,16 +730,16 @@ function renderGlobalRankingsTable(rankings, globalContent) {
                 </tr>
             `;
         } else {
-            filteredRankings.forEach((racer, index) => {
+            paginatedRankings.forEach((racer, index) => {
                 const rank = index + 1;
                 const rowClass = racer.isCurrentUser ? 'current-user-row' : '';
-                
+
                 // Podium class for top 3
                 let rankClass = '';
                 if (rank === 1) rankClass = 'rank-gold';
                 else if (rank === 2) rankClass = 'rank-silver';
                 else if (rank === 3) rankClass = 'rank-bronze';
-                
+
                 // Determine if this is a bot or human rider
                 const isBot = racer.uid.startsWith('Bot');
 
@@ -774,7 +796,32 @@ function renderGlobalRankingsTable(rankings, globalContent) {
         </div>
     `;
 
+    // Add pagination controls
+    tableHTML += `
+        <div id="rankingsPaginationControls" class="pagination-controls" style="display: ${hasMore || paginatedRankings.length > 0 ? 'flex' : 'none'}; justify-content: center; align-items: center; gap: 1rem; margin-top: 1.5rem; padding: 1rem;">
+            <button id="loadMoreRankingsBtn" class="btn btn-secondary" style="display: ${hasMore ? 'inline-block' : 'none'};">
+                Load More Rankings
+            </button>
+            <span id="rankingsPaginationStatus" class="pagination-status" style="color: var(--text-secondary); font-size: 0.9rem;">
+                Showing ${paginatedRankings.length} of ${filteredRankings.length} riders
+            </span>
+        </div>
+    `;
+
     globalContent.innerHTML = tableHTML;
+
+    // Attach event listener to Load More button
+    const loadMoreBtn = document.getElementById('loadMoreRankingsBtn');
+    if (loadMoreBtn) {
+        loadMoreBtn.addEventListener('click', handleLoadMoreRankings);
+    }
+}
+
+// Handle Load More button click
+function handleLoadMoreRankings() {
+    currentRankingsPage++;
+    const globalContent = document.getElementById('individualRankings');
+    renderGlobalRankingsTable(globalContent);
 }
 
 // Render team rankings (top 5 riders per team)
@@ -1031,23 +1078,36 @@ function initFilters() {
     const ageGroupFilter = document.getElementById('ageGroupFilter');
     const countryFilter = document.getElementById('countryFilter');
     const clearButton = document.getElementById('clearFilters');
-    
+
+    // Helper to re-render with pagination reset (uses cached data if available)
+    function applyFilterAndRender() {
+        currentRankingsPage = 1; // Reset pagination when filters change
+        if (allGlobalRankings.length > 0) {
+            // Use cached data - just re-render
+            const globalContent = document.getElementById('individualRankings');
+            renderGlobalRankingsTable(globalContent);
+        } else {
+            // No cached data yet - fetch fresh
+            renderGlobalRankings().catch(err => console.error('Error rendering global high scores:', err));
+        }
+    }
+
     // Gender filter change
     genderFilter.addEventListener('change', () => {
         filters.gender = genderFilter.value;
-        renderGlobalRankings().catch(err => console.error('Error rendering global high scores:', err));
+        applyFilterAndRender();
     });
 
     // Age group filter change
     ageGroupFilter.addEventListener('change', () => {
         filters.ageGroup = ageGroupFilter.value;
-        renderGlobalRankings().catch(err => console.error('Error rendering global high scores:', err));
+        applyFilterAndRender();
     });
 
     // Country filter change
     countryFilter.addEventListener('change', () => {
         filters.country = countryFilter.value;
-        renderGlobalRankings().catch(err => console.error('Error rendering global high scores:', err));
+        applyFilterAndRender();
     });
 
     // Clear all filters
@@ -1060,7 +1120,7 @@ function initFilters() {
         genderFilter.value = 'all';
         ageGroupFilter.value = 'all';
         countryFilter.value = 'all';
-        renderGlobalRankings().catch(err => console.error('Error rendering global high scores:', err));
+        applyFilterAndRender();
     });
 }
 
