@@ -570,25 +570,25 @@ This is more than a race—it's a statement. While the world celebrates hearts a
             {
                 id: 1,
                 day: "Day 1",
-                utcDateTime: "2025-02-13T12:30:00Z",
+                utcDateTime: "2026-02-13T12:30:00Z",
                 signupUrl: null
             },
             {
                 id: 2,
                 day: "Day 1",
-                utcDateTime: "2025-02-13T19:00:00Z",
+                utcDateTime: "2026-02-13T19:00:00Z",
                 signupUrl: null
             },
             {
                 id: 3,
                 day: "Day 2",
-                utcDateTime: "2025-02-14T09:00:00Z",
+                utcDateTime: "2026-02-14T09:00:00Z",
                 signupUrl: null
             },
             {
                 id: 4,
                 day: "Day 2",
-                utcDateTime: "2025-02-14T14:00:00Z",
+                utcDateTime: "2026-02-14T14:00:00Z",
                 signupUrl: null
             }
         ],
