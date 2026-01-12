@@ -255,8 +255,8 @@
     pointer-events: none;
 }
 
-/* Event Badge */
-.event-badge {
+/* Event Badge - Only for special event cards, not the event detail hero */
+.special-event-card .event-badge {
     position: absolute;
     top: 1rem;
     right: 1rem;
@@ -270,11 +270,11 @@
     border-radius: 20px;
 }
 
-.event-badge.available {
+.special-event-card .event-badge.available {
     background: linear-gradient(135deg, var(--success), #00cc66);
 }
 
-.event-badge.completed {
+.special-event-card .event-badge.completed {
     background: linear-gradient(135deg, var(--accent-blue), var(--accent-purple));
     color: #fff;
 }
@@ -546,6 +546,8 @@
     color: #fff;
 }
 
+/* Note: .event-badge selectors above are already scoped to .special-event-card */
+
 /* Locked Event Card */
 .special-event-card.locked {
     opacity: 0.75;
@@ -633,7 +635,7 @@
 }
 
 /* Admin Preview Badge and Card Styling */
-.event-badge.admin-preview {
+.special-event-card .event-badge.admin-preview {
     background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
     color: #fff;
     border: 1px solid rgba(255, 255, 255, 0.3);
@@ -665,7 +667,7 @@
     margin-bottom: 2rem;
 }
 
-.event-badge.completed {
+.special-event-card .event-badge.completed {
     background: linear-gradient(135deg, #22c55e, #10b981);
     color: #fff;
 }
@@ -789,6 +791,80 @@
 }
 
 /* Valentine's Event Specific Styling */
+
+/* Valentine's Card Highlight - Pulsing Romantic Glow */
+@keyframes valentineCardPulse {
+    0%, 100% {
+        border-color: rgba(255, 107, 138, 0.5);
+        box-shadow:
+            0 0 20px rgba(255, 107, 138, 0.25),
+            0 0 40px rgba(255, 27, 107, 0.1),
+            inset 0 0 30px rgba(255, 107, 138, 0.03);
+    }
+    50% {
+        border-color: rgba(255, 107, 138, 0.9);
+        box-shadow:
+            0 0 30px rgba(255, 107, 138, 0.45),
+            0 0 60px rgba(255, 27, 107, 0.2),
+            0 0 80px rgba(255, 107, 138, 0.1),
+            inset 0 0 40px rgba(255, 107, 138, 0.05);
+    }
+}
+
+.special-event-card[data-event-id="103"] {
+    border: 2px solid rgba(255, 107, 138, 0.5) !important;
+    animation: valentineCardPulse 2.5s ease-in-out infinite;
+    position: relative;
+    overflow: visible;
+}
+
+.special-event-card[data-event-id="103"]::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(
+        135deg,
+        rgba(255, 107, 138, 0.15) 0%,
+        transparent 40%,
+        transparent 60%,
+        rgba(255, 27, 107, 0.1) 100%
+    );
+    border-radius: inherit;
+    z-index: -1;
+    pointer-events: none;
+}
+
+.special-event-card[data-event-id="103"]:hover {
+    animation-play-state: paused;
+    border-color: rgba(255, 107, 138, 1) !important;
+    box-shadow:
+        0 10px 40px rgba(255, 107, 138, 0.4),
+        0 0 60px rgba(255, 27, 107, 0.25);
+    transform: translateY(-8px) !important;
+}
+
+/* Featured badge for Valentine's card */
+.special-event-card[data-event-id="103"] .event-card-content::before {
+    content: 'NOW OPEN';
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #ff6b8a, #ff1b6b);
+    color: white;
+    padding: 0.35rem 1rem;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    box-shadow: 0 4px 15px rgba(255, 27, 107, 0.5);
+    z-index: 10;
+}
+
 .special-event-card[data-event-id="103"] .timeslot-card {
     background: rgba(255, 107, 138, 0.05);
     border-color: rgba(255, 107, 138, 0.3);

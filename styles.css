@@ -222,6 +222,92 @@ body {
     }
 }
 
+/* Valentine's Invitational Promo - Navigation Glow */
+@keyframes valentineHeartbeat {
+    0%, 100% {
+        color: #ff6b8a;
+        text-shadow:
+            0 0 8px rgba(255, 107, 138, 0.6),
+            0 0 16px rgba(255, 107, 138, 0.3);
+    }
+    25% {
+        color: #ff8fa3;
+        text-shadow:
+            0 0 12px rgba(255, 107, 138, 0.8),
+            0 0 24px rgba(255, 107, 138, 0.5),
+            0 0 36px rgba(255, 27, 107, 0.2);
+    }
+    50% {
+        color: #ff6b8a;
+        text-shadow:
+            0 0 8px rgba(255, 107, 138, 0.6),
+            0 0 16px rgba(255, 107, 138, 0.3);
+    }
+    75% {
+        color: #ff8fa3;
+        text-shadow:
+            0 0 12px rgba(255, 107, 138, 0.8),
+            0 0 24px rgba(255, 107, 138, 0.5),
+            0 0 36px rgba(255, 27, 107, 0.2);
+    }
+}
+
+.nav-link-valentine {
+    animation: valentineHeartbeat 1.5s ease-in-out infinite;
+    position: relative;
+}
+
+.nav-link-valentine::after {
+    background: linear-gradient(90deg, #ff6b8a, #ff1b6b, #ff6b8a) !important;
+    width: 100% !important;
+    opacity: 0.7;
+}
+
+/* Valentine's Tooltip */
+.nav-link-valentine .nav-valentine-tooltip {
+    position: absolute;
+    top: calc(100% + 12px);
+    left: 50%;
+    transform: translateX(-50%) scale(0.95);
+    background: linear-gradient(135deg, #ff6b8a 0%, #ff1b6b 50%, #ee5a6f 100%);
+    color: white;
+    padding: 0.6rem 1.2rem;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 1001;
+    box-shadow:
+        0 4px 20px rgba(255, 27, 107, 0.5),
+        0 0 30px rgba(255, 107, 138, 0.3);
+    letter-spacing: 0.5px;
+}
+
+.nav-link-valentine .nav-valentine-tooltip::before {
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-left: 7px solid transparent;
+    border-right: 7px solid transparent;
+    border-bottom: 7px solid #ff6b8a;
+}
+
+.nav-link-valentine .nav-valentine-tooltip::after {
+    content: '💝';
+    margin-left: 6px;
+}
+
+.nav-link-valentine:hover .nav-valentine-tooltip {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) scale(1);
+}
+
 .nav-toggle {
     display: none;
     flex-direction: column;

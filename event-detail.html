@@ -512,7 +512,9 @@
             }
 
             // Update hero section
-            document.querySelector('.event-badge').textContent = `${stageLabel} • ${event.level}`;
+            // For special events, show event type instead of redundant "Special Event • Special Event"
+            const badgeText = isSpecialEvent ? `Special Event • ${event.type}` : `${stageLabel} • ${event.level}`;
+            document.querySelector('.event-badge').textContent = badgeText;
             document.querySelector('.event-hero-title').textContent = event.name;
             document.querySelector('.event-hero-subtitle').textContent = event.subtitle;
 
