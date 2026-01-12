@@ -769,3 +769,18 @@
     background: linear-gradient(135deg, #ff6b8a, #ee5a6f);
 }
 
+/* Date overlay for special events */
+.event-date-overlay {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: rgba(255, 107, 138, 0.9);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    z-index: 5;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+

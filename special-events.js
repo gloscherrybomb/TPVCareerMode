@@ -262,9 +262,13 @@ function createComingSoonCard(event, isAdminPreview = false) {
     // Only show badge for admin preview
     const badgeHtml = isAdminPreview ? `<div class="event-badge admin-preview">Admin Preview</div>` : '';
 
+    // Add date overlay for Valentine's event
+    const dateOverlayHtml = event.id === 103 ? `<div class="event-date-overlay">13th/14th Feb</div>` : '';
+
     card.innerHTML = `
         ${badgeHtml}
         ${headerHtml}
+        ${dateOverlayHtml}
         <div class="event-card-content">
             <h3 class="event-title">${event.name}</h3>
             <p class="event-description">${event.description}</p>
