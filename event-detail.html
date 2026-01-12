@@ -785,6 +785,42 @@
                 const backLink = isSpecialEvent ? 'special-events.html' : 'events.html';
                 const backText = isSpecialEvent ? 'Back to Special Events' : 'Back to Events';
 
+                // Helper function to format timeslot display with UTC and local time
+                function formatTimeslotDisplay(utcDateTime) {
+                    const date = new Date(utcDateTime);
+
+                    // Format the date (e.g., "Thursday, 13 February")
+                    const dateStr = date.toLocaleDateString('en-GB', {
+                        weekday: 'long',
+                        day: 'numeric',
+                        month: 'long',
+                        timeZone: 'UTC'
+                    });
+
+                    // Format UTC time (e.g., "12:30 UTC")
+                    const utcHours = date.getUTCHours().toString().padStart(2, '0');
+                    const utcMinutes = date.getUTCMinutes().toString().padStart(2, '0');
+                    const utcTimeStr = `${utcHours}:${utcMinutes} UTC`;
+
+                    // Format local time (e.g., "13:30")
+                    const localTimeStr = date.toLocaleTimeString(undefined, {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: false
+                    });
+
+                    // Check if user is in UTC timezone
+                    const tzOffset = date.getTimezoneOffset();
+                    const isUtc = tzOffset === 0;
+
+                    return {
+                        date: dateStr,
+                        utcTime: utcTimeStr,
+                        localTime: localTimeStr,
+                        isLocalSameAsUtc: isUtc
+                    };
+                }
+
                 // Check if event has multiple timeslots
                 if (event.hasMultipleTimeslots && event.timeslots && event.timeslots.length > 0) {
                     // Multi-timeslot event (e.g., Valentine's Invitational)
@@ -804,20 +840,38 @@
                                 <div class="timeslot-day-section">
                                     <h3 class="timeslot-day-header">${day}</h3>
                                     <div class="timeslot-cards">
-                                        ${slots.map(slot => `
-                                            <div class="timeslot-card">
-                                                <div class="timeslot-datetime">
-                                                    <div class="timeslot-date">${slot.date}</div>
-                                                    <div class="timeslot-time">${slot.time}</div>
+                                        ${slots.map(slot => {
+                                            // Handle TBC or missing utcDateTime
+                                            if (!slot.utcDateTime) {
+                                                return `
+                                                    <div class="timeslot-card">
+                                                        <div class="timeslot-datetime">
+                                                            <div class="timeslot-date">${slot.date || 'TBC'}</div>
+                                                            <div class="timeslot-time">${slot.time || 'TBC'}</div>
+                                                        </div>
+                                                        <button class="btn btn-primary timeslot-signup-btn" disabled>
+                                                            Coming Soon
+                                                        </button>
+                                                    </div>
+                                                `;
+                                            }
+                                            const formatted = formatTimeslotDisplay(slot.utcDateTime);
+                                            return `
+                                                <div class="timeslot-card">
+                                                    <div class="timeslot-datetime">
+                                                        <div class="timeslot-date">${formatted.date}</div>
+                                                        <div class="timeslot-time">${formatted.utcTime}</div>
+                                                        ${!formatted.isLocalSameAsUtc ? `<div class="timeslot-local-time">${formatted.localTime} your time</div>` : ''}
+                                                    </div>
+                                                    <button
+                                                        class="btn btn-primary timeslot-signup-btn"
+                                                        onclick="${slot.signupUrl ? `window.open('${slot.signupUrl}', '_blank')` : 'alert(\'Signup links coming soon - check back later for race registration!\')'}"
+                                                    >
+                                                        ${slot.signupUrl ? 'Sign Up' : 'Sign Up'}
+                                                    </button>
                                                 </div>
-                                                <button
-                                                    class="btn btn-primary timeslot-signup-btn"
-                                                    onclick="${slot.signupUrl ? `window.open('${slot.signupUrl}', '_blank')` : 'alert(\'Signup links coming soon - check back later for race registration!\')'}"
-                                                >
-                                                    ${slot.signupUrl ? 'Sign Up' : 'Sign Up'}
-                                                </button>
-                                            </div>
-                                        `).join('')}
+                                            `;
+                                        }).join('')}
                                     </div>
                                 </div>
                             `).join('')}

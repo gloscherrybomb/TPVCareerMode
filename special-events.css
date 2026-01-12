@@ -721,6 +721,13 @@
     color: var(--accent-blue);
 }
 
+.timeslot-local-time {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-top: 0.5rem;
+    font-style: italic;
+}
+
 .timeslot-signup-btn {
     width: 100%;
     padding: 0.75rem;
