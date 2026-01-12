@@ -518,6 +518,11 @@
             document.querySelector('.event-hero-title').textContent = event.name;
             document.querySelector('.event-hero-subtitle').textContent = event.subtitle;
 
+            // Apply Valentine's styling for event 103
+            if (parseInt(eventId) === 103) {
+                document.querySelector('.event-cta').classList.add('valentine-event');
+            }
+
             // Update overview cards (different layout for special events)
             const overviewGrid = document.querySelector('.overview-grid');
             if (isSpecialEvent) {

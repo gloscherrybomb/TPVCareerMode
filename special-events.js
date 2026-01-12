@@ -216,6 +216,7 @@ function createEventCard(event, isFreeEvent = false) {
     const card = document.createElement('div');
     const eventTypeClass = getEventTypeClass(event.type);
     card.className = `special-event-card unlocked ${eventTypeClass}`;
+    card.dataset.eventId = event.id; // Add data attribute for CSS targeting
 
     const badgeText = isFreeEvent ? 'Available' : 'Unlocked';
     const iconHtml = window.TPVIcons ? window.TPVIcons.getEventIcon(event, 'xl') : event.icon;
@@ -275,6 +276,7 @@ function createComingSoonCard(event, isAdminPreview = false) {
     const card = document.createElement('div');
     const eventTypeClass = getEventTypeClass(event.type);
     card.className = isAdminPreview ? `special-event-card admin-preview ${eventTypeClass}` : `special-event-card coming-soon ${eventTypeClass}`;
+    card.dataset.eventId = event.id; // Add data attribute for CSS targeting
 
     const iconHtml = window.TPVIcons ? window.TPVIcons.getEventIcon(event, 'xl') : event.icon;
 
@@ -340,6 +342,7 @@ function createCompletedEventCard(event) {
     const card = document.createElement('div');
     const eventTypeClass = getEventTypeClass(event.type);
     card.className = `special-event-card completed ${eventTypeClass}`;
+    card.dataset.eventId = event.id; // Add data attribute for CSS targeting
 
     const iconHtml = window.TPVIcons ? window.TPVIcons.getEventIcon(event, 'xl') : event.icon;
 

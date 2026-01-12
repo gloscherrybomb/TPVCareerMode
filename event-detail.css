@@ -426,6 +426,77 @@
     margin-bottom: 3rem;
 }
 
+/* Valentine's Event CTA Styling */
+.event-cta.valentine-event {
+    background: linear-gradient(
+        135deg,
+        rgba(255, 107, 138, 0.15) 0%,
+        rgba(255, 27, 107, 0.1) 50%,
+        rgba(238, 90, 111, 0.12) 100%
+    );
+    position: relative;
+    overflow: hidden;
+}
+
+.event-cta.valentine-event::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #ff6b8a, #ff1b6b, #ee5a6f, #ff6b8a);
+    background-size: 200% 100%;
+    animation: valentineShimmer 3s ease-in-out infinite;
+}
+
+@keyframes valentineShimmer {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+}
+
+.event-cta.valentine-event .cta-box h2 {
+    background: linear-gradient(135deg, #ff6b8a, #ff1b6b, #ff8fa3);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Valentine's Timeslot Styling */
+.event-cta.valentine-event .timeslot-day-header {
+    color: #ff6b8a;
+    border-bottom-color: rgba(255, 107, 138, 0.4);
+}
+
+.event-cta.valentine-event .timeslot-card {
+    background: rgba(255, 107, 138, 0.08);
+    border: 2px solid rgba(255, 107, 138, 0.3);
+}
+
+.event-cta.valentine-event .timeslot-card:hover {
+    border-color: rgba(255, 107, 138, 0.7);
+    box-shadow:
+        0 8px 30px rgba(255, 107, 138, 0.25),
+        0 0 20px rgba(255, 27, 107, 0.1);
+    transform: translateY(-4px);
+}
+
+.event-cta.valentine-event .timeslot-time {
+    color: #ff6b8a;
+}
+
+.event-cta.valentine-event .timeslot-signup-btn:not(:disabled) {
+    background: linear-gradient(135deg, #ff6b8a, #ff1b6b);
+    border: none;
+    box-shadow: 0 4px 15px rgba(255, 27, 107, 0.3);
+}
+
+.event-cta.valentine-event .timeslot-signup-btn:not(:disabled):hover {
+    background: linear-gradient(135deg, #ff8fa3, #ff6b8a);
+    box-shadow: 0 6px 25px rgba(255, 27, 107, 0.45);
+    transform: scale(1.03);
+}
+
 .cta-warning {
     background: linear-gradient(135deg, rgba(255, 193, 7, 0.15), rgba(255, 152, 0, 0.1));
     border: 2px solid #ffc107;
