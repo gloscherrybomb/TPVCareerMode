@@ -1165,7 +1165,7 @@ async function calculateSeasonStats(userData, seasonNumber = 1) {
     totalWins: 0,
     totalPodiums: 0,
     totalTop10s: 0,
-    totalPoints: 0,
+    totalPoints: 0,  // Note: This is a local calculation, mapped to season1Points when saved
     bestFinish: null,
     positions: []
   };
@@ -3344,6 +3344,7 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp, jsonMet
       },
       {
         stagesCompleted: completedEventNumbers.length + 1,
+        // DEPRECATED: Use seasonStats.totalPoints instead of userData.totalPoints
         totalPoints: (userData.totalPoints || 0) + points,
         totalWins: totalWins,
         nextStageNumber: nextStage,

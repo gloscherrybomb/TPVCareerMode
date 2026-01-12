@@ -426,7 +426,9 @@ if (signupForm) {
         completedStages: [],
         completedOptionalEvents: [],
         choiceSelections: {},
-        totalPoints: 0,
+        totalPoints: 0,  // DEPRECATED: Use season1Points or careerPoints instead
+        season1Points: 0,
+        careerPoints: 0,
         createdAt: new Date()
       });
 
@@ -586,7 +588,9 @@ if (uidForm) {
           completedStages: [],
           completedOptionalEvents: [],
           choiceSelections: {},
-          totalPoints: 0,
+          totalPoints: 0,  // DEPRECATED: Use season1Points or careerPoints instead
+          season1Points: 0,
+          careerPoints: 0,
           createdAt: new Date()
         });
       }

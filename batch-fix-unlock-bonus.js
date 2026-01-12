@@ -391,7 +391,7 @@ async function batchFixUnlockBonus() {
           [`event${eventNumber}Results.bonusPoints`]: newBonusPoints,
           [`event${eventNumber}Results.unlockBonusPoints`]: totalUnlockBonus,
           [`event${eventNumber}Results.unlockBonusesApplied`]: unlockBonusesApplied,
-          totalPoints: totalPointsFromEvents,
+          totalPoints: totalPointsFromEvents,  // DEPRECATED: Kept for backwards compatibility
           careerPoints: totalPointsFromEvents,
           season1Points: season1PointsTotal,
           season1Standings: season1Standings

@@ -235,6 +235,7 @@ async function generateIntroParagraph(raceData, seasonData, riderId, narrativeSe
                         raceData.position <= 3 ? 'podium' :
                         raceData.position <= 10 ? 'top10' :
                         raceData.position <= 20 ? 'midpack' : 'back',
+        // DEPRECATED: totalPoints from seasonData is season-specific (from season1Points)
         totalPoints: seasonData.totalPoints,
         totalWins: seasonData.totalWins,
         totalPodiums: seasonData.totalPodiums || 0,
@@ -1137,6 +1138,7 @@ function generateForwardLook(seasonData, raceData) {
  * These are also LONG paragraphs (5-7 sentences) with forward-looking content
  */
 function generateSeasonContext(data) {
+  // DEPRECATED: totalPoints parameter comes from season-specific data (season1Points)
   const {
     stagesCompleted,
     totalPoints,

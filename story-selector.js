@@ -217,6 +217,8 @@ class StorySelector {
     }
 
     // Check total points threshold (supports array of exact values or single minimum)
+    // DEPRECATED: totalPoints trigger should eventually migrate to seasonPoints
+    // Currently checks context.totalPoints which is populated from season1Points
     if (triggers.totalPoints !== undefined) {
       if (Array.isArray(triggers.totalPoints)) {
         // Must be within one of the specified ranges (treat as minimums)
@@ -560,6 +562,7 @@ class StorySelector {
     }
 
     // Total points threshold (scaled bonus based on how much they exceed)
+    // DEPRECATED: Uses context.totalPoints which comes from season1Points
     if (triggers.totalPoints !== undefined) {
       const minPoints = Array.isArray(triggers.totalPoints) ? Math.min(...triggers.totalPoints) : triggers.totalPoints;
       if (context.totalPoints >= minPoints) {
@@ -1100,6 +1103,7 @@ class StorySelector {
       position: raceData.position,
       predictedPosition: raceData.predictedPosition || 15,
       performanceTier: performanceTier,
+      // DEPRECATED: totalPoints comes from seasonData which is season-specific (season1Points)
       totalPoints: seasonData.totalPoints || 0,
       totalWins: seasonData.totalWins || 0,
       recentResults: seasonData.recentResults || [],

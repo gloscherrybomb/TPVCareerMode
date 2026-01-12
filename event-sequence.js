@@ -97,9 +97,9 @@ class ProgressManager {
             completedStages: [],
             completedOptionalEvents: [],
             choiceSelections: {},
-            totalPoints: 0
+            totalPoints: 0  // DEPRECATED: Display-only cache. Use season1Points for actual data.
         };
-        
+
         // Initialize Firebase
         this.auth = getAuth();
         this.db = getFirestore();
@@ -174,7 +174,7 @@ class ProgressManager {
                     completedStages: [],
                     completedOptionalEvents: [],
                     choiceSelections: {},
-                    totalPoints: 0
+                    totalPoints: 0  // DEPRECATED: Display-only cache. Use season1Points for actual data.
                 };
             }
         } catch (error) {
@@ -193,7 +193,7 @@ class ProgressManager {
                 completedStages: [],
                 completedOptionalEvents: [],
                 choiceSelections: {},
-                totalPoints: 0
+                totalPoints: 0  // DEPRECATED: Display-only cache. Use season1Points for actual data.
             };
         }
         console.log('Progress loaded from localStorage:', this.progress);
@@ -206,12 +206,13 @@ class ProgressManager {
         // If user is logged in, save to Firestore
         if (this.currentUser) {
             try {
+                // Note: Points are NOT saved here - they are managed by results processing
+                // which updates season1Points and careerPoints. totalPoints is deprecated.
                 await updateDoc(doc(this.db, 'users', this.currentUser.uid), {
                     currentStage: this.progress.currentStage,
                     completedStages: this.progress.completedStages,
                     completedOptionalEvents: this.progress.completedOptionalEvents,
-                    choiceSelections: this.progress.choiceSelections,
-                    totalPoints: this.progress.totalPoints
+                    choiceSelections: this.progress.choiceSelections
                 });
                 console.log('Progress saved to Firestore');
             } catch (error) {
@@ -227,10 +228,12 @@ class ProgressManager {
         return this.progress.currentStage;
     }
 
+    // DEPRECATED: Use season1Points or careerPoints instead. This returns cached points from page load.
     getTotalPoints() {
         return this.progress.totalPoints;
     }
 
+    // DEPRECATED: Points are managed by results processing. This only updates local cache.
     addPoints(points) {
         this.progress.totalPoints += points;
     }
@@ -303,9 +306,9 @@ class ProgressManager {
             completedStages: [],
             completedOptionalEvents: [],
             choiceSelections: {},
-            totalPoints: 0
+            totalPoints: 0  // DEPRECATED: Display-only cache. Use season1Points for actual data.
         };
-        
+
         localStorage.removeItem(this.storageKey);
         await this.saveProgress();
         console.log('Progress reset');

@@ -222,6 +222,7 @@ function displayCompletedSeasonSummary(seasonId) {
                     <div class="season-stats-card__stat-label">Final Rank</div>
                 </div>
                 <div class="season-stats-card__stat">
+                    <!-- totalPoints fallback for legacy data; prefer stats.totalPoints from season1Points -->
                     <div class="season-stats-card__stat-value">${stats.totalPoints || data.totalPoints || 0}</div>
                     <div class="season-stats-card__stat-label">Total Points</div>
                 </div>

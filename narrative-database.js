@@ -2,6 +2,12 @@
 // Comprehensive narrative moments database - MERGED VERSION WITH NEW ADDITIONS
 
 /**
+ * DEPRECATION NOTE: Triggers using `totalPoints` should eventually migrate to `seasonPoints`.
+ * The totalPoints trigger currently checks against seasonData.totalPoints which is populated
+ * from userData.season1Points (for season 1). The naming is legacy and will be updated.
+ */
+
+/**
  * MEGA NARRATIVE DATABASE - 277 Story Moments (Updated from 247)
  * 
  * This is the complete merged database containing all stories from the original

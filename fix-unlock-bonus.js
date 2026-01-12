@@ -183,7 +183,7 @@ async function fixUnlockBonus() {
       [`event${eventNumber}Results.bonusPoints`]: newBonusPoints,
       [`event${eventNumber}Results.unlockBonusPoints`]: unlockBonusPoints,
       [`event${eventNumber}Results.unlockBonusesApplied`]: unlockBonusesApplied,
-      totalPoints: totalPointsFromEvents,
+      totalPoints: totalPointsFromEvents,  // DEPRECATED: Kept for backwards compatibility
       careerPoints: totalPointsFromEvents,
       season1Points: totalPointsFromEvents,
       season1Standings: season1Standings
