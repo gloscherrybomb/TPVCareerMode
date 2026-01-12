@@ -471,6 +471,75 @@ body {
     color: var(--text-muted);
 }
 
+/* Admin Toggle */
+.admin-control {
+    margin-left: auto;
+}
+
+.admin-toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    user-select: none;
+}
+
+.admin-toggle-checkbox {
+    display: none;
+}
+
+.admin-toggle-slider {
+    position: relative;
+    width: 44px;
+    height: 24px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    transition: all 0.3s ease;
+}
+
+.admin-toggle-slider::before {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 16px;
+    height: 16px;
+    background: var(--text-secondary);
+    border-radius: 50%;
+    transition: all 0.3s ease;
+}
+
+.admin-toggle-checkbox:checked + .admin-toggle-slider {
+    background: rgba(199, 26, 229, 0.3);
+    border-color: var(--accent-purple);
+}
+
+.admin-toggle-checkbox:checked + .admin-toggle-slider::before {
+    transform: translateX(20px);
+    background: var(--accent-purple);
+    box-shadow: 0 0 8px rgba(199, 26, 229, 0.5);
+}
+
+.admin-toggle-text {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    transition: color 0.3s ease;
+}
+
+.admin-toggle-checkbox:checked ~ .admin-toggle-text {
+    color: var(--accent-purple);
+}
+
+.admin-toggle-label:hover .admin-toggle-slider {
+    border-color: rgba(199, 26, 229, 0.4);
+}
+
+.admin-toggle-label:hover .admin-toggle-text {
+    color: var(--text-primary);
+}
+
 /* Tier Section */
 .tier-section {
     margin-bottom: 3rem;

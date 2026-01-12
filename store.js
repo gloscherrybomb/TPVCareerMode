@@ -28,6 +28,8 @@ let userData = null;
 let currentFilter = 'all';
 let currentSort = 'tier';
 let currentSearch = '';
+let isAdmin = false;
+let adminViewAll = false;
 
 // Emoji support detection cache
 const emojiSupportCache = {};
@@ -282,6 +284,15 @@ function initStoreControls() {
       }, 300); // Debounce for 300ms
     });
   }
+
+  // Admin toggle for viewing all unlocks
+  const adminToggle = document.getElementById('adminViewAll');
+  if (adminToggle) {
+    adminToggle.addEventListener('change', (e) => {
+      adminViewAll = e.target.checked;
+      renderGrid();
+    });
+  }
 }
 
 function renderGrid() {
@@ -436,22 +447,24 @@ function renderGrid() {
 
       const canAfford = balance >= item.cost;
       const isLocked = !owned && (!meetsPersonalityReqs || !canAfford);
+      // Admin view shows all unlocks revealed
+      const displayLocked = isLocked && !adminViewAll;
 
       // Use new card component system
       const card = createUnlockCardSync(item, {
         size: 'full',
-        showNarrative: !isLocked,
+        showNarrative: !displayLocked,
         showTrigger: true,
         showCost: true,
         isOwned: owned,
         isEquipped: equippedHere,
-        isLocked: isLocked
+        isLocked: displayLocked
       });
 
       // Add animation delay based on card index
       card.style.setProperty('--card-index', index);
 
-      // Add tooltip for locked cards
+      // Add tooltip for locked cards (show even in admin view for info)
       if (isLocked) {
         const reasons = [];
         if (!canAfford) {
@@ -468,6 +481,9 @@ function renderGrid() {
             }).join(', ');
             reasons.push(`Requires: ${reqs}`);
           }
+        }
+        if (adminViewAll) {
+          reasons.unshift('[Admin View]');
         }
         card.title = reasons.join(' • ');
       }
@@ -516,8 +532,8 @@ function renderGrid() {
 
       cardBody.appendChild(actionsDiv);
 
-      // Add lock icon for locked cards
-      if (isLocked) {
+      // Add lock icon for locked cards (only when not in admin view)
+      if (displayLocked) {
         const lockIcon = document.createElement('div');
         lockIcon.className = 'unlock-lock-icon';
         lockIcon.textContent = '🔒';
@@ -590,6 +606,8 @@ function renderGrid() {
 
       const canAfford = balance >= item.cost;
       const isLocked = !owned && !canAfford;
+      // Admin view shows all unlocks revealed
+      const displayLocked = isLocked && !adminViewAll;
 
       // Create card using existing component
       const card = createUnlockCardSync(item, {
@@ -599,7 +617,7 @@ function renderGrid() {
         showCost: true,
         isOwned: owned,
         isEquipped: false,
-        isLocked: isLocked
+        isLocked: displayLocked
       });
 
       card.style.setProperty('--card-index', index);
@@ -636,7 +654,7 @@ function renderGrid() {
 
       cardBody.appendChild(actionsDiv);
 
-      if (isLocked) {
+      if (displayLocked) {
         const lockIcon = document.createElement('div');
         lockIcon.className = 'unlock-lock-icon';
         lockIcon.textContent = '🔒';
@@ -807,6 +825,17 @@ function start() {
     const data = snap.data();
     console.log('[Store] User data loaded. Loading store...');
     userData = data;
+
+    // Check admin status and show toggle if admin
+    isAdmin = data.isAdmin === true;
+    if (isAdmin) {
+      const adminToggleGroup = document.getElementById('adminToggleGroup');
+      if (adminToggleGroup) {
+        adminToggleGroup.style.display = 'flex';
+      }
+      console.log('[Store] Admin user detected - unlock view toggle enabled');
+    }
+
     console.log('[Store] Balance:', data.currency?.balance || 0);
     console.log('[Store] Slots:', data.unlocks?.slotCount || 1);
     console.log('[Store] Inventory:', data.unlocks?.inventory?.length || 0);
