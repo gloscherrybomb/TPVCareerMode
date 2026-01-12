@@ -134,6 +134,14 @@ const AWARD_NAMES = {
     fanFavourite: { name: "Fan Favourite", icon: "💜" }
 };
 
+// Map award keys to icon registry keys (for icons with different naming)
+const AWARD_ICON_KEYS = {
+    gold: 'goldMedal',
+    silver: 'silverMedal',
+    bronze: 'bronzeMedal',
+    punchingMedal: 'punchingAbove'
+};
+
 // Helper function to get stage number for an event
 // Returns null for choice events (6-12) which don't have a fixed stage display
 function getStageForEvent(eventNum) {
@@ -1180,7 +1188,8 @@ function displayAwardsTable() {
         const nameCell = document.createElement('td');
         const awardInfo = AWARD_NAMES[key];
         if (awardInfo) {
-            const iconHtml = window.TPVIcons ? window.TPVIcons.getIcon(key, {size: 'sm'}) : awardInfo.icon;
+            const iconKey = AWARD_ICON_KEYS[key] || key;
+            const iconHtml = window.TPVIcons ? window.TPVIcons.getIcon(iconKey, {size: 'sm'}) : awardInfo.icon;
             nameCell.innerHTML = `${iconHtml} ${awardInfo.name}`;
         } else {
             nameCell.textContent = key;
