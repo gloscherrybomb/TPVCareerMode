@@ -38,6 +38,8 @@ const AWARD_CREDIT_MAP = {
   theAccountant: 30,
   theEqualizer: 30,  // Special event award - 30CC + 20CC completion bonus = 50CC for The Leveller
   singaporeSling: 30,  // Singapore Criterium podium bonus
+  valentineChampion2026: 80,  // Valentine's Invitational 1st place
+  valentinePodium2026: 50,    // Valentine's Invitational podium
   // Power-based awards
   powerSurge: 25,
   steadyEddie: 30,

@@ -2157,6 +2157,19 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
     eventResults.earnedAwards.push({ awardId: 'singaporeSling', category: 'event_special', intensity: 'flashy' });
   }
 
+  // Valentine's Invitational - Champion and Podium awards (event 103)
+  if (eventNumber === 103 && !isDNF) {
+    if (position === 1) {
+      console.log('   💘 VALENTINE\'S INVITATIONAL winner! Awarding Valentine Champion 2026');
+      eventAwards['awards.valentineChampion2026'] = admin.firestore.FieldValue.increment(1);
+      eventResults.earnedAwards.push({ awardId: 'valentineChampion2026', category: 'event_special', intensity: 'flashy' });
+    } else if (position <= 3) {
+      console.log('   💝 VALENTINE\'S INVITATIONAL podium! Awarding Valentine Podium 2026');
+      eventAwards['awards.valentinePodium2026'] = admin.firestore.FieldValue.increment(1);
+      eventResults.earnedAwards.push({ awardId: 'valentinePodium2026', category: 'event_special', intensity: 'flashy' });
+    }
+  }
+
   // Merge event awards into updates
   Object.assign(updates, eventAwards);
   
