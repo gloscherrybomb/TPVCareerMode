@@ -435,7 +435,7 @@ const CONDENSED_NARRATIVES = {
 
     default: [
       "{position} at {eventName}. Not the result you wanted, but you stayed in the race and gathered experience. Points banked, lessons learned.",
-      "Mid-pack at {eventName} with {position}. The leaders finished up the road{gapTextSuffix}. Not every race is your race, but you showed up and competed.",
+      "Mid-pack at {eventName} with {position}. The leaders finished {gapText} up the road. Not every race is your race, but you showed up and competed.",
       "{position} at {eventName}. A quiet day in the bunch, finishing where the road took you. Sometimes racing is about survival as much as success.",
       "Finishing {position} at {eventName}. The top end was out of reach today, but you're still racing, still learning, still building.",
       "{position} at {eventName}. An anonymous result, but there's value in every finish. The experience counts even when the position doesn't."
@@ -451,7 +451,7 @@ const CONDENSED_NARRATIVES = {
     ],
 
     default: [
-      "A tough day at {eventName}, finishing {position}. The leaders were up the road{gapTextSuffix}. Sometimes racing delivers hard lessons. The question is what you do with them.",
+      "A tough day at {eventName}, finishing {position}. The leaders were {gapText} up the road. Sometimes racing delivers hard lessons. The question is what you do with them.",
       "{position} at {eventName}. A day to forget, deep in the results sheet. But you finished, and finishing is something.",
       "Bringing up the rear at {eventName} with {position}. The race was decided far ahead of you{gapTextSuffix}. Days like this test your resolve.",
       "{position} at {eventName}. Well off the pace, watching the race unfold from behind. Tough, but you crossed the line.",
@@ -855,7 +855,7 @@ function generateRaceRecap(data) {
         recap += `${eventName} rewarded consistent, intelligent racing with a podium finish. You approached the race with a clear plan: stay out of trouble early, position well through the decisive sections, and be ready when it counted. That plan worked. ${dynamics.type === 'bunch_sprint' ? 'You battled through a chaotic sprint and emerged in third place.' : dynamics.type === 'chase_group' ? `The front riders ${gapText ? `finished ${gapText} ahead` : 'broke clear'}, and you led the chase group home for third.` : 'You fought hard in the finale and secured the final podium spot.'} Third isn't as satisfying as first, but it's still a podium, still solid points, still proof that you can race at this level. Not every day delivers victory, but bringing home a result like this keeps your season on track.`;
       } else if (dynamics.type === 'chase_group' || dynamics.type === 'small_gap') {
         // Gap awareness variant
-        recap += `A breakaway decided ${eventName}, and you couldn't make the split. ${dynamics.type === 'chase_group' ? `The front group ${gapText ? `finished ${gapText} ahead` : 'rode clear'}` : `${gapText ? `With ${gapText} to make up` : 'Facing a gap to the leaders'}`}, you led the chase behind, driving the pace and trying to minimize the damage. When the line came, you'd secured third place—not the result you were hoping for, but still a podium finish. Cycling is about reading the race and making the right moves at the right times. Today the decisive move happened without you, but you salvaged a good result from a difficult situation. That's professional racing—not every day is perfect, but you take what you can get.`;
+        recap += `A breakaway decided ${eventName}, and you couldn't make the split. ${dynamics.type === 'chase_group' ? `The front group ${gapText ? `finished ${gapText} ahead` : 'rode clear'}` : `${gapText ? `With ${gapText} to make up` : 'Facing a gap to the leaders'}`}, you led the chase home, driving the pace and trying to minimize the damage. When the line came, you'd secured third place—not the result you were hoping for, but still a podium finish. Cycling is about reading the race and making the right moves at the right times. Today the decisive move happened without you, but you salvaged a good result from a difficult situation. That's professional racing—not every day is perfect, but you take what you can get.`;
       } else {
         // General 3rd place
         const predictionText = predictionTier === 'worse' ? 
@@ -888,9 +888,9 @@ function generateRaceRecap(data) {
       } else if (dynamics.type === 'chase_group') {
         // Mention gap if significant (60+ seconds)
         if (lossMargin >= 60 && gapText) {
-          dynamicsText = `The leaders finished ${gapText} ahead, but you led the chase group behind and `;
+          dynamicsText = `The leaders finished ${gapText} ahead, but you led the chase group home and `;
         } else {
-          dynamicsText = "You couldn't quite make the front group, but you led the chase behind and ";
+          dynamicsText = "You couldn't quite make the front group, but you led the chase home and ";
         }
       }
       recap += `A solid performance at ${eventName}. The predictions had you further back, around ${formatOrdinal(predictedPosition)}, but you rode a tactically smart race that delivered better. ${dynamicsText}you finished ${formatOrdinal(position)}, exceeding expectations and banking solid points. Not every race needs to deliver heroics. Sometimes a result that quietly beats expectations is exactly what the season requires—consistent progress, smart positioning, and gradual improvement.`;
