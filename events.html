@@ -22,6 +22,10 @@
     <link rel="stylesheet" href="result-notifications.css">
     <!-- Color Palette Expansion - Event Type Colors -->
     <link rel="stylesheet" href="color-palette-expansion.css">
+
+    <!-- Preload above-the-fold event images for faster initial render -->
+    <link rel="preload" as="image" href="event-images/season1/event_1.webp" type="image/webp">
+    <link rel="preload" as="image" href="event-images/season1/event_2.webp" type="image/webp">
 </head>
 <body>
     <div id="navbar-placeholder"></div>
@@ -508,13 +512,18 @@
                                 ${selectedEvent ? `
                                 ${selectedEvent.headerImage ? `
                                 <div class="event-header-image-container">
-                                    <img
-                                        src="${selectedEvent.headerImage}"
-                                        alt="${selectedEvent.name}"
-                                        class="event-header-image"
-                                        loading="lazy"
-                                        onerror="this.parentElement.style.display='none'; this.parentElement.nextElementSibling.style.display='flex';"
-                                    >
+                                    <div class="event-header-image-skeleton"></div>
+                                    <picture>
+                                        <source srcset="${selectedEvent.headerImage.replace('.jpg', '.webp')}" type="image/webp">
+                                        <img
+                                            src="${selectedEvent.headerImage}"
+                                            alt="${selectedEvent.name}"
+                                            class="event-header-image"
+                                            loading="lazy"
+                                            onload="this.classList.add('loaded'); this.closest('.event-header-image-container').querySelector('.event-header-image-skeleton').style.display='none';"
+                                            onerror="this.closest('.event-header-image-container').style.display='none'; this.closest('.event-header-image-container').nextElementSibling.style.display='flex';"
+                                        >
+                                    </picture>
                                 </div>
                                 <div class="event-image" style="display: none;">
                                     <div class="event-image-placeholder">
@@ -530,13 +539,18 @@
                                 `}
                                 ` : `
                                 <div class="event-header-image-container">
-                                    <img
-                                        src="event-images/season1/riders_choice.jpg"
-                                        alt="Rider's Choice"
-                                        class="event-header-image"
-                                        loading="lazy"
-                                        onerror="this.parentElement.style.display='none'; this.parentElement.nextElementSibling.style.display='flex';"
-                                    >
+                                    <div class="event-header-image-skeleton"></div>
+                                    <picture>
+                                        <source srcset="event-images/season1/riders_choice.webp" type="image/webp">
+                                        <img
+                                            src="event-images/season1/riders_choice.jpg"
+                                            alt="Rider's Choice"
+                                            class="event-header-image"
+                                            loading="lazy"
+                                            onload="this.classList.add('loaded'); this.closest('.event-header-image-container').querySelector('.event-header-image-skeleton').style.display='none';"
+                                            onerror="this.closest('.event-header-image-container').style.display='none'; this.closest('.event-header-image-container').nextElementSibling.style.display='flex';"
+                                        >
+                                    </picture>
                                 </div>
                                 <div class="event-image" style="display: none;">
                                     <div class="event-image-placeholder">
@@ -605,13 +619,18 @@
                                 ${isTourEvent ? tourProgressBadge : ''}
                                 ${event.headerImage ? `
                                 <div class="event-header-image-container">
-                                    <img
-                                        src="${event.headerImage}"
-                                        alt="${event.name}"
-                                        class="event-header-image"
-                                        loading="lazy"
-                                        onerror="this.parentElement.style.display='none'; this.parentElement.nextElementSibling.style.display='flex';"
-                                    >
+                                    <div class="event-header-image-skeleton"></div>
+                                    <picture>
+                                        <source srcset="${event.headerImage.replace('.jpg', '.webp')}" type="image/webp">
+                                        <img
+                                            src="${event.headerImage}"
+                                            alt="${event.name}"
+                                            class="event-header-image"
+                                            loading="lazy"
+                                            onload="this.classList.add('loaded'); this.closest('.event-header-image-container').querySelector('.event-header-image-skeleton').style.display='none';"
+                                            onerror="this.closest('.event-header-image-container').style.display='none'; this.closest('.event-header-image-container').nextElementSibling.style.display='flex';"
+                                        >
+                                    </picture>
                                 </div>
                                 <div class="event-image" style="display: none;">
                                     <div class="event-image-placeholder">
@@ -949,16 +968,21 @@
                 const iconHtml = window.TPVIcons ? window.TPVIcons.getEventIcon(event, 'xl') : event.icon;
                 const eventTypeClass = getEventTypeClass(event.type);
 
-                // Build header image or fallback to icon
+                // Build header image or fallback to icon with skeleton loading and WebP support
                 const headerHtml = event.headerImage ? `
                     <div class="choice-event-image-container">
-                        <img
-                            src="${event.headerImage}"
-                            alt="${event.name}"
-                            class="choice-event-image"
-                            loading="lazy"
-                            onerror="this.parentElement.style.display='none'; this.parentElement.nextElementSibling.style.display='block';"
-                        >
+                        <div class="event-header-image-skeleton"></div>
+                        <picture>
+                            <source srcset="${event.headerImage.replace('.jpg', '.webp')}" type="image/webp">
+                            <img
+                                src="${event.headerImage}"
+                                alt="${event.name}"
+                                class="choice-event-image"
+                                loading="lazy"
+                                onload="this.classList.add('loaded'); this.closest('.choice-event-image-container').querySelector('.event-header-image-skeleton').style.display='none';"
+                                onerror="this.closest('.choice-event-image-container').style.display='none'; this.closest('.choice-event-image-container').nextElementSibling.style.display='block';"
+                            >
+                        </picture>
                     </div>
                     <div class="choice-event-icon" style="display: none;">${iconHtml}</div>
                 ` : `

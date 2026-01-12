@@ -224,16 +224,21 @@ function createEventCard(event, isFreeEvent = false) {
     const specialEventDataItem = window.specialEventData ? window.specialEventData[event.id] : null;
     const headerImage = specialEventDataItem?.headerImage || null;
 
-    // Build header image or icon HTML
+    // Build header image or icon HTML with skeleton loading and WebP support
     const headerHtml = headerImage ? `
         <div class="event-header-image-container">
-            <img
-                src="${headerImage}"
-                alt="${event.name}"
-                class="event-header-image"
-                loading="lazy"
-                onerror="this.parentElement.style.display='none'; this.parentElement.nextElementSibling.style.display='block';"
-            >
+            <div class="event-header-image-skeleton"></div>
+            <picture>
+                <source srcset="${headerImage.replace('.jpg', '.webp')}" type="image/webp">
+                <img
+                    src="${headerImage}"
+                    alt="${event.name}"
+                    class="event-header-image"
+                    loading="lazy"
+                    onload="this.classList.add('loaded'); this.closest('.event-header-image-container').querySelector('.event-header-image-skeleton').style.display='none';"
+                    onerror="this.closest('.event-header-image-container').style.display='none'; this.closest('.event-header-image-container').nextElementSibling.style.display='block';"
+                >
+            </picture>
         </div>
         <div class="event-icon" style="display: none;">${iconHtml}</div>
     ` : `
@@ -277,16 +282,21 @@ function createComingSoonCard(event, isAdminPreview = false) {
     const specialEventDataItem = window.specialEventData ? window.specialEventData[event.id] : null;
     const headerImage = specialEventDataItem?.headerImage || null;
 
-    // Build header image or icon HTML
+    // Build header image or icon HTML with skeleton loading and WebP support
     const headerHtml = headerImage ? `
         <div class="event-header-image-container">
-            <img
-                src="${headerImage}"
-                alt="${event.name}"
-                class="event-header-image"
-                loading="lazy"
-                onerror="this.parentElement.style.display='none'; this.parentElement.nextElementSibling.style.display='block';"
-            >
+            <div class="event-header-image-skeleton"></div>
+            <picture>
+                <source srcset="${headerImage.replace('.jpg', '.webp')}" type="image/webp">
+                <img
+                    src="${headerImage}"
+                    alt="${event.name}"
+                    class="event-header-image"
+                    loading="lazy"
+                    onload="this.classList.add('loaded'); this.closest('.event-header-image-container').querySelector('.event-header-image-skeleton').style.display='none';"
+                    onerror="this.closest('.event-header-image-container').style.display='none'; this.closest('.event-header-image-container').nextElementSibling.style.display='block';"
+                >
+            </picture>
         </div>
         <div class="event-icon" style="display: none;">${iconHtml}</div>
     ` : `
@@ -338,16 +348,21 @@ function createCompletedEventCard(event) {
     const headerImage = specialEventDataItem?.headerImage || null;
     const userResults = currentUserData ? currentUserData[`event${event.id}Results`] : null;
 
-    // Build header image or icon HTML
+    // Build header image or icon HTML with skeleton loading and WebP support
     const headerHtml = headerImage ? `
         <div class="event-header-image-container">
-            <img
-                src="${headerImage}"
-                alt="${event.name}"
-                class="event-header-image"
-                loading="lazy"
-                onerror="this.parentElement.style.display='none'; this.parentElement.nextElementSibling.style.display='block';"
-            >
+            <div class="event-header-image-skeleton"></div>
+            <picture>
+                <source srcset="${headerImage.replace('.jpg', '.webp')}" type="image/webp">
+                <img
+                    src="${headerImage}"
+                    alt="${event.name}"
+                    class="event-header-image"
+                    loading="lazy"
+                    onload="this.classList.add('loaded'); this.closest('.event-header-image-container').querySelector('.event-header-image-skeleton').style.display='none';"
+                    onerror="this.closest('.event-header-image-container').style.display='none'; this.closest('.event-header-image-container').nextElementSibling.style.display='block';"
+                >
+            </picture>
         </div>
         <div class="event-icon" style="display: none;">${iconHtml}</div>
     ` : `

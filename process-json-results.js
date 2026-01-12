@@ -46,7 +46,8 @@ const EVENT_MAX_POINTS = {
   13: 120, // Local Tour Stage 1
   14: 95,  // Local Tour Stage 2
   15: 135, // Local Tour Stage 3
-  102: 40  // The Leveller
+  102: 40, // The Leveller
+  103: 80  // Valentine's Invitational
 };
 
 // Event name lookup for Discord notifications
@@ -66,7 +67,8 @@ const EVENT_DISPLAY_NAMES = {
   13: 'Local Tour Stage 1',
   14: 'Local Tour Stage 2',
   15: 'Local Tour Stage 3',
-  102: 'The Leveller'
+  102: 'The Leveller',
+  103: "Valentine's Invitational"
 };
 
 /**
@@ -3809,6 +3811,19 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp, jsonMet
     console.log('   🍸 SINGAPORE CRITERIUM podium! Awarding Singapore Sling');
     updateData['awards.singaporeSling'] = admin.firestore.FieldValue.increment(1);
     eventResults.earnedAwards.push({ awardId: 'singaporeSling', category: 'event_special', intensity: 'flashy' });
+  }
+
+  // Valentine's Invitational - Champion and Podium awards (event 103)
+  if (eventNum === 103 && !isDNF) {
+    if (position === 1) {
+      console.log('   💘 VALENTINE\'S INVITATIONAL winner! Awarding Valentine Champion 2026');
+      updateData['awards.valentineChampion2026'] = admin.firestore.FieldValue.increment(1);
+      eventResults.earnedAwards.push({ awardId: 'valentineChampion2026', category: 'event_special', intensity: 'flashy' });
+    } else if (position <= 3) {
+      console.log('   💝 VALENTINE\'S INVITATIONAL podium! Awarding Valentine Podium 2026');
+      updateData['awards.valentinePodium2026'] = admin.firestore.FieldValue.increment(1);
+      eventResults.earnedAwards.push({ awardId: 'valentinePodium2026', category: 'event_special', intensity: 'flashy' });
+    }
   }
 
   // GC trophies (only on Event 15 - final tour stage)

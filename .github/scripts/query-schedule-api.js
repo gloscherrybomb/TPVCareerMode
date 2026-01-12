@@ -37,6 +37,21 @@ const SCHEDULE_KEY_TO_EVENT = {
     53321: { id: 102, name: 'The Leveller' }
 };
 
+// Special events with fixed timeslots - query based on date windows
+// These events have pre-scheduled race times and are queried directly by scheduleKey
+const TIMED_SCHEDULE_CONFIG = {
+    103: {
+        eventName: "Valentine's Invitational",
+        races: [
+            { scheduleKey: 57080, timeslotId: 1, raceStart: '2026-02-13T12:30:00Z', raceEnd: '2026-02-13T14:30:00Z' },
+            { scheduleKey: 57078, timeslotId: 2, raceStart: '2026-02-13T19:00:00Z', raceEnd: '2026-02-13T21:30:00Z' },
+            { scheduleKey: 57079, timeslotId: 3, raceStart: '2026-02-14T09:00:00Z', raceEnd: '2026-02-14T11:30:00Z' },
+            { scheduleKey: 57080, timeslotId: 4, raceStart: '2026-02-14T14:00:00Z', raceEnd: '2026-02-14T16:30:00Z' }
+        ],
+        eventEndDate: '2026-02-15T00:00:00Z'  // Stop querying after this date
+    }
+};
+
 /**
  * Load event data by parsing the JS file
  */
@@ -248,7 +263,9 @@ function saveResults(careerEventId, eventKey, pen, results, metadata) {
             completedAt: metadata.completedAt,
             raceDate,  // Used by process-json-results.js for ordering
             fetchedAt: new Date().toISOString(),
-            source: 'api'
+            source: 'api',
+            // Include timeslotId for timed events (like Valentine's Invitational)
+            ...(metadata.timeslotId && { timeslotId: metadata.timeslotId })
         },
         results
     };
@@ -317,6 +334,134 @@ async function main() {
         }
     }
 
+    // Query timed special events (like Valentine's Invitational)
+    const now = new Date();
+    for (const [careerEventId, eventConfig] of Object.entries(TIMED_SCHEDULE_CONFIG)) {
+        const eventEndDate = new Date(eventConfig.eventEndDate);
+
+        // Skip if event has ended
+        if (now >= eventEndDate) {
+            console.log(`\nTimed Event ${careerEventId} (${eventConfig.eventName}): Past end date, skipping`);
+            continue;
+        }
+
+        console.log(`\nQuerying Timed Event ${careerEventId} (${eventConfig.eventName})...`);
+
+        // Group races by scheduleKey to avoid duplicate API calls
+        const racesByScheduleKey = {};
+        for (const race of eventConfig.races) {
+            const raceStart = new Date(race.raceStart);
+
+            // Only query if race start time has passed
+            if (now >= raceStart) {
+                if (!racesByScheduleKey[race.scheduleKey]) {
+                    racesByScheduleKey[race.scheduleKey] = [];
+                }
+                racesByScheduleKey[race.scheduleKey].push(race);
+            }
+        }
+
+        if (Object.keys(racesByScheduleKey).length === 0) {
+            console.log(`  No races active yet (before first race start time)`);
+            continue;
+        }
+
+        // Query each unique scheduleKey once
+        for (const [scheduleKey, races] of Object.entries(racesByScheduleKey)) {
+            try {
+                console.log(`  Querying scheduleKey ${scheduleKey} for timeslots: ${races.map(r => r.timeslotId).join(', ')}...`);
+
+                // Fetch results directly using the scheduleKey
+                const allResults = await fetchResults(parseInt(scheduleKey), null);
+
+                if (!allResults || allResults.length === 0) {
+                    console.log(`    No results yet`);
+                    continue;
+                }
+
+                console.log(`    Retrieved ${allResults.length} total results`);
+
+                // Group results by pen
+                const resultsByPen = {};
+                for (const result of allResults) {
+                    if (!resultsByPen[result.pen]) {
+                        resultsByPen[result.pen] = [];
+                    }
+                    resultsByPen[result.pen].push(result);
+                }
+
+                // For each pen, determine which timeslot it belongs to based on timestamp
+                for (const [pen, penResults] of Object.entries(resultsByPen)) {
+                    // Get the race completion time from the first result's timestamp or metadata
+                    // We'll use a synthetic eventKey based on scheduleKey + pen + timeslot
+                    const firstResult = penResults[0];
+
+                    // For duplicate scheduleKeys (like 57080), match to correct timeslot by checking time windows
+                    let matchedRace = null;
+                    if (races.length === 1) {
+                        // Only one race for this scheduleKey, use it
+                        matchedRace = races[0];
+                    } else {
+                        // Multiple races share this scheduleKey, need to determine by time
+                        // Since we don't have completedAt in results, we check if there's already a
+                        // processed result for the earlier timeslot
+                        const eventKeyBase = `${scheduleKey}_${pen}`;
+
+                        // Sort races by start time
+                        const sortedRaces = [...races].sort((a, b) =>
+                            new Date(a.raceStart).getTime() - new Date(b.raceStart).getTime()
+                        );
+
+                        // Check which timeslots have already been processed
+                        for (const race of sortedRaces) {
+                            const eventKey = `${eventKeyBase}_ts${race.timeslotId}`;
+                            if (!processedKeys.has(eventKey)) {
+                                matchedRace = race;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (!matchedRace) {
+                        console.log(`    Pen ${pen}: All timeslots already processed`);
+                        continue;
+                    }
+
+                    // Create a unique eventKey for this pen + timeslot combination
+                    const eventKey = `${scheduleKey}_${pen}_ts${matchedRace.timeslotId}`;
+
+                    if (processedKeys.has(eventKey)) {
+                        console.log(`    Pen ${pen} (timeslot ${matchedRace.timeslotId}): Already processed`);
+                        continue;
+                    }
+
+                    console.log(`    Pen ${pen} (timeslot ${matchedRace.timeslotId}): ${penResults.length} results - NEW`);
+
+                    // Add to allNewRaces for processing
+                    allNewRaces.push({
+                        careerEventId: parseInt(careerEventId),
+                        eventKey: eventKey,
+                        pen: parseInt(pen),
+                        scheduleKey: parseInt(scheduleKey),
+                        accessCode: null,
+                        completedAt: new Date().toISOString(), // Use current time as approximation
+                        name: eventConfig.eventName,
+                        timeslotId: matchedRace.timeslotId,
+                        penToEventKey: { [pen]: eventKey },
+                        // Pre-fetched results to avoid re-fetching
+                        prefetchedResults: penResults
+                    });
+                }
+
+                await new Promise(resolve => setTimeout(resolve, 200));
+
+            } catch (error) {
+                console.log(`    Error: ${error.message}`);
+                errors.push({ eventId: careerEventId, scheduleKey, error: error.message });
+            }
+        }
+    }
+
     // Process new races - fetch results and save as JSON
     const savedFiles = [];
     const newEventKeys = [];
@@ -326,9 +471,36 @@ async function main() {
         console.log('=== FETCHING RESULTS ===');
         console.log('='.repeat(50) + '\n');
 
-        // Group races by scheduleKey to minimize API calls
+        // Separate pre-fetched races (from timed events) from regular races
+        const prefetchedRaces = allNewRaces.filter(r => r.prefetchedResults);
+        const regularRaces = allNewRaces.filter(r => !r.prefetchedResults);
+
+        // Process pre-fetched results (from timed events like Valentine's)
+        for (const race of prefetchedRaces) {
+            console.log(`Saving pre-fetched results for Event ${race.careerEventId} (${race.name})...`);
+            console.log(`  Pen ${race.pen} (eventKey ${race.eventKey}, timeslot ${race.timeslotId}): ${race.prefetchedResults.length} results`);
+
+            const filePath = saveResults(
+                race.careerEventId,
+                race.eventKey,
+                race.pen,
+                race.prefetchedResults,
+                {
+                    scheduleKey: race.scheduleKey,
+                    accessCode: race.accessCode,
+                    name: race.name,
+                    completedAt: race.completedAt,
+                    timeslotId: race.timeslotId
+                }
+            );
+            savedFiles.push(filePath);
+            newEventKeys.push(race.eventKey);
+            console.log(`  Saved: ${path.basename(filePath)}`);
+        }
+
+        // Group regular races by scheduleKey to minimize API calls
         const racesByScheduleKey = {};
-        for (const race of allNewRaces) {
+        for (const race of regularRaces) {
             if (!racesByScheduleKey[race.scheduleKey]) {
                 racesByScheduleKey[race.scheduleKey] = {
                     accessCode: race.accessCode,
@@ -385,7 +557,13 @@ async function main() {
                     processedKeysData.processedEventKeys.push(key);
                 }
             }
-            processedKeysData.processedEventKeys.sort((a, b) => a - b);
+            // Sort numerically for numbers, alphabetically for strings
+            processedKeysData.processedEventKeys.sort((a, b) => {
+                const aNum = typeof a === 'number' ? a : parseInt(a);
+                const bNum = typeof b === 'number' ? b : parseInt(b);
+                if (!isNaN(aNum) && !isNaN(bNum)) return aNum - bNum;
+                return String(a).localeCompare(String(b));
+            });
             saveProcessedKeys(processedKeysData);
             console.log(`Added ${newEventKeys.length} new eventKey(s) to processed list`);
         }
