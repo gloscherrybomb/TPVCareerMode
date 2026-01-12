@@ -199,30 +199,8 @@ async function sendUserDiscordNotification(userData, eventResults, eventNumber, 
       });
     }
 
-    // Count and add awards if any earned
-    const awardsEarned = [
-      eventResults.earnedPunchingMedal,
-      eventResults.earnedGiantKillerMedal,
-      eventResults.earnedBullseyeMedal,
-      eventResults.earnedHotStreakMedal,
-      eventResults.earnedDomination,
-      eventResults.earnedCloseCall,
-      eventResults.earnedPhotoFinish,
-      eventResults.earnedDarkHorse,
-      eventResults.earnedZeroToHero,
-      eventResults.earnedWindTunnel,
-      eventResults.earnedTheAccountant,
-      eventResults.earnedLanternRouge,
-      eventResults.earnedComeback,
-      eventResults.earnedPowerSurge,
-      eventResults.earnedSteadyEddie,
-      eventResults.earnedBlastOff,
-      eventResults.earnedSmoothOperator,
-      eventResults.earnedBunchKick,
-      eventResults.earnedGCGoldMedal,
-      eventResults.earnedGCSilverMedal,
-      eventResults.earnedGCBronzeMedal
-    ].filter(Boolean).length;
+    // Count awards from the earnedAwards array (includes all award types)
+    const awardsEarned = (eventResults.earnedAwards || []).length;
 
     if (awardsEarned > 0) {
       embed.fields.push({
@@ -360,30 +338,8 @@ async function sendPublicResultNotification(userData, eventResults, eventNumber,
       });
     }
 
-    // Count and add awards if any earned
-    const publicAwardsEarned = [
-      eventResults.earnedPunchingMedal,
-      eventResults.earnedGiantKillerMedal,
-      eventResults.earnedBullseyeMedal,
-      eventResults.earnedHotStreakMedal,
-      eventResults.earnedDomination,
-      eventResults.earnedCloseCall,
-      eventResults.earnedPhotoFinish,
-      eventResults.earnedDarkHorse,
-      eventResults.earnedZeroToHero,
-      eventResults.earnedWindTunnel,
-      eventResults.earnedTheAccountant,
-      eventResults.earnedLanternRouge,
-      eventResults.earnedComeback,
-      eventResults.earnedPowerSurge,
-      eventResults.earnedSteadyEddie,
-      eventResults.earnedBlastOff,
-      eventResults.earnedSmoothOperator,
-      eventResults.earnedBunchKick,
-      eventResults.earnedGCGoldMedal,
-      eventResults.earnedGCSilverMedal,
-      eventResults.earnedGCBronzeMedal
-    ].filter(Boolean).length;
+    // Count awards from the earnedAwards array (includes all award types)
+    const publicAwardsEarned = (eventResults.earnedAwards || []).length;
 
     if (publicAwardsEarned > 0) {
       embed.fields.push({
