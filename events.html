@@ -20,6 +20,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="result-notifications.css">
+    <!-- Color Palette Expansion - Event Type Colors -->
+    <link rel="stylesheet" href="color-palette-expansion.css">
 </head>
 <body>
     <div id="navbar-placeholder"></div>
@@ -394,6 +396,38 @@
             console.log('=== renderTimeline COMPLETE ===');
         }
 
+        // Helper function to get event type CSS class for color coding
+        function getEventTypeClass(eventType) {
+            if (!eventType) return '';
+            const typeMap = {
+                'Criterium': 'event-type-criterium',
+                'criterium': 'event-type-criterium',
+                'Classic': 'event-type-classic',
+                'classic': 'event-type-classic',
+                'road race': 'event-type-road-race',
+                'Road Race': 'event-type-road-race',
+                'Time Trial': 'event-type-time-trial',
+                'time trial': 'event-type-time-trial',
+                'Hill Climb': 'event-type-hill-climb',
+                'hill climb': 'event-type-hill-climb',
+                'Track': 'event-type-track',
+                'track': 'event-type-track',
+                'track elimination': 'event-type-track-elimination',
+                'Track Elimination': 'event-type-track-elimination',
+                'Points Race': 'event-type-points-race',
+                'points race': 'event-type-points-race',
+                'Gran Fondo': 'event-type-gran-fondo',
+                'gran fondo': 'event-type-gran-fondo',
+                'Gravel': 'event-type-gravel-race',
+                'gravel': 'event-type-gravel-race',
+                'gravel race': 'event-type-gravel-race',
+                'Gravel Race': 'event-type-gravel-race',
+                'Stage Race': 'event-type-stage-race',
+                'stage race': 'event-type-stage-race'
+            };
+            return typeMap[eventType] || '';
+        }
+
         // Render event sequence
         function renderEventSequence() {
             console.log('=== renderEventSequence START ===');
@@ -461,11 +495,12 @@
                         const selectedEventId = progressManager.getChoiceSelection(stage.stage);
                         const availableCount = progressManager.getAvailableOptionalEvents(stage.stage).length;
                         const selectedEvent = selectedEventId ? getEvent(selectedEventId) : null;
-                    
+                        const choiceEventTypeClass = selectedEvent ? getEventTypeClass(selectedEvent.type) : '';
+
                     return `
-                        <div class="sequence-stage ${status}" data-stage="${stage.stage}">
+                        <div class="sequence-stage ${status} ${choiceEventTypeClass}" data-stage="${stage.stage}" ${selectedEventId ? `data-event-id="${selectedEventId}"` : ''}>
                             <div class="stage-connector"></div>
-                            <div class="stage-card choice-card">
+                            <div class="stage-card choice-card ${choiceEventTypeClass}">
                                 <div class="stage-card-header">
                                     <span class="stage-number-badge">Stage ${stage.stage}</span>
                                     <span class="stage-type-badge choice">Rider's Choice</span>
@@ -547,7 +582,10 @@
                 } else {
                     // Mandatory stage
                     const event = getEvent(stage.eventId);
-                    
+
+                    // Get event type class for color coding
+                    const eventTypeClass = getEventTypeClass(event.type);
+
                     // Check if this is the Local Tour (event 13-15)
                     const isTourEvent = stage.eventId >= 13 && stage.eventId <= 15;
                     let tourProgressBadge = '';
@@ -555,11 +593,11 @@
                         // Use the tour progress from userData (already calculated above)
                         tourProgressBadge = `<div class="tour-progress-badge">${tourProgress.completed} of 3 stages completed</div>`;
                     }
-                    
+
                     return `
-                        <div class="sequence-stage ${status}" data-stage="${stage.stage}">
+                        <div class="sequence-stage ${status} ${eventTypeClass}" data-stage="${stage.stage}" data-event-id="${stage.eventId}">
                             <div class="stage-connector"></div>
-                            <div class="stage-card event-card-sequential">
+                            <div class="stage-card event-card-sequential ${eventTypeClass}">
                                 <div class="stage-card-header">
                                     <span class="stage-number-badge">Stage ${stage.stage}</span>
                                     <span class="stage-type-badge mandatory">Mandatory</span>
@@ -909,6 +947,7 @@
             grid.innerHTML = availableEvents.map(eventId => {
                 const event = getEvent(eventId);
                 const iconHtml = window.TPVIcons ? window.TPVIcons.getEventIcon(event, 'xl') : event.icon;
+                const eventTypeClass = getEventTypeClass(event.type);
 
                 // Build header image or fallback to icon
                 const headerHtml = event.headerImage ? `
@@ -927,7 +966,7 @@
                 `;
 
                 return `
-                    <div class="choice-event-card" onclick="selectChoiceEvent(${stage}, ${eventId})">
+                    <div class="choice-event-card ${eventTypeClass}" data-event-id="${eventId}" onclick="selectChoiceEvent(${stage}, ${eventId})">
                         ${headerHtml}
                         <div class="choice-event-content">
                             <h4>${event.name}</h4>

@@ -837,28 +837,30 @@
     padding: 0;
     background: var(--dark-card);
     border: 2px solid rgba(255, 255, 255, 0.05);
-    border-radius: 15px;
+    border-radius: 20px;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.4s ease;
     text-align: center;
     overflow: hidden;
+    position: relative;
+    z-index: 1;
 }
 
 .choice-event-card:hover {
     border-color: var(--accent-blue);
     transform: translateY(-5px);
-    box-shadow: 0 10px 30px rgba(69, 202, 255, 0.2);
+    box-shadow: 0 10px 40px rgba(69, 202, 255, 0.2);
 }
 
 .choice-event-card:hover .choice-event-image {
-    transform: scale(1.05);
+    transform: scale(1.02);
 }
 
 /* Choice event header image */
 .choice-event-image-container {
     position: relative;
     width: 100%;
-    height: 140px;
+    height: 200px;
     overflow: hidden;
 }
 
@@ -866,7 +868,7 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.3s ease;
+    transition: transform 0.4s ease;
 }
 
 .choice-event-image-container::after {
@@ -875,14 +877,29 @@
     bottom: 0;
     left: 0;
     right: 0;
-    height: 50px;
-    background: linear-gradient(transparent, rgba(20, 24, 36, 0.9));
+    height: 100px;
+    background: linear-gradient(
+        to bottom,
+        transparent 0%,
+        rgba(10, 14, 26, 0.4) 40%,
+        rgba(10, 14, 26, 0.95) 100%
+    );
     pointer-events: none;
+    z-index: 2;
 }
 
-/* Content area below image */
+/* Content area below image - overlaps with gradient fade */
 .choice-event-content {
-    padding: 1rem 1.5rem 1.5rem;
+    position: relative;
+    margin-top: -60px;
+    z-index: 3;
+    background: linear-gradient(
+        to bottom,
+        transparent 0%,
+        rgba(20, 24, 36, 0.85) 25px,
+        rgba(20, 24, 36, 1) 60px
+    );
+    padding: 2rem 1.5rem 1.5rem;
 }
 
 /* Fallback icon when no image */

@@ -221,28 +221,19 @@
 /* Special Event Card */
 .special-event-card {
     background: var(--dark-card);
-    border: 2px solid rgba(255, 170, 0, 0.3);
-    border-radius: 16px;
-    padding: 1.5rem;
+    border: 2px solid rgba(255, 255, 255, 0.05);
+    border-radius: 20px;
+    padding: 0;
     position: relative;
     overflow: hidden;
-    transition: all 0.3s ease;
-}
-
-.special-event-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, #ffaa00, #ffd700);
+    transition: all 0.4s ease;
+    z-index: 1;
 }
 
 .special-event-card:hover {
-    transform: translateY(-4px);
-    border-color: rgba(255, 170, 0, 0.6);
-    box-shadow: 0 10px 30px rgba(255, 170, 0, 0.15);
+    transform: translateY(-5px);
+    border-color: var(--accent-blue);
+    box-shadow: 0 10px 40px rgba(69, 202, 255, 0.2);
 }
 
 /* Coming Soon State */
@@ -291,10 +282,9 @@
 /* Event Header Image for Special Events */
 .special-event-card .event-header-image-container {
     position: relative;
-    width: calc(100% + 3rem);
-    margin: -1.5rem -1.5rem 0 -1.5rem;
+    width: 100%;
     overflow: hidden;
-    border-radius: 14px 14px 0 0;
+    border-radius: 18px 18px 0 0;
 }
 
 .special-event-card .event-header-image {
@@ -302,7 +292,7 @@
     height: 280px;
     object-fit: cover;
     display: block;
-    transition: transform 0.3s ease;
+    transition: transform 0.4s ease;
 }
 
 .special-event-card:hover .event-header-image {
@@ -417,7 +407,7 @@
 /* Event Status */
 .event-status {
     text-align: center;
-    padding-top: 1rem;
+    padding: 1rem 1.5rem 1.5rem;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 

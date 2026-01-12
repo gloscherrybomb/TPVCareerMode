@@ -1,0 +1,401 @@
+/* ===========================================
+   TPV Career Mode - Color Palette Expansion
+   Contextual colors for different event types
+   =========================================== */
+
+/* -----------------------------------------
+   NEW CSS VARIABLES - Extended Palette
+   ----------------------------------------- */
+:root {
+    /* Criterium/Crit - Electric Pink (existing accent, enhanced) */
+    --crit-primary: #ff1b6b;
+    --crit-glow: rgba(255, 27, 107, 0.25);
+    --crit-bg: rgba(255, 27, 107, 0.08);
+    --crit-border: rgba(255, 27, 107, 0.4);
+
+    /* Time Trial - Silver/Chrome Metallic */
+    --tt-primary: #94a3b8;
+    --tt-secondary: #cbd5e1;
+    --tt-glow: rgba(148, 163, 184, 0.35);
+    --tt-bg: rgba(148, 163, 184, 0.08);
+    --tt-border: rgba(148, 163, 184, 0.4);
+
+    /* Climbing/Hill Climb - Earthy Teal */
+    --climb-primary: #14b8a6;
+    --climb-glow: rgba(20, 184, 166, 0.25);
+    --climb-bg: rgba(20, 184, 166, 0.08);
+    --climb-border: rgba(20, 184, 166, 0.4);
+
+    /* Road Race/Classic - Warm Amber */
+    --road-primary: #f59e0b;
+    --road-glow: rgba(245, 158, 11, 0.25);
+    --road-bg: rgba(245, 158, 11, 0.08);
+    --road-border: rgba(245, 158, 11, 0.4);
+
+    /* Gravel - Warm Earth/Copper */
+    --gravel-primary: #c2956a;
+    --gravel-glow: rgba(194, 149, 106, 0.25);
+    --gravel-bg: rgba(194, 149, 106, 0.08);
+    --gravel-border: rgba(194, 149, 106, 0.4);
+
+    /* Track - Electric Blue */
+    --track-primary: #3b82f6;
+    --track-glow: rgba(59, 130, 246, 0.25);
+    --track-bg: rgba(59, 130, 246, 0.08);
+    --track-border: rgba(59, 130, 246, 0.4);
+
+    /* Points Race - Purple */
+    --points-primary: #a855f7;
+    --points-glow: rgba(168, 85, 247, 0.25);
+    --points-bg: rgba(168, 85, 247, 0.08);
+    --points-border: rgba(168, 85, 247, 0.4);
+
+    /* Gran Fondo/Endurance - Deep Green */
+    --fondo-primary: #22c55e;
+    --fondo-glow: rgba(34, 197, 94, 0.25);
+    --fondo-bg: rgba(34, 197, 94, 0.08);
+    --fondo-border: rgba(34, 197, 94, 0.4);
+
+    /* Stage Race/Tour - Royal Gold */
+    --tour-primary: #eab308;
+    --tour-glow: rgba(234, 179, 8, 0.3);
+    --tour-bg: rgba(234, 179, 8, 0.1);
+    --tour-border: rgba(234, 179, 8, 0.5);
+}
+
+/* -----------------------------------------
+   CRITERIUM EVENTS
+   ----------------------------------------- */
+.sequence-stage.event-type-criterium.unlocked .stage-card,
+.stage-card.event-type-criterium {
+    border-color: var(--crit-border);
+}
+
+.sequence-stage.event-type-criterium.unlocked .stage-card:hover {
+    box-shadow: 0 10px 40px var(--crit-glow);
+}
+
+.event-type-criterium .stage-type-badge.mandatory,
+.event-type-criterium .event-type-indicator {
+    background: var(--crit-bg);
+    color: var(--crit-primary);
+    border-color: var(--crit-border);
+}
+
+/* -----------------------------------------
+   TIME TRIAL EVENTS
+   ----------------------------------------- */
+.sequence-stage.event-type-time-trial.unlocked .stage-card,
+.stage-card.event-type-time-trial {
+    border-color: var(--tt-border);
+}
+
+.sequence-stage.event-type-time-trial.unlocked .stage-card:hover {
+    box-shadow: 0 10px 40px var(--tt-glow);
+}
+
+.event-type-time-trial .stage-type-badge.mandatory,
+.event-type-time-trial .event-type-indicator {
+    background: var(--tt-bg);
+    color: var(--tt-primary);
+    border-color: var(--tt-border);
+}
+
+/* Chrome shimmer effect for Time Trials */
+.stage-card.event-type-time-trial::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 50%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.03),
+        transparent
+    );
+    z-index: 10;
+    pointer-events: none;
+    transition: left 0.8s ease;
+}
+
+.stage-card.event-type-time-trial:hover::before {
+    left: 200%;
+}
+
+/* -----------------------------------------
+   CLIMBING / HILL CLIMB EVENTS
+   ----------------------------------------- */
+.sequence-stage.event-type-hill-climb.unlocked .stage-card,
+.stage-card.event-type-hill-climb {
+    border-color: var(--climb-border);
+}
+
+.sequence-stage.event-type-hill-climb.unlocked .stage-card:hover {
+    box-shadow: 0 10px 40px var(--climb-glow);
+}
+
+.event-type-hill-climb .stage-type-badge.mandatory,
+.event-type-hill-climb .event-type-indicator {
+    background: var(--climb-bg);
+    color: var(--climb-primary);
+    border-color: var(--climb-border);
+}
+
+/* -----------------------------------------
+   ROAD RACE / CLASSIC EVENTS
+   ----------------------------------------- */
+.sequence-stage.event-type-road-race.unlocked .stage-card,
+.sequence-stage.event-type-classic.unlocked .stage-card,
+.stage-card.event-type-road-race,
+.stage-card.event-type-classic {
+    border-color: var(--road-border);
+}
+
+.sequence-stage.event-type-road-race.unlocked .stage-card:hover,
+.sequence-stage.event-type-classic.unlocked .stage-card:hover {
+    box-shadow: 0 10px 40px var(--road-glow);
+}
+
+.event-type-road-race .stage-type-badge.mandatory,
+.event-type-classic .stage-type-badge.mandatory,
+.event-type-road-race .event-type-indicator,
+.event-type-classic .event-type-indicator {
+    background: var(--road-bg);
+    color: var(--road-primary);
+    border-color: var(--road-border);
+}
+
+/* -----------------------------------------
+   GRAVEL EVENTS
+   ----------------------------------------- */
+.sequence-stage.event-type-gravel-race.unlocked .stage-card,
+.stage-card.event-type-gravel-race {
+    border-color: var(--gravel-border);
+}
+
+.sequence-stage.event-type-gravel-race.unlocked .stage-card:hover {
+    box-shadow: 0 10px 40px var(--gravel-glow);
+}
+
+.event-type-gravel-race .stage-type-badge.mandatory,
+.event-type-gravel-race .event-type-indicator {
+    background: var(--gravel-bg);
+    color: var(--gravel-primary);
+    border-color: var(--gravel-border);
+}
+
+/* -----------------------------------------
+   TRACK EVENTS
+   ----------------------------------------- */
+.sequence-stage.event-type-track.unlocked .stage-card,
+.sequence-stage.event-type-track-elimination.unlocked .stage-card,
+.stage-card.event-type-track,
+.stage-card.event-type-track-elimination {
+    border-color: var(--track-border);
+}
+
+.sequence-stage.event-type-track.unlocked .stage-card:hover,
+.sequence-stage.event-type-track-elimination.unlocked .stage-card:hover {
+    box-shadow: 0 10px 40px var(--track-glow);
+}
+
+.event-type-track .stage-type-badge.mandatory,
+.event-type-track-elimination .stage-type-badge.mandatory,
+.event-type-track .event-type-indicator,
+.event-type-track-elimination .event-type-indicator {
+    background: var(--track-bg);
+    color: var(--track-primary);
+    border-color: var(--track-border);
+}
+
+/* -----------------------------------------
+   POINTS RACE EVENTS
+   ----------------------------------------- */
+.sequence-stage.event-type-points-race.unlocked .stage-card,
+.stage-card.event-type-points-race {
+    border-color: var(--points-border);
+}
+
+.sequence-stage.event-type-points-race.unlocked .stage-card:hover {
+    box-shadow: 0 10px 40px var(--points-glow);
+}
+
+.event-type-points-race .stage-type-badge.mandatory,
+.event-type-points-race .event-type-indicator {
+    background: var(--points-bg);
+    color: var(--points-primary);
+    border-color: var(--points-border);
+}
+
+/* -----------------------------------------
+   GRAN FONDO / ENDURANCE EVENTS
+   ----------------------------------------- */
+.sequence-stage.event-type-gran-fondo.unlocked .stage-card,
+.stage-card.event-type-gran-fondo {
+    border-color: var(--fondo-border);
+}
+
+.sequence-stage.event-type-gran-fondo.unlocked .stage-card:hover {
+    box-shadow: 0 10px 40px var(--fondo-glow);
+}
+
+.event-type-gran-fondo .stage-type-badge.mandatory,
+.event-type-gran-fondo .event-type-indicator {
+    background: var(--fondo-bg);
+    color: var(--fondo-primary);
+    border-color: var(--fondo-border);
+}
+
+/* -----------------------------------------
+   STAGE RACE / TOUR EVENTS
+   ----------------------------------------- */
+.sequence-stage.event-type-stage-race.unlocked .stage-card,
+.stage-card.event-type-stage-race {
+    border-color: var(--tour-border);
+}
+
+.sequence-stage.event-type-stage-race.unlocked .stage-card:hover {
+    box-shadow: 0 10px 40px var(--tour-glow);
+}
+
+.event-type-stage-race .stage-type-badge.mandatory,
+.event-type-stage-race .event-type-indicator {
+    background: var(--tour-bg);
+    color: var(--tour-primary);
+    border-color: var(--tour-border);
+}
+
+/* Special golden glow for tour events */
+.stage-card.event-type-stage-race {
+    background: linear-gradient(
+        135deg,
+        var(--dark-card) 0%,
+        rgba(234, 179, 8, 0.03) 100%
+    );
+}
+
+/* -----------------------------------------
+   EVENT TYPE LEGEND
+   ----------------------------------------- */
+.event-type-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding: 1rem 1.5rem;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    margin-bottom: 2rem;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.legend-dot.criterium { background: var(--crit-primary); }
+.legend-dot.time-trial { background: var(--tt-primary); }
+.legend-dot.hill-climb { background: var(--climb-primary); }
+.legend-dot.road-race { background: var(--road-primary); }
+.legend-dot.gravel { background: var(--gravel-primary); }
+.legend-dot.track { background: var(--track-primary); }
+.legend-dot.points-race { background: var(--points-primary); }
+.legend-dot.gran-fondo { background: var(--fondo-primary); }
+.legend-dot.stage-race { background: var(--tour-primary); }
+
+/* -----------------------------------------
+   CHOICE EVENT CARD COLOR CODING
+   In the choice modal, show event types with colors
+   ----------------------------------------- */
+.choice-event-card.event-type-criterium { border-color: var(--crit-border); }
+.choice-event-card.event-type-time-trial { border-color: var(--tt-border); }
+.choice-event-card.event-type-hill-climb { border-color: var(--climb-border); }
+.choice-event-card.event-type-road-race,
+.choice-event-card.event-type-classic { border-color: var(--road-border); }
+.choice-event-card.event-type-gravel-race { border-color: var(--gravel-border); }
+.choice-event-card.event-type-track { border-color: var(--track-border); }
+.choice-event-card.event-type-points-race { border-color: var(--points-border); }
+.choice-event-card.event-type-gran-fondo { border-color: var(--fondo-border); }
+.choice-event-card.event-type-stage-race { border-color: var(--tour-border); }
+
+.choice-event-card.event-type-criterium:hover { box-shadow: 0 10px 40px var(--crit-glow); border-color: var(--crit-primary); }
+.choice-event-card.event-type-time-trial:hover { box-shadow: 0 10px 40px var(--tt-glow); border-color: var(--tt-primary); }
+.choice-event-card.event-type-hill-climb:hover { box-shadow: 0 10px 40px var(--climb-glow); border-color: var(--climb-primary); }
+.choice-event-card.event-type-road-race:hover,
+.choice-event-card.event-type-classic:hover { box-shadow: 0 10px 40px var(--road-glow); border-color: var(--road-primary); }
+.choice-event-card.event-type-gravel-race:hover { box-shadow: 0 10px 40px var(--gravel-glow); border-color: var(--gravel-primary); }
+.choice-event-card.event-type-track:hover { box-shadow: 0 10px 40px var(--track-glow); border-color: var(--track-primary); }
+.choice-event-card.event-type-points-race:hover { box-shadow: 0 10px 40px var(--points-glow); border-color: var(--points-primary); }
+.choice-event-card.event-type-gran-fondo:hover { box-shadow: 0 10px 40px var(--fondo-glow); border-color: var(--fondo-primary); }
+.choice-event-card.event-type-stage-race:hover { box-shadow: 0 10px 40px var(--tour-glow); border-color: var(--tour-primary); }
+
+/* -----------------------------------------
+   SPECIAL EVENT CARDS
+   Color coding for special-events.html
+   ----------------------------------------- */
+.special-event-card.event-type-criterium { border-color: var(--crit-border); }
+.special-event-card.event-type-time-trial { border-color: var(--tt-border); }
+.special-event-card.event-type-hill-climb { border-color: var(--climb-border); }
+.special-event-card.event-type-road-race,
+.special-event-card.event-type-classic { border-color: var(--road-border); }
+.special-event-card.event-type-gravel-race { border-color: var(--gravel-border); }
+.special-event-card.event-type-track,
+.special-event-card.event-type-track-elimination { border-color: var(--track-border); }
+.special-event-card.event-type-points-race { border-color: var(--points-border); }
+.special-event-card.event-type-gran-fondo { border-color: var(--fondo-border); }
+.special-event-card.event-type-stage-race { border-color: var(--tour-border); }
+
+.special-event-card.event-type-criterium:hover { box-shadow: 0 10px 40px var(--crit-glow); border-color: var(--crit-primary); }
+.special-event-card.event-type-time-trial:hover { box-shadow: 0 10px 40px var(--tt-glow); border-color: var(--tt-primary); }
+.special-event-card.event-type-hill-climb:hover { box-shadow: 0 10px 40px var(--climb-glow); border-color: var(--climb-primary); }
+.special-event-card.event-type-road-race:hover,
+.special-event-card.event-type-classic:hover { box-shadow: 0 10px 40px var(--road-glow); border-color: var(--road-primary); }
+.special-event-card.event-type-gravel-race:hover { box-shadow: 0 10px 40px var(--gravel-glow); border-color: var(--gravel-primary); }
+.special-event-card.event-type-track:hover,
+.special-event-card.event-type-track-elimination:hover { box-shadow: 0 10px 40px var(--track-glow); border-color: var(--track-primary); }
+.special-event-card.event-type-points-race:hover { box-shadow: 0 10px 40px var(--points-glow); border-color: var(--points-primary); }
+.special-event-card.event-type-gran-fondo:hover { box-shadow: 0 10px 40px var(--fondo-glow); border-color: var(--fondo-primary); }
+.special-event-card.event-type-stage-race:hover { box-shadow: 0 10px 40px var(--tour-glow); border-color: var(--tour-primary); }
+
+/* Event type badge colors for special events */
+.special-event-card.event-type-criterium .event-type { color: var(--crit-primary); }
+.special-event-card.event-type-time-trial .event-type { color: var(--tt-primary); }
+.special-event-card.event-type-hill-climb .event-type { color: var(--climb-primary); }
+.special-event-card.event-type-road-race .event-type,
+.special-event-card.event-type-classic .event-type { color: var(--road-primary); }
+.special-event-card.event-type-gravel-race .event-type { color: var(--gravel-primary); }
+.special-event-card.event-type-track .event-type,
+.special-event-card.event-type-track-elimination .event-type { color: var(--track-primary); }
+.special-event-card.event-type-points-race .event-type { color: var(--points-primary); }
+.special-event-card.event-type-gran-fondo .event-type { color: var(--fondo-primary); }
+.special-event-card.event-type-stage-race .event-type { color: var(--tour-primary); }
+
+/* -----------------------------------------
+   MOBILE RESPONSIVENESS
+   ----------------------------------------- */
+@media (max-width: 768px) {
+    .event-type-legend {
+        gap: 0.75rem;
+        padding: 0.75rem 1rem;
+    }
+
+    .legend-item {
+        font-size: 0.7rem;
+    }
+
+    .legend-dot {
+        width: 8px;
+        height: 8px;
+    }
+}

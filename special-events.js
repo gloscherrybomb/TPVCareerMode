@@ -8,6 +8,38 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+// Helper function to get event type CSS class for color coding
+function getEventTypeClass(eventType) {
+    if (!eventType) return '';
+    const typeMap = {
+        'Criterium': 'event-type-criterium',
+        'criterium': 'event-type-criterium',
+        'Classic': 'event-type-classic',
+        'classic': 'event-type-classic',
+        'road race': 'event-type-road-race',
+        'Road Race': 'event-type-road-race',
+        'Time Trial': 'event-type-time-trial',
+        'time trial': 'event-type-time-trial',
+        'Hill Climb': 'event-type-hill-climb',
+        'hill climb': 'event-type-hill-climb',
+        'Track': 'event-type-track',
+        'track': 'event-type-track',
+        'track elimination': 'event-type-track-elimination',
+        'Track Elimination': 'event-type-track-elimination',
+        'Points Race': 'event-type-points-race',
+        'points race': 'event-type-points-race',
+        'Gran Fondo': 'event-type-gran-fondo',
+        'gran fondo': 'event-type-gran-fondo',
+        'Gravel': 'event-type-gravel-race',
+        'gravel': 'event-type-gravel-race',
+        'gravel race': 'event-type-gravel-race',
+        'Gravel Race': 'event-type-gravel-race',
+        'Stage Race': 'event-type-stage-race',
+        'stage race': 'event-type-stage-race'
+    };
+    return typeMap[eventType] || '';
+}
+
 // DOM Elements
 const loadingState = document.getElementById('loadingState');
 const loginPrompt = document.getElementById('loginPrompt');
@@ -182,7 +214,8 @@ function renderSpecialEvents() {
 // Create an event card element for available events
 function createEventCard(event, isFreeEvent = false) {
     const card = document.createElement('div');
-    card.className = 'special-event-card unlocked';
+    const eventTypeClass = getEventTypeClass(event.type);
+    card.className = `special-event-card unlocked ${eventTypeClass}`;
 
     const badgeText = isFreeEvent ? 'Available' : 'Unlocked';
     const iconHtml = window.TPVIcons ? window.TPVIcons.getEventIcon(event, 'xl') : event.icon;
@@ -235,7 +268,8 @@ function createEventCard(event, isFreeEvent = false) {
 // Create a Coming Soon event card (for admin preview or coming-soon events)
 function createComingSoonCard(event, isAdminPreview = false) {
     const card = document.createElement('div');
-    card.className = isAdminPreview ? 'special-event-card admin-preview' : 'special-event-card coming-soon';
+    const eventTypeClass = getEventTypeClass(event.type);
+    card.className = isAdminPreview ? `special-event-card admin-preview ${eventTypeClass}` : `special-event-card coming-soon ${eventTypeClass}`;
 
     const iconHtml = window.TPVIcons ? window.TPVIcons.getEventIcon(event, 'xl') : event.icon;
 
@@ -294,7 +328,8 @@ function createComingSoonCard(event, isAdminPreview = false) {
 // Create a Completed event card
 function createCompletedEventCard(event) {
     const card = document.createElement('div');
-    card.className = 'special-event-card completed';
+    const eventTypeClass = getEventTypeClass(event.type);
+    card.className = `special-event-card completed ${eventTypeClass}`;
 
     const iconHtml = window.TPVIcons ? window.TPVIcons.getEventIcon(event, 'xl') : event.icon;
 
