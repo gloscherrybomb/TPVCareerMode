@@ -1420,8 +1420,13 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
 
     // Build list of previously completed events sorted by timestamp (for Zero to Hero & Hot Streak)
     // Events are NOT completed in numerical order, so we must use chronological ordering
+    // Include both season events (1-15) and special events (101+)
     const previousEventsChronological = [];
-    for (let i = 1; i <= 15; i++) {
+    const allEventNumbers = [
+      ...Array.from({length: 15}, (_, i) => i + 1),  // Season 1: events 1-15
+      101, 102, 103, 104, 105, 106, 107, 108, 109, 110  // Special events
+    ];
+    for (const i of allEventNumbers) {
       if (i !== eventNumber && userData[`event${i}Results`]) {
         const evtData = userData[`event${i}Results`];
         const timestamp = evtData.raceDate || evtData.processedAt;
@@ -1451,21 +1456,23 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
       console.log('   🎯 BULLSEYE! Finished exactly at predicted position');
     }
 
-    // Hot Streak - 3 consecutive wins (chronological order, not event number)
-    if (position === 1) {
-      let consecutiveWins = 1; // Current win counts
+    // Hot Streak - Beat prediction 3 events in a row (chronological order)
+    if (predictedPosition && position < predictedPosition) {
+      let streak = 1; // Current event beats prediction
       // Check previous events in chronological order (most recent first)
-      for (let i = 0; i < previousEventsChronological.length; i++) {
+      for (let i = 0; i < Math.min(2, previousEventsChronological.length); i++) {
         const prevResult = previousEventsChronological[i].data;
-        if (prevResult && prevResult.position === 1) {
-          consecutiveWins++;
+        if (prevResult && prevResult.predictedPosition &&
+            prevResult.position !== 'DNF' &&
+            prevResult.position < prevResult.predictedPosition) {
+          streak++;
         } else {
           break;
         }
       }
-      if (consecutiveWins >= 3) {
+      if (streak >= 3) {
         earnedHotStreakMedal = true;
-        console.log(`   🔥 HOT STREAK! ${consecutiveWins} consecutive wins`);
+        console.log(`   🔥 HOT STREAK! Beat prediction ${streak} events in a row`);
       }
     }
 
@@ -2183,19 +2190,29 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
   }
   
   // Check for special event-based awards
-  
-  // PODIUM STREAK - 5 consecutive top 3 finishes
-  // Get the last 4 event results (before this one)
-  const recentPositions = [];
-  for (let i = 1; i <= 15; i++) {
-    if (userData[`event${i}Results`] && userData[`event${i}Results`].position) {
-      recentPositions.push(userData[`event${i}Results`].position);
+  // Build chronologically sorted list of all events (season + special) for streak calculations
+  const allEventNumbersForStreaks = [
+    ...Array.from({length: 15}, (_, i) => i + 1),  // Season 1: events 1-15
+    101, 102, 103, 104, 105, 106, 107, 108, 109, 110  // Special events
+  ];
+  const chronologicalEventsForStreaks = [];
+  for (const evtNum of allEventNumbersForStreaks) {
+    if (evtNum !== eventNumber && userData[`event${evtNum}Results`]) {
+      const evtData = userData[`event${evtNum}Results`];
+      const timestamp = evtData.raceDate || evtData.processedAt;
+      const timestampMs = timestamp ? (timestamp.toDate ? timestamp.toDate().getTime() : new Date(timestamp).getTime()) : 0;
+      chronologicalEventsForStreaks.push({ eventNum: evtNum, timestamp: timestampMs, position: evtData.position });
     }
   }
-  
+  // Sort by timestamp ascending (oldest first) for streak checking
+  chronologicalEventsForStreaks.sort((a, b) => a.timestamp - b.timestamp);
+
+  // PODIUM STREAK - 5 consecutive top 3 finishes (chronological order)
+  const recentPositions = chronologicalEventsForStreaks.map(e => e.position).filter(p => p && p !== 'DNF');
+
   // Add current position
   recentPositions.push(position);
-  
+
   // Check if last 5 results are all top 3
   if (recentPositions.length >= 5) {
     const last5 = recentPositions.slice(-5);
@@ -2207,15 +2224,15 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
       eventResults.earnedAwards.push({ awardId: 'podiumStreak', category: 'performance', intensity: 'flashy' });
     }
   }
-  
-  // COMEBACK KID - Top 5 after bottom half finish
-  if (recentPositions.length >= 2 && position <= 5) {
-    const previousPosition = recentPositions[recentPositions.length - 2];
+
+  // COMEBACK KID - Top 5 after bottom half finish (uses chronological previous event)
+  if (chronologicalEventsForStreaks.length >= 1 && position <= 5) {
+    const previousPosition = chronologicalEventsForStreaks[chronologicalEventsForStreaks.length - 1].position;
     // Use finishers only (exclude DNFs) for accurate bottom half calculation
     const totalFinishers = results.filter(r => r.Position !== 'DNF' && !isNaN(parseInt(r.Position))).length;
     const bottomHalf = totalFinishers / 2;
 
-    if (previousPosition > bottomHalf) {
+    if (previousPosition && previousPosition !== 'DNF' && previousPosition > bottomHalf) {
       console.log(`   🔄 COMEBACK KID! Top 5 finish after position ${previousPosition}`);
       updates['awards.comeback'] = admin.firestore.FieldValue.increment(1);
       eventResults.earnedComeback = true;
@@ -2223,15 +2240,10 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
     }
   }
 
-  // BACK TO BACK - Win 2 races in a row
-  if (position === 1) {
-    const previousPositions = [];
-    for (let i = 1; i <= 15; i++) {
-      if (userData[`event${i}Results`] && userData[`event${i}Results`].position) {
-        previousPositions.push(userData[`event${i}Results`].position);
-      }
-    }
-    if (previousPositions.length > 0 && previousPositions[previousPositions.length - 1] === 1) {
+  // BACK TO BACK - Win 2 races in a row (uses chronological previous event)
+  if (position === 1 && chronologicalEventsForStreaks.length > 0) {
+    const mostRecentPrevPosition = chronologicalEventsForStreaks[chronologicalEventsForStreaks.length - 1].position;
+    if (mostRecentPrevPosition === 1) {
       console.log('   🔁 BACK TO BACK! 2 consecutive wins');
       updates['awards.backToBack'] = admin.firestore.FieldValue.increment(1);
       eventResults.earnedAwards.push({ awardId: 'backToBack', category: 'performance', intensity: 'flashy' });
@@ -2249,13 +2261,14 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
   }
 
   // WEEKEND WARRIOR - Complete 5+ weekend events (Saturday/Sunday) (one-time award)
+  // Include both season events (1-15) and special events (101+)
   const currentWeekendWarrior = userData.awards?.weekendWarrior || 0;
   if (currentWeekendWarrior === 0) {
     // Count weekend events from previous results
     // Use raceDate if available (actual race date), otherwise fall back to processedAt
     let weekendEventCount = 0;
-    for (let i = 1; i <= 15; i++) {
-      const evtData = userData[`event${i}Results`];
+    for (const evtNum of allEventNumbersForStreaks) {
+      const evtData = userData[`event${evtNum}Results`];
       if (evtData) {
         // Prefer raceDate (actual race date from filename) over processedAt (when results were processed)
         let date = null;
@@ -2287,10 +2300,11 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
   }
 
   // OVERRATED - Finish worse than predicted 5+ times (one-time award)
+  // Include both season events (1-15) and special events (101+)
   if (!isDNF && predictedPosition && position > predictedPosition) {
     let worseThanPredicted = 1;
-    for (let i = 1; i <= 15; i++) {
-      const evtData = userData[`event${i}Results`];
+    for (const evtNum of allEventNumbersForStreaks) {
+      const evtData = userData[`event${evtNum}Results`];
       if (evtData && evtData.position && evtData.predictedPosition &&
           evtData.position > evtData.predictedPosition) {
         worseThanPredicted++;
@@ -2305,10 +2319,11 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
   }
 
   // TECHNICAL ISSUES - DNF 3+ times (one-time award)
+  // Include both season events (1-15) and special events (101+)
   if (isDNF) {
     let dnfCount = 1;
-    for (let i = 1; i <= 15; i++) {
-      const evtData = userData[`event${i}Results`];
+    for (const evtNum of allEventNumbersForStreaks) {
+      const evtData = userData[`event${evtNum}Results`];
       if (evtData && (evtData.position === null || evtData.position === 'DNF')) {
         dnfCount++;
       }
