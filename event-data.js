@@ -571,8 +571,8 @@ This is more than a race—it's a statement. While the world celebrates hearts a
                 id: 1,
                 day: "Day 1",
                 utcDateTime: "2026-02-13T12:30:00Z",
-                signupUrl: "https://tpvirtualhub.com/57080",
-                scheduleKey: 57080
+                signupUrl: "https://tpvirtualhub.com/57077",
+                scheduleKey: 57077
             },
             {
                 id: 2,

@@ -43,7 +43,7 @@ const TIMED_SCHEDULE_CONFIG = {
     103: {
         eventName: "Valentine's Invitational",
         races: [
-            { scheduleKey: 57080, timeslotId: 1, raceStart: '2026-02-13T12:30:00Z', raceEnd: '2026-02-13T14:30:00Z' },
+            { scheduleKey: 57077, timeslotId: 1, raceStart: '2026-02-13T12:30:00Z', raceEnd: '2026-02-13T14:30:00Z' },
             { scheduleKey: 57078, timeslotId: 2, raceStart: '2026-02-13T19:00:00Z', raceEnd: '2026-02-13T21:30:00Z' },
             { scheduleKey: 57079, timeslotId: 3, raceStart: '2026-02-14T09:00:00Z', raceEnd: '2026-02-14T11:30:00Z' },
             { scheduleKey: 57080, timeslotId: 4, raceStart: '2026-02-14T14:00:00Z', raceEnd: '2026-02-14T16:30:00Z' }
