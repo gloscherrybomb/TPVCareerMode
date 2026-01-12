@@ -307,7 +307,8 @@ const UNLOCK_DEFINITIONS = [
     narrative: 'Some riders let their results do the talking. Others let their wallet do the talking. You? You do both.',
     emoji: '💰',
     emojiFallback: '$',
-    isFlair: true
+    isFlair: true,
+    imagePath: 'unlock-images/moneyBags.png'
   },
   // Special Event Unlocks
   {
