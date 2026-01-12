@@ -1209,7 +1209,7 @@ function displayAwardsTable() {
 function displayPowerRecords() {
     const powerRecords = userData.powerRecords;
     const section = document.getElementById('powerRecordsSection');
-    const grid = document.getElementById('powerRecordsGrid');
+    const list = document.getElementById('powerRecordsList');
 
     // Hide section if no power records
     if (!powerRecords || Object.keys(powerRecords).length === 0) {
@@ -1221,48 +1221,13 @@ function displayPowerRecords() {
 
     // Define the records to display
     const recordItems = [
-        {
-            key: 'maxPowerEver',
-            label: 'Max Power Ever',
-            icon: '💥',
-            unit: 'W'
-        },
-        {
-            key: 'bestAvgPower',
-            label: 'Best Avg Power',
-            icon: '⚡',
-            unit: 'W'
-        },
-        {
-            key: 'bestNrmPower',
-            label: 'Best Normalized Power',
-            icon: '📊',
-            unit: 'W'
-        },
-        {
-            key: 'bestAvgPower20km',
-            label: 'Best AP (20km+)',
-            icon: '🛣️',
-            unit: 'W'
-        },
-        {
-            key: 'bestNrmPower20km',
-            label: 'Best NP (20km+)',
-            icon: '🛣️',
-            unit: 'W'
-        },
-        {
-            key: 'bestAvgPower40km',
-            label: 'Best AP (40km+)',
-            icon: '🏔️',
-            unit: 'W'
-        },
-        {
-            key: 'bestNrmPower40km',
-            label: 'Best NP (40km+)',
-            icon: '🏔️',
-            unit: 'W'
-        }
+        { key: 'maxPowerEver', label: 'Max Power Ever', unit: 'W' },
+        { key: 'bestAvgPower', label: 'Best Avg Power', unit: 'W' },
+        { key: 'bestNrmPower', label: 'Best Normalized Power', unit: 'W' },
+        { key: 'bestAvgPower20km', label: 'Best AP (20km+)', unit: 'W' },
+        { key: 'bestNrmPower20km', label: 'Best NP (20km+)', unit: 'W' },
+        { key: 'bestAvgPower40km', label: 'Best AP (40km+)', unit: 'W' },
+        { key: 'bestNrmPower40km', label: 'Best NP (40km+)', unit: 'W' }
     ];
 
     let html = '';
@@ -1272,16 +1237,14 @@ function displayPowerRecords() {
         const hasValue = record && record.value;
 
         html += `
-            <div class="power-record-card${hasValue ? '' : ' empty'}">
-                <div class="record-icon">${item.icon}</div>
-                <div class="record-label">${item.label}</div>
-                <div class="record-value">${hasValue ? record.value + item.unit : '—'}</div>
-                <div class="record-event">${hasValue ? (record.eventName || '') : 'No data yet'}</div>
+            <div class="stat-row">
+                <span class="stat-row-label">${item.label}:</span>
+                <span class="stat-row-value">${hasValue ? record.value + item.unit : '—'}</span>
             </div>
         `;
     });
 
-    grid.innerHTML = html;
+    list.innerHTML = html;
 }
 
 // Map event number to stage number based on user's choice selections
