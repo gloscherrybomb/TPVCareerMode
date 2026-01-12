@@ -38,7 +38,8 @@ async function createUnlockCard(unlock, options = {}) {
   }
 
   // Try to load image, fallback to emoji (skip for locked cards)
-  const imageSrc = isLocked ? null : await loadUnlockImage(unlock.id);
+  // Use custom imagePath if defined, otherwise look in unlock-images folder
+  const imageSrc = isLocked ? null : (unlock.imagePath || await loadUnlockImage(unlock.id));
 
   // Build card HTML
   card.innerHTML = `
@@ -232,9 +233,11 @@ function createUnlockCardSync(unlock, options = {}) {
     card.addEventListener('click', onClick);
   }
 
-  // Start with emoji, load image in background (skip image loading for locked cards)
+  // Start with emoji or custom image path, load image in background (skip image loading for locked cards)
+  // If unlock has a custom imagePath, use it directly
+  const initialImageSrc = !isLocked && unlock.imagePath ? unlock.imagePath : null;
   card.innerHTML = `
-    ${createImageArea(unlock, null, size, isLocked)}
+    ${createImageArea(unlock, initialImageSrc, size, isLocked)}
     ${createCardBody(unlock, size, showTrigger, showNarrative, showCost, isLocked)}
   `;
 
@@ -246,8 +249,8 @@ function createUnlockCardSync(unlock, options = {}) {
     card.querySelector('.card-image-area').appendChild(cooldownBadge);
   }
 
-  // Load image asynchronously and update (only for unlocked cards)
-  if (!isLocked) {
+  // Load image asynchronously and update (only for unlocked cards without custom imagePath)
+  if (!isLocked && !unlock.imagePath) {
     loadUnlockImage(unlock.id).then(imageSrc => {
       if (imageSrc) {
         const imageArea = card.querySelector('.card-image-area');

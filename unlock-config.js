@@ -322,7 +322,8 @@ const UNLOCK_DEFINITIONS = [
     emoji: '🇸🇬',
     emojiFallback: 'SG',
     isSpecialEvent: true,
-    eventId: 101
+    eventId: 101,
+    imagePath: 'event-images/special/event_101.jpg'
   }
 ];
 
