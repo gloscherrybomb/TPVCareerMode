@@ -666,10 +666,22 @@
 /* Timeslot Selection UI (for event detail page) */
 .timeslot-grid {
     margin-top: 2rem;
+    display: flex;
+    gap: 2rem;
 }
 
 .timeslot-day-section {
-    margin-bottom: 2rem;
+    flex: 1;
+}
+
+@media (max-width: 768px) {
+    .timeslot-grid {
+        flex-direction: column;
+    }
+
+    .timeslot-day-section {
+        margin-bottom: 2rem;
+    }
 }
 
 .timeslot-day-header {
