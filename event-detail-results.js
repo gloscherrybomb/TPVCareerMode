@@ -810,10 +810,43 @@ async function loadEventResults() {
             const eventName = eventData?.name || `Event ${eventNumber}`;
             const eventCategory = eventData?.category || 'Local Amateur';
 
+            // Map award IDs to icon registry keys (they use different naming)
+            const awardIdToIconKey = {
+                // Medals
+                'goldMedal': 'goldMedal',
+                'silverMedal': 'silverMedal',
+                'bronzeMedal': 'bronzeMedal',
+                // Performance awards
+                'punchingMedal': 'punchingAbove',
+                'giantKillerMedal': 'giantKiller',
+                'bullseyeMedal': 'bullseye',
+                'hotStreakMedal': 'hotStreak',
+                // Margin awards
+                'domination': 'domination',
+                'closeCall': 'closeCall',
+                'photoFinish': 'photoFinish',
+                // Special awards
+                'darkHorse': 'darkHorse',
+                'zeroToHero': 'zeroToHero',
+                'lanternRouge': 'lanternRouge',
+                'blastOff': 'blastOff',
+                // Career awards
+                'backToBack': 'repeat',
+                'weekendWarrior': 'calendar',
+                'trophyCollector': 'trophy',
+                'technicalIssues': 'wrench',
+                'overrated': 'chartDown',
+                // GC awards
+                'gcGoldMedal': 'gcGold',
+                'gcSilverMedal': 'gcSilver',
+                'gcBronzeMedal': 'gcBronze'
+            };
+
             // Get earnedAwards with their details from AWARD_DEFINITIONS
             const earnedAwards = (userEventResults.earnedAwards || []).map(award => {
                 const awardDef = window.AWARD_DEFINITIONS?.[award.awardId] || {};
-                const iconDef = window.ICON_REGISTRY?.[award.awardId] || {};
+                const iconKey = awardIdToIconKey[award.awardId] || award.awardId;
+                const iconDef = window.ICON_REGISTRY?.[iconKey] || {};
                 return {
                     id: award.awardId,
                     title: awardDef.title || award.awardId,
@@ -1296,14 +1329,20 @@ function condenseStory(story, maxWords = 40) {
 }
 
 /**
- * Load image with promise
+ * Load image with promise - handles both regular images and SVGs
  */
 function loadImage(src) {
     return new Promise((resolve, reject) => {
         const img = new Image();
-        img.crossOrigin = 'anonymous';
+        // Don't set crossOrigin for local files to avoid CORS issues
+        if (src.startsWith('http')) {
+            img.crossOrigin = 'anonymous';
+        }
         img.onload = () => resolve(img);
-        img.onerror = () => reject(new Error(`Failed to load image: ${src}`));
+        img.onerror = (e) => {
+            console.warn(`Failed to load image: ${src}`, e);
+            reject(new Error(`Failed to load image: ${src}`));
+        };
         img.src = src;
     });
 }
@@ -1372,6 +1411,19 @@ async function generateStravaShareImage(userResult, eventInfo) {
         ctx.fillStyle = bgGradient;
         ctx.fillRect(0, 0, width, 500);
     }
+
+    // Add subtle diagonal texture lines to the dark area
+    ctx.save();
+    ctx.globalAlpha = 0.03;
+    ctx.strokeStyle = '#ff1b6b';
+    ctx.lineWidth = 1;
+    for (let i = 0; i < 20; i++) {
+        ctx.beginPath();
+        ctx.moveTo(0, 500 + i * 50);
+        ctx.lineTo(width, 450 + i * 50);
+        ctx.stroke();
+    }
+    ctx.restore();
 
     // Accent gradient for reuse
     const accentGradient = ctx.createLinearGradient(0, 0, width, 0);
@@ -1622,29 +1674,41 @@ async function generateStravaShareImage(userResult, eventInfo) {
             const x = thisRowStartX + col * awardSpacing;
             const y = currentY + row * 85 + 30;
 
+            let iconLoaded = false;
+
             // Try to load award icon
             if (award.iconPath) {
                 try {
                     const iconImg = await loadImage(award.iconPath);
                     ctx.drawImage(iconImg, x - awardSize/2, y - awardSize/2, awardSize, awardSize);
-                } catch {
-                    // Fallback - draw placeholder circle
-                    ctx.fillStyle = 'rgba(199, 26, 229, 0.3)';
-                    ctx.beginPath();
-                    ctx.arc(x, y, awardSize/2, 0, Math.PI * 2);
-                    ctx.fill();
+                    iconLoaded = true;
+                } catch (e) {
+                    console.warn(`Could not load award icon: ${award.iconPath}`, e);
                 }
-            } else {
-                // Draw placeholder
-                ctx.fillStyle = 'rgba(199, 26, 229, 0.3)';
+            }
+
+            // Fallback to emoji if icon didn't load
+            if (!iconLoaded) {
+                // Draw circle background
+                const circleGradient = ctx.createRadialGradient(x, y, 0, x, y, awardSize/2);
+                circleGradient.addColorStop(0, 'rgba(199, 26, 229, 0.4)');
+                circleGradient.addColorStop(1, 'rgba(199, 26, 229, 0.1)');
+                ctx.fillStyle = circleGradient;
                 ctx.beginPath();
                 ctx.arc(x, y, awardSize/2, 0, Math.PI * 2);
                 ctx.fill();
+
+                // Draw emoji fallback
+                if (award.fallback) {
+                    ctx.font = `${awardSize - 10}px "Segoe UI Emoji", "Apple Color Emoji", sans-serif`;
+                    ctx.fillStyle = '#ffffff';
+                    ctx.fillText(award.fallback, x, y + 12);
+                }
             }
 
             // Award title below icon
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-            ctx.font = '500 14px "Exo 2", sans-serif';
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+            ctx.font = '600 13px "Exo 2", sans-serif';
             ctx.fillText(award.title, x, y + awardSize/2 + 20);
         }
 
@@ -1653,54 +1717,94 @@ async function generateStravaShareImage(userResult, eventInfo) {
 
     // ========== STORY SECTION ==========
     if (userResult.story && userResult.story.length > 20) {
-        currentY += 10;
+        currentY += 8;
 
         // Story container with subtle gradient
-        const storyGradient = ctx.createLinearGradient(80, currentY, 80, currentY + 130);
+        const storyGradient = ctx.createLinearGradient(80, currentY, 80, currentY + 110);
         storyGradient.addColorStop(0, 'rgba(255, 255, 255, 0.04)');
         storyGradient.addColorStop(1, 'rgba(255, 255, 255, 0.01)');
         ctx.fillStyle = storyGradient;
         ctx.beginPath();
-        ctx.roundRect(80, currentY, width - 160, 130, 10);
+        ctx.roundRect(80, currentY, width - 160, 110, 10);
         ctx.fill();
 
         // Left accent line
         ctx.fillStyle = 'rgba(255, 27, 107, 0.5)';
-        ctx.fillRect(80, currentY, 3, 130);
+        ctx.fillRect(80, currentY, 3, 110);
 
         // Story text
         ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
-        ctx.font = 'italic 17px "Exo 2", sans-serif';
+        ctx.font = 'italic 16px "Exo 2", sans-serif';
 
         const storyText = userResult.story;
         const lines = wrapText(ctx, `"${storyText}"`, width - 220);
-        const lineHeight = 26;
-        const maxLines = 4;
+        const lineHeight = 24;
+        const maxLines = 3;
         const displayLines = lines.slice(0, maxLines);
-        const textStartY = currentY + 25 + ((100 - displayLines.length * lineHeight) / 2);
+        const textStartY = currentY + 22 + ((85 - displayLines.length * lineHeight) / 2);
 
         displayLines.forEach((line, index) => {
             ctx.fillText(line, width / 2, textStartY + index * lineHeight);
         });
 
-        currentY += 145;
+        currentY += 120;
     }
 
     // ========== FOOTER ==========
-    // Ensure footer is at bottom
-    const footerY = height - 70;
+    // Calculate available space
+    const footerHeight = 120;
+    const availableSpace = height - currentY - footerHeight;
 
-    // Bottom gradient bar
+    // If there's extra space, add visual interest
+    if (availableSpace > 80) {
+        const centerY = currentY + availableSpace / 2;
+
+        // Draw stylized cycling/speed lines emanating from center
+        ctx.save();
+        ctx.globalAlpha = 0.08;
+        const numLines = 5;
+        for (let i = 0; i < numLines; i++) {
+            const lineY = centerY - 30 + i * 15;
+            const lineGradient = ctx.createLinearGradient(0, 0, width, 0);
+            lineGradient.addColorStop(0, 'transparent');
+            lineGradient.addColorStop(0.1, '#ff1b6b');
+            lineGradient.addColorStop(0.5, '#c71ae5');
+            lineGradient.addColorStop(0.9, '#45caff');
+            lineGradient.addColorStop(1, 'transparent');
+            ctx.strokeStyle = lineGradient;
+            ctx.lineWidth = 2 - i * 0.3;
+            ctx.beginPath();
+            ctx.moveTo(100 + i * 20, lineY);
+            ctx.lineTo(width - 100 - i * 20, lineY);
+            ctx.stroke();
+        }
+        ctx.restore();
+    }
+
+    // Footer background - subtle gradient rise
+    const footerGradient = ctx.createLinearGradient(0, height - 100, 0, height);
+    footerGradient.addColorStop(0, 'transparent');
+    footerGradient.addColorStop(0.5, 'rgba(8, 12, 20, 0.5)');
+    footerGradient.addColorStop(1, 'rgba(8, 12, 20, 0.9)');
+    ctx.fillStyle = footerGradient;
+    ctx.fillRect(0, height - 100, width, 100);
+
+    // Bottom gradient bar - thicker and more prominent
     ctx.fillStyle = accentGradient;
-    ctx.fillRect(0, height - 5, width, 5);
+    ctx.fillRect(0, height - 6, width, 6);
 
-    // Website with glow
-    ctx.shadowColor = 'rgba(255, 27, 107, 0.3)';
-    ctx.shadowBlur = 15;
+    // Website URL with enhanced styling
+    ctx.shadowColor = 'rgba(255, 27, 107, 0.5)';
+    ctx.shadowBlur = 20;
     ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 26px "Exo 2", sans-serif';
-    ctx.fillText('TPVCareerMode.com', width / 2, footerY);
+    ctx.font = 'bold 28px "Exo 2", sans-serif';
+    ctx.fillText('TPVCareerMode.com', width / 2, height - 40);
     ctx.shadowBlur = 0;
+
+    // Small tagline
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+    ctx.font = '400 12px "Exo 2", sans-serif';
+    ctx.fillText('VIRTUAL CYCLING CAREER SIMULATION', width / 2, height - 18);
 
     return true;
 }
