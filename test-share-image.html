@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Share Image - TPV Career Mode</title>
+
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="event-detail.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            background: #0a0e1a;
+            color: #ffffff;
+            min-height: 100vh;
+            padding: 2rem;
+            font-family: 'Exo 2', sans-serif;
+        }
+
+        .test-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            background: linear-gradient(135deg, #ff1b6b, #c71ae5, #45caff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 2rem;
+        }
+
+        .status-box {
+            background: #1a1f2e;
+            border: 1px solid #2a2f3e;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .status-box h3 {
+            color: #ffffff;
+            margin-bottom: 1rem;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            color: #a0a0a0;
+        }
+
+        .status-item.success { color: #22c55e; }
+        .status-item.error { color: #ef4444; }
+        .status-item.loading { color: #f59e0b; }
+
+        .event-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .event-card {
+            background: #1a1f2e;
+            border: 2px solid #2a2f3e;
+            border-radius: 12px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .event-card:hover:not(.disabled) {
+            border-color: #ff1b6b;
+            transform: translateY(-2px);
+        }
+
+        .event-card.selected {
+            border-color: #ff1b6b;
+            background: rgba(255, 27, 107, 0.1);
+        }
+
+        .event-card.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .event-card h4 {
+            color: #ffffff;
+            font-size: 0.85rem;
+            margin-bottom: 0.5rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .event-card .event-position {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .event-card .event-position.gold { color: #FFD700; }
+        .event-card .event-position.silver { color: #C0C0C0; }
+        .event-card .event-position.bronze { color: #CD7F32; }
+        .event-card .event-position.other { color: #45caff; }
+
+        .event-card .event-meta {
+            font-size: 0.75rem;
+            color: #a0a0a0;
+            margin-top: 0.5rem;
+        }
+
+        .generate-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #FC4C02, #E34402);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-family: 'Exo 2', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .generate-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(252, 76, 2, 0.4);
+        }
+
+        .generate-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .preview-section {
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        .preview-section h3 {
+            color: #ffffff;
+            margin-bottom: 1rem;
+        }
+
+        #preview {
+            max-width: 400px;
+            border: 2px solid #ff1b6b;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .login-prompt {
+            text-align: center;
+            padding: 3rem;
+        }
+
+        .login-prompt a {
+            color: #ff1b6b;
+        }
+
+        /* Hidden canvas */
+        #stravaShareCanvas {
+            display: none;
+        }
+
+        .section-title {
+            color: #ffffff;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Share Image Test Tool</h1>
+
+        <div class="status-box">
+            <h3>Status</h3>
+            <div id="authStatus" class="status-item loading">⏳ Checking authentication...</div>
+            <div id="dataStatus" class="status-item loading">⏳ Loading user data...</div>
+            <div id="scriptsStatus" class="status-item loading">⏳ Loading scripts...</div>
+        </div>
+
+        <div id="loginPrompt" class="login-prompt" style="display: none;">
+            <p>You need to be logged in to test share images with your real data.</p>
+            <p><a href="index.html">Go to homepage to log in</a></p>
+        </div>
+
+        <div id="eventSelector" style="display: none;">
+            <h3 class="section-title">Select a Completed Event</h3>
+            <div class="event-selector" id="eventGrid"></div>
+
+            <button class="generate-btn" id="generateBtn" disabled>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+                    <polyline points="16 6 12 2 8 6"/>
+                    <line x1="12" y1="2" x2="12" y2="15"/>
+                </svg>
+                Generate Share Image
+            </button>
+        </div>
+
+        <div class="preview-section">
+            <h3>Preview</h3>
+            <img id="preview" alt="Share image preview">
+        </div>
+    </div>
+
+    <!-- Hidden canvas for image generation (same as event-detail.html) -->
+    <canvas id="stravaShareCanvas" width="1080" height="1350" style="display:none;"></canvas>
+
+    <!-- Load all required scripts in the same order as event-detail.html -->
+    <script src="icons/icons.js"></script>
+    <script src="event-data.js"></script>
+    <script src="event-config.js"></script>
+    <script src="awards-config.js"></script>
+
+    <!-- The main results script with generateStravaShareImage -->
+    <script type="module" src="event-detail-results.js"></script>
+
+    <script type="module">
+        import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        // Firebase config (must match app.js)
+        const firebaseConfig = {
+            apiKey: "AIzaSyBn0k_u7Ql9qDtV0t5Hux7Ib3kHNjBhc3w",
+            authDomain: "tpv-career-mode.firebaseapp.com",
+            projectId: "tpv-career-mode",
+            storageBucket: "tpv-career-mode.appspot.com",
+            messagingSenderId: "1053731172220",
+            appId: "1:1053731172220:web:5c8e8e8e8e8e8e8e8e8e8e"
+        };
+
+        let app, auth, db, userData = null, selectedEvent = null;
+
+        const authStatus = document.getElementById('authStatus');
+        const dataStatus = document.getElementById('dataStatus');
+        const scriptsStatus = document.getElementById('scriptsStatus');
+        const loginPrompt = document.getElementById('loginPrompt');
+        const eventSelector = document.getElementById('eventSelector');
+        const eventGrid = document.getElementById('eventGrid');
+        const generateBtn = document.getElementById('generateBtn');
+        const preview = document.getElementById('preview');
+
+        // Wait for the share image function to be available
+        function waitForShareFunction(timeout = 5000) {
+            return new Promise((resolve, reject) => {
+                const start = Date.now();
+                const check = () => {
+                    if (typeof window.downloadStravaShareImage === 'function') {
+                        resolve();
+                    } else if (Date.now() - start > timeout) {
+                        reject(new Error('Share function not loaded'));
+                    } else {
+                        setTimeout(check, 100);
+                    }
+                };
+                check();
+            });
+        }
+
+        // Initialize Firebase (reuse existing app if already initialized)
+        try {
+            app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+        } catch (e) {
+            console.error('Firebase init error:', e);
+            authStatus.textContent = '❌ Firebase init failed: ' + e.message;
+            authStatus.className = 'status-item error';
+        }
+
+        // Wait for share function
+        waitForShareFunction()
+            .then(() => {
+                scriptsStatus.textContent = '✅ Share image function loaded';
+                scriptsStatus.className = 'status-item success';
+            })
+            .catch(e => {
+                scriptsStatus.textContent = '❌ ' + e.message;
+                scriptsStatus.className = 'status-item error';
+            });
+
+        // Check auth state
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                authStatus.textContent = '✅ Logged in as: ' + (user.displayName || user.email);
+                authStatus.className = 'status-item success';
+
+                // Fetch user data
+                try {
+                    const userDocRef = doc(db, 'users', user.uid);
+                    const userDoc = await getDoc(userDocRef);
+
+                    if (userDoc.exists()) {
+                        userData = userDoc.data();
+                        dataStatus.textContent = '✅ User data loaded';
+                        dataStatus.className = 'status-item success';
+
+                        loginPrompt.style.display = 'none';
+                        eventSelector.style.display = 'block';
+
+                        renderEventCards();
+                    } else {
+                        dataStatus.textContent = '❌ No user data found';
+                        dataStatus.className = 'status-item error';
+                    }
+                } catch (e) {
+                    dataStatus.textContent = '❌ Error loading data: ' + e.message;
+                    dataStatus.className = 'status-item error';
+                }
+            } else {
+                authStatus.textContent = '❌ Not logged in';
+                authStatus.className = 'status-item error';
+                dataStatus.textContent = '⏳ Waiting for login...';
+                dataStatus.className = 'status-item loading';
+
+                loginPrompt.style.display = 'block';
+                eventSelector.style.display = 'none';
+            }
+        });
+
+        function renderEventCards() {
+            eventGrid.innerHTML = '';
+
+            // Check events 1-15 for completed results
+            for (let i = 1; i <= 15; i++) {
+                const results = userData[`event${i}Results`];
+                const eventInfo = typeof eventConfigs !== 'undefined' ? eventConfigs[i] : null;
+                const eventName = eventInfo?.name || `Event ${i}`;
+
+                const card = document.createElement('div');
+                card.className = 'event-card' + (results ? '' : ' disabled');
+                card.dataset.eventId = i;
+
+                if (results) {
+                    const pos = results.position;
+                    let posClass = 'other';
+                    if (pos === 1) posClass = 'gold';
+                    else if (pos === 2) posClass = 'silver';
+                    else if (pos === 3) posClass = 'bronze';
+
+                    const suffix = pos === 1 ? 'st' : pos === 2 ? 'nd' : pos === 3 ? 'rd' : 'th';
+
+                    card.innerHTML = `
+                        <h4>${eventName}</h4>
+                        <div class="event-position ${posClass}">${pos}${suffix}</div>
+                        <div class="event-meta">
+                            ${results.points || 0} pts
+                            ${results.earnedAwards?.length ? ` • ${results.earnedAwards.length} awards` : ''}
+                        </div>
+                    `;
+
+                    card.addEventListener('click', () => selectEvent(i, card));
+                } else {
+                    card.innerHTML = `
+                        <h4>${eventName}</h4>
+                        <div class="event-position other">—</div>
+                        <div class="event-meta">Not completed</div>
+                    `;
+                }
+
+                eventGrid.appendChild(card);
+            }
+        }
+
+        function selectEvent(eventId, card) {
+            document.querySelectorAll('.event-card').forEach(c => c.classList.remove('selected'));
+            card.classList.add('selected');
+            selectedEvent = eventId;
+            generateBtn.disabled = false;
+        }
+
+        generateBtn.addEventListener('click', async () => {
+            if (!selectedEvent || !userData) return;
+            if (typeof window.downloadStravaShareImage !== 'function') {
+                alert('Share function not loaded yet. Please wait.');
+                return;
+            }
+
+            generateBtn.disabled = true;
+            generateBtn.textContent = 'Generating...';
+
+            try {
+                const results = userData[`event${selectedEvent}Results`];
+                const eventInfo = typeof eventConfigs !== 'undefined' ? eventConfigs[selectedEvent] : {};
+
+                // Build earned awards with icon paths (same as production code)
+                const earnedAwards = (results.earnedAwards || []).map(award => {
+                    // AWARD_DEFINITIONS is an object, not an array
+                    const awardConfig = (typeof AWARD_DEFINITIONS !== 'undefined' && AWARD_DEFINITIONS[award.awardId])
+                        ? AWARD_DEFINITIONS[award.awardId] : {};
+
+                    // Get icon path from iconRegistry
+                    const iconKey = getIconKeyForAward(award.awardId);
+                    const iconPath = (typeof iconRegistry !== 'undefined' && iconRegistry[iconKey]) ? iconRegistry[iconKey] : null;
+
+                    return {
+                        id: award.awardId,
+                        title: awardConfig.title || award.awardId,
+                        fallback: awardConfig.icon || '🏆',
+                        iconPath: iconPath
+                    };
+                });
+
+                // Build story - use real data or dummy narrative
+                let shareStory = results.discordStory || results.storyRecap || '';
+                if (!shareStory) {
+                    // Dummy narrative for testing (simulates newer results)
+                    const pos = results.position;
+                    const eventName = eventInfo.name || 'the race';
+                    const dummyNarratives = [
+                        `${eventName} delivered exactly what was promised. From the gun, the pace was relentless. You found your rhythm early, stayed patient when others surged, and executed the race plan perfectly. The final kilometers were a battle of attrition, but you held strong.`,
+                        `A tactical masterclass unfolded at ${eventName}. The early breakaway set the tone, and you positioned yourself perfectly for the decisive moment. When the attacks came on the final climb, you responded with measured aggression, securing your place.`,
+                        `${eventName} tested every fiber. The conditions were brutal, the competition fierce, but you rose to the challenge. Smart positioning through the technical sections and raw power on the climbs made the difference today.`
+                    ];
+                    shareStory = dummyNarratives[Math.floor(Math.random() * dummyNarratives.length)];
+                }
+
+                // Power data - use real data or dummy values for testing
+                let powerData = null;
+                if (results.results && results.results.length > 0) {
+                    const firstResult = results.results[0];
+                    if (firstResult.avgPower || firstResult.nrmPower || firstResult.maxPower) {
+                        powerData = {
+                            avgPower: firstResult.avgPower || 0,
+                            nrmPower: firstResult.nrmPower || 0,
+                            maxPower: firstResult.maxPower || 0
+                        };
+                    }
+                }
+                // Add dummy power data if none exists (simulates newer results)
+                if (!powerData) {
+                    powerData = {
+                        avgPower: 220 + Math.floor(Math.random() * 80),  // 220-300w
+                        nrmPower: 240 + Math.floor(Math.random() * 90),  // 240-330w
+                        maxPower: 650 + Math.floor(Math.random() * 350)  // 650-1000w
+                    };
+                }
+
+                const userResult = {
+                    position: results.position,
+                    predictedPosition: results.predictedPosition,
+                    points: results.points || 0,
+                    bonusPoints: results.bonusPoints || 0,
+                    story: shareStory,
+                    earnedAwards: earnedAwards,
+                    powerData: powerData
+                };
+
+                const eventData = {
+                    eventNumber: selectedEvent,
+                    eventName: eventInfo.name || `Event ${selectedEvent}`,
+                    category: eventInfo.category || 'Local Amateur',
+                    raceNumber: results.stageNumber || null
+                };
+
+                // Call the ACTUAL production function
+                await window.downloadStravaShareImage(userResult, eventData);
+
+                // Show preview (the canvas should now have the image)
+                const canvas = document.getElementById('stravaShareCanvas');
+                if (canvas) {
+                    preview.src = canvas.toDataURL('image/png');
+                    preview.style.display = 'block';
+                }
+
+            } catch (e) {
+                console.error('Generation error:', e);
+                alert('Error generating image: ' + e.message);
+            }
+
+            generateBtn.disabled = false;
+            generateBtn.innerHTML = `
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+                    <polyline points="16 6 12 2 8 6"/>
+                    <line x1="12" y1="2" x2="12" y2="15"/>
+                </svg>
+                Generate Share Image
+            `;
+        });
+
+        // Award ID to icon key mapping (same as production)
+        function getIconKeyForAward(awardId) {
+            const mapping = {
+                'goldMedal': 'goldMedal',
+                'silverMedal': 'silverMedal',
+                'bronzeMedal': 'bronzeMedal',
+                'punchingMedal': 'punchingAbove',
+                'giantKillerMedal': 'giantKiller',
+                'consistencyMedal': 'consistency',
+                'comebackMedal': 'comebackKing',
+                'ironmanMedal': 'ironman',
+                'sprinterMedal': 'sprinter',
+                'climberMedal': 'climber',
+                'ttMedal': 'ttSpecialist',
+                'breakawayMedal': 'breakaway',
+                'domestiqueMedal': 'domestique',
+                'raceIQMedal': 'raceIQ',
+                'debutMedal': 'debut',
+                'centuryMedal': 'century'
+            };
+            return mapping[awardId] || awardId;
+        }
+
+        function getOrdinalSuffix(n) {
+            if (n === 'DNF') return '';
+            const num = parseInt(n);
+            if (num === 1) return 'st';
+            if (num === 2) return 'nd';
+            if (num === 3) return 'rd';
+            return 'th';
+        }
+    </script>
+</body>
+</html>

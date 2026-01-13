@@ -846,11 +846,22 @@ async function loadEventResults() {
             const earnedAwards = (userEventResults.earnedAwards || []).map(award => {
                 const awardDef = window.AWARD_DEFINITIONS?.[award.awardId] || {};
                 const iconKey = awardIdToIconKey[award.awardId] || award.awardId;
-                const iconDef = window.ICON_REGISTRY?.[iconKey] || {};
+                // Icons are exported via window.TPVIcons.ICON_REGISTRY
+                const iconDef = window.TPVIcons?.ICON_REGISTRY?.[iconKey] || {};
+
+                // Resolve icon path to absolute URL for canvas fetch
+                let absoluteIconPath = null;
+                if (iconDef.path) {
+                    const baseUrl = window.location.href.replace(/[^/]*$/, '');
+                    absoluteIconPath = new URL(iconDef.path, baseUrl).href;
+                }
+
+                console.log(`[SHARE IMG] Award ${award.awardId} -> iconKey: ${iconKey}, path: ${absoluteIconPath}`);
+
                 return {
                     id: award.awardId,
                     title: awardDef.title || award.awardId,
-                    iconPath: iconDef.path || null,
+                    iconPath: absoluteIconPath,
                     fallback: iconDef.fallback || awardDef.icon || '🏆'
                 };
             });
@@ -1384,7 +1395,8 @@ async function loadSvgAsImage(svgPath) {
 }
 
 /**
- * Generate Strava share image on canvas
+ * Generate Strava share image on canvas - TILE-BASED DESIGN
+ * Cyberpunk aesthetic with neon accents on dark background
  */
 async function generateStravaShareImage(userResult, eventInfo) {
     const canvas = document.getElementById('stravaShareCanvas');
@@ -1400,6 +1412,19 @@ async function generateStravaShareImage(userResult, eventInfo) {
     // Clear canvas
     ctx.clearRect(0, 0, width, height);
 
+    // ========== DESIGN CONSTANTS ==========
+    const PINK = '#ff1b6b';
+    const PURPLE = '#c71ae5';
+    const CYAN = '#45caff';
+    const GOLD = '#FFD700';
+    const GREEN = '#22c55e';
+    const ORANGE = '#ffaa00';
+    const DARK_BG = '#080c14';
+    const TILE_BG = 'rgba(255, 255, 255, 0.03)';
+    const MARGIN = 40;
+    const TILE_GAP = 20;
+    const TILE_RADIUS = 16;
+
     // Helper: Convert hex to rgba
     const hexToRgba = (hex, alpha) => {
         const r = parseInt(hex.slice(1, 3), 16);
@@ -1408,9 +1433,27 @@ async function generateStravaShareImage(userResult, eventInfo) {
         return `rgba(${r}, ${g}, ${b}, ${alpha})`;
     };
 
+    // Helper: Draw a tile with neon border
+    const drawTile = (x, y, w, h, accentColor, filled = true) => {
+        if (filled) {
+            ctx.fillStyle = TILE_BG;
+            ctx.beginPath();
+            ctx.roundRect(x, y, w, h, TILE_RADIUS);
+            ctx.fill();
+        }
+        // Neon glow border
+        ctx.shadowColor = accentColor;
+        ctx.shadowBlur = 15;
+        ctx.strokeStyle = hexToRgba(accentColor, 0.6);
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.roundRect(x, y, w, h, TILE_RADIUS);
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+    };
+
     // ========== BACKGROUND ==========
-    // Dark base
-    ctx.fillStyle = '#080c14';
+    ctx.fillStyle = DARK_BG;
     ctx.fillRect(0, 0, width, height);
 
     // Try to load event image as background
@@ -1421,8 +1464,7 @@ async function generateStravaShareImage(userResult, eventInfo) {
 
     try {
         const eventImg = await loadImage(imgPath);
-        // Draw image at top, covering ~40% of height
-        const imgHeight = 540;
+        const imgHeight = 480;
         const imgAspect = eventImg.width / eventImg.height;
         const drawWidth = width;
         const drawHeight = drawWidth / imgAspect;
@@ -1430,293 +1472,249 @@ async function generateStravaShareImage(userResult, eventInfo) {
 
         ctx.drawImage(eventImg, 0, yOffset, drawWidth, drawHeight);
 
-        // Fade overlay from transparent to dark
-        const fadeGradient = ctx.createLinearGradient(0, 0, 0, imgHeight + 100);
-        fadeGradient.addColorStop(0, 'rgba(8, 12, 20, 0.3)');
-        fadeGradient.addColorStop(0.5, 'rgba(8, 12, 20, 0.6)');
-        fadeGradient.addColorStop(0.75, 'rgba(8, 12, 20, 0.9)');
-        fadeGradient.addColorStop(1, '#080c14');
+        // Fade overlay
+        const fadeGradient = ctx.createLinearGradient(0, 0, 0, imgHeight + 80);
+        fadeGradient.addColorStop(0, 'rgba(8, 12, 20, 0.2)');
+        fadeGradient.addColorStop(0.4, 'rgba(8, 12, 20, 0.5)');
+        fadeGradient.addColorStop(0.7, 'rgba(8, 12, 20, 0.85)');
+        fadeGradient.addColorStop(1, DARK_BG);
         ctx.fillStyle = fadeGradient;
-        ctx.fillRect(0, 0, width, imgHeight + 100);
+        ctx.fillRect(0, 0, width, imgHeight + 80);
     } catch (e) {
-        console.log('Event image not found, using gradient background');
-        // Fallback gradient background
-        const bgGradient = ctx.createLinearGradient(0, 0, 0, 500);
+        const bgGradient = ctx.createLinearGradient(0, 0, 0, 450);
         bgGradient.addColorStop(0, '#1a1f2e');
-        bgGradient.addColorStop(1, '#080c14');
+        bgGradient.addColorStop(1, DARK_BG);
         ctx.fillStyle = bgGradient;
-        ctx.fillRect(0, 0, width, 500);
+        ctx.fillRect(0, 0, width, 450);
     }
-
-    // Add subtle diagonal texture lines to the dark area
-    ctx.save();
-    ctx.globalAlpha = 0.03;
-    ctx.strokeStyle = '#ff1b6b';
-    ctx.lineWidth = 1;
-    for (let i = 0; i < 20; i++) {
-        ctx.beginPath();
-        ctx.moveTo(0, 500 + i * 50);
-        ctx.lineTo(width, 450 + i * 50);
-        ctx.stroke();
-    }
-    ctx.restore();
-
-    // Accent gradient for reuse
-    const accentGradient = ctx.createLinearGradient(0, 0, width, 0);
-    accentGradient.addColorStop(0, '#ff1b6b');
-    accentGradient.addColorStop(0.5, '#c71ae5');
-    accentGradient.addColorStop(1, '#45caff');
 
     // Top accent bar
-    ctx.fillStyle = accentGradient;
+    const topGradient = ctx.createLinearGradient(0, 0, width, 0);
+    topGradient.addColorStop(0, PINK);
+    topGradient.addColorStop(0.5, PURPLE);
+    topGradient.addColorStop(1, CYAN);
+    ctx.fillStyle = topGradient;
     ctx.fillRect(0, 0, width, 5);
 
     // ========== HEADER SECTION ==========
-    // TPV Logo with shadow for visibility over image
     ctx.textAlign = 'center';
-    ctx.shadowColor = 'rgba(0, 0, 0, 0.8)';
-    ctx.shadowBlur = 15;
-    ctx.shadowOffsetX = 0;
-    ctx.shadowOffsetY = 2;
-    ctx.fillStyle = '#ff1b6b';
-    ctx.font = 'bold 52px Orbitron, sans-serif';
-    ctx.fillText('TPV', width / 2, 65);
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
+    ctx.shadowBlur = 20;
 
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-    ctx.font = '600 16px "Exo 2", sans-serif';
-    ctx.fillText('C A R E E R   M O D E', width / 2, 95);
+    // TPV Logo - LARGER
+    ctx.fillStyle = PINK;
+    ctx.font = 'bold 68px Orbitron, sans-serif';
+    ctx.fillText('TPV', width / 2, 75);
+
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+    ctx.font = '600 22px "Exo 2", sans-serif';
+    ctx.fillText('C A R E E R   M O D E', width / 2, 108);
     ctx.shadowBlur = 0;
-    ctx.shadowOffsetY = 0;
 
-    // Race badge with solid background for readability
-    ctx.font = '700 14px "Exo 2", sans-serif';
-    // Use raceNumber (sequential) if available, otherwise fall back to event number
+    // Race badge
     const raceNum = eventInfo.raceNumber || eventNum;
     const badgeText = `RACE ${raceNum}  •  ${(eventInfo.category || 'Local Amateur').toUpperCase()}`;
+    ctx.font = '700 20px "Exo 2", sans-serif';
     const badgeWidth = ctx.measureText(badgeText).width + 50;
 
-    // Solid dark background for badge
-    ctx.fillStyle = 'rgba(10, 14, 26, 0.85)';
+    ctx.fillStyle = 'rgba(10, 14, 26, 0.9)';
     ctx.beginPath();
-    ctx.roundRect((width - badgeWidth) / 2, 120, badgeWidth, 34, 17);
+    ctx.roundRect((width - badgeWidth) / 2, 125, badgeWidth, 38, 19);
     ctx.fill();
-    ctx.strokeStyle = '#ff1b6b';
+    ctx.strokeStyle = PINK;
     ctx.lineWidth = 2;
     ctx.stroke();
 
-    ctx.fillStyle = '#ff1b6b';
-    ctx.fillText(badgeText, width / 2, 143);
+    ctx.fillStyle = PINK;
+    ctx.fillText(badgeText, width / 2, 151);
 
-    // Event name with text shadow for visibility
+    // Event name
     ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
-    ctx.shadowBlur = 20;
-    ctx.shadowOffsetY = 3;
+    ctx.shadowBlur = 25;
     ctx.fillStyle = '#ffffff';
-    drawFittedText(ctx, eventInfo.eventName.toUpperCase(), width / 2, 210, 900, 48, 34, 'bold', 'Orbitron, sans-serif');
+    drawFittedText(ctx, eventInfo.eventName.toUpperCase(), width / 2, 220, 950, 52, 36, 'bold', 'Orbitron, sans-serif');
     ctx.shadowBlur = 0;
-    ctx.shadowOffsetY = 0;
 
-    // ========== POSITION SECTION (Hero) ==========
+    // ========== POSITION (Hero Element) ==========
     const position = userResult.position;
     const positionText = position === 'DNF' ? 'DNF' : `${position}${getOrdinalSuffix(position)}`;
     const posColor = getPositionColor(position);
 
-    // Position glow - stronger for visibility
-    const posGlow = ctx.createRadialGradient(width/2, 360, 0, width/2, 360, 220);
-    posGlow.addColorStop(0, hexToRgba(posColor, 0.35));
-    posGlow.addColorStop(0.4, hexToRgba(posColor, 0.15));
+    // Position glow
+    const posGlow = ctx.createRadialGradient(width/2, 340, 0, width/2, 340, 200);
+    posGlow.addColorStop(0, hexToRgba(posColor, 0.4));
+    posGlow.addColorStop(0.5, hexToRgba(posColor, 0.15));
     posGlow.addColorStop(1, 'transparent');
     ctx.fillStyle = posGlow;
-    ctx.fillRect(0, 200, width, 320);
+    ctx.fillRect(0, 180, width, 320);
 
-    // Position number with strong shadow for readability
-    ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
-    ctx.shadowBlur = 25;
-    ctx.shadowOffsetY = 4;
-    ctx.fillStyle = posColor;
-    ctx.font = 'bold 150px Orbitron, sans-serif';
-    ctx.fillText(positionText, width / 2, 390);
-
-    // Add colored glow on top
+    // Position number
     ctx.shadowColor = posColor;
-    ctx.shadowBlur = 50;
-    ctx.shadowOffsetY = 0;
-    ctx.fillText(positionText, width / 2, 390);
+    ctx.shadowBlur = 60;
+    ctx.fillStyle = posColor;
+    ctx.font = 'bold 160px Orbitron, sans-serif';
+    ctx.fillText(positionText, width / 2, 380);
     ctx.shadowBlur = 0;
 
     ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
-    ctx.font = '600 18px "Exo 2", sans-serif';
-    ctx.fillText('FINISHING POSITION', width / 2, 440);
+    ctx.font = '700 26px "Exo 2", sans-serif';
+    ctx.fillText('FINISHING POSITION', width / 2, 430);
 
-    // ========== STATS SECTION ==========
-    let currentY = 490;
+    // ========== TILE GRID SECTION ==========
+    let currentY = 470;
+    const tileWidth = (width - MARGIN * 2 - TILE_GAP) / 2;
 
-    // Prediction (if available)
-    if (userResult.predictedPosition && position !== 'DNF') {
+    // Determine what tiles we have
+    const hasPrediction = userResult.predictedPosition && position !== 'DNF';
+    const hasPower = userResult.powerData && (userResult.powerData.avgPower || userResult.powerData.nrmPower || userResult.powerData.maxPower);
+    const hasAwards = userResult.earnedAwards && userResult.earnedAwards.length > 0;
+
+    // ===== ROW 1: Points + Prediction (side by side) =====
+    if (hasPrediction) {
+        const tileHeight = 130;
+
+        // POINTS TILE (left)
+        drawTile(MARGIN, currentY, tileWidth, tileHeight, CYAN);
+        ctx.fillStyle = 'rgba(69, 202, 255, 0.15)';
+        ctx.beginPath();
+        ctx.roundRect(MARGIN, currentY, tileWidth, tileHeight, TILE_RADIUS);
+        ctx.fill();
+
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+        ctx.font = '600 20px "Exo 2", sans-serif';
+        ctx.fillText('POINTS', MARGIN + tileWidth / 2, currentY + 32);
+
+        ctx.fillStyle = CYAN;
+        ctx.shadowColor = CYAN;
+        ctx.shadowBlur = 20;
+        ctx.font = 'bold 76px Orbitron, sans-serif';
+        ctx.fillText(userResult.points || '0', MARGIN + tileWidth / 2, currentY + 95);
+        ctx.shadowBlur = 0;
+
+        if (userResult.bonusPoints && userResult.bonusPoints > 0) {
+            ctx.fillStyle = GREEN;
+            ctx.font = 'bold 22px "Exo 2", sans-serif';
+            ctx.fillText(`+${userResult.bonusPoints} BONUS`, MARGIN + tileWidth / 2, currentY + 122);
+        }
+
+        // PREDICTION TILE (right)
         const predicted = userResult.predictedPosition;
         const diff = predicted - position;
+        const predColor = diff > 0 ? GREEN : diff < 0 ? '#ef4444' : GOLD;
 
-        let predIcon, predText, predColor;
-        if (diff > 0) {
-            predIcon = '▲';
-            predText = `Predicted ${predicted}${getOrdinalSuffix(predicted)} → Finished ${positionText}`;
-            predColor = '#22c55e';
-        } else if (diff < 0) {
-            predIcon = '▼';
-            predText = `Predicted ${predicted}${getOrdinalSuffix(predicted)} → Finished ${positionText}`;
-            predColor = '#ef4444';
-        } else {
-            predIcon = '●';
-            predText = `Predicted ${predicted}${getOrdinalSuffix(predicted)} — EXACT!`;
-            predColor = '#FFD700';
-        }
-
-        // Prediction bar with gradient border
-        ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+        drawTile(MARGIN + tileWidth + TILE_GAP, currentY, tileWidth, tileHeight, predColor);
+        ctx.fillStyle = hexToRgba(predColor, 0.1);
         ctx.beginPath();
-        ctx.roundRect(100, currentY, width - 200, 48, 24);
+        ctx.roundRect(MARGIN + tileWidth + TILE_GAP, currentY, tileWidth, tileHeight, TILE_RADIUS);
         ctx.fill();
-        ctx.strokeStyle = hexToRgba(predColor, 0.6);
-        ctx.lineWidth = 2;
-        ctx.stroke();
 
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+        ctx.font = '600 20px "Exo 2", sans-serif';
+        ctx.fillText('PREDICTION', MARGIN + tileWidth + TILE_GAP + tileWidth / 2, currentY + 32);
+
+        const predIcon = diff > 0 ? '▲' : diff < 0 ? '▼' : '●';
         ctx.fillStyle = predColor;
-        ctx.font = 'bold 20px "Exo 2", sans-serif';
-        ctx.fillText(`${predIcon}  ${predText}  (${diff >= 0 ? '+' : ''}${diff})`, width / 2, currentY + 31);
-        currentY += 68;
-    }
+        ctx.font = 'bold 34px "Exo 2", sans-serif';
+        ctx.fillText(`${predicted}${getOrdinalSuffix(predicted)} → ${positionText}`, MARGIN + tileWidth + TILE_GAP + tileWidth / 2, currentY + 72);
 
-    // Points card - more compact
-    ctx.fillStyle = 'rgba(69, 202, 255, 0.08)';
-    ctx.beginPath();
-    ctx.roundRect(140, currentY, width - 280, 115, 12);
-    ctx.fill();
-    ctx.strokeStyle = 'rgba(69, 202, 255, 0.5)';
-    ctx.lineWidth = 2;
-    ctx.stroke();
+        ctx.font = 'bold 44px Orbitron, sans-serif';
+        ctx.fillText(`${predIcon} ${diff >= 0 ? '+' : ''}${diff}`, MARGIN + tileWidth + TILE_GAP + tileWidth / 2, currentY + 116);
 
-    ctx.fillStyle = '#45caff';
-    ctx.shadowColor = '#45caff';
-    ctx.shadowBlur = 25;
-    ctx.font = 'bold 58px Orbitron, sans-serif';
-    ctx.fillText(userResult.points || '0', width / 2, currentY + 65);
-    ctx.shadowBlur = 0;
-
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-    ctx.font = '600 15px "Exo 2", sans-serif';
-    ctx.fillText('POINTS EARNED', width / 2, currentY + 98);
-
-    currentY += 130;
-
-    // Bonus points row
-    if (userResult.bonusPoints && userResult.bonusPoints > 0) {
-        currentY += 12; // Add spacing from points card
-        ctx.fillStyle = '#ff1b6b';
-        ctx.font = 'bold 20px "Exo 2", sans-serif';
-        ctx.fillText(`+${userResult.bonusPoints} BONUS POINTS`, width / 2, currentY);
-        currentY += 30;
-    }
-
-    // ========== POWER DATA SECTION ==========
-    const power = userResult.powerData;
-    if (power && (power.avgPower || power.nrmPower || power.maxPower)) {
-        currentY += 10;
-
-        // Power stats container
-        ctx.fillStyle = 'rgba(255, 170, 0, 0.08)';
+        currentY += tileHeight + TILE_GAP;
+    } else {
+        // Just points - full width
+        const tileHeight = 120;
+        drawTile(MARGIN, currentY, width - MARGIN * 2, tileHeight, CYAN);
+        ctx.fillStyle = 'rgba(69, 202, 255, 0.12)';
         ctx.beginPath();
-        ctx.roundRect(100, currentY, width - 200, 85, 10);
+        ctx.roundRect(MARGIN, currentY, width - MARGIN * 2, tileHeight, TILE_RADIUS);
         ctx.fill();
-        ctx.strokeStyle = 'rgba(255, 170, 0, 0.4)';
-        ctx.lineWidth = 1.5;
-        ctx.stroke();
 
-        // Power header
-        ctx.fillStyle = '#ffaa00';
-        ctx.font = 'bold 14px "Exo 2", sans-serif';
-        ctx.fillText('POWER DATA', width / 2, currentY + 22);
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+        ctx.font = '600 22px "Exo 2", sans-serif';
+        ctx.fillText('POINTS EARNED', width / 2, currentY + 34);
 
-        // Three power values in a row
-        const powerY = currentY + 58;
-        const powerSpacing = 280;
-        const powerStartX = width / 2 - powerSpacing;
+        ctx.fillStyle = CYAN;
+        ctx.shadowColor = CYAN;
+        ctx.shadowBlur = 25;
+        ctx.font = 'bold 82px Orbitron, sans-serif';
+        ctx.fillText(userResult.points || '0', width / 2, currentY + 95);
+        ctx.shadowBlur = 0;
 
-        // Avg Power
-        if (power.avgPower) {
-            ctx.fillStyle = '#ffaa00';
-            ctx.font = 'bold 28px Orbitron, sans-serif';
-            ctx.fillText(power.avgPower, powerStartX, powerY);
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-            ctx.font = '500 11px "Exo 2", sans-serif';
-            ctx.fillText('AVG W', powerStartX, powerY + 18);
+        if (userResult.bonusPoints && userResult.bonusPoints > 0) {
+            ctx.fillStyle = GREEN;
+            ctx.font = 'bold 26px "Exo 2", sans-serif';
+            ctx.fillText(`+${userResult.bonusPoints} BONUS`, width / 2 + 130, currentY + 80);
         }
 
-        // Normalized Power
-        if (power.nrmPower) {
-            ctx.fillStyle = '#ffaa00';
-            ctx.font = 'bold 28px Orbitron, sans-serif';
-            ctx.fillText(power.nrmPower, width / 2, powerY);
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-            ctx.font = '500 11px "Exo 2", sans-serif';
-            ctx.fillText('NP', width / 2, powerY + 18);
-        }
-
-        // Max Power
-        if (power.maxPower) {
-            ctx.fillStyle = '#ffaa00';
-            ctx.font = 'bold 28px Orbitron, sans-serif';
-            ctx.fillText(power.maxPower, powerStartX + powerSpacing * 2, powerY);
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-            ctx.font = '500 11px "Exo 2", sans-serif';
-            ctx.fillText('MAX W', powerStartX + powerSpacing * 2, powerY + 18);
-        }
-
-        currentY += 100;
+        currentY += tileHeight + TILE_GAP;
     }
 
-    // ========== AWARDS SECTION ==========
-    const awards = userResult.earnedAwards || [];
-    if (awards.length > 0) {
-        currentY += 15;
+    // ===== ROW 2: Power Data (clean, minimal) =====
+    if (hasPower) {
+        const power = userResult.powerData;
+        const miniTileWidth = (width - MARGIN * 2) / 3;
+        const tileHeight = 100;
 
-        // Calculate awards box height
-        const awardsPerRow = Math.min(awards.length, 3);
-        const numRows = Math.ceil(Math.min(awards.length, 6) / 3);
-        const boxHeight = 45 + numRows * 85;
+        // AVG POWER
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+        ctx.font = '600 18px "Exo 2", sans-serif';
+        ctx.fillText('AVG POWER', MARGIN + miniTileWidth / 2, currentY + 25);
 
-        // Awards container with gradient border
-        ctx.fillStyle = 'rgba(199, 26, 229, 0.08)';
-        ctx.beginPath();
-        ctx.roundRect(80, currentY, width - 160, boxHeight, 12);
-        ctx.fill();
-        ctx.strokeStyle = 'rgba(199, 26, 229, 0.5)';
-        ctx.lineWidth = 2;
-        ctx.stroke();
+        ctx.fillStyle = ORANGE;
+        ctx.font = 'bold 56px Orbitron, sans-serif';
+        ctx.fillText(power.avgPower ? `${power.avgPower}W` : '—', MARGIN + miniTileWidth / 2, currentY + 75);
 
-        ctx.fillStyle = '#c71ae5';
-        ctx.font = 'bold 16px "Exo 2", sans-serif';
-        ctx.fillText(`${awards.length} AWARD${awards.length > 1 ? 'S' : ''} EARNED`, width / 2, currentY + 28);
+        // NORMALIZED POWER
+        const npX = MARGIN + miniTileWidth;
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+        ctx.font = '600 18px "Exo 2", sans-serif';
+        ctx.fillText('NORMALIZED', npX + miniTileWidth / 2, currentY + 25);
 
-        currentY += 45;
+        ctx.fillStyle = ORANGE;
+        ctx.font = 'bold 56px Orbitron, sans-serif';
+        ctx.fillText(power.nrmPower ? `${power.nrmPower}W` : '—', npX + miniTileWidth / 2, currentY + 75);
 
-        // Draw awards centered in row
-        const awardSize = 52;
-        const awardSpacing = 200;
-        const rowStartX = width / 2 - ((awardsPerRow - 1) * awardSpacing) / 2;
+        // MAX POWER
+        const maxX = MARGIN + miniTileWidth * 2;
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+        ctx.font = '600 18px "Exo 2", sans-serif';
+        ctx.fillText('MAX POWER', maxX + miniTileWidth / 2, currentY + 25);
 
-        for (let i = 0; i < awards.length && i < 6; i++) {
+        ctx.fillStyle = PINK;
+        ctx.shadowColor = PINK;
+        ctx.shadowBlur = 15;
+        ctx.font = 'bold 56px Orbitron, sans-serif';
+        ctx.fillText(power.maxPower ? `${power.maxPower}W` : '—', maxX + miniTileWidth / 2, currentY + 75);
+        ctx.shadowBlur = 0;
+
+        currentY += tileHeight + TILE_GAP;
+    }
+
+    // ===== ROW 3: Awards (clean, minimal) =====
+    if (hasAwards) {
+        const awards = userResult.earnedAwards;
+        const numAwards = Math.min(awards.length, 4);
+        const tileHeight = 140;
+
+        ctx.fillStyle = PURPLE;
+        ctx.font = '700 22px "Exo 2", sans-serif';
+        ctx.fillText(`${awards.length} AWARD${awards.length > 1 ? 'S' : ''} EARNED`, width / 2, currentY + 25);
+
+        // Draw award icons
+        const awardSize = 70;
+        const awardSpacing = Math.min(200, (width - MARGIN * 2 - 80) / numAwards);
+        const startX = width / 2 - ((numAwards - 1) * awardSpacing) / 2;
+        const awardY = currentY + 75;
+
+        for (let i = 0; i < numAwards; i++) {
             const award = awards[i];
-            const row = Math.floor(i / 3);
-            const col = i % 3;
-            const itemsInThisRow = Math.min(3, awards.length - row * 3);
-            const thisRowStartX = width / 2 - ((itemsInThisRow - 1) * awardSpacing) / 2;
-            const x = thisRowStartX + col * awardSpacing;
-            const y = currentY + row * 85 + 30;
+            const x = startX + i * awardSpacing;
 
             let iconLoaded = false;
 
-            // Try to load award icon (use SVG loader for .svg files)
             if (award.iconPath) {
+                console.log(`[SHARE IMG] Attempting to load icon: ${award.iconPath}`);
                 try {
                     let iconImg;
                     if (award.iconPath.endsWith('.svg')) {
@@ -1724,132 +1722,101 @@ async function generateStravaShareImage(userResult, eventInfo) {
                     } else {
                         iconImg = await loadImage(award.iconPath);
                     }
-                    ctx.drawImage(iconImg, x - awardSize/2, y - awardSize/2, awardSize, awardSize);
+                    console.log(`[SHARE IMG] Successfully loaded icon for ${award.title}`);
+                    ctx.drawImage(iconImg, x - awardSize/2, awardY - awardSize/2, awardSize, awardSize);
                     iconLoaded = true;
                 } catch (e) {
-                    console.warn(`Could not load award icon: ${award.iconPath}`, e);
+                    console.error(`[SHARE IMG] FAILED to load award icon: ${award.iconPath}`, e);
                 }
+            } else {
+                console.warn(`[SHARE IMG] No iconPath for award: ${award.id}`);
             }
 
-            // Fallback to emoji if icon didn't load
             if (!iconLoaded && award.fallback) {
-                // Draw circle background
-                const circleGradient = ctx.createRadialGradient(x, y, 0, x, y, awardSize/2);
-                circleGradient.addColorStop(0, 'rgba(199, 26, 229, 0.4)');
-                circleGradient.addColorStop(1, 'rgba(199, 26, 229, 0.1)');
-                ctx.fillStyle = circleGradient;
-                ctx.beginPath();
-                ctx.arc(x, y, awardSize/2, 0, Math.PI * 2);
-                ctx.fill();
-
-                // Draw emoji fallback
-                ctx.font = `${awardSize - 10}px "Segoe UI Emoji", "Apple Color Emoji", sans-serif`;
+                // Just the emoji, no background circle
+                ctx.font = `${awardSize}px "Segoe UI Emoji", "Apple Color Emoji", sans-serif`;
                 ctx.fillStyle = '#ffffff';
-                ctx.fillText(award.fallback, x, y + 12);
+                ctx.fillText(award.fallback, x, awardY + 18);
             }
 
-            // Award title below icon
+            // Award title
             ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
-            ctx.font = '600 13px "Exo 2", sans-serif';
-            ctx.fillText(award.title, x, y + awardSize/2 + 20);
+            ctx.font = '600 18px "Exo 2", sans-serif';
+            ctx.fillText(award.title, x, awardY + awardSize/2 + 26);
         }
 
-        currentY += numRows * 85 + 15;
+        currentY += tileHeight + TILE_GAP;
     }
 
-    // ========== STORY SECTION ==========
+    // ========== NARRATIVE SECTION (KEY SELLING POINT) ==========
     if (userResult.story && userResult.story.length > 20) {
-        currentY += 16;
+        const remainingSpace = height - currentY - 100; // Leave room for footer
+        const containerHeight = Math.min(220, Math.max(160, remainingSpace - 20));
 
-        const containerHeight = 150;
+        // Story container with gradient fill
+        const storyGradient = ctx.createLinearGradient(MARGIN, currentY, MARGIN, currentY + containerHeight);
+        storyGradient.addColorStop(0, hexToRgba(PINK, 0.1));
+        storyGradient.addColorStop(0.5, hexToRgba(PURPLE, 0.06));
+        storyGradient.addColorStop(1, hexToRgba(CYAN, 0.04));
 
-        // Story container with subtle gradient
-        const storyGradient = ctx.createLinearGradient(60, currentY, 60, currentY + containerHeight);
-        storyGradient.addColorStop(0, 'rgba(255, 255, 255, 0.05)');
-        storyGradient.addColorStop(1, 'rgba(255, 255, 255, 0.02)');
         ctx.fillStyle = storyGradient;
         ctx.beginPath();
-        ctx.roundRect(60, currentY, width - 120, containerHeight, 12);
+        ctx.roundRect(MARGIN, currentY, width - MARGIN * 2, containerHeight, TILE_RADIUS);
         ctx.fill();
 
-        // Left accent line - taller and more prominent
-        const accentGradient = ctx.createLinearGradient(0, currentY, 0, currentY + containerHeight);
-        accentGradient.addColorStop(0, 'rgba(255, 27, 107, 0.7)');
-        accentGradient.addColorStop(0.5, 'rgba(199, 26, 229, 0.6)');
-        accentGradient.addColorStop(1, 'rgba(69, 202, 255, 0.5)');
-        ctx.fillStyle = accentGradient;
-        ctx.fillRect(60, currentY, 4, containerHeight);
+        // Neon border
+        ctx.shadowColor = PINK;
+        ctx.shadowBlur = 20;
+        ctx.strokeStyle = hexToRgba(PINK, 0.4);
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.shadowBlur = 0;
 
-        // Story text - LARGER font for impact
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.92)';
-        ctx.font = 'italic 600 24px "Exo 2", sans-serif';
+        // Left accent bar
+        const accentBarGradient = ctx.createLinearGradient(0, currentY, 0, currentY + containerHeight);
+        accentBarGradient.addColorStop(0, PINK);
+        accentBarGradient.addColorStop(0.5, PURPLE);
+        accentBarGradient.addColorStop(1, CYAN);
+        ctx.fillStyle = accentBarGradient;
+        ctx.beginPath();
+        ctx.roundRect(MARGIN, currentY, 6, containerHeight, [TILE_RADIUS, 0, 0, TILE_RADIUS]);
+        ctx.fill();
+
+        // Story text - LARGE AND PROMINENT
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+        ctx.font = 'italic 400 32px "Exo 2", sans-serif';
 
         const storyText = userResult.story;
-        const lines = wrapText(ctx, `"${storyText}"`, width - 180);
-        const lineHeight = 36;
-        const maxLines = 3;
+        const lines = wrapText(ctx, `"${storyText}"`, width - MARGIN * 2 - 60);
+        const lineHeight = 48;
+        const maxLines = Math.floor((containerHeight - 40) / lineHeight);
         const displayLines = lines.slice(0, maxLines);
 
-        // Center the text block vertically within container
         const textBlockHeight = displayLines.length * lineHeight;
-        const textStartY = currentY + (containerHeight - textBlockHeight) / 2 + lineHeight * 0.7;
+        const textStartY = currentY + (containerHeight - textBlockHeight) / 2 + lineHeight * 0.65;
 
         displayLines.forEach((line, index) => {
             ctx.fillText(line, width / 2, textStartY + index * lineHeight);
         });
 
-        currentY += containerHeight + 10;
+        currentY += containerHeight + 15;
     }
 
     // ========== FOOTER ==========
-    // Calculate available space
-    const footerHeight = 120;
-    const availableSpace = height - currentY - footerHeight;
-
-    // If there's extra space, add visual interest
-    if (availableSpace > 80) {
-        const centerY = currentY + availableSpace / 2;
-
-        // Draw stylized cycling/speed lines emanating from center
-        ctx.save();
-        ctx.globalAlpha = 0.08;
-        const numLines = 5;
-        for (let i = 0; i < numLines; i++) {
-            const lineY = centerY - 30 + i * 15;
-            const lineGradient = ctx.createLinearGradient(0, 0, width, 0);
-            lineGradient.addColorStop(0, 'transparent');
-            lineGradient.addColorStop(0.1, '#ff1b6b');
-            lineGradient.addColorStop(0.5, '#c71ae5');
-            lineGradient.addColorStop(0.9, '#45caff');
-            lineGradient.addColorStop(1, 'transparent');
-            ctx.strokeStyle = lineGradient;
-            ctx.lineWidth = 2 - i * 0.3;
-            ctx.beginPath();
-            ctx.moveTo(100 + i * 20, lineY);
-            ctx.lineTo(width - 100 - i * 20, lineY);
-            ctx.stroke();
-        }
-        ctx.restore();
-    }
-
-    // Footer background - subtle gradient rise
-    const footerGradient = ctx.createLinearGradient(0, height - 100, 0, height);
-    footerGradient.addColorStop(0, 'transparent');
-    footerGradient.addColorStop(0.5, 'rgba(8, 12, 20, 0.5)');
-    footerGradient.addColorStop(1, 'rgba(8, 12, 20, 0.9)');
-    ctx.fillStyle = footerGradient;
-    ctx.fillRect(0, height - 100, width, 100);
-
-    // Bottom gradient bar - thicker and more prominent
-    ctx.fillStyle = accentGradient;
+    // Bottom gradient bar
+    const bottomGradient = ctx.createLinearGradient(0, 0, width, 0);
+    bottomGradient.addColorStop(0, PINK);
+    bottomGradient.addColorStop(0.5, PURPLE);
+    bottomGradient.addColorStop(1, CYAN);
+    ctx.fillStyle = bottomGradient;
     ctx.fillRect(0, height - 6, width, 6);
 
-    // Website URL with enhanced styling
-    ctx.shadowColor = 'rgba(255, 27, 107, 0.5)';
-    ctx.shadowBlur = 20;
+    // Website URL
+    ctx.shadowColor = PINK;
+    ctx.shadowBlur = 25;
     ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 28px "Exo 2", sans-serif';
-    ctx.fillText('TPVCareerMode.com', width / 2, height - 35);
+    ctx.font = 'bold 40px "Exo 2", sans-serif';
+    ctx.fillText('TPVCareerMode.com', width / 2, height - 38);
     ctx.shadowBlur = 0;
 
     return true;
