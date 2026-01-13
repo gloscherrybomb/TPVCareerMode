@@ -809,7 +809,41 @@ async function loadEventResults() {
             const eventData = window.getEvent ? window.getEvent(eventNumber) : null;
             const eventName = eventData?.name || `Event ${eventNumber}`;
             const eventCategory = eventData?.category || 'Local Amateur';
-            const awardsCount = userEventResults.earnedAwards?.length || 0;
+
+            // Get earnedAwards with their details from AWARD_DEFINITIONS
+            const earnedAwards = (userEventResults.earnedAwards || []).map(award => {
+                const awardDef = window.AWARD_DEFINITIONS?.[award.awardId] || {};
+                const iconDef = window.ICON_REGISTRY?.[award.awardId] || {};
+                return {
+                    id: award.awardId,
+                    title: awardDef.title || award.awardId,
+                    iconPath: iconDef.path || null,
+                    fallback: iconDef.fallback || awardDef.icon || '🏆'
+                };
+            });
+
+            // Use discordStory (condensed) if available, otherwise generate fallback
+            let shareStory = userEventResults.discordStory || '';
+            if (!shareStory && userEventResults.position) {
+                // Generate fallback summary similar to results-feed
+                const pos = userEventResults.position;
+                const pred = userEventResults.predictedPosition;
+                const posText = pos === 'DNF' ? 'DNF' : `${pos}${getOrdinalSuffix(pos)}`;
+
+                if (pos === 'DNF') {
+                    shareStory = `A tough day at ${eventName}. Racing can be unforgiving.`;
+                } else if (pos === 1) {
+                    shareStory = `Victory at ${eventName}! A winning performance to celebrate.`;
+                } else if (pos <= 3) {
+                    shareStory = `${posText} at ${eventName}. A solid podium finish!`;
+                } else if (pos <= 10) {
+                    shareStory = `${posText} at ${eventName}. A strong top-10 result.`;
+                } else if (pred && pred - pos >= 5) {
+                    shareStory = `${posText} at ${eventName} - beating the predicted ${pred}${getOrdinalSuffix(pred)}.`;
+                } else {
+                    shareStory = `${posText} at ${eventName}. Points earned for the season.`;
+                }
+            }
 
             // Store share data globally to avoid JSON escaping issues in onclick
             window._stravaShareData = {
@@ -818,8 +852,8 @@ async function loadEventResults() {
                     predictedPosition: userEventResults.predictedPosition,
                     points: userEventResults.points || 0,
                     bonusPoints: userEventResults.bonusPoints || 0,
-                    story: userEventResults.story || '',
-                    awardsCount: awardsCount
+                    story: shareStory,
+                    earnedAwards: earnedAwards
                 },
                 eventInfo: {
                     eventNumber: eventNumber,
@@ -1253,6 +1287,19 @@ function condenseStory(story, maxWords = 40) {
 }
 
 /**
+ * Load image with promise
+ */
+function loadImage(src) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
+        img.onload = () => resolve(img);
+        img.onerror = () => reject(new Error(`Failed to load image: ${src}`));
+        img.src = src;
+    });
+}
+
+/**
  * Generate Strava share image on canvas
  */
 async function generateStravaShareImage(userResult, eventInfo) {
@@ -1269,242 +1316,278 @@ async function generateStravaShareImage(userResult, eventInfo) {
     // Clear canvas
     ctx.clearRect(0, 0, width, height);
 
-    // Background gradient - deeper, richer
-    const bgGradient = ctx.createLinearGradient(0, 0, 0, height);
-    bgGradient.addColorStop(0, '#050810');
-    bgGradient.addColorStop(0.2, '#0a0e1a');
-    bgGradient.addColorStop(0.5, '#0f1422');
-    bgGradient.addColorStop(0.8, '#0a0e1a');
-    bgGradient.addColorStop(1, '#050810');
-    ctx.fillStyle = bgGradient;
-    ctx.fillRect(0, 0, width, height);
-
-    // Decorative radial glow behind position
-    const glowGradient = ctx.createRadialGradient(width / 2, 420, 0, width / 2, 420, 350);
-    const positionColor = getPositionColor(userResult.position);
-    // Convert hex to rgba
+    // Helper: Convert hex to rgba
     const hexToRgba = (hex, alpha) => {
         const r = parseInt(hex.slice(1, 3), 16);
         const g = parseInt(hex.slice(3, 5), 16);
         const b = parseInt(hex.slice(5, 7), 16);
         return `rgba(${r}, ${g}, ${b}, ${alpha})`;
     };
-    glowGradient.addColorStop(0, hexToRgba(positionColor, 0.2));
-    glowGradient.addColorStop(0.5, 'rgba(255, 27, 107, 0.05)');
-    glowGradient.addColorStop(1, 'transparent');
-    ctx.fillStyle = glowGradient;
-    ctx.fillRect(0, 100, width, 600);
 
-    // Subtle diagonal lines for texture
-    ctx.strokeStyle = 'rgba(255, 27, 107, 0.04)';
-    ctx.lineWidth = 1;
-    for (let i = 0; i < 15; i++) {
-        ctx.beginPath();
-        ctx.moveTo(0, i * 100);
-        ctx.lineTo(width, i * 100 + 50);
-        ctx.stroke();
+    // ========== BACKGROUND ==========
+    // Dark base
+    ctx.fillStyle = '#080c14';
+    ctx.fillRect(0, 0, width, height);
+
+    // Try to load event image as background
+    const eventNum = eventInfo.eventNumber;
+    const isSpecial = eventNum >= 100;
+    const imgFolder = isSpecial ? 'special' : 'season1';
+    const imgPath = `event-images/${imgFolder}/event_${eventNum}.jpg`;
+
+    try {
+        const eventImg = await loadImage(imgPath);
+        // Draw image at top, covering ~40% of height
+        const imgHeight = 540;
+        const imgAspect = eventImg.width / eventImg.height;
+        const drawWidth = width;
+        const drawHeight = drawWidth / imgAspect;
+        const yOffset = (imgHeight - drawHeight) / 2;
+
+        ctx.drawImage(eventImg, 0, yOffset, drawWidth, drawHeight);
+
+        // Fade overlay from transparent to dark
+        const fadeGradient = ctx.createLinearGradient(0, 0, 0, imgHeight + 100);
+        fadeGradient.addColorStop(0, 'rgba(8, 12, 20, 0.3)');
+        fadeGradient.addColorStop(0.5, 'rgba(8, 12, 20, 0.6)');
+        fadeGradient.addColorStop(0.75, 'rgba(8, 12, 20, 0.9)');
+        fadeGradient.addColorStop(1, '#080c14');
+        ctx.fillStyle = fadeGradient;
+        ctx.fillRect(0, 0, width, imgHeight + 100);
+    } catch (e) {
+        console.log('Event image not found, using gradient background');
+        // Fallback gradient background
+        const bgGradient = ctx.createLinearGradient(0, 0, 0, 500);
+        bgGradient.addColorStop(0, '#1a1f2e');
+        bgGradient.addColorStop(1, '#080c14');
+        ctx.fillStyle = bgGradient;
+        ctx.fillRect(0, 0, width, 500);
     }
 
-    // Top accent gradient bar
+    // Accent gradient for reuse
     const accentGradient = ctx.createLinearGradient(0, 0, width, 0);
     accentGradient.addColorStop(0, '#ff1b6b');
     accentGradient.addColorStop(0.5, '#c71ae5');
     accentGradient.addColorStop(1, '#45caff');
+
+    // Top accent bar
     ctx.fillStyle = accentGradient;
-    ctx.fillRect(0, 0, width, 5);
+    ctx.fillRect(0, 0, width, 4);
 
-    // TPV Logo with gradient
-    const logoGradient = ctx.createLinearGradient(width/2 - 80, 50, width/2 + 80, 90);
-    logoGradient.addColorStop(0, '#ff1b6b');
-    logoGradient.addColorStop(1, '#ff4d8d');
-    ctx.fillStyle = logoGradient;
-    ctx.font = 'bold 64px Orbitron, sans-serif';
+    // ========== HEADER SECTION ==========
+    // TPV Logo
     ctx.textAlign = 'center';
-    ctx.fillText('TPV', width / 2, 85);
+    ctx.fillStyle = '#ff1b6b';
+    ctx.font = 'bold 52px Orbitron, sans-serif';
+    ctx.fillText('TPV', width / 2, 70);
 
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
-    ctx.font = '600 20px "Exo 2", sans-serif';
-    ctx.letterSpacing = '4px';
-    ctx.fillText('C A R E E R  M O D E', width / 2, 120);
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+    ctx.font = '500 18px "Exo 2", sans-serif';
+    ctx.fillText('C A R E E R   M O D E', width / 2, 100);
 
-    // Event badge - pill style
-    ctx.font = '600 16px "Exo 2", sans-serif';
-    const badgeText = `EVENT ${eventInfo.eventNumber.toString().padStart(2, '0')}  •  ${(eventInfo.category || 'Local Amateur').toUpperCase()}`;
-    const badgeWidth = ctx.measureText(badgeText).width + 50;
+    // Event badge
+    ctx.font = '600 15px "Exo 2", sans-serif';
+    const badgeText = `EVENT ${eventNum.toString().padStart(2, '0')}  •  ${(eventInfo.category || 'Local Amateur').toUpperCase()}`;
+    const badgeWidth = ctx.measureText(badgeText).width + 40;
 
-    // Badge background
-    ctx.fillStyle = 'rgba(255, 27, 107, 0.15)';
+    ctx.fillStyle = 'rgba(255, 27, 107, 0.25)';
     ctx.beginPath();
-    ctx.roundRect((width - badgeWidth) / 2, 150, badgeWidth, 38, 19);
+    ctx.roundRect((width - badgeWidth) / 2, 130, badgeWidth, 32, 16);
     ctx.fill();
-    ctx.strokeStyle = 'rgba(255, 27, 107, 0.6)';
-    ctx.lineWidth = 1.5;
+    ctx.strokeStyle = 'rgba(255, 27, 107, 0.7)';
+    ctx.lineWidth = 1;
     ctx.stroke();
 
     ctx.fillStyle = '#ff1b6b';
-    ctx.fillText(badgeText, width / 2, 175);
+    ctx.fillText(badgeText, width / 2, 152);
 
-    // Event name - large and prominent
+    // Event name
     ctx.fillStyle = '#ffffff';
-    ctx.font = 'bold 52px Orbitron, sans-serif';
-    drawFittedText(ctx, eventInfo.eventName.toUpperCase(), width / 2, 270, 920, 52, 36, 'bold', 'Orbitron, sans-serif');
+    drawFittedText(ctx, eventInfo.eventName.toUpperCase(), width / 2, 220, 900, 46, 32, 'bold', 'Orbitron, sans-serif');
 
-    // Elegant divider
-    const dividerGradient = ctx.createLinearGradient(150, 0, width - 150, 0);
-    dividerGradient.addColorStop(0, 'transparent');
-    dividerGradient.addColorStop(0.2, 'rgba(255, 255, 255, 0.2)');
-    dividerGradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.4)');
-    dividerGradient.addColorStop(0.8, 'rgba(255, 255, 255, 0.2)');
-    dividerGradient.addColorStop(1, 'transparent');
-    ctx.strokeStyle = dividerGradient;
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(150, 310);
-    ctx.lineTo(width - 150, 310);
-    ctx.stroke();
-
-    // Position - the hero element
+    // ========== POSITION SECTION (Hero) ==========
     const position = userResult.position;
     const positionText = position === 'DNF' ? 'DNF' : `${position}${getOrdinalSuffix(position)}`;
     const posColor = getPositionColor(position);
 
-    // Position text with slight shadow for depth
+    // Position glow
+    const posGlow = ctx.createRadialGradient(width/2, 380, 0, width/2, 380, 200);
+    posGlow.addColorStop(0, hexToRgba(posColor, 0.25));
+    posGlow.addColorStop(0.5, hexToRgba(posColor, 0.08));
+    posGlow.addColorStop(1, 'transparent');
+    ctx.fillStyle = posGlow;
+    ctx.fillRect(0, 250, width, 280);
+
+    // Position number
     ctx.shadowColor = posColor;
-    ctx.shadowBlur = 30;
+    ctx.shadowBlur = 40;
     ctx.fillStyle = posColor;
-    ctx.font = 'bold 180px Orbitron, sans-serif';
-    ctx.fillText(positionText, width / 2, 500);
+    ctx.font = 'bold 160px Orbitron, sans-serif';
+    ctx.fillText(positionText, width / 2, 420);
     ctx.shadowBlur = 0;
 
     ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-    ctx.font = '600 22px "Exo 2", sans-serif';
-    ctx.fillText('FINISHING POSITION', width / 2, 550);
+    ctx.font = '600 20px "Exo 2", sans-serif';
+    ctx.fillText('FINISHING POSITION', width / 2, 470);
 
-    // Prediction section
-    let currentY = 620;
+    // ========== STATS SECTION ==========
+    let currentY = 530;
+
+    // Prediction (if available)
     if (userResult.predictedPosition && position !== 'DNF') {
         const predicted = userResult.predictedPosition;
         const diff = predicted - position;
 
-        // Prediction card background
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.03)';
-        ctx.beginPath();
-        ctx.roundRect(180, currentY - 30, width - 360, 60, 8);
-        ctx.fill();
-
-        let predictionText;
-        let predictionColor;
-
+        let predIcon, predText, predColor;
         if (diff > 0) {
-            predictionText = `⬆ Predicted ${predicted}${getOrdinalSuffix(predicted)} → Finished ${positionText}  (+${diff})`;
-            predictionColor = '#22c55e';
+            predIcon = '▲';
+            predText = `Predicted ${predicted}${getOrdinalSuffix(predicted)} → Finished ${positionText}`;
+            predColor = '#22c55e';
         } else if (diff < 0) {
-            predictionText = `⬇ Predicted ${predicted}${getOrdinalSuffix(predicted)} → Finished ${positionText}  (${diff})`;
-            predictionColor = '#ef4444';
+            predIcon = '▼';
+            predText = `Predicted ${predicted}${getOrdinalSuffix(predicted)} → Finished ${positionText}`;
+            predColor = '#ef4444';
         } else {
-            predictionText = `🎯 Predicted ${predicted}${getOrdinalSuffix(predicted)} — EXACT!`;
-            predictionColor = '#FFD700';
+            predIcon = '●';
+            predText = `Predicted ${predicted}${getOrdinalSuffix(predicted)} — EXACT!`;
+            predColor = '#FFD700';
         }
 
-        ctx.fillStyle = predictionColor;
-        ctx.font = '600 24px "Exo 2", sans-serif';
-        ctx.fillText(predictionText, width / 2, currentY + 8);
-        currentY += 80;
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.04)';
+        ctx.beginPath();
+        ctx.roundRect(140, currentY, width - 280, 50, 8);
+        ctx.fill();
+
+        ctx.fillStyle = predColor;
+        ctx.font = 'bold 22px "Exo 2", sans-serif';
+        ctx.fillText(`${predIcon}  ${predText}  (${diff >= 0 ? '+' : ''}${diff})`, width / 2, currentY + 33);
+        currentY += 70;
     }
 
-    // Points section - styled card
+    // Points card
     currentY += 10;
-
-    // Points card with gradient border effect
-    ctx.fillStyle = 'rgba(69, 202, 255, 0.08)';
+    ctx.fillStyle = 'rgba(69, 202, 255, 0.1)';
     ctx.beginPath();
-    ctx.roundRect(160, currentY, width - 320, 150, 16);
+    ctx.roundRect(180, currentY, width - 360, 130, 12);
     ctx.fill();
-
-    // Border
     ctx.strokeStyle = 'rgba(69, 202, 255, 0.4)';
     ctx.lineWidth = 2;
     ctx.stroke();
 
-    // Points value
     ctx.fillStyle = '#45caff';
     ctx.shadowColor = '#45caff';
-    ctx.shadowBlur = 15;
-    ctx.font = 'bold 80px Orbitron, sans-serif';
-    ctx.fillText(userResult.points || '0', width / 2, currentY + 85);
+    ctx.shadowBlur = 20;
+    ctx.font = 'bold 64px Orbitron, sans-serif';
+    ctx.fillText(userResult.points || '0', width / 2, currentY + 75);
     ctx.shadowBlur = 0;
 
     ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-    ctx.font = '600 18px "Exo 2", sans-serif';
-    ctx.fillText('POINTS EARNED', width / 2, currentY + 125);
+    ctx.font = '600 16px "Exo 2", sans-serif';
+    ctx.fillText('POINTS EARNED', width / 2, currentY + 110);
 
-    currentY += 170;
+    currentY += 150;
 
-    // Bonus points
+    // Bonus points row
     if (userResult.bonusPoints && userResult.bonusPoints > 0) {
         ctx.fillStyle = '#ff1b6b';
-        ctx.font = 'bold 26px "Exo 2", sans-serif';
+        ctx.font = 'bold 22px "Exo 2", sans-serif';
         ctx.fillText(`+${userResult.bonusPoints} BONUS POINTS`, width / 2, currentY);
-        currentY += 45;
+        currentY += 40;
     }
 
-    // Awards
-    if (userResult.awardsCount && userResult.awardsCount > 0) {
-        ctx.fillStyle = '#c71ae5';
-        ctx.font = 'bold 26px "Exo 2", sans-serif';
-        ctx.fillText(`🏆 ${userResult.awardsCount} AWARD${userResult.awardsCount > 1 ? 'S' : ''} EARNED`, width / 2, currentY);
-        currentY += 50;
-    }
-
-    // Story section
-    if (userResult.story) {
+    // ========== AWARDS SECTION ==========
+    const awards = userResult.earnedAwards || [];
+    if (awards.length > 0) {
         currentY += 20;
-        const condensedStory = condenseStory(userResult.story, 40);
 
-        // Story card
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.02)';
+        // Awards header
+        ctx.fillStyle = 'rgba(199, 26, 229, 0.1)';
         ctx.beginPath();
-        ctx.roundRect(100, currentY, width - 200, 180, 12);
+        ctx.roundRect(100, currentY, width - 200, 50 + Math.ceil(awards.length / 3) * 80, 12);
         ctx.fill();
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+        ctx.strokeStyle = 'rgba(199, 26, 229, 0.4)';
         ctx.lineWidth = 1;
         ctx.stroke();
 
-        // Quote marks
-        ctx.fillStyle = 'rgba(255, 27, 107, 0.3)';
-        ctx.font = 'bold 60px Georgia, serif';
-        ctx.textAlign = 'left';
-        ctx.fillText('"', 120, currentY + 55);
-        ctx.textAlign = 'right';
-        ctx.fillText('"', width - 120, currentY + 160);
-        ctx.textAlign = 'center';
+        ctx.fillStyle = '#c71ae5';
+        ctx.font = 'bold 18px "Exo 2", sans-serif';
+        ctx.fillText(`${awards.length} AWARD${awards.length > 1 ? 'S' : ''} EARNED`, width / 2, currentY + 30);
 
-        // Story text
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.75)';
-        ctx.font = '400 19px "Exo 2", sans-serif';
+        currentY += 50;
 
-        const lines = wrapText(ctx, condensedStory, width - 260);
-        const lineHeight = 30;
-        const maxLines = 5;
-        const displayLines = lines.slice(0, maxLines);
-        const startY = currentY + 50 + ((130 - displayLines.length * lineHeight) / 2);
+        // Draw awards in a row (up to 3 per row)
+        const awardSize = 48;
+        const awardSpacing = 180;
+        const awardsPerRow = Math.min(awards.length, 3);
+        const startX = width / 2 - ((awardsPerRow - 1) * awardSpacing) / 2;
 
-        displayLines.forEach((line, index) => {
-            ctx.fillText(line, width / 2, startY + index * lineHeight);
-        });
+        for (let i = 0; i < awards.length && i < 6; i++) {
+            const award = awards[i];
+            const row = Math.floor(i / 3);
+            const col = i % 3;
+            const x = startX + col * awardSpacing;
+            const y = currentY + row * 80 + 30;
 
-        currentY += 200;
+            // Try to load award icon
+            if (award.iconPath) {
+                try {
+                    const iconImg = await loadImage(award.iconPath);
+                    ctx.drawImage(iconImg, x - awardSize/2, y - awardSize/2, awardSize, awardSize);
+                } catch {
+                    // Fallback to text
+                    ctx.font = `${awardSize}px sans-serif`;
+                    ctx.fillText(award.fallback, x, y + 15);
+                }
+            } else {
+                ctx.font = `${awardSize}px sans-serif`;
+                ctx.fillText(award.fallback, x, y + 15);
+            }
+
+            // Award title below icon
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+            ctx.font = '500 13px "Exo 2", sans-serif';
+            ctx.fillText(award.title, x, y + awardSize/2 + 18);
+        }
+
+        currentY += Math.ceil(awards.length / 3) * 80 + 20;
     }
 
-    // Bottom section - prominent branding
-    // Gradient bar at bottom
-    ctx.fillStyle = accentGradient;
-    ctx.fillRect(0, height - 5, width, 5);
+    // ========== STORY SECTION ==========
+    if (userResult.story) {
+        currentY += 15;
 
-    // Website with subtle glow
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
-    ctx.font = 'bold 32px "Exo 2", sans-serif';
-    ctx.fillText('TPVCareerMode.com', width / 2, height - 50);
+        // Story container
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.03)';
+        ctx.beginPath();
+        ctx.roundRect(80, currentY, width - 160, 150, 10);
+        ctx.fill();
+
+        // Story text (already condensed discordStory)
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+        ctx.font = 'italic 18px "Exo 2", sans-serif';
+
+        const lines = wrapText(ctx, `"${userResult.story}"`, width - 200);
+        const lineHeight = 28;
+        const maxLines = 4;
+        const displayLines = lines.slice(0, maxLines);
+        const textStartY = currentY + 35 + ((115 - displayLines.length * lineHeight) / 2);
+
+        displayLines.forEach((line, index) => {
+            ctx.fillText(line, width / 2, textStartY + index * lineHeight);
+        });
+
+        currentY += 170;
+    }
+
+    // ========== FOOTER ==========
+    // Bottom gradient bar
+    ctx.fillStyle = accentGradient;
+    ctx.fillRect(0, height - 4, width, 4);
+
+    // Website
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+    ctx.font = 'bold 28px "Exo 2", sans-serif';
+    ctx.fillText('TPVCareerMode.com', width / 2, height - 45);
 
     return true;
 }
