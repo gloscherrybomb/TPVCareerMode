@@ -845,6 +845,14 @@ async function loadEventResults() {
                 }
             }
 
+            // Find user's result in results array for power data
+            const userResultFromArray = results.find(r => r.uid === userUid);
+            const powerData = userResultFromArray ? {
+                avgPower: userResultFromArray.avgPower || null,
+                nrmPower: userResultFromArray.nrmPower || null,
+                maxPower: userResultFromArray.maxPower || null
+            } : null;
+
             // Store share data globally to avoid JSON escaping issues in onclick
             window._stravaShareData = {
                 userResult: {
@@ -853,7 +861,8 @@ async function loadEventResults() {
                     points: userEventResults.points || 0,
                     bonusPoints: userEventResults.bonusPoints || 0,
                     story: shareStory,
-                    earnedAwards: earnedAwards
+                    earnedAwards: earnedAwards,
+                    powerData: powerData
                 },
                 eventInfo: {
                     eventNumber: eventNumber,
@@ -1515,6 +1524,63 @@ async function generateStravaShareImage(userResult, eventInfo) {
         ctx.font = 'bold 20px "Exo 2", sans-serif';
         ctx.fillText(`+${userResult.bonusPoints} BONUS POINTS`, width / 2, currentY);
         currentY += 35;
+    }
+
+    // ========== POWER DATA SECTION ==========
+    const power = userResult.powerData;
+    if (power && (power.avgPower || power.nrmPower || power.maxPower)) {
+        currentY += 10;
+
+        // Power stats container
+        ctx.fillStyle = 'rgba(255, 170, 0, 0.08)';
+        ctx.beginPath();
+        ctx.roundRect(100, currentY, width - 200, 85, 10);
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(255, 170, 0, 0.4)';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        // Power header
+        ctx.fillStyle = '#ffaa00';
+        ctx.font = 'bold 14px "Exo 2", sans-serif';
+        ctx.fillText('POWER DATA', width / 2, currentY + 22);
+
+        // Three power values in a row
+        const powerY = currentY + 58;
+        const powerSpacing = 280;
+        const powerStartX = width / 2 - powerSpacing;
+
+        // Avg Power
+        if (power.avgPower) {
+            ctx.fillStyle = '#ffaa00';
+            ctx.font = 'bold 28px Orbitron, sans-serif';
+            ctx.fillText(power.avgPower, powerStartX, powerY);
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+            ctx.font = '500 11px "Exo 2", sans-serif';
+            ctx.fillText('AVG W', powerStartX, powerY + 18);
+        }
+
+        // Normalized Power
+        if (power.nrmPower) {
+            ctx.fillStyle = '#ffaa00';
+            ctx.font = 'bold 28px Orbitron, sans-serif';
+            ctx.fillText(power.nrmPower, width / 2, powerY);
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+            ctx.font = '500 11px "Exo 2", sans-serif';
+            ctx.fillText('NP', width / 2, powerY + 18);
+        }
+
+        // Max Power
+        if (power.maxPower) {
+            ctx.fillStyle = '#ffaa00';
+            ctx.font = 'bold 28px Orbitron, sans-serif';
+            ctx.fillText(power.maxPower, powerStartX + powerSpacing * 2, powerY);
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+            ctx.font = '500 11px "Exo 2", sans-serif';
+            ctx.fillText('MAX W', powerStartX + powerSpacing * 2, powerY + 18);
+        }
+
+        currentY += 100;
     }
 
     // ========== AWARDS SECTION ==========
