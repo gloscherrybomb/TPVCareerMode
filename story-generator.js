@@ -518,7 +518,7 @@ function generateRaceRecapCondensed(data) {
   const gapText = formatGapText(position === 1 ? winMargin : lossMargin);
 
   // Build dynamic text based on race dynamics
-  const getDynamicsText = () => {
+  const getDynamicsText = (pos) => {
     if (dynamics.type === 'bunch_sprint') {
       const sprintTexts = [
         'The sprint was chaos, riders everywhere, and you timed it perfectly.',
@@ -540,10 +540,16 @@ function generateRaceRecapCondensed(data) {
     if (dynamics.type === 'chase_group') {
       return gapText ? `The front group rode away with ${gapText} on the chase.` : 'You finished in the chase group.';
     }
-    if (gapText) {
+    if (pos === 1 && gapText) {
       return `When the race reached its decisive moment, you proved strongest, winning by ${gapText}.`;
     }
-    return 'When the race reached its decisive moment, you were ready.';
+    if (pos === 1) {
+      return 'When the race reached its decisive moment, you were ready.';
+    }
+    if (gapText) {
+      return `You finished ${gapText} behind the winner.`;
+    }
+    return 'You crossed the line with the group.';
   };
 
   // Build gap suffix for templates
@@ -561,7 +567,7 @@ function generateRaceRecapCondensed(data) {
     gapText,
     gapTextSuffix: getGapSuffix(),
     winnerName,
-    dynamicsText: getDynamicsText()
+    dynamicsText: getDynamicsText(position)
   };
 
   // Handle DNF
