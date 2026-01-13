@@ -886,6 +886,10 @@ async function loadEventResults() {
                 maxPower: userResultFromArray.maxPower || null
             } : null;
 
+            // Get race number (sequential stage number for this rider)
+            // stageNumber is the sequential race number the rider completed
+            const raceNumber = userEventResults.stageNumber || null;
+
             // Store share data globally to avoid JSON escaping issues in onclick
             window._stravaShareData = {
                 userResult: {
@@ -900,7 +904,8 @@ async function loadEventResults() {
                 eventInfo: {
                     eventNumber: eventNumber,
                     eventName: eventName,
-                    category: eventCategory
+                    category: eventCategory,
+                    raceNumber: raceNumber
                 }
             };
 
@@ -1348,6 +1353,37 @@ function loadImage(src) {
 }
 
 /**
+ * Load SVG as image by fetching and converting to data URL
+ * This works better for canvas rendering than direct SVG loading
+ */
+async function loadSvgAsImage(svgPath) {
+    try {
+        const response = await fetch(svgPath);
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+        const svgText = await response.text();
+        const blob = new Blob([svgText], { type: 'image/svg+xml' });
+        const url = URL.createObjectURL(blob);
+
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.onload = () => {
+                URL.revokeObjectURL(url);
+                resolve(img);
+            };
+            img.onerror = (e) => {
+                URL.revokeObjectURL(url);
+                reject(e);
+            };
+            img.src = url;
+        });
+    } catch (e) {
+        console.warn(`Failed to load SVG: ${svgPath}`, e);
+        throw e;
+    }
+}
+
+/**
  * Generate Strava share image on canvas
  */
 async function generateStravaShareImage(userResult, eventInfo) {
@@ -1452,9 +1488,11 @@ async function generateStravaShareImage(userResult, eventInfo) {
     ctx.shadowBlur = 0;
     ctx.shadowOffsetY = 0;
 
-    // Event badge with solid background for readability
+    // Race badge with solid background for readability
     ctx.font = '700 14px "Exo 2", sans-serif';
-    const badgeText = `EVENT ${eventNum.toString().padStart(2, '0')}  •  ${(eventInfo.category || 'Local Amateur').toUpperCase()}`;
+    // Use raceNumber (sequential) if available, otherwise fall back to event number
+    const raceNum = eventInfo.raceNumber || eventNum;
+    const badgeText = `RACE ${raceNum}  •  ${(eventInfo.category || 'Local Amateur').toUpperCase()}`;
     const badgeWidth = ctx.measureText(badgeText).width + 50;
 
     // Solid dark background for badge
@@ -1677,10 +1715,15 @@ async function generateStravaShareImage(userResult, eventInfo) {
 
             let iconLoaded = false;
 
-            // Try to load award icon
+            // Try to load award icon (use SVG loader for .svg files)
             if (award.iconPath) {
                 try {
-                    const iconImg = await loadImage(award.iconPath);
+                    let iconImg;
+                    if (award.iconPath.endsWith('.svg')) {
+                        iconImg = await loadSvgAsImage(award.iconPath);
+                    } else {
+                        iconImg = await loadImage(award.iconPath);
+                    }
                     ctx.drawImage(iconImg, x - awardSize/2, y - awardSize/2, awardSize, awardSize);
                     iconLoaded = true;
                 } catch (e) {
@@ -1689,7 +1732,7 @@ async function generateStravaShareImage(userResult, eventInfo) {
             }
 
             // Fallback to emoji if icon didn't load
-            if (!iconLoaded) {
+            if (!iconLoaded && award.fallback) {
                 // Draw circle background
                 const circleGradient = ctx.createRadialGradient(x, y, 0, x, y, awardSize/2);
                 circleGradient.addColorStop(0, 'rgba(199, 26, 229, 0.4)');
@@ -1700,11 +1743,9 @@ async function generateStravaShareImage(userResult, eventInfo) {
                 ctx.fill();
 
                 // Draw emoji fallback
-                if (award.fallback) {
-                    ctx.font = `${awardSize - 10}px "Segoe UI Emoji", "Apple Color Emoji", sans-serif`;
-                    ctx.fillStyle = '#ffffff';
-                    ctx.fillText(award.fallback, x, y + 12);
-                }
+                ctx.font = `${awardSize - 10}px "Segoe UI Emoji", "Apple Color Emoji", sans-serif`;
+                ctx.fillStyle = '#ffffff';
+                ctx.fillText(award.fallback, x, y + 12);
             }
 
             // Award title below icon
@@ -1718,37 +1759,46 @@ async function generateStravaShareImage(userResult, eventInfo) {
 
     // ========== STORY SECTION ==========
     if (userResult.story && userResult.story.length > 20) {
-        currentY += 8;
+        currentY += 16;
+
+        const containerHeight = 150;
 
         // Story container with subtle gradient
-        const storyGradient = ctx.createLinearGradient(80, currentY, 80, currentY + 110);
-        storyGradient.addColorStop(0, 'rgba(255, 255, 255, 0.04)');
-        storyGradient.addColorStop(1, 'rgba(255, 255, 255, 0.01)');
+        const storyGradient = ctx.createLinearGradient(60, currentY, 60, currentY + containerHeight);
+        storyGradient.addColorStop(0, 'rgba(255, 255, 255, 0.05)');
+        storyGradient.addColorStop(1, 'rgba(255, 255, 255, 0.02)');
         ctx.fillStyle = storyGradient;
         ctx.beginPath();
-        ctx.roundRect(80, currentY, width - 160, 110, 10);
+        ctx.roundRect(60, currentY, width - 120, containerHeight, 12);
         ctx.fill();
 
-        // Left accent line
-        ctx.fillStyle = 'rgba(255, 27, 107, 0.5)';
-        ctx.fillRect(80, currentY, 3, 110);
+        // Left accent line - taller and more prominent
+        const accentGradient = ctx.createLinearGradient(0, currentY, 0, currentY + containerHeight);
+        accentGradient.addColorStop(0, 'rgba(255, 27, 107, 0.7)');
+        accentGradient.addColorStop(0.5, 'rgba(199, 26, 229, 0.6)');
+        accentGradient.addColorStop(1, 'rgba(69, 202, 255, 0.5)');
+        ctx.fillStyle = accentGradient;
+        ctx.fillRect(60, currentY, 4, containerHeight);
 
-        // Story text
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
-        ctx.font = 'italic 16px "Exo 2", sans-serif';
+        // Story text - LARGER font for impact
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.92)';
+        ctx.font = 'italic 600 24px "Exo 2", sans-serif';
 
         const storyText = userResult.story;
-        const lines = wrapText(ctx, `"${storyText}"`, width - 220);
-        const lineHeight = 24;
+        const lines = wrapText(ctx, `"${storyText}"`, width - 180);
+        const lineHeight = 36;
         const maxLines = 3;
         const displayLines = lines.slice(0, maxLines);
-        const textStartY = currentY + 22 + ((85 - displayLines.length * lineHeight) / 2);
+
+        // Center the text block vertically within container
+        const textBlockHeight = displayLines.length * lineHeight;
+        const textStartY = currentY + (containerHeight - textBlockHeight) / 2 + lineHeight * 0.7;
 
         displayLines.forEach((line, index) => {
             ctx.fillText(line, width / 2, textStartY + index * lineHeight);
         });
 
-        currentY += 120;
+        currentY += containerHeight + 10;
     }
 
     // ========== FOOTER ==========
