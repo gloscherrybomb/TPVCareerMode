@@ -804,6 +804,43 @@ async function loadEventResults() {
             `;
         }
 
+        // Add Strava Share button
+        if (userEventResults) {
+            const eventData = window.getEvent ? window.getEvent(eventNumber) : null;
+            const eventName = eventData?.name || `Event ${eventNumber}`;
+            const eventCategory = eventData?.category || 'Local Amateur';
+            const awardsCount = userEventResults.earnedAwards?.length || 0;
+
+            // Prepare share data as JSON for onclick handler
+            const shareUserResult = {
+                position: userEventResults.position,
+                predictedPosition: userEventResults.predictedPosition,
+                points: userEventResults.points || 0,
+                bonusPoints: userEventResults.bonusPoints || 0,
+                story: userEventResults.story || '',
+                awardsCount: awardsCount
+            };
+
+            const shareEventInfo = {
+                eventNumber: eventNumber,
+                eventName: eventName,
+                category: eventCategory
+            };
+
+            tableHTML += `
+                <div class="share-section">
+                    <p class="share-section-title">Share Your Result</p>
+                    <button class="btn-strava-share" onclick='window.downloadStravaShareImage(${JSON.stringify(shareUserResult)}, ${JSON.stringify(shareEventInfo)})'>
+                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066l-2.084 4.116zM7.451 13.828h3.04l4.897-9.656l-2.025-4.172L7.451 13.828z"/>
+                        </svg>
+                        Download Share Image
+                    </button>
+                    <p class="share-hint">Download to share on Strava, Instagram, or social media</p>
+                </div>
+            `;
+        }
+
         // Check if this is a time-based event (show distance instead of time)
         const isTimeBasedEvent = getTimeBasedEvents().includes(eventNumber);
         console.log(`Event ${eventNumber}: isTimeBasedEvent=${isTimeBasedEvent}, TIME_BASED_EVENTS=${JSON.stringify(getTimeBasedEvents())}`);
@@ -1112,3 +1149,382 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Make loadEventResults available globally
 window.loadEventResults = loadEventResults;
+
+// ===== Strava Share Image Generation =====
+
+/**
+ * Get position color based on finishing position
+ */
+function getPositionColor(position) {
+    if (position === 'DNF') return '#6B7280';
+    if (position === 1) return '#FFD700';  // Gold
+    if (position === 2) return '#C0C0C0';  // Silver
+    if (position === 3) return '#CD7F32';  // Bronze
+    if (position <= 10) return '#45caff';  // Blue
+    return '#6B7280';  // Gray
+}
+
+/**
+ * Draw text that fits within a max width, scaling down if needed
+ */
+function drawFittedText(ctx, text, x, y, maxWidth, initialFontSize, minFontSize, fontWeight, fontFamily) {
+    let fontSize = initialFontSize;
+    ctx.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
+
+    while (ctx.measureText(text).width > maxWidth && fontSize > minFontSize) {
+        fontSize -= 2;
+        ctx.font = `${fontWeight} ${fontSize}px ${fontFamily}`;
+    }
+
+    let displayText = text;
+    if (ctx.measureText(text).width > maxWidth) {
+        while (ctx.measureText(displayText + '...').width > maxWidth && displayText.length > 0) {
+            displayText = displayText.slice(0, -1);
+        }
+        displayText += '...';
+    }
+
+    ctx.fillText(displayText, x, y);
+    return fontSize;
+}
+
+/**
+ * Wrap text to fit within a max width, returning array of lines
+ */
+function wrapText(ctx, text, maxWidth) {
+    const words = text.split(' ');
+    const lines = [];
+    let currentLine = '';
+
+    for (const word of words) {
+        const testLine = currentLine ? `${currentLine} ${word}` : word;
+        if (ctx.measureText(testLine).width > maxWidth && currentLine) {
+            lines.push(currentLine);
+            currentLine = word;
+        } else {
+            currentLine = testLine;
+        }
+    }
+    if (currentLine) {
+        lines.push(currentLine);
+    }
+
+    return lines;
+}
+
+/**
+ * Condense story to approximately N words
+ */
+function condenseStory(story, maxWords = 40) {
+    if (!story) return '';
+
+    // Remove paragraph breaks and extra whitespace
+    const cleanStory = story.replace(/\n\n/g, ' ').replace(/\s+/g, ' ').trim();
+    const words = cleanStory.split(' ');
+
+    if (words.length <= maxWords) return cleanStory;
+
+    // Find a good breaking point (end of sentence if possible)
+    let truncated = words.slice(0, maxWords).join(' ');
+
+    // Try to end at a sentence
+    const lastPeriod = truncated.lastIndexOf('.');
+    const lastExclaim = truncated.lastIndexOf('!');
+    const lastQuestion = truncated.lastIndexOf('?');
+    const lastSentenceEnd = Math.max(lastPeriod, lastExclaim, lastQuestion);
+
+    if (lastSentenceEnd > truncated.length * 0.5) {
+        return truncated.substring(0, lastSentenceEnd + 1);
+    }
+
+    return truncated + '...';
+}
+
+/**
+ * Generate Strava share image on canvas
+ */
+async function generateStravaShareImage(userResult, eventInfo) {
+    const canvas = document.getElementById('stravaShareCanvas');
+    if (!canvas) {
+        console.error('Strava share canvas not found');
+        return false;
+    }
+
+    const ctx = canvas.getContext('2d');
+    const width = 1080;
+    const height = 1350;
+
+    // Clear canvas
+    ctx.clearRect(0, 0, width, height);
+
+    // Background gradient - deeper, richer
+    const bgGradient = ctx.createLinearGradient(0, 0, 0, height);
+    bgGradient.addColorStop(0, '#050810');
+    bgGradient.addColorStop(0.2, '#0a0e1a');
+    bgGradient.addColorStop(0.5, '#0f1422');
+    bgGradient.addColorStop(0.8, '#0a0e1a');
+    bgGradient.addColorStop(1, '#050810');
+    ctx.fillStyle = bgGradient;
+    ctx.fillRect(0, 0, width, height);
+
+    // Decorative radial glow behind position
+    const glowGradient = ctx.createRadialGradient(width / 2, 420, 0, width / 2, 420, 350);
+    const positionColor = getPositionColor(userResult.position);
+    // Convert hex to rgba
+    const hexToRgba = (hex, alpha) => {
+        const r = parseInt(hex.slice(1, 3), 16);
+        const g = parseInt(hex.slice(3, 5), 16);
+        const b = parseInt(hex.slice(5, 7), 16);
+        return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+    };
+    glowGradient.addColorStop(0, hexToRgba(positionColor, 0.2));
+    glowGradient.addColorStop(0.5, 'rgba(255, 27, 107, 0.05)');
+    glowGradient.addColorStop(1, 'transparent');
+    ctx.fillStyle = glowGradient;
+    ctx.fillRect(0, 100, width, 600);
+
+    // Subtle diagonal lines for texture
+    ctx.strokeStyle = 'rgba(255, 27, 107, 0.04)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i < 15; i++) {
+        ctx.beginPath();
+        ctx.moveTo(0, i * 100);
+        ctx.lineTo(width, i * 100 + 50);
+        ctx.stroke();
+    }
+
+    // Top accent gradient bar
+    const accentGradient = ctx.createLinearGradient(0, 0, width, 0);
+    accentGradient.addColorStop(0, '#ff1b6b');
+    accentGradient.addColorStop(0.5, '#c71ae5');
+    accentGradient.addColorStop(1, '#45caff');
+    ctx.fillStyle = accentGradient;
+    ctx.fillRect(0, 0, width, 5);
+
+    // TPV Logo with gradient
+    const logoGradient = ctx.createLinearGradient(width/2 - 80, 50, width/2 + 80, 90);
+    logoGradient.addColorStop(0, '#ff1b6b');
+    logoGradient.addColorStop(1, '#ff4d8d');
+    ctx.fillStyle = logoGradient;
+    ctx.font = 'bold 64px Orbitron, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('TPV', width / 2, 85);
+
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+    ctx.font = '600 20px "Exo 2", sans-serif';
+    ctx.letterSpacing = '4px';
+    ctx.fillText('C A R E E R  M O D E', width / 2, 120);
+
+    // Event badge - pill style
+    ctx.font = '600 16px "Exo 2", sans-serif';
+    const badgeText = `EVENT ${eventInfo.eventNumber.toString().padStart(2, '0')}  •  ${(eventInfo.category || 'Local Amateur').toUpperCase()}`;
+    const badgeWidth = ctx.measureText(badgeText).width + 50;
+
+    // Badge background
+    ctx.fillStyle = 'rgba(255, 27, 107, 0.15)';
+    ctx.beginPath();
+    ctx.roundRect((width - badgeWidth) / 2, 150, badgeWidth, 38, 19);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255, 27, 107, 0.6)';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    ctx.fillStyle = '#ff1b6b';
+    ctx.fillText(badgeText, width / 2, 175);
+
+    // Event name - large and prominent
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 52px Orbitron, sans-serif';
+    drawFittedText(ctx, eventInfo.eventName.toUpperCase(), width / 2, 270, 920, 52, 36, 'bold', 'Orbitron, sans-serif');
+
+    // Elegant divider
+    const dividerGradient = ctx.createLinearGradient(150, 0, width - 150, 0);
+    dividerGradient.addColorStop(0, 'transparent');
+    dividerGradient.addColorStop(0.2, 'rgba(255, 255, 255, 0.2)');
+    dividerGradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.4)');
+    dividerGradient.addColorStop(0.8, 'rgba(255, 255, 255, 0.2)');
+    dividerGradient.addColorStop(1, 'transparent');
+    ctx.strokeStyle = dividerGradient;
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(150, 310);
+    ctx.lineTo(width - 150, 310);
+    ctx.stroke();
+
+    // Position - the hero element
+    const position = userResult.position;
+    const positionText = position === 'DNF' ? 'DNF' : `${position}${getOrdinalSuffix(position)}`;
+    const posColor = getPositionColor(position);
+
+    // Position text with slight shadow for depth
+    ctx.shadowColor = posColor;
+    ctx.shadowBlur = 30;
+    ctx.fillStyle = posColor;
+    ctx.font = 'bold 180px Orbitron, sans-serif';
+    ctx.fillText(positionText, width / 2, 500);
+    ctx.shadowBlur = 0;
+
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+    ctx.font = '600 22px "Exo 2", sans-serif';
+    ctx.fillText('FINISHING POSITION', width / 2, 550);
+
+    // Prediction section
+    let currentY = 620;
+    if (userResult.predictedPosition && position !== 'DNF') {
+        const predicted = userResult.predictedPosition;
+        const diff = predicted - position;
+
+        // Prediction card background
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.03)';
+        ctx.beginPath();
+        ctx.roundRect(180, currentY - 30, width - 360, 60, 8);
+        ctx.fill();
+
+        let predictionText;
+        let predictionColor;
+
+        if (diff > 0) {
+            predictionText = `⬆ Predicted ${predicted}${getOrdinalSuffix(predicted)} → Finished ${positionText}  (+${diff})`;
+            predictionColor = '#22c55e';
+        } else if (diff < 0) {
+            predictionText = `⬇ Predicted ${predicted}${getOrdinalSuffix(predicted)} → Finished ${positionText}  (${diff})`;
+            predictionColor = '#ef4444';
+        } else {
+            predictionText = `🎯 Predicted ${predicted}${getOrdinalSuffix(predicted)} — EXACT!`;
+            predictionColor = '#FFD700';
+        }
+
+        ctx.fillStyle = predictionColor;
+        ctx.font = '600 24px "Exo 2", sans-serif';
+        ctx.fillText(predictionText, width / 2, currentY + 8);
+        currentY += 80;
+    }
+
+    // Points section - styled card
+    currentY += 10;
+
+    // Points card with gradient border effect
+    ctx.fillStyle = 'rgba(69, 202, 255, 0.08)';
+    ctx.beginPath();
+    ctx.roundRect(160, currentY, width - 320, 150, 16);
+    ctx.fill();
+
+    // Border
+    ctx.strokeStyle = 'rgba(69, 202, 255, 0.4)';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Points value
+    ctx.fillStyle = '#45caff';
+    ctx.shadowColor = '#45caff';
+    ctx.shadowBlur = 15;
+    ctx.font = 'bold 80px Orbitron, sans-serif';
+    ctx.fillText(userResult.points || '0', width / 2, currentY + 85);
+    ctx.shadowBlur = 0;
+
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+    ctx.font = '600 18px "Exo 2", sans-serif';
+    ctx.fillText('POINTS EARNED', width / 2, currentY + 125);
+
+    currentY += 170;
+
+    // Bonus points
+    if (userResult.bonusPoints && userResult.bonusPoints > 0) {
+        ctx.fillStyle = '#ff1b6b';
+        ctx.font = 'bold 26px "Exo 2", sans-serif';
+        ctx.fillText(`+${userResult.bonusPoints} BONUS POINTS`, width / 2, currentY);
+        currentY += 45;
+    }
+
+    // Awards
+    if (userResult.awardsCount && userResult.awardsCount > 0) {
+        ctx.fillStyle = '#c71ae5';
+        ctx.font = 'bold 26px "Exo 2", sans-serif';
+        ctx.fillText(`🏆 ${userResult.awardsCount} AWARD${userResult.awardsCount > 1 ? 'S' : ''} EARNED`, width / 2, currentY);
+        currentY += 50;
+    }
+
+    // Story section
+    if (userResult.story) {
+        currentY += 20;
+        const condensedStory = condenseStory(userResult.story, 40);
+
+        // Story card
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.02)';
+        ctx.beginPath();
+        ctx.roundRect(100, currentY, width - 200, 180, 12);
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        // Quote marks
+        ctx.fillStyle = 'rgba(255, 27, 107, 0.3)';
+        ctx.font = 'bold 60px Georgia, serif';
+        ctx.textAlign = 'left';
+        ctx.fillText('"', 120, currentY + 55);
+        ctx.textAlign = 'right';
+        ctx.fillText('"', width - 120, currentY + 160);
+        ctx.textAlign = 'center';
+
+        // Story text
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.75)';
+        ctx.font = '400 19px "Exo 2", sans-serif';
+
+        const lines = wrapText(ctx, condensedStory, width - 260);
+        const lineHeight = 30;
+        const maxLines = 5;
+        const displayLines = lines.slice(0, maxLines);
+        const startY = currentY + 50 + ((130 - displayLines.length * lineHeight) / 2);
+
+        displayLines.forEach((line, index) => {
+            ctx.fillText(line, width / 2, startY + index * lineHeight);
+        });
+
+        currentY += 200;
+    }
+
+    // Bottom section - prominent branding
+    // Gradient bar at bottom
+    ctx.fillStyle = accentGradient;
+    ctx.fillRect(0, height - 5, width, 5);
+
+    // Website with subtle glow
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+    ctx.font = 'bold 32px "Exo 2", sans-serif';
+    ctx.fillText('TPVCareerMode.com', width / 2, height - 50);
+
+    return true;
+}
+
+/**
+ * Download the generated Strava share image
+ */
+function downloadStravaShareImage(userResult, eventInfo) {
+    generateStravaShareImage(userResult, eventInfo).then((success) => {
+        if (!success) {
+            alert('Could not generate share image. Please try again.');
+            return;
+        }
+
+        const canvas = document.getElementById('stravaShareCanvas');
+        if (!canvas) return;
+
+        try {
+            const dataUrl = canvas.toDataURL('image/png');
+            const link = document.createElement('a');
+            const eventName = eventInfo.eventName.replace(/[^a-zA-Z0-9]/g, '-').toLowerCase();
+            link.download = `tpv-result-${eventName}-${Date.now()}.png`;
+            link.href = dataUrl;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        } catch (e) {
+            console.error('Failed to download share image:', e);
+            alert('Could not download image. Please try taking a screenshot instead.');
+        }
+    });
+}
+
+// Make share functions available globally
+window.downloadStravaShareImage = downloadStravaShareImage;
