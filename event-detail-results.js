@@ -811,26 +811,27 @@ async function loadEventResults() {
             const eventCategory = eventData?.category || 'Local Amateur';
             const awardsCount = userEventResults.earnedAwards?.length || 0;
 
-            // Prepare share data as JSON for onclick handler
-            const shareUserResult = {
-                position: userEventResults.position,
-                predictedPosition: userEventResults.predictedPosition,
-                points: userEventResults.points || 0,
-                bonusPoints: userEventResults.bonusPoints || 0,
-                story: userEventResults.story || '',
-                awardsCount: awardsCount
-            };
-
-            const shareEventInfo = {
-                eventNumber: eventNumber,
-                eventName: eventName,
-                category: eventCategory
+            // Store share data globally to avoid JSON escaping issues in onclick
+            window._stravaShareData = {
+                userResult: {
+                    position: userEventResults.position,
+                    predictedPosition: userEventResults.predictedPosition,
+                    points: userEventResults.points || 0,
+                    bonusPoints: userEventResults.bonusPoints || 0,
+                    story: userEventResults.story || '',
+                    awardsCount: awardsCount
+                },
+                eventInfo: {
+                    eventNumber: eventNumber,
+                    eventName: eventName,
+                    category: eventCategory
+                }
             };
 
             tableHTML += `
                 <div class="share-section">
                     <p class="share-section-title">Share Your Result</p>
-                    <button class="btn-strava-share" onclick='window.downloadStravaShareImage(${JSON.stringify(shareUserResult)}, ${JSON.stringify(shareEventInfo)})'>
+                    <button class="btn-strava-share" id="stravaShareBtn">
                         <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                             <path d="M15.387 17.944l-2.089-4.116h-3.065L15.387 24l5.15-10.172h-3.066l-2.084 4.116zM7.451 13.828h3.04l4.897-9.656l-2.025-4.172L7.451 13.828z"/>
                         </svg>
@@ -1006,6 +1007,17 @@ async function loadEventResults() {
         }
 
         eventResultsContent.innerHTML = tableHTML;
+
+        // Add Strava share button event listener
+        const stravaShareBtn = document.getElementById('stravaShareBtn');
+        if (stravaShareBtn && window._stravaShareData) {
+            stravaShareBtn.addEventListener('click', function() {
+                window.downloadStravaShareImage(
+                    window._stravaShareData.userResult,
+                    window._stravaShareData.eventInfo
+                );
+            });
+        }
 
         // Add replay awards button before interview section if there are earned awards
         if (userEventResults?.earnedAwards && userEventResults.earnedAwards.length > 0) {
