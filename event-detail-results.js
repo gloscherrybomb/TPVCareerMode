@@ -1572,10 +1572,11 @@ async function generateStravaShareImage(userResult, eventInfo) {
 
     // Bonus points row
     if (userResult.bonusPoints && userResult.bonusPoints > 0) {
+        currentY += 12; // Add spacing from points card
         ctx.fillStyle = '#ff1b6b';
         ctx.font = 'bold 20px "Exo 2", sans-serif';
         ctx.fillText(`+${userResult.bonusPoints} BONUS POINTS`, width / 2, currentY);
-        currentY += 35;
+        currentY += 30;
     }
 
     // ========== POWER DATA SECTION ==========
