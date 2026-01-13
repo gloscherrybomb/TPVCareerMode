@@ -68,8 +68,7 @@ export function getOrdinalSuffix(num) {
 export function getARRBand(arr) {
   if (!arr || arr < 300) return 'Unranked';
 
-  // Diamond: 1600-2000 (4 tiers)
-  if (arr >= 1900) return 'Diamond 4';
+  // Diamond: 1600+ (3 tiers)
   if (arr >= 1800) return 'Diamond 3';
   if (arr >= 1700) return 'Diamond 2';
   if (arr >= 1600) return 'Diamond 1';
