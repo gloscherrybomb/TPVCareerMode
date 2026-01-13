@@ -10,13 +10,36 @@ const { EVENT_NAMES, EVENT_TYPES, OPTIONAL_EVENTS } = require('./event-config');
  * @returns {string} The number with ordinal suffix (e.g., "1st", "21st")
  */
 function formatOrdinal(num) {
-  if (!num) return '';
+  if (!num || typeof num !== 'number' || !Number.isInteger(num) || num < 1) return '';
   const j = num % 10;
   const k = num % 100;
   if (j === 1 && k !== 11) return num + 'st';
   if (j === 2 && k !== 12) return num + 'nd';
   if (j === 3 && k !== 13) return num + 'rd';
   return num + 'th';
+}
+
+/**
+ * Determine performance tier based on position
+ * @param {number|string} position - The finishing position (or 'DNF')
+ * @returns {string} The tier: 'win', 'podium', 'top10', 'midpack', or 'back'
+ */
+function getPerformanceTier(position) {
+  if (position === 'DNF' || !position) return 'back';
+  if (position === 1) return 'win';
+  if (position <= 3) return 'podium';
+  if (position <= 10) return 'top10';
+  if (position <= 20) return 'midpack';
+  return 'back';
+}
+
+/**
+ * Helper to randomly pick from an array of variants
+ * @param {Array} variants - Array of variant strings
+ * @returns {*} A randomly selected element from the array
+ */
+function pickRandom(variants) {
+  return variants[Math.floor(Math.random() * variants.length)];
 }
 
 // Optional event descriptions by type (local - specific to narrative generation)
@@ -151,8 +174,17 @@ function formatGapText(seconds, context = 'neutral') {
   if (minutes === 2 && secs < 5) return 'just over two minutes';
   if (minutes < 3) return `${minutes}:${secs.toString().padStart(2, '0')}`;
   if (minutes < 5) return `over ${minutes} minutes`;
-  
-  return `more than ${minutes} minutes`;
+  if (minutes < 10) return `around ${minutes} minutes`;
+  if (minutes < 15) return `over ${minutes} minutes`;
+  if (minutes < 30) return `nearly ${Math.round(minutes / 5) * 5} minutes`;
+  if (minutes < 45) return 'over half an hour';
+  if (minutes < 60) return 'nearly an hour';
+
+  const hours = Math.floor(minutes / 60);
+  const remainingMins = minutes % 60;
+  if (hours === 1 && remainingMins < 15) return 'just over an hour';
+  if (hours === 1) return `over an hour`;
+  return `over ${hours} hours`;
 }
 
 /**
@@ -199,7 +231,8 @@ function selectVariant(eventNumber, position, variantCount, context = {}) {
   
   if (hasWinnerName && variantCount >= 3) {
     // Use variants that can mention winner names (typically 0, 1, 4)
-    const nameVariants = [0, 1, 4 % variantCount];
+    // Apply modulo when selecting to avoid out-of-bounds, not when building array
+    const nameVariants = [0, 1, Math.min(4, variantCount - 1)];
     return nameVariants[seed % nameVariants.length];
   }
   
@@ -372,12 +405,12 @@ const CONDENSED_NARRATIVES = {
         "The cruelest second place at {eventName}. A bike length, a wheel, maybe less{gapTextSuffix}. {dynamicsText} P2 when victory was there for the taking."
       ],
       default: [
-        "Second at {eventName}. You rode a tactically smart race, positioning yourself well through the key moments. {winnerText} had the edge when it mattered{gapTextSuffix}. Still, second is second—solid points.",
+        "Second at {eventName}. You rode a tactically smart race, positioning yourself well through the key moments. {winnerText} had the edge when it mattered{winnerGapSuffix}. Still, second is second—solid points.",
         "P2 at {eventName}. You were in the fight until the end, just not quite strong enough to take the top step{gapTextSuffix}. A podium finish and points in the bank.",
         "Runner-up at {eventName}. The winner was slightly stronger today, but you were right there challenging{gapTextSuffix}. Second place—frustrating and encouraging in equal measure.",
-        "A strong ride at {eventName} nets you second place. {winnerText} proved too good{gapTextSuffix}, but you showed you belong at the front of this field.",
+        "A strong ride at {eventName} nets you second place. {winnerText} proved too good{winnerGapSuffix}, but you showed you belong at the front of this field.",
         "{eventName} rewarded consistent, smart racing with P2. Not the win, but proof you can compete with the best{gapTextSuffix}. The podium is the podium.",
-        "Second place at {eventName}. Close enough to the victory to hurt, good enough to stand on the podium. {winnerText} had the legs today{gapTextSuffix}. Next time."
+        "Second place at {eventName}. Close enough to the victory to hurt, good enough to stand on the podium. {winnerText} had the legs today{winnerGapSuffix}. Next time."
       ]
     },
     third: {
@@ -479,7 +512,8 @@ function processCondensedTemplate(template, data) {
     gapText,
     winnerName,
     dynamicsText,
-    gapTextSuffix
+    gapTextSuffix,
+    winnerGapSuffix
   } = data;
 
   return template
@@ -488,6 +522,7 @@ function processCondensedTemplate(template, data) {
     .replace(/\{predictedPosition\}/g, formatOrdinal(predictedPosition))
     .replace(/\{gapText\}/g, gapText || '')
     .replace(/\{gapTextSuffix\}/g, gapTextSuffix || '')
+    .replace(/\{winnerGapSuffix\}/g, winnerGapSuffix || '')
     .replace(/\{winnerText\}/g, winnerName && winnerName !== 'the winner' ? winnerName : 'The winner')
     .replace(/\{dynamicsText\}/g, dynamicsText || '');
 }
@@ -552,11 +587,17 @@ function generateRaceRecapCondensed(data) {
     return 'You crossed the line with the group.';
   };
 
-  // Build gap suffix for templates
+  // Build gap suffix for templates (user perspective - "you were X behind")
   const getGapSuffix = () => {
     if (!gapText) return '';
     if (position === 1) return ` by ${gapText}`;
     return `, ${gapText} behind`;
+  };
+
+  // Build winner gap suffix for templates (winner perspective - "winner finished X ahead")
+  const getWinnerGapSuffix = () => {
+    if (!gapText || position === 1) return '';
+    return `, finishing ${gapText} ahead`;
   };
 
   // Template data for narrative processing
@@ -566,6 +607,7 @@ function generateRaceRecapCondensed(data) {
     predictedPosition,
     gapText,
     gapTextSuffix: getGapSuffix(),
+    winnerGapSuffix: getWinnerGapSuffix(),
     winnerName,
     dynamicsText: getDynamicsText(position)
   };
@@ -576,12 +618,7 @@ function generateRaceRecapCondensed(data) {
   }
 
   // Determine tier
-  let tier;
-  if (position === 1) tier = 'win';
-  else if (position <= 3) tier = 'podium';
-  else if (position <= 10) tier = 'top10';
-  else if (position <= 20) tier = 'midpack';
-  else tier = 'back';
+  const tier = getPerformanceTier(position);
 
   // WIN condensed recaps
   if (tier === 'win') {
@@ -686,12 +723,7 @@ function generateRaceRecap(data) {
   const winnerText = hasWinnerName ? winnerName : 'the winner';
 
   // Determine performance tier
-  let tier;
-  if (position === 1) tier = 'win';
-  else if (position <= 3) tier = 'podium';
-  else if (position <= 10) tier = 'top10';
-  else if (position <= 20) tier = 'midpack';
-  else tier = 'back';
+  const tier = getPerformanceTier(position);
 
   // Determine prediction accuracy
   let predictionTier;
@@ -700,9 +732,6 @@ function generateRaceRecap(data) {
   else if (Math.abs(placeDiff) <= 1) predictionTier = 'matched';
   else if (placeDiff < 0 && placeDiff >= -5) predictionTier = 'worse';
   else predictionTier = 'much_worse';
-
-  // Helper to randomly pick from an array of variant strings
-  const pickRandom = (variants) => variants[Math.floor(Math.random() * variants.length)];
   
   // Helper to format gaps contextually
   const formatGapContextual = (seconds, context = 'neutral') => {
@@ -768,10 +797,11 @@ function generateRaceRecap(data) {
         
       } else if (eventType === 'stage race') {
         const stageText = eventNumber === 13 ? 'opening stage' : eventNumber === 14 ? 'middle stage' : 'queen stage';
+        const gcGapText = gcGap ? `, ${formatGapText(gcGap)} behind the leader` : '';
         const variants = [
-          `The Local Tour's ${stageText} turned into a statement ride. ${gapText ? `You finished ${gapText} ahead of your closest rival` : 'You rode away from the field'}, putting serious time into everyone else's GC hopes. ${gcPosition ? `This moves you into ${gcPosition === 1 ? 'the GC lead' : `${gcPosition}${gcPosition === 2 ? 'nd' : gcPosition === 3 ? 'rd' : 'th'} on GC`}` : 'The overall classification implications are significant'}. Stage racing rewards consistency, but today was about dominance.`,
-          
-          `${eventName} was where you needed to make your mark, and you did so emphatically. ${dynamics.type === 'solo_victory' ? `You attacked solo and rode away from everyone. ${gapText ? `By the finish, you'd gained ${gapText} on your GC rivals.` : 'The time gaps were significant.'}` : `You were part of the winning move, and when it came down to the sprint, you had the legs to take it. ${gapText ? `The ${gapText} gap to the chasers` : 'The time gained'} could prove crucial for GC.`} ${gcPosition === 1 ? `You're now in the race lead` : gcPosition ? `You're sitting ${gcPosition}${gcPosition === 2 ? 'nd' : gcPosition === 3 ? 'rd' : 'th'} overall` : `Your GC position has improved significantly`}. In stage racing, days like this can define your tour.`
+          `The Local Tour's ${stageText} turned into a statement ride. ${gapText ? `You finished ${gapText} ahead of your closest rival` : 'You rode away from the field'}, putting serious time into everyone else's GC hopes. ${gcPosition ? `This moves you into ${gcPosition === 1 ? 'the GC lead' : `${gcPosition}${gcPosition === 2 ? 'nd' : gcPosition === 3 ? 'rd' : 'th'} on GC${gcPosition > 1 ? gcGapText : ''}`}` : 'The overall classification implications are significant'}. Stage racing rewards consistency, but today was about dominance.`,
+
+          `${eventName} was where you needed to make your mark, and you did so emphatically. ${dynamics.type === 'solo_victory' ? `You attacked solo and rode away from everyone. ${gapText ? `By the finish, you'd gained ${gapText} on your GC rivals.` : 'The time gaps were significant.'}` : `You were part of the winning move, and when it came down to the sprint, you had the legs to take it. ${gapText ? `The ${gapText} gap to the chasers` : 'The time gained'} could prove crucial for GC.`} ${gcPosition === 1 ? `You're now in the race lead` : gcPosition ? `You're sitting ${gcPosition}${gcPosition === 2 ? 'nd' : gcPosition === 3 ? 'rd' : 'th'} overall${gcGapText}` : `Your GC position has improved significantly`}. In stage racing, days like this can define your tour.`
         ];
         recap = pickRandom(variants);
         
@@ -1574,7 +1604,7 @@ function generateRivalInline(raceData, seasonData) {
   }
 
   // Regular events - use time-based phrasing
-  const gap = rival.timeGap.toFixed(1);
+  const gap = rival.timeGap != null ? rival.timeGap.toFixed(1) : '0.0';
 
   // Return inline phrase (to be woven into recap)
   if (userWon) {
@@ -1624,7 +1654,7 @@ function generateRivalMention(raceData, seasonData) {
   // Generate mention for the closest/most significant rival
   const rival = rivalsInRace[0]; // Take first (should be closest or most significant)
   const userWon = rival.userFinishedAhead;
-  const gap = rival.timeGap.toFixed(1);
+  const gap = rival.timeGap != null ? rival.timeGap.toFixed(1) : '0.0';
 
   // NEW: Check if this is first encounter or ongoing rivalry
   const rivalData = seasonData.encounters?.[rival.botUid];
@@ -1710,12 +1740,7 @@ async function generateRaceStory(raceData, seasonData, riderId = null, narrative
 
   // Determine performance tier for connector selection
   const position = raceData.position;
-  let tier;
-  if (position === 1) tier = 'win';
-  else if (position <= 3) tier = 'podium';
-  else if (position <= 10) tier = 'top10';
-  else if (position <= 20) tier = 'midpack';
-  else tier = 'back';
+  const tier = getPerformanceTier(position);
 
   // ========================================
   // PART 1: RACE STORY (~120-140 words)
