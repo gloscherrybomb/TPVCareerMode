@@ -1798,13 +1798,8 @@ async function generateStravaShareImage(userResult, eventInfo) {
     ctx.shadowBlur = 20;
     ctx.fillStyle = '#ffffff';
     ctx.font = 'bold 28px "Exo 2", sans-serif';
-    ctx.fillText('TPVCareerMode.com', width / 2, height - 40);
+    ctx.fillText('TPVCareerMode.com', width / 2, height - 35);
     ctx.shadowBlur = 0;
-
-    // Small tagline
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-    ctx.font = '400 12px "Exo 2", sans-serif';
-    ctx.fillText('VIRTUAL CYCLING CAREER SIMULATION', width / 2, height - 18);
 
     return true;
 }
