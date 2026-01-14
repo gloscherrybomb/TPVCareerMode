@@ -336,15 +336,16 @@ function calculateBalanceMetrics(player) {
     // Using a sigmoid-like function where avgDiff near 0 = high score
     const balanceScore = Math.max(0, 100 - Math.abs(avgDiff) * 10);
 
-    // Trend direction - use non-win data if available for more accurate assessment
-    const trendMetric = nonWinAvgDiff !== null ? nonWinAvgDiff : avgDiff;
-    let trend = 'balanced';
-    if (trendMetric < -2) trend = 'overperforming';  // Consistently beating predictions
-    if (trendMetric > 2) trend = 'underperforming';  // Consistently missing predictions
-
     // Flag if trend assessment is uncertain due to many wins
     const ceilingWarning = wins > 0;
     const highWinRate = winRate >= 50;
+
+    // Trend direction - use overall avg if high win rate (>50%), otherwise use non-win avg
+    // When win rate is high, non-win sample is too small to be representative
+    const trendMetric = (highWinRate || nonWinAvgDiff === null) ? avgDiff : nonWinAvgDiff;
+    let trend = 'balanced';
+    if (trendMetric < -2) trend = 'overperforming';  // Consistently beating predictions
+    if (trendMetric > 2) trend = 'underperforming';  // Consistently missing predictions
 
     return {
         raceCount: races.length,
