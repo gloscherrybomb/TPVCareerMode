@@ -1285,7 +1285,13 @@ function initFilters() {
 
     // Jump to Me button
     if (jumpToMeBtn) {
-        jumpToMeBtn.addEventListener('click', handleJumpToMe);
+        console.log('Jump to Me button found, attaching listener');
+        jumpToMeBtn.addEventListener('click', () => {
+            console.log('Jump to Me clicked');
+            handleJumpToMe();
+        });
+    } else {
+        console.warn('Jump to Me button NOT found');
     }
 
     // Clear all filters (including search)
@@ -1314,17 +1320,23 @@ function initFilters() {
 
 // Handle "Jump to Me" button click
 function handleJumpToMe() {
+    console.log('handleJumpToMe called');
+    console.log('currentUser:', currentUser);
+
     // Check if user is logged in
     if (!currentUser) {
+        console.log('No user logged in');
         showJumpToMeMessage('Please log in to find your position');
         return;
     }
 
     // Find current user row in the DOM
     const currentUserRow = document.querySelector('.current-user-row');
+    console.log('currentUserRow:', currentUserRow);
 
     if (!currentUserRow) {
         // User not in currently displayed rankings
+        console.log('User row not found in DOM');
         showJumpToMeMessage('Load more results or clear filters to find your position');
         return;
     }
