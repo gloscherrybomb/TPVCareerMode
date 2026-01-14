@@ -1330,8 +1330,9 @@ function handleJumpToMe() {
         return;
     }
 
-    // Find current user row in the DOM
-    const currentUserRow = document.querySelector('.current-user-row');
+    // Find current user row in the VISIBLE section (Global High Scores tab)
+    const globalContent = document.getElementById('globalContent');
+    const currentUserRow = globalContent ? globalContent.querySelector('.current-user-row') : null;
     console.log('currentUserRow:', currentUserRow);
 
     if (!currentUserRow) {
