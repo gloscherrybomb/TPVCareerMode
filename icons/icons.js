@@ -109,7 +109,21 @@ const ICON_REGISTRY = {
         fallback: '🥊',
         category: 'award'
     },
+    // Alias for award system compatibility
+    punchingMedal: {
+        type: 'local-svg',
+        path: 'icons/svg/awards/boxing-glove.svg',
+        fallback: '🥊',
+        category: 'award'
+    },
     hotStreak: {
+        type: 'local-svg',
+        path: 'icons/svg/awards/fire.svg',
+        fallback: '🔥',
+        category: 'award'
+    },
+    // Alias for award system compatibility
+    hotStreakMedal: {
         type: 'local-svg',
         path: 'icons/svg/awards/fire.svg',
         fallback: '🔥',
@@ -221,7 +235,21 @@ const ICON_REGISTRY = {
         fallback: '⚔️',
         category: 'award'
     },
+    // Alias for award system compatibility
+    giantKillerMedal: {
+        type: 'local-svg',
+        path: 'icons/svg/awards/giant-killer.svg',
+        fallback: '⚔️',
+        category: 'award'
+    },
     bullseye: {
+        type: 'local-svg',
+        path: 'icons/svg/awards/target.svg',
+        fallback: '🎯',
+        category: 'award'
+    },
+    // Alias for award system compatibility
+    bullseyeMedal: {
         type: 'local-svg',
         path: 'icons/svg/awards/target.svg',
         fallback: '🎯',

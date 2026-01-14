@@ -1285,13 +1285,7 @@ function initFilters() {
 
     // Jump to Me button
     if (jumpToMeBtn) {
-        console.log('Jump to Me button found, attaching listener');
-        jumpToMeBtn.addEventListener('click', () => {
-            console.log('Jump to Me clicked');
-            handleJumpToMe();
-        });
-    } else {
-        console.warn('Jump to Me button NOT found');
+        jumpToMeBtn.addEventListener('click', handleJumpToMe);
     }
 
     // Clear all filters (including search)
@@ -1320,24 +1314,18 @@ function initFilters() {
 
 // Handle "Jump to Me" button click
 function handleJumpToMe() {
-    console.log('handleJumpToMe called');
-    console.log('currentUser:', currentUser);
-
     // Check if user is logged in
     if (!currentUser) {
-        console.log('No user logged in');
         showJumpToMeMessage('Please log in to find your position');
         return;
     }
 
-    // Find current user row in the VISIBLE section (Global High Scores tab)
+    // Find current user row in the Global High Scores section
     const globalContent = document.getElementById('globalContent');
     const currentUserRow = globalContent ? globalContent.querySelector('.current-user-row') : null;
-    console.log('currentUserRow:', currentUserRow);
 
     if (!currentUserRow) {
         // User not in currently displayed rankings
-        console.log('User row not found in DOM');
         showJumpToMeMessage('Load more results or clear filters to find your position');
         return;
     }
