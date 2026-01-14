@@ -24,6 +24,56 @@
     "worseThanPredicted": 37,
     "worsePct": 30.833333333333336
   },
+  "humanTT": {
+    "count": 4,
+    "meanDiff": 11,
+    "meanAbsDiff": 17,
+    "stdDev": 15.572411502397436,
+    "median": 19,
+    "p75": 30,
+    "p90": 30,
+    "p95": 30,
+    "maxDiff": 30,
+    "minDiff": -12,
+    "maxAbsDiff": 30,
+    "exactPredictions": 0,
+    "exactPct": 0,
+    "within1": 0,
+    "within1Pct": 0,
+    "within3": 0,
+    "within3Pct": 0,
+    "within5": 0,
+    "within5Pct": 0,
+    "betterThanPredicted": 1,
+    "betterPct": 25,
+    "worseThanPredicted": 3,
+    "worsePct": 75
+  },
+  "humanNonTT": {
+    "count": 116,
+    "meanDiff": -2.103448275862069,
+    "meanAbsDiff": 9.448275862068966,
+    "stdDev": 12.84011716453743,
+    "median": 7,
+    "p75": 15,
+    "p90": 23,
+    "p95": 27,
+    "maxDiff": 36,
+    "minDiff": -36,
+    "maxAbsDiff": 36,
+    "exactPredictions": 15,
+    "exactPct": 12.931034482758621,
+    "within1": 25,
+    "within1Pct": 21.551724137931032,
+    "within3": 39,
+    "within3Pct": 33.62068965517241,
+    "within5": 54,
+    "within5Pct": 46.55172413793103,
+    "betterThanPredicted": 67,
+    "betterPct": 57.758620689655174,
+    "worseThanPredicted": 34,
+    "worsePct": 29.310344827586203
+  },
   "bot": {
     "count": 4590,
     "meanDiff": 0.04357298474945534,
@@ -201,121 +251,421 @@
       "worsePct": 28.000000000000004
     }
   },
+  "humanTTByBand": {
+    "Diamond": null,
+    "Platinum": null,
+    "Gold": {
+      "count": 2,
+      "meanDiff": 24.5,
+      "meanAbsDiff": 24.5,
+      "stdDev": 5.5,
+      "median": 30,
+      "p75": 30,
+      "p90": 30,
+      "p95": 30,
+      "maxDiff": 30,
+      "minDiff": 19,
+      "maxAbsDiff": 30,
+      "exactPredictions": 0,
+      "exactPct": 0,
+      "within1": 0,
+      "within1Pct": 0,
+      "within3": 0,
+      "within3Pct": 0,
+      "within5": 0,
+      "within5Pct": 0,
+      "betterThanPredicted": 0,
+      "betterPct": 0,
+      "worseThanPredicted": 2,
+      "worsePct": 100
+    },
+    "Silver": null,
+    "Bronze": null,
+    "Unranked": {
+      "count": 2,
+      "meanDiff": -2.5,
+      "meanAbsDiff": 9.5,
+      "stdDev": 9.5,
+      "median": 12,
+      "p75": 12,
+      "p90": 12,
+      "p95": 12,
+      "maxDiff": 12,
+      "minDiff": -12,
+      "maxAbsDiff": 12,
+      "exactPredictions": 0,
+      "exactPct": 0,
+      "within1": 0,
+      "within1Pct": 0,
+      "within3": 0,
+      "within3Pct": 0,
+      "within5": 0,
+      "within5Pct": 0,
+      "betterThanPredicted": 1,
+      "betterPct": 50,
+      "worseThanPredicted": 1,
+      "worsePct": 50
+    }
+  },
+  "humanNonTTByBand": {
+    "Diamond": {
+      "count": 7,
+      "meanDiff": 0,
+      "meanAbsDiff": 0,
+      "stdDev": 0,
+      "median": 0,
+      "p75": 0,
+      "p90": 0,
+      "p95": 0,
+      "maxDiff": 0,
+      "minDiff": 0,
+      "maxAbsDiff": 0,
+      "exactPredictions": 7,
+      "exactPct": 100,
+      "within1": 7,
+      "within1Pct": 100,
+      "within3": 7,
+      "within3Pct": 100,
+      "within5": 7,
+      "within5Pct": 100,
+      "betterThanPredicted": 0,
+      "betterPct": 0,
+      "worseThanPredicted": 0,
+      "worsePct": 0
+    },
+    "Platinum": {
+      "count": 27,
+      "meanDiff": 1.1111111111111112,
+      "meanAbsDiff": 8.666666666666666,
+      "stdDev": 11.532027329181442,
+      "median": 5,
+      "p75": 15,
+      "p90": 21,
+      "p95": 23,
+      "maxDiff": 23,
+      "minDiff": -19,
+      "maxAbsDiff": 23,
+      "exactPredictions": 4,
+      "exactPct": 14.814814814814813,
+      "within1": 6,
+      "within1Pct": 22.22222222222222,
+      "within3": 10,
+      "within3Pct": 37.03703703703704,
+      "within5": 14,
+      "within5Pct": 51.85185185185185,
+      "betterThanPredicted": 14,
+      "betterPct": 51.85185185185185,
+      "worseThanPredicted": 9,
+      "worsePct": 33.33333333333333
+    },
+    "Gold": {
+      "count": 37,
+      "meanDiff": 0.24324324324324326,
+      "meanAbsDiff": 7.8108108108108105,
+      "stdDev": 11.007136273383406,
+      "median": 4,
+      "p75": 11,
+      "p90": 23,
+      "p95": 26,
+      "maxDiff": 28,
+      "minDiff": -24,
+      "maxAbsDiff": 28,
+      "exactPredictions": 2,
+      "exactPct": 5.405405405405405,
+      "within1": 8,
+      "within1Pct": 21.62162162162162,
+      "within3": 14,
+      "within3Pct": 37.83783783783784,
+      "within5": 21,
+      "within5Pct": 56.75675675675676,
+      "betterThanPredicted": 23,
+      "betterPct": 62.16216216216216,
+      "worseThanPredicted": 12,
+      "worsePct": 32.432432432432435
+    },
+    "Silver": {
+      "count": 5,
+      "meanDiff": -0.4,
+      "meanAbsDiff": 6,
+      "stdDev": 6.6211781428987395,
+      "median": 7,
+      "p75": 8,
+      "p90": 9,
+      "p95": 9,
+      "maxDiff": 9,
+      "minDiff": -9,
+      "maxAbsDiff": 9,
+      "exactPredictions": 0,
+      "exactPct": 0,
+      "within1": 1,
+      "within1Pct": 20,
+      "within3": 1,
+      "within3Pct": 20,
+      "within5": 2,
+      "within5Pct": 40,
+      "betterThanPredicted": 2,
+      "betterPct": 40,
+      "worseThanPredicted": 3,
+      "worsePct": 60
+    },
+    "Bronze": {
+      "count": 17,
+      "meanDiff": -5.588235294117647,
+      "meanAbsDiff": 9.470588235294118,
+      "stdDev": 10.997640514483694,
+      "median": 7,
+      "p75": 11,
+      "p90": 24,
+      "p95": 27,
+      "maxDiff": 27,
+      "minDiff": -27,
+      "maxAbsDiff": 27,
+      "exactPredictions": 1,
+      "exactPct": 5.88235294117647,
+      "within1": 2,
+      "within1Pct": 11.76470588235294,
+      "within3": 4,
+      "within3Pct": 23.52941176470588,
+      "within5": 6,
+      "within5Pct": 35.294117647058826,
+      "betterThanPredicted": 12,
+      "betterPct": 70.58823529411765,
+      "worseThanPredicted": 4,
+      "worsePct": 23.52941176470588
+    },
+    "Unranked": {
+      "count": 23,
+      "meanDiff": -8.08695652173913,
+      "meanAbsDiff": 16.608695652173914,
+      "stdDev": 17.714923807904135,
+      "median": 15,
+      "p75": 23,
+      "p90": 31,
+      "p95": 35,
+      "maxDiff": 36,
+      "minDiff": -36,
+      "maxAbsDiff": 36,
+      "exactPredictions": 1,
+      "exactPct": 4.3478260869565215,
+      "within1": 1,
+      "within1Pct": 4.3478260869565215,
+      "within3": 3,
+      "within3Pct": 13.043478260869565,
+      "within5": 4,
+      "within5Pct": 17.391304347826086,
+      "betterThanPredicted": 16,
+      "betterPct": 69.56521739130434,
+      "worseThanPredicted": 6,
+      "worsePct": 26.08695652173913
+    }
+  },
   "humanDistribution": {
     "0": {
       "label": "0 (exact)",
       "count": 15,
-      "countNoDiamond": 8
+      "countNoDiamond": 8,
+      "countTT": 0,
+      "countTTNoDiamond": 0,
+      "countNonTT": 15,
+      "countNonTTNoDiamond": 8
     },
     "2": {
       "label": "+1 to +2",
       "count": 5,
-      "countNoDiamond": 5
+      "countNoDiamond": 5,
+      "countTT": 0,
+      "countTTNoDiamond": 0,
+      "countNonTT": 5,
+      "countNonTTNoDiamond": 5
     },
     "4": {
       "label": "+3 to +4",
       "count": 3,
-      "countNoDiamond": 3
+      "countNoDiamond": 3,
+      "countTT": 0,
+      "countTTNoDiamond": 0,
+      "countNonTT": 3,
+      "countNonTTNoDiamond": 3
     },
     "6": {
       "label": "+5 to +6",
       "count": 4,
-      "countNoDiamond": 4
+      "countNoDiamond": 4,
+      "countTT": 0,
+      "countTTNoDiamond": 0,
+      "countNonTT": 4,
+      "countNonTTNoDiamond": 4
     },
     "8": {
       "label": "+7 to +8",
       "count": 2,
-      "countNoDiamond": 2
+      "countNoDiamond": 2,
+      "countTT": 1,
+      "countTTNoDiamond": 1,
+      "countNonTT": 1,
+      "countNonTTNoDiamond": 1
     },
     "10": {
       "label": "+9 to +10",
       "count": 3,
-      "countNoDiamond": 3
+      "countNoDiamond": 3,
+      "countTT": 0,
+      "countTTNoDiamond": 0,
+      "countNonTT": 3,
+      "countNonTTNoDiamond": 3
     },
     "12": {
       "label": "+11 to +12",
       "count": 2,
-      "countNoDiamond": 2
+      "countNoDiamond": 2,
+      "countTT": 0,
+      "countTTNoDiamond": 0,
+      "countNonTT": 2,
+      "countNonTTNoDiamond": 2
     },
     "14": {
       "label": "+13 to +14",
       "count": 2,
-      "countNoDiamond": 2
+      "countNoDiamond": 2,
+      "countTT": 0,
+      "countTTNoDiamond": 0,
+      "countNonTT": 2,
+      "countNonTTNoDiamond": 2
     },
     "16": {
       "label": "+15 to +16",
       "count": 3,
-      "countNoDiamond": 3
+      "countNoDiamond": 3,
+      "countTT": 0,
+      "countTTNoDiamond": 0,
+      "countNonTT": 3,
+      "countNonTTNoDiamond": 3
     },
     "18": {
       "label": "+17 to +18",
       "count": 1,
-      "countNoDiamond": 1
+      "countNoDiamond": 1,
+      "countTT": 0,
+      "countTTNoDiamond": 0,
+      "countNonTT": 1,
+      "countNonTTNoDiamond": 1
     },
     "20": {
       "label": "+19 to +20",
       "count": 2,
-      "countNoDiamond": 2
+      "countNoDiamond": 2,
+      "countTT": 1,
+      "countTTNoDiamond": 1,
+      "countNonTT": 1,
+      "countNonTTNoDiamond": 1
     },
     "21": {
       "label": "+21 or more",
       "count": 10,
-      "countNoDiamond": 10
+      "countNoDiamond": 10,
+      "countTT": 1,
+      "countTTNoDiamond": 1,
+      "countNonTT": 9,
+      "countNonTTNoDiamond": 9
     },
     "-21": {
       "label": "-21 or less",
       "count": 10,
-      "countNoDiamond": 10
+      "countNoDiamond": 10,
+      "countTT": 0,
+      "countTTNoDiamond": 0,
+      "countNonTT": 10,
+      "countNonTTNoDiamond": 10
     },
     "-20": {
       "label": "-20 to -19",
       "count": 3,
-      "countNoDiamond": 3
+      "countNoDiamond": 3,
+      "countTT": 0,
+      "countTTNoDiamond": 0,
+      "countNonTT": 3,
+      "countNonTTNoDiamond": 3
     },
     "-18": {
       "label": "-18 to -17",
       "count": 0,
-      "countNoDiamond": 0
+      "countNoDiamond": 0,
+      "countTT": 0,
+      "countTTNoDiamond": 0,
+      "countNonTT": 0,
+      "countNonTTNoDiamond": 0
     },
     "-16": {
       "label": "-16 to -15",
       "count": 4,
-      "countNoDiamond": 4
+      "countNoDiamond": 4,
+      "countTT": 0,
+      "countTTNoDiamond": 0,
+      "countNonTT": 4,
+      "countNonTTNoDiamond": 4
     },
     "-14": {
       "label": "-14 to -13",
       "count": 1,
-      "countNoDiamond": 1
+      "countNoDiamond": 1,
+      "countTT": 0,
+      "countTTNoDiamond": 0,
+      "countNonTT": 1,
+      "countNonTTNoDiamond": 1
     },
     "-12": {
       "label": "-12 to -11",
       "count": 7,
-      "countNoDiamond": 7
+      "countNoDiamond": 7,
+      "countTT": 1,
+      "countTTNoDiamond": 1,
+      "countNonTT": 6,
+      "countNonTTNoDiamond": 6
     },
     "-10": {
       "label": "-10 to -9",
       "count": 7,
-      "countNoDiamond": 7
+      "countNoDiamond": 7,
+      "countTT": 0,
+      "countTTNoDiamond": 0,
+      "countNonTT": 7,
+      "countNonTTNoDiamond": 7
     },
     "-8": {
       "label": "-8 to -7",
       "count": 6,
-      "countNoDiamond": 6
+      "countNoDiamond": 6,
+      "countTT": 0,
+      "countTTNoDiamond": 0,
+      "countNonTT": 6,
+      "countNonTTNoDiamond": 6
     },
     "-6": {
       "label": "-6 to -5",
       "count": 5,
-      "countNoDiamond": 5
+      "countNoDiamond": 5,
+      "countTT": 0,
+      "countTTNoDiamond": 0,
+      "countNonTT": 5,
+      "countNonTTNoDiamond": 5
     },
     "-4": {
       "label": "-4 to -3",
       "count": 13,
-      "countNoDiamond": 13
+      "countNoDiamond": 13,
+      "countTT": 0,
+      "countTTNoDiamond": 0,
+      "countNonTT": 13,
+      "countNonTTNoDiamond": 13
     },
     "-2": {
       "label": "-2 to -1",
       "count": 12,
-      "countNoDiamond": 12
+      "countNoDiamond": 12,
+      "countTT": 0,
+      "countTTNoDiamond": 0,
+      "countNonTT": 12,
+      "countNonTTNoDiamond": 12
     }
   }
 }

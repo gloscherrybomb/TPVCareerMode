@@ -639,6 +639,66 @@
         .filter-toggle-container.active .filter-active-badge {
             display: block;
         }
+
+        .filters-row {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.5rem;
+        }
+
+        .filters-row .filter-toggle-container {
+            margin-bottom: 0;
+        }
+
+        .filter-select-container {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 1.25rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+        }
+
+        .filter-select {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.875rem;
+            cursor: pointer;
+            min-width: 160px;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--accent-neutral);
+        }
+
+        .filter-select option {
+            background: var(--bg-elevated);
+            color: var(--text-primary);
+        }
+
+        .limited-data-warning {
+            background: rgba(251, 191, 36, 0.1);
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            margin-bottom: 1rem;
+            display: none;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            color: var(--gold);
+        }
+
+        .limited-data-warning.visible {
+            display: flex;
+        }
     </style>
 </head>
 <body>
@@ -658,14 +718,31 @@
             </div>
         </header>
 
-        <!-- Filter Toggle -->
-        <div class="filter-toggle-container">
-            <label class="filter-toggle">
-                <input type="checkbox" id="excludeDiamond">
-                <span class="toggle-slider"></span>
-            </label>
-            <span class="filter-label">Exclude Diamond riders</span>
-            <span class="filter-hint">(7 results with 100% accuracy)</span>
+        <!-- Filters -->
+        <div class="filters-row">
+            <div class="filter-toggle-container">
+                <label class="filter-toggle">
+                    <input type="checkbox" id="excludeDiamond">
+                    <span class="toggle-slider"></span>
+                </label>
+                <span class="filter-label">Exclude Diamond riders</span>
+                <span class="filter-hint">(7 results with 100% accuracy)</span>
+            </div>
+
+            <div class="filter-select-container">
+                <span class="filter-label">Time Trials:</span>
+                <select id="ttFilter" class="filter-select">
+                    <option value="all">All races</option>
+                    <option value="ttOnly">TT only (4 results)</option>
+                    <option value="excludeTT">Exclude TT (116 results)</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Limited Data Warning -->
+        <div class="limited-data-warning" id="limitedDataWarning">
+            <span>&#x26A0;</span>
+            <span><strong>Limited data:</strong> Only 4 TT results available. Statistics may not be meaningful.</span>
         </div>
 
         <!-- Key Metrics (Human Riders Only) -->
@@ -909,50 +986,117 @@
             '+11 to +12', '+13 to +14', '+15 to +16', '+17 to +18', '+19 to +20', '+21 or more'
         ];
 
-        // All human riders (120 results)
-        const dataWithDiamond = {
-            count: 120,
-            mae: 9.70,
-            exact: 15,
-            exactPct: 12.5,
-            within3: 39,
-            within3Pct: 32.5,
-            within5: 54,
-            within5Pct: 45.0,
-            bias: -1.67,
-            distribution: [10, 3, 0, 4, 1, 7, 7, 6, 5, 13, 12, 15, 5, 3, 4, 2, 3, 2, 2, 3, 1, 2, 10],
-            bandMAE: [0.00, 8.67, 8.67, 6.00, 9.47, 16.04],
-            bandWithin3: [100, 37.0, 35.9, 20.0, 23.5, 12.0]
-        };
-
-        // Without Diamond riders (113 results)
-        const dataWithoutDiamond = {
-            count: 113,
-            mae: 10.30,
-            exact: 8,
-            exactPct: 7.1,
-            within3: 32,
-            within3Pct: 28.3,
-            within5: 47,
-            within5Pct: 41.6,
-            bias: -1.77,
-            distribution: [10, 3, 0, 4, 1, 7, 7, 6, 5, 13, 12, 8, 5, 3, 4, 2, 3, 2, 2, 3, 1, 2, 10], // 15 -> 8 at index 11
-            bandMAE: [null, 8.67, 8.67, 6.00, 9.47, 16.04],
-            bandWithin3: [null, 37.0, 35.9, 20.0, 23.5, 12.0]
+        // Data for all filter combinations
+        // Key format: {ttFilter}_{diamond} where diamond is 'with' or 'without'
+        const allData = {
+            // ALL RACES
+            'all_with': {
+                count: 120,
+                mae: 9.70,
+                exact: 15, exactPct: 12.5,
+                within3: 39, within3Pct: 32.5,
+                within5: 54, within5Pct: 45.0,
+                bias: -1.67,
+                distribution: [10, 3, 0, 4, 1, 7, 7, 6, 5, 13, 12, 15, 5, 3, 4, 2, 3, 2, 2, 3, 1, 2, 10],
+                bandLabels: ['Diamond', 'Platinum', 'Gold', 'Silver', 'Bronze', 'Unranked'],
+                bandMAE: [0.00, 8.67, 8.67, 6.00, 9.47, 16.04],
+                bandWithin3: [100, 37.0, 35.9, 20.0, 23.5, 12.0],
+                bandColors: ['rgba(34, 211, 238, 0.7)', 'rgba(161, 161, 170, 0.7)', 'rgba(251, 191, 36, 0.7)', 'rgba(156, 163, 175, 0.7)', 'rgba(217, 119, 6, 0.7)', 'rgba(107, 114, 128, 0.7)'],
+                bandBorders: ['#22d3ee', '#a1a1aa', '#fbbf24', '#9ca3af', '#d97706', '#6b7280']
+            },
+            'all_without': {
+                count: 113,
+                mae: 10.30,
+                exact: 8, exactPct: 7.1,
+                within3: 32, within3Pct: 28.3,
+                within5: 47, within5Pct: 41.6,
+                bias: -1.77,
+                distribution: [10, 3, 0, 4, 1, 7, 7, 6, 5, 13, 12, 8, 5, 3, 4, 2, 3, 2, 2, 3, 1, 2, 10],
+                bandLabels: ['Platinum', 'Gold', 'Silver', 'Bronze', 'Unranked'],
+                bandMAE: [8.67, 8.67, 6.00, 9.47, 16.04],
+                bandWithin3: [37.0, 35.9, 20.0, 23.5, 12.0],
+                bandColors: ['rgba(161, 161, 170, 0.7)', 'rgba(251, 191, 36, 0.7)', 'rgba(156, 163, 175, 0.7)', 'rgba(217, 119, 6, 0.7)', 'rgba(107, 114, 128, 0.7)'],
+                bandBorders: ['#a1a1aa', '#fbbf24', '#9ca3af', '#d97706', '#6b7280']
+            },
+            // TT ONLY (4 results - very limited!)
+            'ttOnly_with': {
+                count: 4,
+                mae: 17.00,
+                exact: 0, exactPct: 0,
+                within3: 0, within3Pct: 0,
+                within5: 0, within5Pct: 0,
+                bias: 11.00,
+                distribution: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1],
+                bandLabels: ['Gold', 'Unranked'],
+                bandMAE: [24.50, 5.50],
+                bandWithin3: [0, 50.0],
+                bandColors: ['rgba(251, 191, 36, 0.7)', 'rgba(107, 114, 128, 0.7)'],
+                bandBorders: ['#fbbf24', '#6b7280']
+            },
+            'ttOnly_without': {
+                count: 4,
+                mae: 17.00,
+                exact: 0, exactPct: 0,
+                within3: 0, within3Pct: 0,
+                within5: 0, within5Pct: 0,
+                bias: 11.00,
+                distribution: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 1, 1],
+                bandLabels: ['Gold', 'Unranked'],
+                bandMAE: [24.50, 5.50],
+                bandWithin3: [0, 50.0],
+                bandColors: ['rgba(251, 191, 36, 0.7)', 'rgba(107, 114, 128, 0.7)'],
+                bandBorders: ['#fbbf24', '#6b7280']
+            },
+            // EXCLUDE TT (116 results)
+            'excludeTT_with': {
+                count: 116,
+                mae: 9.45,
+                exact: 15, exactPct: 12.9,
+                within3: 39, within3Pct: 33.6,
+                within5: 54, within5Pct: 46.6,
+                bias: -2.10,
+                distribution: [10, 3, 0, 4, 1, 7, 7, 6, 5, 13, 12, 15, 5, 3, 4, 1, 3, 2, 2, 3, 0, 1, 9],
+                bandLabels: ['Diamond', 'Platinum', 'Gold', 'Silver', 'Bronze', 'Unranked'],
+                bandMAE: [0.00, 8.67, 6.84, 6.00, 9.47, 16.61],
+                bandWithin3: [100, 37.0, 37.8, 20.0, 23.5, 13.0],
+                bandColors: ['rgba(34, 211, 238, 0.7)', 'rgba(161, 161, 170, 0.7)', 'rgba(251, 191, 36, 0.7)', 'rgba(156, 163, 175, 0.7)', 'rgba(217, 119, 6, 0.7)', 'rgba(107, 114, 128, 0.7)'],
+                bandBorders: ['#22d3ee', '#a1a1aa', '#fbbf24', '#9ca3af', '#d97706', '#6b7280']
+            },
+            'excludeTT_without': {
+                count: 109,
+                mae: 10.06,
+                exact: 8, exactPct: 7.3,
+                within3: 32, within3Pct: 29.4,
+                within5: 47, within5Pct: 43.1,
+                bias: -2.24,
+                distribution: [10, 3, 0, 4, 1, 7, 7, 6, 5, 13, 12, 8, 5, 3, 4, 1, 3, 2, 2, 3, 0, 1, 9],
+                bandLabels: ['Platinum', 'Gold', 'Silver', 'Bronze', 'Unranked'],
+                bandMAE: [8.67, 6.84, 6.00, 9.47, 16.61],
+                bandWithin3: [37.0, 37.8, 20.0, 23.5, 13.0],
+                bandColors: ['rgba(161, 161, 170, 0.7)', 'rgba(251, 191, 36, 0.7)', 'rgba(156, 163, 175, 0.7)', 'rgba(217, 119, 6, 0.7)', 'rgba(107, 114, 128, 0.7)'],
+                bandBorders: ['#a1a1aa', '#fbbf24', '#9ca3af', '#d97706', '#6b7280']
+            }
         };
 
         // Chart instances (for updating)
         let distributionChart, maeChart, within3Chart;
 
-        // Current state
+        // Current filter state
         let excludeDiamond = false;
+        let ttFilter = 'all'; // 'all', 'ttOnly', 'excludeTT'
 
         // ============================================
         // UPDATE FUNCTIONS
         // ============================================
 
+        function getCurrentData() {
+            const diamondKey = excludeDiamond ? 'without' : 'with';
+            const key = `${ttFilter}_${diamondKey}`;
+            return allData[key];
+        }
+
         function updateMetrics() {
-            const data = excludeDiamond ? dataWithoutDiamond : dataWithDiamond;
+            const data = getCurrentData();
 
             document.getElementById('header-results').textContent = `${data.count} Human Results`;
             document.getElementById('metric-mae').textContent = data.mae.toFixed(2);
@@ -963,76 +1107,60 @@
             document.getElementById('metric-within5').textContent = data.within5Pct.toFixed(1) + '%';
             document.getElementById('metric-within5-sub').textContent = `${data.within5} results`;
             document.getElementById('metric-bias').textContent = data.bias.toFixed(2);
+
+            // Update bias color based on value
+            const biasEl = document.getElementById('metric-bias');
+            if (data.bias < 0) {
+                biasEl.style.color = 'var(--accent-positive)';
+            } else if (data.bias > 0) {
+                biasEl.style.color = 'var(--accent-negative)';
+            } else {
+                biasEl.style.color = 'var(--text-secondary)';
+            }
+
+            // Show/hide limited data warning
+            const warning = document.getElementById('limitedDataWarning');
+            warning.classList.toggle('visible', ttFilter === 'ttOnly');
         }
 
         function updateCharts() {
-            const data = excludeDiamond ? dataWithoutDiamond : dataWithDiamond;
+            const data = getCurrentData();
 
             // Update distribution chart
             distributionChart.data.datasets[0].data = data.distribution;
             distributionChart.update();
 
             // Update MAE chart
-            if (excludeDiamond) {
-                maeChart.data.labels = ['Platinum', 'Gold', 'Silver', 'Bronze', 'Unranked'];
-                maeChart.data.datasets[0].data = [8.67, 8.67, 6.00, 9.47, 16.04];
-                maeChart.data.datasets[0].backgroundColor = [
-                    'rgba(161, 161, 170, 0.7)',
-                    'rgba(251, 191, 36, 0.7)',
-                    'rgba(156, 163, 175, 0.7)',
-                    'rgba(217, 119, 6, 0.7)',
-                    'rgba(107, 114, 128, 0.7)'
-                ];
-                maeChart.data.datasets[0].borderColor = ['#a1a1aa', '#fbbf24', '#9ca3af', '#d97706', '#6b7280'];
-            } else {
-                maeChart.data.labels = ['Diamond', 'Platinum', 'Gold', 'Silver', 'Bronze', 'Unranked'];
-                maeChart.data.datasets[0].data = [0.00, 8.67, 8.67, 6.00, 9.47, 16.04];
-                maeChart.data.datasets[0].backgroundColor = [
-                    'rgba(34, 211, 238, 0.7)',
-                    'rgba(161, 161, 170, 0.7)',
-                    'rgba(251, 191, 36, 0.7)',
-                    'rgba(156, 163, 175, 0.7)',
-                    'rgba(217, 119, 6, 0.7)',
-                    'rgba(107, 114, 128, 0.7)'
-                ];
-                maeChart.data.datasets[0].borderColor = ['#22d3ee', '#a1a1aa', '#fbbf24', '#9ca3af', '#d97706', '#6b7280'];
-            }
+            maeChart.data.labels = data.bandLabels;
+            maeChart.data.datasets[0].data = data.bandMAE;
+            maeChart.data.datasets[0].backgroundColor = data.bandColors;
+            maeChart.data.datasets[0].borderColor = data.bandBorders;
             maeChart.update();
 
             // Update Within 3 chart
-            if (excludeDiamond) {
-                within3Chart.data.labels = ['Platinum', 'Gold', 'Silver', 'Bronze', 'Unranked'];
-                within3Chart.data.datasets[0].data = [37.0, 35.9, 20.0, 23.5, 12.0];
-                within3Chart.data.datasets[0].backgroundColor = [
-                    'rgba(161, 161, 170, 0.7)',
-                    'rgba(251, 191, 36, 0.7)',
-                    'rgba(156, 163, 175, 0.7)',
-                    'rgba(217, 119, 6, 0.7)',
-                    'rgba(107, 114, 128, 0.7)'
-                ];
-                within3Chart.data.datasets[0].borderColor = ['#a1a1aa', '#fbbf24', '#9ca3af', '#d97706', '#6b7280'];
-            } else {
-                within3Chart.data.labels = ['Diamond', 'Platinum', 'Gold', 'Silver', 'Bronze', 'Unranked'];
-                within3Chart.data.datasets[0].data = [100, 37.0, 35.9, 20.0, 23.5, 12.0];
-                within3Chart.data.datasets[0].backgroundColor = [
-                    'rgba(34, 211, 238, 0.7)',
-                    'rgba(161, 161, 170, 0.7)',
-                    'rgba(251, 191, 36, 0.7)',
-                    'rgba(156, 163, 175, 0.7)',
-                    'rgba(217, 119, 6, 0.7)',
-                    'rgba(107, 114, 128, 0.7)'
-                ];
-                within3Chart.data.datasets[0].borderColor = ['#22d3ee', '#a1a1aa', '#fbbf24', '#9ca3af', '#d97706', '#6b7280'];
-            }
+            within3Chart.data.labels = data.bandLabels;
+            within3Chart.data.datasets[0].data = data.bandWithin3;
+            within3Chart.data.datasets[0].backgroundColor = data.bandColors;
+            within3Chart.data.datasets[0].borderColor = data.bandBorders;
             within3Chart.update();
         }
 
-        // Toggle handler
+        function updateAll() {
+            updateMetrics();
+            updateCharts();
+        }
+
+        // Diamond toggle handler
         document.getElementById('excludeDiamond').addEventListener('change', function() {
             excludeDiamond = this.checked;
             document.querySelector('.filter-toggle-container').classList.toggle('active', excludeDiamond);
-            updateMetrics();
-            updateCharts();
+            updateAll();
+        });
+
+        // TT filter handler
+        document.getElementById('ttFilter').addEventListener('change', function() {
+            ttFilter = this.value;
+            updateAll();
         });
 
         // ============================================
@@ -1050,7 +1178,7 @@
             labels: distributionLabels,
             datasets: [{
                 label: 'Count',
-                data: dataWithDiamond.distribution,
+                data: allData['all_with'].distribution,
                 backgroundColor: function(context) {
                     const index = context.dataIndex;
                     // Index 11 is "0 (exact)"

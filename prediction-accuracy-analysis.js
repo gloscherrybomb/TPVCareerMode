@@ -107,6 +107,7 @@ function analyzeResults() {
                 allAnalysis.push({
                     eventKey: data.metadata?.eventKey,
                     eventName: data.metadata?.eventName,
+                    careerEventId: data.metadata?.careerEventId,
                     playerId: rider.playerId,
                     name: `${rider.firstName} ${rider.lastName}`,
                     arr: rider.arr,
@@ -465,15 +466,34 @@ function exportHumanStats(analysis) {
     const humanOnly = analysis.filter(d => !d.isBot);
     const botOnly = analysis.filter(d => d.isBot);
 
+    // Time trial events
+    const ttEvents = [4, 6, 10];
+    const isTimeTrialEvent = (eventKey) => {
+        // Check careerEventId from the analysis data
+        return ttEvents.includes(eventKey);
+    };
+
+    // Split by TT
+    const humanTT = humanOnly.filter(d => ttEvents.includes(d.careerEventId));
+    const humanNonTT = humanOnly.filter(d => !ttEvents.includes(d.careerEventId));
+
     const humanStats = calculateStats(humanOnly);
     const botStats = calculateStats(botOnly);
+    const humanTTStats = calculateStats(humanTT);
+    const humanNonTTStats = calculateStats(humanNonTT);
 
-    // Human stats by ARR band
+    // Human stats by ARR band (all, TT only, non-TT only)
     const bandGroups = ['Diamond', 'Platinum', 'Gold', 'Silver', 'Bronze', 'Unranked'];
     const humanStatsByBand = {};
+    const humanTTStatsByBand = {};
+    const humanNonTTStatsByBand = {};
     for (const band of bandGroups) {
         const bandData = humanOnly.filter(d => d.arrBandGroup === band);
+        const bandDataTT = humanTT.filter(d => d.arrBandGroup === band);
+        const bandDataNonTT = humanNonTT.filter(d => d.arrBandGroup === band);
         humanStatsByBand[band] = calculateStats(bandData);
+        humanTTStatsByBand[band] = calculateStats(bandDataTT);
+        humanNonTTStatsByBand[band] = calculateStats(bandDataNonTT);
     }
 
     // Distribution for humans only (buckets of 2, with 0 as its own bucket)
@@ -508,14 +528,22 @@ function exportHumanStats(analysis) {
         humanDistribution[b.key] = {
             label: b.label,
             count: humanOnly.filter(b.filter).length,
-            countNoDiamond: humanOnly.filter(d => !d.arrBandGroup.includes('Diamond')).filter(b.filter).length
+            countNoDiamond: humanOnly.filter(d => d.arrBandGroup !== 'Diamond').filter(b.filter).length,
+            countTT: humanTT.filter(b.filter).length,
+            countTTNoDiamond: humanTT.filter(d => d.arrBandGroup !== 'Diamond').filter(b.filter).length,
+            countNonTT: humanNonTT.filter(b.filter).length,
+            countNonTTNoDiamond: humanNonTT.filter(d => d.arrBandGroup !== 'Diamond').filter(b.filter).length
         };
     });
 
     return {
         human: humanStats,
+        humanTT: humanTTStats,
+        humanNonTT: humanNonTTStats,
         bot: botStats,
         humanByBand: humanStatsByBand,
+        humanTTByBand: humanTTStatsByBand,
+        humanNonTTByBand: humanNonTTStatsByBand,
         humanDistribution
     };
 }
