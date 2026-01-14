@@ -1671,16 +1671,13 @@ async function generateStravaShareImage(userResult, eventInfo) {
         ctx.font = 'bold 34px Orbitron, sans-serif';
         ctx.fillText(power.nrmPower ? `${power.nrmPower}W` : '—', colWidth * 1.5, centerY + 22);
 
-        // MAX POWER (right) - with glow
+        // MAX POWER (right)
         ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
         ctx.font = '600 14px "Exo 2", sans-serif';
         ctx.fillText('MAX', colWidth * 2.5, centerY - 8);
-        ctx.fillStyle = PINK;
-        ctx.shadowColor = PINK;
-        ctx.shadowBlur = 10;
+        ctx.fillStyle = ORANGE;
         ctx.font = 'bold 34px Orbitron, sans-serif';
         ctx.fillText(power.maxPower ? `${power.maxPower}W` : '—', colWidth * 2.5, centerY + 22);
-        ctx.shadowBlur = 0;
 
         currentY += sectionHeight + 12;
     }

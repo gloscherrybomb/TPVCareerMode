@@ -1,0 +1,202 @@
+
+================================================================================
+                    PREDICTION ACCURACY ANALYSIS REPORT
+================================================================================
+                         TPV Career Mode - Season 1
+                         Generated: 2026-01-14T10:52:07.475Z
+================================================================================
+
+PURPOSE
+-------
+This report analyzes the accuracy of the event rating prediction system.
+Event Rating is used to predict expected finish position based on rider rating.
+The goal is to identify patterns and areas for improvement.
+
+METHODOLOGY
+-----------
+1. For each race, riders are ranked by their Event Rating (descending)
+2. This ranking becomes their "Predicted Position" (1st = highest rating)
+3. We compare Predicted Position to Actual Position
+4. Difference = Actual - Predicted (negative = beat prediction, positive = missed it)
+
+================================================================================
+                            OVERALL STATISTICS
+================================================================================
+
+Total Results Analyzed: 4,710
+  - Human Riders: 120
+  - Bot Riders: 4,590
+
+PREDICTION ACCURACY
+-------------------
+                              All Riders    Humans Only    Bots Only
+                              ----------    -----------    ---------
+Mean Absolute Error (MAE):          8.41           9.70         8.38
+Mean Signed Error:                  0.00          -1.67         0.04
+Standard Deviation:                11.06          13.15        11.00
+Median Absolute Error:                 6              7            6
+
+PERCENTILES (Absolute Error)
+----------------------------
+75th Percentile:                      13             15           12
+90th Percentile:                      19             23           19
+95th Percentile:                      23             28           23
+Maximum Error:                        36             36           36
+
+PREDICTION HIT RATES
+--------------------
+Exact Predictions:                  5.7%          12.5%         5.5%
+Within 1 Position:                 15.2%          20.8%        15.0%
+Within 3 Positions:                31.0%          32.5%        31.0%
+Within 5 Positions:                44.5%          45.0%        44.4%
+
+DIRECTION OF ERRORS
+-------------------
+Finished BETTER than predicted: 47.8% (2,251 riders)
+Finished WORSE than predicted:  46.5% (2,190 riders)
+Finished EXACTLY as predicted:  5.7% (269 riders)
+
+
+  Distribution of Prediction Errors (Actual - Predicted):
+  Negative = Finished BETTER than predicted, Positive = Finished WORSE
+
+          -10: ############################################# (790)
+           -9: ###### (101)
+           -8: ####### (125)
+           -7: ######### (154)
+           -6: ####### (122)
+           -5: ########## (176)
+           -4: ########## (174)
+           -3: ########### (189)
+           -2: ########### (199)
+           -1: ############# (221)
+    0 (exact): ############### (269)
+           +1: ############# (224)
+           +2: ############ (204)
+           +3: ######### (156)
+           +4: ######### (151)
+           +5: ######## (131)
+           +6: ######### (150)
+           +7: ###### (110)
+           +8: ###### (96)
+           +9: ###### (98)
+          +10: ################################################## (870)
+
+
+================================================================================
+                        ACCURACY BY ARR BAND
+================================================================================
+
+This section shows prediction accuracy broken down by rider ARR level.
+Key questions: Are predictions more accurate for higher or lower rated riders?
+
+ARR Band      Count     MAE    Std Dev    Exact%   Within3%   Within5%   Avg Diff
+---------     -----     ---    -------    ------   --------   --------   --------
+Diamond           7    0.00       0.00    100.0%     100.0%     100.0%      0.00
+Platinum       1232   10.43      13.14      5.1%      25.2%      35.1%    +  1.10
+Gold           1659    8.53      11.12      5.2%      29.1%      43.6%    +  0.21
+Silver          908    7.52       9.89      4.5%      32.3%      47.5%     -0.22
+Bronze          821    6.19       8.11      7.4%      40.3%      55.7%     -1.56
+Unranked         83    8.35      11.93     13.3%      45.8%      51.8%     -2.61
+
+
+DETAILED BREAKDOWN BY ARR SUB-BAND
+----------------------------------
+Sub-Band        Count     MAE    Exact%   Within3%   Avg Diff   Better%   Worse%
+--------        -----     ---    ------   --------   --------   -------   ------
+Platinum 1        275   11.12      5.1%      26.5%    +  8.99      22.9%    72.0%
+Platinum 2        492   10.19      4.3%      22.6%     -1.83      54.5%    41.3%
+Platinum 3        465   10.26      6.0%      27.1%     -0.47      46.7%    47.3%
+Gold 1            539    8.80      4.3%      30.8%    +  1.52      40.3%    55.5%
+Gold 2            611    8.72      5.1%      23.9%    +  0.56      45.3%    49.6%
+Gold 3            509    8.03      6.3%      33.6%     -1.61      47.9%    45.8%
+Silver 1          307    8.30      3.3%      31.3%     -0.55      51.8%    45.0%
+Silver 2          298    7.26      4.0%      30.5%     -0.47      51.0%    45.0%
+Silver 3          303    7.00      6.3%      35.0%    +  0.35      50.2%    43.6%
+Bronze 1          325    6.37      5.8%      36.0%     -1.08      52.3%    41.8%
+Bronze 2          213    5.91      8.9%      43.2%     -2.62      60.1%    31.0%
+Bronze 3          283    6.18      8.1%      43.1%     -1.30      56.5%    35.3%
+Unranked           83    8.35     13.3%      45.8%     -2.61      53.0%    33.7%
+
+
+================================================================================
+                      ACCURACY BY FIELD SIZE
+================================================================================
+
+How does field size affect prediction accuracy?
+
+Field Size       Count     MAE    Exact%   Within3%   Within5%
+----------       -----     ---    ------   --------   --------
+11-20 riders        95    4.63     10.5%      49.5%      67.4%
+21-30 riders        28    4.93      0.0%      53.6%      64.3%
+31-40 riders      4532    8.51      5.6%      30.5%      43.8%
+51+ riders          55    8.51      9.1%      30.9%      47.3%
+
+
+================================================================================
+                      LARGEST PREDICTION ERRORS
+================================================================================
+
+Top 20 cases where prediction was furthest from actual result:
+
+Rider Name                  ARR Band      Predicted   Actual   Error   Event
+----------                  --------      ---------   ------   -----   -----
+George Young                Gold 3               38        2     -36   96196
+Fye Votu                    Unranked             37        1     -36   97272
+Fye Votu                    Unranked             36        1     -35   97430
+Ian Ortiz                   Platinum 2            2       36     +34   96519
+Elvis Hodge                 Gold 2               38        4     -34   96667
+Gilbert Meyer               Platinum 3           36        2     -34   97258
+Dwayne Williams             Platinum 3           38        5     -33   96264
+Emil Rockov                 Gold 1                4       37     +33   96667
+Nikola Serdarušić           Platinum 2            2       35     +33   96778
+Manuel Castro               Platinum 3           38        5     -33   97042
+Aleksandar Košarac          Silver 1             39        6     -33   97137
+Erwin Müller                Gold 1               35        2     -33   97116
+Jack Mahy                   Platinum 3            4       37     +33   97116
+Ton Dekker                  Gold 1               36        4     -32   96070
+Daeho Baek                  Platinum 3            1       33     +32   96221
+Philippe Fabre              Platinum 3           34        2     -32   96519
+Haruki Watanabe             Platinum 3           35        3     -32   96778
+Sascha Walter               Platinum 3           37        5     -32   96778
+Niran Boonmee               Gold 3               36        4     -32   97355
+Wendell Shannon             Platinum 1            7       39     +32   96092
+
+
+================================================================================
+                    KEY FINDINGS & RECOMMENDATIONS
+================================================================================
+
+SUMMARY OF FINDINGS
+-------------------
+1. Overall Mean Absolute Error: 8.41 positions
+   - This means on average, predictions are off by ~8 positions
+
+2. Prediction Bias: Predictions are well-balanced
+   - Mean signed error: 0.00 positions
+
+3. Accuracy Rates:
+   - 5.7% of predictions are exactly correct
+   - 31.0% of predictions are within 3 positions
+   - 44.5% of predictions are within 5 positions
+
+4. Human vs Bot Performance:
+   - Humans have MAE of 9.70 vs Bots at 8.38
+   - Human results are LESS predictable than bots
+
+ARR BAND INSIGHTS
+-----------------
+- MOST accurate predictions: Bronze (MAE: 6.19)
+- LEAST accurate predictions: Platinum (MAE: 10.43)
+
+
+POTENTIAL AREAS FOR IMPROVEMENT
+-------------------------------
+1. Consider adjusting rating weights for specific ARR bands showing higher errors
+2. Analyze event types separately (crits, road races, TTs) for different patterns
+3. Factor in recent form or race-specific attributes
+4. Review cases with errors > 10 positions for common patterns
+
+================================================================================
+                              END OF REPORT
+================================================================================
