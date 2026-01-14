@@ -843,11 +843,20 @@ async function loadEventResults() {
             };
 
             // Get earnedAwards with their details from AWARD_DEFINITIONS
+            // Debug: Check if TPVIcons is available
+            console.log('[SHARE IMG] TPVIcons available:', !!window.TPVIcons);
+            console.log('[SHARE IMG] ICON_REGISTRY available:', !!window.TPVIcons?.ICON_REGISTRY);
+            if (window.TPVIcons?.ICON_REGISTRY) {
+                console.log('[SHARE IMG] bronzeMedal in registry:', !!window.TPVIcons.ICON_REGISTRY['bronzeMedal']);
+            }
+
             const earnedAwards = (userEventResults.earnedAwards || []).map(award => {
                 const awardDef = window.AWARD_DEFINITIONS?.[award.awardId] || {};
                 const iconKey = awardIdToIconKey[award.awardId] || award.awardId;
                 // Icons are exported via window.TPVIcons.ICON_REGISTRY
                 const iconDef = window.TPVIcons?.ICON_REGISTRY?.[iconKey] || {};
+
+                console.log(`[SHARE IMG] Award ${award.awardId}: iconKey=${iconKey}, iconDef=`, iconDef);
 
                 // Resolve icon path to absolute URL for canvas fetch
                 let absoluteIconPath = null;
@@ -856,7 +865,7 @@ async function loadEventResults() {
                     absoluteIconPath = new URL(iconDef.path, baseUrl).href;
                 }
 
-                console.log(`[SHARE IMG] Award ${award.awardId} -> iconKey: ${iconKey}, path: ${absoluteIconPath}`);
+                console.log(`[SHARE IMG] Award ${award.awardId} -> resolved path: ${absoluteIconPath}`);
 
                 return {
                     id: award.awardId,
