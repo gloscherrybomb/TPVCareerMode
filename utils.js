@@ -402,11 +402,12 @@ export function getCountryCode2(countryCode3) {
 }
 
 /**
- * Get high-resolution version of a profile photo URL
- * Google profile photos have a size parameter that can be modified
+ * Get appropriately sized version of a profile photo URL
+ * - Google profile photos: modifies URL size parameter
+ * - Firebase Storage: returns thumbnail URL (requires Resize Images extension)
  * @param {string} photoURL - The original photo URL
  * @param {number} size - Desired size in pixels (default 400)
- * @returns {string} Modified URL with higher resolution
+ * @returns {string} Modified URL for the appropriate size
  */
 export function getHighResPhotoURL(photoURL, size = 400) {
   if (!photoURL) return null;
@@ -427,7 +428,61 @@ export function getHighResPhotoURL(photoURL, size = 400) {
     return `${baseURL}=s${size}-c`;
   }
 
-  // For other URLs (like Firebase Storage), return as-is
+  // Check if it's a Firebase Storage URL
+  if (photoURL.includes('firebasestorage.googleapis.com')) {
+    return getFirebaseThumbnailURL(photoURL, size);
+  }
+
+  // For other URLs, return as-is
+  return photoURL;
+}
+
+/**
+ * Get Firebase Storage thumbnail URL
+ * Works with the Firebase Resize Images extension
+ * Thumbnails are named: {original}_WIDTHxHEIGHT.{ext}
+ * @param {string} photoURL - Original Firebase Storage URL
+ * @param {number} size - Desired size (uses closest available: 200 or 400)
+ * @returns {string} Thumbnail URL
+ */
+export function getFirebaseThumbnailURL(photoURL, size = 400) {
+  if (!photoURL) return null;
+
+  // Determine which thumbnail size to use (200x200 or 400x400)
+  const thumbSize = size <= 200 ? '200x200' : '400x400';
+
+  try {
+    // Firebase Storage URL format:
+    // https://firebasestorage.googleapis.com/v0/b/{bucket}/o/{encoded-path}?alt=media&token={token}
+    const url = new URL(photoURL);
+    const pathMatch = url.pathname.match(/\/o\/(.+)/);
+
+    if (pathMatch) {
+      // Decode the path (e.g., profile-photos%2Fabc123 -> profile-photos/abc123)
+      const encodedPath = pathMatch[1];
+      const decodedPath = decodeURIComponent(encodedPath);
+
+      // Add thumbnail suffix before the extension (or at end if no extension)
+      let thumbPath;
+      const lastDotIndex = decodedPath.lastIndexOf('.');
+      if (lastDotIndex > decodedPath.lastIndexOf('/')) {
+        // Has extension: profile-photos/abc123.jpg -> profile-photos/abc123_400x400.jpg
+        thumbPath = decodedPath.slice(0, lastDotIndex) + '_' + thumbSize + decodedPath.slice(lastDotIndex);
+      } else {
+        // No extension: profile-photos/abc123 -> profile-photos/abc123_400x400
+        thumbPath = decodedPath + '_' + thumbSize;
+      }
+
+      // Re-encode and rebuild URL
+      url.pathname = url.pathname.replace(encodedPath, encodeURIComponent(thumbPath).replace(/%2F/g, '%2F'));
+
+      return url.toString();
+    }
+  } catch (e) {
+    console.warn('Failed to generate thumbnail URL:', e);
+  }
+
+  // Fallback to original URL if parsing fails
   return photoURL;
 }
 

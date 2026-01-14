@@ -423,10 +423,10 @@ function displayHeader() {
     document.getElementById('currentSeason').textContent = '1';
     document.getElementById('totalEvents').textContent = allResults.length;
 
-    // Set photo if available (use high-res version for Google photos)
+    // Set photo if available (use 200px thumbnail for 100px display)
     if (userData.photoURL) {
         const photo = document.getElementById('riderPhoto');
-        photo.src = getHighResPhotoURL(userData.photoURL, 400);
+        photo.src = getHighResPhotoURL(userData.photoURL, 200);
         photo.style.display = 'block';
     }
 }

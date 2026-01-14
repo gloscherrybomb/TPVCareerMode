@@ -591,8 +591,8 @@ async function fetchResults(isLoadMore = false) {
                     firebaseAuthUid = userSnapshot.docs[0].id; // Get the Firebase Auth document ID
                     const userData = userSnapshot.docs[0].data();
                     riderName = userData.name || riderName;
-                    // Get high-res photo URL (250px for 80px display, 3x for retina)
-                    photoURL = getHighResPhotoURL(userData.photoURL, 250);
+                    // Use 200px thumbnail for 80px display (2.5x for retina)
+                    photoURL = getHighResPhotoURL(userData.photoURL, 200);
 
                     // Get event-specific results for discordStory
                     const eventResultsKey = `event${eventNumber}Results`;

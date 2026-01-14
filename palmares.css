@@ -123,6 +123,9 @@
         0 0 0 2px rgba(255, 27, 107, 0.3),
         0 8px 24px rgba(0, 0, 0, 0.4);
     transition: all 0.3s ease;
+    /* High-quality downscaling for large images */
+    image-rendering: high-quality;
+    -ms-interpolation-mode: bicubic;
 }
 
 .rider-photo-wrapper:hover .rider-photo-large {

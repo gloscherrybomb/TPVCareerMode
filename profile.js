@@ -646,8 +646,8 @@ function displayProfileInfo(user, userData, stats, seasonRanking, globalRanking)
     initialsSpan.textContent = getInitials(userData.name || user.displayName);
     
     if (userData.photoURL) {
-        // Use high-res version of Google profile photos (500px for 150px display, 3.3x for retina)
-        profilePhoto.src = getHighResPhotoURL(userData.photoURL, 500);
+        // Use 400px thumbnail for 150px display (2.67x for retina)
+        profilePhoto.src = getHighResPhotoURL(userData.photoURL, 400);
         profilePhoto.classList.add('active');
         profilePlaceholder.classList.add('hide');
     } else {

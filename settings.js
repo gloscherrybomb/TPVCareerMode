@@ -1,7 +1,7 @@
 // Settings Page Logic for TPV Career Mode
 
 import { firebaseConfig } from './firebase-config.js';
-import { getInitials } from './utils.js';
+import { getInitials, getHighResPhotoURL } from './utils.js';
 import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 import {
     getFirestore,
@@ -89,7 +89,8 @@ function populateSettings(data) {
     const photoInitials = document.getElementById('photoInitials');
 
     if (data.photoURL) {
-        photoPreview.src = data.photoURL;
+        // Use 200px thumbnail for 100px display (2x for retina)
+        photoPreview.src = getHighResPhotoURL(data.photoURL, 200);
         photoPreview.classList.add('visible');
         photoPlaceholder.classList.add('hidden');
     } else {
