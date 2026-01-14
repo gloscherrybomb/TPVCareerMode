@@ -1649,7 +1649,7 @@ async function generateStravaShareImage(userResult, eventInfo) {
     // ===== ROW 2: Power Data (clean, no background) =====
     if (hasPower) {
         const power = userResult.powerData;
-        const sectionHeight = 55;
+        const sectionHeight = 75;
 
         // Three columns - label above value, centered
         const colWidth = width / 3;
@@ -1657,27 +1657,27 @@ async function generateStravaShareImage(userResult, eventInfo) {
 
         // AVG POWER (left)
         ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
-        ctx.font = '600 14px "Exo 2", sans-serif';
-        ctx.fillText('AVG', colWidth / 2, centerY - 8);
+        ctx.font = '600 16px "Exo 2", sans-serif';
+        ctx.fillText('AVG', colWidth / 2, centerY - 12);
         ctx.fillStyle = ORANGE;
-        ctx.font = 'bold 34px Orbitron, sans-serif';
-        ctx.fillText(power.avgPower ? `${power.avgPower}W` : '—', colWidth / 2, centerY + 22);
+        ctx.font = 'bold 48px Orbitron, sans-serif';
+        ctx.fillText(power.avgPower ? `${power.avgPower}W` : '—', colWidth / 2, centerY + 28);
 
         // NORMALIZED (center)
         ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
-        ctx.font = '600 14px "Exo 2", sans-serif';
-        ctx.fillText('NRM', colWidth * 1.5, centerY - 8);
+        ctx.font = '600 16px "Exo 2", sans-serif';
+        ctx.fillText('NRM', colWidth * 1.5, centerY - 12);
         ctx.fillStyle = ORANGE;
-        ctx.font = 'bold 34px Orbitron, sans-serif';
-        ctx.fillText(power.nrmPower ? `${power.nrmPower}W` : '—', colWidth * 1.5, centerY + 22);
+        ctx.font = 'bold 48px Orbitron, sans-serif';
+        ctx.fillText(power.nrmPower ? `${power.nrmPower}W` : '—', colWidth * 1.5, centerY + 28);
 
         // MAX POWER (right)
         ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
-        ctx.font = '600 14px "Exo 2", sans-serif';
-        ctx.fillText('MAX', colWidth * 2.5, centerY - 8);
+        ctx.font = '600 16px "Exo 2", sans-serif';
+        ctx.fillText('MAX', colWidth * 2.5, centerY - 12);
         ctx.fillStyle = ORANGE;
-        ctx.font = 'bold 34px Orbitron, sans-serif';
-        ctx.fillText(power.maxPower ? `${power.maxPower}W` : '—', colWidth * 2.5, centerY + 22);
+        ctx.font = 'bold 48px Orbitron, sans-serif';
+        ctx.fillText(power.maxPower ? `${power.maxPower}W` : '—', colWidth * 2.5, centerY + 28);
 
         currentY += sectionHeight + 12;
     }
@@ -1685,11 +1685,11 @@ async function generateStravaShareImage(userResult, eventInfo) {
     // ========== NARRATIVE SECTION (PROMINENT, MOBILE-READABLE) ==========
     if (userResult.story && userResult.story.length > 20) {
         const footerHeight = 80; // Space for footer
-        const awardsHeight = hasAwards ? 90 : 0; // Reserve space for awards below
+        const awardsHeight = hasAwards ? 105 : 0; // Reserve space for awards below
         const remainingSpace = height - currentY - footerHeight - awardsHeight;
         const containerHeight = Math.max(160, remainingSpace - 10);
 
-        // Subtle left accent bar only - no box background
+        // Left accent bar
         const accentBarGradient = ctx.createLinearGradient(0, currentY + 20, 0, currentY + containerHeight - 20);
         accentBarGradient.addColorStop(0, PINK);
         accentBarGradient.addColorStop(0.5, PURPLE);
@@ -1699,6 +1699,19 @@ async function generateStravaShareImage(userResult, eventInfo) {
         ctx.shadowBlur = 15;
         ctx.beginPath();
         ctx.roundRect(MARGIN - 5, currentY + 20, 4, containerHeight - 40, 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        // Right accent bar (mirror of left)
+        const rightAccentGradient = ctx.createLinearGradient(0, currentY + 20, 0, currentY + containerHeight - 20);
+        rightAccentGradient.addColorStop(0, PINK);
+        rightAccentGradient.addColorStop(0.5, PURPLE);
+        rightAccentGradient.addColorStop(1, CYAN);
+        ctx.fillStyle = rightAccentGradient;
+        ctx.shadowColor = CYAN;
+        ctx.shadowBlur = 15;
+        ctx.beginPath();
+        ctx.roundRect(width - MARGIN + 1, currentY + 20, 4, containerHeight - 40, 2);
         ctx.fill();
         ctx.shadowBlur = 0;
 
@@ -1748,13 +1761,13 @@ async function generateStravaShareImage(userResult, eventInfo) {
     if (hasAwards) {
         const awards = userResult.earnedAwards;
         const numAwards = Math.min(awards.length, 4);
-        const sectionHeight = 85;
+        const sectionHeight = 100;
 
         // Icons in a horizontal row
-        const awardSize = 45;
-        const awardSpacing = Math.min(150, (width - MARGIN * 2 - 40) / numAwards);
+        const awardSize = 60;
+        const awardSpacing = Math.min(170, (width - MARGIN * 2 - 40) / numAwards);
         const startX = width / 2 - ((numAwards - 1) * awardSpacing) / 2;
-        const awardY = currentY + 38;
+        const awardY = currentY + 42;
 
         for (let i = 0; i < numAwards; i++) {
             const award = awards[i];
@@ -1780,13 +1793,13 @@ async function generateStravaShareImage(userResult, eventInfo) {
             if (!iconLoaded && award.fallback) {
                 ctx.font = `${awardSize}px "Segoe UI Emoji", "Apple Color Emoji", sans-serif`;
                 ctx.fillStyle = '#ffffff';
-                ctx.fillText(award.fallback, x, awardY + 12);
+                ctx.fillText(award.fallback, x, awardY + 15);
             }
 
             // Award title below icon
             ctx.fillStyle = 'rgba(255, 255, 255, 0.75)';
-            ctx.font = '600 14px "Exo 2", sans-serif';
-            ctx.fillText(award.title, x, awardY + awardSize/2 + 18);
+            ctx.font = '600 16px "Exo 2", sans-serif';
+            ctx.fillText(award.title, x, awardY + awardSize/2 + 20);
         }
 
         currentY += sectionHeight;
