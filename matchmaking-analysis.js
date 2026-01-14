@@ -337,8 +337,11 @@ function calculateBalanceMetrics(player) {
     const balanceScore = Math.max(0, 100 - Math.abs(avgDiff) * 10);
 
     // Trend direction - use non-win data if available for more accurate assessment
-    // BUT: if win rate >= 50%, use overall avgDiff since non-win sample is too small
-    const trendMetric = (nonWinAvgDiff !== null && winRate < 50) ? nonWinAvgDiff : avgDiff;
+    // BUT: use overall avgDiff if EITHER:
+    //  1. Win rate >= 50% (non-win sample too small), OR
+    //  2. |avgDiff| > 5 (clearly extreme performance regardless of win rate)
+    const useOverallAvgDiff = winRate >= 50 || Math.abs(avgDiff) > 5;
+    const trendMetric = (nonWinAvgDiff !== null && !useOverallAvgDiff) ? nonWinAvgDiff : avgDiff;
     let trend = 'balanced';
     if (trendMetric < -2) trend = 'overperforming';  // Consistently beating predictions
     if (trendMetric > 2) trend = 'underperforming';  // Consistently missing predictions
