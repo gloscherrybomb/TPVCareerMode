@@ -399,7 +399,7 @@ const CONDENSED_NARRATIVES = {
   podium: {
     second: {
       photoFinish: [
-        "So close at {eventName}. The finish came down to a desperate sprint—{dynamicsText} You crossed {gapTextSuffix}, close enough to taste victory, far enough to know you came up short. Second, but it stings.",
+        "So close at {eventName}. The finish came down to a desperate sprint—{dynamicsText} You crossed the line{gapTextSuffix}, close enough to taste victory, far enough to know you came up short. Second, but it stings.",
         "Inches from glory at {eventName}. The photo finish went the wrong way—{dynamicsText} P2 when P1 was right there{gapTextSuffix}. Racing can be cruel.",
         "{eventName} was decided at the line. You threw your bike, gave everything, and came up just short{gapTextSuffix}. Second place in a photo finish—so close, yet so far.",
         "The cruelest second place at {eventName}. A bike length, a wheel, maybe less{gapTextSuffix}. {dynamicsText} P2 when victory was there for the taking."
@@ -486,7 +486,7 @@ const CONDENSED_NARRATIVES = {
     default: [
       "A tough day at {eventName}, finishing {position}. The leaders were {gapText} up the road. Sometimes racing delivers hard lessons. The question is what you do with them.",
       "{position} at {eventName}. A day to forget, deep in the results sheet. But you finished, and finishing is something.",
-      "Bringing up the rear at {eventName} with {position}. The race was decided far ahead of you{gapTextSuffix}. Days like this test your resolve.",
+      "Bringing up the rear at {eventName} with {position}. The race was decided far ahead—you finished{gapTextSuffix}. Days like this test your resolve.",
       "{position} at {eventName}. Well off the pace, watching the race unfold from behind. Tough, but you crossed the line.",
       "Finishing {position} at {eventName}. A humbling result, but every finish adds to the experience bank. The road back to the front starts with showing up."
     ]
