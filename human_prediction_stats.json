@@ -203,9 +203,9 @@
   },
   "humanDistribution": {
     "0": {
-      "label": "-1 to 0",
-      "count": 22,
-      "countNoDiamond": 15
+      "label": "0 (exact)",
+      "count": 15,
+      "countNoDiamond": 8
     },
     "2": {
       "label": "+1 to +2",
@@ -257,60 +257,65 @@
       "count": 2,
       "countNoDiamond": 2
     },
-    "22": {
+    "21": {
       "label": "+21 or more",
       "count": 10,
       "countNoDiamond": 10
     },
+    "-21": {
+      "label": "-21 or less",
+      "count": 10,
+      "countNoDiamond": 10
+    },
     "-20": {
-      "label": "-20 or less",
-      "count": 12,
-      "countNoDiamond": 12
+      "label": "-20 to -19",
+      "count": 3,
+      "countNoDiamond": 3
     },
     "-18": {
-      "label": "-19 to -18",
-      "count": 1,
-      "countNoDiamond": 1
+      "label": "-18 to -17",
+      "count": 0,
+      "countNoDiamond": 0
     },
     "-16": {
-      "label": "-17 to -16",
+      "label": "-16 to -15",
+      "count": 4,
+      "countNoDiamond": 4
+    },
+    "-14": {
+      "label": "-14 to -13",
       "count": 1,
       "countNoDiamond": 1
     },
-    "-14": {
-      "label": "-15 to -14",
-      "count": 3,
-      "countNoDiamond": 3
-    },
     "-12": {
-      "label": "-13 to -12",
-      "count": 3,
-      "countNoDiamond": 3
+      "label": "-12 to -11",
+      "count": 7,
+      "countNoDiamond": 7
     },
     "-10": {
-      "label": "-11 to -10",
-      "count": 9,
-      "countNoDiamond": 9
+      "label": "-10 to -9",
+      "count": 7,
+      "countNoDiamond": 7
     },
     "-8": {
-      "label": "-9 to -8",
-      "count": 5,
-      "countNoDiamond": 5
+      "label": "-8 to -7",
+      "count": 6,
+      "countNoDiamond": 6
     },
     "-6": {
-      "label": "-7 to -6",
+      "label": "-6 to -5",
       "count": 5,
       "countNoDiamond": 5
     },
     "-4": {
-      "label": "-5 to -4",
-      "count": 12,
-      "countNoDiamond": 12
+      "label": "-4 to -3",
+      "count": 13,
+      "countNoDiamond": 13
     },
     "-2": {
-      "label": "-3 to -2",
-      "count": 10,
-      "countNoDiamond": 10
+      "label": "-2 to -1",
+      "count": 12,
+      "countNoDiamond": 12
     }
   }
 }

@@ -900,10 +900,11 @@
         // DATA SETS: With and Without Diamond Riders
         // ============================================
 
-        // Distribution labels (buckets of 2, range -20 to +21+)
+        // Distribution labels (buckets of 2, with 0 as its own bucket)
         const distributionLabels = [
-            '-20 or less', '-19 to -18', '-17 to -16', '-15 to -14', '-13 to -12',
-            '-11 to -10', '-9 to -8', '-7 to -6', '-5 to -4', '-3 to -2', '-1 to 0',
+            '-21 or less', '-20 to -19', '-18 to -17', '-16 to -15', '-14 to -13',
+            '-12 to -11', '-10 to -9', '-8 to -7', '-6 to -5', '-4 to -3', '-2 to -1',
+            '0 (exact)',
             '+1 to +2', '+3 to +4', '+5 to +6', '+7 to +8', '+9 to +10',
             '+11 to +12', '+13 to +14', '+15 to +16', '+17 to +18', '+19 to +20', '+21 or more'
         ];
@@ -919,7 +920,7 @@
             within5: 54,
             within5Pct: 45.0,
             bias: -1.67,
-            distribution: [12, 1, 1, 3, 3, 9, 5, 5, 12, 10, 22, 5, 3, 4, 2, 3, 2, 2, 3, 1, 2, 10],
+            distribution: [10, 3, 0, 4, 1, 7, 7, 6, 5, 13, 12, 15, 5, 3, 4, 2, 3, 2, 2, 3, 1, 2, 10],
             bandMAE: [0.00, 8.67, 8.67, 6.00, 9.47, 16.04],
             bandWithin3: [100, 37.0, 35.9, 20.0, 23.5, 12.0]
         };
@@ -935,7 +936,7 @@
             within5: 47,
             within5Pct: 41.6,
             bias: -1.77,
-            distribution: [12, 1, 1, 3, 3, 9, 5, 5, 12, 10, 15, 5, 3, 4, 2, 3, 2, 2, 3, 1, 2, 10], // 22 -> 15 at index 10
+            distribution: [10, 3, 0, 4, 1, 7, 7, 6, 5, 13, 12, 8, 5, 3, 4, 2, 3, 2, 2, 3, 1, 2, 10], // 15 -> 8 at index 11
             bandMAE: [null, 8.67, 8.67, 6.00, 9.47, 16.04],
             bandWithin3: [null, 37.0, 35.9, 20.0, 23.5, 12.0]
         };
@@ -1052,15 +1053,15 @@
                 data: dataWithDiamond.distribution,
                 backgroundColor: function(context) {
                     const index = context.dataIndex;
-                    // Index 10 is "-1 to 0" which includes exact predictions
-                    if (index < 10) return 'rgba(16, 185, 129, 0.7)'; // Better than predicted - green
-                    if (index === 10) return 'rgba(99, 102, 241, 0.9)'; // Near exact - purple
+                    // Index 11 is "0 (exact)"
+                    if (index < 11) return 'rgba(16, 185, 129, 0.7)'; // Better than predicted - green
+                    if (index === 11) return 'rgba(99, 102, 241, 0.9)'; // Exact - purple
                     return 'rgba(239, 68, 68, 0.7)'; // Worse than predicted - red
                 },
                 borderColor: function(context) {
                     const index = context.dataIndex;
-                    if (index < 10) return '#10b981';
-                    if (index === 10) return '#6366f1';
+                    if (index < 11) return '#10b981';
+                    if (index === 11) return '#6366f1';
                     return '#ef4444';
                 },
                 borderWidth: 1,
