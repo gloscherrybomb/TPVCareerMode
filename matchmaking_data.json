@@ -1,49 +1,55 @@
 {
   "summary": {
-    "totalPlayers": 33,
-    "balancedCount": 6,
-    "balancedPct": "18.2",
-    "overperformingCount": 11,
-    "overperformingPct": "33.3",
+    "totalPlayers": 34,
+    "balancedCount": 8,
+    "balancedPct": "23.5",
+    "overperformingCount": 10,
+    "overperformingPct": "29.4",
     "underperformingCount": 16,
-    "underperformingPct": "48.5",
-    "avgBalanceScore": "38.3"
+    "underperformingPct": "47.1",
+    "avgBalanceScore": "40.0"
   },
   "bandStats": {
     "Bronze": {
       "players": 6,
-      "totalAvgDiff": -31.773809523809526,
-      "totalRaces": 21,
-      "avgDiff": -5.295634920634921
+      "totalAvgDiff": -42.58333333333333,
+      "totalRaces": 26,
+      "validPlayerCount": 6,
+      "avgDiff": -7.097222222222221
     },
     "Gold": {
-      "players": 10,
-      "totalAvgDiff": 13.99285714285714,
-      "totalRaces": 31,
-      "avgDiff": 1.399285714285714
+      "players": 11,
+      "totalAvgDiff": 13.842857142857142,
+      "totalRaces": 44,
+      "validPlayerCount": 11,
+      "avgDiff": 1.2584415584415583
+    },
+    "Unranked": {
+      "players": 7,
+      "totalAvgDiff": -79.5,
+      "totalRaces": 18,
+      "validPlayerCount": 6,
+      "avgDiff": -13.25
     },
     "Diamond": {
       "players": 2,
       "totalAvgDiff": 0,
       "totalRaces": 8,
+      "validPlayerCount": 2,
       "avgDiff": 0
     },
     "Platinum": {
       "players": 7,
       "totalAvgDiff": 15.333333333333332,
       "totalRaces": 20,
+      "validPlayerCount": 7,
       "avgDiff": 2.1904761904761902
-    },
-    "Unranked": {
-      "players": 7,
-      "totalAvgDiff": -92.83333333333334,
-      "totalRaces": 15,
-      "avgDiff": -13.261904761904763
     },
     "Silver": {
       "players": 1,
       "totalAvgDiff": 4.666666666666667,
       "totalRaces": 3,
+      "validPlayerCount": 1,
       "avgDiff": 4.666666666666667
     }
   },
@@ -53,65 +59,257 @@
       "name": "Julien Helleputte",
       "band": "Bronze",
       "arr": 300,
-      "raceCount": 7,
-      "avgDiff": "1.14",
-      "nonWinAvgDiff": "1.14",
-      "cumulativeFinal": 8,
-      "driftRate": "1.14",
-      "balanceScore": "89",
+      "raceCount": 12,
+      "avgDiff": "-9.67",
+      "nonWinAvgDiff": "1.75",
+      "cumulativeFinal": -116,
+      "driftRate": "-9.67",
+      "balanceScore": "3",
       "trend": "balanced",
-      "wins": 0,
-      "winRate": "0",
-      "ceilingWarning": false,
+      "wins": 4,
+      "winRate": "33",
+      "ceilingWarning": true,
       "highWinRate": false,
       "races": [
         {
           "raceNum": 1,
-          "diff": -4,
-          "cumulative": -4,
-          "date": "2026-01-03",
-          "isWin": false
+          "diff": -39,
+          "cumulative": -39,
+          "date": "2025-12-10",
+          "isWin": true
         },
         {
           "raceNum": 2,
-          "diff": 7,
-          "cumulative": 3,
-          "date": "2026-01-04",
-          "isWin": false
+          "diff": -38,
+          "cumulative": -77,
+          "date": "2025-12-14",
+          "isWin": true
         },
         {
           "raceNum": 3,
-          "diff": 23,
-          "cumulative": 26,
-          "date": "2026-01-04",
-          "isWin": false
+          "diff": -35,
+          "cumulative": -112,
+          "date": "2025-12-17",
+          "isWin": true
         },
         {
           "raceNum": 4,
-          "diff": 10,
-          "cumulative": 36,
-          "date": "2026-01-04",
-          "isWin": false
+          "diff": -18,
+          "cumulative": -130,
+          "date": "2025-12-19",
+          "isWin": true
         },
         {
           "raceNum": 5,
-          "diff": -11,
-          "cumulative": 25,
-          "date": "2026-01-04",
+          "diff": 6,
+          "cumulative": -124,
+          "date": "2025-12-21",
           "isWin": false
         },
         {
           "raceNum": 6,
-          "diff": -7,
-          "cumulative": 18,
-          "date": "2026-01-04",
+          "diff": -4,
+          "cumulative": -128,
+          "date": "2026-01-03",
           "isWin": false
         },
         {
           "raceNum": 7,
-          "diff": -10,
-          "cumulative": 8,
+          "diff": 7,
+          "cumulative": -121,
           "date": "2026-01-04",
+          "isWin": false
+        },
+        {
+          "raceNum": 8,
+          "diff": 23,
+          "cumulative": -98,
+          "date": "2026-01-04",
+          "isWin": false
+        },
+        {
+          "raceNum": 9,
+          "diff": 10,
+          "cumulative": -88,
+          "date": "2026-01-04",
+          "isWin": false
+        },
+        {
+          "raceNum": 10,
+          "diff": -11,
+          "cumulative": -99,
+          "date": "2026-01-04",
+          "isWin": false
+        },
+        {
+          "raceNum": 11,
+          "diff": -7,
+          "cumulative": -106,
+          "date": "2026-01-04",
+          "isWin": false
+        },
+        {
+          "raceNum": 12,
+          "diff": -10,
+          "cumulative": -116,
+          "date": "2026-01-04",
+          "isWin": false
+        }
+      ]
+    },
+    {
+      "playerId": "2FDBB5DD4345DCB5",
+      "name": "Ryan Yates",
+      "band": "Gold",
+      "arr": 1284,
+      "raceCount": 10,
+      "avgDiff": "-3.50",
+      "nonWinAvgDiff": "2.67",
+      "cumulativeFinal": -35,
+      "driftRate": "-3.50",
+      "balanceScore": "65",
+      "trend": "underperforming",
+      "wins": 7,
+      "winRate": "70",
+      "ceilingWarning": true,
+      "highWinRate": true,
+      "races": [
+        {
+          "raceNum": 1,
+          "diff": -9,
+          "cumulative": -9,
+          "date": "2025-12-08",
+          "isWin": true
+        },
+        {
+          "raceNum": 2,
+          "diff": -2,
+          "cumulative": -11,
+          "date": "2025-12-10",
+          "isWin": true
+        },
+        {
+          "raceNum": 3,
+          "diff": -6,
+          "cumulative": -17,
+          "date": "2025-12-16",
+          "isWin": false
+        },
+        {
+          "raceNum": 4,
+          "diff": -2,
+          "cumulative": -19,
+          "date": "2025-12-18",
+          "isWin": true
+        },
+        {
+          "raceNum": 5,
+          "diff": 11,
+          "cumulative": -8,
+          "date": "2025-12-23",
+          "isWin": false
+        },
+        {
+          "raceNum": 6,
+          "diff": -8,
+          "cumulative": -16,
+          "date": "2026-01-03",
+          "isWin": true
+        },
+        {
+          "raceNum": 7,
+          "diff": 3,
+          "cumulative": -13,
+          "date": "2026-01-04",
+          "isWin": false
+        },
+        {
+          "raceNum": 8,
+          "diff": -1,
+          "cumulative": -14,
+          "date": "2026-01-06",
+          "isWin": true
+        },
+        {
+          "raceNum": 9,
+          "diff": -2,
+          "cumulative": -16,
+          "date": "2026-01-13",
+          "isWin": true
+        },
+        {
+          "raceNum": 10,
+          "diff": -19,
+          "cumulative": -35,
+          "date": "2026-01-14",
+          "isWin": true
+        }
+      ]
+    },
+    {
+      "playerId": "F03D3F7331D34D18",
+      "name": "Jamie Bishop",
+      "band": "Gold",
+      "arr": 1181,
+      "raceCount": 7,
+      "avgDiff": "2.00",
+      "nonWinAvgDiff": "2.33",
+      "cumulativeFinal": 14,
+      "driftRate": "2.00",
+      "balanceScore": "80",
+      "trend": "underperforming",
+      "wins": 1,
+      "winRate": "14",
+      "ceilingWarning": true,
+      "highWinRate": false,
+      "races": [
+        {
+          "raceNum": 1,
+          "diff": -8,
+          "cumulative": -8,
+          "date": "2025-12-10",
+          "isWin": false
+        },
+        {
+          "raceNum": 2,
+          "diff": -12,
+          "cumulative": -20,
+          "date": "2025-12-16",
+          "isWin": false
+        },
+        {
+          "raceNum": 3,
+          "diff": 17,
+          "cumulative": -3,
+          "date": "2025-12-20",
+          "isWin": false
+        },
+        {
+          "raceNum": 4,
+          "diff": 30,
+          "cumulative": 27,
+          "date": "2025-12-27",
+          "isWin": false
+        },
+        {
+          "raceNum": 5,
+          "diff": 0,
+          "cumulative": 27,
+          "date": "2026-01-03",
+          "isWin": true
+        },
+        {
+          "raceNum": 6,
+          "diff": -9,
+          "cumulative": 18,
+          "date": "2026-01-08",
+          "isWin": false
+        },
+        {
+          "raceNum": 7,
+          "diff": -4,
+          "cumulative": 14,
+          "date": "2026-01-11",
           "isWin": false
         }
       ]
@@ -185,56 +383,117 @@
       ]
     },
     {
-      "playerId": "2FDBB5DD4345DCB5",
-      "name": "Ryan Yates",
-      "band": "Gold",
-      "arr": 1284,
-      "raceCount": 5,
-      "avgDiff": "-5.40",
-      "nonWinAvgDiff": "3.00",
-      "cumulativeFinal": -27,
-      "driftRate": "-5.40",
-      "balanceScore": "46",
-      "trend": "underperforming",
+      "playerId": "A8DBE4F760E1C622",
+      "name": "Ian Winchester",
+      "band": "Unranked",
+      "arr": 100,
+      "raceCount": 6,
+      "avgDiff": "NaN",
+      "nonWinAvgDiff": "NaN",
+      "cumulativeFinal": null,
+      "driftRate": "NaN",
+      "balanceScore": "NaN",
+      "trend": "balanced",
       "wins": 4,
-      "winRate": "80",
+      "winRate": "67",
       "ceilingWarning": true,
       "highWinRate": true,
       "races": [
         {
           "raceNum": 1,
-          "diff": -8,
-          "cumulative": -8,
-          "date": "2026-01-03",
+          "diff": -19,
+          "cumulative": -19,
+          "date": "2025-12-09",
           "isWin": true
         },
         {
           "raceNum": 2,
-          "diff": 3,
-          "cumulative": -5,
-          "date": "2026-01-04",
-          "isWin": false
-        },
-        {
-          "raceNum": 3,
-          "diff": -1,
-          "cumulative": -6,
-          "date": "2026-01-06",
+          "diff": -24,
+          "cumulative": -43,
+          "date": "2025-12-12",
           "isWin": true
         },
         {
+          "raceNum": 3,
+          "diff": null,
+          "cumulative": null,
+          "date": "2025-12-17",
+          "isWin": false
+        },
+        {
           "raceNum": 4,
-          "diff": -2,
-          "cumulative": -8,
-          "date": "2026-01-13",
+          "diff": -12,
+          "cumulative": null,
+          "date": "2026-01-05",
           "isWin": true
         },
         {
           "raceNum": 5,
-          "diff": -19,
-          "cumulative": -27,
-          "date": "2026-01-14",
+          "diff": -12,
+          "cumulative": null,
+          "date": "2026-01-10",
           "isWin": true
+        },
+        {
+          "raceNum": 6,
+          "diff": -16,
+          "cumulative": null,
+          "date": "2026-01-12",
+          "isWin": false
+        }
+      ]
+    },
+    {
+      "playerId": "212354980F57BA1B",
+      "name": "James Eastwood",
+      "band": "Gold",
+      "arr": 1205,
+      "raceCount": 5,
+      "avgDiff": "0.20",
+      "nonWinAvgDiff": "0.75",
+      "cumulativeFinal": 1,
+      "driftRate": "0.20",
+      "balanceScore": "98",
+      "trend": "balanced",
+      "wins": 1,
+      "winRate": "20",
+      "ceilingWarning": true,
+      "highWinRate": false,
+      "races": [
+        {
+          "raceNum": 1,
+          "diff": -4,
+          "cumulative": -4,
+          "date": "2025-12-08",
+          "isWin": false
+        },
+        {
+          "raceNum": 2,
+          "diff": -23,
+          "cumulative": -27,
+          "date": "2025-12-10",
+          "isWin": false
+        },
+        {
+          "raceNum": 3,
+          "diff": 1,
+          "cumulative": -26,
+          "date": "2025-12-13",
+          "isWin": false
+        },
+        {
+          "raceNum": 4,
+          "diff": -2,
+          "cumulative": -28,
+          "date": "2025-12-18",
+          "isWin": true
+        },
+        {
+          "raceNum": 5,
+          "diff": 29,
+          "cumulative": 1,
+          "date": "2025-12-19",
+          "isWin": false
         }
       ]
     },
@@ -289,53 +548,6 @@
           "cumulative": 0,
           "date": "2026-01-14",
           "isWin": true
-        }
-      ]
-    },
-    {
-      "playerId": "F03D3F7331D34D18",
-      "name": "Jamie Bishop",
-      "band": "Gold",
-      "arr": 1181,
-      "raceCount": 4,
-      "avgDiff": "4.25",
-      "nonWinAvgDiff": "5.67",
-      "cumulativeFinal": 17,
-      "driftRate": "4.25",
-      "balanceScore": "58",
-      "trend": "underperforming",
-      "wins": 1,
-      "winRate": "25",
-      "ceilingWarning": true,
-      "highWinRate": false,
-      "races": [
-        {
-          "raceNum": 1,
-          "diff": 30,
-          "cumulative": 30,
-          "date": "2025-12-27",
-          "isWin": false
-        },
-        {
-          "raceNum": 2,
-          "diff": 0,
-          "cumulative": 30,
-          "date": "2026-01-03",
-          "isWin": true
-        },
-        {
-          "raceNum": 3,
-          "diff": -9,
-          "cumulative": 21,
-          "date": "2026-01-08",
-          "isWin": false
-        },
-        {
-          "raceNum": 4,
-          "diff": -4,
-          "cumulative": 17,
-          "date": "2026-01-11",
-          "isWin": false
         }
       ]
     },
@@ -515,46 +727,6 @@
           "raceNum": 3,
           "diff": -2,
           "cumulative": -23,
-          "date": "2026-01-12",
-          "isWin": false
-        }
-      ]
-    },
-    {
-      "playerId": "A8DBE4F760E1C622",
-      "name": "Ian Winchester",
-      "band": "Unranked",
-      "arr": 100,
-      "raceCount": 3,
-      "avgDiff": "-13.33",
-      "nonWinAvgDiff": "-16.00",
-      "cumulativeFinal": -40,
-      "driftRate": "-13.33",
-      "balanceScore": "0",
-      "trend": "overperforming",
-      "wins": 2,
-      "winRate": "67",
-      "ceilingWarning": true,
-      "highWinRate": true,
-      "races": [
-        {
-          "raceNum": 1,
-          "diff": -12,
-          "cumulative": -12,
-          "date": "2026-01-05",
-          "isWin": true
-        },
-        {
-          "raceNum": 2,
-          "diff": -12,
-          "cumulative": -24,
-          "date": "2026-01-10",
-          "isWin": true
-        },
-        {
-          "raceNum": 3,
-          "diff": -16,
-          "cumulative": -40,
           "date": "2026-01-12",
           "isWin": false
         }
