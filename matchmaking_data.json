@@ -1,0 +1,1078 @@
+{
+  "summary": {
+    "totalPlayers": 33,
+    "balancedCount": 7,
+    "balancedPct": "21.2",
+    "overperformingCount": 13,
+    "overperformingPct": "39.4",
+    "underperformingCount": 13,
+    "underperformingPct": "39.4",
+    "avgBalanceScore": "40.4"
+  },
+  "bandStats": {
+    "Bronze": {
+      "players": 6,
+      "totalAvgDiff": -35.19047619047619,
+      "totalRaces": 20,
+      "avgDiff": -5.865079365079365
+    },
+    "Gold": {
+      "players": 10,
+      "totalAvgDiff": 17.39285714285714,
+      "totalRaces": 30,
+      "avgDiff": 1.7392857142857139
+    },
+    "Diamond": {
+      "players": 2,
+      "totalAvgDiff": 0,
+      "totalRaces": 7,
+      "avgDiff": 0
+    },
+    "Platinum": {
+      "players": 7,
+      "totalAvgDiff": 15.333333333333332,
+      "totalRaces": 19,
+      "avgDiff": 2.1904761904761902
+    },
+    "Unranked": {
+      "players": 7,
+      "totalAvgDiff": -92.83333333333334,
+      "totalRaces": 15,
+      "avgDiff": -13.261904761904763
+    },
+    "Silver": {
+      "players": 1,
+      "totalAvgDiff": 4.666666666666667,
+      "totalRaces": 3,
+      "avgDiff": 4.666666666666667
+    }
+  },
+  "players": [
+    {
+      "playerId": "5F2EDC06F34578B8",
+      "name": "Julien Helleputte",
+      "band": "Bronze",
+      "arr": 300,
+      "raceCount": 7,
+      "avgDiff": "1.14",
+      "cumulativeFinal": 8,
+      "driftRate": "1.14",
+      "balanceScore": "89",
+      "trend": "balanced",
+      "races": [
+        {
+          "raceNum": 1,
+          "diff": -4,
+          "cumulative": -4,
+          "date": "2026-01-03"
+        },
+        {
+          "raceNum": 2,
+          "diff": 7,
+          "cumulative": 3,
+          "date": "2026-01-04"
+        },
+        {
+          "raceNum": 3,
+          "diff": 23,
+          "cumulative": 26,
+          "date": "2026-01-04"
+        },
+        {
+          "raceNum": 4,
+          "diff": 10,
+          "cumulative": 36,
+          "date": "2026-01-04"
+        },
+        {
+          "raceNum": 5,
+          "diff": -11,
+          "cumulative": 25,
+          "date": "2026-01-04"
+        },
+        {
+          "raceNum": 6,
+          "diff": -7,
+          "cumulative": 18,
+          "date": "2026-01-04"
+        },
+        {
+          "raceNum": 7,
+          "diff": -10,
+          "cumulative": 8,
+          "date": "2026-01-04"
+        }
+      ]
+    },
+    {
+      "playerId": "5419CFD111515433",
+      "name": "Rob Miller",
+      "band": "Gold",
+      "arr": 1178,
+      "raceCount": 7,
+      "avgDiff": "-1.86",
+      "cumulativeFinal": -13,
+      "driftRate": "-1.86",
+      "balanceScore": "81",
+      "trend": "balanced",
+      "races": [
+        {
+          "raceNum": 1,
+          "diff": -4,
+          "cumulative": -4,
+          "date": "2026-01-06"
+        },
+        {
+          "raceNum": 2,
+          "diff": -4,
+          "cumulative": -8,
+          "date": "2026-01-07"
+        },
+        {
+          "raceNum": 3,
+          "diff": -8,
+          "cumulative": -16,
+          "date": "2026-01-08"
+        },
+        {
+          "raceNum": 4,
+          "diff": -4,
+          "cumulative": -20,
+          "date": "2026-01-09"
+        },
+        {
+          "raceNum": 5,
+          "diff": 19,
+          "cumulative": -1,
+          "date": "2026-01-11"
+        },
+        {
+          "raceNum": 6,
+          "diff": -7,
+          "cumulative": -8,
+          "date": "2026-01-11"
+        },
+        {
+          "raceNum": 7,
+          "diff": -5,
+          "cumulative": -13,
+          "date": "2026-01-12"
+        }
+      ]
+    },
+    {
+      "playerId": "F03D3F7331D34D18",
+      "name": "Jamie Bishop",
+      "band": "Gold",
+      "arr": 1181,
+      "raceCount": 4,
+      "avgDiff": "4.25",
+      "cumulativeFinal": 17,
+      "driftRate": "4.25",
+      "balanceScore": "58",
+      "trend": "underperforming",
+      "races": [
+        {
+          "raceNum": 1,
+          "diff": 30,
+          "cumulative": 30,
+          "date": "2025-12-27"
+        },
+        {
+          "raceNum": 2,
+          "diff": 0,
+          "cumulative": 30,
+          "date": "2026-01-03"
+        },
+        {
+          "raceNum": 3,
+          "diff": -9,
+          "cumulative": 21,
+          "date": "2026-01-08"
+        },
+        {
+          "raceNum": 4,
+          "diff": -4,
+          "cumulative": 17,
+          "date": "2026-01-11"
+        }
+      ]
+    },
+    {
+      "playerId": "2FDBB5DD4345DCB5",
+      "name": "Ryan Yates",
+      "band": "Gold",
+      "arr": 1281,
+      "raceCount": 4,
+      "avgDiff": "-2.00",
+      "cumulativeFinal": -8,
+      "driftRate": "-2.00",
+      "balanceScore": "80",
+      "trend": "balanced",
+      "races": [
+        {
+          "raceNum": 1,
+          "diff": -8,
+          "cumulative": -8,
+          "date": "2026-01-03"
+        },
+        {
+          "raceNum": 2,
+          "diff": 3,
+          "cumulative": -5,
+          "date": "2026-01-04"
+        },
+        {
+          "raceNum": 3,
+          "diff": -1,
+          "cumulative": -6,
+          "date": "2026-01-06"
+        },
+        {
+          "raceNum": 4,
+          "diff": -2,
+          "cumulative": -8,
+          "date": "2026-01-13"
+        }
+      ]
+    },
+    {
+      "playerId": "25238B3BC618DB07",
+      "name": "Gregory Frison",
+      "band": "Diamond",
+      "arr": 1818,
+      "raceCount": 4,
+      "avgDiff": "0.00",
+      "cumulativeFinal": 0,
+      "driftRate": "0.00",
+      "balanceScore": "100",
+      "trend": "balanced",
+      "races": [
+        {
+          "raceNum": 1,
+          "diff": 0,
+          "cumulative": 0,
+          "date": "2026-01-09"
+        },
+        {
+          "raceNum": 2,
+          "diff": 0,
+          "cumulative": 0,
+          "date": "2026-01-09"
+        },
+        {
+          "raceNum": 3,
+          "diff": 0,
+          "cumulative": 0,
+          "date": "2026-01-10"
+        },
+        {
+          "raceNum": 4,
+          "diff": 0,
+          "cumulative": 0,
+          "date": "2026-01-11"
+        }
+      ]
+    },
+    {
+      "playerId": "11799A7C1CF76DE9",
+      "name": "Doug Hart",
+      "band": "Platinum",
+      "arr": 1453,
+      "raceCount": 4,
+      "avgDiff": "4.50",
+      "cumulativeFinal": 18,
+      "driftRate": "4.50",
+      "balanceScore": "55",
+      "trend": "underperforming",
+      "races": [
+        {
+          "raceNum": 1,
+          "diff": 0,
+          "cumulative": 0,
+          "date": "2026-01-09"
+        },
+        {
+          "raceNum": 2,
+          "diff": -15,
+          "cumulative": -15,
+          "date": "2026-01-10"
+        },
+        {
+          "raceNum": 3,
+          "diff": 21,
+          "cumulative": 6,
+          "date": "2026-01-11"
+        },
+        {
+          "raceNum": 4,
+          "diff": 12,
+          "cumulative": 18,
+          "date": "2026-01-13"
+        }
+      ]
+    },
+    {
+      "playerId": "3EE22AAAE0FE66C3",
+      "name": "Julian Burren",
+      "band": "Platinum",
+      "arr": 1362,
+      "raceCount": 4,
+      "avgDiff": "3.00",
+      "cumulativeFinal": 12,
+      "driftRate": "3.00",
+      "balanceScore": "70",
+      "trend": "underperforming",
+      "races": [
+        {
+          "raceNum": 1,
+          "diff": -2,
+          "cumulative": -2,
+          "date": "2026-01-10"
+        },
+        {
+          "raceNum": 2,
+          "diff": 0,
+          "cumulative": -2,
+          "date": "2026-01-11"
+        },
+        {
+          "raceNum": 3,
+          "diff": 0,
+          "cumulative": -2,
+          "date": "2026-01-11"
+        },
+        {
+          "raceNum": 4,
+          "diff": 14,
+          "cumulative": 12,
+          "date": "2026-01-13"
+        }
+      ]
+    },
+    {
+      "playerId": "DE77F095D134721E",
+      "name": "Ludvig Karlberg",
+      "band": "Platinum",
+      "arr": 1646,
+      "raceCount": 3,
+      "avgDiff": "-7.67",
+      "cumulativeFinal": -23,
+      "driftRate": "-7.67",
+      "balanceScore": "23",
+      "trend": "overperforming",
+      "races": [
+        {
+          "raceNum": 1,
+          "diff": -11,
+          "cumulative": -11,
+          "date": "2026-01-05"
+        },
+        {
+          "raceNum": 2,
+          "diff": -10,
+          "cumulative": -21,
+          "date": "2026-01-06"
+        },
+        {
+          "raceNum": 3,
+          "diff": -2,
+          "cumulative": -23,
+          "date": "2026-01-12"
+        }
+      ]
+    },
+    {
+      "playerId": "A8DBE4F760E1C622",
+      "name": "Ian Winchester",
+      "band": "Unranked",
+      "arr": 100,
+      "raceCount": 3,
+      "avgDiff": "-13.33",
+      "cumulativeFinal": -40,
+      "driftRate": "-13.33",
+      "balanceScore": "0",
+      "trend": "overperforming",
+      "races": [
+        {
+          "raceNum": 1,
+          "diff": -12,
+          "cumulative": -12,
+          "date": "2026-01-05"
+        },
+        {
+          "raceNum": 2,
+          "diff": -12,
+          "cumulative": -24,
+          "date": "2026-01-10"
+        },
+        {
+          "raceNum": 3,
+          "diff": -16,
+          "cumulative": -40,
+          "date": "2026-01-12"
+        }
+      ]
+    },
+    {
+      "playerId": "D7004AC4F53416F8",
+      "name": "Dean Harding",
+      "band": "Bronze",
+      "arr": 657,
+      "raceCount": 3,
+      "avgDiff": "5.33",
+      "cumulativeFinal": 16,
+      "driftRate": "5.33",
+      "balanceScore": "47",
+      "trend": "underperforming",
+      "races": [
+        {
+          "raceNum": 1,
+          "diff": 2,
+          "cumulative": 2,
+          "date": "2026-01-06"
+        },
+        {
+          "raceNum": 2,
+          "diff": -1,
+          "cumulative": 1,
+          "date": "2026-01-07"
+        },
+        {
+          "raceNum": 3,
+          "diff": 15,
+          "cumulative": 16,
+          "date": "2026-01-12"
+        }
+      ]
+    },
+    {
+      "playerId": "8E3324C446A55BFB",
+      "name": "Noel Toone KCC",
+      "band": "Bronze",
+      "arr": 674,
+      "raceCount": 3,
+      "avgDiff": "0.33",
+      "cumulativeFinal": 1,
+      "driftRate": "0.33",
+      "balanceScore": "97",
+      "trend": "balanced",
+      "races": [
+        {
+          "raceNum": 1,
+          "diff": 0,
+          "cumulative": 0,
+          "date": "2026-01-06"
+        },
+        {
+          "raceNum": 2,
+          "diff": 6,
+          "cumulative": 6,
+          "date": "2026-01-08"
+        },
+        {
+          "raceNum": 3,
+          "diff": -5,
+          "cumulative": 1,
+          "date": "2026-01-10"
+        }
+      ]
+    },
+    {
+      "playerId": "2F3371F7A01DEE62",
+      "name": "Joe Giannone",
+      "band": "Bronze",
+      "arr": 571,
+      "raceCount": 3,
+      "avgDiff": "-10.00",
+      "cumulativeFinal": -30,
+      "driftRate": "-10.00",
+      "balanceScore": "0",
+      "trend": "overperforming",
+      "races": [
+        {
+          "raceNum": 1,
+          "diff": -4,
+          "cumulative": -4,
+          "date": "2026-01-06"
+        },
+        {
+          "raceNum": 2,
+          "diff": -24,
+          "cumulative": -28,
+          "date": "2026-01-09"
+        },
+        {
+          "raceNum": 3,
+          "diff": -2,
+          "cumulative": -30,
+          "date": "2026-01-14"
+        }
+      ]
+    },
+    {
+      "playerId": "902E4950963F3C37",
+      "name": "Josh Harris",
+      "band": "Diamond",
+      "arr": 1912,
+      "raceCount": 3,
+      "avgDiff": "0.00",
+      "cumulativeFinal": 0,
+      "driftRate": "0.00",
+      "balanceScore": "100",
+      "trend": "balanced",
+      "races": [
+        {
+          "raceNum": 1,
+          "diff": 0,
+          "cumulative": 0,
+          "date": "2026-01-07"
+        },
+        {
+          "raceNum": 2,
+          "diff": 0,
+          "cumulative": 0,
+          "date": "2026-01-11"
+        },
+        {
+          "raceNum": 3,
+          "diff": 0,
+          "cumulative": 0,
+          "date": "2026-01-12"
+        }
+      ]
+    },
+    {
+      "playerId": "962336672CEDE7CD",
+      "name": "Birgit S",
+      "band": "Silver",
+      "arr": 814,
+      "raceCount": 3,
+      "avgDiff": "4.67",
+      "cumulativeFinal": 14,
+      "driftRate": "4.67",
+      "balanceScore": "53",
+      "trend": "underperforming",
+      "races": [
+        {
+          "raceNum": 1,
+          "diff": 5,
+          "cumulative": 5,
+          "date": "2026-01-08"
+        },
+        {
+          "raceNum": 2,
+          "diff": 1,
+          "cumulative": 6,
+          "date": "2026-01-10"
+        },
+        {
+          "raceNum": 3,
+          "diff": 8,
+          "cumulative": 14,
+          "date": "2026-01-13"
+        }
+      ]
+    },
+    {
+      "playerId": "B21357D338C98C5B",
+      "name": "AleX GoLd",
+      "band": "Gold",
+      "arr": 1205,
+      "raceCount": 3,
+      "avgDiff": "3.00",
+      "cumulativeFinal": 9,
+      "driftRate": "3.00",
+      "balanceScore": "70",
+      "trend": "underperforming",
+      "races": [
+        {
+          "raceNum": 1,
+          "diff": -4,
+          "cumulative": -4,
+          "date": "2026-01-09"
+        },
+        {
+          "raceNum": 2,
+          "diff": 16,
+          "cumulative": 12,
+          "date": "2026-01-10"
+        },
+        {
+          "raceNum": 3,
+          "diff": -3,
+          "cumulative": 9,
+          "date": "2026-01-13"
+        }
+      ]
+    },
+    {
+      "playerId": "B8BBC9C64CAB2D89",
+      "name": "Daniel Holdener",
+      "band": "Bronze",
+      "arr": 661,
+      "raceCount": 2,
+      "avgDiff": "-15.50",
+      "cumulativeFinal": -31,
+      "driftRate": "-15.50",
+      "balanceScore": "0",
+      "trend": "overperforming",
+      "races": [
+        {
+          "raceNum": 1,
+          "diff": -22,
+          "cumulative": -22,
+          "date": "2026-01-05"
+        },
+        {
+          "raceNum": 2,
+          "diff": -9,
+          "cumulative": -31,
+          "date": "2026-01-12"
+        }
+      ]
+    },
+    {
+      "playerId": "38B077C7D857ADFE",
+      "name": "Toby Hetherington",
+      "band": "Gold",
+      "arr": 1115,
+      "raceCount": 2,
+      "avgDiff": "5.50",
+      "cumulativeFinal": 11,
+      "driftRate": "5.50",
+      "balanceScore": "45",
+      "trend": "underperforming",
+      "races": [
+        {
+          "raceNum": 1,
+          "diff": 18,
+          "cumulative": 18,
+          "date": "2026-01-06"
+        },
+        {
+          "raceNum": 2,
+          "diff": -7,
+          "cumulative": 11,
+          "date": "2026-01-13"
+        }
+      ]
+    },
+    {
+      "playerId": "ED02BBAB1601D82D",
+      "name": "Jon Wakefield",
+      "band": "Platinum",
+      "arr": 1514,
+      "raceCount": 2,
+      "avgDiff": "22.00",
+      "cumulativeFinal": 44,
+      "driftRate": "22.00",
+      "balanceScore": "0",
+      "trend": "underperforming",
+      "races": [
+        {
+          "raceNum": 1,
+          "diff": 23,
+          "cumulative": 23,
+          "date": "2026-01-06"
+        },
+        {
+          "raceNum": 2,
+          "diff": 21,
+          "cumulative": 44,
+          "date": "2026-01-12"
+        }
+      ]
+    },
+    {
+      "playerId": "C94C5C28E7C300E9",
+      "name": "Lutz Pleuter",
+      "band": "Gold",
+      "arr": 1255,
+      "raceCount": 2,
+      "avgDiff": "23.50",
+      "cumulativeFinal": 47,
+      "driftRate": "23.50",
+      "balanceScore": "0",
+      "trend": "underperforming",
+      "races": [
+        {
+          "raceNum": 1,
+          "diff": 19,
+          "cumulative": 19,
+          "date": "2026-01-06"
+        },
+        {
+          "raceNum": 2,
+          "diff": 28,
+          "cumulative": 47,
+          "date": "2026-01-12"
+        }
+      ]
+    },
+    {
+      "playerId": "41E66B1A2DBD4BBC",
+      "name": "Ian Bright",
+      "band": "Bronze",
+      "arr": 466,
+      "raceCount": 2,
+      "avgDiff": "-16.50",
+      "cumulativeFinal": -33,
+      "driftRate": "-16.50",
+      "balanceScore": "0",
+      "trend": "overperforming",
+      "races": [
+        {
+          "raceNum": 1,
+          "diff": -27,
+          "cumulative": -27,
+          "date": "2026-01-06"
+        },
+        {
+          "raceNum": 2,
+          "diff": -6,
+          "cumulative": -33,
+          "date": "2026-01-10"
+        }
+      ]
+    },
+    {
+      "playerId": "FE6B6E687C77DA38",
+      "name": "Ryan Hamilton",
+      "band": "Gold",
+      "arr": 1274,
+      "raceCount": 2,
+      "avgDiff": "4.00",
+      "cumulativeFinal": 8,
+      "driftRate": "4.00",
+      "balanceScore": "60",
+      "trend": "underperforming",
+      "races": [
+        {
+          "raceNum": 1,
+          "diff": 9,
+          "cumulative": 9,
+          "date": "2026-01-07"
+        },
+        {
+          "raceNum": 2,
+          "diff": -1,
+          "cumulative": 8,
+          "date": "2026-01-10"
+        }
+      ]
+    },
+    {
+      "playerId": "B29C5A2E87435F20",
+      "name": "Gemma Hamilton",
+      "band": "Unranked",
+      "arr": 100,
+      "raceCount": 2,
+      "avgDiff": "3.00",
+      "cumulativeFinal": 6,
+      "driftRate": "3.00",
+      "balanceScore": "70",
+      "trend": "underperforming",
+      "races": [
+        {
+          "raceNum": 1,
+          "diff": 6,
+          "cumulative": 6,
+          "date": "2026-01-07"
+        },
+        {
+          "raceNum": 2,
+          "diff": 0,
+          "cumulative": 6,
+          "date": "2026-01-10"
+        }
+      ]
+    },
+    {
+      "playerId": "D65DA831322E1AAB",
+      "name": "Ross Collins",
+      "band": "Gold",
+      "arr": 1183,
+      "raceCount": 2,
+      "avgDiff": "-5.00",
+      "cumulativeFinal": -10,
+      "driftRate": "-5.00",
+      "balanceScore": "50",
+      "trend": "overperforming",
+      "races": [
+        {
+          "raceNum": 1,
+          "diff": -11,
+          "cumulative": -11,
+          "date": "2026-01-07"
+        },
+        {
+          "raceNum": 2,
+          "diff": 1,
+          "cumulative": -10,
+          "date": "2026-01-13"
+        }
+      ]
+    },
+    {
+      "playerId": "EBD478B7F208C265",
+      "name": "Andy Hall",
+      "band": "Platinum",
+      "arr": 1390,
+      "raceCount": 2,
+      "avgDiff": "6.50",
+      "cumulativeFinal": 13,
+      "driftRate": "6.50",
+      "balanceScore": "35",
+      "trend": "underperforming",
+      "races": [
+        {
+          "raceNum": 1,
+          "diff": 4,
+          "cumulative": 4,
+          "date": "2026-01-07"
+        },
+        {
+          "raceNum": 2,
+          "diff": 9,
+          "cumulative": 13,
+          "date": "2026-01-10"
+        }
+      ]
+    },
+    {
+      "playerId": "7174325A8BDCB12F",
+      "name": "Quentin Paquot",
+      "band": "Gold",
+      "arr": 1181,
+      "raceCount": 2,
+      "avgDiff": "-12.00",
+      "cumulativeFinal": -24,
+      "driftRate": "-12.00",
+      "balanceScore": "0",
+      "trend": "overperforming",
+      "races": [
+        {
+          "raceNum": 1,
+          "diff": -13,
+          "cumulative": -13,
+          "date": "2026-01-07"
+        },
+        {
+          "raceNum": 2,
+          "diff": -11,
+          "cumulative": -24,
+          "date": "2026-01-11"
+        }
+      ]
+    },
+    {
+      "playerId": "4CD14EAA6F4FCF60",
+      "name": "Steve Lopro",
+      "band": "Unranked",
+      "arr": 100,
+      "raceCount": 2,
+      "avgDiff": "-23.50",
+      "cumulativeFinal": -47,
+      "driftRate": "-23.50",
+      "balanceScore": "0",
+      "trend": "overperforming",
+      "races": [
+        {
+          "raceNum": 1,
+          "diff": -22,
+          "cumulative": -22,
+          "date": "2026-01-08"
+        },
+        {
+          "raceNum": 2,
+          "diff": -25,
+          "cumulative": -47,
+          "date": "2026-01-13"
+        }
+      ]
+    },
+    {
+      "playerId": "99D3251383077B95",
+      "name": "Dan Stimson",
+      "band": "Gold",
+      "arr": 1226,
+      "raceCount": 2,
+      "avgDiff": "-2.00",
+      "cumulativeFinal": -4,
+      "driftRate": "-2.00",
+      "balanceScore": "80",
+      "trend": "balanced",
+      "races": [
+        {
+          "raceNum": 1,
+          "diff": -3,
+          "cumulative": -3,
+          "date": "2026-01-08"
+        },
+        {
+          "raceNum": 2,
+          "diff": -1,
+          "cumulative": -4,
+          "date": "2026-01-11"
+        }
+      ]
+    },
+    {
+      "playerId": "965FD7E72D7A2D87",
+      "name": "Rudolf Dolezal",
+      "band": "Unranked",
+      "arr": 100,
+      "raceCount": 2,
+      "avgDiff": "-15.00",
+      "cumulativeFinal": -30,
+      "driftRate": "-15.00",
+      "balanceScore": "0",
+      "trend": "overperforming",
+      "races": [
+        {
+          "raceNum": 1,
+          "diff": -10,
+          "cumulative": -10,
+          "date": "2026-01-09"
+        },
+        {
+          "raceNum": 2,
+          "diff": -20,
+          "cumulative": -30,
+          "date": "2026-01-13"
+        }
+      ]
+    },
+    {
+      "playerId": "F19FD5591C1777D5",
+      "name": "piggy dwarf",
+      "band": "Unranked",
+      "arr": 100,
+      "raceCount": 2,
+      "avgDiff": "-21.50",
+      "cumulativeFinal": -43,
+      "driftRate": "-21.50",
+      "balanceScore": "0",
+      "trend": "overperforming",
+      "races": [
+        {
+          "raceNum": 1,
+          "diff": -23,
+          "cumulative": -23,
+          "date": "2026-01-09"
+        },
+        {
+          "raceNum": 2,
+          "diff": -20,
+          "cumulative": -43,
+          "date": "2026-01-10"
+        }
+      ]
+    },
+    {
+      "playerId": "6BD1EADCED05444A",
+      "name": "Darryl Brown",
+      "band": "Unranked",
+      "arr": 100,
+      "raceCount": 2,
+      "avgDiff": "13.00",
+      "cumulativeFinal": 26,
+      "driftRate": "13.00",
+      "balanceScore": "0",
+      "trend": "underperforming",
+      "races": [
+        {
+          "raceNum": 1,
+          "diff": 15,
+          "cumulative": 15,
+          "date": "2026-01-10"
+        },
+        {
+          "raceNum": 2,
+          "diff": 11,
+          "cumulative": 26,
+          "date": "2026-01-10"
+        }
+      ]
+    },
+    {
+      "playerId": "A4DD9760300BDC00",
+      "name": "Even Øistensen",
+      "band": "Platinum",
+      "arr": 1495,
+      "raceCount": 2,
+      "avgDiff": "-9.00",
+      "cumulativeFinal": -18,
+      "driftRate": "-9.00",
+      "balanceScore": "10",
+      "trend": "overperforming",
+      "races": [
+        {
+          "raceNum": 1,
+          "diff": -3,
+          "cumulative": -3,
+          "date": "2026-01-11"
+        },
+        {
+          "raceNum": 2,
+          "diff": -15,
+          "cumulative": -18,
+          "date": "2026-01-12"
+        }
+      ]
+    },
+    {
+      "playerId": "9271B1A99DF177A2",
+      "name": "Julian Herz - WATT",
+      "band": "Platinum",
+      "arr": 1635,
+      "raceCount": 2,
+      "avgDiff": "-4.00",
+      "cumulativeFinal": -8,
+      "driftRate": "-4.00",
+      "balanceScore": "60",
+      "trend": "overperforming",
+      "races": [
+        {
+          "raceNum": 1,
+          "diff": -3,
+          "cumulative": -3,
+          "date": "2026-01-12"
+        },
+        {
+          "raceNum": 2,
+          "diff": -5,
+          "cumulative": -8,
+          "date": "2026-01-12"
+        }
+      ]
+    },
+    {
+      "playerId": "28650FD04EC04301",
+      "name": "Fye Votu",
+      "band": "Unranked",
+      "arr": 100,
+      "raceCount": 2,
+      "avgDiff": "-35.50",
+      "cumulativeFinal": -71,
+      "driftRate": "-35.50",
+      "balanceScore": "0",
+      "trend": "overperforming",
+      "races": [
+        {
+          "raceNum": 1,
+          "diff": -36,
+          "cumulative": -36,
+          "date": "2026-01-12"
+        },
+        {
+          "raceNum": 2,
+          "diff": -35,
+          "cumulative": -71,
+          "date": "2026-01-13"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,314 @@
+/**
+ * Matchmaking Effectiveness Analysis
+ *
+ * Instead of measuring prediction accuracy (which is affected by race variance),
+ * this analyzes whether matchmaking is effective by checking if results balance out over time.
+ *
+ * Key insight: In cycling, a rider might miss prediction by 20 positions due to race dynamics
+ * (breakaways, sprints, tactics). That's not bad matchmaking - that's racing.
+ * Good matchmaking means: over multiple races, the ups and downs should balance out.
+ */
+
+const fs = require('fs');
+const path = require('path');
+
+// ARR Band definitions
+function getARRBandGroup(arr) {
+    if (arr >= 1750) return 'Diamond';
+    if (arr >= 1300) return 'Platinum';
+    if (arr >= 1000) return 'Gold';
+    if (arr >= 700) return 'Silver';
+    if (arr >= 300) return 'Bronze';
+    return 'Unranked';
+}
+
+// Calculate predicted position from event ratings
+function calculatePredictedPositions(results) {
+    const finishers = results.filter(r => !r.isDNF && r.position !== 32767 && r.rating != null);
+    const sorted = [...finishers].sort((a, b) => b.rating - a.rating);
+    const predictedPositions = new Map();
+    sorted.forEach((rider, index) => {
+        predictedPositions.set(rider.playerId, index + 1);
+    });
+    return predictedPositions;
+}
+
+// Recursively find all JSON files
+function findJsonFiles(dir) {
+    const files = [];
+    const items = fs.readdirSync(dir, { withFileTypes: true });
+    for (const item of items) {
+        const fullPath = path.join(dir, item.name);
+        if (item.isDirectory()) {
+            files.push(...findJsonFiles(fullPath));
+        } else if (item.isFile() && item.name.endsWith('.json')) {
+            files.push(fullPath);
+        }
+    }
+    return files;
+}
+
+// Main analysis
+function analyzeMatchmaking() {
+    const resultsDir = path.join(__dirname, 'race_results');
+    const jsonFiles = findJsonFiles(resultsDir);
+
+    console.log(`Processing ${jsonFiles.length} result files...\n`);
+
+    // Collect all results with timestamps
+    const allResults = [];
+
+    for (const file of jsonFiles) {
+        try {
+            const data = JSON.parse(fs.readFileSync(file, 'utf8'));
+            if (!data.results || !Array.isArray(data.results)) continue;
+
+            const results = data.results;
+            const predictedPositions = calculatePredictedPositions(results);
+            const raceDate = new Date(data.metadata?.completedAt || data.metadata?.raceDate);
+            const fieldSize = results.filter(r => !r.isDNF && r.position !== 32767).length;
+
+            for (const rider of results) {
+                if (rider.isDNF || rider.position === 32767 || !rider.rating) continue;
+
+                const predictedPos = predictedPositions.get(rider.playerId);
+                if (!predictedPos) continue;
+
+                const actualPos = rider.position;
+                const diff = actualPos - predictedPos;
+
+                // Calculate percentile finish (0 = won, 100 = last)
+                const percentileFinish = ((actualPos - 1) / (fieldSize - 1)) * 100;
+                const expectedPercentile = ((predictedPos - 1) / (fieldSize - 1)) * 100;
+
+                allResults.push({
+                    playerId: rider.playerId,
+                    name: `${rider.firstName} ${rider.lastName}`,
+                    isBot: rider.isBot,
+                    arr: rider.arr,
+                    arrBand: getARRBandGroup(rider.arr),
+                    raceDate,
+                    eventKey: data.metadata?.eventKey,
+                    predictedPos,
+                    actualPos,
+                    difference: diff,
+                    fieldSize,
+                    percentileFinish,
+                    expectedPercentile,
+                    percentileDiff: percentileFinish - expectedPercentile
+                });
+            }
+        } catch (err) {
+            console.error(`Error processing ${file}: ${err.message}`);
+        }
+    }
+
+    // Sort all results by date
+    allResults.sort((a, b) => a.raceDate - b.raceDate);
+
+    // Group by player and build cumulative trends
+    const playerResults = new Map();
+
+    for (const result of allResults) {
+        if (!playerResults.has(result.playerId)) {
+            playerResults.set(result.playerId, {
+                playerId: result.playerId,
+                name: result.name,
+                isBot: result.isBot,
+                currentARR: result.arr,
+                currentBand: result.arrBand,
+                races: []
+            });
+        }
+
+        const player = playerResults.get(result.playerId);
+        const prevCumulative = player.races.length > 0
+            ? player.races[player.races.length - 1].cumulativeDiff
+            : 0;
+
+        player.races.push({
+            raceNumber: player.races.length + 1,
+            eventKey: result.eventKey,
+            date: result.raceDate,
+            predictedPos: result.predictedPos,
+            actualPos: result.actualPos,
+            difference: result.difference,
+            cumulativeDiff: prevCumulative + result.difference,
+            fieldSize: result.fieldSize,
+            percentileFinish: result.percentileFinish,
+            expectedPercentile: result.expectedPercentile
+        });
+
+        // Update current ARR/band to most recent
+        player.currentARR = result.arr;
+        player.currentBand = result.arrBand;
+    }
+
+    return playerResults;
+}
+
+// Calculate balance metrics for a player
+function calculateBalanceMetrics(player) {
+    const races = player.races;
+    if (races.length === 0) return null;
+
+    const differences = races.map(r => r.difference);
+    const cumulativeFinal = races[races.length - 1].cumulativeDiff;
+
+    // Average difference (should be near 0 for balanced)
+    const avgDiff = differences.reduce((a, b) => a + b, 0) / differences.length;
+
+    // How often does cumulative cross zero? (more crossings = more balanced)
+    let zeroCrossings = 0;
+    for (let i = 1; i < races.length; i++) {
+        const prev = races[i-1].cumulativeDiff;
+        const curr = races[i].cumulativeDiff;
+        if ((prev <= 0 && curr > 0) || (prev >= 0 && curr < 0)) {
+            zeroCrossings++;
+        }
+    }
+
+    // Drift rate: final cumulative / number of races
+    const driftRate = cumulativeFinal / races.length;
+
+    // Volatility: standard deviation of differences
+    const variance = differences.reduce((acc, d) => acc + Math.pow(d - avgDiff, 2), 0) / differences.length;
+    const volatility = Math.sqrt(variance);
+
+    // Balance score: how close to zero is the average? (0-100, higher = better balanced)
+    // Using a sigmoid-like function where avgDiff near 0 = high score
+    const balanceScore = Math.max(0, 100 - Math.abs(avgDiff) * 10);
+
+    // Trend direction
+    let trend = 'balanced';
+    if (avgDiff < -2) trend = 'overperforming';  // Consistently beating predictions
+    if (avgDiff > 2) trend = 'underperforming';  // Consistently missing predictions
+
+    return {
+        raceCount: races.length,
+        avgDifference: avgDiff,
+        cumulativeFinal,
+        driftRate,
+        volatility,
+        zeroCrossings,
+        balanceScore,
+        trend
+    };
+}
+
+// Generate analysis data for dashboard
+function generateDashboardData(playerResults) {
+    // Filter to humans only with at least 2 races
+    const humanPlayers = [...playerResults.values()]
+        .filter(p => !p.isBot && p.races.length >= 2);
+
+    console.log(`Found ${humanPlayers.length} human riders with 2+ races\n`);
+
+    // Calculate metrics for each player
+    const playerMetrics = humanPlayers.map(player => {
+        const metrics = calculateBalanceMetrics(player);
+        return {
+            ...player,
+            metrics
+        };
+    }).filter(p => p.metrics);
+
+    // Sort by race count descending for display
+    playerMetrics.sort((a, b) => b.races.length - a.races.length);
+
+    // Summary statistics
+    const totalPlayers = playerMetrics.length;
+    const balancedCount = playerMetrics.filter(p => p.metrics.trend === 'balanced').length;
+    const overperformingCount = playerMetrics.filter(p => p.metrics.trend === 'overperforming').length;
+    const underperformingCount = playerMetrics.filter(p => p.metrics.trend === 'underperforming').length;
+
+    const avgBalanceScore = playerMetrics.reduce((a, p) => a + p.metrics.balanceScore, 0) / totalPlayers;
+
+    // Band analysis - are certain bands systematically off?
+    const bandStats = {};
+    for (const player of playerMetrics) {
+        const band = player.currentBand;
+        if (!bandStats[band]) {
+            bandStats[band] = { players: 0, totalAvgDiff: 0, totalRaces: 0 };
+        }
+        bandStats[band].players++;
+        bandStats[band].totalAvgDiff += player.metrics.avgDifference;
+        bandStats[band].totalRaces += player.metrics.raceCount;
+    }
+
+    for (const band in bandStats) {
+        bandStats[band].avgDiff = bandStats[band].totalAvgDiff / bandStats[band].players;
+    }
+
+    return {
+        summary: {
+            totalPlayers,
+            balancedCount,
+            balancedPct: (balancedCount / totalPlayers * 100).toFixed(1),
+            overperformingCount,
+            overperformingPct: (overperformingCount / totalPlayers * 100).toFixed(1),
+            underperformingCount,
+            underperformingPct: (underperformingCount / totalPlayers * 100).toFixed(1),
+            avgBalanceScore: avgBalanceScore.toFixed(1)
+        },
+        bandStats,
+        players: playerMetrics.map(p => ({
+            playerId: p.playerId,
+            name: p.name,
+            band: p.currentBand,
+            arr: p.currentARR,
+            raceCount: p.metrics.raceCount,
+            avgDiff: p.metrics.avgDifference.toFixed(2),
+            cumulativeFinal: p.metrics.cumulativeFinal,
+            driftRate: p.metrics.driftRate.toFixed(2),
+            balanceScore: p.metrics.balanceScore.toFixed(0),
+            trend: p.metrics.trend,
+            // Include race-by-race data for charts
+            races: p.races.map(r => ({
+                raceNum: r.raceNumber,
+                diff: r.difference,
+                cumulative: r.cumulativeDiff,
+                date: r.date.toISOString().split('T')[0]
+            }))
+        }))
+    };
+}
+
+// Main execution
+console.log('Matchmaking Effectiveness Analysis\n');
+console.log('='.repeat(50));
+
+const playerResults = analyzeMatchmaking();
+const dashboardData = generateDashboardData(playerResults);
+
+// Save data for dashboard
+const outputPath = path.join(__dirname, 'matchmaking_data.json');
+fs.writeFileSync(outputPath, JSON.stringify(dashboardData, null, 2));
+console.log(`\nDashboard data saved to: ${outputPath}`);
+
+// Print summary
+console.log('\n' + '='.repeat(50));
+console.log('MATCHMAKING EFFECTIVENESS SUMMARY');
+console.log('='.repeat(50));
+console.log(`\nTotal Human Riders (2+ races): ${dashboardData.summary.totalPlayers}`);
+console.log(`\nBalance Distribution:`);
+console.log(`  Balanced (avg diff within ±2):    ${dashboardData.summary.balancedCount} (${dashboardData.summary.balancedPct}%)`);
+console.log(`  Overperforming (beating preds):   ${dashboardData.summary.overperformingCount} (${dashboardData.summary.overperformingPct}%)`);
+console.log(`  Underperforming (missing preds):  ${dashboardData.summary.underperformingCount} (${dashboardData.summary.underperformingPct}%)`);
+console.log(`\nAverage Balance Score: ${dashboardData.summary.avgBalanceScore}/100`);
+
+console.log(`\nBy ARR Band:`);
+const bands = ['Diamond', 'Platinum', 'Gold', 'Silver', 'Bronze', 'Unranked'];
+for (const band of bands) {
+    const stats = dashboardData.bandStats[band];
+    if (stats) {
+        const direction = stats.avgDiff < -1 ? '(overperforming)' : stats.avgDiff > 1 ? '(underperforming)' : '(balanced)';
+        console.log(`  ${band.padEnd(10)}: ${stats.players} riders, avg diff ${stats.avgDiff.toFixed(2)} ${direction}`);
+    }
+}
+
+console.log('\nTop riders by race count:');
+dashboardData.players.slice(0, 10).forEach((p, i) => {
+    const arrow = p.trend === 'overperforming' ? '↑' : p.trend === 'underperforming' ? '↓' : '→';
+    console.log(`  ${i+1}. ${p.name.padEnd(25)} ${p.raceCount} races, cumulative: ${p.cumulativeFinal > 0 ? '+' : ''}${p.cumulativeFinal}, trend: ${arrow} ${p.trend}`);
+});

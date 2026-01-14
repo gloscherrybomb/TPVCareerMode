@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matchmaking Effectiveness | TPV Career Mode</title>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-primary: #0a0e17;
+            --bg-secondary: #111827;
+            --bg-card: #1a2234;
+            --bg-elevated: #232d42;
+            --border-color: #2d3a52;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+
+            --diamond: #22d3ee;
+            --platinum: #a1a1aa;
+            --gold: #fbbf24;
+            --silver: #9ca3af;
+            --bronze: #d97706;
+            --unranked: #6b7280;
+
+            --accent-positive: #10b981;
+            --accent-negative: #ef4444;
+            --accent-neutral: #6366f1;
+            --accent-warning: #f59e0b;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image:
+                linear-gradient(rgba(45, 58, 82, 0.15) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(45, 58, 82, 0.15) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .dashboard {
+            position: relative;
+            z-index: 1;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .header {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header h1 {
+            font-size: 1.75rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .header h1::before {
+            content: '';
+            display: block;
+            width: 4px;
+            height: 28px;
+            background: linear-gradient(180deg, var(--accent-positive), var(--accent-neutral));
+            border-radius: 2px;
+        }
+
+        .header-subtitle {
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        /* Concept Explainer */
+        .concept-box {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(16, 185, 129, 0.1));
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 2rem;
+        }
+
+        .concept-box h3 {
+            font-size: 0.9rem;
+            color: var(--accent-neutral);
+            margin-bottom: 0.5rem;
+        }
+
+        .concept-box p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        /* Summary Cards */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .summary-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.25rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .summary-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+        }
+
+        .summary-card.balanced::before { background: var(--accent-positive); }
+        .summary-card.overperforming::before { background: var(--accent-neutral); }
+        .summary-card.underperforming::before { background: var(--accent-negative); }
+        .summary-card.score::before { background: linear-gradient(90deg, var(--accent-warning), var(--gold)); }
+
+        .summary-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .summary-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 2.25rem;
+            font-weight: 700;
+        }
+
+        .summary-card.balanced .summary-value { color: var(--accent-positive); }
+        .summary-card.overperforming .summary-value { color: var(--accent-neutral); }
+        .summary-card.underperforming .summary-value { color: var(--accent-negative); }
+        .summary-card.score .summary-value { color: var(--gold); }
+
+        .summary-pct {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* Section Headers */
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin: 2rem 0 1rem;
+        }
+
+        .section-header h2 {
+            font-size: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .section-header::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, var(--border-color), transparent);
+        }
+
+        /* Band Bias Chart */
+        .chart-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .chart-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .chart-subtitle {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 200px;
+        }
+
+        .chart-container.tall { height: 300px; }
+
+        /* Rider Trends */
+        .rider-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1rem;
+        }
+
+        .rider-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.25rem;
+            transition: all 0.3s ease;
+        }
+
+        .rider-card:hover {
+            border-color: var(--accent-neutral);
+            transform: translateY(-2px);
+        }
+
+        .rider-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .rider-name {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .rider-band {
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .rider-band.diamond { background: rgba(34, 211, 238, 0.2); color: var(--diamond); }
+        .rider-band.platinum { background: rgba(161, 161, 170, 0.2); color: var(--platinum); }
+        .rider-band.gold { background: rgba(251, 191, 36, 0.2); color: var(--gold); }
+        .rider-band.silver { background: rgba(156, 163, 175, 0.2); color: var(--silver); }
+        .rider-band.bronze { background: rgba(217, 119, 6, 0.2); color: var(--bronze); }
+        .rider-band.unranked { background: rgba(107, 114, 128, 0.2); color: var(--unranked); }
+
+        .rider-stats {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 1rem;
+            font-size: 0.8rem;
+        }
+
+        .rider-stat {
+            text-align: center;
+        }
+
+        .rider-stat-value {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .rider-stat-label {
+            color: var(--text-muted);
+            font-size: 0.65rem;
+            text-transform: uppercase;
+        }
+
+        .trend-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 0.25rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .trend-badge.balanced {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--accent-positive);
+        }
+
+        .trend-badge.overperforming {
+            background: rgba(99, 102, 241, 0.2);
+            color: var(--accent-neutral);
+        }
+
+        .trend-badge.underperforming {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--accent-negative);
+        }
+
+        .rider-chart {
+            height: 80px;
+            margin-top: 0.5rem;
+        }
+
+        /* Key Insights */
+        .insights-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .insights-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .insight-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: var(--bg-secondary);
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .insight-badge {
+            flex-shrink: 0;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.65rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .insight-badge.action { background: rgba(251, 191, 36, 0.2); color: var(--gold); }
+        .insight-badge.positive { background: rgba(16, 185, 129, 0.2); color: var(--accent-positive); }
+        .insight-badge.info { background: rgba(99, 102, 241, 0.2); color: var(--accent-neutral); }
+
+        /* Zero line indicator */
+        .zero-line-legend {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+
+        .zero-line-legend::before {
+            content: '';
+            width: 20px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.3);
+            border-style: dashed;
+        }
+
+        .footer {
+            margin-top: 3rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <header class="header">
+            <h1>Matchmaking Effectiveness</h1>
+            <p class="header-subtitle">TPV Career Mode - Season 1 | Analyzing whether race results balance out over time</p>
+        </header>
+
+        <div class="concept-box">
+            <h3>Why This View Matters</h3>
+            <p>
+                Traditional "prediction accuracy" doesn't tell the full story. In cycling, a rider might miss their predicted position by 20 places due to race dynamics - breakaways, bunch sprints, tactical decisions. That's not bad matchmaking, that's just racing.
+                <strong>Good matchmaking means the ups and downs balance out over time.</strong>
+                If a rider consistently beats or misses predictions across multiple races, that signals their rating needs adjustment.
+            </p>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="summary-grid">
+            <div class="summary-card balanced">
+                <div class="summary-label">Balanced Riders</div>
+                <div class="summary-value" id="balancedCount">7</div>
+                <div class="summary-pct" id="balancedPct">21.2% of riders</div>
+            </div>
+            <div class="summary-card overperforming">
+                <div class="summary-label">Overperforming</div>
+                <div class="summary-value" id="overCount">13</div>
+                <div class="summary-pct" id="overPct">39.4% beating predictions</div>
+            </div>
+            <div class="summary-card underperforming">
+                <div class="summary-label">Underperforming</div>
+                <div class="summary-value" id="underCount">13</div>
+                <div class="summary-pct" id="underPct">39.4% missing predictions</div>
+            </div>
+            <div class="summary-card score">
+                <div class="summary-label">Avg Balance Score</div>
+                <div class="summary-value" id="avgScore">40</div>
+                <div class="summary-pct">out of 100</div>
+            </div>
+        </div>
+
+        <!-- Band Bias Analysis -->
+        <div class="section-header">
+            <h2>Systematic Bias by Rating Band</h2>
+        </div>
+
+        <div class="chart-card">
+            <div class="chart-title">Average Position Difference by ARR Band</div>
+            <div class="chart-subtitle">Negative = riders beating predictions (rated too low) | Positive = riders missing predictions (rated too high) | Zero = perfectly balanced</div>
+            <div class="chart-container">
+                <canvas id="bandBiasChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Key Insights -->
+        <div class="insights-panel">
+            <div class="insights-title">Key Findings</div>
+            <div id="insightsList">
+                <!-- Populated by JS -->
+            </div>
+        </div>
+
+        <!-- Rider Trends -->
+        <div class="section-header">
+            <h2>Individual Rider Journeys</h2>
+        </div>
+
+        <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 1rem;">
+            Each chart shows cumulative position difference over races. A line staying near zero (the dashed line) indicates good matchmaking balance.
+            Consistent drift away from zero suggests the rider's rating needs adjustment.
+        </p>
+
+        <div class="rider-grid" id="riderGrid">
+            <!-- Populated by JS -->
+        </div>
+
+        <footer class="footer">
+            TPV Career Mode Matchmaking Analysis | Data from 33 riders across 129 races
+        </footer>
+    </div>
+
+    <script>
+        // Load data and render
+        let matchmakingData = null;
+
+        async function loadData() {
+            try {
+                const response = await fetch('matchmaking_data.json');
+                matchmakingData = await response.json();
+                renderDashboard();
+            } catch (err) {
+                console.error('Error loading data:', err);
+                // Fallback to embedded data if fetch fails
+                renderWithFallback();
+            }
+        }
+
+        function renderWithFallback() {
+            // Embedded fallback data
+            matchmakingData = {
+                summary: {
+                    totalPlayers: 33,
+                    balancedCount: 7,
+                    balancedPct: "21.2",
+                    overperformingCount: 13,
+                    overperformingPct: "39.4",
+                    underperformingCount: 13,
+                    underperformingPct: "39.4",
+                    avgBalanceScore: "40.4"
+                },
+                bandStats: {
+                    Diamond: { players: 2, avgDiff: 0 },
+                    Platinum: { players: 7, avgDiff: 2.19 },
+                    Gold: { players: 10, avgDiff: 1.74 },
+                    Silver: { players: 1, avgDiff: 4.67 },
+                    Bronze: { players: 6, avgDiff: -5.87 },
+                    Unranked: { players: 7, avgDiff: -13.26 }
+                },
+                players: []
+            };
+            renderDashboard();
+        }
+
+        function renderDashboard() {
+            // Update summary cards
+            document.getElementById('balancedCount').textContent = matchmakingData.summary.balancedCount;
+            document.getElementById('balancedPct').textContent = `${matchmakingData.summary.balancedPct}% of riders`;
+            document.getElementById('overCount').textContent = matchmakingData.summary.overperformingCount;
+            document.getElementById('overPct').textContent = `${matchmakingData.summary.overperformingPct}% beating predictions`;
+            document.getElementById('underCount').textContent = matchmakingData.summary.underperformingCount;
+            document.getElementById('underPct').textContent = `${matchmakingData.summary.underperformingPct}% missing predictions`;
+            document.getElementById('avgScore').textContent = Math.round(parseFloat(matchmakingData.summary.avgBalanceScore));
+
+            renderBandBiasChart();
+            renderInsights();
+            renderRiderCards();
+        }
+
+        function renderBandBiasChart() {
+            const ctx = document.getElementById('bandBiasChart').getContext('2d');
+            const bands = ['Diamond', 'Platinum', 'Gold', 'Silver', 'Bronze', 'Unranked'];
+            const bandColors = {
+                Diamond: '#22d3ee',
+                Platinum: '#a1a1aa',
+                Gold: '#fbbf24',
+                Silver: '#9ca3af',
+                Bronze: '#d97706',
+                Unranked: '#6b7280'
+            };
+
+            const data = bands.map(band => {
+                const stats = matchmakingData.bandStats[band];
+                return stats ? stats.avgDiff : 0;
+            });
+
+            const colors = bands.map(band => bandColors[band]);
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: bands,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: colors.map(c => c + '99'),
+                        borderColor: colors,
+                        borderWidth: 2,
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: ctx => {
+                                    const val = ctx.raw;
+                                    const direction = val < 0 ? 'overperforming' : val > 0 ? 'underperforming' : 'balanced';
+                                    return `Avg diff: ${val > 0 ? '+' : ''}${val.toFixed(2)} (${direction})`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            min: -20,
+                            max: 10,
+                            grid: { color: '#2d3a52' },
+                            ticks: {
+                                callback: val => val === 0 ? '0 (balanced)' : (val > 0 ? '+' + val : val),
+                                font: { family: "'JetBrains Mono', monospace", size: 10 }
+                            }
+                        },
+                        y: {
+                            grid: { display: false },
+                            ticks: { font: { weight: 500 } }
+                        }
+                    }
+                },
+                plugins: [{
+                    id: 'zeroLine',
+                    afterDraw: chart => {
+                        const ctx = chart.ctx;
+                        const xAxis = chart.scales.x;
+                        const yAxis = chart.scales.y;
+                        const zeroX = xAxis.getPixelForValue(0);
+
+                        ctx.save();
+                        ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+                        ctx.lineWidth = 2;
+                        ctx.setLineDash([5, 5]);
+                        ctx.beginPath();
+                        ctx.moveTo(zeroX, yAxis.top);
+                        ctx.lineTo(zeroX, yAxis.bottom);
+                        ctx.stroke();
+                        ctx.restore();
+                    }
+                }]
+            });
+        }
+
+        function renderInsights() {
+            const insights = [];
+            const bandStats = matchmakingData.bandStats;
+
+            // Check for systematic bias
+            if (bandStats.Unranked && bandStats.Unranked.avgDiff < -10) {
+                insights.push({
+                    type: 'action',
+                    text: `<strong>Unranked riders are significantly overperforming</strong> (avg ${bandStats.Unranked.avgDiff.toFixed(1)} positions better than predicted). New riders may need higher starting ratings or faster rating adjustments.`
+                });
+            }
+
+            if (bandStats.Bronze && bandStats.Bronze.avgDiff < -4) {
+                insights.push({
+                    type: 'action',
+                    text: `<strong>Bronze riders consistently beat predictions</strong> (avg ${bandStats.Bronze.avgDiff.toFixed(1)} positions). Consider whether Bronze rating thresholds need adjustment.`
+                });
+            }
+
+            if (bandStats.Diamond && Math.abs(bandStats.Diamond.avgDiff) < 1) {
+                insights.push({
+                    type: 'positive',
+                    text: `<strong>Diamond tier is perfectly balanced</strong> (avg diff: ${bandStats.Diamond.avgDiff.toFixed(2)}). Top-tier matchmaking is working as expected.`
+                });
+            }
+
+            const balancedPct = parseFloat(matchmakingData.summary.balancedPct);
+            if (balancedPct < 30) {
+                insights.push({
+                    type: 'info',
+                    text: `<strong>Only ${balancedPct}% of riders are balanced</strong>. This suggests ratings may need to adjust faster to player performance, or initial ratings need refinement.`
+                });
+            }
+
+            const container = document.getElementById('insightsList');
+            container.innerHTML = insights.map(i => `
+                <div class="insight-item">
+                    <span class="insight-badge ${i.type}">${i.type}</span>
+                    <span>${i.text}</span>
+                </div>
+            `).join('');
+        }
+
+        function renderRiderCards() {
+            const container = document.getElementById('riderGrid');
+
+            if (!matchmakingData.players || matchmakingData.players.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-muted);">No rider data available. Run matchmaking-analysis.js to generate data.</p>';
+                return;
+            }
+
+            container.innerHTML = matchmakingData.players.map((player, idx) => {
+                const trendIcon = player.trend === 'overperforming' ? '&#x2191;' :
+                                  player.trend === 'underperforming' ? '&#x2193;' : '&#x2192;';
+                const bandClass = player.band.toLowerCase();
+                const cumColor = player.cumulativeFinal < 0 ? 'var(--accent-neutral)' :
+                                 player.cumulativeFinal > 0 ? 'var(--accent-negative)' : 'var(--accent-positive)';
+
+                return `
+                    <div class="rider-card">
+                        <div class="rider-header">
+                            <div>
+                                <div class="rider-name">${player.name}</div>
+                                <span class="rider-band ${bandClass}">${player.band}</span>
+                            </div>
+                            <span class="trend-badge ${player.trend}">${trendIcon} ${player.trend}</span>
+                        </div>
+                        <div class="rider-stats">
+                            <div class="rider-stat">
+                                <div class="rider-stat-value">${player.raceCount}</div>
+                                <div class="rider-stat-label">Races</div>
+                            </div>
+                            <div class="rider-stat">
+                                <div class="rider-stat-value" style="color: ${cumColor}">${player.cumulativeFinal > 0 ? '+' : ''}${player.cumulativeFinal}</div>
+                                <div class="rider-stat-label">Cumulative</div>
+                            </div>
+                            <div class="rider-stat">
+                                <div class="rider-stat-value">${player.avgDiff > 0 ? '+' : ''}${player.avgDiff}</div>
+                                <div class="rider-stat-label">Avg/Race</div>
+                            </div>
+                            <div class="rider-stat">
+                                <div class="rider-stat-value" style="color: var(--gold)">${player.balanceScore}</div>
+                                <div class="rider-stat-label">Balance</div>
+                            </div>
+                        </div>
+                        <div class="rider-chart">
+                            <canvas id="riderChart${idx}"></canvas>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Render mini charts
+            matchmakingData.players.forEach((player, idx) => {
+                renderRiderChart(player, idx);
+            });
+        }
+
+        function renderRiderChart(player, idx) {
+            const ctx = document.getElementById(`riderChart${idx}`).getContext('2d');
+            const races = player.races || [];
+
+            if (races.length === 0) return;
+
+            const labels = races.map(r => r.raceNum);
+            const data = races.map(r => r.cumulative);
+
+            // Determine line color based on trend
+            const lineColor = player.trend === 'overperforming' ? '#6366f1' :
+                              player.trend === 'underperforming' ? '#ef4444' : '#10b981';
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [{
+                        data,
+                        borderColor: lineColor,
+                        backgroundColor: lineColor + '20',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 3,
+                        pointBackgroundColor: lineColor
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                title: items => `Race ${items[0].label}`,
+                                label: ctx => `Cumulative: ${ctx.raw > 0 ? '+' : ''}${ctx.raw}`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            display: false
+                        },
+                        y: {
+                            grid: { color: '#2d3a5233' },
+                            ticks: {
+                                font: { size: 8 },
+                                callback: val => val === 0 ? '0' : val
+                            }
+                        }
+                    }
+                },
+                plugins: [{
+                    id: 'zeroLine',
+                    afterDraw: chart => {
+                        const ctx = chart.ctx;
+                        const yAxis = chart.scales.y;
+                        const xAxis = chart.scales.x;
+
+                        // Only draw if 0 is in range
+                        if (yAxis.min <= 0 && yAxis.max >= 0) {
+                            const zeroY = yAxis.getPixelForValue(0);
+
+                            ctx.save();
+                            ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+                            ctx.lineWidth = 1;
+                            ctx.setLineDash([3, 3]);
+                            ctx.beginPath();
+                            ctx.moveTo(xAxis.left, zeroY);
+                            ctx.lineTo(xAxis.right, zeroY);
+                            ctx.stroke();
+                            ctx.restore();
+                        }
+                    }
+                }]
+            });
+        }
+
+        // Initialize
+        Chart.defaults.color = '#94a3b8';
+        Chart.defaults.borderColor = '#2d3a52';
+        Chart.defaults.font.family = "'Outfit', sans-serif";
+
+        loadData();
+    </script>
+</body>
+</html>
