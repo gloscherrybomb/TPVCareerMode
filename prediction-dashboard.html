@@ -1250,9 +1250,10 @@
                         callbacks: {
                             title: function(items) {
                                 const idx = items[0].dataIndex;
-                                if (idx < 10) return `${items[0].label} positions (beat prediction)`;
-                                if (idx === 10) return 'Exact prediction';
-                                return `+${idx - 10} positions (missed prediction)`;
+                                // Index 11 is "0 (exact)" in the labels array
+                                if (idx < 11) return `${items[0].label} positions (beat prediction)`;
+                                if (idx === 11) return 'Exact prediction';
+                                return `${items[0].label} positions (missed prediction)`;
                             }
                         }
                     }
