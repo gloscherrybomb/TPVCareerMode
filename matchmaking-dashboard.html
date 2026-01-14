@@ -592,6 +592,13 @@
                 Unranked: '#6b7280'
             };
 
+            // Create labels with rider counts
+            const labelsWithCounts = bands.map(band => {
+                const stats = matchmakingData.bandStats[band];
+                const count = stats ? stats.players : 0;
+                return `${band} (${count})`;
+            });
+
             const data = bands.map(band => {
                 const stats = matchmakingData.bandStats[band];
                 return stats ? stats.avgDiff : 0;
@@ -602,7 +609,7 @@
             new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: bands,
+                    labels: labelsWithCounts,
                     datasets: [{
                         data: data,
                         backgroundColor: colors.map(c => c + '99'),
