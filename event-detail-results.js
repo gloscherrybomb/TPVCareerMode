@@ -1646,126 +1646,51 @@ async function generateStravaShareImage(userResult, eventInfo) {
         currentY += tileHeight + TILE_GAP;
     }
 
-    // ===== ROW 2: Power Data (compact horizontal bar) =====
+    // ===== ROW 2: Power Data (clean, no background) =====
     if (hasPower) {
         const power = userResult.powerData;
-        const barHeight = 70;
-        const barY = currentY + 5;
+        const sectionHeight = 55;
 
-        // Full-width subtle background bar with gradient
-        const barGradient = ctx.createLinearGradient(0, barY, 0, barY + barHeight);
-        barGradient.addColorStop(0, 'rgba(255, 170, 0, 0.08)');
-        barGradient.addColorStop(0.5, 'rgba(255, 170, 0, 0.12)');
-        barGradient.addColorStop(1, 'rgba(255, 170, 0, 0.08)');
-        ctx.fillStyle = barGradient;
-        ctx.fillRect(0, barY, width, barHeight);
-
-        // Subtle top/bottom lines for definition
-        ctx.strokeStyle = 'rgba(255, 170, 0, 0.25)';
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(0, barY);
-        ctx.lineTo(width, barY);
-        ctx.moveTo(0, barY + barHeight);
-        ctx.lineTo(width, barY + barHeight);
-        ctx.stroke();
-
-        // Three columns for power values
+        // Three columns - label above value, centered
         const colWidth = width / 3;
-        const textY = barY + barHeight / 2;
+        const centerY = currentY + sectionHeight / 2;
 
         // AVG POWER (left)
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
         ctx.font = '600 14px "Exo 2", sans-serif';
-        ctx.fillText('AVG', colWidth / 2 - 50, textY + 5);
+        ctx.fillText('AVG', colWidth / 2, centerY - 8);
         ctx.fillStyle = ORANGE;
-        ctx.font = 'bold 38px Orbitron, sans-serif';
-        ctx.fillText(power.avgPower ? `${power.avgPower}W` : '—', colWidth / 2 + 30, textY + 12);
+        ctx.font = 'bold 34px Orbitron, sans-serif';
+        ctx.fillText(power.avgPower ? `${power.avgPower}W` : '—', colWidth / 2, centerY + 22);
 
         // NORMALIZED (center)
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
         ctx.font = '600 14px "Exo 2", sans-serif';
-        ctx.fillText('NRM', colWidth + colWidth / 2 - 50, textY + 5);
+        ctx.fillText('NRM', colWidth * 1.5, centerY - 8);
         ctx.fillStyle = ORANGE;
-        ctx.font = 'bold 38px Orbitron, sans-serif';
-        ctx.fillText(power.nrmPower ? `${power.nrmPower}W` : '—', colWidth + colWidth / 2 + 30, textY + 12);
+        ctx.font = 'bold 34px Orbitron, sans-serif';
+        ctx.fillText(power.nrmPower ? `${power.nrmPower}W` : '—', colWidth * 1.5, centerY + 22);
 
         // MAX POWER (right) - with glow
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
         ctx.font = '600 14px "Exo 2", sans-serif';
-        ctx.fillText('MAX', colWidth * 2 + colWidth / 2 - 50, textY + 5);
+        ctx.fillText('MAX', colWidth * 2.5, centerY - 8);
         ctx.fillStyle = PINK;
         ctx.shadowColor = PINK;
-        ctx.shadowBlur = 12;
-        ctx.font = 'bold 38px Orbitron, sans-serif';
-        ctx.fillText(power.maxPower ? `${power.maxPower}W` : '—', colWidth * 2 + colWidth / 2 + 30, textY + 12);
+        ctx.shadowBlur = 10;
+        ctx.font = 'bold 34px Orbitron, sans-serif';
+        ctx.fillText(power.maxPower ? `${power.maxPower}W` : '—', colWidth * 2.5, centerY + 22);
         ctx.shadowBlur = 0;
 
-        currentY += barHeight + TILE_GAP + 5;
-    }
-
-    // ===== ROW 3: Awards (clean, minimal) =====
-    if (hasAwards) {
-        const awards = userResult.earnedAwards;
-        const numAwards = Math.min(awards.length, 4);
-        const tileHeight = 140;
-
-        ctx.fillStyle = PURPLE;
-        ctx.font = '700 22px "Exo 2", sans-serif';
-        ctx.fillText(`${awards.length} AWARD${awards.length > 1 ? 'S' : ''} EARNED`, width / 2, currentY + 25);
-
-        // Draw award icons
-        const awardSize = 70;
-        const awardSpacing = Math.min(200, (width - MARGIN * 2 - 80) / numAwards);
-        const startX = width / 2 - ((numAwards - 1) * awardSpacing) / 2;
-        const awardY = currentY + 75;
-
-        for (let i = 0; i < numAwards; i++) {
-            const award = awards[i];
-            const x = startX + i * awardSpacing;
-
-            let iconLoaded = false;
-
-            if (award.iconPath) {
-                console.log(`[SHARE IMG] Attempting to load icon: ${award.iconPath}`);
-                try {
-                    let iconImg;
-                    if (award.iconPath.endsWith('.svg')) {
-                        iconImg = await loadSvgAsImage(award.iconPath);
-                    } else {
-                        iconImg = await loadImage(award.iconPath);
-                    }
-                    console.log(`[SHARE IMG] Successfully loaded icon for ${award.title}`);
-                    ctx.drawImage(iconImg, x - awardSize/2, awardY - awardSize/2, awardSize, awardSize);
-                    iconLoaded = true;
-                } catch (e) {
-                    console.error(`[SHARE IMG] FAILED to load award icon: ${award.iconPath}`, e);
-                }
-            } else {
-                console.warn(`[SHARE IMG] No iconPath for award: ${award.id}`);
-            }
-
-            if (!iconLoaded && award.fallback) {
-                // Just the emoji, no background circle
-                ctx.font = `${awardSize}px "Segoe UI Emoji", "Apple Color Emoji", sans-serif`;
-                ctx.fillStyle = '#ffffff';
-                ctx.fillText(award.fallback, x, awardY + 18);
-            }
-
-            // Award title
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
-            ctx.font = '600 18px "Exo 2", sans-serif';
-            ctx.fillText(award.title, x, awardY + awardSize/2 + 26);
-        }
-
-        currentY += tileHeight + TILE_GAP;
+        currentY += sectionHeight + 12;
     }
 
     // ========== NARRATIVE SECTION (PROMINENT, MOBILE-READABLE) ==========
     if (userResult.story && userResult.story.length > 20) {
         const footerHeight = 80; // Space for footer
-        const remainingSpace = height - currentY - footerHeight;
-        const containerHeight = Math.max(180, remainingSpace - 10);
+        const awardsHeight = hasAwards ? 90 : 0; // Reserve space for awards below
+        const remainingSpace = height - currentY - footerHeight - awardsHeight;
+        const containerHeight = Math.max(160, remainingSpace - 10);
 
         // Subtle left accent bar only - no box background
         const accentBarGradient = ctx.createLinearGradient(0, currentY + 20, 0, currentY + containerHeight - 20);
@@ -1820,6 +1745,54 @@ async function generateStravaShareImage(userResult, eventInfo) {
         ctx.shadowBlur = 0;
 
         currentY += containerHeight;
+    }
+
+    // ===== AWARDS (below narrative, before footer) =====
+    if (hasAwards) {
+        const awards = userResult.earnedAwards;
+        const numAwards = Math.min(awards.length, 4);
+        const sectionHeight = 85;
+
+        // Icons in a horizontal row
+        const awardSize = 45;
+        const awardSpacing = Math.min(150, (width - MARGIN * 2 - 40) / numAwards);
+        const startX = width / 2 - ((numAwards - 1) * awardSpacing) / 2;
+        const awardY = currentY + 38;
+
+        for (let i = 0; i < numAwards; i++) {
+            const award = awards[i];
+            const x = startX + i * awardSpacing;
+
+            let iconLoaded = false;
+
+            if (award.iconPath) {
+                try {
+                    let iconImg;
+                    if (award.iconPath.endsWith('.svg')) {
+                        iconImg = await loadSvgAsImage(award.iconPath);
+                    } else {
+                        iconImg = await loadImage(award.iconPath);
+                    }
+                    ctx.drawImage(iconImg, x - awardSize/2, awardY - awardSize/2, awardSize, awardSize);
+                    iconLoaded = true;
+                } catch (e) {
+                    console.error(`[SHARE IMG] Failed to load award icon: ${award.iconPath}`, e);
+                }
+            }
+
+            if (!iconLoaded && award.fallback) {
+                ctx.font = `${awardSize}px "Segoe UI Emoji", "Apple Color Emoji", sans-serif`;
+                ctx.fillStyle = '#ffffff';
+                ctx.fillText(award.fallback, x, awardY + 12);
+            }
+
+            // Award title below icon
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.75)';
+            ctx.font = '600 14px "Exo 2", sans-serif';
+            ctx.fillText(award.title, x, awardY + awardSize/2 + 18);
+        }
+
+        currentY += sectionHeight;
     }
 
     // ========== FOOTER ==========
