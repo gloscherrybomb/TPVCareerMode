@@ -565,38 +565,38 @@
                 </div>
                 <div class="header-meta">
                     <span><span class="status-dot"></span> Live Data</span>
-                    <span>4,710 Results</span>
+                    <span>120 Human Results</span>
                     <span>128 Races</span>
                 </div>
             </div>
         </header>
 
-        <!-- Key Metrics -->
+        <!-- Key Metrics (Human Riders Only) -->
         <div class="metrics-grid">
             <div class="metric-card">
                 <div class="metric-label">Mean Absolute Error</div>
-                <div class="metric-value highlight">8.41</div>
+                <div class="metric-value highlight">9.70</div>
                 <div class="metric-subtext">positions off on average</div>
             </div>
             <div class="metric-card">
                 <div class="metric-label">Exact Predictions</div>
-                <div class="metric-value">5.7%</div>
-                <div class="metric-subtext">269 of 4,710 results</div>
+                <div class="metric-value">12.5%</div>
+                <div class="metric-subtext">15 of 120 results</div>
             </div>
             <div class="metric-card">
                 <div class="metric-label">Within 3 Positions</div>
-                <div class="metric-value positive">31.0%</div>
-                <div class="metric-subtext">1,460 results</div>
+                <div class="metric-value positive">32.5%</div>
+                <div class="metric-subtext">39 results</div>
             </div>
             <div class="metric-card">
                 <div class="metric-label">Within 5 Positions</div>
-                <div class="metric-value positive">44.5%</div>
-                <div class="metric-subtext">2,096 results</div>
+                <div class="metric-value positive">45.0%</div>
+                <div class="metric-subtext">54 results</div>
             </div>
             <div class="metric-card">
                 <div class="metric-label">Prediction Bias</div>
-                <div class="metric-value" style="color: var(--text-secondary);">0.00</div>
-                <div class="metric-subtext">balanced (no systematic bias)</div>
+                <div class="metric-value" style="color: var(--accent-positive);">-1.67</div>
+                <div class="metric-subtext">humans beat predictions</div>
             </div>
         </div>
 
@@ -635,10 +635,10 @@
             </div>
         </div>
 
-        <!-- ARR Band Table -->
+        <!-- ARR Band Table (Human Riders Only) -->
         <div class="chart-card full-width">
             <div class="chart-title">Detailed ARR Band Breakdown</div>
-            <div class="chart-subtitle">Complete statistics for each skill tier</div>
+            <div class="chart-subtitle">Human rider statistics for each skill tier</div>
             <table class="data-table">
                 <thead>
                     <tr>
@@ -654,42 +654,50 @@
                     <tr>
                         <td><span class="band-indicator"><span class="band-dot diamond"></span>Diamond</span></td>
                         <td>7</td>
-                        <td>0.00</td>
-                        <td>100.0%</td>
+                        <td style="color: var(--accent-positive);">0.00</td>
+                        <td style="color: var(--accent-positive);">100.0%</td>
                         <td class="trend-neutral">0.00</td>
-                        <td class="trend-neutral">Perfect (limited data)</td>
+                        <td class="trend-positive">Perfect predictions</td>
                     </tr>
                     <tr>
                         <td><span class="band-indicator"><span class="band-dot platinum"></span>Platinum</span></td>
-                        <td>1,232</td>
-                        <td style="color: var(--accent-negative);">10.43</td>
-                        <td>25.2%</td>
-                        <td class="trend-negative">+1.10</td>
-                        <td class="trend-negative">Finish worse than predicted</td>
+                        <td>27</td>
+                        <td>8.67</td>
+                        <td>37.0%</td>
+                        <td class="trend-negative">+1.11</td>
+                        <td class="trend-negative">Finish slightly worse</td>
                     </tr>
                     <tr>
                         <td><span class="band-indicator"><span class="band-dot gold"></span>Gold</span></td>
-                        <td>1,659</td>
-                        <td>8.53</td>
-                        <td>29.1%</td>
-                        <td class="trend-negative">+0.21</td>
-                        <td class="trend-neutral">Slightly optimistic</td>
+                        <td>39</td>
+                        <td>8.67</td>
+                        <td>35.9%</td>
+                        <td class="trend-negative">+1.49</td>
+                        <td class="trend-negative">Finish slightly worse</td>
                     </tr>
                     <tr>
                         <td><span class="band-indicator"><span class="band-dot silver"></span>Silver</span></td>
-                        <td>908</td>
-                        <td>7.52</td>
-                        <td>32.3%</td>
-                        <td class="trend-positive">-0.22</td>
-                        <td class="trend-neutral">Well balanced</td>
+                        <td>5</td>
+                        <td>6.00</td>
+                        <td>20.0%</td>
+                        <td class="trend-positive">-0.40</td>
+                        <td class="trend-neutral">Limited sample size</td>
                     </tr>
                     <tr>
                         <td><span class="band-indicator"><span class="band-dot bronze"></span>Bronze</span></td>
-                        <td>821</td>
-                        <td style="color: var(--accent-positive);">6.19</td>
-                        <td style="color: var(--accent-positive);">40.3%</td>
-                        <td class="trend-positive">-1.56</td>
-                        <td class="trend-positive">Finish better than predicted</td>
+                        <td>17</td>
+                        <td>9.47</td>
+                        <td>23.5%</td>
+                        <td class="trend-positive">-5.59</td>
+                        <td class="trend-positive">Beat predictions significantly</td>
+                    </tr>
+                    <tr>
+                        <td><span class="band-indicator"><span class="band-dot" style="background: #6b7280;"></span>Unranked</span></td>
+                        <td>25</td>
+                        <td style="color: var(--accent-negative);">16.04</td>
+                        <td style="color: var(--accent-negative);">12.0%</td>
+                        <td class="trend-positive">-7.64</td>
+                        <td class="trend-positive">Beat predictions but high variance</td>
                     </tr>
                 </tbody>
             </table>
@@ -756,42 +764,29 @@
             </div>
         </div>
 
-        <!-- Field Size Impact -->
-        <div class="section-header">
-            <h2>Field Size Impact</h2>
-        </div>
-
-        <div class="chart-card full-width">
-            <div class="chart-title">Prediction Accuracy by Field Size</div>
-            <div class="chart-subtitle">How race size affects prediction accuracy</div>
-            <div class="chart-container">
-                <canvas id="fieldSizeChart"></canvas>
-            </div>
-        </div>
-
         <!-- Key Insights -->
         <div class="insights-panel">
             <div class="insights-title">Key Findings for Developers</div>
             <div class="insights-list">
                 <div class="insight-item">
                     <span class="insight-badge critical">Critical</span>
-                    <span><strong>Platinum tier has worst accuracy</strong> (MAE 10.43) - predictions are too optimistic for high-skill riders. Consider adjusting rating weights for ARR 1300-1599.</span>
+                    <span><strong>Unranked riders have worst accuracy</strong> (MAE 16.04) - new riders without established ratings are highly unpredictable. Consider special handling for unranked players.</span>
                 </div>
                 <div class="insight-item">
                     <span class="insight-badge warning">Warning</span>
-                    <span><strong>Platinum 1 sub-band bias:</strong> Riders finish +8.99 positions worse than predicted on average. Only 22.9% beat their prediction in this tier.</span>
+                    <span><strong>Humans consistently beat predictions:</strong> Average diff of -1.67 means humans finish ~2 positions better than predicted. The model underestimates human performance.</span>
                 </div>
                 <div class="insight-item">
                     <span class="insight-badge info">Pattern</span>
-                    <span><strong>Bronze riders consistently outperform</strong> predictions (-1.56 avg diff). The model may be underestimating lower-rated riders.</span>
+                    <span><strong>Bronze riders massively outperform</strong> predictions (-5.59 avg diff). Lower-rated humans beat predictions by ~6 positions on average.</span>
                 </div>
                 <div class="insight-item">
                     <span class="insight-badge info">Pattern</span>
-                    <span><strong>Field size matters:</strong> Smaller fields (11-30 riders) have much better accuracy (MAE ~4.8) vs larger fields (MAE ~8.5). Consider field-size calibration.</span>
+                    <span><strong>Diamond predictions are perfect:</strong> All 7 Diamond-tier results matched predictions exactly. High consistency at the top tier.</span>
                 </div>
                 <div class="insight-item">
                     <span class="insight-badge warning">Warning</span>
-                    <span><strong>Human unpredictability:</strong> Humans are less predictable (MAE 9.70 vs 8.38) but beat predictions more often. May need separate modeling.</span>
+                    <span><strong>Humans less predictable than bots:</strong> Human MAE 9.70 vs Bot MAE 8.38. Consider separate prediction models or wider confidence intervals for humans.</span>
                 </div>
             </div>
         </div>
@@ -809,13 +804,13 @@
         Chart.defaults.borderColor = '#2d3a52';
         Chart.defaults.font.family = "'Outfit', sans-serif";
 
-        // Distribution Chart
+        // Distribution Chart (Human Riders Only)
         const distributionCtx = document.getElementById('distributionChart').getContext('2d');
         const distributionData = {
             labels: ['-10 or less', '-9', '-8', '-7', '-6', '-5', '-4', '-3', '-2', '-1', '0 (exact)', '+1', '+2', '+3', '+4', '+5', '+6', '+7', '+8', '+9', '+10 or more'],
             datasets: [{
                 label: 'Count',
-                data: [790, 101, 125, 154, 122, 176, 174, 189, 199, 221, 269, 224, 204, 156, 151, 131, 150, 110, 96, 98, 870],
+                data: [29, 3, 2, 4, 1, 4, 8, 5, 5, 7, 15, 3, 2, 2, 1, 2, 2, 1, 1, 2, 21],
                 backgroundColor: function(context) {
                     const index = context.dataIndex;
                     if (index < 10) return 'rgba(16, 185, 129, 0.7)'; // Better than predicted - green
@@ -875,23 +870,24 @@
             }
         });
 
-        // MAE by Band Chart
+        // MAE by Band Chart (Human Riders Only)
         const maeCtx = document.getElementById('maeChart').getContext('2d');
         new Chart(maeCtx, {
             type: 'bar',
             data: {
-                labels: ['Diamond', 'Platinum', 'Gold', 'Silver', 'Bronze'],
+                labels: ['Diamond', 'Platinum', 'Gold', 'Silver', 'Bronze', 'Unranked'],
                 datasets: [{
                     label: 'MAE',
-                    data: [0.00, 10.43, 8.53, 7.52, 6.19],
+                    data: [0.00, 8.67, 8.67, 6.00, 9.47, 16.04],
                     backgroundColor: [
                         'rgba(34, 211, 238, 0.7)',
                         'rgba(161, 161, 170, 0.7)',
                         'rgba(251, 191, 36, 0.7)',
                         'rgba(156, 163, 175, 0.7)',
-                        'rgba(217, 119, 6, 0.7)'
+                        'rgba(217, 119, 6, 0.7)',
+                        'rgba(107, 114, 128, 0.7)'
                     ],
-                    borderColor: ['#22d3ee', '#a1a1aa', '#fbbf24', '#9ca3af', '#d97706'],
+                    borderColor: ['#22d3ee', '#a1a1aa', '#fbbf24', '#9ca3af', '#d97706', '#6b7280'],
                     borderWidth: 2,
                     borderRadius: 6,
                 }]
@@ -916,7 +912,7 @@
                 scales: {
                     x: {
                         beginAtZero: true,
-                        max: 12,
+                        max: 18,
                         grid: { color: '#2d3a52' },
                         ticks: { font: { family: "'JetBrains Mono', monospace" } }
                     },
@@ -928,23 +924,24 @@
             }
         });
 
-        // Within 3 Chart
+        // Within 3 Chart (Human Riders Only)
         const within3Ctx = document.getElementById('within3Chart').getContext('2d');
         new Chart(within3Ctx, {
             type: 'bar',
             data: {
-                labels: ['Diamond', 'Platinum', 'Gold', 'Silver', 'Bronze'],
+                labels: ['Diamond', 'Platinum', 'Gold', 'Silver', 'Bronze', 'Unranked'],
                 datasets: [{
                     label: 'Within 3',
-                    data: [100, 25.2, 29.1, 32.3, 40.3],
+                    data: [100, 37.0, 35.9, 20.0, 23.5, 12.0],
                     backgroundColor: [
                         'rgba(34, 211, 238, 0.7)',
                         'rgba(161, 161, 170, 0.7)',
                         'rgba(251, 191, 36, 0.7)',
                         'rgba(156, 163, 175, 0.7)',
-                        'rgba(217, 119, 6, 0.7)'
+                        'rgba(217, 119, 6, 0.7)',
+                        'rgba(107, 114, 128, 0.7)'
                     ],
-                    borderColor: ['#22d3ee', '#a1a1aa', '#fbbf24', '#9ca3af', '#d97706'],
+                    borderColor: ['#22d3ee', '#a1a1aa', '#fbbf24', '#9ca3af', '#d97706', '#6b7280'],
                     borderWidth: 2,
                     borderRadius: 6,
                 }]
@@ -984,111 +981,6 @@
             }
         });
 
-        // Field Size Chart
-        const fieldSizeCtx = document.getElementById('fieldSizeChart').getContext('2d');
-        new Chart(fieldSizeCtx, {
-            type: 'line',
-            data: {
-                labels: ['11-20', '21-30', '31-40', '51+'],
-                datasets: [
-                    {
-                        label: 'MAE',
-                        data: [4.63, 4.93, 8.51, 8.51],
-                        borderColor: '#f472b6',
-                        backgroundColor: 'rgba(244, 114, 182, 0.1)',
-                        borderWidth: 3,
-                        fill: true,
-                        tension: 0.4,
-                        pointBackgroundColor: '#f472b6',
-                        pointBorderColor: '#0a0e17',
-                        pointBorderWidth: 2,
-                        pointRadius: 6,
-                        yAxisID: 'y'
-                    },
-                    {
-                        label: 'Within 3%',
-                        data: [49.5, 53.6, 30.5, 30.9],
-                        borderColor: '#10b981',
-                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                        borderWidth: 3,
-                        fill: true,
-                        tension: 0.4,
-                        pointBackgroundColor: '#10b981',
-                        pointBorderColor: '#0a0e17',
-                        pointBorderWidth: 2,
-                        pointRadius: 6,
-                        yAxisID: 'y1'
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                interaction: {
-                    mode: 'index',
-                    intersect: false,
-                },
-                plugins: {
-                    legend: {
-                        position: 'top',
-                        labels: {
-                            usePointStyle: true,
-                            padding: 20
-                        }
-                    },
-                    tooltip: {
-                        backgroundColor: '#1a2234',
-                        borderColor: '#2d3a52',
-                        borderWidth: 1,
-                    }
-                },
-                scales: {
-                    x: {
-                        grid: { color: '#2d3a52' },
-                        title: {
-                            display: true,
-                            text: 'Field Size (riders)',
-                            color: '#64748b'
-                        }
-                    },
-                    y: {
-                        type: 'linear',
-                        display: true,
-                        position: 'left',
-                        beginAtZero: true,
-                        max: 12,
-                        grid: { color: '#2d3a52' },
-                        title: {
-                            display: true,
-                            text: 'MAE (positions)',
-                            color: '#f472b6'
-                        },
-                        ticks: {
-                            font: { family: "'JetBrains Mono', monospace" },
-                            color: '#f472b6'
-                        }
-                    },
-                    y1: {
-                        type: 'linear',
-                        display: true,
-                        position: 'right',
-                        beginAtZero: true,
-                        max: 60,
-                        grid: { drawOnChartArea: false },
-                        title: {
-                            display: true,
-                            text: 'Within 3 (%)',
-                            color: '#10b981'
-                        },
-                        ticks: {
-                            font: { family: "'JetBrains Mono', monospace" },
-                            color: '#10b981',
-                            callback: function(value) { return value + '%'; }
-                        }
-                    }
-                }
-            }
-        });
     </script>
 </body>
 </html>

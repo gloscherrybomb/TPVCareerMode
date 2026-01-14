@@ -460,6 +460,40 @@ POTENTIAL AREAS FOR IMPROVEMENT
     return report;
 }
 
+// Export human-only stats as JSON for dashboard
+function exportHumanStats(analysis) {
+    const humanOnly = analysis.filter(d => !d.isBot);
+    const botOnly = analysis.filter(d => d.isBot);
+
+    const humanStats = calculateStats(humanOnly);
+    const botStats = calculateStats(botOnly);
+
+    // Human stats by ARR band
+    const bandGroups = ['Diamond', 'Platinum', 'Gold', 'Silver', 'Bronze', 'Unranked'];
+    const humanStatsByBand = {};
+    for (const band of bandGroups) {
+        const bandData = humanOnly.filter(d => d.arrBandGroup === band);
+        humanStatsByBand[band] = calculateStats(bandData);
+    }
+
+    // Distribution for humans only
+    const humanDistribution = {};
+    for (let i = -10; i <= 10; i++) {
+        humanDistribution[i] = humanOnly.filter(d => {
+            if (i === -10) return d.difference <= -10;
+            if (i === 10) return d.difference >= 10;
+            return d.difference === i;
+        }).length;
+    }
+
+    return {
+        human: humanStats,
+        bot: botStats,
+        humanByBand: humanStatsByBand,
+        humanDistribution
+    };
+}
+
 // Export data to CSV for further analysis
 function exportToCSV(analysis) {
     const headers = [
@@ -510,6 +544,12 @@ const csv = exportToCSV(analysis);
 const csvPath = path.join(__dirname, 'prediction_accuracy_data.csv');
 fs.writeFileSync(csvPath, csv);
 console.log(`CSV data exported to: ${csvPath}`);
+
+// Export human-focused stats as JSON
+const humanFocusedStats = exportHumanStats(analysis);
+const jsonPath = path.join(__dirname, 'human_prediction_stats.json');
+fs.writeFileSync(jsonPath, JSON.stringify(humanFocusedStats, null, 2));
+console.log(`Human-focused stats exported to: ${jsonPath}`);
 
 // Print summary to console
 console.log('\n' + '='.repeat(60));
