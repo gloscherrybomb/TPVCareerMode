@@ -486,7 +486,7 @@ const CONDENSED_NARRATIVES = {
     default: [
       "A tough day at {eventName}, finishing {position}. The leaders were {gapText} up the road. Sometimes racing delivers hard lessons. The question is what you do with them.",
       "{position} at {eventName}. A day to forget, deep in the results sheet. But you finished, and finishing is something.",
-      "Bringing up the rear at {eventName} with {position}. The race was decided far ahead—you finished{gapTextSuffix}. Days like this test your resolve.",
+      "Bringing up the rear at {eventName} with {position}. The race was decided far ahead—you were {gapText} behind. Days like this test your resolve.",
       "{position} at {eventName}. Well off the pace, watching the race unfold from behind. Tough, but you crossed the line.",
       "Finishing {position} at {eventName}. A humbling result, but every finish adds to the experience bank. The road back to the front starts with showing up."
     ]
