@@ -3,7 +3,7 @@
 import { firebaseConfig } from './firebase-config.js';
 import { getARRBand, getCountryCode2 } from './utils.js';
 import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-import { getFirestore, doc, getDoc, collection, getDocs, query, orderBy, limit } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { getFirestore, doc, getDoc, collection, getDocs, query, orderBy, limit, startAfter } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import { makeNameClickable } from './bot-profile-modal.js';
 import { initRiderProfileModal, makeRiderNameClickable } from './rider-profile-modal.js';
@@ -32,7 +32,10 @@ let filters = {
 // Pagination state for global rankings
 const RANKINGS_PER_PAGE = 50;
 let currentRankingsPage = 1;
-let allGlobalRankings = []; // Store full fetched data for pagination
+let allGlobalRankings = []; // Store fetched data for display
+let lastVisibleDoc = null; // Cursor for Firestore pagination
+let hasMoreRankings = true; // Track if more data is available
+let isLoadingMoreRankings = false; // Prevent duplicate loads
 
 // Initialize season switcher for standings
 function initStandingsSeasonSwitcher() {
@@ -553,64 +556,110 @@ const GLOBAL_RANKINGS_TIMESTAMP_KEY = 'globalRankingsTimestamp';
 const SEASON_STANDINGS_CACHE_KEY = 'seasonStandings';
 const SEASON_STANDINGS_TIMESTAMP_KEY = 'seasonStandingsTimestamp';
 
-// Render Global High Scores
-async function renderGlobalRankings(forceRefresh = false) {
+// Render Global High Scores with cursor-based pagination
+async function renderGlobalRankings(forceRefresh = false, loadMore = false) {
     const globalContent = document.getElementById('individualRankings');
 
     try {
-        let rankings = [];
+        // If loading more, don't reset state
+        if (!loadMore) {
+            // Check cache first (unless force refresh) - only for initial load
+            if (!forceRefresh) {
+                const cachedData = localStorage.getItem(GLOBAL_RANKINGS_CACHE_KEY);
+                const cacheTimestamp = localStorage.getItem(GLOBAL_RANKINGS_TIMESTAMP_KEY);
+                const now = Date.now();
 
-        // Check cache first (unless force refresh)
-        if (!forceRefresh) {
-            const cachedData = localStorage.getItem(GLOBAL_RANKINGS_CACHE_KEY);
-            const cacheTimestamp = localStorage.getItem(GLOBAL_RANKINGS_TIMESTAMP_KEY);
-            const now = Date.now();
+                if (cachedData && cacheTimestamp) {
+                    const cacheAge = now - parseInt(cacheTimestamp);
+                    if (cacheAge < CACHE_DURATION) {
+                        console.log(`📦 Using cached global high scores (${Math.round(cacheAge / 1000)}s old)`);
+                        const cachedData_parsed = JSON.parse(cachedData);
 
-            if (cachedData && cacheTimestamp) {
-                const cacheAge = now - parseInt(cacheTimestamp);
-                if (cacheAge < CACHE_DURATION) {
-                    console.log(`📦 Using cached global high scores (${Math.round(cacheAge / 1000)}s old)`);
-                    rankings = JSON.parse(cachedData);
+                        // Handle backwards compatibility - old cache was array, new is object
+                        const cachedRankings = Array.isArray(cachedData_parsed)
+                            ? { rankings: cachedData_parsed, hasMore: true }
+                            : cachedData_parsed;
 
-                    // Filter out bots from cached data (in case cache has old data with bots)
-                    rankings = rankings.filter(r => !r.uid.startsWith('Bot'));
+                        // Filter out bots from cached data (in case cache has old data with bots)
+                        let rankings = cachedRankings.rankings.filter(r => !r.uid.startsWith('Bot'));
 
-                    console.log('Global High Scores - Total racers:', rankings.length);
-                    console.log('Global High Scores - First racer:', rankings[0]);
+                        console.log('Global High Scores - Total racers:', rankings.length);
 
-                    // Mark current user
-                    if (currentUser) {
-                        rankings = rankings.map(r => ({
-                            ...r,
-                            isCurrentUser: r.uid === currentUser.uid
-                        }));
+                        // Mark current user
+                        if (currentUser) {
+                            rankings = rankings.map(r => ({
+                                ...r,
+                                isCurrentUser: r.uid === currentUser.uid
+                            }));
+                        }
+
+                        // Restore pagination state from cache
+                        allGlobalRankings = rankings;
+                        hasMoreRankings = cachedRankings.hasMore;
+                        // Note: lastVisibleDoc can't be cached, so we'll need to re-fetch if loading more
+                        lastVisibleDoc = null;
+                        currentRankingsPage = 1;
+
+                        // Render the table
+                        renderGlobalRankingsTable(globalContent);
+                        return rankings;
                     }
-
-                    // Store for pagination and reset page
-                    allGlobalRankings = rankings;
-                    currentRankingsPage = 1;
-
-                    // Skip to rendering
-                    renderGlobalRankingsTable(globalContent);
-                    return rankings;
                 }
             }
+
+            // Reset pagination state for fresh load
+            allGlobalRankings = [];
+            lastVisibleDoc = null;
+            hasMoreRankings = true;
+            currentRankingsPage = 1;
         }
 
-        // Cache miss or expired - fetch from Firestore
-        console.log('🔄 Fetching fresh global high scores from Firestore...');
+        // Prevent duplicate loads
+        if (isLoadingMoreRankings) {
+            console.log('⏳ Already loading more rankings, skipping...');
+            return allGlobalRankings;
+        }
+        isLoadingMoreRankings = true;
 
-        // Fetch top 100 users by careerPoints (lifetime achievement across all seasons)
-        const usersQuery = query(
-            collection(db, 'users'),
-            orderBy('careerPoints', 'desc'),
-            limit(100)
-        );
+        // Build query with cursor if loading more
+        console.log(loadMore ? '🔄 Loading more rankings...' : '🔄 Fetching global high scores from Firestore...');
+
+        // If loading more but no cursor (e.g., restored from cache), we need to re-fetch from scratch
+        if (loadMore && !lastVisibleDoc) {
+            console.log('⚠️ No cursor available (loaded from cache). Re-fetching from Firestore...');
+            allGlobalRankings = [];
+            loadMore = false;
+        }
+
+        let usersQuery;
+        if (loadMore && lastVisibleDoc) {
+            usersQuery = query(
+                collection(db, 'users'),
+                orderBy('careerPoints', 'desc'),
+                startAfter(lastVisibleDoc),
+                limit(RANKINGS_PER_PAGE)
+            );
+        } else {
+            usersQuery = query(
+                collection(db, 'users'),
+                orderBy('careerPoints', 'desc'),
+                limit(RANKINGS_PER_PAGE)
+            );
+        }
+
         console.log('📡 Executing Firestore query...');
         const usersSnapshot = await getDocs(usersQuery);
         console.log(`📊 Firestore returned ${usersSnapshot.size} documents`);
 
-        rankings = [];
+        // Store the last document for cursor-based pagination
+        if (usersSnapshot.docs.length > 0) {
+            lastVisibleDoc = usersSnapshot.docs[usersSnapshot.docs.length - 1];
+        }
+
+        // Check if there are more results
+        hasMoreRankings = usersSnapshot.docs.length === RANKINGS_PER_PAGE;
+
+        const newRankings = [];
         usersSnapshot.forEach((doc) => {
             const data = doc.data();
 
@@ -624,8 +673,6 @@ async function renderGlobalRankings(forceRefresh = false) {
             const currentSeason = data.currentSeason || 1;
 
             // Check if current season is complete (rider finished but hasn't progressed)
-            // For season 1: check season1Complete field
-            // For season 2+: check seasons.seasonX.complete field
             let seasonCompleted = false;
             if (currentSeason === 1) {
                 seasonCompleted = data.season1Complete === true;
@@ -633,7 +680,7 @@ async function renderGlobalRankings(forceRefresh = false) {
                 seasonCompleted = data?.seasons?.[`season${currentSeason}`]?.complete === true;
             }
 
-            rankings.push({
+            newRankings.push({
                 uid: doc.id,
                 name: data.name || 'Unknown',
                 team: data.team || '',
@@ -649,29 +696,40 @@ async function renderGlobalRankings(forceRefresh = false) {
                 isCurrentUser: currentUser && doc.id === currentUser.uid
             });
         });
-        console.log(`✅ Processed ${rankings.length} rankings from Firestore`);
 
-        // Store in cache only if we have data
-        if (rankings.length > 0) {
-            localStorage.setItem(GLOBAL_RANKINGS_CACHE_KEY, JSON.stringify(rankings));
-            localStorage.setItem(GLOBAL_RANKINGS_TIMESTAMP_KEY, Date.now().toString());
-            console.log(`✅ Cached ${rankings.length} global high scores`);
+        // Append new rankings to existing (or set if initial load)
+        if (loadMore) {
+            allGlobalRankings = [...allGlobalRankings, ...newRankings];
         } else {
-            console.warn('⚠️ Not caching global high scores - no data returned from Firestore');
+            allGlobalRankings = newRankings;
         }
 
-        // Populate country filter with available countries
-        populateCountryFilter(rankings);
+        console.log(`✅ Total rankings loaded: ${allGlobalRankings.length}`);
 
-        // Store for pagination and reset page
-        allGlobalRankings = rankings;
-        currentRankingsPage = 1;
+        // Cache only the initial load
+        if (!loadMore && allGlobalRankings.length > 0) {
+            const cacheData = {
+                rankings: allGlobalRankings,
+                hasMore: hasMoreRankings
+            };
+            localStorage.setItem(GLOBAL_RANKINGS_CACHE_KEY, JSON.stringify(cacheData));
+            localStorage.setItem(GLOBAL_RANKINGS_TIMESTAMP_KEY, Date.now().toString());
+            console.log(`✅ Cached ${allGlobalRankings.length} global high scores`);
+        }
+
+        // Populate country filter with available countries (on initial load)
+        if (!loadMore) {
+            populateCountryFilter(allGlobalRankings);
+        }
+
+        isLoadingMoreRankings = false;
 
         // Render the table
         renderGlobalRankingsTable(globalContent);
-        return rankings; // Return rankings for team calculations
+        return allGlobalRankings;
     } catch (error) {
         console.error('Error loading global high scores:', error);
+        isLoadingMoreRankings = false;
         globalContent.innerHTML = `
             <div class="error-state">
                 <p>Error loading rankings. Please try again later.</p>
@@ -683,24 +741,21 @@ async function renderGlobalRankings(forceRefresh = false) {
 
 // Separate function to render the global high scores table with pagination
 function renderGlobalRankingsTable(globalContent, appendMode = false) {
-    console.log('renderGlobalRankingsTable - Total rankings:', allGlobalRankings.length);
+    console.log('renderGlobalRankingsTable - Total rankings loaded:', allGlobalRankings.length);
     console.log('renderGlobalRankingsTable - Current filters:', filters);
-    console.log('renderGlobalRankingsTable - Current page:', currentRankingsPage);
+    console.log('renderGlobalRankingsTable - Has more:', hasMoreRankings);
 
-    // Apply filters
+    // Apply filters to loaded rankings
     const filteredRankings = applyFilters(allGlobalRankings);
     console.log('renderGlobalRankingsTable - After filters:', filteredRankings.length);
 
-    // Sort by total points (descending)
+    // Sort by total points (descending) - data should already be sorted but ensure consistency
     filteredRankings.sort((a, b) => b.points - a.points);
 
-    // Calculate pagination
-    const startIndex = 0;
-    const endIndex = currentRankingsPage * RANKINGS_PER_PAGE;
-    const paginatedRankings = filteredRankings.slice(startIndex, endIndex);
-    const hasMore = endIndex < filteredRankings.length;
+    // Display all loaded rankings (server-side pagination handles limiting)
+    const displayRankings = filteredRankings;
 
-    console.log('renderGlobalRankingsTable - Showing:', paginatedRankings.length, 'of', filteredRankings.length);
+    console.log('renderGlobalRankingsTable - Showing:', displayRankings.length);
 
     // Build table HTML
     let tableHTML = `
@@ -719,7 +774,7 @@ function renderGlobalRankingsTable(globalContent, appendMode = false) {
                         <tbody>
         `;
 
-        if (paginatedRankings.length === 0) {
+        if (displayRankings.length === 0) {
             const emptyStatsIcon = window.TPVIcons ? window.TPVIcons.getIcon('stats', { size: 'lg' }) : '📊';
             tableHTML += `
                 <tr>
@@ -730,7 +785,7 @@ function renderGlobalRankingsTable(globalContent, appendMode = false) {
                 </tr>
             `;
         } else {
-            paginatedRankings.forEach((racer, index) => {
+            displayRankings.forEach((racer, index) => {
                 const rank = index + 1;
                 const rowClass = racer.isCurrentUser ? 'current-user-row' : '';
 
@@ -797,13 +852,18 @@ function renderGlobalRankingsTable(globalContent, appendMode = false) {
     `;
 
     // Add pagination controls
+    const showLoadMore = hasMoreRankings && !isLoadingMoreRankings;
+    const statusText = hasMoreRankings
+        ? `Showing ${displayRankings.length} riders`
+        : `Showing all ${displayRankings.length} riders`;
+
     tableHTML += `
-        <div id="rankingsPaginationControls" class="pagination-controls" style="display: ${hasMore || paginatedRankings.length > 0 ? 'flex' : 'none'}; justify-content: center; align-items: center; gap: 1rem; margin-top: 1.5rem; padding: 1rem;">
-            <button id="loadMoreRankingsBtn" class="btn btn-secondary" style="display: ${hasMore ? 'inline-block' : 'none'};">
+        <div id="rankingsPaginationControls" class="pagination-controls" style="display: ${displayRankings.length > 0 ? 'flex' : 'none'}; justify-content: center; align-items: center; gap: 1rem; margin-top: 1.5rem; padding: 1rem;">
+            <button id="loadMoreRankingsBtn" class="btn btn-secondary" style="display: ${showLoadMore ? 'inline-block' : 'none'};">
                 Load More Rankings
             </button>
             <span id="rankingsPaginationStatus" class="pagination-status" style="color: var(--text-secondary); font-size: 0.9rem;">
-                Showing ${paginatedRankings.length} of ${filteredRankings.length} riders
+                ${statusText}
             </span>
         </div>
     `;
@@ -817,11 +877,10 @@ function renderGlobalRankingsTable(globalContent, appendMode = false) {
     }
 }
 
-// Handle Load More button click
-function handleLoadMoreRankings() {
-    currentRankingsPage++;
-    const globalContent = document.getElementById('individualRankings');
-    renderGlobalRankingsTable(globalContent);
+// Handle Load More button click - fetch next batch from Firestore
+async function handleLoadMoreRankings() {
+    // Fetch next batch from Firestore (loadMore = true)
+    await renderGlobalRankings(false, true);
 }
 
 // Render team rankings (top 5 riders per team)
