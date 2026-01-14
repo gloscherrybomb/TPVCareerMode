@@ -7,6 +7,7 @@ import {
   getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  sendPasswordResetEmail,
   onAuthStateChanged,
   signOut,
   GoogleAuthProvider,
@@ -351,7 +352,7 @@ if (loginForm) {
   loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
-    const email = document.getElementById('loginEmail').value;
+    const email = document.getElementById('loginEmail').value.trim();
     const password = document.getElementById('loginPassword').value;
     const rememberMe = document.getElementById('rememberMe').checked;
 
@@ -387,13 +388,63 @@ if (loginForm) {
   });
 }
 
+// Forgot Password link click handler
+const forgotPasswordLink = document.getElementById('forgotPasswordLink');
+if (forgotPasswordLink) {
+  forgotPasswordLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    document.getElementById('loginTab').classList.remove('active');
+    document.getElementById('resetPasswordTab').classList.add('active');
+  });
+}
+
+// Back to Login link handler
+const backToLoginLink = document.getElementById('backToLoginLink');
+if (backToLoginLink) {
+  backToLoginLink.addEventListener('click', (e) => {
+    e.preventDefault();
+    document.getElementById('resetPasswordTab').classList.remove('active');
+    document.getElementById('loginTab').classList.add('active');
+  });
+}
+
+// Reset Password form handler
+const resetPasswordForm = document.getElementById('resetPasswordForm');
+if (resetPasswordForm) {
+  resetPasswordForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('resetEmail').value.trim();
+
+    try {
+      await sendPasswordResetEmail(auth, email);
+      alert('Password reset email sent! Check your inbox (and spam folder) for the reset link.');
+      // Switch back to login tab
+      document.getElementById('resetPasswordTab').classList.remove('active');
+      document.getElementById('loginTab').classList.add('active');
+    } catch (error) {
+      console.error('Password reset error:', error);
+      let errorMessage = 'Failed to send reset email. ';
+      if (error.code === 'auth/user-not-found') {
+        errorMessage += 'No account found with this email.';
+      } else if (error.code === 'auth/invalid-email') {
+        errorMessage += 'Invalid email address.';
+      } else if (error.code === 'auth/too-many-requests') {
+        errorMessage += 'Too many requests. Please try again later.';
+      } else {
+        errorMessage += error.message;
+      }
+      alert(errorMessage);
+    }
+  });
+}
+
 if (signupForm) {
   signupForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
     const name = document.getElementById('signupName').value;
     const uid = document.getElementById('signupUID').value.toUpperCase();
-    const email = document.getElementById('signupEmail').value;
+    const email = document.getElementById('signupEmail').value.trim();
     const password = document.getElementById('signupPassword').value;
 
     // Validate UID format (15 or 16 hexadecimal characters)

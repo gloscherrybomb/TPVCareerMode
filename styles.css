@@ -1384,6 +1384,31 @@ body {
     color: var(--text-primary);
 }
 
+/* Forgot Password / Reset Password Styles */
+.forgot-password-link,
+.back-to-login-link {
+    display: block;
+    text-align: center;
+    margin-top: 1rem;
+    color: var(--accent-blue);
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.forgot-password-link:hover,
+.back-to-login-link:hover {
+    color: var(--accent-pink);
+    text-decoration: underline;
+}
+
+.reset-description {
+    color: var(--text-secondary);
+    text-align: center;
+    margin-bottom: 1.5rem;
+    font-size: 0.95rem;
+}
+
 /* Responsive Design */
 @media (max-width: 1024px) {
     .page-header {
