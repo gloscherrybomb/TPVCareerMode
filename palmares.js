@@ -405,6 +405,9 @@ async function loadPalmares(user) {
         displayPersonalityTimeline();
         displayRivalsTable();
 
+        // Initialize icons using TPVIcons system
+        initializeIcons();
+
         showContent();
     } catch (error) {
         console.error('Error loading palmares:', error);
@@ -446,56 +449,79 @@ function displayKeyStats() {
     document.getElementById('statHighFives').textContent = userData.totalHighFivesReceived || 0;
 }
 
-// Display key achievements
+// Display key achievements (Trophy Case)
 function displayKeyAchievements() {
     const lifetime = userData.lifetimeStats || {};
 
     // Best vs Expected
     const bestPred = lifetime.bestVsPrediction;
+    const bestPredCard = document.getElementById('achievementBestPred');
     if (bestPred) {
-        document.querySelector('#achievementBestPred .achievement-text').innerHTML =
-            `Best vs Expected: <strong>+${bestPred.difference} places</strong> (${bestPred.eventName})`;
+        bestPredCard.querySelector('.trophy-value').textContent = `+${bestPred.difference}`;
+        bestPredCard.querySelector('.trophy-detail').textContent = bestPred.eventName;
     } else {
-        document.querySelector('#achievementBestPred .achievement-text').innerHTML =
-            `Best vs Expected: <strong>—</strong>`;
+        bestPredCard.querySelector('.trophy-value').textContent = '—';
+        bestPredCard.querySelector('.trophy-detail').textContent = '';
     }
 
     // Biggest Win
     const bigWin = lifetime.biggestWin;
+    const bigWinCard = document.getElementById('achievementBiggestWin');
     if (bigWin) {
-        // For elimination races (event 3) and time-based events (e.g., event 4), margin isn't meaningful
+        // For elimination races (event 3) and time-based events margin isn't meaningful
         const isTimeIrrelevant = bigWin.eventNumber === 3 || (window.eventConfig?.TIME_BASED_EVENTS || []).includes(bigWin.eventNumber);
         if (isTimeIrrelevant) {
-            document.querySelector('#achievementBiggestWin .achievement-text').innerHTML =
-                `Biggest Win: <strong>${bigWin.eventName}</strong>`;
+            bigWinCard.querySelector('.trophy-value').textContent = bigWin.eventName;
+            bigWinCard.querySelector('.trophy-detail').textContent = '';
         } else {
-            document.querySelector('#achievementBiggestWin .achievement-text').innerHTML =
-                `Biggest Win: <strong>${formatTime(bigWin.marginSeconds)} margin</strong> (${bigWin.eventName})`;
+            bigWinCard.querySelector('.trophy-value').textContent = formatTime(bigWin.marginSeconds);
+            bigWinCard.querySelector('.trophy-detail').textContent = bigWin.eventName;
         }
     } else {
-        document.querySelector('#achievementBiggestWin .achievement-text').innerHTML =
-            `Biggest Win: <strong>—</strong>`;
+        bigWinCard.querySelector('.trophy-value').textContent = '—';
+        bigWinCard.querySelector('.trophy-detail').textContent = 'No wins yet';
     }
 
     // Highest ARR
     const highARR = lifetime.highestARR;
+    const highArrCard = document.getElementById('achievementHighestARR');
     if (highARR) {
-        document.querySelector('#achievementHighestARR .achievement-text').innerHTML =
-            `Highest ARR: <strong>${highARR.value}</strong> (${highARR.eventName})`;
+        highArrCard.querySelector('.trophy-value').textContent = highARR.value;
+        highArrCard.querySelector('.trophy-detail').textContent = highARR.eventName;
     } else {
-        document.querySelector('#achievementHighestARR .achievement-text').innerHTML =
-            `Highest ARR: <strong>—</strong>`;
+        highArrCard.querySelector('.trophy-value').textContent = '—';
+        highArrCard.querySelector('.trophy-detail').textContent = '';
     }
 
     // Biggest Giant Beaten
     const giant = lifetime.biggestGiantBeaten;
+    const giantCard = document.getElementById('achievementBiggestGiant');
     if (giant) {
-        document.querySelector('#achievementBiggestGiant .achievement-text').innerHTML =
-            `Biggest Giant Beaten: <strong>Beat ARR ${giant.opponentARR}</strong> (${giant.opponentName})`;
+        giantCard.querySelector('.trophy-value').textContent = giant.opponentARR;
+        giantCard.querySelector('.trophy-detail').textContent = giant.opponentName;
     } else {
-        document.querySelector('#achievementBiggestGiant .achievement-text').innerHTML =
-            `Biggest Giant Beaten: <strong>—</strong>`;
+        giantCard.querySelector('.trophy-value').textContent = '—';
+        giantCard.querySelector('.trophy-detail').textContent = '';
     }
+}
+
+// Initialize icons using TPVIcons system
+function initializeIcons() {
+    // Populate trophy case icons
+    document.querySelectorAll('.trophy-icon-wrap[data-icon]').forEach(el => {
+        const iconId = el.dataset.icon;
+        if (window.TPVIcons && window.TPVIcons.getIcon) {
+            el.innerHTML = window.TPVIcons.getIcon(iconId, { size: 'xl' });
+        }
+    });
+
+    // Populate section icons
+    document.querySelectorAll('.section-icon[data-icon]').forEach(el => {
+        const iconId = el.dataset.icon;
+        if (window.TPVIcons && window.TPVIcons.getIcon) {
+            el.innerHTML = window.TPVIcons.getIcon(iconId, { size: 'md' });
+        }
+    });
 }
 
 // Display season stats for completed seasons
@@ -604,6 +630,14 @@ function displayResultsTable(appendMode = false) {
     resultsToShow.forEach(result => {
         const row = document.createElement('tr');
 
+        // Add row classes based on position for visual highlighting
+        const pos = result.position;
+        if (pos === 1) {
+            row.classList.add('row-win');
+        } else if (pos === 2 || pos === 3) {
+            row.classList.add('row-podium');
+        }
+
         // Date - prefer raceDate (actual race date) over processedAt (when result was processed)
         const dateCell = document.createElement('td');
         const displayDate = result.raceDate || result.processedAt;
@@ -642,9 +676,10 @@ function displayResultsTable(appendMode = false) {
         }
         row.appendChild(stageCell);
 
-        // Position
+        // Position (pos already defined above for row styling)
         const posCell = document.createElement('td');
-        const pos = result.position;
+        posCell.className = 'align-center';
+
         let posClass = 'pos-cell';
         let posText = '';
 
@@ -660,8 +695,7 @@ function displayResultsTable(appendMode = false) {
             posText = pos + getOrdinalSuffix(pos);
         }
 
-        posCell.className = posClass + ' align-center';
-        posCell.textContent = posText;
+        posCell.innerHTML = `<span class="${posClass}">${posText}</span>`;
         row.appendChild(posCell);
 
         // vs Predicted
@@ -699,27 +733,28 @@ function displayResultsTable(appendMode = false) {
         pointsCell.textContent = result.points;
         row.appendChild(pointsCell);
 
-        // Awards
+        // Awards (using TPVIcons)
         const awardsCell = document.createElement('td');
         awardsCell.className = 'awards-cell';
-        const medals = [];
+        const awardIcons = [];
+        const getIconFn = window.TPVIcons?.getIcon;
 
         // Add podium medals based on position
-        if (pos === 1) medals.push('🥇');
-        else if (pos === 2) medals.push('🥈');
-        else if (pos === 3) medals.push('🥉');
+        if (pos === 1 && getIconFn) awardIcons.push(getIconFn('goldMedal', { size: 'sm' }));
+        else if (pos === 2 && getIconFn) awardIcons.push(getIconFn('silverMedal', { size: 'sm' }));
+        else if (pos === 3 && getIconFn) awardIcons.push(getIconFn('bronzeMedal', { size: 'sm' }));
 
-        // Add special medals
-        if (result.earnedPunchingMedal) medals.push('🥊');
-        if (result.earnedGiantKillerMedal) medals.push('⚔️');
-        if (result.earnedBullseyeMedal) medals.push('🎯');
-        if (result.earnedHotStreakMedal) medals.push('🔥');
-        if (result.earnedDomination) medals.push('💪');
-        if (result.earnedCloseCall) medals.push('😅');
-        if (result.earnedPhotoFinish) medals.push('📸');
-        if (result.earnedDarkHorse) medals.push('🐴');
-        if (result.earnedZeroToHero) medals.push('🦸');
-        awardsCell.textContent = medals.join(' ');
+        // Add special medals using icon system
+        if (result.earnedPunchingMedal && getIconFn) awardIcons.push(getIconFn('punchingAbove', { size: 'sm' }));
+        if (result.earnedGiantKillerMedal && getIconFn) awardIcons.push(getIconFn('giantKiller', { size: 'sm' }));
+        if (result.earnedBullseyeMedal && getIconFn) awardIcons.push(getIconFn('bullseye', { size: 'sm' }));
+        if (result.earnedHotStreakMedal && getIconFn) awardIcons.push(getIconFn('hotStreak', { size: 'sm' }));
+        if (result.earnedDomination && getIconFn) awardIcons.push(getIconFn('domination', { size: 'sm' }));
+        if (result.earnedCloseCall && getIconFn) awardIcons.push(getIconFn('closeCall', { size: 'sm' }));
+        if (result.earnedPhotoFinish && getIconFn) awardIcons.push(getIconFn('photoFinish', { size: 'sm' }));
+        if (result.earnedDarkHorse && getIconFn) awardIcons.push(getIconFn('darkHorse', { size: 'sm' }));
+        if (result.earnedZeroToHero && getIconFn) awardIcons.push(getIconFn('zeroToHero', { size: 'sm' }));
+        awardsCell.innerHTML = awardIcons.join('');
         row.appendChild(awardsCell);
 
         // Cadence Coins

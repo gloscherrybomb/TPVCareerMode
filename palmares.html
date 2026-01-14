@@ -11,7 +11,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;700;800;900&family=Bebas+Neue&family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="palmares.css">
     <link rel="stylesheet" href="season-switcher.css">
@@ -47,31 +47,39 @@
 
         <!-- Palmares Content -->
         <div id="palmaresContent" class="container" style="display: none;">
-            <!-- Compact Header -->
-            <div class="palmares-header">
-                <div class="header-left">
-                    <a href="profile.html" class="btn-back">← Back to Profile</a>
-                    <div class="header-breadcrumb">
-                        <span class="breadcrumb-item">Profile</span>
-                        <span class="breadcrumb-separator">›</span>
-                        <span class="breadcrumb-item">Palmares</span>
-                    </div>
-                </div>
-                <div class="header-identity">
-                    <img id="riderPhoto" src="" alt="Rider Photo" class="rider-photo-small">
-                    <div class="rider-name-block">
-                        <h1 class="rider-name" id="riderName">—</h1>
-                        <div class="rider-meta">
-                            <span id="riderTeam">—</span>
-                            <span class="separator">•</span>
-                            <span>ARR <span id="riderARR">—</span></span>
+            <!-- Hero Header -->
+            <div class="palmares-hero">
+                <div class="hero-bg-pattern"></div>
+                <div class="hero-content">
+                    <a href="profile.html" class="btn-back">
+                        <span class="back-arrow">←</span> Back to Profile
+                    </a>
+                    <div class="hero-main">
+                        <div class="rider-showcase">
+                            <div class="rider-photo-wrapper">
+                                <img id="riderPhoto" src="" alt="Rider Photo" class="rider-photo-large">
+                                <div class="photo-glow"></div>
+                            </div>
+                            <div class="rider-identity">
+                                <h1 class="rider-name" id="riderName">—</h1>
+                                <div class="rider-meta">
+                                    <span id="riderTeam" class="team-name">—</span>
+                                    <span class="meta-divider">•</span>
+                                    <span class="career-label">Season <span id="currentSeason">1</span></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="arr-showcase">
+                            <div class="arr-badge">
+                                <span class="arr-label">ARR</span>
+                                <span class="arr-value" id="riderARR">—</span>
+                            </div>
+                            <div class="career-events">
+                                <span id="totalEvents">0</span> Career Events
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <div class="palmares-subtitle">
-                Career Record • Season <span id="currentSeason">1</span> • <span id="totalEvents">0</span> Events
             </div>
 
             <!-- Search & Filter Controls -->
@@ -150,19 +158,42 @@
                 </div>
             </div>
 
-            <!-- Key Achievements -->
-            <div class="key-achievements">
-                <div class="achievement-item" id="achievementBestPred">
-                    <span class="achievement-icon"></span> <span class="achievement-text">Best vs Expected: <strong>—</strong></span>
-                </div>
-                <div class="achievement-item" id="achievementBiggestWin">
-                    <span class="achievement-icon"></span> <span class="achievement-text">Biggest Win: <strong>—</strong></span>
-                </div>
-                <div class="achievement-item" id="achievementHighestARR">
-                    <span class="achievement-icon"></span> <span class="achievement-text">Highest ARR: <strong>—</strong></span>
-                </div>
-                <div class="achievement-item" id="achievementBiggestGiant">
-                    <span class="achievement-icon"></span> <span class="achievement-text">Biggest Giant Beaten: <strong>—</strong></span>
+            <!-- Trophy Case - Key Achievements -->
+            <div class="trophy-case">
+                <h2 class="trophy-case-title">Career Highlights</h2>
+                <div class="trophy-grid">
+                    <div class="trophy-card" id="achievementBestPred">
+                        <div class="trophy-icon-wrap" data-icon="bullseye"></div>
+                        <div class="trophy-content">
+                            <span class="trophy-label">Best vs Expected</span>
+                            <span class="trophy-value">—</span>
+                            <span class="trophy-detail">positions</span>
+                        </div>
+                    </div>
+                    <div class="trophy-card featured" id="achievementBiggestWin">
+                        <div class="trophy-icon-wrap" data-icon="trophy"></div>
+                        <div class="trophy-content">
+                            <span class="trophy-label">Biggest Win</span>
+                            <span class="trophy-value">—</span>
+                            <span class="trophy-detail"></span>
+                        </div>
+                    </div>
+                    <div class="trophy-card" id="achievementHighestARR">
+                        <div class="trophy-icon-wrap" data-icon="specialist"></div>
+                        <div class="trophy-content">
+                            <span class="trophy-label">Peak ARR</span>
+                            <span class="trophy-value">—</span>
+                            <span class="trophy-detail"></span>
+                        </div>
+                    </div>
+                    <div class="trophy-card" id="achievementBiggestGiant">
+                        <div class="trophy-icon-wrap" data-icon="giantKiller"></div>
+                        <div class="trophy-content">
+                            <span class="trophy-label">Biggest Giant Beaten</span>
+                            <span class="trophy-value">—</span>
+                            <span class="trophy-detail">ARR</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -210,8 +241,11 @@
             <!-- Detailed Statistics Sections -->
             <div class="stats-grid">
                 <!-- Career Totals -->
-                <div class="palmares-section stat-section">
-                    <h2 class="section-heading">Career Totals</h2>
+                <div class="palmares-section stat-section stat-section-totals">
+                    <div class="section-header">
+                        <div class="section-icon" data-icon="stats"></div>
+                        <h2 class="section-heading">Career Totals</h2>
+                    </div>
                     <div class="stat-list">
                         <div class="stat-row">
                             <span class="stat-row-label">Total Distance:</span>
@@ -245,8 +279,11 @@
                 </div>
 
                 <!-- Performance Breakdown -->
-                <div class="palmares-section stat-section">
-                    <h2 class="section-heading">Performance</h2>
+                <div class="palmares-section stat-section stat-section-performance">
+                    <div class="section-header">
+                        <div class="section-icon" data-icon="trophy"></div>
+                        <h2 class="section-heading">Performance</h2>
+                    </div>
                     <div class="stat-list">
                         <div class="stat-row">
                             <span class="stat-row-label">Wins:</span>
@@ -293,8 +330,11 @@
                 </div>
 
                 <!-- Competition Analysis -->
-                <div class="palmares-section stat-section">
-                    <h2 class="section-heading">Competition</h2>
+                <div class="palmares-section stat-section stat-section-competition">
+                    <div class="section-header">
+                        <div class="section-icon" data-icon="giantKiller"></div>
+                        <h2 class="section-heading">Competition</h2>
+                    </div>
                     <div class="stat-list">
                         <div class="stat-row">
                             <span class="stat-row-label">Avg Opponent ARR:</span>
@@ -318,8 +358,11 @@
                 </div>
 
                 <!-- Specialty & Versatility -->
-                <div class="palmares-section stat-section">
-                    <h2 class="section-heading">Specialty</h2>
+                <div class="palmares-section stat-section stat-section-specialty">
+                    <div class="section-header">
+                        <div class="section-icon" data-icon="allRounder"></div>
+                        <h2 class="section-heading">Specialty</h2>
+                    </div>
                     <div class="stat-list">
                         <div class="stat-row">
                             <span class="stat-row-label">Best Race Type:</span>
