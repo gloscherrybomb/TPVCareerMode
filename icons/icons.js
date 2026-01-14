@@ -57,7 +57,21 @@ const ICON_REGISTRY = {
         fallback: '🏆',
         category: 'award'
     },
+    // Alias for award system compatibility
+    trophyCollector: {
+        type: 'local-svg',
+        path: 'icons/svg/trophies/trophy-gold.svg',
+        fallback: '🏆',
+        category: 'award'
+    },
     gcGold: {
+        type: 'local-svg',
+        path: 'icons/svg/trophies/gc-gold.svg',
+        fallback: '🏆',
+        category: 'award'
+    },
+    // Alias for award system compatibility
+    gcGoldMedal: {
         type: 'local-svg',
         path: 'icons/svg/trophies/gc-gold.svg',
         fallback: '🏆',
@@ -69,13 +83,34 @@ const ICON_REGISTRY = {
         fallback: '🏆',
         category: 'award'
     },
+    // Alias for award system compatibility
+    gcSilverMedal: {
+        type: 'local-svg',
+        path: 'icons/svg/trophies/gc-silver.svg',
+        fallback: '🥈',
+        category: 'award'
+    },
     gcBronze: {
         type: 'local-svg',
         path: 'icons/svg/trophies/gc-bronze.svg',
         fallback: '🏆',
         category: 'award'
     },
+    // Alias for award system compatibility
+    gcBronzeMedal: {
+        type: 'local-svg',
+        path: 'icons/svg/trophies/gc-bronze.svg',
+        fallback: '🥉',
+        category: 'award'
+    },
     seasonGold: {
+        type: 'local-svg',
+        path: 'icons/svg/trophies/season-gold.svg',
+        fallback: '🏆',
+        category: 'award'
+    },
+    // Alias for award system compatibility
+    seasonChampion: {
         type: 'local-svg',
         path: 'icons/svg/trophies/season-gold.svg',
         fallback: '🏆',
@@ -87,10 +122,24 @@ const ICON_REGISTRY = {
         fallback: '🏆',
         category: 'award'
     },
+    // Alias for award system compatibility
+    seasonRunnerUp: {
+        type: 'local-svg',
+        path: 'icons/svg/trophies/season-silver.svg',
+        fallback: '🥈',
+        category: 'award'
+    },
     seasonBronze: {
         type: 'local-svg',
         path: 'icons/svg/trophies/season-bronze.svg',
         fallback: '🏆',
+        category: 'award'
+    },
+    // Alias for award system compatibility
+    seasonThirdPlace: {
+        type: 'local-svg',
+        path: 'icons/svg/trophies/season-bronze.svg',
+        fallback: '🥉',
         category: 'award'
     },
 
@@ -524,6 +573,19 @@ const ICON_REGISTRY = {
         path: 'icons/svg/events/valentine-heart.svg',
         fallback: '💝',
         category: 'event'
+    },
+    // Valentine's Invitational awards
+    valentineChampion2026: {
+        type: 'local-svg',
+        path: 'icons/svg/awards/valentine-champion.svg',
+        fallback: '💘',
+        category: 'award'
+    },
+    valentinePodium2026: {
+        type: 'local-svg',
+        path: 'icons/svg/awards/valentine-podium.svg',
+        fallback: '💝',
+        category: 'award'
     },
 
     // ==========================================
