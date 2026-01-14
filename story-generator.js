@@ -362,7 +362,7 @@ const CONDENSED_NARRATIVES = {
   win: {
     darkHorse: [
       "Nobody saw this coming. The predictions had you finishing {predictedPosition} at {eventName}—an afterthought, mid-pack at best. But racing isn't run on spreadsheets. {dynamicsText} P1. The upset of the day.",
-      "From {predictedPosition} predicted to P1 at {eventName}. You weren't supposed to be in the mix, let alone winning. Sometimes the race rewards those who refuse to accept their place in the pecking order.",
+      "From {predictedPosition} predicted to P1 at {eventName}. You weren't supposed to be in the mix, let alone winning. {dynamicsText} Sometimes the race rewards those who refuse to accept their place in the pecking order.",
       "The spreadsheets had you at {predictedPosition}. Reality had other ideas. {eventName} became your statement race—proving that predictions mean nothing once the flag drops. First place, against all expectations.",
       "Call it an upset, call it a breakthrough—{eventName} rewrote the script. From {predictedPosition} predicted to standing on the top step. The kind of result that changes how others see you.",
       "When you lined up at {eventName}, nobody was watching you. Predicted {predictedPosition}, easy to overlook. {dynamicsText} Now everyone knows your name. P1—the dark horse delivers."
@@ -402,7 +402,7 @@ const CONDENSED_NARRATIVES = {
         "So close at {eventName}. The finish came down to a desperate sprint—{dynamicsText} You crossed the line{gapTextSuffix}, close enough to taste victory, far enough to know you came up short. Second, but it stings.",
         "Inches from glory at {eventName}. The photo finish went the wrong way—{dynamicsText} P2 when P1 was right there{gapTextSuffix}. Racing can be cruel.",
         "{eventName} was decided at the line. You threw your bike, gave everything, and came up just short{gapTextSuffix}. Second place in a photo finish—so close, yet so far.",
-        "The cruelest second place at {eventName}. A bike length, a wheel, maybe less{gapTextSuffix}. {dynamicsText} P2 when victory was there for the taking."
+        "The cruelest second place at {eventName}. A bike length, a wheel, maybe less. {dynamicsText} P2 when victory was there for the taking."
       ],
       default: [
         "Second at {eventName}. You rode a tactically smart race, positioning yourself well through the key moments. {winnerText} had the edge when it mattered{winnerGapSuffix}. Still, second is second—solid points.",
@@ -423,7 +423,7 @@ const CONDENSED_NARRATIVES = {
       default: [
         "{eventName} rewarded smart, patient racing. You stayed out of trouble, moved up when it mattered, and claimed the final podium spot{gapTextSuffix}. Third isn't first, but you stood on the podium.",
         "Third place at {eventName}. You fought for every position in the finale and secured a spot on the podium{gapTextSuffix}. Solid points and proof of good form.",
-        "P3 at {eventName}. The podium was the target, and you delivered. {dynamicsText} Three steps, and you're on one of them{gapTextSuffix}.",
+        "P3 at {eventName}. The podium was the target, and you delivered. {dynamicsText} Three steps, and you're on one of them.",
         "{eventName} yields a podium finish. You rode smart, positioned well, and took third when others faded{gapTextSuffix}. Mission accomplished.",
         "Bronze at {eventName}. Not the color you wanted, but a podium is a podium. You raced well and earned your spot{gapTextSuffix}.",
         "Third place at {eventName}. You gave everything in the finale and held on for a podium spot{gapTextSuffix}. Points earned, result banked."
