@@ -3,10 +3,10 @@
     "totalPlayers": 33,
     "balancedCount": 7,
     "balancedPct": "21.2",
-    "overperformingCount": 13,
-    "overperformingPct": "39.4",
-    "underperformingCount": 13,
-    "underperformingPct": "39.4",
+    "overperformingCount": 11,
+    "overperformingPct": "33.3",
+    "underperformingCount": 15,
+    "underperformingPct": "45.5",
     "avgBalanceScore": "40.4"
   },
   "bandStats": {
@@ -55,52 +55,64 @@
       "arr": 300,
       "raceCount": 7,
       "avgDiff": "1.14",
+      "nonWinAvgDiff": "1.14",
       "cumulativeFinal": 8,
       "driftRate": "1.14",
       "balanceScore": "89",
       "trend": "balanced",
+      "wins": 0,
+      "winRate": "0",
+      "ceilingWarning": false,
+      "highWinRate": false,
       "races": [
         {
           "raceNum": 1,
           "diff": -4,
           "cumulative": -4,
-          "date": "2026-01-03"
+          "date": "2026-01-03",
+          "isWin": false
         },
         {
           "raceNum": 2,
           "diff": 7,
           "cumulative": 3,
-          "date": "2026-01-04"
+          "date": "2026-01-04",
+          "isWin": false
         },
         {
           "raceNum": 3,
           "diff": 23,
           "cumulative": 26,
-          "date": "2026-01-04"
+          "date": "2026-01-04",
+          "isWin": false
         },
         {
           "raceNum": 4,
           "diff": 10,
           "cumulative": 36,
-          "date": "2026-01-04"
+          "date": "2026-01-04",
+          "isWin": false
         },
         {
           "raceNum": 5,
           "diff": -11,
           "cumulative": 25,
-          "date": "2026-01-04"
+          "date": "2026-01-04",
+          "isWin": false
         },
         {
           "raceNum": 6,
           "diff": -7,
           "cumulative": 18,
-          "date": "2026-01-04"
+          "date": "2026-01-04",
+          "isWin": false
         },
         {
           "raceNum": 7,
           "diff": -10,
           "cumulative": 8,
-          "date": "2026-01-04"
+          "date": "2026-01-04",
+          "isWin": false
         }
       ]
     },
@@ -111,52 +123,64 @@
       "arr": 1178,
       "raceCount": 7,
       "avgDiff": "-1.86",
+      "nonWinAvgDiff": "3.33",
       "cumulativeFinal": -13,
       "driftRate": "-1.86",
       "balanceScore": "81",
-      "trend": "balanced",
+      "trend": "underperforming",
+      "wins": 4,
+      "winRate": "57",
+      "ceilingWarning": true,
+      "highWinRate": true,
       "races": [
         {
           "raceNum": 1,
           "diff": -4,
           "cumulative": -4,
-          "date": "2026-01-06"
+          "date": "2026-01-06",
+          "isWin": true
         },
         {
           "raceNum": 2,
           "diff": -4,
           "cumulative": -8,
-          "date": "2026-01-07"
+          "date": "2026-01-07",
+          "isWin": false
         },
         {
           "raceNum": 3,
           "diff": -8,
           "cumulative": -16,
-          "date": "2026-01-08"
+          "date": "2026-01-08",
+          "isWin": true
         },
         {
           "raceNum": 4,
           "diff": -4,
           "cumulative": -20,
-          "date": "2026-01-09"
+          "date": "2026-01-09",
+          "isWin": true
         },
         {
           "raceNum": 5,
           "diff": 19,
           "cumulative": -1,
-          "date": "2026-01-11"
+          "date": "2026-01-11",
+          "isWin": false
         },
         {
           "raceNum": 6,
           "diff": -7,
           "cumulative": -8,
-          "date": "2026-01-11"
+          "date": "2026-01-11",
+          "isWin": true
         },
         {
           "raceNum": 7,
           "diff": -5,
           "cumulative": -13,
-          "date": "2026-01-12"
+          "date": "2026-01-12",
+          "isWin": false
         }
       ]
     },
@@ -167,34 +191,43 @@
       "arr": 1181,
       "raceCount": 4,
       "avgDiff": "4.25",
+      "nonWinAvgDiff": "5.67",
       "cumulativeFinal": 17,
       "driftRate": "4.25",
       "balanceScore": "58",
       "trend": "underperforming",
+      "wins": 1,
+      "winRate": "25",
+      "ceilingWarning": true,
+      "highWinRate": false,
       "races": [
         {
           "raceNum": 1,
           "diff": 30,
           "cumulative": 30,
-          "date": "2025-12-27"
+          "date": "2025-12-27",
+          "isWin": false
         },
         {
           "raceNum": 2,
           "diff": 0,
           "cumulative": 30,
-          "date": "2026-01-03"
+          "date": "2026-01-03",
+          "isWin": true
         },
         {
           "raceNum": 3,
           "diff": -9,
           "cumulative": 21,
-          "date": "2026-01-08"
+          "date": "2026-01-08",
+          "isWin": false
         },
         {
           "raceNum": 4,
           "diff": -4,
           "cumulative": 17,
-          "date": "2026-01-11"
+          "date": "2026-01-11",
+          "isWin": false
         }
       ]
     },
@@ -205,34 +238,43 @@
       "arr": 1281,
       "raceCount": 4,
       "avgDiff": "-2.00",
+      "nonWinAvgDiff": "3.00",
       "cumulativeFinal": -8,
       "driftRate": "-2.00",
       "balanceScore": "80",
-      "trend": "balanced",
+      "trend": "underperforming",
+      "wins": 3,
+      "winRate": "75",
+      "ceilingWarning": true,
+      "highWinRate": true,
       "races": [
         {
           "raceNum": 1,
           "diff": -8,
           "cumulative": -8,
-          "date": "2026-01-03"
+          "date": "2026-01-03",
+          "isWin": true
         },
         {
           "raceNum": 2,
           "diff": 3,
           "cumulative": -5,
-          "date": "2026-01-04"
+          "date": "2026-01-04",
+          "isWin": false
         },
         {
           "raceNum": 3,
           "diff": -1,
           "cumulative": -6,
-          "date": "2026-01-06"
+          "date": "2026-01-06",
+          "isWin": true
         },
         {
           "raceNum": 4,
           "diff": -2,
           "cumulative": -8,
-          "date": "2026-01-13"
+          "date": "2026-01-13",
+          "isWin": true
         }
       ]
     },
@@ -243,34 +285,43 @@
       "arr": 1818,
       "raceCount": 4,
       "avgDiff": "0.00",
+      "nonWinAvgDiff": null,
       "cumulativeFinal": 0,
       "driftRate": "0.00",
       "balanceScore": "100",
       "trend": "balanced",
+      "wins": 4,
+      "winRate": "100",
+      "ceilingWarning": true,
+      "highWinRate": true,
       "races": [
         {
           "raceNum": 1,
           "diff": 0,
           "cumulative": 0,
-          "date": "2026-01-09"
+          "date": "2026-01-09",
+          "isWin": true
         },
         {
           "raceNum": 2,
           "diff": 0,
           "cumulative": 0,
-          "date": "2026-01-09"
+          "date": "2026-01-09",
+          "isWin": true
         },
         {
           "raceNum": 3,
           "diff": 0,
           "cumulative": 0,
-          "date": "2026-01-10"
+          "date": "2026-01-10",
+          "isWin": true
         },
         {
           "raceNum": 4,
           "diff": 0,
           "cumulative": 0,
-          "date": "2026-01-11"
+          "date": "2026-01-11",
+          "isWin": true
         }
       ]
     },
@@ -281,34 +332,43 @@
       "arr": 1453,
       "raceCount": 4,
       "avgDiff": "4.50",
+      "nonWinAvgDiff": "6.00",
       "cumulativeFinal": 18,
       "driftRate": "4.50",
       "balanceScore": "55",
       "trend": "underperforming",
+      "wins": 1,
+      "winRate": "25",
+      "ceilingWarning": true,
+      "highWinRate": false,
       "races": [
         {
           "raceNum": 1,
           "diff": 0,
           "cumulative": 0,
-          "date": "2026-01-09"
+          "date": "2026-01-09",
+          "isWin": true
         },
         {
           "raceNum": 2,
           "diff": -15,
           "cumulative": -15,
-          "date": "2026-01-10"
+          "date": "2026-01-10",
+          "isWin": false
         },
         {
           "raceNum": 3,
           "diff": 21,
           "cumulative": 6,
-          "date": "2026-01-11"
+          "date": "2026-01-11",
+          "isWin": false
         },
         {
           "raceNum": 4,
           "diff": 12,
           "cumulative": 18,
-          "date": "2026-01-13"
+          "date": "2026-01-13",
+          "isWin": false
         }
       ]
     },
@@ -319,34 +379,43 @@
       "arr": 1362,
       "raceCount": 4,
       "avgDiff": "3.00",
+      "nonWinAvgDiff": "14.00",
       "cumulativeFinal": 12,
       "driftRate": "3.00",
       "balanceScore": "70",
       "trend": "underperforming",
+      "wins": 3,
+      "winRate": "75",
+      "ceilingWarning": true,
+      "highWinRate": true,
       "races": [
         {
           "raceNum": 1,
           "diff": -2,
           "cumulative": -2,
-          "date": "2026-01-10"
+          "date": "2026-01-10",
+          "isWin": true
         },
         {
           "raceNum": 2,
           "diff": 0,
           "cumulative": -2,
-          "date": "2026-01-11"
+          "date": "2026-01-11",
+          "isWin": true
         },
         {
           "raceNum": 3,
           "diff": 0,
           "cumulative": -2,
-          "date": "2026-01-11"
+          "date": "2026-01-11",
+          "isWin": true
         },
         {
           "raceNum": 4,
           "diff": 14,
           "cumulative": 12,
-          "date": "2026-01-13"
+          "date": "2026-01-13",
+          "isWin": false
         }
       ]
     },
@@ -357,28 +426,36 @@
       "arr": 1646,
       "raceCount": 3,
       "avgDiff": "-7.67",
+      "nonWinAvgDiff": "-2.00",
       "cumulativeFinal": -23,
       "driftRate": "-7.67",
       "balanceScore": "23",
-      "trend": "overperforming",
+      "trend": "balanced",
+      "wins": 2,
+      "winRate": "67",
+      "ceilingWarning": true,
+      "highWinRate": true,
       "races": [
         {
           "raceNum": 1,
           "diff": -11,
           "cumulative": -11,
-          "date": "2026-01-05"
+          "date": "2026-01-05",
+          "isWin": true
         },
         {
           "raceNum": 2,
           "diff": -10,
           "cumulative": -21,
-          "date": "2026-01-06"
+          "date": "2026-01-06",
+          "isWin": true
         },
         {
           "raceNum": 3,
           "diff": -2,
           "cumulative": -23,
-          "date": "2026-01-12"
+          "date": "2026-01-12",
+          "isWin": false
         }
       ]
     },
@@ -389,28 +466,36 @@
       "arr": 100,
       "raceCount": 3,
       "avgDiff": "-13.33",
+      "nonWinAvgDiff": "-16.00",
       "cumulativeFinal": -40,
       "driftRate": "-13.33",
       "balanceScore": "0",
       "trend": "overperforming",
+      "wins": 2,
+      "winRate": "67",
+      "ceilingWarning": true,
+      "highWinRate": true,
       "races": [
         {
           "raceNum": 1,
           "diff": -12,
           "cumulative": -12,
-          "date": "2026-01-05"
+          "date": "2026-01-05",
+          "isWin": true
         },
         {
           "raceNum": 2,
           "diff": -12,
           "cumulative": -24,
-          "date": "2026-01-10"
+          "date": "2026-01-10",
+          "isWin": true
         },
         {
           "raceNum": 3,
           "diff": -16,
           "cumulative": -40,
-          "date": "2026-01-12"
+          "date": "2026-01-12",
+          "isWin": false
         }
       ]
     },
@@ -421,28 +506,36 @@
       "arr": 657,
       "raceCount": 3,
       "avgDiff": "5.33",
+      "nonWinAvgDiff": "5.33",
       "cumulativeFinal": 16,
       "driftRate": "5.33",
       "balanceScore": "47",
       "trend": "underperforming",
+      "wins": 0,
+      "winRate": "0",
+      "ceilingWarning": false,
+      "highWinRate": false,
       "races": [
         {
           "raceNum": 1,
           "diff": 2,
           "cumulative": 2,
-          "date": "2026-01-06"
+          "date": "2026-01-06",
+          "isWin": false
         },
         {
           "raceNum": 2,
           "diff": -1,
           "cumulative": 1,
-          "date": "2026-01-07"
+          "date": "2026-01-07",
+          "isWin": false
         },
         {
           "raceNum": 3,
           "diff": 15,
           "cumulative": 16,
-          "date": "2026-01-12"
+          "date": "2026-01-12",
+          "isWin": false
         }
       ]
     },
@@ -453,28 +546,36 @@
       "arr": 674,
       "raceCount": 3,
       "avgDiff": "0.33",
+      "nonWinAvgDiff": "0.33",
       "cumulativeFinal": 1,
       "driftRate": "0.33",
       "balanceScore": "97",
       "trend": "balanced",
+      "wins": 0,
+      "winRate": "0",
+      "ceilingWarning": false,
+      "highWinRate": false,
       "races": [
         {
           "raceNum": 1,
           "diff": 0,
           "cumulative": 0,
-          "date": "2026-01-06"
+          "date": "2026-01-06",
+          "isWin": false
         },
         {
           "raceNum": 2,
           "diff": 6,
           "cumulative": 6,
-          "date": "2026-01-08"
+          "date": "2026-01-08",
+          "isWin": false
         },
         {
           "raceNum": 3,
           "diff": -5,
           "cumulative": 1,
-          "date": "2026-01-10"
+          "date": "2026-01-10",
+          "isWin": false
         }
       ]
     },
@@ -485,28 +586,36 @@
       "arr": 571,
       "raceCount": 3,
       "avgDiff": "-10.00",
+      "nonWinAvgDiff": "-10.00",
       "cumulativeFinal": -30,
       "driftRate": "-10.00",
       "balanceScore": "0",
       "trend": "overperforming",
+      "wins": 0,
+      "winRate": "0",
+      "ceilingWarning": false,
+      "highWinRate": false,
       "races": [
         {
           "raceNum": 1,
           "diff": -4,
           "cumulative": -4,
-          "date": "2026-01-06"
+          "date": "2026-01-06",
+          "isWin": false
         },
         {
           "raceNum": 2,
           "diff": -24,
           "cumulative": -28,
-          "date": "2026-01-09"
+          "date": "2026-01-09",
+          "isWin": false
         },
         {
           "raceNum": 3,
           "diff": -2,
           "cumulative": -30,
-          "date": "2026-01-14"
+          "date": "2026-01-14",
+          "isWin": false
         }
       ]
     },
@@ -517,28 +626,36 @@
       "arr": 1912,
       "raceCount": 3,
       "avgDiff": "0.00",
+      "nonWinAvgDiff": null,
       "cumulativeFinal": 0,
       "driftRate": "0.00",
       "balanceScore": "100",
       "trend": "balanced",
+      "wins": 3,
+      "winRate": "100",
+      "ceilingWarning": true,
+      "highWinRate": true,
       "races": [
         {
           "raceNum": 1,
           "diff": 0,
           "cumulative": 0,
-          "date": "2026-01-07"
+          "date": "2026-01-07",
+          "isWin": true
         },
         {
           "raceNum": 2,
           "diff": 0,
           "cumulative": 0,
-          "date": "2026-01-11"
+          "date": "2026-01-11",
+          "isWin": true
         },
         {
           "raceNum": 3,
           "diff": 0,
           "cumulative": 0,
-          "date": "2026-01-12"
+          "date": "2026-01-12",
+          "isWin": true
         }
       ]
     },
@@ -549,28 +666,36 @@
       "arr": 814,
       "raceCount": 3,
       "avgDiff": "4.67",
+      "nonWinAvgDiff": "4.67",
       "cumulativeFinal": 14,
       "driftRate": "4.67",
       "balanceScore": "53",
       "trend": "underperforming",
+      "wins": 0,
+      "winRate": "0",
+      "ceilingWarning": false,
+      "highWinRate": false,
       "races": [
         {
           "raceNum": 1,
           "diff": 5,
           "cumulative": 5,
-          "date": "2026-01-08"
+          "date": "2026-01-08",
+          "isWin": false
         },
         {
           "raceNum": 2,
           "diff": 1,
           "cumulative": 6,
-          "date": "2026-01-10"
+          "date": "2026-01-10",
+          "isWin": false
         },
         {
           "raceNum": 3,
           "diff": 8,
           "cumulative": 14,
-          "date": "2026-01-13"
+          "date": "2026-01-13",
+          "isWin": false
         }
       ]
     },
@@ -581,28 +706,36 @@
       "arr": 1205,
       "raceCount": 3,
       "avgDiff": "3.00",
+      "nonWinAvgDiff": "16.00",
       "cumulativeFinal": 9,
       "driftRate": "3.00",
       "balanceScore": "70",
       "trend": "underperforming",
+      "wins": 2,
+      "winRate": "67",
+      "ceilingWarning": true,
+      "highWinRate": true,
       "races": [
         {
           "raceNum": 1,
           "diff": -4,
           "cumulative": -4,
-          "date": "2026-01-09"
+          "date": "2026-01-09",
+          "isWin": true
         },
         {
           "raceNum": 2,
           "diff": 16,
           "cumulative": 12,
-          "date": "2026-01-10"
+          "date": "2026-01-10",
+          "isWin": false
         },
         {
           "raceNum": 3,
           "diff": -3,
           "cumulative": 9,
-          "date": "2026-01-13"
+          "date": "2026-01-13",
+          "isWin": true
         }
       ]
     },
@@ -613,22 +746,29 @@
       "arr": 661,
       "raceCount": 2,
       "avgDiff": "-15.50",
+      "nonWinAvgDiff": "-15.50",
       "cumulativeFinal": -31,
       "driftRate": "-15.50",
       "balanceScore": "0",
       "trend": "overperforming",
+      "wins": 0,
+      "winRate": "0",
+      "ceilingWarning": false,
+      "highWinRate": false,
       "races": [
         {
           "raceNum": 1,
           "diff": -22,
           "cumulative": -22,
-          "date": "2026-01-05"
+          "date": "2026-01-05",
+          "isWin": false
         },
         {
           "raceNum": 2,
           "diff": -9,
           "cumulative": -31,
-          "date": "2026-01-12"
+          "date": "2026-01-12",
+          "isWin": false
         }
       ]
     },
@@ -639,22 +779,29 @@
       "arr": 1115,
       "raceCount": 2,
       "avgDiff": "5.50",
+      "nonWinAvgDiff": "5.50",
       "cumulativeFinal": 11,
       "driftRate": "5.50",
       "balanceScore": "45",
       "trend": "underperforming",
+      "wins": 0,
+      "winRate": "0",
+      "ceilingWarning": false,
+      "highWinRate": false,
       "races": [
         {
           "raceNum": 1,
           "diff": 18,
           "cumulative": 18,
-          "date": "2026-01-06"
+          "date": "2026-01-06",
+          "isWin": false
         },
         {
           "raceNum": 2,
           "diff": -7,
           "cumulative": 11,
-          "date": "2026-01-13"
+          "date": "2026-01-13",
+          "isWin": false
         }
       ]
     },
@@ -665,22 +812,29 @@
       "arr": 1514,
       "raceCount": 2,
       "avgDiff": "22.00",
+      "nonWinAvgDiff": "22.00",
       "cumulativeFinal": 44,
       "driftRate": "22.00",
       "balanceScore": "0",
       "trend": "underperforming",
+      "wins": 0,
+      "winRate": "0",
+      "ceilingWarning": false,
+      "highWinRate": false,
       "races": [
         {
           "raceNum": 1,
           "diff": 23,
           "cumulative": 23,
-          "date": "2026-01-06"
+          "date": "2026-01-06",
+          "isWin": false
         },
         {
           "raceNum": 2,
           "diff": 21,
           "cumulative": 44,
-          "date": "2026-01-12"
+          "date": "2026-01-12",
+          "isWin": false
         }
       ]
     },
@@ -691,22 +845,29 @@
       "arr": 1255,
       "raceCount": 2,
       "avgDiff": "23.50",
+      "nonWinAvgDiff": "23.50",
       "cumulativeFinal": 47,
       "driftRate": "23.50",
       "balanceScore": "0",
       "trend": "underperforming",
+      "wins": 0,
+      "winRate": "0",
+      "ceilingWarning": false,
+      "highWinRate": false,
       "races": [
         {
           "raceNum": 1,
           "diff": 19,
           "cumulative": 19,
-          "date": "2026-01-06"
+          "date": "2026-01-06",
+          "isWin": false
         },
         {
           "raceNum": 2,
           "diff": 28,
           "cumulative": 47,
-          "date": "2026-01-12"
+          "date": "2026-01-12",
+          "isWin": false
         }
       ]
     },
@@ -717,22 +878,29 @@
       "arr": 466,
       "raceCount": 2,
       "avgDiff": "-16.50",
+      "nonWinAvgDiff": "-6.00",
       "cumulativeFinal": -33,
       "driftRate": "-16.50",
       "balanceScore": "0",
       "trend": "overperforming",
+      "wins": 1,
+      "winRate": "50",
+      "ceilingWarning": true,
+      "highWinRate": true,
       "races": [
         {
           "raceNum": 1,
           "diff": -27,
           "cumulative": -27,
-          "date": "2026-01-06"
+          "date": "2026-01-06",
+          "isWin": true
         },
         {
           "raceNum": 2,
           "diff": -6,
           "cumulative": -33,
-          "date": "2026-01-10"
+          "date": "2026-01-10",
+          "isWin": false
         }
       ]
     },
@@ -743,22 +911,29 @@
       "arr": 1274,
       "raceCount": 2,
       "avgDiff": "4.00",
+      "nonWinAvgDiff": "4.00",
       "cumulativeFinal": 8,
       "driftRate": "4.00",
       "balanceScore": "60",
       "trend": "underperforming",
+      "wins": 0,
+      "winRate": "0",
+      "ceilingWarning": false,
+      "highWinRate": false,
       "races": [
         {
           "raceNum": 1,
           "diff": 9,
           "cumulative": 9,
-          "date": "2026-01-07"
+          "date": "2026-01-07",
+          "isWin": false
         },
         {
           "raceNum": 2,
           "diff": -1,
           "cumulative": 8,
-          "date": "2026-01-10"
+          "date": "2026-01-10",
+          "isWin": false
         }
       ]
     },
@@ -769,22 +944,29 @@
       "arr": 100,
       "raceCount": 2,
       "avgDiff": "3.00",
+      "nonWinAvgDiff": "3.00",
       "cumulativeFinal": 6,
       "driftRate": "3.00",
       "balanceScore": "70",
       "trend": "underperforming",
+      "wins": 0,
+      "winRate": "0",
+      "ceilingWarning": false,
+      "highWinRate": false,
       "races": [
         {
           "raceNum": 1,
           "diff": 6,
           "cumulative": 6,
-          "date": "2026-01-07"
+          "date": "2026-01-07",
+          "isWin": false
         },
         {
           "raceNum": 2,
           "diff": 0,
           "cumulative": 6,
-          "date": "2026-01-10"
+          "date": "2026-01-10",
+          "isWin": false
         }
       ]
     },
@@ -795,22 +977,29 @@
       "arr": 1183,
       "raceCount": 2,
       "avgDiff": "-5.00",
+      "nonWinAvgDiff": "1.00",
       "cumulativeFinal": -10,
       "driftRate": "-5.00",
       "balanceScore": "50",
-      "trend": "overperforming",
+      "trend": "balanced",
+      "wins": 1,
+      "winRate": "50",
+      "ceilingWarning": true,
+      "highWinRate": true,
       "races": [
         {
           "raceNum": 1,
           "diff": -11,
           "cumulative": -11,
-          "date": "2026-01-07"
+          "date": "2026-01-07",
+          "isWin": true
         },
         {
           "raceNum": 2,
           "diff": 1,
           "cumulative": -10,
-          "date": "2026-01-13"
+          "date": "2026-01-13",
+          "isWin": false
         }
       ]
     },
@@ -821,22 +1010,29 @@
       "arr": 1390,
       "raceCount": 2,
       "avgDiff": "6.50",
+      "nonWinAvgDiff": "6.50",
       "cumulativeFinal": 13,
       "driftRate": "6.50",
       "balanceScore": "35",
       "trend": "underperforming",
+      "wins": 0,
+      "winRate": "0",
+      "ceilingWarning": false,
+      "highWinRate": false,
       "races": [
         {
           "raceNum": 1,
           "diff": 4,
           "cumulative": 4,
-          "date": "2026-01-07"
+          "date": "2026-01-07",
+          "isWin": false
         },
         {
           "raceNum": 2,
           "diff": 9,
           "cumulative": 13,
-          "date": "2026-01-10"
+          "date": "2026-01-10",
+          "isWin": false
         }
       ]
     },
@@ -847,22 +1043,29 @@
       "arr": 1181,
       "raceCount": 2,
       "avgDiff": "-12.00",
+      "nonWinAvgDiff": "-11.00",
       "cumulativeFinal": -24,
       "driftRate": "-12.00",
       "balanceScore": "0",
       "trend": "overperforming",
+      "wins": 1,
+      "winRate": "50",
+      "ceilingWarning": true,
+      "highWinRate": true,
       "races": [
         {
           "raceNum": 1,
           "diff": -13,
           "cumulative": -13,
-          "date": "2026-01-07"
+          "date": "2026-01-07",
+          "isWin": true
         },
         {
           "raceNum": 2,
           "diff": -11,
           "cumulative": -24,
-          "date": "2026-01-11"
+          "date": "2026-01-11",
+          "isWin": false
         }
       ]
     },
@@ -873,22 +1076,29 @@
       "arr": 100,
       "raceCount": 2,
       "avgDiff": "-23.50",
+      "nonWinAvgDiff": null,
       "cumulativeFinal": -47,
       "driftRate": "-23.50",
       "balanceScore": "0",
       "trend": "overperforming",
+      "wins": 2,
+      "winRate": "100",
+      "ceilingWarning": true,
+      "highWinRate": true,
       "races": [
         {
           "raceNum": 1,
           "diff": -22,
           "cumulative": -22,
-          "date": "2026-01-08"
+          "date": "2026-01-08",
+          "isWin": true
         },
         {
           "raceNum": 2,
           "diff": -25,
           "cumulative": -47,
-          "date": "2026-01-13"
+          "date": "2026-01-13",
+          "isWin": true
         }
       ]
     },
@@ -899,22 +1109,29 @@
       "arr": 1226,
       "raceCount": 2,
       "avgDiff": "-2.00",
+      "nonWinAvgDiff": null,
       "cumulativeFinal": -4,
       "driftRate": "-2.00",
       "balanceScore": "80",
       "trend": "balanced",
+      "wins": 2,
+      "winRate": "100",
+      "ceilingWarning": true,
+      "highWinRate": true,
       "races": [
         {
           "raceNum": 1,
           "diff": -3,
           "cumulative": -3,
-          "date": "2026-01-08"
+          "date": "2026-01-08",
+          "isWin": true
         },
         {
           "raceNum": 2,
           "diff": -1,
           "cumulative": -4,
-          "date": "2026-01-11"
+          "date": "2026-01-11",
+          "isWin": true
         }
       ]
     },
@@ -925,22 +1142,29 @@
       "arr": 100,
       "raceCount": 2,
       "avgDiff": "-15.00",
+      "nonWinAvgDiff": "-15.00",
       "cumulativeFinal": -30,
       "driftRate": "-15.00",
       "balanceScore": "0",
       "trend": "overperforming",
+      "wins": 0,
+      "winRate": "0",
+      "ceilingWarning": false,
+      "highWinRate": false,
       "races": [
         {
           "raceNum": 1,
           "diff": -10,
           "cumulative": -10,
-          "date": "2026-01-09"
+          "date": "2026-01-09",
+          "isWin": false
         },
         {
           "raceNum": 2,
           "diff": -20,
           "cumulative": -30,
-          "date": "2026-01-13"
+          "date": "2026-01-13",
+          "isWin": false
         }
       ]
     },
@@ -951,22 +1175,29 @@
       "arr": 100,
       "raceCount": 2,
       "avgDiff": "-21.50",
+      "nonWinAvgDiff": null,
       "cumulativeFinal": -43,
       "driftRate": "-21.50",
       "balanceScore": "0",
       "trend": "overperforming",
+      "wins": 2,
+      "winRate": "100",
+      "ceilingWarning": true,
+      "highWinRate": true,
       "races": [
         {
           "raceNum": 1,
           "diff": -23,
           "cumulative": -23,
-          "date": "2026-01-09"
+          "date": "2026-01-09",
+          "isWin": true
         },
         {
           "raceNum": 2,
           "diff": -20,
           "cumulative": -43,
-          "date": "2026-01-10"
+          "date": "2026-01-10",
+          "isWin": true
         }
       ]
     },
@@ -977,22 +1208,29 @@
       "arr": 100,
       "raceCount": 2,
       "avgDiff": "13.00",
+      "nonWinAvgDiff": "13.00",
       "cumulativeFinal": 26,
       "driftRate": "13.00",
       "balanceScore": "0",
       "trend": "underperforming",
+      "wins": 0,
+      "winRate": "0",
+      "ceilingWarning": false,
+      "highWinRate": false,
       "races": [
         {
           "raceNum": 1,
           "diff": 15,
           "cumulative": 15,
-          "date": "2026-01-10"
+          "date": "2026-01-10",
+          "isWin": false
         },
         {
           "raceNum": 2,
           "diff": 11,
           "cumulative": 26,
-          "date": "2026-01-10"
+          "date": "2026-01-10",
+          "isWin": false
         }
       ]
     },
@@ -1003,22 +1241,29 @@
       "arr": 1495,
       "raceCount": 2,
       "avgDiff": "-9.00",
+      "nonWinAvgDiff": "-3.00",
       "cumulativeFinal": -18,
       "driftRate": "-9.00",
       "balanceScore": "10",
       "trend": "overperforming",
+      "wins": 1,
+      "winRate": "50",
+      "ceilingWarning": true,
+      "highWinRate": true,
       "races": [
         {
           "raceNum": 1,
           "diff": -3,
           "cumulative": -3,
-          "date": "2026-01-11"
+          "date": "2026-01-11",
+          "isWin": false
         },
         {
           "raceNum": 2,
           "diff": -15,
           "cumulative": -18,
-          "date": "2026-01-12"
+          "date": "2026-01-12",
+          "isWin": true
         }
       ]
     },
@@ -1029,22 +1274,29 @@
       "arr": 1635,
       "raceCount": 2,
       "avgDiff": "-4.00",
+      "nonWinAvgDiff": null,
       "cumulativeFinal": -8,
       "driftRate": "-4.00",
       "balanceScore": "60",
       "trend": "overperforming",
+      "wins": 2,
+      "winRate": "100",
+      "ceilingWarning": true,
+      "highWinRate": true,
       "races": [
         {
           "raceNum": 1,
           "diff": -3,
           "cumulative": -3,
-          "date": "2026-01-12"
+          "date": "2026-01-12",
+          "isWin": true
         },
         {
           "raceNum": 2,
           "diff": -5,
           "cumulative": -8,
-          "date": "2026-01-12"
+          "date": "2026-01-12",
+          "isWin": true
         }
       ]
     },
@@ -1055,22 +1307,29 @@
       "arr": 100,
       "raceCount": 2,
       "avgDiff": "-35.50",
+      "nonWinAvgDiff": null,
       "cumulativeFinal": -71,
       "driftRate": "-35.50",
       "balanceScore": "0",
       "trend": "overperforming",
+      "wins": 2,
+      "winRate": "100",
+      "ceilingWarning": true,
+      "highWinRate": true,
       "races": [
         {
           "raceNum": 1,
           "diff": -36,
           "cumulative": -36,
-          "date": "2026-01-12"
+          "date": "2026-01-12",
+          "isWin": true
         },
         {
           "raceNum": 2,
           "diff": -35,
           "cumulative": -71,
-          "date": "2026-01-13"
+          "date": "2026-01-13",
+          "isWin": true
         }
       ]
     }

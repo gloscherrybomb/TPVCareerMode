@@ -81,6 +81,13 @@ function analyzeMatchmaking() {
                 const percentileFinish = ((actualPos - 1) / (fieldSize - 1)) * 100;
                 const expectedPercentile = ((predictedPos - 1) / (fieldSize - 1)) * 100;
 
+                // Track if this is a win (ceiling effect applies)
+                const isWin = actualPos === 1;
+                // Track if predicted to win - if so, ceiling effect makes balance unmeasurable
+                const predictedWin = predictedPos === 1;
+                // Ceiling-affected: won the race, so true overperformance is unknown
+                const ceilingAffected = isWin;
+
                 allResults.push({
                     playerId: rider.playerId,
                     name: `${rider.firstName} ${rider.lastName}`,
@@ -95,7 +102,10 @@ function analyzeMatchmaking() {
                     fieldSize,
                     percentileFinish,
                     expectedPercentile,
-                    percentileDiff: percentileFinish - expectedPercentile
+                    percentileDiff: percentileFinish - expectedPercentile,
+                    isWin,
+                    predictedWin,
+                    ceilingAffected
                 });
             }
         } catch (err) {
@@ -136,7 +146,9 @@ function analyzeMatchmaking() {
             cumulativeDiff: prevCumulative + result.difference,
             fieldSize: result.fieldSize,
             percentileFinish: result.percentileFinish,
-            expectedPercentile: result.expectedPercentile
+            expectedPercentile: result.expectedPercentile,
+            isWin: result.isWin,
+            ceilingAffected: result.ceilingAffected
         });
 
         // Update current ARR/band to most recent
@@ -154,6 +166,17 @@ function calculateBalanceMetrics(player) {
 
     const differences = races.map(r => r.difference);
     const cumulativeFinal = races[races.length - 1].cumulativeDiff;
+
+    // Count wins (ceiling-affected results)
+    const wins = races.filter(r => r.isWin).length;
+    const winRate = (wins / races.length) * 100;
+
+    // Calculate metrics excluding wins (non-ceiling-affected)
+    const nonWinRaces = races.filter(r => !r.isWin);
+    const nonWinDiffs = nonWinRaces.map(r => r.difference);
+    const nonWinAvgDiff = nonWinDiffs.length > 0
+        ? nonWinDiffs.reduce((a, b) => a + b, 0) / nonWinDiffs.length
+        : null;
 
     // Average difference (should be near 0 for balanced)
     const avgDiff = differences.reduce((a, b) => a + b, 0) / differences.length;
@@ -179,20 +202,30 @@ function calculateBalanceMetrics(player) {
     // Using a sigmoid-like function where avgDiff near 0 = high score
     const balanceScore = Math.max(0, 100 - Math.abs(avgDiff) * 10);
 
-    // Trend direction
+    // Trend direction - use non-win data if available for more accurate assessment
+    const trendMetric = nonWinAvgDiff !== null ? nonWinAvgDiff : avgDiff;
     let trend = 'balanced';
-    if (avgDiff < -2) trend = 'overperforming';  // Consistently beating predictions
-    if (avgDiff > 2) trend = 'underperforming';  // Consistently missing predictions
+    if (trendMetric < -2) trend = 'overperforming';  // Consistently beating predictions
+    if (trendMetric > 2) trend = 'underperforming';  // Consistently missing predictions
+
+    // Flag if trend assessment is uncertain due to many wins
+    const ceilingWarning = wins > 0;
+    const highWinRate = winRate >= 50;
 
     return {
         raceCount: races.length,
         avgDifference: avgDiff,
+        nonWinAvgDiff,
         cumulativeFinal,
         driftRate,
         volatility,
         zeroCrossings,
         balanceScore,
-        trend
+        trend,
+        wins,
+        winRate,
+        ceilingWarning,
+        highWinRate
     };
 }
 
@@ -259,16 +292,22 @@ function generateDashboardData(playerResults) {
             arr: p.currentARR,
             raceCount: p.metrics.raceCount,
             avgDiff: p.metrics.avgDifference.toFixed(2),
+            nonWinAvgDiff: p.metrics.nonWinAvgDiff !== null ? p.metrics.nonWinAvgDiff.toFixed(2) : null,
             cumulativeFinal: p.metrics.cumulativeFinal,
             driftRate: p.metrics.driftRate.toFixed(2),
             balanceScore: p.metrics.balanceScore.toFixed(0),
             trend: p.metrics.trend,
+            wins: p.metrics.wins,
+            winRate: p.metrics.winRate.toFixed(0),
+            ceilingWarning: p.metrics.ceilingWarning,
+            highWinRate: p.metrics.highWinRate,
             // Include race-by-race data for charts
             races: p.races.map(r => ({
                 raceNum: r.raceNumber,
                 diff: r.difference,
                 cumulative: r.cumulativeDiff,
-                date: r.date.toISOString().split('T')[0]
+                date: r.date.toISOString().split('T')[0],
+                isWin: r.isWin
             }))
         }))
     };
@@ -310,5 +349,13 @@ for (const band of bands) {
 console.log('\nTop riders by race count:');
 dashboardData.players.slice(0, 10).forEach((p, i) => {
     const arrow = p.trend === 'overperforming' ? '↑' : p.trend === 'underperforming' ? '↓' : '→';
-    console.log(`  ${i+1}. ${p.name.padEnd(25)} ${p.raceCount} races, cumulative: ${p.cumulativeFinal > 0 ? '+' : ''}${p.cumulativeFinal}, trend: ${arrow} ${p.trend}`);
+    const winInfo = p.wins > 0 ? ` [${p.wins} wins - ceiling effect]` : '';
+    console.log(`  ${i+1}. ${p.name.padEnd(25)} ${p.raceCount} races, cumulative: ${p.cumulativeFinal > 0 ? '+' : ''}${p.cumulativeFinal}, trend: ${arrow} ${p.trend}${winInfo}`);
 });
+
+// Ceiling effect summary
+const playersWithWins = dashboardData.players.filter(p => p.wins > 0);
+const totalWins = playersWithWins.reduce((a, p) => a + p.wins, 0);
+console.log(`\nCeiling Effect Note:`);
+console.log(`  ${playersWithWins.length} riders have ${totalWins} total wins where true overperformance is unmeasurable.`);
+console.log(`  Riders with many wins may appear "balanced" but could be significantly underrated.`);

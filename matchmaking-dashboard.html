@@ -382,6 +382,56 @@
             color: var(--text-muted);
             text-align: center;
         }
+
+        /* Navigation */
+        .nav-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .nav-tab {
+            padding: 0.6rem 1.2rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .nav-tab:hover {
+            border-color: var(--accent-neutral);
+            color: var(--text-primary);
+        }
+
+        .nav-tab.active {
+            background: linear-gradient(135deg, var(--accent-positive), var(--accent-neutral));
+            border-color: transparent;
+            color: white;
+        }
+
+        /* Ceiling effect warning */
+        .ceiling-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.15rem 0.4rem;
+            background: rgba(251, 191, 36, 0.2);
+            color: var(--gold);
+            border-radius: 3px;
+            font-size: 0.65rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+
+        .wins-indicator {
+            font-size: 0.7rem;
+            color: var(--gold);
+            margin-top: 0.25rem;
+        }
     </style>
 </head>
 <body>
@@ -391,12 +441,21 @@
             <p class="header-subtitle">TPV Career Mode - Season 1 | Analyzing whether race results balance out over time</p>
         </header>
 
+        <!-- Navigation -->
+        <nav class="nav-tabs">
+            <a href="prediction-dashboard.html" class="nav-tab">Prediction Accuracy</a>
+            <a href="matchmaking-dashboard.html" class="nav-tab active">Matchmaking Effectiveness</a>
+        </nav>
+
         <div class="concept-box">
             <h3>Why This View Matters</h3>
             <p>
                 Traditional "prediction accuracy" doesn't tell the full story. In cycling, a rider might miss their predicted position by 20 places due to race dynamics - breakaways, bunch sprints, tactical decisions. That's not bad matchmaking, that's just racing.
                 <strong>Good matchmaking means the ups and downs balance out over time.</strong>
                 If a rider consistently beats or misses predictions across multiple races, that signals their rating needs adjustment.
+            </p>
+            <p style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid rgba(99, 102, 241, 0.2);">
+                <strong style="color: var(--gold);">Ceiling Effect:</strong> When a rider wins (position 1), we can only measure that they matched or exceeded prediction - not by how much. A rider predicted 1st who wins appears "balanced" but could be significantly underrated. Wins are flagged below to highlight this unmeasurable potential.
             </p>
         </div>
 
@@ -609,6 +668,7 @@
         function renderInsights() {
             const insights = [];
             const bandStats = matchmakingData.bandStats;
+            const players = matchmakingData.players || [];
 
             // Check for systematic bias
             if (bandStats.Unranked && bandStats.Unranked.avgDiff < -10) {
@@ -625,17 +685,39 @@
                 });
             }
 
+            // Diamond ceiling effect warning
             if (bandStats.Diamond && Math.abs(bandStats.Diamond.avgDiff) < 1) {
+                const diamondPlayers = players.filter(p => p.band === 'Diamond');
+                const diamondWins = diamondPlayers.reduce((a, p) => a + (p.wins || 0), 0);
+                const diamondRaces = diamondPlayers.reduce((a, p) => a + p.raceCount, 0);
+
+                if (diamondWins > 0) {
+                    insights.push({
+                        type: 'info',
+                        text: `<strong>Diamond tier appears balanced but has ceiling effect</strong>. ${diamondWins} of ${diamondRaces} Diamond results are wins where true overperformance is unmeasurable. These riders could be significantly underrated.`
+                    });
+                } else {
+                    insights.push({
+                        type: 'positive',
+                        text: `<strong>Diamond tier is well balanced</strong> (avg diff: ${bandStats.Diamond.avgDiff.toFixed(2)}). Top-tier matchmaking is working as expected.`
+                    });
+                }
+            }
+
+            // Overall ceiling effect summary
+            const playersWithWins = players.filter(p => p.wins > 0);
+            const totalWins = playersWithWins.reduce((a, p) => a + p.wins, 0);
+            if (totalWins > 0) {
                 insights.push({
-                    type: 'positive',
-                    text: `<strong>Diamond tier is perfectly balanced</strong> (avg diff: ${bandStats.Diamond.avgDiff.toFixed(2)}). Top-tier matchmaking is working as expected.`
+                    type: 'info',
+                    text: `<strong>Ceiling effect applies to ${totalWins} race results</strong> (${playersWithWins.length} riders with wins). When a rider wins, we can't measure how much they exceeded expectations - they may be more underrated than the data suggests.`
                 });
             }
 
             const balancedPct = parseFloat(matchmakingData.summary.balancedPct);
             if (balancedPct < 30) {
                 insights.push({
-                    type: 'info',
+                    type: 'action',
                     text: `<strong>Only ${balancedPct}% of riders are balanced</strong>. This suggests ratings may need to adjust faster to player performance, or initial ratings need refinement.`
                 });
             }
@@ -664,11 +746,21 @@
                 const cumColor = player.cumulativeFinal < 0 ? 'var(--accent-neutral)' :
                                  player.cumulativeFinal > 0 ? 'var(--accent-negative)' : 'var(--accent-positive)';
 
+                // Ceiling effect badge for riders with wins
+                const ceilingBadge = player.wins > 0
+                    ? `<span class="ceiling-badge" title="This rider has ${player.wins} win(s) where true overperformance is unmeasurable">&#x26A0; ${player.wins} win${player.wins > 1 ? 's' : ''}</span>`
+                    : '';
+
+                // Warning if high win rate makes balance assessment unreliable
+                const winWarning = player.highWinRate
+                    ? `<div class="wins-indicator">&#x26A0; ${player.winRate}% win rate - balance may be understated</div>`
+                    : '';
+
                 return `
                     <div class="rider-card">
                         <div class="rider-header">
                             <div>
-                                <div class="rider-name">${player.name}</div>
+                                <div class="rider-name">${player.name}${ceilingBadge}</div>
                                 <span class="rider-band ${bandClass}">${player.band}</span>
                             </div>
                             <span class="trend-badge ${player.trend}">${trendIcon} ${player.trend}</span>
@@ -691,6 +783,7 @@
                                 <div class="rider-stat-label">Balance</div>
                             </div>
                         </div>
+                        ${winWarning}
                         <div class="rider-chart">
                             <canvas id="riderChart${idx}"></canvas>
                         </div>
@@ -717,6 +810,11 @@
             const lineColor = player.trend === 'overperforming' ? '#6366f1' :
                               player.trend === 'underperforming' ? '#ef4444' : '#10b981';
 
+            // Mark wins with different point style
+            const pointColors = races.map(r => r.isWin ? '#fbbf24' : lineColor);
+            const pointRadii = races.map(r => r.isWin ? 5 : 3);
+            const pointStyles = races.map(r => r.isWin ? 'star' : 'circle');
+
             new Chart(ctx, {
                 type: 'line',
                 data: {
@@ -728,8 +826,10 @@
                         borderWidth: 2,
                         fill: true,
                         tension: 0.3,
-                        pointRadius: 3,
-                        pointBackgroundColor: lineColor
+                        pointRadius: pointRadii,
+                        pointBackgroundColor: pointColors,
+                        pointBorderColor: pointColors,
+                        pointStyle: pointStyles
                     }]
                 },
                 options: {
@@ -739,8 +839,20 @@
                         legend: { display: false },
                         tooltip: {
                             callbacks: {
-                                title: items => `Race ${items[0].label}`,
-                                label: ctx => `Cumulative: ${ctx.raw > 0 ? '+' : ''}${ctx.raw}`
+                                title: items => {
+                                    const raceIdx = items[0].dataIndex;
+                                    const race = races[raceIdx];
+                                    return race.isWin ? `Race ${items[0].label} (WIN)` : `Race ${items[0].label}`;
+                                },
+                                label: ctx => {
+                                    const raceIdx = ctx.dataIndex;
+                                    const race = races[raceIdx];
+                                    let label = `Cumulative: ${ctx.raw > 0 ? '+' : ''}${ctx.raw}`;
+                                    if (race.isWin) {
+                                        label += ' (ceiling effect)';
+                                    }
+                                    return label;
+                                }
                             }
                         }
                     },
