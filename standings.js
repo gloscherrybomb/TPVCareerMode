@@ -36,6 +36,7 @@ let allGlobalRankings = []; // Store fetched data for display
 let lastVisibleDoc = null; // Cursor for Firestore pagination
 let hasMoreRankings = true; // Track if more data is available
 let isLoadingMoreRankings = false; // Prevent duplicate loads
+let totalRegisteredUsers = null; // Total count of registered (non-bot) users
 
 // Initialize season switcher for standings
 function initStandingsSeasonSwitcher() {
@@ -555,6 +556,49 @@ const GLOBAL_RANKINGS_CACHE_KEY = 'globalRankings';
 const GLOBAL_RANKINGS_TIMESTAMP_KEY = 'globalRankingsTimestamp';
 const SEASON_STANDINGS_CACHE_KEY = 'seasonStandings';
 const SEASON_STANDINGS_TIMESTAMP_KEY = 'seasonStandingsTimestamp';
+const TOTAL_USERS_CACHE_KEY = 'totalRegisteredUsers';
+const TOTAL_USERS_TIMESTAMP_KEY = 'totalRegisteredUsersTimestamp';
+
+// Fetch total count of registered (non-bot) users
+async function fetchTotalRegisteredUsers(forceRefresh = false) {
+    // Check cache first
+    if (!forceRefresh) {
+        const cachedCount = localStorage.getItem(TOTAL_USERS_CACHE_KEY);
+        const cacheTimestamp = localStorage.getItem(TOTAL_USERS_TIMESTAMP_KEY);
+        const now = Date.now();
+
+        if (cachedCount && cacheTimestamp) {
+            const cacheAge = now - parseInt(cacheTimestamp);
+            if (cacheAge < CACHE_DURATION) {
+                totalRegisteredUsers = parseInt(cachedCount);
+                console.log(`📦 Using cached total users count: ${totalRegisteredUsers}`);
+                return totalRegisteredUsers;
+            }
+        }
+    }
+
+    try {
+        console.log('🔄 Fetching total registered users count...');
+        const usersSnapshot = await getDocs(collection(db, 'users'));
+        let count = 0;
+
+        usersSnapshot.forEach((doc) => {
+            // Skip bots
+            if (!doc.id.startsWith('Bot')) {
+                count++;
+            }
+        });
+
+        totalRegisteredUsers = count;
+        localStorage.setItem(TOTAL_USERS_CACHE_KEY, count.toString());
+        localStorage.setItem(TOTAL_USERS_TIMESTAMP_KEY, Date.now().toString());
+        console.log(`✅ Total registered users: ${totalRegisteredUsers}`);
+        return totalRegisteredUsers;
+    } catch (error) {
+        console.error('Error fetching total users count:', error);
+        return null;
+    }
+}
 
 // Render Global High Scores with cursor-based pagination
 async function renderGlobalRankings(forceRefresh = false, loadMore = false) {
@@ -600,6 +644,12 @@ async function renderGlobalRankings(forceRefresh = false, loadMore = false) {
                         lastVisibleDoc = null;
                         currentRankingsPage = 1;
 
+                        // Fetch total count (in background, don't block rendering)
+                        fetchTotalRegisteredUsers().then(() => {
+                            // Re-render to update the count display
+                            renderGlobalRankingsTable(globalContent);
+                        });
+
                         // Render the table
                         renderGlobalRankingsTable(globalContent);
                         return rankings;
@@ -612,6 +662,9 @@ async function renderGlobalRankings(forceRefresh = false, loadMore = false) {
             lastVisibleDoc = null;
             hasMoreRankings = true;
             currentRankingsPage = 1;
+
+            // Fetch total count (in parallel with rankings fetch)
+            fetchTotalRegisteredUsers(forceRefresh);
         }
 
         // Prevent duplicate loads
@@ -853,9 +906,14 @@ function renderGlobalRankingsTable(globalContent, appendMode = false) {
 
     // Add pagination controls
     const showLoadMore = hasMoreRankings && !isLoadingMoreRankings;
-    const statusText = hasMoreRankings
-        ? `Showing ${displayRankings.length} riders`
-        : `Showing all ${displayRankings.length} riders`;
+    let statusText;
+    if (totalRegisteredUsers !== null) {
+        statusText = `Showing ${displayRankings.length} of ${totalRegisteredUsers} riders`;
+    } else if (hasMoreRankings) {
+        statusText = `Showing ${displayRankings.length} riders`;
+    } else {
+        statusText = `Showing all ${displayRankings.length} riders`;
+    }
 
     tableHTML += `
         <div id="rankingsPaginationControls" class="pagination-controls" style="display: ${displayRankings.length > 0 ? 'flex' : 'none'}; justify-content: center; align-items: center; gap: 1rem; margin-top: 1.5rem; padding: 1rem;">
