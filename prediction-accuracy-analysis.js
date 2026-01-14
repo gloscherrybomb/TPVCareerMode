@@ -476,15 +476,41 @@ function exportHumanStats(analysis) {
         humanStatsByBand[band] = calculateStats(bandData);
     }
 
-    // Distribution for humans only
+    // Distribution for humans only (buckets of 2, range -20 to +20)
     const humanDistribution = {};
-    for (let i = -10; i <= 10; i++) {
-        humanDistribution[i] = humanOnly.filter(d => {
-            if (i === -10) return d.difference <= -10;
-            if (i === 10) return d.difference >= 10;
-            return d.difference === i;
-        }).length;
-    }
+    // Create buckets: -20 or less, -19 to -18, -17 to -16, ... 0, +1 to +2, ... +19 to +20, +20 or more
+    const buckets = [
+        { key: '-20', label: '-20 or less', filter: d => d.difference <= -20 },
+        { key: '-18', label: '-19 to -18', filter: d => d.difference >= -19 && d.difference <= -18 },
+        { key: '-16', label: '-17 to -16', filter: d => d.difference >= -17 && d.difference <= -16 },
+        { key: '-14', label: '-15 to -14', filter: d => d.difference >= -15 && d.difference <= -14 },
+        { key: '-12', label: '-13 to -12', filter: d => d.difference >= -13 && d.difference <= -12 },
+        { key: '-10', label: '-11 to -10', filter: d => d.difference >= -11 && d.difference <= -10 },
+        { key: '-8', label: '-9 to -8', filter: d => d.difference >= -9 && d.difference <= -8 },
+        { key: '-6', label: '-7 to -6', filter: d => d.difference >= -7 && d.difference <= -6 },
+        { key: '-4', label: '-5 to -4', filter: d => d.difference >= -5 && d.difference <= -4 },
+        { key: '-2', label: '-3 to -2', filter: d => d.difference >= -3 && d.difference <= -2 },
+        { key: '0', label: '-1 to 0', filter: d => d.difference >= -1 && d.difference <= 0 },
+        { key: '2', label: '+1 to +2', filter: d => d.difference >= 1 && d.difference <= 2 },
+        { key: '4', label: '+3 to +4', filter: d => d.difference >= 3 && d.difference <= 4 },
+        { key: '6', label: '+5 to +6', filter: d => d.difference >= 5 && d.difference <= 6 },
+        { key: '8', label: '+7 to +8', filter: d => d.difference >= 7 && d.difference <= 8 },
+        { key: '10', label: '+9 to +10', filter: d => d.difference >= 9 && d.difference <= 10 },
+        { key: '12', label: '+11 to +12', filter: d => d.difference >= 11 && d.difference <= 12 },
+        { key: '14', label: '+13 to +14', filter: d => d.difference >= 13 && d.difference <= 14 },
+        { key: '16', label: '+15 to +16', filter: d => d.difference >= 15 && d.difference <= 16 },
+        { key: '18', label: '+17 to +18', filter: d => d.difference >= 17 && d.difference <= 18 },
+        { key: '20', label: '+19 to +20', filter: d => d.difference >= 19 && d.difference <= 20 },
+        { key: '22', label: '+21 or more', filter: d => d.difference >= 21 }
+    ];
+
+    buckets.forEach(b => {
+        humanDistribution[b.key] = {
+            label: b.label,
+            count: humanOnly.filter(b.filter).length,
+            countNoDiamond: humanOnly.filter(d => !d.arrBandGroup.includes('Diamond')).filter(b.filter).length
+        };
+    });
 
     return {
         human: humanStats,

@@ -552,6 +552,93 @@
         .comparison-card:nth-child(2) { animation-delay: 0.5s; }
 
         .insights-panel { animation-delay: 0.55s; }
+
+        /* Filter Toggle */
+        .filter-toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            padding: 1rem 1.25rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+        }
+
+        .filter-toggle {
+            position: relative;
+            display: inline-block;
+            width: 48px;
+            height: 26px;
+            flex-shrink: 0;
+        }
+
+        .filter-toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--bg-elevated);
+            border: 1px solid var(--border-color);
+            transition: 0.3s;
+            border-radius: 26px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: var(--text-muted);
+            transition: 0.3s;
+            border-radius: 50%;
+        }
+
+        .filter-toggle input:checked + .toggle-slider {
+            background: linear-gradient(135deg, var(--accent-highlight), var(--accent-neutral));
+            border-color: var(--accent-highlight);
+        }
+
+        .filter-toggle input:checked + .toggle-slider:before {
+            transform: translateX(22px);
+            background-color: white;
+        }
+
+        .filter-label {
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .filter-hint {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .filter-active-badge {
+            display: none;
+            padding: 0.25rem 0.5rem;
+            background: rgba(244, 114, 182, 0.2);
+            color: var(--accent-highlight);
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-left: auto;
+        }
+
+        .filter-toggle-container.active .filter-active-badge {
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -565,37 +652,47 @@
                 </div>
                 <div class="header-meta">
                     <span><span class="status-dot"></span> Live Data</span>
-                    <span>120 Human Results</span>
+                    <span id="header-results">120 Human Results</span>
                     <span>128 Races</span>
                 </div>
             </div>
         </header>
 
+        <!-- Filter Toggle -->
+        <div class="filter-toggle-container">
+            <label class="filter-toggle">
+                <input type="checkbox" id="excludeDiamond">
+                <span class="toggle-slider"></span>
+            </label>
+            <span class="filter-label">Exclude Diamond riders</span>
+            <span class="filter-hint">(7 results with 100% accuracy)</span>
+        </div>
+
         <!-- Key Metrics (Human Riders Only) -->
         <div class="metrics-grid">
             <div class="metric-card">
                 <div class="metric-label">Mean Absolute Error</div>
-                <div class="metric-value highlight">9.70</div>
+                <div class="metric-value highlight" id="metric-mae">9.70</div>
                 <div class="metric-subtext">positions off on average</div>
             </div>
             <div class="metric-card">
                 <div class="metric-label">Exact Predictions</div>
-                <div class="metric-value">12.5%</div>
-                <div class="metric-subtext">15 of 120 results</div>
+                <div class="metric-value" id="metric-exact">12.5%</div>
+                <div class="metric-subtext" id="metric-exact-sub">15 of 120 results</div>
             </div>
             <div class="metric-card">
                 <div class="metric-label">Within 3 Positions</div>
-                <div class="metric-value positive">32.5%</div>
-                <div class="metric-subtext">39 results</div>
+                <div class="metric-value positive" id="metric-within3">32.5%</div>
+                <div class="metric-subtext" id="metric-within3-sub">39 results</div>
             </div>
             <div class="metric-card">
                 <div class="metric-label">Within 5 Positions</div>
-                <div class="metric-value positive">45.0%</div>
-                <div class="metric-subtext">54 results</div>
+                <div class="metric-value positive" id="metric-within5">45.0%</div>
+                <div class="metric-subtext" id="metric-within5-sub">54 results</div>
             </div>
             <div class="metric-card">
                 <div class="metric-label">Prediction Bias</div>
-                <div class="metric-value" style="color: var(--accent-positive);">-1.67</div>
+                <div class="metric-value" style="color: var(--accent-positive);" id="metric-bias">-1.67</div>
                 <div class="metric-subtext">humans beat predictions</div>
             </div>
         </div>
@@ -607,7 +704,7 @@
 
         <div class="chart-card full-width">
             <div class="chart-title">Prediction Error Distribution</div>
-            <div class="chart-subtitle">Negative = finished better than predicted | Positive = finished worse than predicted</div>
+            <div class="chart-subtitle">Negative = finished better than predicted | Positive = finished worse than predicted | Grouped in buckets of 2 positions</div>
             <div class="chart-container tall">
                 <canvas id="distributionChart"></canvas>
             </div>
@@ -799,22 +896,165 @@
     </div>
 
     <script>
+        // ============================================
+        // DATA SETS: With and Without Diamond Riders
+        // ============================================
+
+        // Distribution labels (buckets of 2, range -20 to +21+)
+        const distributionLabels = [
+            '-20 or less', '-19 to -18', '-17 to -16', '-15 to -14', '-13 to -12',
+            '-11 to -10', '-9 to -8', '-7 to -6', '-5 to -4', '-3 to -2', '-1 to 0',
+            '+1 to +2', '+3 to +4', '+5 to +6', '+7 to +8', '+9 to +10',
+            '+11 to +12', '+13 to +14', '+15 to +16', '+17 to +18', '+19 to +20', '+21 or more'
+        ];
+
+        // All human riders (120 results)
+        const dataWithDiamond = {
+            count: 120,
+            mae: 9.70,
+            exact: 15,
+            exactPct: 12.5,
+            within3: 39,
+            within3Pct: 32.5,
+            within5: 54,
+            within5Pct: 45.0,
+            bias: -1.67,
+            distribution: [12, 1, 1, 3, 3, 9, 5, 5, 12, 10, 22, 5, 3, 4, 2, 3, 2, 2, 3, 1, 2, 10],
+            bandMAE: [0.00, 8.67, 8.67, 6.00, 9.47, 16.04],
+            bandWithin3: [100, 37.0, 35.9, 20.0, 23.5, 12.0]
+        };
+
+        // Without Diamond riders (113 results)
+        const dataWithoutDiamond = {
+            count: 113,
+            mae: 10.30,
+            exact: 8,
+            exactPct: 7.1,
+            within3: 32,
+            within3Pct: 28.3,
+            within5: 47,
+            within5Pct: 41.6,
+            bias: -1.77,
+            distribution: [12, 1, 1, 3, 3, 9, 5, 5, 12, 10, 15, 5, 3, 4, 2, 3, 2, 2, 3, 1, 2, 10], // 22 -> 15 at index 10
+            bandMAE: [null, 8.67, 8.67, 6.00, 9.47, 16.04],
+            bandWithin3: [null, 37.0, 35.9, 20.0, 23.5, 12.0]
+        };
+
+        // Chart instances (for updating)
+        let distributionChart, maeChart, within3Chart;
+
+        // Current state
+        let excludeDiamond = false;
+
+        // ============================================
+        // UPDATE FUNCTIONS
+        // ============================================
+
+        function updateMetrics() {
+            const data = excludeDiamond ? dataWithoutDiamond : dataWithDiamond;
+
+            document.getElementById('header-results').textContent = `${data.count} Human Results`;
+            document.getElementById('metric-mae').textContent = data.mae.toFixed(2);
+            document.getElementById('metric-exact').textContent = data.exactPct.toFixed(1) + '%';
+            document.getElementById('metric-exact-sub').textContent = `${data.exact} of ${data.count} results`;
+            document.getElementById('metric-within3').textContent = data.within3Pct.toFixed(1) + '%';
+            document.getElementById('metric-within3-sub').textContent = `${data.within3} results`;
+            document.getElementById('metric-within5').textContent = data.within5Pct.toFixed(1) + '%';
+            document.getElementById('metric-within5-sub').textContent = `${data.within5} results`;
+            document.getElementById('metric-bias').textContent = data.bias.toFixed(2);
+        }
+
+        function updateCharts() {
+            const data = excludeDiamond ? dataWithoutDiamond : dataWithDiamond;
+
+            // Update distribution chart
+            distributionChart.data.datasets[0].data = data.distribution;
+            distributionChart.update();
+
+            // Update MAE chart
+            if (excludeDiamond) {
+                maeChart.data.labels = ['Platinum', 'Gold', 'Silver', 'Bronze', 'Unranked'];
+                maeChart.data.datasets[0].data = [8.67, 8.67, 6.00, 9.47, 16.04];
+                maeChart.data.datasets[0].backgroundColor = [
+                    'rgba(161, 161, 170, 0.7)',
+                    'rgba(251, 191, 36, 0.7)',
+                    'rgba(156, 163, 175, 0.7)',
+                    'rgba(217, 119, 6, 0.7)',
+                    'rgba(107, 114, 128, 0.7)'
+                ];
+                maeChart.data.datasets[0].borderColor = ['#a1a1aa', '#fbbf24', '#9ca3af', '#d97706', '#6b7280'];
+            } else {
+                maeChart.data.labels = ['Diamond', 'Platinum', 'Gold', 'Silver', 'Bronze', 'Unranked'];
+                maeChart.data.datasets[0].data = [0.00, 8.67, 8.67, 6.00, 9.47, 16.04];
+                maeChart.data.datasets[0].backgroundColor = [
+                    'rgba(34, 211, 238, 0.7)',
+                    'rgba(161, 161, 170, 0.7)',
+                    'rgba(251, 191, 36, 0.7)',
+                    'rgba(156, 163, 175, 0.7)',
+                    'rgba(217, 119, 6, 0.7)',
+                    'rgba(107, 114, 128, 0.7)'
+                ];
+                maeChart.data.datasets[0].borderColor = ['#22d3ee', '#a1a1aa', '#fbbf24', '#9ca3af', '#d97706', '#6b7280'];
+            }
+            maeChart.update();
+
+            // Update Within 3 chart
+            if (excludeDiamond) {
+                within3Chart.data.labels = ['Platinum', 'Gold', 'Silver', 'Bronze', 'Unranked'];
+                within3Chart.data.datasets[0].data = [37.0, 35.9, 20.0, 23.5, 12.0];
+                within3Chart.data.datasets[0].backgroundColor = [
+                    'rgba(161, 161, 170, 0.7)',
+                    'rgba(251, 191, 36, 0.7)',
+                    'rgba(156, 163, 175, 0.7)',
+                    'rgba(217, 119, 6, 0.7)',
+                    'rgba(107, 114, 128, 0.7)'
+                ];
+                within3Chart.data.datasets[0].borderColor = ['#a1a1aa', '#fbbf24', '#9ca3af', '#d97706', '#6b7280'];
+            } else {
+                within3Chart.data.labels = ['Diamond', 'Platinum', 'Gold', 'Silver', 'Bronze', 'Unranked'];
+                within3Chart.data.datasets[0].data = [100, 37.0, 35.9, 20.0, 23.5, 12.0];
+                within3Chart.data.datasets[0].backgroundColor = [
+                    'rgba(34, 211, 238, 0.7)',
+                    'rgba(161, 161, 170, 0.7)',
+                    'rgba(251, 191, 36, 0.7)',
+                    'rgba(156, 163, 175, 0.7)',
+                    'rgba(217, 119, 6, 0.7)',
+                    'rgba(107, 114, 128, 0.7)'
+                ];
+                within3Chart.data.datasets[0].borderColor = ['#22d3ee', '#a1a1aa', '#fbbf24', '#9ca3af', '#d97706', '#6b7280'];
+            }
+            within3Chart.update();
+        }
+
+        // Toggle handler
+        document.getElementById('excludeDiamond').addEventListener('change', function() {
+            excludeDiamond = this.checked;
+            document.querySelector('.filter-toggle-container').classList.toggle('active', excludeDiamond);
+            updateMetrics();
+            updateCharts();
+        });
+
+        // ============================================
+        // CHART INITIALIZATION
+        // ============================================
+
         // Chart.js global defaults
         Chart.defaults.color = '#94a3b8';
         Chart.defaults.borderColor = '#2d3a52';
         Chart.defaults.font.family = "'Outfit', sans-serif";
 
-        // Distribution Chart (Human Riders Only)
+        // Distribution Chart (Human Riders Only) - buckets of 2, range -20 to +21+
         const distributionCtx = document.getElementById('distributionChart').getContext('2d');
         const distributionData = {
-            labels: ['-10 or less', '-9', '-8', '-7', '-6', '-5', '-4', '-3', '-2', '-1', '0 (exact)', '+1', '+2', '+3', '+4', '+5', '+6', '+7', '+8', '+9', '+10 or more'],
+            labels: distributionLabels,
             datasets: [{
                 label: 'Count',
-                data: [29, 3, 2, 4, 1, 4, 8, 5, 5, 7, 15, 3, 2, 2, 1, 2, 2, 1, 1, 2, 21],
+                data: dataWithDiamond.distribution,
                 backgroundColor: function(context) {
                     const index = context.dataIndex;
+                    // Index 10 is "-1 to 0" which includes exact predictions
                     if (index < 10) return 'rgba(16, 185, 129, 0.7)'; // Better than predicted - green
-                    if (index === 10) return 'rgba(99, 102, 241, 0.9)'; // Exact - purple
+                    if (index === 10) return 'rgba(99, 102, 241, 0.9)'; // Near exact - purple
                     return 'rgba(239, 68, 68, 0.7)'; // Worse than predicted - red
                 },
                 borderColor: function(context) {
@@ -828,7 +1068,7 @@
             }]
         };
 
-        new Chart(distributionCtx, {
+        distributionChart = new Chart(distributionCtx, {
             type: 'bar',
             data: distributionData,
             options: {
@@ -872,7 +1112,7 @@
 
         // MAE by Band Chart (Human Riders Only)
         const maeCtx = document.getElementById('maeChart').getContext('2d');
-        new Chart(maeCtx, {
+        maeChart = new Chart(maeCtx, {
             type: 'bar',
             data: {
                 labels: ['Diamond', 'Platinum', 'Gold', 'Silver', 'Bronze', 'Unranked'],
@@ -926,7 +1166,7 @@
 
         // Within 3 Chart (Human Riders Only)
         const within3Ctx = document.getElementById('within3Chart').getContext('2d');
-        new Chart(within3Ctx, {
+        within3Chart = new Chart(within3Ctx, {
             type: 'bar',
             data: {
                 labels: ['Diamond', 'Platinum', 'Gold', 'Silver', 'Bronze', 'Unranked'],
