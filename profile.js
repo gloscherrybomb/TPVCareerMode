@@ -1737,11 +1737,13 @@ function displayCareerSummary(userData, stats) {
 
 // Auth state observer
 onAuthStateChanged(auth, async (user) => {
+    console.log('[Profile] Auth state changed:', user ? `User logged in: ${user.uid}` : 'No user (logged out)');
     currentUser = user;
-    
+
     if (user) {
         await loadProfile(user);
     } else {
+        console.log('[Profile] Showing login prompt');
         showLoginPrompt();
     }
 });

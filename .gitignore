@@ -1,5 +1,6 @@
 # Firebase configuration and rules (deploy manually, don't commit)
 firestore.rules
+storage.rules
 firestore.indexes.json
 firebase.json
 FIRESTORE_SETUP.md

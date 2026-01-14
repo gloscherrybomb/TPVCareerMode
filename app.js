@@ -356,12 +356,17 @@ if (loginForm) {
     const password = document.getElementById('loginPassword').value;
     const rememberMe = document.getElementById('rememberMe').checked;
 
+    console.log('Login attempt:', { email, rememberMe });
+
     try {
       // Set persistence based on Remember Me checkbox
       const persistence = rememberMe ? browserLocalPersistence : browserSessionPersistence;
+      console.log('Setting persistence:', persistence.type);
       await setPersistence(auth, persistence);
 
+      console.log('Calling signInWithEmailAndPassword...');
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      console.log('Login successful! User:', userCredential.user.uid);
 
       closeModal();
 
@@ -659,6 +664,8 @@ if (uidForm) {
 
 // Auth state observer
 onAuthStateChanged(auth, async (user) => {
+  console.log('Auth state changed:', user ? `User logged in: ${user.uid}` : 'No user (logged out)');
+
   const loginBtn = document.getElementById('loginBtn');
   const logoutBtn = document.getElementById('logoutBtn');
   const supportBtn = document.getElementById('supportBtn');

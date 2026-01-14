@@ -439,51 +439,50 @@ export function getHighResPhotoURL(photoURL, size = 400) {
 
 /**
  * Get Firebase Storage thumbnail URL
- * Works with the Firebase Resize Images extension
- * Thumbnails are named: {original}_WIDTHxHEIGHT.{ext}
+ * Uses Firebase Resize Images extension naming convention: filename_WIDTHxHEIGHT.ext
+ * Requires profile-photos to have public read access in Storage rules.
  * @param {string} photoURL - Original Firebase Storage URL
- * @param {number} size - Desired size (uses closest available: 200 or 400)
+ * @param {number} size - Desired size in pixels (will be used for both width and height)
  * @returns {string} Thumbnail URL
  */
 export function getFirebaseThumbnailURL(photoURL, size = 400) {
-  if (!photoURL) return null;
-
-  // Determine which thumbnail size to use (200x200 or 400x400)
-  const thumbSize = size <= 200 ? '200x200' : '400x400';
-
-  try {
-    // Firebase Storage URL format:
-    // https://firebasestorage.googleapis.com/v0/b/{bucket}/o/{encoded-path}?alt=media&token={token}
-    const url = new URL(photoURL);
-    const pathMatch = url.pathname.match(/\/o\/(.+)/);
-
-    if (pathMatch) {
-      // Decode the path (e.g., profile-photos%2Fabc123 -> profile-photos/abc123)
-      const encodedPath = pathMatch[1];
-      const decodedPath = decodeURIComponent(encodedPath);
-
-      // Add thumbnail suffix before the extension (or at end if no extension)
-      let thumbPath;
-      const lastDotIndex = decodedPath.lastIndexOf('.');
-      if (lastDotIndex > decodedPath.lastIndexOf('/')) {
-        // Has extension: profile-photos/abc123.jpg -> profile-photos/abc123_400x400.jpg
-        thumbPath = decodedPath.slice(0, lastDotIndex) + '_' + thumbSize + decodedPath.slice(lastDotIndex);
-      } else {
-        // No extension: profile-photos/abc123 -> profile-photos/abc123_400x400
-        thumbPath = decodedPath + '_' + thumbSize;
-      }
-
-      // Re-encode and rebuild URL
-      url.pathname = url.pathname.replace(encodedPath, encodeURIComponent(thumbPath).replace(/%2F/g, '%2F'));
-
-      return url.toString();
-    }
-  } catch (e) {
-    console.warn('Failed to generate thumbnail URL:', e);
+  if (!photoURL || !photoURL.includes('firebasestorage.googleapis.com')) {
+    return photoURL;
   }
 
-  // Fallback to original URL if parsing fails
-  return photoURL;
+  try {
+    // Parse the URL to extract the path
+    const url = new URL(photoURL);
+    const pathMatch = url.pathname.match(/\/o\/(.+)$/);
+    if (!pathMatch) return photoURL;
+
+    // Decode the path (it's URL encoded)
+    const encodedPath = pathMatch[1];
+    const decodedPath = decodeURIComponent(encodedPath);
+
+    // Split path and filename
+    const lastSlash = decodedPath.lastIndexOf('/');
+    const directory = lastSlash >= 0 ? decodedPath.substring(0, lastSlash + 1) : '';
+    const filename = lastSlash >= 0 ? decodedPath.substring(lastSlash + 1) : decodedPath;
+
+    // Split filename into name and extension
+    const lastDot = filename.lastIndexOf('.');
+    if (lastDot < 0) return photoURL; // No extension, return original
+
+    const name = filename.substring(0, lastDot);
+    const ext = filename.substring(lastDot); // includes the dot
+
+    // Construct thumbnail filename: name_WIDTHxHEIGHT.ext
+    const thumbFilename = `${name}_${size}x${size}${ext}`;
+    const thumbPath = `${directory}${thumbFilename}`;
+
+    // Construct new URL (public access, no token needed)
+    const thumbEncodedPath = encodeURIComponent(thumbPath);
+    return `https://firebasestorage.googleapis.com/v0/b/${url.pathname.split('/')[3]}/o/${thumbEncodedPath}?alt=media`;
+  } catch (e) {
+    console.error('Error constructing thumbnail URL:', e);
+    return photoURL;
+  }
 }
 
 /**
