@@ -18,8 +18,8 @@
     const NEWS_ITEMS = [
    
         {
-            date: '10th Jan 2026',
-            text: 'New event images, results feed and notifications'
+            date: '14th Jan 2026',
+            text: 'Image generation for Strava added to results pages'
         },
         {
             date: '5th Jan 2026',
