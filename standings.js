@@ -26,7 +26,8 @@ let viewingSeason = 1;
 let filters = {
     gender: 'all',
     ageGroup: 'all',
-    country: 'all'
+    country: 'all',
+    searchTerm: ''
 };
 
 // Pagination state for global rankings
@@ -138,21 +139,30 @@ function updateStandingsSeasonSwitcherWithUserData(userData) {
 // Apply filters to rankings
 function applyFilters(rankings) {
     return rankings.filter(racer => {
+        // Name search filter
+        if (filters.searchTerm) {
+            const searchLower = filters.searchTerm.toLowerCase();
+            const nameMatch = racer.name.toLowerCase().includes(searchLower);
+            if (!nameMatch) {
+                return false;
+            }
+        }
+
         // Gender filter
         if (filters.gender !== 'all' && racer.gender !== filters.gender) {
             return false;
         }
-        
+
         // Age group filter (uses ageBand from user profile)
         if (filters.ageGroup !== 'all' && racer.ageBand !== filters.ageGroup) {
             return false;
         }
-        
+
         // Country filter
         if (filters.country !== 'all' && racer.country !== filters.country) {
             return false;
         }
-        
+
         return true;
     });
 }
@@ -829,11 +839,22 @@ function renderGlobalRankingsTable(globalContent, appendMode = false) {
 
         if (displayRankings.length === 0) {
             const emptyStatsIcon = window.TPVIcons ? window.TPVIcons.getIcon('stats', { size: 'lg' }) : '📊';
+
+            // Check if this is due to search
+            const isSearchActive = filters.searchTerm && filters.searchTerm.length > 0;
+            const emptyMessage = isSearchActive
+                ? `No riders found matching "${filters.searchTerm}"`
+                : 'No riders match the selected filters.';
+            const emptySubMessage = isSearchActive
+                ? 'Try a different search term or clear the search.'
+                : 'Try adjusting your filter selections.';
+
             tableHTML += `
                 <tr>
                     <td colspan="5" class="empty-state">
                         <div class="empty-icon">${emptyStatsIcon}</div>
-                        <p>No riders match the selected filters.</p>
+                        <p><strong>${emptyMessage}</strong></p>
+                        <p style="font-size: 0.9rem; margin-top: 0.5rem; opacity: 0.7;">${emptySubMessage}</p>
                     </td>
                 </tr>
             `;
@@ -1195,6 +1216,9 @@ function initFilters() {
     const ageGroupFilter = document.getElementById('ageGroupFilter');
     const countryFilter = document.getElementById('countryFilter');
     const clearButton = document.getElementById('clearFilters');
+    const riderSearchInput = document.getElementById('riderSearchInput');
+    const clearRiderSearch = document.getElementById('clearRiderSearch');
+    const jumpToMeBtn = document.getElementById('jumpToMeBtn');
 
     // Helper to re-render with pagination reset (uses cached data if available)
     function applyFilterAndRender() {
@@ -1227,18 +1251,116 @@ function initFilters() {
         applyFilterAndRender();
     });
 
-    // Clear all filters
+    // Search input handling with debounce
+    if (riderSearchInput) {
+        let searchTimeout;
+        riderSearchInput.addEventListener('input', (e) => {
+            const value = e.target.value;
+
+            // Show/hide clear button
+            if (clearRiderSearch) {
+                clearRiderSearch.classList.toggle('visible', value.length > 0);
+            }
+
+            // Debounce the search (300ms delay)
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                filters.searchTerm = value.trim();
+                applyFilterAndRender();
+            }, 300);
+        });
+    }
+
+    // Clear search button
+    if (clearRiderSearch) {
+        clearRiderSearch.addEventListener('click', () => {
+            if (riderSearchInput) {
+                riderSearchInput.value = '';
+            }
+            clearRiderSearch.classList.remove('visible');
+            filters.searchTerm = '';
+            applyFilterAndRender();
+        });
+    }
+
+    // Jump to Me button
+    if (jumpToMeBtn) {
+        jumpToMeBtn.addEventListener('click', handleJumpToMe);
+    }
+
+    // Clear all filters (including search)
     clearButton.addEventListener('click', () => {
         filters = {
             gender: 'all',
             ageGroup: 'all',
-            country: 'all'
+            country: 'all',
+            searchTerm: ''
         };
         genderFilter.value = 'all';
         ageGroupFilter.value = 'all';
         countryFilter.value = 'all';
+
+        // Clear search input
+        if (riderSearchInput) {
+            riderSearchInput.value = '';
+        }
+        if (clearRiderSearch) {
+            clearRiderSearch.classList.remove('visible');
+        }
+
         applyFilterAndRender();
     });
+}
+
+// Handle "Jump to Me" button click
+function handleJumpToMe() {
+    // Check if user is logged in
+    if (!currentUser) {
+        showJumpToMeMessage('Please log in to find your position');
+        return;
+    }
+
+    // Find current user row in the DOM
+    const currentUserRow = document.querySelector('.current-user-row');
+
+    if (!currentUserRow) {
+        // User not in currently displayed rankings
+        showJumpToMeMessage('Load more results or clear filters to find your position');
+        return;
+    }
+
+    // Scroll to the row
+    currentUserRow.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center'
+    });
+
+    // Add highlight flash animation
+    currentUserRow.classList.add('highlight-flash');
+
+    // Remove animation class after completion
+    setTimeout(() => {
+        currentUserRow.classList.remove('highlight-flash');
+    }, 1500);
+}
+
+// Show temporary message for Jump to Me button
+function showJumpToMeMessage(message) {
+    const jumpToMeBtn = document.getElementById('jumpToMeBtn');
+    if (!jumpToMeBtn) return;
+
+    // Store original content
+    const originalHTML = jumpToMeBtn.innerHTML;
+
+    // Show message state
+    jumpToMeBtn.innerHTML = `<span style="font-size: 0.75rem;">${message}</span>`;
+    jumpToMeBtn.disabled = true;
+
+    // Restore after 3 seconds
+    setTimeout(() => {
+        jumpToMeBtn.innerHTML = originalHTML;
+        jumpToMeBtn.disabled = false;
+    }, 3000);
 }
 
 // Make functions available globally

@@ -109,6 +109,32 @@
                         <!-- Will be populated dynamically -->
                     </select>
                 </div>
+
+                <!-- Search Input -->
+                <div class="filter-group search-filter-group">
+                    <label for="riderSearchInput">Search Rider</label>
+                    <div class="search-input-wrapper">
+                        <svg class="search-icon" width="16" height="16" viewBox="0 0 20 20" fill="none">
+                            <path d="M9 17A8 8 0 1 0 9 1a8 8 0 0 0 0 16zM19 19l-4.35-4.35" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <input type="text" id="riderSearchInput" class="filter-input search-input" placeholder="Search by name...">
+                        <button type="button" id="clearRiderSearch" class="clear-search-btn" title="Clear search">
+                            <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                                <path d="M12 4L4 12M4 4l8 8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Jump to Me Button -->
+                <button type="button" id="jumpToMeBtn" class="btn-jump-to-me" title="Find your position in the rankings">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="2"/>
+                        <path d="M12 2v4M12 18v4M2 12h4M18 12h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    Jump to Me
+                </button>
+
                 <button id="clearFilters" class="btn-clear-filters">Clear Filters</button>
             </div>
 
