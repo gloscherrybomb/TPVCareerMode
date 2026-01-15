@@ -11,6 +11,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const Papa = require('papaparse');
 
 // ARR Band definitions
 function getARRBandGroup(arr) {
@@ -48,16 +49,89 @@ function findJsonFiles(dir) {
     return files;
 }
 
+// Recursively find all CSV files
+function findCsvFiles(dir) {
+    const files = [];
+    const items = fs.readdirSync(dir, { withFileTypes: true });
+    for (const item of items) {
+        const fullPath = path.join(dir, item.name);
+        if (item.isDirectory()) {
+            files.push(...findCsvFiles(fullPath));
+        } else if (item.isFile() && item.name.endsWith('.csv')) {
+            files.push(fullPath);
+        }
+    }
+    return files;
+}
+
+// Parse CSV file (handles TPVirtual format with title lines)
+function parseCSV(csvContent) {
+    return new Promise((resolve, reject) => {
+        let processedContent = csvContent;
+        let lines = csvContent.split('\n');
+
+        // Remove first 2 lines if they contain "OVERALL INDIVIDUAL RESULTS:"
+        if (lines[0].includes('OVERALL INDIVIDUAL RESULTS')) {
+            lines = lines.slice(2);
+            processedContent = lines.join('\n');
+        }
+
+        Papa.parse(processedContent, {
+            header: true,
+            skipEmptyLines: true,
+            complete: (results) => {
+                resolve(results.data);
+            },
+            error: (error) => {
+                reject(error);
+            }
+        });
+    });
+}
+
+// Extract timestamp from filename
+function extractTimestampFromFilename(filePath) {
+    const match = filePath.match(/_(\d{8})_(\d{6})\.(csv|json)$/);
+    if (!match) {
+        return null;
+    }
+    const dateStr = match[1]; // YYYYMMDD
+    const timeStr = match[2]; // HHMMSS
+    const year = dateStr.substring(0, 4);
+    const month = dateStr.substring(4, 6);
+    const day = dateStr.substring(6, 8);
+    const hour = timeStr.substring(0, 2);
+    const minute = timeStr.substring(2, 4);
+    const second = timeStr.substring(4, 6);
+    return new Date(`${year}-${month}-${day}T${hour}:${minute}:${second}.000Z`);
+}
+
+// Convert CSV row to result format
+function csvRowToResult(row) {
+    return {
+        playerId: row.UID,
+        firstName: row.Name?.split(' ')[0] || '',
+        lastName: row.Name?.split(' ').slice(1).join(' ') || '',
+        position: parseInt(row.Position),
+        isDNF: false, // CSV doesn't include DNFs
+        rating: parseFloat(row.EventRating) || null,
+        arr: parseInt(row.ARR) || null,
+        isBot: row.Gender === 'Bot'
+    };
+}
+
 // Main analysis
-function analyzeMatchmaking() {
+async function analyzeMatchmaking() {
     const resultsDir = path.join(__dirname, 'race_results');
     const jsonFiles = findJsonFiles(resultsDir);
+    const csvFiles = findCsvFiles(resultsDir);
 
-    console.log(`Processing ${jsonFiles.length} result files...\n`);
+    console.log(`Processing ${jsonFiles.length} JSON files and ${csvFiles.length} CSV files...\n`);
 
     // Collect all results with timestamps
     const allResults = [];
 
+    // Process JSON files
     for (const file of jsonFiles) {
         try {
             const data = JSON.parse(fs.readFileSync(file, 'utf8'));
@@ -105,11 +179,71 @@ function analyzeMatchmaking() {
                     percentileDiff: percentileFinish - expectedPercentile,
                     isWin,
                     predictedWin,
-                    ceilingAffected
+                    ceilingAffected,
+                    source: 'json'
                 });
             }
         } catch (err) {
-            console.error(`Error processing ${file}: ${err.message}`);
+            console.error(`Error processing JSON ${file}: ${err.message}`);
+        }
+    }
+
+    // Process CSV files
+    for (const file of csvFiles) {
+        try {
+            const csvContent = fs.readFileSync(file, 'utf8');
+            const csvData = await parseCSV(csvContent);
+
+            if (!csvData || csvData.length === 0) continue;
+
+            // Convert CSV rows to results format
+            const results = csvData.map(csvRowToResult).filter(r => r.rating != null);
+
+            const predictedPositions = calculatePredictedPositions(results);
+            const raceDate = extractTimestampFromFilename(file) || new Date(fs.statSync(file).mtime);
+            const fieldSize = results.filter(r => !r.isDNF && r.position !== 32767).length;
+            const eventKey = csvData[0]?.EventKey || path.basename(file);
+
+            for (const rider of results) {
+                if (rider.isDNF || rider.position === 32767 || !rider.rating) continue;
+
+                const predictedPos = predictedPositions.get(rider.playerId);
+                if (!predictedPos) continue;
+
+                const actualPos = rider.position;
+                const diff = actualPos - predictedPos;
+
+                // Calculate percentile finish
+                const percentileFinish = ((actualPos - 1) / (fieldSize - 1)) * 100;
+                const expectedPercentile = ((predictedPos - 1) / (fieldSize - 1)) * 100;
+
+                const isWin = actualPos === 1;
+                const predictedWin = predictedPos === 1;
+                const ceilingAffected = isWin;
+
+                allResults.push({
+                    playerId: rider.playerId,
+                    name: `${rider.firstName} ${rider.lastName}`,
+                    isBot: rider.isBot,
+                    arr: rider.arr,
+                    arrBand: getARRBandGroup(rider.arr),
+                    raceDate,
+                    eventKey,
+                    predictedPos,
+                    actualPos,
+                    difference: diff,
+                    fieldSize,
+                    percentileFinish,
+                    expectedPercentile,
+                    percentileDiff: percentileFinish - expectedPercentile,
+                    isWin,
+                    predictedWin,
+                    ceilingAffected,
+                    source: 'csv'
+                });
+            }
+        } catch (err) {
+            console.error(`Error processing CSV ${file}: ${err.message}`);
         }
     }
 
@@ -203,7 +337,11 @@ function calculateBalanceMetrics(player) {
     const balanceScore = Math.max(0, 100 - Math.abs(avgDiff) * 10);
 
     // Trend direction - use non-win data if available for more accurate assessment
-    const trendMetric = nonWinAvgDiff !== null ? nonWinAvgDiff : avgDiff;
+    // BUT: use overall avgDiff if EITHER:
+    //  1. Win rate >= 50% (non-win sample too small), OR
+    //  2. |avgDiff| > 5 (clearly extreme performance regardless of win rate)
+    const useOverallAvgDiff = winRate >= 50 || Math.abs(avgDiff) > 5;
+    const trendMetric = (nonWinAvgDiff !== null && !useOverallAvgDiff) ? nonWinAvgDiff : avgDiff;
     let trend = 'balanced';
     if (trendMetric < -2) trend = 'overperforming';  // Consistently beating predictions
     if (trendMetric > 2) trend = 'underperforming';  // Consistently missing predictions
@@ -255,22 +393,30 @@ function generateDashboardData(playerResults) {
     const overperformingCount = playerMetrics.filter(p => p.metrics.trend === 'overperforming').length;
     const underperformingCount = playerMetrics.filter(p => p.metrics.trend === 'underperforming').length;
 
-    const avgBalanceScore = playerMetrics.reduce((a, p) => a + p.metrics.balanceScore, 0) / totalPlayers;
+    const validBalanceScores = playerMetrics.filter(p => !isNaN(p.metrics.balanceScore));
+    const avgBalanceScore = validBalanceScores.length > 0
+        ? validBalanceScores.reduce((a, p) => a + p.metrics.balanceScore, 0) / validBalanceScores.length
+        : 0;
 
     // Band analysis - are certain bands systematically off?
     const bandStats = {};
     for (const player of playerMetrics) {
         const band = player.currentBand;
         if (!bandStats[band]) {
-            bandStats[band] = { players: 0, totalAvgDiff: 0, totalRaces: 0 };
+            bandStats[band] = { players: 0, totalAvgDiff: 0, totalRaces: 0, validPlayerCount: 0 };
         }
         bandStats[band].players++;
-        bandStats[band].totalAvgDiff += player.metrics.avgDifference;
+        if (!isNaN(player.metrics.avgDifference)) {
+            bandStats[band].totalAvgDiff += player.metrics.avgDifference;
+            bandStats[band].validPlayerCount++;
+        }
         bandStats[band].totalRaces += player.metrics.raceCount;
     }
 
     for (const band in bandStats) {
-        bandStats[band].avgDiff = bandStats[band].totalAvgDiff / bandStats[band].players;
+        bandStats[band].avgDiff = bandStats[band].validPlayerCount > 0
+            ? bandStats[band].totalAvgDiff / bandStats[band].validPlayerCount
+            : 0;
     }
 
     return {
@@ -314,48 +460,55 @@ function generateDashboardData(playerResults) {
 }
 
 // Main execution
-console.log('Matchmaking Effectiveness Analysis\n');
-console.log('='.repeat(50));
+async function main() {
+    console.log('Matchmaking Effectiveness Analysis\n');
+    console.log('='.repeat(50));
 
-const playerResults = analyzeMatchmaking();
-const dashboardData = generateDashboardData(playerResults);
+    const playerResults = await analyzeMatchmaking();
+    const dashboardData = generateDashboardData(playerResults);
 
-// Save data for dashboard
-const outputPath = path.join(__dirname, 'matchmaking_data.json');
-fs.writeFileSync(outputPath, JSON.stringify(dashboardData, null, 2));
-console.log(`\nDashboard data saved to: ${outputPath}`);
+    // Save data for dashboard
+    const outputPath = path.join(__dirname, 'matchmaking_data.json');
+    fs.writeFileSync(outputPath, JSON.stringify(dashboardData, null, 2));
+    console.log(`\nDashboard data saved to: ${outputPath}`);
 
-// Print summary
-console.log('\n' + '='.repeat(50));
-console.log('MATCHMAKING EFFECTIVENESS SUMMARY');
-console.log('='.repeat(50));
-console.log(`\nTotal Human Riders (2+ races): ${dashboardData.summary.totalPlayers}`);
-console.log(`\nBalance Distribution:`);
-console.log(`  Balanced (avg diff within ±2):    ${dashboardData.summary.balancedCount} (${dashboardData.summary.balancedPct}%)`);
-console.log(`  Overperforming (beating preds):   ${dashboardData.summary.overperformingCount} (${dashboardData.summary.overperformingPct}%)`);
-console.log(`  Underperforming (missing preds):  ${dashboardData.summary.underperformingCount} (${dashboardData.summary.underperformingPct}%)`);
-console.log(`\nAverage Balance Score: ${dashboardData.summary.avgBalanceScore}/100`);
+    // Print summary
+    console.log('\n' + '='.repeat(50));
+    console.log('MATCHMAKING EFFECTIVENESS SUMMARY');
+    console.log('='.repeat(50));
+    console.log(`\nTotal Human Riders (2+ races): ${dashboardData.summary.totalPlayers}`);
+    console.log(`\nBalance Distribution:`);
+    console.log(`  Balanced (avg diff within ±2):    ${dashboardData.summary.balancedCount} (${dashboardData.summary.balancedPct}%)`);
+    console.log(`  Overperforming (beating preds):   ${dashboardData.summary.overperformingCount} (${dashboardData.summary.overperformingPct}%)`);
+    console.log(`  Underperforming (missing preds):  ${dashboardData.summary.underperformingCount} (${dashboardData.summary.underperformingPct}%)`);
+    console.log(`\nAverage Balance Score: ${dashboardData.summary.avgBalanceScore}/100`);
 
-console.log(`\nBy ARR Band:`);
-const bands = ['Diamond', 'Platinum', 'Gold', 'Silver', 'Bronze', 'Unranked'];
-for (const band of bands) {
-    const stats = dashboardData.bandStats[band];
-    if (stats) {
-        const direction = stats.avgDiff < -1 ? '(overperforming)' : stats.avgDiff > 1 ? '(underperforming)' : '(balanced)';
-        console.log(`  ${band.padEnd(10)}: ${stats.players} riders, avg diff ${stats.avgDiff.toFixed(2)} ${direction}`);
+    console.log(`\nBy ARR Band:`);
+    const bands = ['Diamond', 'Platinum', 'Gold', 'Silver', 'Bronze', 'Unranked'];
+    for (const band of bands) {
+        const stats = dashboardData.bandStats[band];
+        if (stats) {
+            const direction = stats.avgDiff < -1 ? '(overperforming)' : stats.avgDiff > 1 ? '(underperforming)' : '(balanced)';
+            console.log(`  ${band.padEnd(10)}: ${stats.players} riders, avg diff ${stats.avgDiff.toFixed(2)} ${direction}`);
+        }
     }
+
+    console.log('\nTop riders by race count:');
+    dashboardData.players.slice(0, 10).forEach((p, i) => {
+        const arrow = p.trend === 'overperforming' ? '↑' : p.trend === 'underperforming' ? '↓' : '→';
+        const winInfo = p.wins > 0 ? ` [${p.wins} wins - ceiling effect]` : '';
+        console.log(`  ${i+1}. ${p.name.padEnd(25)} ${p.raceCount} races, cumulative: ${p.cumulativeFinal > 0 ? '+' : ''}${p.cumulativeFinal}, trend: ${arrow} ${p.trend}${winInfo}`);
+    });
+
+    // Ceiling effect summary
+    const playersWithWins = dashboardData.players.filter(p => p.wins > 0);
+    const totalWins = playersWithWins.reduce((a, p) => a + p.wins, 0);
+    console.log(`\nCeiling Effect Note:`);
+    console.log(`  ${playersWithWins.length} riders have ${totalWins} total wins where true overperformance is unmeasurable.`);
+    console.log(`  Riders with many wins may appear "balanced" but could be significantly underrated.`);
 }
 
-console.log('\nTop riders by race count:');
-dashboardData.players.slice(0, 10).forEach((p, i) => {
-    const arrow = p.trend === 'overperforming' ? '↑' : p.trend === 'underperforming' ? '↓' : '→';
-    const winInfo = p.wins > 0 ? ` [${p.wins} wins - ceiling effect]` : '';
-    console.log(`  ${i+1}. ${p.name.padEnd(25)} ${p.raceCount} races, cumulative: ${p.cumulativeFinal > 0 ? '+' : ''}${p.cumulativeFinal}, trend: ${arrow} ${p.trend}${winInfo}`);
+main().catch(err => {
+    console.error('Fatal error:', err);
+    process.exit(1);
 });
-
-// Ceiling effect summary
-const playersWithWins = dashboardData.players.filter(p => p.wins > 0);
-const totalWins = playersWithWins.reduce((a, p) => a + p.wins, 0);
-console.log(`\nCeiling Effect Note:`);
-console.log(`  ${playersWithWins.length} riders have ${totalWins} total wins where true overperformance is unmeasurable.`);
-console.log(`  Riders with many wins may appear "balanced" but could be significantly underrated.`);
