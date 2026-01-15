@@ -16,9 +16,7 @@ let db;
 let currentUser = null;
 let unlockStats = {};
 let filteredUnlocks = [];
-
-// Import unlock definitions
-const UNLOCK_DEFINITIONS = (window.unlockConfig && window.unlockConfig.UNLOCK_DEFINITIONS) || [];
+let UNLOCK_DEFINITIONS = [];
 
 // Initialize Firebase
 async function initFirebase() {
@@ -81,6 +79,16 @@ function showUnauthorized() {
 // Load unlock statistics from all users
 async function loadUnlockStatistics() {
     try {
+        // Load unlock definitions
+        UNLOCK_DEFINITIONS = (window.unlockConfig && window.unlockConfig.UNLOCK_DEFINITIONS) || [];
+
+        if (UNLOCK_DEFINITIONS.length === 0) {
+            console.error('No unlock definitions found');
+            document.getElementById('unlocksGrid').innerHTML =
+                '<p style="color: var(--text-secondary); text-align: center;">Error: Unlock definitions not loaded.</p>';
+            return;
+        }
+
         const usersSnapshot = await getDocs(collection(db, 'users'));
 
         // Initialize stats for each unlock
@@ -280,19 +288,7 @@ function escapeHtml(text) {
 
 // Event listeners
 document.addEventListener('DOMContentLoaded', () => {
-    // Load unlock-config.js first
-    const script = document.createElement('script');
-    script.src = 'unlock-config.js';
-    script.onload = () => {
-        console.log('Unlock config loaded');
-        initFirebase();
-    };
-    script.onerror = () => {
-        console.error('Failed to load unlock-config.js');
-        document.getElementById('unlocksGrid').innerHTML =
-            '<p style="color: var(--text-secondary); text-align: center;">Error loading unlock definitions.</p>';
-    };
-    document.head.appendChild(script);
+    initFirebase();
 
     // Sort dropdown
     document.getElementById('sortSelect').addEventListener('change', () => {
