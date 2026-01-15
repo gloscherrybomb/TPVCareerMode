@@ -610,7 +610,7 @@ async function fetchTotalRegisteredUsers(forceRefresh = false) {
     }
 }
 
-// Search users by name and calculate their position
+// Search users by name and calculate their position (optimized version)
 async function searchUsersByName(searchTerm) {
     if (!searchTerm || searchTerm.trim().length === 0) {
         return [];
@@ -619,13 +619,15 @@ async function searchUsersByName(searchTerm) {
     try {
         console.log(`🔍 Searching for users matching: "${searchTerm}"`);
 
-        // Fetch all users from Firestore (we need all to search case-insensitively)
+        // Fetch all users from Firestore ONCE
         const usersQuery = query(collection(db, 'users'));
         const usersSnapshot = await getDocs(usersQuery);
 
         const searchLower = searchTerm.toLowerCase().trim();
         const matchingUsers = [];
+        const allUserPoints = []; // Store all user points for ranking calculation
 
+        // First pass: collect matching users and all user points
         usersSnapshot.forEach((doc) => {
             const data = doc.data();
 
@@ -633,6 +635,9 @@ async function searchUsersByName(searchTerm) {
             if (doc.id.startsWith('Bot')) {
                 return;
             }
+
+            const points = data.careerPoints || 0;
+            allUserPoints.push(points);
 
             // Check if name matches (case-insensitive)
             const name = data.name || '';
@@ -644,7 +649,7 @@ async function searchUsersByName(searchTerm) {
                     season: data.currentSeason || 1,
                     seasonCompleted: data.season1Complete === true || data?.seasons?.[`season${data.currentSeason}`]?.complete === true,
                     events: data.careerTotalEvents || data.completedStages?.length || 0,
-                    points: data.careerPoints || 0,
+                    points: points,
                     gender: data.gender || null,
                     ageBand: data.ageBand || null,
                     country: data.country || null,
@@ -658,12 +663,19 @@ async function searchUsersByName(searchTerm) {
         console.log(`✅ Found ${matchingUsers.length} matching users`);
 
         // Calculate position for each matching user
-        for (const user of matchingUsers) {
-            const position = await calculateUserPosition(user.points);
-            user.calculatedPosition = position;
-        }
+        matchingUsers.forEach(user => {
+            // Count how many users have strictly more points
+            let higherCount = 0;
+            for (let i = 0; i < allUserPoints.length; i++) {
+                if (allUserPoints[i] > user.points) {
+                    higherCount++;
+                }
+            }
+            // Position is the count of higher-ranked users + 1
+            user.calculatedPosition = higherCount + 1;
+        });
 
-        // Sort by calculated position
+        // Sort matching users by calculated position
         matchingUsers.sort((a, b) => a.calculatedPosition - b.calculatedPosition);
 
         return matchingUsers;
@@ -676,11 +688,12 @@ async function searchUsersByName(searchTerm) {
 // Calculate a user's position based on their career points
 async function calculateUserPosition(userPoints) {
     try {
-        // Count how many users have more points (excluding bots)
+        // Fetch all users to calculate position
         const usersQuery = query(collection(db, 'users'));
         const usersSnapshot = await getDocs(usersQuery);
 
-        let higherRankedCount = 0;
+        // Count how many users have strictly more points
+        let higherCount = 0;
         usersSnapshot.forEach((doc) => {
             // Skip bots
             if (doc.id.startsWith('Bot')) {
@@ -691,12 +704,12 @@ async function calculateUserPosition(userPoints) {
             const points = data.careerPoints || 0;
 
             if (points > userPoints) {
-                higherRankedCount++;
+                higherCount++;
             }
         });
 
-        // Position is count of higher-ranked users + 1
-        return higherRankedCount + 1;
+        // Position is the count of higher-ranked users + 1
+        return higherCount + 1;
     } catch (error) {
         console.error('Error calculating user position:', error);
         return null;
