@@ -45,20 +45,51 @@ class ResultNotificationManager {
       await userRef.update({
         viewedResults: this.viewedResults
       });
-      console.log('Saved viewed results to Firebase');
+      console.log('Successfully saved viewed results to Firebase:', Object.keys(this.viewedResults).length, 'results');
     } catch (error) {
       console.error('Failed to save viewed results to Firebase:', error);
+      console.error('Error code:', error.code);
+      console.error('Error message:', error.message);
+
+      // If update fails (e.g., field doesn't exist), try setting it
+      if (error.code === 'not-found' || error.message.includes('No document to update')) {
+        console.log('Document not found, attempting to set viewedResults field...');
+        try {
+          const userRef = db.collection('users').doc(this.userId);
+          await userRef.set({
+            viewedResults: this.viewedResults
+          }, { merge: true });
+          console.log('Successfully set viewedResults field using merge');
+        } catch (setError) {
+          console.error('Failed to set viewedResults field:', setError);
+        }
+      }
     }
   }
 
   /**
    * Mark a result as viewed
    * @param {string} resultKey - Key in format "s{season}_e{event}"
+   * @param {boolean} autoSave - Whether to automatically save to Firebase (default: true)
    */
-  async markAsViewed(resultKey) {
+  async markAsViewed(resultKey, autoSave = true) {
     this.viewedResults[resultKey] = Date.now();
-    await this.saveViewedResults();
+    if (autoSave) {
+      await this.saveViewedResults();
+    }
     console.log('Result marked as viewed:', resultKey);
+  }
+
+  /**
+   * Mark multiple results as viewed (batched operation)
+   * @param {Array<string>} resultKeys - Array of result keys
+   */
+  async markMultipleAsViewed(resultKeys) {
+    resultKeys.forEach(key => {
+      this.viewedResults[key] = Date.now();
+    });
+    await this.saveViewedResults();
+    console.log('Marked', resultKeys.length, 'results as viewed');
   }
 
   /**
@@ -258,18 +289,18 @@ class ResultNotificationManager {
     this._pendingResults = newResults;
 
     // Add event listeners
-    document.getElementById('viewResultsBtn').addEventListener('click', () => {
-      this.handleViewResults(newResults);
+    document.getElementById('viewResultsBtn').addEventListener('click', async () => {
+      await this.handleViewResults(newResults);
     });
 
-    document.getElementById('dismissResultsBtn').addEventListener('click', () => {
-      this.handleDismiss(newResults);
+    document.getElementById('dismissResultsBtn').addEventListener('click', async () => {
+      await this.handleDismiss(newResults);
     });
 
     // ESC key to dismiss
-    const escHandler = (e) => {
+    const escHandler = async (e) => {
       if (e.key === 'Escape') {
-        this.handleDismiss(newResults);
+        await this.handleDismiss(newResults);
         document.removeEventListener('keydown', escHandler);
       }
     };
@@ -289,10 +320,11 @@ class ResultNotificationManager {
    * @param {Array} results - Array of result objects
    */
   async handleViewResults(results) {
-    // Mark all as viewed
-    for (const result of results) {
-      await this.markAsViewed(result.resultKey);
-    }
+    // Mark all as viewed (batched operation)
+    const resultKeys = results.map(r => r.resultKey);
+    await this.markMultipleAsViewed(resultKeys);
+
+    console.log('Saved viewed results to Firebase, now navigating...');
 
     // Close overlay
     this.closeOverlay();
@@ -312,10 +344,11 @@ class ResultNotificationManager {
    * @param {Array} results - Array of result objects
    */
   async handleDismiss(results) {
-    // Mark all as viewed
-    for (const result of results) {
-      await this.markAsViewed(result.resultKey);
-    }
+    // Mark all as viewed (batched operation)
+    const resultKeys = results.map(r => r.resultKey);
+    await this.markMultipleAsViewed(resultKeys);
+
+    console.log('Saved viewed results to Firebase, dismissing notification...');
 
     // Close overlay
     this.closeOverlay();
