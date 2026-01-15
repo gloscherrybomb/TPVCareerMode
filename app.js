@@ -535,6 +535,7 @@ if (googleLoginBtn) {
 
       if (!userDoc.exists() || !userDoc.data().uid) {
         // New Google user or existing user without UID - show UID modal
+        // Note: Document will be created by event-sequence.js or profile.js fallback
         openUidModal();
       } else {
         // User has UID, proceed normally
@@ -563,8 +564,13 @@ const googleSignupBtn = document.getElementById('googleSignupBtn');
 if (googleSignupBtn) {
   googleSignupBtn.addEventListener('click', async () => {
     try {
-      // Always use local persistence for signup (user choosing to create account)
-      await setPersistence(auth, browserLocalPersistence);
+      // Check Remember Me checkbox (default to true if not found)
+      const rememberMeCheckbox = document.getElementById('rememberMe');
+      const rememberMe = rememberMeCheckbox ? rememberMeCheckbox.checked : true;
+
+      // Set persistence based on Remember Me checkbox
+      const persistence = rememberMe ? browserLocalPersistence : browserSessionPersistence;
+      await setPersistence(auth, persistence);
 
       const result = await signInWithPopup(auth, googleProvider);
       const user = result.user;
@@ -574,6 +580,7 @@ if (googleSignupBtn) {
 
       if (!userDoc.exists() || !userDoc.data().uid) {
         // New Google user or existing user without UID - show UID modal
+        // Note: Document will be created by event-sequence.js or profile.js fallback
         openUidModal();
       } else {
         // User has UID, proceed normally

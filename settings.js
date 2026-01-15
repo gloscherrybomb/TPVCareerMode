@@ -15,9 +15,15 @@ import {
     uploadBytes,
     getDownloadURL
 } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js';
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { initializeApp, getApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 
-const app = initializeApp(firebaseConfig);
+// Get existing Firebase app or initialize if needed
+let app;
+try {
+    app = getApp();
+} catch (error) {
+    app = initializeApp(firebaseConfig);
+}
 const auth = getAuth(app);
 const db = getFirestore(app);
 const storage = getStorage(app);
@@ -67,8 +73,9 @@ async function loadSettings(user) {
             populateSettings(userData);
             showSettingsContent();
         } else {
-            console.error('User document not found');
-            showLoginPrompt();
+            console.log('User document not found. Redirecting to complete profile setup.');
+            alert('Please complete your profile setup by entering your TPV UID.');
+            window.location.href = 'index.html';
         }
     } catch (error) {
         console.error('Error loading settings:', error);

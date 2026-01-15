@@ -3,12 +3,18 @@
 
 // Firebase imports
 import { firebaseConfig } from './firebase-config.js';
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { initializeApp, getApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 import { getFirestore, doc, getDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+// Get existing Firebase app or initialize if needed
+// This prevents multiple Firebase instances from causing auth state issues
+let app;
+try {
+    app = getApp();
+} catch (error) {
+    app = initializeApp(firebaseConfig);
+}
 
 // Define the event sequence
 const eventSequence = [
@@ -134,15 +140,15 @@ class ProgressManager {
 
         try {
             const userDoc = await getDoc(doc(this.db, 'users', this.currentUser.uid));
-            
+
             if (userDoc.exists()) {
                 const userData = userDoc.data();
-                
+
                 // Build choiceSelections from usedOptionalEvents if not already present
                 // usedOptionalEvents array maps to choice stages: index 0 -> stage 3, index 1 -> stage 6, index 2 -> stage 8
                 let choiceSelections = userData.choiceSelections || {};
                 const usedOptionalEvents = userData.usedOptionalEvents || [];
-                
+
                 // If choiceSelections is empty but usedOptionalEvents has data, build it
                 if (Object.keys(choiceSelections).length === 0 && usedOptionalEvents.length > 0) {
                     const choiceStages = [3, 6, 8];
@@ -152,7 +158,7 @@ class ProgressManager {
                         }
                     });
                 }
-                
+
                 this.progress = {
                     currentStage: userData.currentStage || 1,
                     completedStages: userData.completedStages || [],
@@ -161,14 +167,15 @@ class ProgressManager {
                     totalPoints: userData.season1Points || 0
                 };
                 console.log('Progress loaded from Firestore:', this.progress);
-                
+
                 // Force UI update after Firebase load
                 if (typeof window.updateProgressUI === 'function') {
                     console.log('Triggering UI update with currentStage:', this.progress.currentStage);
                     window.updateProgressUI();
                 }
             } else {
-                console.log('No user document found, using defaults');
+                console.log('No user document found. Using defaults. Please complete profile setup.');
+                // Use default progress - user needs to complete UID modal to create document
                 this.progress = {
                     currentStage: 1,
                     completedStages: [],

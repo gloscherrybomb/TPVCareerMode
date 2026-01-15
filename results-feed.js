@@ -1,7 +1,7 @@
 // Results Feed Page Logic for TPV Career Mode
 
 import { firebaseConfig } from './firebase-config.js';
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { initializeApp, getApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 import {
     getFirestore,
@@ -22,7 +22,13 @@ import {
 import { initRiderProfileModal, makeRiderNameClickable } from './rider-profile-modal.js';
 import { getHighResPhotoURL } from './utils.js';
 
-const app = initializeApp(firebaseConfig);
+// Get existing Firebase app or initialize if needed
+let app;
+try {
+    app = getApp();
+} catch (error) {
+    app = initializeApp(firebaseConfig);
+}
 const auth = getAuth(app);
 const db = getFirestore(app);
 
