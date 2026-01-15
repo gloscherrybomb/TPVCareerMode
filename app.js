@@ -533,25 +533,9 @@ if (googleLoginBtn) {
       // Check if user document exists and has UID
       const userDoc = await getDoc(doc(db, 'users', user.uid));
 
-      if (!userDoc.exists()) {
-        // Create default user document immediately to prevent persistence issues
-        await setDoc(doc(db, 'users', user.uid), {
-          name: user.displayName || 'Google User',
-          uid: null, // Will be filled in via UID modal
-          email: user.email,
-          currentStage: 1,
-          completedStages: [],
-          completedOptionalEvents: [],
-          choiceSelections: {},
-          totalPoints: 0,  // DEPRECATED: Use season1Points or careerPoints instead
-          season1Points: 0,
-          careerPoints: 0,
-          createdAt: new Date()
-        });
-        // Show UID modal for new user
-        openUidModal();
-      } else if (!userDoc.data().uid) {
-        // Existing user without UID - show UID modal
+      if (!userDoc.exists() || !userDoc.data().uid) {
+        // New Google user or existing user without UID - show UID modal
+        // Note: Document will be created by event-sequence.js or profile.js fallback
         openUidModal();
       } else {
         // User has UID, proceed normally
@@ -594,25 +578,9 @@ if (googleSignupBtn) {
       // Check if user document exists and has UID
       const userDoc = await getDoc(doc(db, 'users', user.uid));
 
-      if (!userDoc.exists()) {
-        // Create default user document immediately to prevent persistence issues
-        await setDoc(doc(db, 'users', user.uid), {
-          name: user.displayName || 'Google User',
-          uid: null, // Will be filled in via UID modal
-          email: user.email,
-          currentStage: 1,
-          completedStages: [],
-          completedOptionalEvents: [],
-          choiceSelections: {},
-          totalPoints: 0,  // DEPRECATED: Use season1Points or careerPoints instead
-          season1Points: 0,
-          careerPoints: 0,
-          createdAt: new Date()
-        });
-        // Show UID modal for new user
-        openUidModal();
-      } else if (!userDoc.data().uid) {
-        // Existing user without UID - show UID modal
+      if (!userDoc.exists() || !userDoc.data().uid) {
+        // New Google user or existing user without UID - show UID modal
+        // Note: Document will be created by event-sequence.js or profile.js fallback
         openUidModal();
       } else {
         // User has UID, proceed normally

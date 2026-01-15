@@ -1,12 +1,18 @@
 // Upload Results Page Logic
 
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { initializeApp, getApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 import { getFirestore, doc, getDoc, collection, addDoc, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 import { firebaseConfig } from './firebase-config.js';
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
+// Get existing Firebase app or initialize if needed
+let app;
+try {
+    app = getApp();
+} catch (error) {
+    app = initializeApp(firebaseConfig);
+}
 const auth = getAuth(app);
 const db = getFirestore(app);
 
@@ -103,8 +109,9 @@ async function loadUserData(user) {
         const userDoc = await getDoc(doc(db, 'users', user.uid));
 
         if (!userDoc.exists()) {
-            console.error('User document not found');
-            showLoginPrompt();
+            console.log('User document not found. Redirecting to complete profile setup.');
+            alert('Please complete your profile setup by entering your TPV UID.');
+            window.location.href = 'index.html';
             return;
         }
 

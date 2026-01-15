@@ -17,11 +17,18 @@ import {
     getDocs,
     orderBy
 } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { initializeApp, getApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 
 // Access eventData from global scope (loaded via script tag in HTML)
 
-const app = initializeApp(firebaseConfig);
+// Get existing Firebase app or initialize if needed
+// This prevents multiple Firebase instances from causing auth state issues
+let app;
+try {
+    app = getApp();
+} catch (error) {
+    app = initializeApp(firebaseConfig);
+}
 const auth = getAuth(app);
 const db = getFirestore(app);
 
@@ -540,35 +547,14 @@ async function loadProfile(user) {
         const userDoc = await getDoc(doc(db, 'users', user.uid));
 
         if (!userDoc.exists()) {
-            console.log('User document not found, creating default document to fix persistence issue');
-
-            // Create default user document to prevent login persistence issues
-            const defaultUserData = {
-                name: user.displayName || user.email || 'User',
-                uid: null, // Will be filled in later via profile/settings
-                email: user.email,
-                currentStage: 1,
-                completedStages: [],
-                completedOptionalEvents: [],
-                choiceSelections: {},
-                totalPoints: 0,  // DEPRECATED: Use season1Points or careerPoints instead
-                season1Points: 0,
-                careerPoints: 0,
-                createdAt: new Date()
-            };
-
-            try {
-                await setDoc(doc(db, 'users', user.uid), defaultUserData);
-                console.log('Default user document created successfully');
-                userData = defaultUserData;
-            } catch (createError) {
-                console.error('Error creating default user document:', createError);
-                showLoginPrompt();
-                return;
-            }
-        } else {
-            userData = userDoc.data();
+            console.log('User document not found. Redirecting to complete profile setup.');
+            // Redirect to index.html to complete UID modal
+            alert('Please complete your profile setup by entering your TPV UID.');
+            window.location.href = 'index.html';
+            return;
         }
+
+        userData = userDoc.data();
 
         // Store globally for share functionality
         window.currentUserData = userData;
