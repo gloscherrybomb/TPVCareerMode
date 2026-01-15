@@ -67,8 +67,9 @@ async function loadSettings(user) {
             populateSettings(userData);
             showSettingsContent();
         } else {
-            console.error('User document not found');
-            showLoginPrompt();
+            console.log('User document not found. Redirecting to complete profile setup.');
+            alert('Please complete your profile setup by entering your TPV UID.');
+            window.location.href = 'index.html';
         }
     } catch (error) {
         console.error('Error loading settings:', error);

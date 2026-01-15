@@ -229,7 +229,9 @@ async function loadPalmares(user) {
         const userDoc = await getDoc(userDocRef);
 
         if (!userDoc.exists()) {
-            showLoginPrompt();
+            console.log('User document not found. Redirecting to complete profile setup.');
+            alert('Please complete your profile setup by entering your TPV UID.');
+            window.location.href = 'index.html';
             return;
         }
 

@@ -5,7 +5,7 @@
 import { firebaseConfig } from './firebase-config.js';
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-import { getFirestore, doc, getDoc, setDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { getFirestore, doc, getDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
@@ -168,30 +168,8 @@ class ProgressManager {
                     window.updateProgressUI();
                 }
             } else {
-                console.log('No user document found, creating default document to fix persistence issue');
-
-                // Create default user document to prevent login persistence issues
-                const defaultProgress = {
-                    name: this.currentUser.displayName || this.currentUser.email || 'User',
-                    uid: null, // Will be filled in later via profile/settings
-                    email: this.currentUser.email,
-                    currentStage: 1,
-                    completedStages: [],
-                    completedOptionalEvents: [],
-                    choiceSelections: {},
-                    totalPoints: 0,  // DEPRECATED: Use season1Points or careerPoints instead
-                    season1Points: 0,
-                    careerPoints: 0,
-                    createdAt: new Date()
-                };
-
-                try {
-                    await setDoc(doc(this.db, 'users', this.currentUser.uid), defaultProgress);
-                    console.log('Default user document created successfully');
-                } catch (createError) {
-                    console.error('Error creating default user document:', createError);
-                }
-
+                console.log('No user document found. Using defaults. Please complete profile setup.');
+                // Use default progress - user needs to complete UID modal to create document
                 this.progress = {
                     currentStage: 1,
                     completedStages: [],

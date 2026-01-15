@@ -103,8 +103,9 @@ async function loadUserData(user) {
         const userDoc = await getDoc(doc(db, 'users', user.uid));
 
         if (!userDoc.exists()) {
-            console.error('User document not found');
-            showLoginPrompt();
+            console.log('User document not found. Redirecting to complete profile setup.');
+            alert('Please complete your profile setup by entering your TPV UID.');
+            window.location.href = 'index.html';
             return;
         }
 
