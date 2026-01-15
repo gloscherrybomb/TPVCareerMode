@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Award Statistics - TPV Career Mode</title>
+    <title>Unlock Statistics - TPV Career Mode</title>
 
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="tpv-team-car.png">
@@ -51,6 +51,10 @@
             color: var(--success);
         }
 
+        .stat-value.purple {
+            color: #a855f7;
+        }
+
         .stat-label {
             color: var(--text-secondary);
             font-size: 0.9rem;
@@ -93,13 +97,13 @@
             border-color: var(--accent-blue);
         }
 
-        .awards-grid {
+        .unlocks-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
             gap: 1.5rem;
         }
 
-        .award-card {
+        .unlock-card {
             background: var(--dark-card);
             border-radius: 12px;
             padding: 1.5rem;
@@ -107,47 +111,62 @@
             transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
-        .award-card:hover {
+        .unlock-card:hover {
             transform: translateY(-2px);
             box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
         }
 
-        .award-card.type-event {
+        .unlock-card.tier-120 {
+            border-left-color: #22c55e;
+        }
+
+        .unlock-card.tier-200 {
             border-left-color: var(--accent-blue);
         }
 
-        .award-card.type-career {
-            border-left-color: var(--success);
+        .unlock-card.tier-300 {
+            border-left-color: #a855f7;
         }
 
-        .award-card.type-season {
+        .unlock-card.tier-400 {
+            border-left-color: #f59e0b;
+        }
+
+        .unlock-card.tier-special {
             border-left-color: #ffd700;
         }
 
-        .award-header {
+        .unlock-header {
             display: flex;
             align-items: center;
             gap: 1rem;
             margin-bottom: 1rem;
         }
 
-        .award-icon {
+        .unlock-icon {
             font-size: 2.5rem;
             line-height: 1;
         }
 
-        .award-title-section {
+        .unlock-title-section {
             flex: 1;
         }
 
-        .award-title {
+        .unlock-title {
             font-family: 'Orbitron', sans-serif;
             font-size: 1.1rem;
             color: var(--text-primary);
             margin-bottom: 0.25rem;
         }
 
-        .award-type-badge {
+        .unlock-badges {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-top: 0.5rem;
+        }
+
+        .unlock-tier-badge {
             display: inline-block;
             padding: 0.2rem 0.5rem;
             border-radius: 4px;
@@ -157,28 +176,32 @@
             letter-spacing: 0.5px;
         }
 
-        .award-type-badge.event {
+        .unlock-tier-badge.tier-120 {
+            background: rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+
+        .unlock-tier-badge.tier-200 {
             background: rgba(69, 202, 255, 0.2);
             color: var(--accent-blue);
         }
 
-        .award-type-badge.career {
-            background: rgba(52, 199, 89, 0.2);
-            color: var(--success);
+        .unlock-tier-badge.tier-300 {
+            background: rgba(168, 85, 247, 0.2);
+            color: #a855f7;
         }
 
-        .award-type-badge.season {
+        .unlock-tier-badge.tier-400 {
+            background: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+        }
+
+        .unlock-tier-badge.tier-special {
             background: rgba(255, 215, 0, 0.2);
             color: #ffd700;
         }
 
-        .award-badges {
-            display: flex;
-            gap: 0.5rem;
-            flex-wrap: wrap;
-        }
-
-        .award-cc-badge {
+        .unlock-cost-badge {
             display: inline-block;
             padding: 0.2rem 0.5rem;
             border-radius: 4px;
@@ -189,32 +212,32 @@
             color: #ffa500;
         }
 
-        .award-description {
+        .unlock-description {
             color: var(--text-secondary);
             font-size: 0.9rem;
             line-height: 1.5;
             margin-bottom: 1rem;
         }
 
-        .award-stats {
+        .unlock-stats {
             display: flex;
             gap: 1.5rem;
             padding-top: 1rem;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .award-stat {
+        .unlock-stat {
             text-align: center;
         }
 
-        .award-stat-value {
+        .unlock-stat-value {
             font-family: 'Orbitron', sans-serif;
             font-size: 1.5rem;
             font-weight: 700;
             color: var(--text-primary);
         }
 
-        .award-stat-label {
+        .unlock-stat-label {
             font-size: 0.75rem;
             color: var(--text-secondary);
             text-transform: uppercase;
@@ -288,7 +311,7 @@
         }
 
         @media (max-width: 768px) {
-            .awards-grid {
+            .unlocks-grid {
                 grid-template-columns: 1fr;
             }
 
@@ -311,8 +334,8 @@
                 <a href="admin-bots.html" class="nav-link">Bot Admin</a>
                 <a href="admin-contributors.html" class="nav-link">Contributors</a>
                 <a href="admin-stats.html" class="nav-link">Usage Stats</a>
-                <a href="admin-awards.html" class="nav-link active">Awards</a>
-                <a href="admin-unlocks.html" class="nav-link">Unlocks</a>
+                <a href="admin-awards.html" class="nav-link">Awards</a>
+                <a href="admin-unlocks.html" class="nav-link active">Unlocks</a>
                 <a href="#" class="nav-link nav-logout" id="logoutBtn">Logout</a>
             </div>
         </div>
@@ -338,8 +361,8 @@
     <div id="adminContent" style="display: none;">
         <div class="page-header">
             <div class="container">
-                <h1 class="page-title">Award Statistics</h1>
-                <p class="page-subtitle">Overview of all awards and how many riders have earned them</p>
+                <h1 class="page-title">Unlock Statistics</h1>
+                <p class="page-subtitle">Overview of all unlocks showing purchases and usage</p>
             </div>
         </div>
 
@@ -347,16 +370,20 @@
             <!-- Summary Stats -->
             <div class="stats-section">
                 <div class="stat-card">
-                    <div class="stat-value" id="totalAwardTypes">-</div>
-                    <div class="stat-label">Award Types</div>
+                    <div class="stat-value" id="totalUnlockTypes">-</div>
+                    <div class="stat-label">Unlock Types</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-value blue" id="totalAwarded">-</div>
-                    <div class="stat-label">Total Awarded</div>
+                    <div class="stat-value blue" id="totalPurchases">-</div>
+                    <div class="stat-label">Total Purchases</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-value green" id="uniqueEarners">-</div>
-                    <div class="stat-label">Unique Earners</div>
+                    <div class="stat-value purple" id="totalTriggers">-</div>
+                    <div class="stat-label">Total Triggers</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value green" id="activeUsers">-</div>
+                    <div class="stat-label">Active Users</div>
                 </div>
             </div>
 
@@ -364,38 +391,43 @@
             <div class="controls-section">
                 <label style="color: var(--text-secondary);">Sort by:</label>
                 <select id="sortSelect" class="sort-select">
-                    <option value="total-desc">Most Earned</option>
-                    <option value="total-asc">Rarest (Fewest Earned)</option>
-                    <option value="riders-desc">Most Unique Riders</option>
-                    <option value="riders-asc">Fewest Unique Riders</option>
+                    <option value="owned-desc">Most Owned</option>
+                    <option value="owned-asc">Least Owned (Rarest)</option>
+                    <option value="triggers-desc">Most Used</option>
+                    <option value="triggers-asc">Least Used</option>
+                    <option value="tier-asc">Tier (Low to High)</option>
                     <option value="name-asc">Name (A-Z)</option>
                 </select>
                 <label style="color: var(--text-secondary);">Filter:</label>
                 <select id="filterSelect" class="filter-select">
-                    <option value="all">All Awards</option>
-                    <option value="event">Event Awards</option>
-                    <option value="career">Career Awards</option>
-                    <option value="season">Season Awards</option>
-                    <option value="earned">Earned Only</option>
-                    <option value="unearned">Never Earned</option>
+                    <option value="all">All Unlocks</option>
+                    <option value="tier-120">Tier 120</option>
+                    <option value="tier-200">Tier 200</option>
+                    <option value="tier-300">Tier 300</option>
+                    <option value="tier-400">Tier 400</option>
+                    <option value="tier-special">Special Items</option>
+                    <option value="owned">Purchased</option>
+                    <option value="never-purchased">Never Purchased</option>
+                    <option value="triggered">Triggered</option>
+                    <option value="never-triggered">Never Triggered</option>
                 </select>
                 <button class="refresh-btn" id="refreshBtn">Refresh Data</button>
             </div>
 
-            <!-- Awards Grid -->
+            <!-- Unlocks Grid -->
             <div class="header-row">
-                <h2 class="section-title">All Awards</h2>
+                <h2 class="section-title">All Unlocks</h2>
                 <span id="filteredCount" style="color: var(--text-secondary);"></span>
             </div>
-            <div id="awardsGrid" class="awards-grid">
+            <div id="unlocksGrid" class="unlocks-grid">
                 <div class="loading">
                     <div class="spinner"></div>
-                    <p>Loading award statistics...</p>
+                    <p>Loading unlock statistics...</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <script type="module" src="admin-awards.js"></script>
+    <script type="module" src="admin-unlocks.js"></script>
 </body>
 </html>
