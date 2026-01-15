@@ -4,7 +4,7 @@ import { firebaseConfig } from './firebase-config.js';
 import { formatTime } from './utils.js';
 import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 import { getFirestore, doc, getDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { initializeApp, getApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import { makeNameClickable } from './bot-profile-modal.js';
 import { displayPostRaceInterview } from './event-detail-interview.js';
 
@@ -14,7 +14,13 @@ function getTimeBasedEvents() {
     return window.eventConfig?.TIME_BASED_EVENTS || [];
 }
 
-const app = initializeApp(firebaseConfig);
+// Get existing Firebase app or initialize if needed
+let app;
+try {
+    app = getApp();
+} catch (error) {
+    app = initializeApp(firebaseConfig);
+}
 const auth = getAuth(app);
 const db = getFirestore(app);
 

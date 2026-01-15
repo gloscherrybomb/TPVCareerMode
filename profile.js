@@ -17,11 +17,18 @@ import {
     getDocs,
     orderBy
 } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+import { initializeApp, getApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 
 // Access eventData from global scope (loaded via script tag in HTML)
 
-const app = initializeApp(firebaseConfig);
+// Get existing Firebase app or initialize if needed
+// This prevents multiple Firebase instances from causing auth state issues
+let app;
+try {
+    app = getApp();
+} catch (error) {
+    app = initializeApp(firebaseConfig);
+}
 const auth = getAuth(app);
 const db = getFirestore(app);
 
