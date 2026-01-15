@@ -245,15 +245,13 @@ function renderUnlocksGrid() {
         const tierClass = getTierClass(unlock);
         const tierLabel = unlock.isFlair ? 'Flair' : unlock.isSpecialEvent ? 'Special Event' : `Tier ${unlock.tier}`;
 
-        // Try to get icon, fall back to emoji if TPVIcons isn't available
-        const iconHtml = (window.TPVIcons && window.TPVIcons.getIconFallback)
-            ? window.TPVIcons.getIconFallback(unlock.id)
-            : unlock.emoji;
+        // Use emoji for unlocks (they don't use the icon system)
+        const displayEmoji = unlock.emoji || '⭐';
 
         return `
         <div class="unlock-card ${tierClass}">
             <div class="unlock-header">
-                <div class="unlock-icon">${iconHtml}</div>
+                <div class="unlock-icon">${displayEmoji}</div>
                 <div class="unlock-title-section">
                     <div class="unlock-title">${escapeHtml(unlock.name)}</div>
                     <div class="unlock-badges">
