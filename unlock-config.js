@@ -157,7 +157,7 @@ const UNLOCK_DEFINITIONS = [
     tier: 200,
     pointsBonus: 5,
     trigger: 'beatPredictionByAny',
-    description: 'Beat prediction → +5 pts & +5 Confidence',
+    description: 'Beat prediction → +5 pts & +5 Confidence (one-time)',
     narrative: 'Sports psychology rebuilds self-belief. Outperform predictions, build confidence.',
     emoji: '🧠',
     personalityBonus: { confidence: 5 }
@@ -169,7 +169,7 @@ const UNLOCK_DEFINITIONS = [
     tier: 200,
     pointsBonus: 6,
     trigger: 'winSprint',
-    description: 'Win a sprint → +6 pts & +5 Aggression',
+    description: 'Win a sprint → +6 pts & +5 Aggression (one-time)',
     narrative: 'Explosive intervals and controlled fury. Win sprints, earn respect.',
     emoji: '💪',
     personalityBonus: { aggression: 5 }
@@ -181,7 +181,7 @@ const UNLOCK_DEFINITIONS = [
     tier: 200,
     pointsBonus: 5,
     trigger: 'finishTop10',
-    description: 'Finish top 10 → +5 pts & +5 Professionalism',
+    description: 'Finish top 10 → +5 pts & +5 Professionalism (one-time)',
     narrative: 'Clear comms, tactical awareness. Consistent top-10s prove reliability.',
     emoji: '📻',
     personalityBonus: { professionalism: 5 }
@@ -193,7 +193,7 @@ const UNLOCK_DEFINITIONS = [
     tier: 200,
     pointsBonus: 5,
     trigger: 'withinPrediction',
-    description: 'Finish within ±3 of prediction → +5 pts & +5 Professionalism',
+    description: 'Finish within ±3 of prediction → +5 pts & +5 Professionalism (one-time)',
     narrative: 'Consistency is professionalism. Hit your marks, deliver predictable results.',
     emoji: '👔',
     personalityBonus: { professionalism: 5 }

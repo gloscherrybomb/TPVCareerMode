@@ -777,3 +777,20 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ===== PERSONALITY BONUS EARNED INDICATOR ===== */
+.personality-bonus-earned {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  padding: 6px 10px;
+  background: rgba(0, 255, 136, 0.15);
+  border: 1px solid rgba(0, 255, 136, 0.3);
+  border-radius: 6px;
+  font-size: 0.7rem;
+  color: var(--success);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  z-index: 2;
+}

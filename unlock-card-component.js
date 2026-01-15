@@ -18,7 +18,8 @@ async function createUnlockCard(unlock, options = {}) {
     isOwned = false,
     isEquipped = false,
     isLocked = false,
-    isResting = false
+    isResting = false,
+    personalityBonusGranted = false  // Whether personality bonus already unlocked
   } = options;
 
   // Create card container
@@ -44,7 +45,7 @@ async function createUnlockCard(unlock, options = {}) {
   // Build card HTML
   card.innerHTML = `
     ${createImageArea(unlock, imageSrc, size, isLocked)}
-    ${createCardBody(unlock, size, showTrigger, showNarrative, showCost, isLocked)}
+    ${createCardBody(unlock, size, showTrigger, showNarrative, showCost, isLocked, personalityBonusGranted)}
   `;
 
   // Add cooldown indicator if resting
@@ -53,6 +54,14 @@ async function createUnlockCard(unlock, options = {}) {
     cooldownBadge.className = 'cooldown-indicator';
     cooldownBadge.textContent = 'Resting';
     card.querySelector('.card-image-area').appendChild(cooldownBadge);
+  }
+
+  // Add personality bonus earned indicator if applicable
+  if (unlock.personalityBonus && isOwned && personalityBonusGranted) {
+    const earnedIndicator = document.createElement('div');
+    earnedIndicator.className = 'personality-bonus-earned';
+    earnedIndicator.textContent = 'Personality bonus earned';
+    card.appendChild(earnedIndicator);
   }
 
   return card;
@@ -90,7 +99,7 @@ function createImageArea(unlock, imageSrc, size, isLocked = false) {
 /**
  * Creates the body content of the card
  */
-function createCardBody(unlock, size, showTrigger, showNarrative, showCost, isLocked = false) {
+function createCardBody(unlock, size, showTrigger, showNarrative, showCost, isLocked = false, personalityBonusGranted = false) {
   const personalityTag = unlock.personality
     ? `<span class="personality-tag">+${unlock.personality}</span>`
     : (unlock.requires
@@ -214,7 +223,8 @@ function createUnlockCardSync(unlock, options = {}) {
     isOwned = false,
     isEquipped = false,
     isLocked = false,
-    isResting = false
+    isResting = false,
+    personalityBonusGranted = false
   } = options;
 
   // Create card container
@@ -238,7 +248,7 @@ function createUnlockCardSync(unlock, options = {}) {
   const initialImageSrc = !isLocked && unlock.imagePath ? unlock.imagePath : null;
   card.innerHTML = `
     ${createImageArea(unlock, initialImageSrc, size, isLocked)}
-    ${createCardBody(unlock, size, showTrigger, showNarrative, showCost, isLocked)}
+    ${createCardBody(unlock, size, showTrigger, showNarrative, showCost, isLocked, personalityBonusGranted)}
   `;
 
   // Add cooldown indicator if resting
@@ -247,6 +257,14 @@ function createUnlockCardSync(unlock, options = {}) {
     cooldownBadge.className = 'cooldown-indicator';
     cooldownBadge.textContent = 'Resting';
     card.querySelector('.card-image-area').appendChild(cooldownBadge);
+  }
+
+  // Add personality bonus earned indicator if applicable
+  if (unlock.personalityBonus && isOwned && personalityBonusGranted) {
+    const earnedIndicator = document.createElement('div');
+    earnedIndicator.className = 'personality-bonus-earned';
+    earnedIndicator.textContent = 'Personality bonus earned';
+    card.appendChild(earnedIndicator);
   }
 
   // Load image asynchronously and update (only for unlocked cards without custom imagePath)

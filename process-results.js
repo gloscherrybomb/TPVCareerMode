@@ -1741,17 +1741,31 @@ async function processUserResult(uid, eventInfo, results, raceTimestamp) {
         // Set cooldown for this unlock (simple boolean - resting for next race)
         newCooldowns[selectedUnlock.unlock.id] = true;
 
-        // Apply personality bonus if defined
+        // Apply personality bonus if defined (one-time only)
         if (selectedUnlock.unlock.personalityBonus) {
-          const currentPersonality = userData.personality || {
-            confidence: 50, aggression: 50, professionalism: 50,
-            humility: 50, showmanship: 50, resilience: 50
-          };
-          for (const [trait, bonus] of Object.entries(selectedUnlock.unlock.personalityBonus)) {
-            currentPersonality[trait] = Math.min(100, (currentPersonality[trait] || 50) + bonus);
+          const bonusesGranted = userData.personalityBonusesGranted || {};
+          const unlockId = selectedUnlock.unlock.id;
+
+          if (!bonusesGranted[unlockId]) {
+            // First time triggering this personality bonus - apply it
+            const currentPersonality = userData.personality || {
+              confidence: 50, aggression: 50, professionalism: 50,
+              humility: 50, showmanship: 50, resilience: 50
+            };
+
+            for (const [trait, bonus] of Object.entries(selectedUnlock.unlock.personalityBonus)) {
+              currentPersonality[trait] = Math.min(100, (currentPersonality[trait] || 50) + bonus);
+            }
+
+            userData.personality = currentPersonality;
+            bonusesGranted[unlockId] = true;
+            userData.personalityBonusesGranted = bonusesGranted;
+
+            console.log(`   🧠 Personality bonus applied: +${JSON.stringify(selectedUnlock.unlock.personalityBonus)}`);
+          } else {
+            // Already granted this personality bonus previously
+            console.log(`   🧠 Personality bonus already granted for ${selectedUnlock.unlock.name} (skipped)`);
           }
-          userData.personality = currentPersonality;
-          console.log(`   🧠 Personality bonus applied: +${JSON.stringify(selectedUnlock.unlock.personalityBonus)}`);
         }
 
         console.log(`   💎 Unlock applied (${selectedUnlock.unlock.name}): +${unlockPoints} pts`);
