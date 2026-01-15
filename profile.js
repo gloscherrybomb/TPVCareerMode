@@ -538,14 +538,37 @@ async function loadProfile(user) {
     try {
         // Get user document
         const userDoc = await getDoc(doc(db, 'users', user.uid));
-        
+
         if (!userDoc.exists()) {
-            console.error('User document not found');
-            showLoginPrompt();
-            return;
+            console.log('User document not found, creating default document to fix persistence issue');
+
+            // Create default user document to prevent login persistence issues
+            const defaultUserData = {
+                name: user.displayName || user.email || 'User',
+                uid: null, // Will be filled in later via profile/settings
+                email: user.email,
+                currentStage: 1,
+                completedStages: [],
+                completedOptionalEvents: [],
+                choiceSelections: {},
+                totalPoints: 0,  // DEPRECATED: Use season1Points or careerPoints instead
+                season1Points: 0,
+                careerPoints: 0,
+                createdAt: new Date()
+            };
+
+            try {
+                await setDoc(doc(db, 'users', user.uid), defaultUserData);
+                console.log('Default user document created successfully');
+                userData = defaultUserData;
+            } catch (createError) {
+                console.error('Error creating default user document:', createError);
+                showLoginPrompt();
+                return;
+            }
+        } else {
+            userData = userDoc.data();
         }
-        
-        userData = userDoc.data();
 
         // Store globally for share functionality
         window.currentUserData = userData;

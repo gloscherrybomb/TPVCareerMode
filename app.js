@@ -533,8 +533,25 @@ if (googleLoginBtn) {
       // Check if user document exists and has UID
       const userDoc = await getDoc(doc(db, 'users', user.uid));
 
-      if (!userDoc.exists() || !userDoc.data().uid) {
-        // New Google user or existing user without UID - show UID modal
+      if (!userDoc.exists()) {
+        // Create default user document immediately to prevent persistence issues
+        await setDoc(doc(db, 'users', user.uid), {
+          name: user.displayName || 'Google User',
+          uid: null, // Will be filled in via UID modal
+          email: user.email,
+          currentStage: 1,
+          completedStages: [],
+          completedOptionalEvents: [],
+          choiceSelections: {},
+          totalPoints: 0,  // DEPRECATED: Use season1Points or careerPoints instead
+          season1Points: 0,
+          careerPoints: 0,
+          createdAt: new Date()
+        });
+        // Show UID modal for new user
+        openUidModal();
+      } else if (!userDoc.data().uid) {
+        // Existing user without UID - show UID modal
         openUidModal();
       } else {
         // User has UID, proceed normally
@@ -563,8 +580,13 @@ const googleSignupBtn = document.getElementById('googleSignupBtn');
 if (googleSignupBtn) {
   googleSignupBtn.addEventListener('click', async () => {
     try {
-      // Always use local persistence for signup (user choosing to create account)
-      await setPersistence(auth, browserLocalPersistence);
+      // Check Remember Me checkbox (default to true if not found)
+      const rememberMeCheckbox = document.getElementById('rememberMe');
+      const rememberMe = rememberMeCheckbox ? rememberMeCheckbox.checked : true;
+
+      // Set persistence based on Remember Me checkbox
+      const persistence = rememberMe ? browserLocalPersistence : browserSessionPersistence;
+      await setPersistence(auth, persistence);
 
       const result = await signInWithPopup(auth, googleProvider);
       const user = result.user;
@@ -572,8 +594,25 @@ if (googleSignupBtn) {
       // Check if user document exists and has UID
       const userDoc = await getDoc(doc(db, 'users', user.uid));
 
-      if (!userDoc.exists() || !userDoc.data().uid) {
-        // New Google user or existing user without UID - show UID modal
+      if (!userDoc.exists()) {
+        // Create default user document immediately to prevent persistence issues
+        await setDoc(doc(db, 'users', user.uid), {
+          name: user.displayName || 'Google User',
+          uid: null, // Will be filled in via UID modal
+          email: user.email,
+          currentStage: 1,
+          completedStages: [],
+          completedOptionalEvents: [],
+          choiceSelections: {},
+          totalPoints: 0,  // DEPRECATED: Use season1Points or careerPoints instead
+          season1Points: 0,
+          careerPoints: 0,
+          createdAt: new Date()
+        });
+        // Show UID modal for new user
+        openUidModal();
+      } else if (!userDoc.data().uid) {
+        // Existing user without UID - show UID modal
         openUidModal();
       } else {
         // User has UID, proceed normally
