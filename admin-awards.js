@@ -52,6 +52,8 @@ const AWARD_DEFINITIONS = {
     theAccountant: { id: 'theAccountant', title: 'The Accountant', icon: '🧮', description: 'Score more points than the line winner', calculationType: 'event', storageKey: 'theAccountant', ccBonus: 30 },
     theEqualizer: { id: 'theEqualizer', title: 'The Equalizer', icon: '🎚️', description: 'Complete The Leveller special event', calculationType: 'event', storageKey: 'theEqualizer', ccBonus: 30 },
     singaporeSling: { id: 'singaporeSling', title: 'Singapore Sling', icon: '🍸', description: 'Podium at the Singapore Criterium', calculationType: 'event', storageKey: 'singaporeSling', ccBonus: 30 },
+    valentineChampion2026: { id: 'valentineChampion2026', title: '2026 Valentine\'s Invitational 1st Place', icon: '💘', description: 'Win the 2026 Valentine\'s Invitational', calculationType: 'event', storageKey: 'valentineChampion2026', ccBonus: 80 },
+    valentinePodium2026: { id: 'valentinePodium2026', title: '2026 Valentine\'s Invitational Podium', icon: '💝', description: 'Finish 2nd or 3rd at the 2026 Valentine\'s Invitational', calculationType: 'event', storageKey: 'valentinePodium2026', ccBonus: 50 },
     powerSurge: { id: 'powerSurge', title: 'Power Surge', icon: '💥', description: 'Max power 30%+ above average, top 10', calculationType: 'event', storageKey: 'powerSurge', ccBonus: 25 },
     steadyEddie: { id: 'steadyEddie', title: 'Steady Eddie', icon: '📊', description: 'NP within 1% of average power', calculationType: 'event', storageKey: 'steadyEddie', ccBonus: 30 },
     blastOff: { id: 'blastOff', title: 'Blast Off', icon: '🚀', description: 'Break 1300W max power (one-time)', calculationType: 'career', storageKey: 'blastOff', ccBonus: 50 },
@@ -240,10 +242,16 @@ function renderAwardsGrid() {
         return;
     }
 
-    container.innerHTML = filteredAwards.map(award => `
+    container.innerHTML = filteredAwards.map(award => {
+        // Try to get icon, fall back to emoji if TPVIcons isn't available
+        const iconHtml = (window.TPVIcons && window.TPVIcons.getIconFallback)
+            ? window.TPVIcons.getIconFallback(award.id)
+            : award.icon;
+
+        return `
         <div class="award-card type-${award.calculationType}">
             <div class="award-header">
-                <div class="award-icon">${window.TPVIcons.getIcon(award.id, { size: 'xl' })}</div>
+                <div class="award-icon">${iconHtml}</div>
                 <div class="award-title-section">
                     <div class="award-title">${escapeHtml(award.title)}</div>
                     <div class="award-badges">
@@ -264,7 +272,8 @@ function renderAwardsGrid() {
                 </div>
             </div>
         </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 // Escape HTML to prevent XSS
