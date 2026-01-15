@@ -243,7 +243,7 @@ function renderAwardsGrid() {
     container.innerHTML = filteredAwards.map(award => `
         <div class="award-card type-${award.calculationType}">
             <div class="award-header">
-                <div class="award-icon">${award.icon}</div>
+                <div class="award-icon">${window.TPVIcons.getIcon(award.id, { size: 'xl' })}</div>
                 <div class="award-title-section">
                     <div class="award-title">${escapeHtml(award.title)}</div>
                     <div class="award-badges">
