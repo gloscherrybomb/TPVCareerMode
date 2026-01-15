@@ -5,34 +5,49 @@
 
 class ResultNotificationManager {
   constructor() {
-    this.storageKey = 'tpv_viewed_results';
     this.lastCheckKey = 'tpv_last_result_check';
     this.checkIntervalMs = 5 * 60 * 1000; // 5 minutes between Firestore checks
-    this.viewedResults = this.loadViewedResults();
+    this.viewedResults = {};
+    this.userId = null;
   }
 
   /**
-   * Load viewed results from localStorage
-   * @returns {Object} Map of resultKey -> timestamp
+   * Initialize viewed results from Firebase userData
+   * @param {Object} userData - User document data from Firestore
    */
-  loadViewedResults() {
+  loadViewedResults(userData) {
     try {
-      const data = localStorage.getItem(this.storageKey);
-      return data ? JSON.parse(data) : {};
+      // Load viewed results from Firebase user document
+      if (userData && userData.viewedResults) {
+        this.viewedResults = userData.viewedResults;
+      } else {
+        this.viewedResults = {};
+      }
+      console.log('Loaded viewed results from Firebase:', Object.keys(this.viewedResults).length, 'results');
     } catch (error) {
       console.error('Failed to load viewed results:', error);
-      return {};
+      this.viewedResults = {};
     }
   }
 
   /**
-   * Save viewed results to localStorage
+   * Save viewed results to Firebase
    */
-  saveViewedResults() {
+  async saveViewedResults() {
+    if (!this.userId) {
+      console.error('Cannot save viewed results: userId not set');
+      return;
+    }
+
     try {
-      localStorage.setItem(this.storageKey, JSON.stringify(this.viewedResults));
+      // Save to Firestore user document
+      const userRef = db.collection('users').doc(this.userId);
+      await userRef.update({
+        viewedResults: this.viewedResults
+      });
+      console.log('Saved viewed results to Firebase');
     } catch (error) {
-      console.error('Failed to save viewed results:', error);
+      console.error('Failed to save viewed results to Firebase:', error);
     }
   }
 
@@ -40,9 +55,9 @@ class ResultNotificationManager {
    * Mark a result as viewed
    * @param {string} resultKey - Key in format "s{season}_e{event}"
    */
-  markAsViewed(resultKey) {
+  async markAsViewed(resultKey) {
     this.viewedResults[resultKey] = Date.now();
-    this.saveViewedResults();
+    await this.saveViewedResults();
     console.log('Result marked as viewed:', resultKey);
   }
 
@@ -273,9 +288,11 @@ class ResultNotificationManager {
    * Handle "View Results" button click
    * @param {Array} results - Array of result objects
    */
-  handleViewResults(results) {
+  async handleViewResults(results) {
     // Mark all as viewed
-    results.forEach(result => this.markAsViewed(result.resultKey));
+    for (const result of results) {
+      await this.markAsViewed(result.resultKey);
+    }
 
     // Close overlay
     this.closeOverlay();
@@ -294,9 +311,11 @@ class ResultNotificationManager {
    * Handle "Dismiss" button click
    * @param {Array} results - Array of result objects
    */
-  handleDismiss(results) {
+  async handleDismiss(results) {
     // Mark all as viewed
-    results.forEach(result => this.markAsViewed(result.resultKey));
+    for (const result of results) {
+      await this.markAsViewed(result.resultKey);
+    }
 
     // Close overlay
     this.closeOverlay();
@@ -324,6 +343,12 @@ class ResultNotificationManager {
       console.log('Result notification: No user or userData, skipping check');
       return;
     }
+
+    // Set user ID for saving later
+    this.userId = user.uid;
+
+    // Load viewed results from Firebase
+    this.loadViewedResults(userData);
 
     // Find new results
     const newResults = this.findNewResults(userData);
