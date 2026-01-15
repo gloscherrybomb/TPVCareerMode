@@ -3,7 +3,7 @@
 import { firebaseConfig } from './firebase-config.js';
 import { getARRBand, getCountryCode2 } from './utils.js';
 import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
-import { getFirestore, doc, getDoc, collection, getDocs, query, orderBy, limit, startAfter } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { getFirestore, doc, getDoc, collection, getDocs, query, orderBy, limit, startAfter, where } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import { makeNameClickable } from './bot-profile-modal.js';
 import { initRiderProfileModal, makeRiderNameClickable } from './rider-profile-modal.js';
@@ -610,6 +610,99 @@ async function fetchTotalRegisteredUsers(forceRefresh = false) {
     }
 }
 
+// Search users by name and calculate their position
+async function searchUsersByName(searchTerm) {
+    if (!searchTerm || searchTerm.trim().length === 0) {
+        return [];
+    }
+
+    try {
+        console.log(`🔍 Searching for users matching: "${searchTerm}"`);
+
+        // Fetch all users from Firestore (we need all to search case-insensitively)
+        const usersQuery = query(collection(db, 'users'));
+        const usersSnapshot = await getDocs(usersQuery);
+
+        const searchLower = searchTerm.toLowerCase().trim();
+        const matchingUsers = [];
+
+        usersSnapshot.forEach((doc) => {
+            const data = doc.data();
+
+            // Skip bots
+            if (doc.id.startsWith('Bot')) {
+                return;
+            }
+
+            // Check if name matches (case-insensitive)
+            const name = data.name || '';
+            if (name.toLowerCase().includes(searchLower)) {
+                matchingUsers.push({
+                    uid: doc.id,
+                    name: name,
+                    team: data.team || '',
+                    season: data.currentSeason || 1,
+                    seasonCompleted: data.season1Complete === true || data?.seasons?.[`season${data.currentSeason}`]?.complete === true,
+                    events: data.careerTotalEvents || data.completedStages?.length || 0,
+                    points: data.careerPoints || 0,
+                    gender: data.gender || null,
+                    ageBand: data.ageBand || null,
+                    country: data.country || null,
+                    isContributor: data.isContributor || false,
+                    hasMoneyBags: data.hasHighRollerFlair || false,
+                    isCurrentUser: currentUser && doc.id === currentUser.uid
+                });
+            }
+        });
+
+        console.log(`✅ Found ${matchingUsers.length} matching users`);
+
+        // Calculate position for each matching user
+        for (const user of matchingUsers) {
+            const position = await calculateUserPosition(user.points);
+            user.calculatedPosition = position;
+        }
+
+        // Sort by calculated position
+        matchingUsers.sort((a, b) => a.calculatedPosition - b.calculatedPosition);
+
+        return matchingUsers;
+    } catch (error) {
+        console.error('Error searching users:', error);
+        return [];
+    }
+}
+
+// Calculate a user's position based on their career points
+async function calculateUserPosition(userPoints) {
+    try {
+        // Count how many users have more points (excluding bots)
+        const usersQuery = query(collection(db, 'users'));
+        const usersSnapshot = await getDocs(usersQuery);
+
+        let higherRankedCount = 0;
+        usersSnapshot.forEach((doc) => {
+            // Skip bots
+            if (doc.id.startsWith('Bot')) {
+                return;
+            }
+
+            const data = doc.data();
+            const points = data.careerPoints || 0;
+
+            if (points > userPoints) {
+                higherRankedCount++;
+            }
+        });
+
+        // Position is count of higher-ranked users + 1
+        return higherRankedCount + 1;
+    } catch (error) {
+        console.error('Error calculating user position:', error);
+        return null;
+    }
+}
+
 // Render Global High Scores with cursor-based pagination
 async function renderGlobalRankings(forceRefresh = false, loadMore = false) {
     const globalContent = document.getElementById('individualRankings');
@@ -803,20 +896,30 @@ async function renderGlobalRankings(forceRefresh = false, loadMore = false) {
 }
 
 // Separate function to render the global high scores table with pagination
-function renderGlobalRankingsTable(globalContent, appendMode = false) {
+async function renderGlobalRankingsTable(globalContent, appendMode = false, searchResults = null) {
     console.log('renderGlobalRankingsTable - Total rankings loaded:', allGlobalRankings.length);
     console.log('renderGlobalRankingsTable - Current filters:', filters);
     console.log('renderGlobalRankingsTable - Has more:', hasMoreRankings);
+    console.log('renderGlobalRankingsTable - Search results provided:', searchResults ? searchResults.length : 'none');
 
-    // Apply filters to loaded rankings
-    const filteredRankings = applyFilters(allGlobalRankings);
-    console.log('renderGlobalRankingsTable - After filters:', filteredRankings.length);
+    let displayRankings;
+    let isSearchMode = false;
 
-    // Sort by total points (descending) - data should already be sorted but ensure consistency
-    filteredRankings.sort((a, b) => b.points - a.points);
+    // If search results are provided, use them instead of cached rankings
+    if (searchResults !== null) {
+        displayRankings = searchResults;
+        isSearchMode = true;
+        console.log('renderGlobalRankingsTable - Using search results:', displayRankings.length);
+    } else {
+        // Apply filters to loaded rankings
+        const filteredRankings = applyFilters(allGlobalRankings);
+        console.log('renderGlobalRankingsTable - After filters:', filteredRankings.length);
 
-    // Display all loaded rankings (server-side pagination handles limiting)
-    const displayRankings = filteredRankings;
+        // Sort by total points (descending) - data should already be sorted but ensure consistency
+        filteredRankings.sort((a, b) => b.points - a.points);
+
+        displayRankings = filteredRankings;
+    }
 
     console.log('renderGlobalRankingsTable - Showing:', displayRankings.length);
 
@@ -860,7 +963,8 @@ function renderGlobalRankingsTable(globalContent, appendMode = false) {
             `;
         } else {
             displayRankings.forEach((racer, index) => {
-                const rank = index + 1;
+                // Use calculatedPosition in search mode, otherwise use index + 1
+                const rank = isSearchMode && racer.calculatedPosition ? racer.calculatedPosition : (index + 1);
                 const rowClass = racer.isCurrentUser ? 'current-user-row' : '';
 
                 // Podium class for top 3
@@ -925,10 +1029,12 @@ function renderGlobalRankingsTable(globalContent, appendMode = false) {
         </div>
     `;
 
-    // Add pagination controls
-    const showLoadMore = hasMoreRankings && !isLoadingMoreRankings;
+    // Add pagination controls (hide in search mode)
+    const showLoadMore = hasMoreRankings && !isLoadingMoreRankings && !isSearchMode;
     let statusText;
-    if (totalRegisteredUsers !== null) {
+    if (isSearchMode) {
+        statusText = `Search results: ${displayRankings.length} rider${displayRankings.length !== 1 ? 's' : ''} found`;
+    } else if (totalRegisteredUsers !== null) {
         statusText = `Showing ${displayRankings.length} of ${totalRegisteredUsers} riders`;
     } else if (hasMoreRankings) {
         statusText = `Showing ${displayRankings.length} riders`;
@@ -1221,15 +1327,37 @@ function initFilters() {
     const jumpToMeBtn = document.getElementById('jumpToMeBtn');
 
     // Helper to re-render with pagination reset (uses cached data if available)
-    function applyFilterAndRender() {
+    async function applyFilterAndRender() {
         currentRankingsPage = 1; // Reset pagination when filters change
-        if (allGlobalRankings.length > 0) {
-            // Use cached data - just re-render
-            const globalContent = document.getElementById('individualRankings');
-            renderGlobalRankingsTable(globalContent);
+        const globalContent = document.getElementById('individualRankings');
+
+        // If there's a search term, perform server-side search
+        if (filters.searchTerm && filters.searchTerm.trim().length > 0) {
+            // Show loading state
+            globalContent.innerHTML = `
+                <div style="text-align: center; padding: 3rem;">
+                    <div class="spinner" style="margin: 0 auto 1rem;"></div>
+                    <p style="color: var(--text-secondary);">Searching all riders...</p>
+                </div>
+            `;
+
+            // Perform search
+            const searchResults = await searchUsersByName(filters.searchTerm);
+
+            // Apply other filters to search results (gender, age, country)
+            const filteredSearchResults = applyFilters(searchResults);
+
+            // Render with search results
+            await renderGlobalRankingsTable(globalContent, false, filteredSearchResults);
         } else {
-            // No cached data yet - fetch fresh
-            renderGlobalRankings().catch(err => console.error('Error rendering global high scores:', err));
+            // No search term - use regular rendering
+            if (allGlobalRankings.length > 0) {
+                // Use cached data - just re-render
+                await renderGlobalRankingsTable(globalContent);
+            } else {
+                // No cached data yet - fetch fresh
+                renderGlobalRankings().catch(err => console.error('Error rendering global high scores:', err));
+            }
         }
     }
 
@@ -1313,36 +1441,92 @@ function initFilters() {
 }
 
 // Handle "Jump to Me" button click
-function handleJumpToMe() {
+async function handleJumpToMe() {
     // Check if user is logged in
     if (!currentUser) {
         showJumpToMeMessage('Please log in to find your position');
         return;
     }
 
-    // Find current user row in the Global High Scores section
-    const globalContent = document.getElementById('globalContent');
-    const currentUserRow = globalContent ? globalContent.querySelector('.current-user-row') : null;
+    const globalContent = document.getElementById('individualRankings');
 
-    if (!currentUserRow) {
-        // User not in currently displayed rankings
-        showJumpToMeMessage('Load more results or clear filters to find your position');
-        return;
+    try {
+        // Show loading state
+        const jumpToMeBtn = document.getElementById('jumpToMeBtn');
+        const originalHTML = jumpToMeBtn ? jumpToMeBtn.innerHTML : '';
+        if (jumpToMeBtn) {
+            jumpToMeBtn.innerHTML = '<span class="spinner" style="width: 14px; height: 14px; border-width: 2px; margin-right: 0.5rem; display: inline-block; vertical-align: middle;"></span><span>Finding you...</span>';
+            jumpToMeBtn.disabled = true;
+        }
+
+        // Fetch current user's data
+        const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
+        if (!userDoc.exists()) {
+            showJumpToMeMessage('User data not found');
+            return;
+        }
+
+        const userData = userDoc.data();
+        const userPoints = userData.careerPoints || 0;
+
+        // Calculate position
+        const position = await calculateUserPosition(userPoints);
+
+        // Create user object with all necessary data
+        const userRanking = {
+            uid: currentUser.uid,
+            name: userData.name || 'Unknown',
+            team: userData.team || '',
+            season: userData.currentSeason || 1,
+            seasonCompleted: userData.season1Complete === true || userData?.seasons?.[`season${userData.currentSeason}`]?.complete === true,
+            events: userData.careerTotalEvents || userData.completedStages?.length || 0,
+            points: userPoints,
+            gender: userData.gender || null,
+            ageBand: userData.ageBand || null,
+            country: userData.country || null,
+            isContributor: userData.isContributor || false,
+            hasMoneyBags: userData.hasHighRollerFlair || false,
+            isCurrentUser: true,
+            calculatedPosition: position
+        };
+
+        // Apply current filters to see if user matches
+        const filteredUser = applyFilters([userRanking]);
+
+        // Render the user in search mode (showing just them)
+        await renderGlobalRankingsTable(globalContent, false, filteredUser);
+
+        // Restore button
+        if (jumpToMeBtn) {
+            jumpToMeBtn.innerHTML = originalHTML;
+            jumpToMeBtn.disabled = false;
+        }
+
+        // If user doesn't match filters, show message
+        if (filteredUser.length === 0) {
+            showJumpToMeMessage('You don\'t match the current filters');
+        } else {
+            // Scroll to the user
+            setTimeout(() => {
+                const currentUserRow = globalContent.querySelector('.current-user-row');
+                if (currentUserRow) {
+                    currentUserRow.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+
+                    // Add highlight flash animation
+                    currentUserRow.classList.add('highlight-flash');
+                    setTimeout(() => {
+                        currentUserRow.classList.remove('highlight-flash');
+                    }, 1500);
+                }
+            }, 100);
+        }
+    } catch (error) {
+        console.error('Error in Jump to Me:', error);
+        showJumpToMeMessage('Error finding your position');
     }
-
-    // Scroll to the row
-    currentUserRow.scrollIntoView({
-        behavior: 'smooth',
-        block: 'center'
-    });
-
-    // Add highlight flash animation
-    currentUserRow.classList.add('highlight-flash');
-
-    // Remove animation class after completion
-    setTimeout(() => {
-        currentUserRow.classList.remove('highlight-flash');
-    }, 1500);
 }
 
 // Show temporary message for Jump to Me button
