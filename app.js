@@ -33,9 +33,11 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 const googleProvider = new GoogleAuthProvider();
 
-// ✅ Make app visible to admin-bots.js
+// ✅ Make app and db visible globally
 // admin-bots.js waits for `window.firebaseApp` before initializing.
+// result-notifications.js needs access to `window.db` for saving viewed results.
 window.firebaseApp = app;
+window.db = db;
 
 // Component loader for centralized navbar and footer
 async function loadComponents() {

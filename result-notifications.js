@@ -39,10 +39,16 @@ class ResultNotificationManager {
       return;
     }
 
+    if (!window.db) {
+      console.error('Firebase database not initialized. Make sure app.js is loaded first.');
+      return;
+    }
+
     try {
-      // Save to Firestore user document
-      const userRef = db.collection('users').doc(this.userId);
-      await userRef.update({
+      // Save to Firestore user document using modular SDK
+      const { doc, updateDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+      const userRef = doc(window.db, 'users', this.userId);
+      await updateDoc(userRef, {
         viewedResults: this.viewedResults
       });
       console.log('Successfully saved viewed results to Firebase:', Object.keys(this.viewedResults).length, 'results');
@@ -52,11 +58,12 @@ class ResultNotificationManager {
       console.error('Error message:', error.message);
 
       // If update fails (e.g., field doesn't exist), try setting it
-      if (error.code === 'not-found' || error.message.includes('No document to update')) {
+      if (error.code === 'not-found' || error.message?.includes('No document to update')) {
         console.log('Document not found, attempting to set viewedResults field...');
         try {
-          const userRef = db.collection('users').doc(this.userId);
-          await userRef.set({
+          const { doc, setDoc } = await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+          const userRef = doc(window.db, 'users', this.userId);
+          await setDoc(userRef, {
             viewedResults: this.viewedResults
           }, { merge: true });
           console.log('Successfully set viewedResults field using merge');
