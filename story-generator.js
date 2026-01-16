@@ -307,42 +307,86 @@ async function generateIntroParagraph(raceData, seasonData, riderId, narrativeSe
 }
 
 /**
+ * Fallback bridges for generic intros (when narrative database unavailable)
+ */
+const GENERIC_FALLBACK_BRIDGES = {
+  win: "And today delivered.",
+  podium: "And today, you were in the fight.",
+  top10: "And today, you showed you belonged.",
+  midpack: "But today was a different story.",
+  back: "But today wasn't your day."
+};
+
+/**
  * Generate generic intro when narrative database unavailable
+ * Returns { text, bridge } to match narrative database format
  */
 function generateGenericIntro(raceData, seasonData) {
   const { eventName, isFirstRace } = raceData;
   const eventType = EVENT_TYPES[raceData.eventNumber];
-  
+
+  // Determine performance tier for bridge selection
+  const position = raceData.position;
+  const tier = position === 1 ? 'win' :
+               position <= 3 ? 'podium' :
+               position <= 10 ? 'top10' :
+               position <= 20 ? 'midpack' : 'back';
+  const bridge = GENERIC_FALLBACK_BRIDGES[tier];
+
   if (isFirstRace) {
-    return `The pre-race jitters for ${eventName} were real—your first event of the season, your first chance to see how the winter training paid off. Standing on the start line surrounded by competitors, some familiar faces from last season and many unknowns, you felt that familiar cocktail of nervousness and excitement that comes with racing.`;
+    return {
+      text: `The pre-race jitters for ${eventName} were real—your first event of the season, your first chance to see how the winter training paid off. Standing on the start line surrounded by competitors, some familiar faces from last season and many unknowns, you felt that familiar cocktail of nervousness and excitement that comes with racing.`,
+      bridge
+    };
   }
-  
+
   // Race-type specific intros
   if (eventType === 'time trial') {
-    return `The night before ${eventName}, you couldn't stop thinking about pacing strategy. Time trials are mentally exhausting even before they start—knowing that every watt matters, that there's no pack to hide in, that the clock will reveal exactly how strong you are that day.`;
+    return {
+      text: `The night before ${eventName}, you couldn't stop thinking about pacing strategy. Time trials are mentally exhausting even before they start—knowing that every watt matters, that there's no pack to hide in, that the clock will reveal exactly how strong you are that day.`,
+      bridge
+    };
   }
-  
+
   if (eventType === 'track elimination') {
-    return `The velodrome atmosphere before ${eventName} was electric—the wooden boards echoing with warmups, riders practicing their positioning on the banking, everyone knowing that one lap of inattention could end their day early.`;
+    return {
+      text: `The velodrome atmosphere before ${eventName} was electric—the wooden boards echoing with warmups, riders practicing their positioning on the banking, everyone knowing that one lap of inattention could end their day early.`,
+      bridge
+    };
   }
-  
+
   if (eventType === 'hill climb') {
-    return `Looking up at the climb before ${eventName}, you ran through your strategy one more time. Hill climbs are brutally honest—there's nowhere to hide when it's just you and gravity, nowhere to recover when the gradient kicks up.`;
+    return {
+      text: `Looking up at the climb before ${eventName}, you ran through your strategy one more time. Hill climbs are brutally honest—there's nowhere to hide when it's just you and gravity, nowhere to recover when the gradient kicks up.`,
+      bridge
+    };
   }
-  
+
   if (eventType === 'stage race') {
     const stageNum = raceData.eventNumber - 12;
     if (stageNum === 1) {
-      return `The Local Tour was finally here. Three stages over three days—this wasn't just about today's result but about managing effort across multiple days, about racing smart when your legs are already tired from yesterday.`;
+      return {
+        text: `The Local Tour was finally here. Three stages over three days—this wasn't just about today's result but about managing effort across multiple days, about racing smart when your legs are already tired from yesterday.`,
+        bridge
+      };
     } else if (stageNum === 2) {
-      return `Waking up on Stage 2 of the Local Tour, you could feel yesterday's effort still in your legs. That deep fatigue that comes from racing hard less than 24 hours ago, the knowledge that you need to do it again today and tomorrow.`;
+      return {
+        text: `Waking up on Stage 2 of the Local Tour, you could feel yesterday's effort still in your legs. That deep fatigue that comes from racing hard less than 24 hours ago, the knowledge that you need to do it again today and tomorrow.`,
+        bridge
+      };
     } else {
-      return `The queen stage. Two days of racing in your legs, and the hardest day still ahead. The Local Tour comes down to this—one last effort to defend or improve your GC position.`;
+      return {
+        text: `The queen stage. Two days of racing in your legs, and the hardest day still ahead. The Local Tour comes down to this—one last effort to defend or improve your GC position.`,
+        bridge
+      };
     }
   }
-  
+
   // Generic intro
-  return `The days leading up to ${eventName} had been about preparation and anticipation. You'd studied the course, planned your strategy, done the training—now it was time to execute and see where you stood against the field.`;
+  return {
+    text: `The days leading up to ${eventName} had been about preparation and anticipation. You'd studied the course, planned your strategy, done the training—now it was time to execute and see where you stood against the field.`,
+    bridge
+  };
 }
 
 /**
@@ -1747,9 +1791,10 @@ async function generateRaceStory(raceData, seasonData, riderId = null, narrative
   // ========================================
 
   // Generate intro paragraph (uses narrative database if available)
-  let introParagraph = '';
+  // Returns { text, bridge } where bridge transitions to race recap
+  let introResult = { text: '', bridge: '' };
   if (riderId && narrativeSelector) {
-    introParagraph = await generateIntroParagraph(
+    introResult = await generateIntroParagraph(
       { ...raceData, eventName, isFirstRace: seasonData.stagesCompleted === 1 },
       seasonData,
       riderId,
@@ -1757,11 +1802,15 @@ async function generateRaceStory(raceData, seasonData, riderId = null, narrative
       db
     );
   } else {
-    introParagraph = generateGenericIntro(
+    introResult = generateGenericIntro(
       { ...raceData, eventName, isFirstRace: seasonData.stagesCompleted === 1 },
       seasonData
     );
   }
+
+  // Handle both old (string) and new ({ text, bridge }) return formats
+  const introParagraph = typeof introResult === 'string' ? introResult : (introResult.text || '');
+  const introBridge = typeof introResult === 'string' ? '' : (introResult.bridge || '');
 
   // Generate CONDENSED race recap
   const recapData = {
@@ -1774,8 +1823,27 @@ async function generateRaceStory(raceData, seasonData, riderId = null, narrative
   // Generate inline rival phrase (not full paragraph)
   const rivalInline = generateRivalInline(raceData, seasonData);
 
-  // Build Part 1: Weave intro, recap, and rival together
+  // Build Part 1: Weave intro, bridge, recap, and rival together
+  // Start with intro text
   let raceStory = introParagraph;
+
+  // Add bridge if present (transitions from intro to race recap)
+  if (introBridge) {
+    // Append bridge to intro, handling sentence flow
+    // If intro ends with punctuation, add space; if bridge starts lowercase, weave it in
+    const trimmedIntro = raceStory.trim();
+    const trimmedBridge = introBridge.trim();
+    if (trimmedIntro && trimmedBridge) {
+      // Check if bridge is a continuation (starts with lowercase or connector like "and", "but")
+      const isContinuation = /^[a-z]|^(and|but|so|yet)\b/i.test(trimmedBridge);
+      if (isContinuation && /[.!?]$/.test(trimmedIntro)) {
+        // Replace final punctuation with comma for smoother flow
+        raceStory = trimmedIntro.replace(/[.!?]$/, ', ') + trimmedBridge.charAt(0).toLowerCase() + trimmedBridge.slice(1);
+      } else {
+        raceStory = trimmedIntro + ' ' + trimmedBridge;
+      }
+    }
+  }
 
   // Add recap with rival woven in if present
   if (rivalInline) {

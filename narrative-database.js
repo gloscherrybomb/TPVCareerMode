@@ -70,61 +70,131 @@ const NARRATIVE_DATABASE = {
       id: "opening_hometown",
       text: "Six months ago you were racing your local club rides, wondering if you had what it takes to compete at a higher level. Now you're lined up at {eventName}, registration paid, race number pinned on, heart pounding with a mixture of excitement and pure terror. The riders around you look fast—lean, confident, decked out in team kit that probably costs more than your entire bike. You've trained for this, visualized this, dreamed about this moment. But standing here in the pre-race churn of nervous energy and racing bikes, the reality hits differently than the fantasy.",
       triggers: { raceNumber: 1 },
-      weight: 0.9
+      weight: 0.9,
+      bridges: {
+        win: "And then, unbelievably, you won.",
+        podium: "And then you proved you belonged.",
+        top10: "And then you showed you could compete.",
+        midpack: "The race delivered a reality check.",
+        back: "The fantasy met a harsh reality."
+      }
     },
     {
       id: "opening_leap",
       text: "The decision to race seriously didn't come gradually—it came all at once, late one night scrolling through race results and realizing you'd been making excuses for too long. A few weeks later you registered for {eventName}, paid the entry fee before you could change your mind, and committed to showing up no matter how intimidating it felt. Your bike isn't the newest model and your kit doesn't match, but you've put in the training miles. You've done the intervals until your legs burned and your lungs screamed.",
       triggers: { raceNumber: 1 },
-      weight: 0.9
+      weight: 0.9,
+      bridges: {
+        win: "And all those miles paid off spectacularly.",
+        podium: "And those intervals were worth it.",
+        top10: "And the training showed.",
+        midpack: "The training helped, but there's more work to do.",
+        back: "But the race showed how much more work lies ahead."
+      }
     },
     {
       id: "opening_investment",
       text: "The registration fee for {eventName} felt steep—money you could've spent on anything else. But you clicked 'confirm payment' anyway because something inside you needed to know if you could actually do this. The weeks of training that followed were harder than expected: early morning rides when the bed felt impossibly comfortable, interval sessions that left you gasping, nights falling asleep wondering if you were good enough. But you showed up, week after week, and now here you are at the start line.",
       triggers: { raceNumber: 1 },
-      weight: 0.9
+      weight: 0.9,
+      bridges: {
+        win: "And it turns out, you were more than good enough.",
+        podium: "And the answer was yes—you can do this.",
+        top10: "And the investment is already paying returns.",
+        midpack: "The answer is still unclear, but you finished.",
+        back: "The answer wasn't what you hoped for, but you have it now."
+      }
     },
     {
       id: "opening_dream",
       text: "You've been dreaming about this for longer than you'd admit out loud. Watching races online, studying the tactics, imagining yourself in the peloton. Now the imagination becomes reality at {eventName}. The nerves are almost overwhelming—what if you get dropped immediately? What if you can't keep up? What if this whole dream was just that, a dream? But you're here. The start line doesn't care about your doubts. It only cares if you're willing to race.",
       triggers: { raceNumber: 1 },
-      weight: 0.8
+      weight: 0.8,
+      bridges: {
+        win: "And the dream became better than you imagined.",
+        podium: "And the dream turned out to be real.",
+        top10: "And you kept up—more than kept up.",
+        midpack: "You didn't get dropped. That's a start.",
+        back: "The dream met reality, and reality was harder."
+      }
     },
     {
       id: "opening_transformation",
       text: "Three months ago, racing wasn't even on your radar. Then a friend invited you to a group ride that turned competitive, and something clicked. The feeling of pushing hard, of testing yourself against others, of finding out what you're really capable of—it was addictive. One thing led to another, and now you're at {eventName}, about to race for real. You're not sure if you're ready, but you're done wondering. Time to find out.",
       triggers: { raceNumber: 1 },
-      weight: 0.8
+      weight: 0.8,
+      bridges: {
+        win: "Turns out, you were more than ready.",
+        podium: "Turns out, you were ready.",
+        top10: "You found out—you can do this.",
+        midpack: "You're not quite ready, but you're on your way.",
+        back: "The finding out was humbling, but valuable."
+      }
     },
     {
       id: "opening_solo_journey",
       text: "Nobody in your life really understands why you're doing this. Your friends think you're crazy for spending money on entry fees and equipment. Your family worries about you getting hurt. But this isn't about them—it's about you, testing yourself, proving something to yourself. Standing at the start of {eventName}, surrounded by strangers who share this inexplicable need to race bicycles, you feel less alone than you have in months.",
       triggers: { raceNumber: 1 },
-      weight: 0.7
+      weight: 0.7,
+      bridges: {
+        win: "And you proved everything you needed to prove.",
+        podium: "And you proved something important to yourself.",
+        top10: "And you passed your own test.",
+        midpack: "The test continues. You're learning.",
+        back: "The test was harder than expected, but you showed up."
+      }
     },
     {
       id: "opening_second_chance",
       text: "You tried racing years ago and it didn't work out. Life got in the way, motivation faded, other priorities took over. But something kept nagging at you—unfinished business, potential unrealized. Now you're back at {eventName}, older but maybe wiser, giving yourself a second chance to see what you're really made of.",
       triggers: { raceNumber: 1 },
-      weight: 0.7
+      weight: 0.7,
+      bridges: {
+        win: "This time, you made the most of it.",
+        podium: "This time, the story had a better ending.",
+        top10: "This time, things are different.",
+        midpack: "The second chance continues—this was just the beginning.",
+        back: "The second chance is still unfolding. One race doesn't define it."
+      }
     },
     {
       id: "opening_lockdown_inspiration",
       text: "The pandemic changed something in you. All those months of indoor training, watching pro races, having nothing but time to think about what you really wanted to do. When the world opened back up, you didn't want to go back to normal—you wanted to actually race. Now here you are at {eventName}, turning pandemic dreams into reality.",
       triggers: { raceNumber: 1 },
-      weight: 0.6
+      weight: 0.6,
+      bridges: {
+        win: "And reality exceeded the dreams.",
+        podium: "And reality lived up to the dreams.",
+        top10: "The reality is unfolding better than expected.",
+        midpack: "Reality is more challenging than the dreams suggested.",
+        back: "Reality hit hard, but the dream isn't over."
+      }
     },
     {
       id: "opening_bucket_list",
       text: "Racing has been on your bucket list for as long as you can remember. Not someday—today. Not eventually—now. {eventName} is where you cross this off the list, where you stop talking about racing and actually do it. The time for hypotheticals is over.",
       triggers: { raceNumber: 1 },
-      weight: 0.6
+      weight: 0.6,
+      bridges: {
+        win: "Consider it crossed off—in spectacular fashion.",
+        podium: "Crossed off the list, and then some.",
+        top10: "Crossed off the list, with a solid result too.",
+        midpack: "Crossed off the list. Now the real journey begins.",
+        back: "Crossed off the list, though not as you'd imagined."
+      }
     },
     {
       id: "opening_proving_ground",
       text: "You've been the fastest in your friend group for years, winning unofficial sprints, crushing group ride KOMs. But that's not real racing. {eventName} is where you find out if that local dominance translates to actual competitive ability. Time to see if you're actually fast or just fast compared to your friends.",
       triggers: { raceNumber: 1 },
-      weight: 0.7
+      weight: 0.7,
+      bridges: {
+        win: "Turns out, you're actually fast.",
+        podium: "The answer is clear—you're actually fast.",
+        top10: "You're fast. Maybe not the fastest, but fast.",
+        midpack: "Fast compared to friends, yes. Fast overall? Work in progress.",
+        back: "The answer was humbling, but honest."
+      }
     }
   ],
 
@@ -134,163 +204,352 @@ const NARRATIVE_DATABASE = {
       id: "early_bike_struggles",
       text: "Your bike isn't the problem—you keep telling yourself that as you pass another rider on a carbon race machine that costs more than your car. It's not about the equipment, it's about the legs. At least that's what you're choosing to believe right now as your aluminum frame clatters over rough pavement while the rider ahead seems to float effortlessly on electronic shifting.",
       triggers: { raceNumber: [2, 3, 4], performanceTier: ["midpack", "back"] },
-      weight: 0.7
+      weight: 0.7,
+      bridges: {
+        win: "And the legs proved it—equipment be damned.",
+        podium: "And today, the legs did the talking.",
+        top10: "And today, the legs were good enough.",
+        midpack: "Today confirmed it's about more than just equipment.",
+        back: "Today made you wonder if the bike matters more than you thought."
+      }
     },
     {
       id: "early_race_day_routine",
       text: "You're still figuring out your pre-race routine. Coffee? No coffee? Eat two hours before or three? You watch other riders going through their warm-up routines with practiced ease—static stretches, a few openers on the trainer, calves perfectly taped—while you're still anxiously checking your tire pressure for the third time.",
       triggers: { raceNumber: [1, 2, 3], performanceTier: ["any"] },
-      weight: 0.6
+      weight: 0.6,
+      bridges: {
+        win: "Whatever you did today, it worked.",
+        podium: "Today's routine clearly wasn't wrong.",
+        top10: "The routine is coming together.",
+        midpack: "Still figuring it out, but you're learning.",
+        back: "The routine still needs work, clearly."
+      }
     },
     {
       id: "early_first_upgrade",
       text: "After weeks of researching and comparing prices, you finally pulled the trigger: new wheels. Not the top-tier carbon dream wheels, but a solid mid-range upgrade that represents a serious chunk of your budget. When you first spun them up, the difference was immediately noticeable—smoother, faster, more responsive. Whether they'll actually make you faster in races remains to be seen, but psychologically, they've already paid dividends.",
       triggers: { raceNumber: [3, 4, 5], performanceTier: ["top10", "podium", "win"] },
-      weight: 0.5
+      weight: 0.5,
+      bridges: {
+        win: "And today, they definitely made you faster.",
+        podium: "And today, the investment paid off.",
+        top10: "The wheels are working—or at least not hurting.",
+        midpack: "The wheels helped, but there's more to it than equipment.",
+        back: "Turns out wheels alone don't make you fast."
+      }
     },
     {
       id: "early_nutrition_learning",
       text: "You bonked hard in your last race—that terrible, empty-tank feeling where your legs just stop responding. Turns out racing requires a completely different fueling strategy than training rides. Now you're carrying gels, bars, and sports drink, maybe too much of everything, paranoid about running out of energy again.",
       triggers: { raceNumber: [2, 3, 4], performanceTier: ["back"], minRacesCompleted: 2 },
-      weight: 0.6
+      weight: 0.6,
+      bridges: {
+        win: "And this time, the tank stayed full.",
+        podium: "The new fueling strategy worked.",
+        top10: "No bonking today—that's progress.",
+        midpack: "At least you finished with energy to spare.",
+        back: "The nutrition still needs dialing in."
+      }
     },
     {
       id: "early_first_good_result",
       text: "Something clicked in that last race—you're not entirely sure what. Maybe it was better positioning, maybe you're finally getting fitter, maybe you just got lucky with the break. Whatever it was, you finished higher than you expected, higher than you dared hope, and suddenly this whole racing thing feels possible.",
       triggers: { raceNumber: [3, 4, 5], performanceTier: ["podium", "top10"], improvementFromPrediction: 5, minRacesCompleted: 2 },
-      weight: 0.8
+      weight: 0.8,
+      bridges: {
+        win: "And today, something clicked again—even better.",
+        podium: "That feeling of possibility continued today.",
+        top10: "Today kept that momentum going.",
+        midpack: "Today was a step back, but the belief remains.",
+        back: "Today reminded you that good results aren't guaranteed."
+      }
     },
     {
       id: "early_imposter_syndrome",
       text: "Every race, you feel like someone's going to tap you on the shoulder and tell you that you don't belong here. That feeling of being an imposter never quite goes away, even when your results say otherwise. You look at the riders around you and assume they all know something you don't, have some secret knowledge that makes racing easier for them.",
       triggers: { raceNumber: [2, 3, 4, 5], performanceTier: ["top10", "podium", "midpack"] },
-      weight: 0.5
+      weight: 0.5,
+      bridges: {
+        win: "But today proved you absolutely belong.",
+        podium: "Today's result says you belong.",
+        top10: "Today said otherwise—you do belong here.",
+        midpack: "The imposter feeling lingers, even after today.",
+        back: "Today fed that imposter feeling, unfortunately."
+      }
     },
     {
       id: "early_learning_positioning",
       text: "You're starting to understand that where you are in the pack matters almost as much as how strong your legs are. Last race you wasted so much energy fighting for position, surging and braking, stuck in bad spots. This time you're more aware, more deliberate about where you place yourself before key moments.",
       triggers: { raceNumber: [3, 4, 5], performanceTier: ["top10", "podium"], minRacesCompleted: 2 },
-      weight: 0.7
+      weight: 0.7,
+      bridges: {
+        win: "And today, the positioning was perfect.",
+        podium: "The awareness paid off today.",
+        top10: "The deliberate approach is working.",
+        midpack: "Good positioning, but the legs weren't there.",
+        back: "The positioning knowledge didn't help today."
+      }
     },
     {
       id: "early_mechanical_lesson",
       text: "You've heard enough stories about dropped chains and mechanical failures to develop a healthy paranoia. Now your pre-race ritual includes running through gears multiple times, checking brake pad clearance, testing quick releases. It might seem obsessive, but a mechanical issue at the wrong moment can ruin months of preparation.",
       triggers: { raceNumber: [3, 4, 5], performanceTier: ["any"], minRacesCompleted: 3 },
-      weight: 0.5
+      weight: 0.5,
+      bridges: {
+        win: "And today, the bike was flawless.",
+        podium: "No mechanicals today—just racing.",
+        top10: "The paranoia paid off: smooth ride today.",
+        midpack: "At least the bike worked perfectly.",
+        back: "The bike was fine; it was the legs that failed."
+      }
     },
     {
       id: "early_pacing_discovery",
       text: "You went out too hard in the first few races, burning matches you'd need later. Now you're learning the art of patience—staying near the front without actually working, following the right wheels, conserving energy for when it actually matters. It's a harder skill than it looks.",
       triggers: { raceNumber: [3, 4, 5], performanceTier: ["top10", "podium", "win"], minRacesCompleted: 3 },
-      weight: 0.6
+      weight: 0.6,
+      bridges: {
+        win: "And today, the patience paid off perfectly.",
+        podium: "The pacing worked—you had energy when it mattered.",
+        top10: "The patience is becoming natural.",
+        midpack: "The pacing was fine; other factors weren't.",
+        back: "Still learning. Today wasn't the lesson you wanted."
+      }
     },
     {
       id: "early_kit_pride",
       text: "You finally invested in proper racing kit—not team issue, just quality shorts and a jersey that actually fit. It's a small thing, but pulling on that kit this morning, you felt more legitimate. More like someone who takes this seriously. Clothes don't make the racer, but they don't hurt confidence either.",
       triggers: { raceNumber: [2, 3, 4], performanceTier: ["any"] },
-      weight: 0.4
+      weight: 0.4,
+      bridges: {
+        win: "And today, you looked the part and raced it too.",
+        podium: "Looking good, racing good.",
+        top10: "The confidence translated to the race.",
+        midpack: "You looked the part, at least.",
+        back: "The kit looked better than the result."
+      }
     },
     {
       id: "early_recovery_awareness",
       text: "The soreness from your last race lingered longer than expected. Your legs felt heavy, your motivation low. You're learning that recovery is part of training, that showing up race after race without proper rest is a recipe for burnout. Now you're paying attention to sleep, nutrition, and giving your body time to adapt.",
       triggers: { raceNumber: [3, 4, 5], performanceTier: ["any"], minRacesCompleted: 2 },
-      weight: 0.5
+      weight: 0.5,
+      bridges: {
+        win: "And today, the fresh legs showed.",
+        podium: "The recovery focus is paying off.",
+        top10: "The legs felt better today—recovery working.",
+        midpack: "Still finding the balance.",
+        back: "Maybe more recovery was needed."
+      }
     },
     {
       id: "early_group_ride_confidence",
       text: "The local group rides that used to intimidate you now feel manageable. You can hang with the front group, cover attacks, even throw in a dig occasionally. That confidence is translating to races—you're not intimidated by speed anymore.",
       triggers: { raceNumber: [3, 4, 5], performanceTier: ["top10", "podium", "win"] },
-      weight: 0.6
+      weight: 0.6,
+      bridges: {
+        win: "And today, you weren't just unintimidated—you dominated.",
+        podium: "That confidence showed today.",
+        top10: "Not intimidated, and the result proves it.",
+        midpack: "The confidence is there, even if today's result wasn't.",
+        back: "Racing is different from group rides, it turns out."
+      }
     },
     {
       id: "early_race_face",
       text: "You've started recognizing the same faces at races. There's the rider who always attacks early, the one who never pulls through, the cagey veteran who seems to win without ever looking like they're trying. You're learning their habits, their tells, becoming part of this community of racers.",
       triggers: { raceNumber: [3, 4, 5], performanceTier: ["any"] },
-      weight: 0.5
+      weight: 0.5,
+      bridges: {
+        win: "Today, you were the one they'll remember.",
+        podium: "Today added to your reputation.",
+        top10: "You're establishing yourself in this community.",
+        midpack: "Still finding your place in this world.",
+        back: "Today you learned more about who's who."
+      }
     },
     {
       id: "early_suffering_acceptance",
       text: "Racing hurts. That shouldn't have been surprising, but the first few times that deep, lung-burning, leg-screaming suffering hit, it was almost overwhelming. Now you're learning to accept it, even embrace it. The pain means you're going hard enough. The pain means you're racing.",
       triggers: { raceNumber: [2, 3, 4], performanceTier: ["any"] },
-      weight: 0.6
+      weight: 0.6,
+      bridges: {
+        win: "And today, you embraced the pain all the way to the top.",
+        podium: "Today, the suffering was worth it.",
+        top10: "You suffered well today.",
+        midpack: "You suffered, just not productively.",
+        back: "The suffering was there. The results weren't."
+      }
     },
     {
       id: "early_tactical_awakening",
       text: "You used to think racing was just about being the strongest. Then you watched a rider half your power output beat you through better tactics—sitting in, conserving energy, attacking at exactly the right moment. Now you're studying race tactics like you're cramming for an exam, learning that bike racing is as much chess as it is physical.",
       triggers: { raceNumber: [4, 5], performanceTier: ["top10", "midpack", "podium"] },
-      weight: 0.7
+      weight: 0.7,
+      bridges: {
+        win: "And today, the tactics exam came back with an A.",
+        podium: "The studying is paying off.",
+        top10: "The chess match went well enough today.",
+        midpack: "Still learning the game.",
+        back: "Today's tactical lesson was a hard one."
+      }
     },
     {
       id: "early_first_podium_hunger",
       text: "You've tasted the podium once now, and it's changed everything. That single top-three finish proved you can compete at the front—now you're hungry to prove it wasn't a fluke. The other riders don't look as intimidating anymore. You belong up there.",
       triggers: { raceNumber: [3, 4, 5], totalPodiums: [1], performanceTier: ["top10", "midpack"] },
-      weight: 0.9
+      weight: 0.9,
+      bridges: {
+        win: "And today, you proved it was no fluke—you won.",
+        podium: "And today, you proved it was no fluke.",
+        top10: "The hunger kept you in the fight today.",
+        midpack: "Still hungry. Today just wasn't the day.",
+        back: "The hunger remains, even after today."
+      }
     },
     {
       id: "early_second_podium_pattern",
       text: "Two podiums now. One could have been luck, but two? Two suggests something real is happening. You're starting to believe this isn't a phase or a fortunate streak—you might actually be good at this.",
       triggers: { raceNumber: [4, 5], totalPodiums: [2], performanceTier: ["podium", "top10"] },
-      weight: 0.9
+      weight: 0.9,
+      bridges: {
+        win: "Three now. This is definitely real.",
+        podium: "Make that three. Definitely not luck.",
+        top10: "The pattern continues—you're consistently in the mix.",
+        midpack: "A dip, but the pattern isn't broken.",
+        back: "Every pattern has outliers. Today was one."
+      }
     },
     {
       id: "early_bike_handling",
       text: "Your bike handling skills were adequate for training rides but woefully inadequate for pack racing. The first time someone's elbow touched yours at 30mph, you nearly crashed from panic. Now you're practicing cornering, bumping shoulders with friends, learning to ride confidently inches from other wheels.",
       triggers: { raceNumber: [2, 3, 4], performanceTier: ["any"] },
-      weight: 0.5
+      weight: 0.5,
+      bridges: {
+        win: "And today, the handling was smooth and confident.",
+        podium: "The practice showed in today's pack work.",
+        top10: "The handling held up when it mattered.",
+        midpack: "Handling was fine; other things weren't.",
+        back: "Still more to learn about pack racing."
+      }
     },
     {
       id: "early_registration_anxiety",
       text: "Every time you click 'register' for a race, there's that moment of anxiety. What if you can't finish? What if you embarrass yourself? What if you're not ready? But you keep clicking anyway, because the only way to get ready is to race, and the only way forward is through the fear.",
       triggers: { raceNumber: [2, 3, 4], performanceTier: ["any"] },
-      weight: 0.4
+      weight: 0.4,
+      bridges: {
+        win: "And today vindicated every anxious click.",
+        podium: "Today proved the clicking was worth it.",
+        top10: "You finished. More than finished.",
+        midpack: "You didn't embarrass yourself. Progress.",
+        back: "The fear was justified today, but you survived."
+      }
     },
     {
       id: "early_course_preview",
       text: "You spent hours studying the course profile online, watching videos from previous years, memorizing every turn. That preparation gave you confidence, but it also revealed how much you didn't know about course reading and terrain analysis. There's a difference between knowing the course and knowing how to race it.",
       triggers: { raceNumber: [3, 4, 5], performanceTier: ["any"] },
-      weight: 0.4
+      weight: 0.4,
+      bridges: {
+        win: "And today, you raced it perfectly.",
+        podium: "The preparation paid off.",
+        top10: "Knowing the course helped today.",
+        midpack: "The course wasn't the problem.",
+        back: "Knowing the course didn't help today."
+      }
     },
     {
       id: "early_results_obsession",
       text: "You check race results compulsively now. Not just your own—everyone's. Where you placed relative to predictions, how the top finishers did, who's trending up. You're building a mental database of who's fast, who's consistent, who you need to watch. It's probably excessive, but knowledge is power.",
       triggers: { raceNumber: [3, 4, 5], performanceTier: ["any"] },
-      weight: 0.4
+      weight: 0.4,
+      bridges: {
+        win: "And today, your name is at the top of those results.",
+        podium: "Today's result will look good in that database.",
+        top10: "Another data point for the mental database.",
+        midpack: "More data to analyze.",
+        back: "Today's result needs no analysis—just processing."
+      }
     },
     {
       id: "early_photo_finish",
       text: "The finish line photo from your last race revealed something interesting: you were sitting up, celebrating too early, while riders behind were still sprinting. That mistake probably cost you two or three places. Now you're committed to sprinting through the line, every single time, no matter what.",
       triggers: { raceNumber: [3, 4, 5], performanceTier: ["midpack"], minRacesCompleted: 2 },
-      weight: 0.5
+      weight: 0.5,
+      bridges: {
+        win: "And today, you sprinted through—all the way to first.",
+        podium: "Today, no sitting up early. Every inch earned.",
+        top10: "Sprinted through the line. Lesson learned.",
+        midpack: "At least you sprinted through this time.",
+        back: "Sprinting through didn't help today."
+      }
     },
     {
       id: "early_cadence_lesson",
       text: "You've been grinding big gears at low cadence because it felt powerful. Then someone pointed out that the fast riders all spin faster, keeping their legs fresh, maximizing efficiency. Now you're working on cadence drills, learning to spin smoothly at 90-95 rpm even when it feels unnatural.",
       triggers: { raceNumber: [3, 4, 5], performanceTier: ["any"] },
-      weight: 0.4
+      weight: 0.4,
+      bridges: {
+        win: "And today, the spin was smooth all the way to victory.",
+        podium: "The cadence work is paying dividends.",
+        top10: "The legs felt fresher today—cadence working.",
+        midpack: "The spinning helped, if not with the result.",
+        back: "Still adapting to the new style."
+      }
     },
     {
       id: "early_drafting_discovery",
       text: "The first time you properly drafted in a pack, you couldn't believe the difference. 30% less effort for the same speed felt like cheating. Now you understand why positioning matters so much—good wheels save watts, bad wheels waste them. You're learning to find the sweet spots.",
       triggers: { raceNumber: [2, 3, 4], performanceTier: ["any"] },
-      weight: 0.5
+      weight: 0.5,
+      bridges: {
+        win: "And today, you found all the right wheels.",
+        podium: "The drafting skills paid off today.",
+        top10: "Good wheels, good result.",
+        midpack: "Found good wheels; still not enough.",
+        back: "Drafting only helps if you can hold the wheel."
+      }
     },
     {
       id: "early_attack_response",
       text: "When attacks went in your first few races, you either chased too hard or didn't chase at all. Now you're learning to gauge threats—which moves are dangerous, which will come back, when to expend energy and when to let it go. Race intelligence is developing slowly but surely.",
       triggers: { raceNumber: [4, 5], performanceTier: ["top10", "podium"] },
-      weight: 0.6
+      weight: 0.6,
+      bridges: {
+        win: "And today, you read every move perfectly.",
+        podium: "The race intelligence showed today.",
+        top10: "Good reads today, good result.",
+        midpack: "The reading was right; the legs were wrong.",
+        back: "Misread the race today."
+      }
     },
     {
       id: "early_numbers_pinning",
       text: "You've developed a specific ritual for pinning race numbers—fold the edges just so, four pins exactly placed, centered and wrinkle-free. It's superstitious and probably silly, but having a pre-race ritual helps calm the nerves. Besides, you've seen pros obsess over weirder things.",
       triggers: { raceNumber: [2, 3, 4], performanceTier: ["any"] },
-      weight: 0.3
+      weight: 0.3,
+      bridges: {
+        win: "And today, the ritual worked its magic.",
+        podium: "Lucky number pinning continues.",
+        top10: "The ritual calmed the nerves, at least.",
+        midpack: "The number looked good. The result less so.",
+        back: "Time to adjust the ritual, maybe."
+      }
     },
     {
       id: "early_post_race_analysis",
       text: "You've started doing post-race debriefs with yourself. What went right, what went wrong, where you made mistakes, where you got lucky. Writing it down helps cement the lessons, turns raw experience into actual learning. Your racing journal is becoming one of your most valuable training tools.",
       triggers: { raceNumber: [4, 5], performanceTier: ["any"] },
-      weight: 0.5
+      weight: 0.5,
+      bridges: {
+        win: "And today's entry will be a happy one.",
+        podium: "Today's debrief will be encouraging.",
+        top10: "Another lesson learned, another entry written.",
+        midpack: "Plenty to write about today.",
+        back: "Today's entry will be longer than most."
+      }
     }
   ],
 
@@ -300,181 +559,391 @@ const NARRATIVE_DATABASE = {
       id: "mid_confidence_building",
       text: "The pack dynamics are starting to make sense now. You can read moves before they happen, anticipate attacks, find the right wheels to follow. What felt like chaos a few races ago now has patterns, rhythms, logic. You're not just surviving in the peloton anymore—you're racing with intent.",
       triggers: { raceNumber: [6, 7, 8], performanceTier: ["top10", "podium"], consecutiveGoodResults: 2 },
-      weight: 0.7
+      weight: 0.7,
+      bridges: {
+        win: "And that intent turned into victory today.",
+        podium: "And today, the intent paid off.",
+        top10: "The reading continues to improve.",
+        midpack: "But today the patterns didn't help.",
+        back: "But today the pack got the better of you."
+      }
     },
     {
       id: "mid_equipment_upgrade",
       text: "The new bike arrived this week—a proper race machine, not just an upgraded version of your old setup but a completely different category of equipment. Carbon frame, electronic shifting, integrated cockpit, the works. It represents months of saving, of choosing to skip other expenses, of committing fully to this racing thing.",
       triggers: { raceNumber: [7, 8, 9], performanceTier: ["win", "podium"], totalPoints: 100 },
-      weight: 0.6
+      weight: 0.6,
+      bridges: {
+        win: "And today, the new machine delivered.",
+        podium: "And the investment is paying off.",
+        top10: "The bike is working; the results will follow.",
+        midpack: "The bike is great; the legs needed more.",
+        back: "The bike can't race itself, as today proved."
+      }
     },
     {
       id: "mid_training_dedication",
       text: "The off-bike training has become as important as the riding itself. You've set up a corner of your place as a makeshift gym: yoga mat, resistance bands, foam roller, a set of dumbbells picked up secondhand. Core work three times a week, mobility sessions, strength training focused on the posterior chain.",
       triggers: { raceNumber: [7, 8, 9, 10], performanceTier: ["any"] },
-      weight: 0.5
+      weight: 0.5,
+      bridges: {
+        win: "And today, all that work showed.",
+        podium: "The dedication is translating to results.",
+        top10: "The off-bike work is helping.",
+        midpack: "The training continues; so does the learning.",
+        back: "More work needed, on and off the bike."
+      }
     },
     {
       id: "mid_financial_reality",
       text: "Racing isn't cheap, and the costs add up faster than you anticipated: entry fees, equipment, travel, food, the endless small expenses that weren't part of the original budget. You've started packing your own race-day meals, driving instead of flying when possible, researching every discount and deal available.",
       triggers: { raceNumber: [6, 7, 8], performanceTier: ["midpack", "back"] },
-      weight: 0.6
+      weight: 0.6,
+      bridges: {
+        win: "But today made every penny worth it.",
+        podium: "But days like today make it worthwhile.",
+        top10: "At least today's entry fee was well spent.",
+        midpack: "The cost-per-result math isn't great today.",
+        back: "Days like today make you question the expenses."
+      }
     },
     {
       id: "mid_rival_emergence",
       text: "There's a rider you keep seeing in results, someone racing a similar schedule who seems to be on a similar trajectory. You've never spoken, barely made eye contact, but you track their results obsessively. When they finish ahead of you, it stings more than it should. When you beat them, the satisfaction is disproportionate.",
       triggers: { raceNumber: [8, 9, 10], performanceTier: ["top10", "podium"] },
-      weight: 0.7
+      weight: 0.7,
+      bridges: {
+        win: "Today, you finished well ahead of them.",
+        podium: "Today, you were at the front together—or ahead.",
+        top10: "The rivalry continues, evenly matched.",
+        midpack: "They had a better day than you today.",
+        back: "They'll pull ahead in your mental standings after today."
+      }
     },
     {
       id: "mid_power_meter_insight",
       text: "You finally got a power meter, and the data is both enlightening and humbling. Those efforts that felt hard? Turns out you were barely above threshold. The intervals you thought were maximal? You had way more to give. Now you're training with numbers, and the numbers don't lie about your limits.",
       triggers: { raceNumber: [6, 7, 8], performanceTier: ["any"] },
-      weight: 0.5
+      weight: 0.5,
+      bridges: {
+        win: "And today, the numbers translated to victory.",
+        podium: "And today, you pushed those limits.",
+        top10: "The data-driven approach is working.",
+        midpack: "The numbers showed today's limits clearly.",
+        back: "Today's data will be humbling to review."
+      }
     },
     {
       id: "mid_sprint_development",
       text: "You've been working on your sprint—not just raw power, but timing, positioning, reading the final kilometers. In training, you practice launching at exactly the right moment, staying seated for maximum watts, throwing the bike at the line. All for those crucial seconds that separate winners from also-rans.",
       triggers: { raceNumber: [7, 8, 9], performanceTier: ["win", "podium", "top10"] },
-      weight: 0.6
+      weight: 0.6,
+      bridges: {
+        win: "And today, that sprint work paid off perfectly.",
+        podium: "The sprint came through when it mattered.",
+        top10: "The sprint is improving—today showed it.",
+        midpack: "The sprint didn't materialize today.",
+        back: "No sprint opportunity today—never in position."
+      }
     },
     {
       id: "mid_climbing_focus",
       text: "Hills have become your focus. You've been hitting every climb in your area repeatedly, working on sustained power, learning to suffer efficiently uphill. Your power-to-weight ratio is improving, and you're starting to look forward to races with elevation rather than dreading them.",
       triggers: { raceNumber: [6, 7, 8, 9], performanceTier: ["top10", "podium"] },
-      weight: 0.5
+      weight: 0.5,
+      bridges: {
+        win: "And today, the climbing paid dividends.",
+        podium: "The hill work showed in the results.",
+        top10: "The climbing is coming along.",
+        midpack: "The climbs weren't the problem today.",
+        back: "Still more climbing work needed."
+      }
     },
     {
       id: "mid_race_craft",
       text: "You're developing race craft—those subtle skills that separate experienced racers from strong riders. How to shelter from the wind without being obvious. When to close gaps and when to let them go. Reading body language to anticipate attacks. It's an education you can only get through racing.",
       triggers: { raceNumber: [7, 8, 9, 10], performanceTier: ["top10", "podium", "win"] },
-      weight: 0.7
+      weight: 0.7,
+      bridges: {
+        win: "And today, race craft won the day.",
+        podium: "The craft is becoming instinctive.",
+        top10: "Race craft kept you in contention.",
+        midpack: "The craft is there; execution wasn't.",
+        back: "Race craft can't overcome everything."
+      }
     },
     {
       id: "mid_consistency_pride",
       text: "You're building a reputation for consistency. Not the flashiest rider, not the strongest on any given day, but always there, always competitive, always finishing in the points. That reliability matters more than occasional brilliance, and you're starting to embrace being the steady, dependable competitor.",
       triggers: { raceNumber: [8, 9, 10], performanceTier: ["top10", "podium"], consecutiveGoodResults: 3 },
-      weight: 0.7
+      weight: 0.7,
+      bridges: {
+        win: "And today, consistency turned to brilliance.",
+        podium: "Another day, another solid result.",
+        top10: "The consistency continues.",
+        midpack: "Even consistent riders have off days.",
+        back: "A break in the pattern—it happens."
+      }
     },
     {
       id: "mid_nutrition_mastery",
       text: "You've dialed in your race nutrition to a science. Exactly 60 grams of carbs per hour, starting 30 minutes in, alternating between gels and bars. Water every 15 minutes. Electrolytes when it's hot. The bonk from early in the season feels like a distant memory—now you're fueling like a pro.",
       triggers: { raceNumber: [7, 8, 9, 10], performanceTier: ["any"] },
-      weight: 0.4
+      weight: 0.4,
+      bridges: {
+        win: "And the fueling strategy powered a victory.",
+        podium: "Nutrition on point, result on point.",
+        top10: "The tank was full when it mattered.",
+        midpack: "Fueling was fine; other factors weren't.",
+        back: "At least you didn't bonk."
+      }
     },
     {
       id: "mid_team_consideration",
       text: "A local team has been watching your results, and there's been talk of you joining for next season. It's flattering and terrifying in equal measure. Team racing means obligations, tactics, racing for someone else sometimes. But it also means support, equipment deals, a sense of belonging.",
       triggers: { raceNumber: [8, 9, 10], performanceTier: ["win", "podium"], totalPoints: 150 },
-      weight: 0.6
+      weight: 0.6,
+      bridges: {
+        win: "Today's win won't hurt those conversations.",
+        podium: "Results like today keep the interest alive.",
+        top10: "Still building the case for next season.",
+        midpack: "Not the audition tape you wanted.",
+        back: "The team talk might cool after today."
+      }
     },
     {
       id: "mid_weather_toughness",
       text: "You've raced in the rain now, in wind, in heat that made you question your sanity. Each one taught you something—how your tires handle on wet corners, how to stay fueled when it's too hot to want to eat, how to position yourself to use crosswinds to your advantage. You're becoming an all-conditions racer.",
       triggers: { raceNumber: [7, 8, 9], performanceTier: ["any"] },
-      weight: 0.5
+      weight: 0.5,
+      bridges: {
+        win: "And today, whatever the conditions, you thrived.",
+        podium: "The all-conditions approach paid off.",
+        top10: "Handled today's conditions well.",
+        midpack: "Conditions weren't the excuse today.",
+        back: "Today's conditions got the better of you."
+      }
     },
     {
       id: "mid_experience_advantage",
       text: "The newer racers at the startline look at you differently now. You've been doing this long enough that you're no longer the nervous newbie. You know the courses, you recognize the officials, you understand the unwritten rules. That experience is its own form of strength.",
       triggers: { raceNumber: [8, 9, 10], performanceTier: ["any"] },
-      weight: 0.6
+      weight: 0.6,
+      bridges: {
+        win: "And experience won out today.",
+        podium: "Experience showing in the results.",
+        top10: "The experience advantage helped.",
+        midpack: "Experience doesn't guarantee results.",
+        back: "Sometimes experience isn't enough."
+      }
     },
     {
       id: "mid_photo_analysis",
       text: "You've been studying finish photos and race footage obsessively, analyzing your position in the pack, your body language, when you were on the wrong wheel. Every image is a lesson in what you did right and what you need to fix. The attention to detail is paying off.",
       triggers: { raceNumber: [7, 8, 9], performanceTier: ["top10", "podium", "win"] },
-      weight: 0.5
+      weight: 0.5,
+      bridges: {
+        win: "Today's photos will be fun to review.",
+        podium: "Today's footage will show good positioning.",
+        top10: "More footage to study, more lessons to learn.",
+        midpack: "Today's analysis will be instructive.",
+        back: "Today's footage will be painful to watch."
+      }
     },
     {
       id: "mid_interval_evolution",
       text: "Your interval sessions have evolved dramatically. What used to be generic 'go hard for a while' efforts are now precisely structured workouts: VO2 max intervals, threshold repeats, sprint power development. You're training smarter, not just harder, and the results are showing in races.",
       triggers: { raceNumber: [7, 8, 9], performanceTier: ["top10", "podium", "win"] },
-      weight: 0.5
+      weight: 0.5,
+      bridges: {
+        win: "And today, smart training meant a win.",
+        podium: "The structured approach is delivering.",
+        top10: "Training smart, racing smart.",
+        midpack: "The training is good; race execution wasn't.",
+        back: "Training doesn't always translate immediately."
+      }
     },
     {
       id: "mid_cornering_confidence",
       text: "Your cornering has improved dramatically. You used to brake way too early, losing positions in every turn. Now you're carrying more speed, taking better lines, even gaining places through technical sections. The confidence to trust your tires at speed changes everything.",
       triggers: { raceNumber: [7, 8, 9], performanceTier: ["top10", "podium"] },
-      weight: 0.5
+      weight: 0.5,
+      bridges: {
+        win: "And that cornering confidence helped secure the win.",
+        podium: "Corners were an advantage today.",
+        top10: "The technical sections went well.",
+        midpack: "Cornering was fine; other things weren't.",
+        back: "Corners weren't the problem today."
+      }
     },
     {
       id: "mid_race_day_ritual",
       text: "Your race day routine is now finely tuned. Wake at a specific time, same breakfast, same warm-up protocol, same mental preparation. The ritual reduces variables, minimizes anxiety, lets you focus on the racing itself rather than the logistics. Consistency breeds performance.",
       triggers: { raceNumber: [7, 8, 9, 10], performanceTier: ["any"] },
-      weight: 0.4
+      weight: 0.4,
+      bridges: {
+        win: "And the routine produced a perfect day.",
+        podium: "Ritual executed, result delivered.",
+        top10: "The routine is working.",
+        midpack: "The routine is fine; the race wasn't.",
+        back: "Maybe time to adjust the ritual."
+      }
     },
     {
       id: "mid_breakaway_participation",
       text: "You've started making it into breakaways—not just covering moves, but initiating them. The calculated risk of going off the front, the cooperation with strangers, the math of whether a break will stick. It's a different dimension of racing, and you're learning to thrive in it.",
       triggers: { raceNumber: [8, 9, 10], performanceTier: ["win", "podium", "top10"] },
-      weight: 0.7
+      weight: 0.7,
+      bridges: {
+        win: "And today, the breakaway stuck—all the way to victory.",
+        podium: "The breakaway gambit paid off.",
+        top10: "The move didn't fully work, but you were in it.",
+        midpack: "No breakaway opportunity today.",
+        back: "Stuck in the pack, never a chance to attack."
+      }
     },
     {
       id: "mid_data_analysis",
       text: "Your post-race data analysis has become sophisticated. You're not just looking at average power anymore—you're analyzing power distribution, effort timing, heart rate trends, cadence patterns. Every file tells a story, and you're learning to read them like a coach.",
       triggers: { raceNumber: [7, 8, 9], performanceTier: ["any"] },
-      weight: 0.4
+      weight: 0.4,
+      bridges: {
+        win: "Today's file will tell a winning story.",
+        podium: "Today's data will confirm a good race.",
+        top10: "More data to learn from.",
+        midpack: "Today's numbers will need examining.",
+        back: "Today's data will explain what went wrong."
+      }
     },
     {
       id: "mid_mental_toughness",
       text: "The mental side of racing is becoming clearer. You've learned when to push through discomfort and when pain signals actual problems. How to stay calm when the pace spikes, how to manage suffering, how to maintain focus for the entire duration. Your mind is becoming as trained as your legs.",
       triggers: { raceNumber: [8, 9, 10], performanceTier: ["top10", "podium", "win"] },
-      weight: 0.6
+      weight: 0.6,
+      bridges: {
+        win: "And the mental game delivered a win.",
+        podium: "Mental strength showed today.",
+        top10: "Stayed focused when it mattered.",
+        midpack: "The mind was willing; the body less so.",
+        back: "Mental toughness wasn't the issue today."
+      }
     },
     {
       id: "mid_pack_positioning_mastery",
       text: "Pack positioning has become second nature. You can sense gaps opening before they appear, feel when the pace is about to change, position yourself for attacks before they happen. It's like developing a sixth sense for group dynamics.",
       triggers: { raceNumber: [8, 9, 10], performanceTier: ["win", "podium", "top10"] },
-      weight: 0.7
+      weight: 0.7,
+      bridges: {
+        win: "And today, perfect positioning meant victory.",
+        podium: "The sixth sense served you well.",
+        top10: "Always in the right place today.",
+        midpack: "Good positioning, but couldn't capitalize.",
+        back: "Even good positioning can't overcome bad legs."
+      }
     },
     {
       id: "mid_equipment_confidence",
       text: "You've stopped worrying about equipment. Your bike is properly maintained, your kit is comfortable, your gear works reliably. That mental space previously occupied by equipment anxiety is now focused on actual racing. The setup is dialed, the excuses are gone.",
       triggers: { raceNumber: [7, 8, 9], performanceTier: ["any"] },
-      weight: 0.4
+      weight: 0.4,
+      bridges: {
+        win: "And with no excuses, you delivered a win.",
+        podium: "Equipment sorted, result delivered.",
+        top10: "No equipment issues, solid result.",
+        midpack: "Can't blame the equipment today.",
+        back: "The equipment was fine; something else wasn't."
+      }
     },
     {
       id: "mid_race_reading",
       text: "You're getting better at reading races in real-time. Recognizing which attacks are dangerous, which teams are working together, when the decisive moment is approaching. This tactical awareness makes you dangerous—not just strong, but smart.",
       triggers: { raceNumber: [8, 9, 10], performanceTier: ["podium", "win"] },
-      weight: 0.7
+      weight: 0.7,
+      bridges: {
+        win: "And today, you read it perfectly.",
+        podium: "The reading was spot on.",
+        top10: "Good reads, good result.",
+        midpack: "Read the race well; couldn't act on it.",
+        back: "Misread something crucial today."
+      }
     },
     {
       id: "mid_social_media_presence",
       text: "Your racing social media has grown organically. People follow your journey, comment on your progress, share in your successes and setbacks. You're not an influencer, but you've built a small community of supporters who care about your racing. That accountability and encouragement matters more than you expected.",
       triggers: { raceNumber: [7, 8, 9, 10], performanceTier: ["any"] },
-      weight: 0.3
+      weight: 0.3,
+      bridges: {
+        win: "Today's post will be a celebration.",
+        podium: "A good update for the followers.",
+        top10: "Solid content for the feed.",
+        midpack: "An honest update about the journey.",
+        back: "A humbling post to write tonight."
+      }
     },
     {
       id: "mid_first_win_afterglow",
       text: "The afterglow of your first victory hasn't faded yet. You won. Actually won. Crossed the line first, stood on the top step, heard your name announced as the winner. That moment changed something inside you—you're not just racing to compete anymore, you're racing to win again.",
       triggers: { raceNumber: [6, 7, 8, 9, 10], totalWins: [1], performanceTier: ["top10", "podium", "midpack"] },
-      weight: 0.95
+      weight: 0.95,
+      bridges: {
+        win: "And today, you did it again.",
+        podium: "Today kept you close to that feeling.",
+        top10: "Still chasing that winning feeling.",
+        midpack: "The hunger for another win remains.",
+        back: "That winning feeling feels far away today."
+      }
     },
     {
       id: "mid_multi_winner_confidence",
       text: "{totalWins} wins this season. That's not a fluke, that's a pattern. You've proven repeatedly that when the race reaches its critical moment, you have what it takes to cross the line first. The competition knows your name now—they mark you, watch you, respect you.",
       triggers: { raceNumber: [7, 8, 9, 10], totalWins: [2, 3, 4, 5], performanceTier: ["win", "podium", "top10"] },
-      weight: 0.95
+      weight: 0.95,
+      bridges: {
+        win: "Make that one more win to add to the tally.",
+        podium: "Another front-of-pack finish.",
+        top10: "Still a threat, even on an off day.",
+        midpack: "Even winners have off days.",
+        back: "The pattern broke today—it happens."
+      }
     },
     {
       id: "mid_exceeded_predictions_momentum",
       text: "You keep outperforming what everyone expects. Race after race, the predictions say one thing and you deliver something better. It's not luck at this point—something's clicking, and you're riding better than anyone gave you credit for.",
       triggers: { raceNumber: [6, 7, 8, 9], improvementFromPrediction: 3, performanceTier: ["top10", "podium", "win"] },
-      weight: 0.85
+      weight: 0.85,
+      bridges: {
+        win: "And today exceeded expectations again—a win.",
+        podium: "The overperformance continues.",
+        top10: "Still beating predictions.",
+        midpack: "Back to expected levels today.",
+        back: "The overperformance streak ended today."
+      }
     },
     {
       id: "mid_struggling_below_expectations",
       text: "The season hasn't unfolded the way you hoped. The predictions suggested you'd be higher in the standings by now, but results haven't cooperated. It's frustrating—you know you're capable of more, but translating that capability into results remains elusive.",
       triggers: { raceNumber: [6, 7, 8, 9], performanceTier: ["midpack", "back"], isWorseResult: true },
-      weight: 0.8
+      weight: 0.8,
+      bridges: {
+        win: "But today, finally, things clicked.",
+        podium: "Today offered a glimpse of that capability.",
+        top10: "A step in the right direction today.",
+        midpack: "The frustration continues.",
+        back: "Another difficult day in a difficult stretch."
+      }
     },
     {
       id: "mid_podium_consistency",
       text: "{totalPodiums} podiums across the season establishes you as one of the most consistent front-runners in the field. You're not a one-hit wonder—you're a genuine threat every time you pin on a number.",
       triggers: { raceNumber: [7, 8, 9, 10], totalPodiums: [3, 4, 5], performanceTier: ["win", "podium", "top10"] },
-      weight: 0.9
+      weight: 0.9,
+      bridges: {
+        win: "And today added another—a win this time.",
+        podium: "Add another podium to the count.",
+        top10: "Just off the podium today, but still a threat.",
+        midpack: "A rare miss for someone so consistent.",
+        back: "Even the most consistent have bad days."
+      }
     }
   ],
 
@@ -484,73 +953,157 @@ const NARRATIVE_DATABASE = {
       id: "late_season_fatigue",
       text: "The season is taking its toll. You can feel it in the way your legs respond to hard efforts, in the extra time needed for recovery, in the mental weight of showing up race after race. This is where consistency matters most—when everyone is tired, when the excitement of early season has faded into the grind, when it would be easy to skip a race or mail in a performance.",
       triggers: { raceNumber: [11, 12, 13], performanceTier: ["any"] },
-      weight: 0.6
+      weight: 0.6,
+      bridges: {
+        win: "But you showed up today, and it paid off.",
+        podium: "You showed up today, and it mattered.",
+        top10: "You showed up today, and it showed.",
+        midpack: "You showed up today. That counts for something.",
+        back: "The fatigue won today."
+      }
     },
     {
       id: "late_season_reflection",
       text: "Looking back at where you started this season, the progress is undeniable. The rider who toed the line at Event 1, nervous and uncertain, barely resembles who you are now. You've learned to race, learned to suffer, learned what you're capable of when you commit fully.",
       triggers: { raceNumber: [13, 14], performanceTier: ["win", "podium", "top10"] },
-      weight: 0.7
+      weight: 0.7,
+      bridges: {
+        win: "And today proved just how far you've come.",
+        podium: "Today was another demonstration of that growth.",
+        top10: "Today continued that progression.",
+        midpack: "Growth isn't always linear—today was a reminder.",
+        back: "Even with all that growth, hard days happen."
+      }
     },
     {
       id: "late_final_push",
       text: "Everything comes down to these final races. Points accumulated over months, form built through countless training hours, lessons learned in a dozen race situations—it all matters now. The standings are still fluid, positions can change, and every place gained or lost carries weight.",
       triggers: { raceNumber: [13, 14, 15], performanceTier: ["any"] },
-      weight: 0.8
+      weight: 0.8,
+      bridges: {
+        win: "And you delivered when it mattered most.",
+        podium: "And you delivered a strong result.",
+        top10: "And you stayed in the fight.",
+        midpack: "But today didn't go as planned.",
+        back: "Today was costly at the worst time."
+      }
     },
     {
       id: "late_championship_mindset",
       text: "The math is simple: if you can string together strong results in these final races, you're in contention for the overall. It's no longer about individual race results—it's about the season as a whole, about proving you can perform when it counts most, when fatigue is highest and the pressure is real.",
       triggers: { raceNumber: [13, 14, 15], performanceTier: ["win", "podium", "top10"] },
-      weight: 0.7
+      weight: 0.7,
+      bridges: {
+        win: "Today's result keeps the dream alive—and then some.",
+        podium: "Today keeps you in contention.",
+        top10: "Today kept the math working in your favor.",
+        midpack: "The math got harder today.",
+        back: "Today changed the calculations significantly."
+      }
     },
     {
       id: "late_no_regrets",
       text: "The season is almost over, and you're determined to finish strong. No regrets, no 'what ifs,' no holding back. You've come too far, worked too hard, sacrificed too much to coast through the final races. This is the time to empty the tank completely.",
       triggers: { raceNumber: [13, 14, 15], performanceTier: ["any"] },
-      weight: 0.7
+      weight: 0.7,
+      bridges: {
+        win: "And you emptied the tank all the way to victory.",
+        podium: "No regrets after today.",
+        top10: "You left nothing in reserve today.",
+        midpack: "No regrets about the effort, at least.",
+        back: "You emptied the tank; it just wasn't full enough."
+      }
     },
     {
       id: "late_lessons_learned",
       text: "Every race this season taught you something valuable—about tactics, about your body, about who you are under pressure. Now, in these final events, you're putting all those lessons into practice. This is where the education becomes wisdom, where experience transforms into results.",
       triggers: { raceNumber: [12, 13, 14], performanceTier: ["any"] },
-      weight: 0.6
+      weight: 0.6,
+      bridges: {
+        win: "And today, wisdom became victory.",
+        podium: "Today, the lessons translated to the podium.",
+        top10: "The education continues to pay dividends.",
+        midpack: "Still learning, even this late in the season.",
+        back: "Today's lesson was a hard one."
+      }
     },
     {
       id: "late_next_season_thoughts",
       text: "Your mind keeps drifting to next season—how much stronger you'll be with a full year of racing experience, what you'll do differently, where you can improve. But first, you need to finish this season strong, to prove to yourself that you can close when it matters.",
       triggers: { raceNumber: [13, 14, 15], performanceTier: ["any"] },
-      weight: 0.5
+      weight: 0.5,
+      bridges: {
+        win: "And today proved you can close strong.",
+        podium: "Today was a strong close to be proud of.",
+        top10: "Today showed you can still deliver.",
+        midpack: "Next season starts with lessons from today.",
+        back: "More to work on for next season."
+      }
     },
     {
       id: "late_emotional_investment",
       text: "You didn't expect to care this much. At the start of the season, racing was just something you were trying. Now, the results matter deeply. The standings mean something. You check them compulsively, run through scenarios, calculate what you need to happen. Racing has become personal.",
       triggers: { raceNumber: [12, 13, 14], performanceTier: ["any"] },
-      weight: 0.6
+      weight: 0.6,
+      bridges: {
+        win: "And today delivered everything you hoped for.",
+        podium: "Today gave you something to care about.",
+        top10: "Today moved the needle in the right direction.",
+        midpack: "Caring this much makes results like today harder.",
+        back: "Caring this much makes today sting."
+      }
     },
     {
       id: "late_veterans_respect",
       text: "The experienced racers who you admired from afar at the start of the season now treat you differently. There's a nod of recognition at the start line, a word of respect after the race. You've earned your place in this community through consistency and performance.",
       triggers: { raceNumber: [12, 13, 14, 15], performanceTier: ["podium", "top10"] },
-      weight: 0.6
+      weight: 0.6,
+      bridges: {
+        win: "Today earned more than respect—it earned the win.",
+        podium: "Today reinforced that respect.",
+        top10: "Today showed why you've earned that place.",
+        midpack: "Respect doesn't guarantee results.",
+        back: "A humbling day in front of those veterans."
+      }
     },
     {
       id: "late_fitness_peak",
       text: "All the training, all the racing, all the recovery—it's culminating now. You feel the best you've felt all season, that rare confluence of fitness and freshness that defines peak form. These final races come at exactly the right moment.",
       triggers: { raceNumber: [13, 14, 15], performanceTier: ["win", "podium"] },
-      weight: 0.8
+      weight: 0.8,
+      bridges: {
+        win: "And peak form produced peak results.",
+        podium: "The peak form showed today.",
+        top10: "The form is there; the result was close.",
+        midpack: "Peak form doesn't guarantee peak results.",
+        back: "The form felt better than the result suggests."
+      }
     },
     {
       id: "late_standings_pressure",
       text: "Every time you check the standings, the pressure builds. You're close enough to move up significantly, positioned where a strong finish could change your entire season narrative. That pressure could be crushing or motivating—you're choosing motivation.",
       triggers: { raceNumber: [13, 14, 15], performanceTier: ["any"] },
-      weight: 0.6
+      weight: 0.6,
+      bridges: {
+        win: "And you used that pressure to win.",
+        podium: "The pressure became fuel today.",
+        top10: "You handled the pressure well.",
+        midpack: "The pressure didn't produce today.",
+        back: "Maybe the pressure was too much today."
+      }
     },
     {
       id: "late_legacy_building",
       text: "These final races are about more than points or positions—they're about establishing who you are as a racer. Do you fade when things get hard, or do you rise to the occasion? Do you quit when tired, or push through? The answer to those questions gets written in these final events.",
       triggers: { raceNumber: [13, 14, 15], performanceTier: ["any"] },
-      weight: 0.7
+      weight: 0.7,
+      bridges: {
+        win: "Today's answer was emphatic: you rise.",
+        podium: "Today you rose to the occasion.",
+        top10: "Today showed you don't fade.",
+        midpack: "The answer wasn't what you hoped today.",
+        back: "Today's chapter was a difficult one."
+      }
     }
   ],
 
@@ -560,121 +1113,261 @@ const NARRATIVE_DATABASE = {
       id: "equip_tire_choice",
       text: "You spent an embarrassing amount of time researching tire choices for this race. Thread count, rubber compound, tubeless vs tubes, optimal pressure for your weight. Your friends think you're overthinking it. But marginal gains matter, and if the right tires save you five watts or give you better cornering confidence, that's worth the research.",
       triggers: { raceNumber: [3, 4, 5, 6], performanceTier: ["any"] },
-      weight: 0.4
+      weight: 0.4,
+      bridges: {
+        win: "Turns out, the research paid off.",
+        podium: "The tire choice worked out perfectly.",
+        top10: "The marginal gains added up.",
+        midpack: "But tires alone don't win races.",
+        back: "But all that research didn't translate to the result."
+      }
     },
     {
       id: "equip_saddle_saga",
       text: "Finding the right saddle has been a months-long odyssey. You've tried five different models, adjusting height and fore-aft position countless times. Finally, this one feels right—you can put down power without discomfort, stay aero without numbness. It's amazing how much difference a few centimeters of shaped carbon and padding can make.",
       triggers: { raceNumber: [4, 5, 6, 7], performanceTier: ["any"] },
-      weight: 0.3
+      weight: 0.3,
+      bridges: {
+        win: "And today, comfort translated to power.",
+        podium: "The saddle search was worth it.",
+        top10: "At least you were comfortable while competing.",
+        midpack: "But comfort doesn't equal speed.",
+        back: "But a good saddle isn't the whole equation."
+      }
     },
     {
       id: "equip_aero_obsession",
       text: "You've gone full aero-nerd: tight clothing, tucked elbows, flat back position. You practice in the mirror, film yourself on training rides, optimize every detail. Whether it's actually making you faster is unclear, but the psychological benefit of knowing you're doing everything possible to reduce drag is real.",
       triggers: { raceNumber: [6, 7, 8, 9], performanceTier: ["top10", "podium", "win"] },
-      weight: 0.5
+      weight: 0.5,
+      bridges: {
+        win: "And the aero obsession paid dividends.",
+        podium: "Those saved watts made a difference.",
+        top10: "The attention to aerodynamics helped.",
+        midpack: "But aero doesn't matter if you can't hold the wheel.",
+        back: "But you can't out-aero a lack of fitness."
+      }
     },
     {
       id: "equip_maintenance_ritual",
       text: "The night before races has become a ritual: bike completely clean, chain freshly lubed, bolts checked, wheels true, brake pads inspected. Some might call it obsessive. You call it preparation. A mechanical DNF is preventable, and you're not leaving anything to chance.",
       triggers: { raceNumber: [5, 6, 7, 8], performanceTier: ["any"] },
-      weight: 0.4
+      weight: 0.4,
+      bridges: {
+        win: "And the bike performed flawlessly.",
+        podium: "Zero mechanical issues, exactly as planned.",
+        top10: "The preparation paid off—no problems today.",
+        midpack: "At least the bike worked perfectly.",
+        back: "The bike was ready; you just weren't."
+      }
     },
     {
       id: "equip_clothing_experiment",
       text: "You've been experimenting with race clothing—speedsuits vs separate bibs and jersey, short vs long socks, aero fabrics vs comfort. Every choice is a trade-off between aerodynamics, comfort, and looking the part. Today's kit represents your current best guess at the optimal combination.",
       triggers: { raceNumber: [6, 7, 8], performanceTier: ["any"] },
-      weight: 0.3
+      weight: 0.3,
+      bridges: {
+        win: "And the combination proved optimal.",
+        podium: "Today's kit choice worked well.",
+        top10: "The clothing experiment continues to show promise.",
+        midpack: "But kit alone doesn't determine results.",
+        back: "But you can't buy speed with fancy clothing."
+      }
     },
     {
       id: "equip_tech_adoption",
       text: "Your bike computer now tracks everything: power, heart rate, cadence, GPS, even the weather. Post-race, you spend almost as much time analyzing the data as you did racing. Every file reveals something—a premature effort, an inefficient cadence spike, proof that you had more to give.",
       triggers: { raceNumber: [6, 7, 8, 9], performanceTier: ["any"] },
-      weight: 0.4
+      weight: 0.4,
+      bridges: {
+        win: "And the data will show exactly how you won.",
+        podium: "The post-race analysis will be satisfying.",
+        top10: "The data will reveal what you did right.",
+        midpack: "The data will tell you what went wrong.",
+        back: "At least the data will help you learn from this."
+      }
     },
     {
       id: "equip_helmet_upgrade",
       text: "The new aero helmet looked ridiculous in the shop, but the wind tunnel data doesn't lie—it's measurably faster than your old one. You've stopped caring what it looks like. Racing is about going fast, not looking cool. Well, mostly.",
       triggers: { raceNumber: [5, 6, 7], performanceTier: ["any"] },
-      weight: 0.3
+      weight: 0.3,
+      bridges: {
+        win: "And you were fast. Mission accomplished.",
+        podium: "The helmet earned its keep today.",
+        top10: "The aero investment showed promise.",
+        midpack: "But a faster helmet can't fix everything.",
+        back: "But looking fast isn't the same as being fast."
+      }
     },
     {
       id: "equip_budget_creativity",
       text: "You can't afford the top-tier equipment the front of the pack is riding, so you've become creative: used race wheels from last year's model, take-off components from bike shop, waiting for sales. The bike may not be Instagram-worthy, but it's race-ready, and that's what matters.",
       triggers: { raceNumber: [3, 4, 5, 6], performanceTier: ["midpack", "back"] },
-      weight: 0.5
+      weight: 0.5,
+      bridges: {
+        win: "And today proved that legs matter more than equipment.",
+        podium: "The budget build punched above its weight.",
+        top10: "Your resourcefulness paid off.",
+        midpack: "But equipment gaps do show up in results.",
+        back: "And sometimes equipment does make a difference."
+      }
     },
     {
       id: "equip_position_refinement",
       text: "You've been working with online fit guides, adjusting saddle height by millimeters, tweaking stem length, rotating handlebar angle. The goal: maximum power output with minimum discomfort. Every adjustment is tested on rides, refined, tested again. Your position is becoming truly yours.",
       triggers: { raceNumber: [6, 7, 8], performanceTier: ["top10", "podium"] },
-      weight: 0.4
+      weight: 0.4,
+      bridges: {
+        win: "And that optimized position delivered power when it mattered.",
+        podium: "The position tweaks paid off.",
+        top10: "Your refined position helped today.",
+        midpack: "But position alone doesn't win races.",
+        back: "But fit optimization isn't everything."
+      }
     },
     {
       id: "equip_minimalist_approach",
       text: "You've started stripping unnecessary weight and items from your race setup. No saddlebag, minimal tools, just what's absolutely essential. Every gram counts, or so you tell yourself. In reality, the mental benefit of a cleaner, simpler setup might matter more than the actual weight savings.",
       triggers: { raceNumber: [7, 8, 9], performanceTier: ["any"] },
-      weight: 0.3
+      weight: 0.3,
+      bridges: {
+        win: "And every gram saved felt worth it.",
+        podium: "The minimalist approach worked.",
+        top10: "The streamlined setup served you well.",
+        midpack: "But stripped weight can't replace missing watts.",
+        back: "But grams don't matter when you're off the back."
+      }
     },
     {
       id: "equip_pedal_efficiency",
       text: "New pedals and cleats made a bigger difference than expected. Better power transfer, more secure connection, easier unclipping when needed. You spent weeks getting the float and tension dialed in perfectly, but now they feel like an extension of your body.",
       triggers: { raceNumber: [4, 5, 6], performanceTier: ["any"] },
-      weight: 0.3
+      weight: 0.3,
+      bridges: {
+        win: "And that pedal efficiency translated to winning power.",
+        podium: "The pedal setup proved its worth.",
+        top10: "The connection felt solid all race.",
+        midpack: "But pedals don't pedal themselves.",
+        back: "But efficient pedals need power to transfer."
+      }
     },
     {
       id: "equip_chain_obsession",
       text: "You've become obsessed with chain maintenance. Cleaning after every ride, fresh lube before races, measuring wear religiously. A new chain costs money, but a snapped chain costs races. The investment in maintenance is paying dividends in reliability.",
       triggers: { raceNumber: [5, 6, 7, 8], performanceTier: ["any"] },
-      weight: 0.3
+      weight: 0.3,
+      bridges: {
+        win: "And a well-maintained drivetrain helped you to victory.",
+        podium: "Zero mechanical issues, as planned.",
+        top10: "The chain purred along without issue.",
+        midpack: "At least the drivetrain wasn't the problem.",
+        back: "A smooth chain couldn't solve everything."
+      }
     },
     {
       id: "equip_bottle_system",
       text: "You've optimized your hydration system down to the last detail: aero bottles, valve positions, even the angle they sit in the cages. Being able to grab a bottle smoothly at speed without losing momentum matters. Every detail matters.",
       triggers: { raceNumber: [6, 7, 8], performanceTier: ["any"] },
-      weight: 0.2
+      weight: 0.2,
+      bridges: {
+        win: "And every detail added up to victory.",
+        podium: "The optimizations contributed to the result.",
+        top10: "The attention to detail helped.",
+        midpack: "But bottle placement isn't the limiting factor.",
+        back: "But you can't optimize your way past a lack of form."
+      }
     },
     {
       id: "equip_electronic_shifting",
       text: "Electronic shifting was a revelation. Perfect shifts every time, trimming on the fly, no cable stretch or adjustment needed. You resisted for budget reasons, but after your first race with it, you wonder how you ever raced with mechanical. The precision changes everything.",
       triggers: { raceNumber: [7, 8, 9], performanceTier: ["win", "podium"] },
-      weight: 0.4
+      weight: 0.4,
+      bridges: {
+        win: "And that precision helped you shift to victory.",
+        podium: "The smooth shifting made a difference.",
+        top10: "Electronic shifting kept you in the right gear.",
+        midpack: "But perfect shifting can't add missing watts.",
+        back: "But gear selection wasn't the issue today."
+      }
     },
     {
       id: "equip_spare_wheels",
       text: "You finally have a second set of race wheels. Not having to choose between training and preserving your good wheels is liberating. Plus, now you can match wheels to conditions—deeper rims for calm days, shallower for wind. Options are power.",
       triggers: { raceNumber: [7, 8, 9], performanceTier: ["any"] },
-      weight: 0.3
+      weight: 0.3,
+      bridges: {
+        win: "And you made the right wheel choice today.",
+        podium: "The wheel selection proved spot-on.",
+        top10: "Having options helped.",
+        midpack: "But wheels don't spin themselves.",
+        back: "But fancy wheels need strong legs."
+      }
     },
     {
       id: "equip_bar_tape_preference",
       text: "Bar tape seems trivial until you've raced with the wrong stuff—too thick, too thin, not tacky enough. You've found exactly the right combination of cushioning and grip for your hands. Small comforts matter over race distances.",
       triggers: { raceNumber: [5, 6, 7], performanceTier: ["any"] },
-      weight: 0.2
+      weight: 0.2,
+      bridges: {
+        win: "And comfortable hands helped you race to victory.",
+        podium: "Every small comfort helped today.",
+        top10: "The attention to detail paid off.",
+        midpack: "But tape doesn't determine finishing position.",
+        back: "But small comforts couldn't save today's result."
+      }
     },
     {
       id: "equip_computer_mounting",
       text: "You spent an entire evening getting your computer position perfect—low enough to be aero, high enough to see clearly, angled just right for easy viewing. Now you can glance at data without breaking your aerodynamic position. The details stack up.",
       triggers: { raceNumber: [6, 7, 8], performanceTier: ["any"] },
-      weight: 0.2
+      weight: 0.2,
+      bridges: {
+        win: "And those stacked details added up to a win.",
+        podium: "The attention to details showed in the result.",
+        top10: "The optimizations contributed.",
+        midpack: "But details don't replace raw power.",
+        back: "But you can't optimize your way to fitness."
+      }
     },
     {
       id: "equip_tubeless_conversion",
       text: "Converting to tubeless was tedious but worthwhile. Lower rolling resistance, better flat protection, the ability to run lower pressures. You've had one puncture that sealed itself while riding—that alone justified the conversion hassle.",
       triggers: { raceNumber: [6, 7, 8, 9], performanceTier: ["any"] },
-      weight: 0.3
+      weight: 0.3,
+      bridges: {
+        win: "And zero flats plus lower resistance helped you win.",
+        podium: "The tubeless setup performed flawlessly.",
+        top10: "No puncture issues today.",
+        midpack: "At least the tires weren't the problem.",
+        back: "But rolling resistance wasn't the limiting factor."
+      }
     },
     {
       id: "equip_cage_bolts",
       text: "After a bottle cage came loose mid-race, you've become paranoid about bolt tension. Now you check every bolt before every race, carry the right tools, even keep spare cage bolts in your race bag. The lesson was expensive but learned permanently.",
       triggers: { raceNumber: [4, 5, 6], performanceTier: ["any"] },
-      weight: 0.2
+      weight: 0.2,
+      bridges: {
+        win: "And everything stayed tight while you rode to victory.",
+        podium: "Zero mechanical issues today.",
+        top10: "The paranoia paid off—everything held together.",
+        midpack: "At least nothing came loose this time.",
+        back: "Well, at least the bike didn't fall apart."
+      }
     },
     {
       id: "equip_backup_plan",
       text: "Your race bag now contains backup everything: spare derailleur hanger, extra tube, CO2, quick link, even a spare race number. Being prepared for mechanical issues gives you confidence, reduces pre-race anxiety about what could go wrong.",
       triggers: { raceNumber: [5, 6, 7, 8], performanceTier: ["any"] },
-      weight: 0.3
+      weight: 0.3,
+      bridges: {
+        win: "And you didn't need any of it—except the confidence.",
+        podium: "The preparation gave you peace of mind to race hard.",
+        top10: "Being prepared let you focus on racing.",
+        midpack: "At least you were prepared for everything except results.",
+        back: "But spare parts can't fix a bad day."
+      }
     }
   ],
 
@@ -684,121 +1377,259 @@ const NARRATIVE_DATABASE = {
       id: "life_morning_routine",
       text: "The alarm goes off at 5:30 AM and for three full seconds you debate whether racing is really worth this. Then you remember why you started: the feeling of speed, the challenge, the person you're becoming through this process. You roll out of bed, stumble to the kitchen, start the coffee.",
       triggers: { raceNumber: [2, 3, 4, 5, 6], performanceTier: ["any"] },
-      weight: 0.4
+      weight: 0.4,
+      bridges: {
+        win: "Today gave you the answer—every 5:30 alarm was worth it.",
+        podium: "Today reminded you exactly why it's worth it.",
+        top10: "Today made those early mornings feel justified.",
+        midpack: "But today, the coffee wasn't quite strong enough.",
+        back: "And today, those three seconds of doubt felt justified."
+      }
     },
     {
       id: "life_grocery_store",
       text: "The grocery store has become a different place since you started racing seriously. You find yourself reading nutrition labels obsessively, calculating protein content, comparing carbohydrate sources. Your cart looks different too—less junk food, more rice and pasta, vegetables actually purchased with intent rather than guilt.",
       triggers: { raceNumber: [4, 5, 6, 7], performanceTier: ["any"] },
-      weight: 0.3
+      weight: 0.3,
+      bridges: {
+        win: "Today, all those careful choices proved their worth.",
+        podium: "And today, the fueling strategy paid dividends.",
+        top10: "Today showed the nutrition is working.",
+        midpack: "Though today, you wondered if you missed something.",
+        back: "But today wasn't about nutrition—something else was off."
+      }
     },
     {
       id: "life_social_sacrifice",
       text: "Your friends have stopped inviting you to late-night events. They know you'll either decline because of early training rides or show up and leave early, checking your watch and calculating sleep hours. Racing has rearranged your social life in ways you didn't fully anticipate.",
       triggers: { raceNumber: [5, 6, 7], performanceTier: ["any"] },
-      weight: 0.3
+      weight: 0.3,
+      bridges: {
+        win: "Days like today make those sacrifices feel small.",
+        podium: "Results like today help justify the trade-offs.",
+        top10: "Today made those social sacrifices feel worthwhile.",
+        midpack: "And today, you wondered what you're missing.",
+        back: "Today made you question what all those missed nights were for."
+      }
     },
     {
       id: "life_work_balance",
       text: "Balancing work and training has become an art form. You schedule meetings around key workouts, take lunch breaks for quick spins, sneak in intervals before the office. Your colleagues don't understand the dedication, but you've found a rhythm that mostly works.",
       triggers: { raceNumber: [6, 7, 8, 9], performanceTier: ["any"] },
-      weight: 0.4
+      weight: 0.4,
+      bridges: {
+        win: "Today, all that schedule juggling delivered.",
+        podium: "Today showed the balance is working.",
+        top10: "Today proved the rhythm is sustainable.",
+        midpack: "Though today made you wonder if something needs adjusting.",
+        back: "But today suggested the balance might be off."
+      }
     },
     {
       id: "life_laundry_reality",
       text: "The laundry situation has reached critical levels—sweaty cycling kit piling up after every ride, the constant washing, the gear that never quite dries in time. You've considered buying duplicates of everything just to keep up with the volume. Racing is glamorous until it's time to deal with the logistics.",
       triggers: { raceNumber: [4, 5, 6], performanceTier: ["any"] },
-      weight: 0.2
+      weight: 0.2,
+      bridges: {
+        win: "Today was the glamorous part. The laundry can wait.",
+        podium: "Today reminded you why you put up with the logistics.",
+        top10: "Today made all that laundry feel worth it.",
+        midpack: "And now you still have to do the laundry.",
+        back: "And you still have to wash all that kit."
+      }
     },
     {
       id: "life_weather_watching",
       text: "You've become obsessed with weather forecasts. Not just for race day, but for every training ride. Wind direction, temperature, chance of rain—it all affects your preparation. Your phone's weather app is checked more often than social media now.",
       triggers: { raceNumber: [5, 6, 7], performanceTier: ["any"] },
-      weight: 0.3
+      weight: 0.3,
+      bridges: {
+        win: "Today, you read the conditions perfectly.",
+        podium: "Today, the forecast knowledge helped.",
+        top10: "Today, you were prepared for what came.",
+        midpack: "Though today, no amount of preparation helped.",
+        back: "But today, the weather app couldn't save you."
+      }
     },
     {
       id: "life_sleep_priority",
       text: "Sleep has become non-negotiable. Eight hours minimum, nine when possible. You've reorganized your entire evening routine around getting to bed early enough to wake up recovered. Friends joke about your grandmother bedtime, but the performance benefits are undeniable.",
       triggers: { raceNumber: [6, 7, 8, 9], performanceTier: ["any"] },
-      weight: 0.4
+      weight: 0.4,
+      bridges: {
+        win: "Today proved the early bedtimes aren't a joke—they're a weapon.",
+        podium: "Today showed exactly why you prioritize sleep.",
+        top10: "Today, you felt the benefit of being well-rested.",
+        midpack: "Though today, the recovery didn't translate.",
+        back: "But today, even perfect sleep couldn't fix what was missing."
+      }
     },
     {
       id: "life_food_timing",
       text: "You've become that person who times meals around training. Carbs four hours before long rides, protein within thirty minutes after hard efforts, fat restricted when glycogen loading. Your eating habits would seem neurotic to anyone who doesn't race bikes.",
       triggers: { raceNumber: [5, 6, 7, 8], performanceTier: ["any"] },
-      weight: 0.3
+      weight: 0.3,
+      bridges: {
+        win: "Today proved the neurotic approach works.",
+        podium: "Today, the precise fueling paid off.",
+        top10: "Today showed the timing matters.",
+        midpack: "Though today, something in the equation was off.",
+        back: "But today, all that precision didn't help."
+      }
     },
     {
       id: "life_family_support",
       text: "Your family has been incredibly supportive, even when they don't fully understand the appeal. They show up at races when they can, ask about your results, tolerate the bikes in the living room. That support means more than they probably realize.",
       triggers: { raceNumber: [7, 8, 9, 10], performanceTier: ["any"] },
-      weight: 0.4
+      weight: 0.4,
+      bridges: {
+        win: "Today you gave them a result worth celebrating.",
+        podium: "Today gave them something to cheer about.",
+        top10: "Today was one they could be proud of.",
+        midpack: "Today wasn't the result you hoped to share.",
+        back: "Today's result was hard to explain."
+      }
     },
     {
       id: "life_time_management",
       text: "Every hour of your week is accounted for: work, training, recovery, race prep. You've become ruthlessly efficient with time, cutting out activities that don't serve your goals. It's probably unsustainable long-term, but right now, in this season, the focus feels necessary.",
       triggers: { raceNumber: [7, 8, 9], performanceTier: ["any"] },
-      weight: 0.4
+      weight: 0.4,
+      bridges: {
+        win: "Today validated the ruthless focus.",
+        podium: "Today showed the efficiency is paying off.",
+        top10: "Today made all that structure feel worthwhile.",
+        midpack: "Though today made you question the intensity.",
+        back: "But today raised questions about the approach."
+      }
     },
     {
       id: "life_injury_avoidance",
       text: "You've become paranoid about staying healthy—washing hands obsessively, avoiding sick people, taking vitamins, stretching religiously. A cold or injury could derail weeks of training. Prevention has become as important as the training itself.",
       triggers: { raceNumber: [6, 7, 8], performanceTier: ["any"] },
-      weight: 0.3
+      weight: 0.3,
+      bridges: {
+        win: "Today, you raced healthy and it showed.",
+        podium: "Today, all that prevention paid dividends.",
+        top10: "You arrived healthy, and it mattered.",
+        midpack: "At least you're healthy. That's something.",
+        back: "Today wasn't about health—something else was missing."
+      }
     },
     {
       id: "life_bike_shop_regular",
       text: "The local bike shop staff know you by name now. You're there weekly—picking up nutrition, getting last-minute adjustments, browsing components you can't afford yet. It's become your community hub, where you hear about group rides, get course beta, share war stories from races.",
       triggers: { raceNumber: [5, 6, 7, 8], performanceTier: ["any"] },
-      weight: 0.4
+      weight: 0.4,
+      bridges: {
+        win: "Today gave you a war story worth sharing.",
+        podium: "Today's a story the shop will want to hear.",
+        top10: "Today added another chapter to the racing life.",
+        midpack: "Today's story isn't one you'll lead with.",
+        back: "Today's story goes in the 'lessons learned' category."
+      }
     },
     {
       id: "life_coffee_shop_work",
       text: "You've become a regular at the coffee shop near popular riding routes. It's become your pre-ride ritual and post-ride recovery spot. The baristas know your order, other cyclists congregate there, and it feels like an unofficial team headquarters.",
       triggers: { raceNumber: [4, 5, 6, 7], performanceTier: ["any"] },
-      weight: 0.3
+      weight: 0.3,
+      bridges: {
+        win: "Today's post-race coffee will taste especially good.",
+        podium: "Today earned a celebratory espresso.",
+        top10: "Today was worth a solid post-race coffee.",
+        midpack: "Today calls for a strong recovery brew.",
+        back: "Today, the coffee will be more comfort than celebration."
+      }
     },
     {
       id: "life_weekend_structure",
       text: "Your weekends have a rigid structure now: long ride Saturday, race or hard workout Sunday, religiously. Friends want spontaneity; you need structure. The predictability reduces stress and ensures you're hitting your training targets.",
       triggers: { raceNumber: [5, 6, 7, 8], performanceTier: ["any"] },
-      weight: 0.3
+      weight: 0.3,
+      bridges: {
+        win: "Today proved the structure delivers.",
+        podium: "Today showed the predictability works.",
+        top10: "Today validated the disciplined approach.",
+        midpack: "Though today made you wonder about the routine.",
+        back: "But today, the structure didn't save you."
+      }
     },
     {
       id: "life_commute_training",
       text: "Your work commute has become training time. You've mapped out routes with elevation, can add intervals on certain segments, have multiple distance options depending on the day. Every ride serves a purpose now—even getting to work.",
       triggers: { raceNumber: [4, 5, 6], performanceTier: ["any"] },
-      weight: 0.3
+      weight: 0.3,
+      bridges: {
+        win: "Today, all those purposeful commutes paid off.",
+        podium: "Today showed the commute training adds up.",
+        top10: "Today proved every ride matters.",
+        midpack: "Though today, the gains weren't visible.",
+        back: "But today, the extra volume wasn't enough."
+      }
     },
     {
       id: "life_meal_prep",
       text: "Sunday meal prep has become essential. Containers of rice, grilled chicken, vegetables, all portioned and ready. It's boring and time-consuming, but fueling properly isn't optional. The pros do it, and now so do you.",
       triggers: { raceNumber: [6, 7, 8, 9], performanceTier: ["any"] },
-      weight: 0.3
+      weight: 0.3,
+      bridges: {
+        win: "Today made all those boring containers worth it.",
+        podium: "Today showed the meal prep discipline pays off.",
+        top10: "Today, you felt the benefit of proper fueling.",
+        midpack: "Though today, the fueling wasn't the limiting factor.",
+        back: "But today wasn't about the food."
+      }
     },
     {
       id: "life_alcohol_sacrifice",
       text: "You've dramatically cut back on alcohol. Not eliminated entirely, but race weeks are now completely dry, and even off-weeks are minimal. The performance cost of drinking just isn't worth it anymore. Your social life has adapted, mostly.",
       triggers: { raceNumber: [6, 7, 8], performanceTier: ["top10", "podium", "win"] },
-      weight: 0.3
+      weight: 0.3,
+      bridges: {
+        win: "Today proved every declined drink was worth it.",
+        podium: "Today justified all those dry race weeks.",
+        top10: "Today, you felt the benefit of staying sharp."
+      }
     },
     {
       id: "life_apartment_gym",
       text: "Your apartment has evolved into a mini training center: trainer in the corner, foam roller and yoga mat out permanently, resistance bands hanging from doorways. Your living space is now optimized for athletic performance, not entertaining guests.",
       triggers: { raceNumber: [5, 6, 7, 8], performanceTier: ["any"] },
-      weight: 0.3
+      weight: 0.3,
+      bridges: {
+        win: "Today, the home gym investment paid off.",
+        podium: "Today showed the dedication works.",
+        top10: "Today made the apartment gym feel worthwhile.",
+        midpack: "Though today, the equipment wasn't the issue.",
+        back: "But today, all that gear couldn't help."
+      }
     },
     {
       id: "life_relationship_impact",
       text: "Your significant other has been patient with the racing obsession, but the impact is real. Weekend rides that take hours, races that dominate the calendar, the fatigue that affects your mood. You're grateful for their understanding, aware you need to find better balance.",
       triggers: { raceNumber: [7, 8, 9], performanceTier: ["any"] },
-      weight: 0.3
+      weight: 0.3,
+      bridges: {
+        win: "Today gave you something to celebrate together.",
+        podium: "Today made their patience feel rewarded.",
+        top10: "Today was a result worth sharing.",
+        midpack: "Today's result is harder to explain.",
+        back: "Today made the balance question more urgent."
+      }
     },
     {
       id: "life_financial_priority",
       text: "Your budget has shifted dramatically toward racing. That vacation you planned? Postponed. New clothes? Not until race season ends. Racing has become the line item that everything else works around. It's extreme, but so is your commitment.",
       triggers: { raceNumber: [6, 7, 8], performanceTier: ["any"] },
-      weight: 0.3
+      weight: 0.3,
+      bridges: {
+        win: "Today made every postponed purchase feel worthwhile.",
+        podium: "Today justified the budget priorities.",
+        top10: "Today was a return on the investment.",
+        midpack: "Though today made you think about that vacation.",
+        back: "Today raised questions about the financial commitment."
+      }
     }
   ],
 
@@ -872,91 +1703,196 @@ const NARRATIVE_DATABASE = {
       id: "motiv_tour_watching",
       text: "You stayed up late watching Tour de France highlights, studying how the professionals navigate the chaos of the peloton, how they position themselves before climbs, the body language that telegraphs attacks before they happen. It's inspiring and humbling in equal measure.",
       triggers: { raceNumber: [3, 4, 5, 6], performanceTier: ["any"] },
-      weight: 0.5
+      weight: 0.5,
+      bridges: {
+        win: "And today, some of those lessons paid off beautifully.",
+        podium: "Today, you channeled a little of that pro energy.",
+        top10: "Today, you applied some of what you learned.",
+        midpack: "But watching isn't the same as doing.",
+        back: "But the gap between watching and executing felt wide today."
+      }
     },
     {
       id: "motiv_why_you_race",
       text: "Someone asked you why you race, and you struggled to articulate an answer that made sense. For the competition? For the fitness? Because suffering builds character? All true, none complete. The real answer is messier: you race because it makes you feel alive in a way few other things do.",
       triggers: { raceNumber: [6, 7, 8], performanceTier: ["any"] },
-      weight: 0.4
+      weight: 0.4,
+      bridges: {
+        win: "And today, you felt very alive indeed.",
+        podium: "Today reminded you exactly why you do this.",
+        top10: "Today, you felt that aliveness again.",
+        midpack: "Even today, with the result, you felt alive.",
+        back: "Even in disappointment, this still beats everything else."
+      }
     },
     {
       id: "motiv_role_model",
       text: "There's a rider you admire—someone who races clean, works hard, carries themselves with quiet confidence. You've never met them, but you study their results, watch how they race, try to emulate their approach. Everyone needs a north star, and they're yours.",
       triggers: { raceNumber: [5, 6, 7, 8], performanceTier: ["any"] },
-      weight: 0.4
+      weight: 0.4,
+      bridges: {
+        win: "Today, you raced like they would.",
+        podium: "Today, you made them proud, in a way.",
+        top10: "Today, you showed flashes of that quiet confidence.",
+        midpack: "But today, emulating wasn't enough.",
+        back: "But today wasn't your day to shine."
+      }
     },
     {
       id: "motiv_proving_doubters_wrong",
       text: "Not everyone believed you could do this. Some people laughed at your ambitions, told you racing was for younger athletes, suggested you were wasting your time. Part of you races to prove them wrong. But the bigger part races to prove something to yourself.",
       triggers: { raceNumber: [6, 7, 8, 9], performanceTier: ["win", "podium", "top10"] },
-      weight: 0.5
+      weight: 0.5,
+      bridges: {
+        win: "Today, you proved everything you needed to prove.",
+        podium: "Today, the doubters got a little quieter.",
+        top10: "Today was another step in proving them wrong.",
+        midpack: "But today, proving anything was harder.",
+        back: "But some days, the doubters seem less wrong."
+      }
     },
     {
       id: "motiv_personal_growth",
       text: "Racing has changed you in unexpected ways. You're more disciplined in all areas of life now, more resilient when things go wrong, more confident in your ability to push through discomfort. The person in the mirror barely resembles who you were a year ago.",
       triggers: { raceNumber: [7, 8, 9, 10], performanceTier: ["any"] },
-      weight: 0.5
+      weight: 0.5,
+      bridges: {
+        win: "And today showcased everything you've become.",
+        podium: "Today, that growth showed on the results sheet.",
+        top10: "Today, that resilience served you well.",
+        midpack: "And today tested that resilience again.",
+        back: "And today required all of that mental strength to finish."
+      }
     },
     {
       id: "motiv_community",
       text: "The cycling community has become your tribe. These are people who understand the sacrifices, celebrate the victories, commiserate over the defeats. You've found your people, and that sense of belonging is worth more than any result.",
       triggers: { raceNumber: [6, 7, 8], performanceTier: ["any"] },
-      weight: 0.4
+      weight: 0.4,
+      bridges: {
+        win: "And today, your tribe was there to celebrate with you.",
+        podium: "Today gave them something to celebrate.",
+        top10: "Today, they'll share in your satisfaction.",
+        midpack: "Today, they'll commiserate and encourage.",
+        back: "Today, they'll understand without needing words."
+      }
     },
     {
       id: "motiv_age_defiance",
       text: "You're not the youngest rider in the field anymore, and you won't be the oldest either. But you refuse to let age become an excuse. If anything, starting later means you appreciate this more, work harder, waste less time doubting yourself.",
       triggers: { raceNumber: [5, 6, 7, 8], performanceTier: ["any"] },
-      weight: 0.4
+      weight: 0.4,
+      bridges: {
+        win: "And today, age was just a number.",
+        podium: "Today proved age isn't a limiter.",
+        top10: "Today, experience outweighed any disadvantage.",
+        midpack: "But today, the younger legs were faster.",
+        back: "But today, the body reminded you it's not twenty anymore."
+      }
     },
     {
       id: "motiv_pure_love",
       text: "Strip away the tactics, the technology, the data, and what's left is simple: you love riding bikes fast. The wind in your face, the burn in your legs, the sensation of pushing your body to its limits—this is what you're here for.",
       triggers: { raceNumber: [4, 5, 6, 7, 8], performanceTier: ["any"] },
-      weight: 0.5
+      weight: 0.5,
+      bridges: {
+        win: "And today, that love was rewarded.",
+        podium: "Today was a perfect expression of that love.",
+        top10: "Today, you got to do what you love.",
+        midpack: "And today, despite the result, you still loved it.",
+        back: "And even on days like this, you still love it."
+      }
     },
     {
       id: "motiv_documentary_inspiration",
       text: "You watched a cycling documentary last night—one of those intimate looks at what it takes to compete at the highest level. The sacrifices, the dedication, the brutal honesty about the cost. It made you more grateful for the opportunity to race, more determined to make the most of it.",
       triggers: { raceNumber: [5, 6, 7], performanceTier: ["any"] },
-      weight: 0.4
+      weight: 0.4,
+      bridges: {
+        win: "And today, you made the most of every second.",
+        podium: "Today, you honored that opportunity.",
+        top10: "Today, you raced with that determination.",
+        midpack: "But today, determination wasn't enough.",
+        back: "But the cost was particularly high today."
+      }
     },
     {
       id: "motiv_finish_line_memory",
       text: "You keep replaying that moment from a previous race—crossing the finish line, looking down at your result, the rush of accomplishment. That memory fuels you through hard training, through doubts, through moments when quitting seems easier than continuing.",
       triggers: { raceNumber: [5, 6, 7, 8], performanceTier: ["any"], minRacesCompleted: 2 },
-      weight: 0.4
+      weight: 0.4,
+      bridges: {
+        win: "Today gave you a new memory to replay.",
+        podium: "Today added another great memory to the collection.",
+        top10: "Today was a memory worth keeping.",
+        midpack: "Today won't make the highlight reel.",
+        back: "Today... you'll file away and move on from."
+      }
     },
     {
       id: "motiv_mentor_advice",
       text: "An experienced racer took you aside recently and shared some wisdom: 'Most people never discover what they're capable of because they quit before finding out.' Those words stuck with you. Today is about not quitting, about discovering what you're really capable of.",
       triggers: { raceNumber: [6, 7, 8, 9], performanceTier: ["any"] },
-      weight: 0.5
+      weight: 0.5,
+      bridges: {
+        win: "Today, you discovered exactly what you're capable of.",
+        podium: "Today, you pushed and found more than you expected.",
+        top10: "Today, you didn't quit, and it paid off.",
+        midpack: "Today, you didn't quit—that's what matters.",
+        back: "Today, not quitting was the victory."
+      }
     },
     {
       id: "motiv_childhood_dreams",
       text: "As a kid, you watched bike races and dreamed of being that person—strong, confident, fearless. Life took you in different directions, but that dream never completely died. Now you're living a version of it, and that kid inside you is proud.",
       triggers: { raceNumber: [4, 5, 6], performanceTier: ["any"] },
-      weight: 0.4
+      weight: 0.4,
+      bridges: {
+        win: "Today, that kid inside you was ecstatic.",
+        podium: "Today, you lived the dream.",
+        top10: "Today, the dream felt very real.",
+        midpack: "Today was still part of living the dream.",
+        back: "Even today, that kid is still proud you're trying."
+      }
     },
     {
       id: "motiv_legacy_thoughts",
       text: "You've been thinking about legacy lately. Not fame or fortune, but the satisfaction of knowing you gave something your full effort, that you tested your limits, that you didn't settle for wondering 'what if.' Racing is your answer to that question.",
       triggers: { raceNumber: [8, 9, 10], performanceTier: ["any"] },
-      weight: 0.4
+      weight: 0.4,
+      bridges: {
+        win: "Today, you answered emphatically.",
+        podium: "Today, you gave your full effort and it showed.",
+        top10: "Today, you tested those limits.",
+        midpack: "Today, you showed up and gave what you had.",
+        back: "Today, at least you weren't left wondering 'what if.'"
+      }
     },
     {
       id: "motiv_quote_inspiration",
       text: "A quote has been rattling around in your head: 'It never gets easier, you just get faster.' Greg LeMond was right. The suffering doesn't diminish—you just learn to suffer at higher speeds. There's something beautiful and terrible about that truth.",
       triggers: { raceNumber: [6, 7, 8], performanceTier: ["any"] },
-      weight: 0.4
+      weight: 0.4,
+      bridges: {
+        win: "Today, you suffered at winning speed.",
+        podium: "Today, you suffered beautifully fast.",
+        top10: "Today, you suffered at a respectable pace.",
+        midpack: "Today, you suffered at a humbling speed.",
+        back: "Today, you just suffered. The speed will come."
+      }
     },
     {
       id: "motiv_transformation_reflection",
       text: "Looking at photos from the start of the season, you barely recognize yourself. Not just physically—though the fitness shows—but in your eyes. There's a confidence there now, a sense of purpose. Racing has given you that.",
       triggers: { raceNumber: [9, 10, 11], performanceTier: ["any"] },
-      weight: 0.5
+      weight: 0.5,
+      bridges: {
+        win: "Today, that transformation was on full display.",
+        podium: "Today, that purpose was perfectly clear.",
+        top10: "Today, that confidence served you well.",
+        midpack: "Today tested that confidence, but it held.",
+        back: "Today challenged that confidence, but didn't break it."
+      }
     }
   ],
 
@@ -966,73 +1902,157 @@ const NARRATIVE_DATABASE = {
       id: "break_first_win",
       text: "You won. Actually won. Not just placed well, not just exceeded expectations, but crossed the line first with everyone else behind you. The feeling is indescribable—euphoria mixed with disbelief mixed with validation of every hard training session and early morning and sacrifice.",
       triggers: { performanceTier: ["win"], isFirstWin: true },
-      weight: 1.0
+      weight: 1.0,
+      bridges: {
+        win: "And now, you've done it again.",
+        podium: "This time, you came close to recreating that magic.",
+        top10: "Today you chased that feeling, finishing in solid form.",
+        midpack: "Today the magic didn't quite materialize.",
+        back: "Today was a reminder that those highs don't come easy."
+      }
     },
     {
       id: "break_podium_streak",
       text: "Three races, three podiums. This isn't luck anymore—it's form, consistency, the accumulation of everything you've been working toward. Other riders are starting to recognize you at race sign-in, and not just casually but with the kind of respect reserved for genuine competitors.",
       triggers: { performanceTier: ["podium"], consecutivePodiums: 3 },
-      weight: 0.9
+      weight: 0.9,
+      bridges: {
+        win: "And today, you took it one step further.",
+        podium: "And today, you kept that streak alive.",
+        top10: "Today, you stayed in the mix, even if the podium slipped away.",
+        midpack: "But today, the streak came to an end.",
+        back: "But today, the form that carried you here was nowhere to be found."
+      }
     },
     {
       id: "break_pack_control",
       text: "There was a moment in your last race where you realized you weren't just reacting to the pack—you were controlling it. Setting tempo, covering moves, dictating when attacks could go. That shift from participant to protagonist felt seismic.",
       triggers: { raceNumber: [6, 7, 8, 9], performanceTier: ["win", "podium"], minRacesCompleted: 2 },
-      weight: 0.7
+      weight: 0.7,
+      bridges: {
+        win: "Today, you controlled things from start to finish.",
+        podium: "Today, you stayed in control when it mattered.",
+        top10: "Today, you found yourself back in reactive mode, but still in the fight.",
+        midpack: "But today, the pack controlled you.",
+        back: "But today, controlling anything was out of the question."
+      }
     },
     {
       id: "break_mental_strength",
       text: "Your last race taught you something crucial: your mind quits before your body does. When you pushed past that mental barrier, past the voice saying 'this is too hard,' you found another gear entirely. Now you know—true limits are further than you thought.",
       triggers: { raceNumber: [5, 6, 7, 8], performanceTier: ["win", "podium", "top10"], improvementFromPrediction: 5, minRacesCompleted: 2 },
-      weight: 0.8
+      weight: 0.8,
+      bridges: {
+        win: "Today, you pushed past those limits again.",
+        podium: "Today, you found that gear when you needed it most.",
+        top10: "Today, you dug deep and it paid off.",
+        midpack: "But today, the mental game wasn't enough.",
+        back: "But today, the limits found you first."
+      }
     },
     {
       id: "break_tactical_victory",
       text: "Your last win wasn't about being the strongest—it was about being the smartest. You conserved energy when others wasted it, positioned perfectly for the finale, timed your effort to perfection. That's the kind of racing that wins championships.",
       triggers: { raceNumber: [7, 8, 9, 10], performanceTier: ["win"], minRacesCompleted: 2 },
-      weight: 0.8
+      weight: 0.8,
+      bridges: {
+        win: "Today, the tactics worked again.",
+        podium: "Today, smart racing kept you in the fight.",
+        top10: "Today, the tactics were sound, even if the legs weren't perfect.",
+        midpack: "But today, no amount of tactical smarts could overcome the circumstances.",
+        back: "But today, nothing went according to plan."
+      }
     },
     {
       id: "break_confidence_shift",
       text: "Something fundamental has shifted in how you approach races. You used to hope for good results. Now you expect them. That confidence isn't arrogance—it's earned through consistent performance and the knowledge that you belong at the front.",
       triggers: { raceNumber: [7, 8, 9, 10], performanceTier: ["win", "podium"], consecutiveGoodResults: 4 },
-      weight: 0.8
+      weight: 0.8,
+      bridges: {
+        win: "Today, that confidence was fully justified.",
+        podium: "Today, the confidence carried you to the front once again.",
+        top10: "Today, you belonged in the mix, even if the top step stayed out of reach.",
+        midpack: "But today tested that confidence.",
+        back: "But today was a humbling reminder that nothing is guaranteed."
+      }
     },
     {
       id: "break_physical_breakthrough",
       text: "You felt it during your last interval session—a new level of power, sustained longer than before. All the training, all the recovery, all the attention to detail culminating in a physical breakthrough. You're not the same engine you were three months ago.",
       triggers: { raceNumber: [6, 7, 8], performanceTier: ["win", "podium", "top10"], minRacesCompleted: 2 },
-      weight: 0.6
+      weight: 0.6,
+      bridges: {
+        win: "Today, that new engine delivered.",
+        podium: "Today, the improved power showed.",
+        top10: "Today, the gains translated to a solid result.",
+        midpack: "But today, the power didn't translate as expected.",
+        back: "But today, that engine sputtered when you needed it most."
+      }
     },
     {
       id: "break_fearless_moment",
       text: "There was a moment in your last race where fear just... evaporated. Descending at speeds that used to terrify you, cornering on the limit, confident in your bike handling. That fearlessness is a breakthrough as significant as any fitness gain.",
       triggers: { raceNumber: [7, 8, 9], performanceTier: ["top10", "podium", "win"], minRacesCompleted: 2 },
-      weight: 0.6
+      weight: 0.6,
+      bridges: {
+        win: "Today, you raced with that same fearlessness.",
+        podium: "Today, the confidence showed in how you raced.",
+        top10: "Today, you rode with purpose, even if the result was modest.",
+        midpack: "But today, caution crept back in.",
+        back: "But today, the race demanded more than confidence alone."
+      }
     },
     {
       id: "break_recognition_moment",
       text: "A rider you respect pulled you aside after your last race and said, 'You're getting really strong.' Simple words, but the recognition from someone who's been doing this for years hit differently. You're being seen as a legitimate competitor now.",
       triggers: { raceNumber: [7, 8, 9], performanceTier: ["podium", "win"], minRacesCompleted: 2 },
-      weight: 0.6
+      weight: 0.6,
+      bridges: {
+        win: "Today, you proved them right.",
+        podium: "Today, you gave them more reasons to notice.",
+        top10: "Today, you showed you still belong.",
+        midpack: "But today wasn't a day that turned heads.",
+        back: "But today, strength alone wasn't enough."
+      }
     },
     {
       id: "break_solo_effort",
       text: "You went solo off the front in your last race and held it to the finish. No teammates, no help, just you against everyone else's collective effort to bring you back. Holding that breakaway required every bit of physical and mental strength you possess.",
       triggers: { raceNumber: [7, 8, 9, 10], performanceTier: ["win"], minRacesCompleted: 2 },
-      weight: 0.9
+      weight: 0.9,
+      bridges: {
+        win: "Today, you pulled off another audacious ride.",
+        podium: "Today, the solo spirit was there, even if others finished ahead.",
+        top10: "Today, the legs were willing, but the race played out differently.",
+        midpack: "But today, there was no breakaway magic to be found.",
+        back: "But today, the race swallowed you whole."
+      }
     },
     {
       id: "break_suffering_comfort",
       text: "You've reached a point where deep suffering in races feels almost comfortable. Not easy—never easy—but familiar. Your relationship with pain has fundamentally changed. You can live in that dark place longer than most, and that's a massive competitive advantage.",
       triggers: { raceNumber: [8, 9, 10], performanceTier: ["win", "podium", "top10"] },
-      weight: 0.7
+      weight: 0.7,
+      bridges: {
+        win: "Today, you suffered all the way to victory.",
+        podium: "Today, embracing the pain put you on the podium.",
+        top10: "Today, suffering kept you in contention.",
+        midpack: "But today, the suffering didn't translate to results.",
+        back: "But today, the pain overwhelmed even your practiced tolerance."
+      }
     },
     {
       id: "break_consistent_excellence",
       text: "You haven't finished outside the top ten in six races. That kind of consistency is rare—it requires fitness, tactics, reliability, mental strength. You're not just having good days anymore; you've reached a plateau of consistent excellence.",
       triggers: { raceNumber: [9, 10, 11], performanceTier: ["top10", "podium"], consecutiveGoodResults: 6 },
-      weight: 0.9
+      weight: 0.9,
+      bridges: {
+        win: "Today, consistency became dominance.",
+        podium: "Today, the consistency continued at the sharp end.",
+        top10: "Today, you extended that remarkable run.",
+        midpack: "But today, the streak finally broke.",
+        back: "But today, that plateau crumbled beneath you."
+      }
     }
   ],
 
@@ -1042,91 +2062,196 @@ const NARRATIVE_DATABASE = {
       id: "set_mechanical",
       text: "A mechanical ended your race today—chain drop, derailleur issue, something that could've been prevented with better pre-race prep. You sat on the roadside while the peloton disappeared, feeling equal parts frustration and self-recrimination.",
       triggers: { performanceTier: ["back"], isWorseResult: true },
-      weight: 0.6
+      weight: 0.6,
+      bridges: {
+        win: "But today, everything worked perfectly.",
+        podium: "But today, the bike held together when it mattered.",
+        top10: "Today, at least the equipment cooperated.",
+        midpack: "And today brought more of the same frustration.",
+        back: "And today, the bad luck continued."
+      }
     },
     {
       id: "set_bad_day",
       text: "Some days the legs just aren't there. No explanation, no warning, just the terrible realization mid-race that you're off form and there's nothing you can do about it. You fought through to the finish, but it was ugly.",
       triggers: { performanceTier: ["back"], predictedMuchBetter: true },
-      weight: 0.7
+      weight: 0.7,
+      bridges: {
+        win: "But today, the legs showed up when you needed them.",
+        podium: "But today, the form returned.",
+        top10: "Today, the legs were at least present.",
+        midpack: "And today felt like more of the same.",
+        back: "And today was another one of those days."
+      }
     },
     {
       id: "set_tactical_error",
       text: "You made a tactical mistake today—attacked too early, chased the wrong move, positioned yourself poorly for the finale. The legs were there, but the brain made the wrong call. Sometimes the hardest lessons come from races you should have won.",
       triggers: { performanceTier: ["midpack", "back"], predictedMuchBetter: true },
-      weight: 0.6
+      weight: 0.6,
+      bridges: {
+        win: "But today, you got the tactics right.",
+        podium: "Today, you raced smarter.",
+        top10: "Today, the decisions were better, if not perfect.",
+        midpack: "And today, the same mistakes crept back in.",
+        back: "And today, the brain let you down again."
+      }
     },
     {
       id: "set_crash",
       text: "Someone went down in front of you, and you had nowhere to go. The crash itself was minor—road rash, bruised ego, lost time. But the race was over, and watching the pack ride away while you picked yourself up was its own kind of pain.",
       triggers: { performanceTier: ["back"], isWorseResult: true },
-      weight: 0.5
+      weight: 0.5,
+      bridges: {
+        win: "But today, you stayed upright and came out on top.",
+        podium: "Today, the rubber stayed on the road.",
+        top10: "Today, you kept the bike upright through it all.",
+        midpack: "And today brought another close call.",
+        back: "And today, the bad luck struck again."
+      }
     },
     {
       id: "set_illness_impact",
       text: "You probably shouldn't have raced today. The cold you thought was behind you clearly wasn't, and your body made that abundantly clear during the race. Pride got you to the start line, but wisdom would have kept you home.",
       triggers: { performanceTier: ["back"], isWorseResult: true },
-      weight: 0.5
+      weight: 0.5,
+      bridges: {
+        win: "But today, you were back to full strength.",
+        podium: "Today, the body was finally cooperative.",
+        top10: "Today, at least you felt healthy enough to compete.",
+        midpack: "And today, the body still wasn't quite right.",
+        back: "And today, the lingering effects were still there."
+      }
     },
     {
       id: "set_overconfidence",
       text: "You went into today's race overconfident, expecting an easy result based on recent form. Racing doesn't work that way. The pack punished your assumptions, and you learned again that every race must be respected, every field taken seriously.",
       triggers: { performanceTier: ["midpack", "back"], predictedMuchBetter: true, requiresPreviousResults: true },
-      weight: 0.6
+      weight: 0.6,
+      bridges: {
+        win: "But today, confident execution replaced overconfidence.",
+        podium: "Today, you found the right balance of confidence.",
+        top10: "Today, a more measured approach paid off.",
+        midpack: "And today, the lesson needed reinforcing.",
+        back: "And today, the humbling continued."
+      }
     },
     {
       id: "set_equipment_failure",
       text: "Your equipment let you down today—a flat at the worst possible moment, a component that chose this race to fail. You can't control everything, but that doesn't make it less frustrating when mechanical bad luck decides your result.",
       triggers: { performanceTier: ["back"], isWorseResult: true },
-      weight: 0.5
+      weight: 0.5,
+      bridges: {
+        win: "But today, every component worked flawlessly.",
+        podium: "Today, the equipment held up its end of the bargain.",
+        top10: "Today, at least the bike cooperated.",
+        midpack: "And today, another equipment issue surfaced.",
+        back: "And today, the mechanical gremlins struck again."
+      }
     },
     {
       id: "set_learning_experience",
       text: "Today hurt, both physically and psychologically. But you're choosing to treat it as tuition paid for the education. Every failure teaches something if you're willing to learn. Tomorrow you'll be smarter, stronger, more prepared.",
       triggers: { performanceTier: ["back"], isWorseResult: true },
-      weight: 0.7
+      weight: 0.7,
+      bridges: {
+        win: "And today, those lessons paid dividends.",
+        podium: "Today showed the education is working.",
+        top10: "Today, you applied some of what you learned.",
+        midpack: "And today offered more lessons to absorb.",
+        back: "And today, the tuition payments continued."
+      }
     },
     {
       id: "set_wrong_position",
       text: "You were in the wrong position when the race split apart. Too far back to respond, boxed in when you needed to move. By the time you fought your way forward, the damage was done. Positioning errors are expensive lessons.",
       triggers: { performanceTier: ["midpack", "back"], isWorseResult: true },
-      weight: 0.6
+      weight: 0.6,
+      bridges: {
+        win: "But today, you were exactly where you needed to be.",
+        podium: "Today, the positioning was spot-on.",
+        top10: "Today, you stayed in the right places at the right times.",
+        midpack: "And today, the positioning issues returned.",
+        back: "And today, you found yourself out of position again."
+      }
     },
     {
       id: "set_pacing_mistake",
       text: "You went too hard too early, burning matches you'd desperately need later. When the decisive moment came, you had nothing left. Pacing is an art, and today you painted badly. The lesson is learned, painfully but thoroughly.",
       triggers: { performanceTier: ["back"], isWorseResult: true },
-      weight: 0.6
+      weight: 0.6,
+      bridges: {
+        win: "But today, the pacing was perfect.",
+        podium: "Today, you managed your effort well.",
+        top10: "Today, the pacing was much better.",
+        midpack: "And today, the same pacing errors crept back in.",
+        back: "And today, you repeated the same mistake."
+      }
     },
     {
       id: "set_nutrition_failure",
       text: "You bonked spectacularly today. The nutrition plan that worked in training completely failed in race conditions. The empty-tank feeling, the mental fog, the inability to push—it's a horrible way to end a race. Back to the drawing board on fueling.",
       triggers: { performanceTier: ["back"], isWorseResult: true },
-      weight: 0.5
+      weight: 0.5,
+      bridges: {
+        win: "But today, the nutrition strategy worked perfectly.",
+        podium: "Today, you fueled smart and it showed.",
+        top10: "Today, at least the tank stayed full.",
+        midpack: "And today, the fueling still wasn't quite right.",
+        back: "And today, the bonk returned."
+      }
     },
     {
       id: "set_weather_victim",
       text: "The weather turned brutal mid-race—rain, cold, wind, everything at once. While some riders seemed unaffected, you struggled terribly. Weather resilience is something you clearly need to work on. Mother Nature was the winner today.",
       triggers: { performanceTier: ["back"], isWorseResult: true },
-      weight: 0.5
+      weight: 0.5,
+      bridges: {
+        win: "But today, you conquered the conditions.",
+        podium: "Today, you handled the elements well.",
+        top10: "Today, the weather was kinder—or you were tougher.",
+        midpack: "And today, the conditions proved challenging again.",
+        back: "And today, the weather won again."
+      }
     },
     {
       id: "set_missed_break",
       text: "The winning break went and you weren't in it. You saw it forming, tried to bridge, but couldn't close the gap. Sometimes races are decided in thirty seconds of inattention. Today was one of those races, and you were on the wrong side of the split.",
       triggers: { performanceTier: ["midpack"], predictedBetter: true },
-      weight: 0.6
+      weight: 0.6,
+      bridges: {
+        win: "But today, you were in the right move at the right time.",
+        podium: "Today, you made the selection.",
+        top10: "Today, you stayed alert and stayed with the front.",
+        midpack: "And today, another key move slipped away.",
+        back: "And today, you missed even more splits."
+      }
     },
     {
       id: "set_form_dip",
       text: "The form that carried you through the past few races has dipped. It happens—training stress accumulates, recovery gets missed, fitness plateaus. The challenge now is managing through this rough patch, trusting the process, waiting for form to return.",
       triggers: { performanceTier: ["midpack", "back"], wasDoingBetter: true },
-      weight: 0.6
+      weight: 0.6,
+      bridges: {
+        win: "And today, the form came roaring back.",
+        podium: "Today felt like the form is returning.",
+        top10: "Today showed signs of improvement.",
+        midpack: "And today, the dip continued.",
+        back: "And today, the waiting continued."
+      }
     },
     {
       id: "set_mental_defeat",
       text: "You gave up mentally before the race was over. The body still had something left, but your mind quit first. That's harder to accept than physical failure—knowing you left something on the table because you stopped believing.",
       triggers: { performanceTier: ["back"], isWorseResult: true },
-      weight: 0.7
+      weight: 0.7,
+      bridges: {
+        win: "But today, you stayed in the fight mentally.",
+        podium: "Today, the mind was as strong as the body.",
+        top10: "Today, you kept believing until the line.",
+        midpack: "And today, the mental battle was hard again.",
+        back: "And today, the mind wavered once more."
+      }
     }
   ],
 
@@ -1136,73 +2261,157 @@ const NARRATIVE_DATABASE = {
       id: "rival_emergence",
       text: "There's a rider you keep seeing in results, someone racing a similar schedule who seems to be on a similar trajectory. You've never spoken, barely made eye contact, but you track their results obsessively. When they finish ahead of you, it stings more than it should.",
       triggers: { raceNumber: [8, 9, 10], performanceTier: ["top10", "podium"], requiresRivalHistory: true },
-      weight: 0.7
+      weight: 0.7,
+      bridges: {
+        win: "Today, you finished ahead of them.",
+        podium: "Today, you both finished near the front.",
+        top10: "Today, you stayed in their orbit.",
+        midpack: "Today, they pulled further ahead in your mental standings.",
+        back: "Today, the gap between you grew painfully wider."
+      }
     },
     {
       id: "rival_respect",
       text: "You've been racing against the same core group all season, and a mutual respect has developed. You know their strengths and weaknesses, they know yours. In the pack, you acknowledge each other with nods—competitors, but also fellow travelers on this journey.",
       triggers: { raceNumber: [7, 8, 9, 10], performanceTier: ["any"], requiresRivalHistory: true },
-      weight: 0.5
+      weight: 0.5,
+      bridges: {
+        win: "Today, respect turned to congratulations from them.",
+        podium: "Today, you shared the pointy end with familiar faces.",
+        top10: "Today, the familiar competition played out as expected.",
+        midpack: "Today, you watched them ride away.",
+        back: "Today, you were left behind by those you've been measuring yourself against."
+      }
     },
     {
       id: "rival_revenge",
       text: "A rider who beat you soundly in your last encounter is here again. You've been thinking about that race, analyzing what went wrong, planning how to approach today differently. Revenge might be petty, but it's also motivating.",
       triggers: { raceNumber: [6, 7, 8, 9], performanceTier: ["any"], minRacesCompleted: 2, requiresRivalHistory: true },
-      weight: 0.6
+      weight: 0.6,
+      bridges: {
+        win: "Today, revenge was sweet.",
+        podium: "Today, you evened the score.",
+        top10: "Today, you closed the gap between you.",
+        midpack: "But today, they got away from you again.",
+        back: "But today, the gap only widened."
+      }
     },
     {
       id: "rival_friendly",
       text: "Your main rival has become something close to a friend. You warm up together, share race intel, commiserate after tough days. The competition is fierce, but the friendship is genuine. It's possible to want to beat someone and genuinely hope they do well.",
       triggers: { raceNumber: [8, 9, 10], performanceTier: ["podium", "top10"], requiresRivalHistory: true },
-      weight: 0.5
+      weight: 0.5,
+      bridges: {
+        win: "Today, you had bragging rights over coffee afterward.",
+        podium: "Today, you both had something to celebrate.",
+        top10: "Today, the friendly competition continued.",
+        midpack: "Today, they'll be buying the post-race coffee.",
+        back: "Today, they had the better of the battle."
+      }
     },
     {
       id: "rival_shadowing",
       text: "You've been watching one rider in particular—studying their race tactics, their training posts, their equipment choices. Call it respect or obsession, but you're learning from them, using them as a benchmark for where you want to be.",
       triggers: { raceNumber: [6, 7, 8], performanceTier: ["any"], requiresRivalHistory: true },
-      weight: 0.5
+      weight: 0.5,
+      bridges: {
+        win: "Today, the student became the master.",
+        podium: "Today, you showed you've learned well.",
+        top10: "Today, you proved you belong in their league.",
+        midpack: "Today, the benchmark remained out of reach.",
+        back: "Today, the gap felt insurmountable."
+      }
     },
     {
       id: "rival_motivation",
       text: "Knowing your rival will be racing today adds an extra layer of motivation. You want to beat them specifically, to prove something you're not even sure how to articulate. Personal competition elevates performance in ways general competition never could.",
       triggers: { raceNumber: [7, 8, 9, 10], performanceTier: ["any"], requiresRivalHistory: true },
-      weight: 0.6
+      weight: 0.6,
+      bridges: {
+        win: "Today, that motivation carried you to victory.",
+        podium: "Today, the extra motivation paid off.",
+        top10: "Today, you raced with that edge.",
+        midpack: "But today, motivation wasn't enough.",
+        back: "But today, wanting it wasn't the same as having it."
+      }
     },
     {
       id: "rival_comparison",
       text: "You check their results as obsessively as your own. When they have a good race, you're simultaneously impressed and irritated. When they have a bad race, you feel sympathy mixed with opportunity. This rivalry has become personal in ways that surprise you.",
       triggers: { raceNumber: [8, 9, 10], performanceTier: ["any"], requiresRivalHistory: true },
-      weight: 0.5
+      weight: 0.5,
+      bridges: {
+        win: "Today, you'll enjoy checking those results.",
+        podium: "Today, you'll be happy with how the comparison looks.",
+        top10: "Today, the comparison is respectable.",
+        midpack: "Today, you might skip checking the results.",
+        back: "Today, you'd rather not think about comparisons."
+      }
     },
     {
       id: "rival_final_sprint",
       text: "Your last race came down to a sprint against your main rival. The competition, the tactical chess match, the pure racing between two equally matched competitors—it was bicycle racing at its finest. Win or lose, those are the moments you live for.",
       triggers: { raceNumber: [7, 8, 9], performanceTier: ["win", "podium"], minRacesCompleted: 2, requiresRivalHistory: true },
-      weight: 0.7
+      weight: 0.7,
+      bridges: {
+        win: "And you got to experience it all over again here.",
+        podium: "Today brought another chapter in that rivalry.",
+        top10: "Today, the battle continued, if less dramatically.",
+        midpack: "But today, the sprint never materialized.",
+        back: "But today was a different story entirely."
+      }
     },
     {
       id: "rival_different_strengths",
       text: "You and your rival have completely different racing styles. They're a climber; you're a sprinter. They attack constantly; you race conservatively. That contrast makes your competition interesting—it's not about who's stronger, but whose strengths suit today's race better.",
       triggers: { raceNumber: [7, 8, 9, 10], performanceTier: ["any"], requiresRivalHistory: true },
-      weight: 0.5
+      weight: 0.5,
+      bridges: {
+        win: "Today, the race suited your strengths perfectly.",
+        podium: "Today, your style paid dividends.",
+        top10: "Today, the race was neutral ground.",
+        midpack: "Today, the course favored their strengths.",
+        back: "Today, the race played to their advantages, not yours."
+      }
     },
     {
       id: "rival_age_group_battle",
       text: "In the age group standings, there's one rider you're locked in battle with. Every race, the gap between you shifts slightly. Points accumulate, positions change, and the season-long competition adds meaning to every result.",
       triggers: { raceNumber: [8, 9, 10, 11], performanceTier: ["any"], requiresRivalHistory: true },
-      weight: 0.6
+      weight: 0.6,
+      bridges: {
+        win: "Today, you opened up a significant gap.",
+        podium: "Today, you gained valuable ground.",
+        top10: "Today, you held your position.",
+        midpack: "Today, the gap narrowed in their favor.",
+        back: "Today, they pulled further ahead in the standings."
+      }
     },
     {
       id: "rival_social_media",
       text: "You follow each other on social media, watching training updates, race preparations, results posts. There's an unspoken acknowledgment of the rivalry, a public-facing politeness that masks intense competitive drive underneath.",
       triggers: { raceNumber: [7, 8, 9], performanceTier: ["any"], requiresRivalHistory: true },
-      weight: 0.4
+      weight: 0.4,
+      bridges: {
+        win: "Today, you'll enjoy posting this result.",
+        podium: "Today gives you something worth sharing.",
+        top10: "Today's post will be straightforward enough.",
+        midpack: "Today might not make it to social media.",
+        back: "Today's a day to scroll past without posting."
+      }
     },
     {
       id: "rival_post_race_chat",
       text: "After races, you and your rival often end up chatting—comparing notes on the race, discussing tactics, sharing frustrations. The competitive fire burns hot during races, but afterward, there's genuine respect and even admiration for each other's dedication.",
       triggers: { raceNumber: [8, 9, 10], performanceTier: ["any"], requiresRivalHistory: true },
-      weight: 0.5
+      weight: 0.5,
+      bridges: {
+        win: "Today, you had the better story to tell.",
+        podium: "Today, you both had reasons to smile.",
+        top10: "Today's conversation will cover the usual ground.",
+        midpack: "Today, you'll be listening more than talking.",
+        back: "Today, you might skip the post-race chat."
+      }
     }
   ],
 
@@ -1212,73 +2421,157 @@ const NARRATIVE_DATABASE = {
       id: "color_coast_and_roast",
       text: "The Coast and Roast Crit has a reputation: fast, technical, and absolutely unforgiving of positioning mistakes. The tight corners come rapid-fire, and one moment of hesitation can cost you twenty places. Locals dominate this race because they know every corner, every rough patch, exactly where to brake and where to carry speed.",
       triggers: { raceNumber: [1], performanceTier: ["any"] },
-      weight: 0.5
+      weight: 0.5,
+      bridges: {
+        win: "Today, you raced like a local.",
+        podium: "Today, you navigated the chaos successfully.",
+        top10: "Today, you survived the technical demands.",
+        midpack: "And today, the corners caught up with you.",
+        back: "And today, the reputation proved accurate."
+      }
     },
     {
       id: "color_forest_velodrome",
       text: "Track racing is a different animal entirely—nowhere to hide, nowhere to rest, just raw speed and tactical awareness. The Forest Velodrome Elimination is particularly brutal: every lap someone goes home, and the pressure is relentless from the opening whistle.",
       triggers: { raceNumber: [3], performanceTier: ["any"] },
-      weight: 0.6
+      weight: 0.6,
+      bridges: {
+        win: "And today, you were the last one standing.",
+        podium: "Today, you survived until the final laps.",
+        top10: "Today, you held on through the brutal middle rounds.",
+        midpack: "And today, the elimination came for you.",
+        back: "And today, the pressure was too much too soon."
+      }
     },
     {
       id: "color_unbound",
       text: "Unbound - Little Egypt isn't your typical race. The gravel sections are rough and unpredictable, the distance is long enough to expose any weakness in fitness or pacing, and the whole event has this adventurous, slightly wild energy that's different from standard road racing.",
       triggers: { raceNumber: [12], performanceTier: ["any"] },
-      weight: 0.7
+      weight: 0.7,
+      bridges: {
+        win: "And today, you embraced the adventure and came out on top.",
+        podium: "Today, you thrived in the wild atmosphere.",
+        top10: "Today, you handled the unpredictability well.",
+        midpack: "And today, the gravel exposed a weakness.",
+        back: "And today, the distance and terrain were too much."
+      }
     },
     {
       id: "color_time_trial",
       text: "Time trials are the race of truth—just you, the bike, and the clock. No tactics to hide behind, no teammates to help, nowhere to coast. Every watt matters, every second of position savings counts. It's pure suffering converted directly into time.",
       triggers: { raceNumber: [4, 10], performanceTier: ["any"] },
-      weight: 0.6
+      weight: 0.6,
+      bridges: {
+        win: "And today, the truth was flattering.",
+        podium: "Today, the clock confirmed your fitness.",
+        top10: "Today, you suffered honestly and well.",
+        midpack: "And today, the truth was harder to accept.",
+        back: "And today, the clock told a painful truth."
+      }
     },
     {
       id: "color_criterium_chaos",
       text: "Criteriums are controlled chaos—same corners lap after lap, speeds that feel dangerous, positioning that changes every turn. The technical demands are enormous: handling skills, spatial awareness, the ability to accelerate out of corners repeatedly without burning all your matches.",
       triggers: { raceNumber: [1, 7], performanceTier: ["any"] },
-      weight: 0.5
+      weight: 0.5,
+      bridges: {
+        win: "And today, you controlled the chaos.",
+        podium: "Today, your handling skills proved sharp.",
+        top10: "Today, you rode the chaos well.",
+        midpack: "And today, the chaos controlled you.",
+        back: "And today, the technical demands were too much."
+      }
     },
     {
       id: "color_hill_climb",
       text: "Hill climbs are elegantly simple and brutally hard. The road goes up, and you either have the legs to go fast or you don't. No hiding, no tactics, just you versus gravity in its purest form.",
       triggers: { raceNumber: [6], performanceTier: ["any"] },
-      weight: 0.6
+      weight: 0.6,
+      bridges: {
+        win: "Today, you had the legs.",
+        podium: "Today, you fought gravity and mostly won.",
+        top10: "Today, you climbed respectably.",
+        midpack: "And today, gravity won.",
+        back: "And today, the simple truth was painful."
+      }
     },
     {
       id: "color_points_race",
       text: "Points races reward consistency over single efforts. You need to be alert for every sprint, positioned well each time, smart about when to go all-in and when to take what you can get. It's about accumulation, not one decisive moment.",
       triggers: { raceNumber: [5, 11], performanceTier: ["any"] },
-      weight: 0.5
+      weight: 0.5,
+      bridges: {
+        win: "And today, the points accumulated beautifully.",
+        podium: "Today, your consistency paid off.",
+        top10: "Today, you picked up points when they mattered.",
+        midpack: "And today, the accumulation wasn't enough.",
+        back: "And today, too many sprints slipped away."
+      }
     },
     {
       id: "color_gran_fondo",
       text: "The gran fondo distance changes everything. What seems sustainable for an hour becomes questionable over three or four. Pacing becomes critical, nutrition essential, mental strength as important as physical. These races reveal who prepared properly and who overestimated their fitness.",
       triggers: { raceNumber: [8], performanceTier: ["any"] },
-      weight: 0.6
+      weight: 0.6,
+      bridges: {
+        win: "Today revealed you were properly prepared.",
+        podium: "Today, your preparation proved solid.",
+        top10: "Today, you managed the distance well.",
+        midpack: "And today, the distance exposed a gap in preparation.",
+        back: "And today revealed you'd overestimated your readiness."
+      }
     },
     {
       id: "color_race_atmosphere",
       text: "The pre-race atmosphere is electric today. More spectators than usual, local media coverage, a genuine sense of occasion. These bigger events have a different energy—more pressure, more excitement, more meaning packed into the same race distance.",
       triggers: { raceNumber: [5, 8, 12], performanceTier: ["any"] },
-      weight: 0.4
+      weight: 0.4,
+      bridges: {
+        win: "And today, you rose to the occasion.",
+        podium: "Today, the big stage brought out your best.",
+        top10: "Today, you handled the pressure well.",
+        midpack: "But today, the pressure got to you.",
+        back: "And today, the occasion was overwhelming."
+      }
     },
     {
       id: "color_course_knowledge",
       text: "This course has become familiar over multiple races. You know where the attacks will come, where the pack will slow, which corners are dangerous. That local knowledge is an advantage—not decisive, but meaningful. You can race smarter when you know what's coming.",
       triggers: { raceNumber: [7, 8, 9, 10], performanceTier: ["any"] },
-      weight: 0.4
+      weight: 0.4,
+      bridges: {
+        win: "And today, that knowledge proved decisive.",
+        podium: "Today, racing smart paid dividends.",
+        top10: "Today, the course knowledge helped.",
+        midpack: "But today, knowing the course wasn't enough.",
+        back: "And today, familiarity couldn't save you."
+      }
     },
     {
       id: "color_new_venue",
       text: "This is your first time racing this course, and the unfamiliarity adds an extra layer of challenge. Every corner is uncertain, every climb is a surprise. You're racing cautiously, conservatively, trying to learn the course while also competing.",
       triggers: { raceNumber: [1, 2, 3], performanceTier: ["any"] },
-      weight: 0.4
+      weight: 0.4,
+      bridges: {
+        win: "And today, the unfamiliarity didn't slow you down.",
+        podium: "Today, you adapted faster than expected.",
+        top10: "Today, caution served you well.",
+        midpack: "And today, the uncertainty showed in your result.",
+        back: "And today, the unfamiliar course got the better of you."
+      }
     },
     {
       id: "color_championship_importance",
       text: "Today's race carries extra weight—it's a championship event, or a known race on the calendar that attracts the strongest field. The level of competition is noticeably higher, the racing more aggressive. These are the events that define seasons.",
       triggers: { raceNumber: [8, 12, 15], performanceTier: ["any"] },
-      weight: 0.6
+      weight: 0.6,
+      bridges: {
+        win: "And today, you defined your season in the best way.",
+        podium: "Today, you proved you belong at this level.",
+        top10: "Today, you held your own against the best.",
+        midpack: "And today, the higher level showed.",
+        back: "And today, the championship field was too strong."
+      }
     }
   ],
 
@@ -1288,61 +2581,131 @@ const NARRATIVE_DATABASE = {
       id: "weather_rain",
       text: "Rain changes everything about bike racing. Corners become sketchy, braking distances extend, vision decreases. Some riders thrive in these conditions, comfortable when others are terrified. You're learning which category you fall into.",
       triggers: { raceNumber: [2, 3, 4, 5, 6, 7, 8], performanceTier: ["any"] },
-      weight: 0.3
+      weight: 0.3,
+      bridges: {
+        win: "Today, you found out you're a rain rider.",
+        podium: "Today, you handled the conditions better than most.",
+        top10: "Today, you stayed upright and competitive.",
+        midpack: "And today, the rain proved your nemesis.",
+        back: "And today, the conditions got the better of you."
+      }
     },
     {
       id: "weather_heat",
       text: "The heat is brutal today—the kind that makes every effort feel twice as hard, that drains your energy even before the race starts. Staying hydrated becomes as important as staying in position. Some riders wilt in heat; others seem unaffected. Today you'll find out which you are.",
       triggers: { raceNumber: [5, 6, 7, 8, 9], performanceTier: ["any"] },
-      weight: 0.4
+      weight: 0.4,
+      bridges: {
+        win: "You found out—you're a hot-weather rider.",
+        podium: "You found out—you can handle the heat.",
+        top10: "You survived the conditions well enough.",
+        midpack: "And the heat took its toll.",
+        back: "And the heat absolutely crushed you."
+      }
     },
     {
       id: "weather_wind",
       text: "The wind is howling—crosswinds that will split the field, headwinds that will punish anyone who works too hard early. Wind racing requires different tactics: echelon positioning, selective effort, tactical patience. Get it wrong and you'll be gapped before you know what happened.",
       triggers: { raceNumber: [3, 4, 5, 6, 7, 8], performanceTier: ["any"] },
-      weight: 0.4
+      weight: 0.4,
+      bridges: {
+        win: "And you got it right—the wind was your ally today.",
+        podium: "And you read the wind well.",
+        top10: "You stayed in the right echelons when it mattered.",
+        midpack: "And you got caught out when the wind split the field.",
+        back: "And the wind gapped you completely."
+      }
     },
     {
       id: "weather_cold",
       text: "The cold makes warming up crucial and staying warm during the race a challenge. Your fingers hurt, your face goes numb, and finding that perfect balance between enough clothing and too much becomes its own tactical decision.",
       triggers: { raceNumber: [1, 2, 3], performanceTier: ["any"] },
-      weight: 0.3
+      weight: 0.3,
+      bridges: {
+        win: "But you got the balance right and came out on top.",
+        podium: "And you found that balance today.",
+        top10: "You stayed warm enough to compete.",
+        midpack: "And the cold affected you more than others.",
+        back: "And the cold got into your bones and stayed there."
+      }
     },
     {
       id: "weather_perfect",
       text: "Today's weather is perfect—temperature in the sweet spot, minimal wind, dry roads. These are the conditions where pure form wins out, where there are no excuses about weather affecting performance. Either you're fast today or you're not.",
       triggers: { raceNumber: [4, 5, 6, 7, 8], performanceTier: ["any"] },
-      weight: 0.3
+      weight: 0.3,
+      bridges: {
+        win: "You were fast. Very fast.",
+        podium: "You were fast enough.",
+        top10: "You were fast—just not quite fast enough.",
+        midpack: "And today, you weren't fast.",
+        back: "And today showed you exactly where you stand."
+      }
     },
     {
       id: "weather_humidity",
       text: "The humidity is oppressive, making every breath feel thick, every effort harder than it should be. Sweat doesn't evaporate, body temperature regulation becomes difficult. This kind of weather separates those who prepared properly from those who didn't.",
       triggers: { raceNumber: [6, 7, 8, 9], performanceTier: ["any"] },
-      weight: 0.3
+      weight: 0.3,
+      bridges: {
+        win: "And your preparation paid off perfectly.",
+        podium: "Your preparation proved solid.",
+        top10: "You managed the conditions well enough.",
+        midpack: "And you weren't quite prepared enough.",
+        back: "And you were among those who weren't ready."
+      }
     },
     {
       id: "weather_early_morning",
       text: "The early morning start means racing in cool temperatures that will warm significantly as the race progresses. Choosing the right clothing is tricky—start comfortable and risk overheating, or start cold and trust you'll warm up. It's racing roulette.",
       triggers: { raceNumber: [2, 3, 4, 5], performanceTier: ["any"] },
-      weight: 0.3
+      weight: 0.3,
+      bridges: {
+        win: "The roulette wheel landed in your favor.",
+        podium: "You made the right call on kit today.",
+        top10: "Your clothing choice was good enough.",
+        midpack: "And you guessed wrong on the kit.",
+        back: "And the roulette wheel spun against you."
+      }
     },
     {
       id: "weather_unpredictable",
       text: "The weather forecast was uncertain, and now mid-race, you're dealing with changing conditions. What started clear is now threatening rain, or vice versa. Adaptability becomes as important as fitness in races like this.",
       triggers: { raceNumber: [5, 6, 7, 8], performanceTier: ["any"] },
-      weight: 0.3
+      weight: 0.3,
+      bridges: {
+        win: "And you adapted brilliantly.",
+        podium: "Your adaptability served you well.",
+        top10: "You adapted well enough to stay competitive.",
+        midpack: "And the changing conditions threw you off.",
+        back: "And you couldn't adapt fast enough."
+      }
     },
     {
       id: "weather_tailwind_sections",
       text: "The course has serious tailwind sections that will push speeds dangerously high. Staying in the draft becomes critical, because anyone off the back in a tailwind is gone forever. The physics of wind create their own brutal tactical demands.",
       triggers: { raceNumber: [4, 5, 6, 7, 8], performanceTier: ["any"] },
-      weight: 0.3
+      weight: 0.3,
+      bridges: {
+        win: "And you rode those tailwind sections to perfection.",
+        podium: "You stayed in the right wheels through the tailwind.",
+        top10: "You held the draft through the fast sections.",
+        midpack: "And the tailwind sections hurt you.",
+        back: "And you got dropped when the tailwind hit."
+      }
     },
     {
       id: "weather_sun_blinding",
       text: "The low sun is blinding coming into certain turns, making it hard to read the road, hard to spot hazards. Some riders forgot sunglasses; others have the wrong tint. These small equipment decisions become significant in specific conditions.",
       triggers: { raceNumber: [5, 6, 7, 8], performanceTier: ["any"] },
-      weight: 0.2
+      weight: 0.2,
+      bridges: {
+        win: "But you navigated those blind corners perfectly.",
+        podium: "Your eyewear choice paid off.",
+        top10: "You handled the tricky light well.",
+        midpack: "And those conditions cost you positions.",
+        back: "And the sun caught you out more than once."
+      }
     }
   ],
 
@@ -1352,49 +2715,105 @@ const NARRATIVE_DATABASE = {
       id: "travel_long_drive",
       text: "The drive to this race was longer than expected—three hours each way, leaving before dawn to make the start time. You tried to rest in the car, but pre-race nerves made that impossible. Now you're here, slightly tired from travel but committed to making the drive worth it.",
       triggers: { raceNumber: [4, 5, 6, 7, 8], performanceTier: ["any"] },
-      weight: 0.3
+      weight: 0.3,
+      bridges: {
+        win: "And the drive was absolutely worth it.",
+        podium: "The drive paid off handsomely.",
+        top10: "The long drive was justified by the result.",
+        midpack: "But the tired legs from travel showed.",
+        back: "And you have a long drive home to think about what went wrong."
+      }
     },
     {
       id: "travel_local_race",
       text: "There's something comforting about racing close to home. You know these roads, you've trained on them countless times, and sleeping in your own bed last night meant arriving fresh and ready. Local races have their advantages.",
       triggers: { raceNumber: [1, 2, 3], performanceTier: ["any"] },
-      weight: 0.4
+      weight: 0.4,
+      bridges: {
+        win: "And you made the home advantage count.",
+        podium: "The local knowledge paid off.",
+        top10: "The familiar roads helped you compete.",
+        midpack: "But even the home advantage couldn't help today.",
+        back: "But familiarity didn't translate into a good result."
+      }
     },
     {
       id: "travel_logistics_stress",
       text: "Race day logistics are more complicated than they should be—parking, registration, warming up, bathroom, pinning numbers, one last bike check. You've developed a system, a routine that minimizes stress, but there's always that underlying anxiety that you've forgotten something crucial.",
       triggers: { raceNumber: [2, 3, 4, 5], performanceTier: ["any"] },
-      weight: 0.3
+      weight: 0.3,
+      bridges: {
+        win: "But the system worked, and so did you.",
+        podium: "The routine paid off today.",
+        top10: "Your preparation system delivered.",
+        midpack: "But the pre-race stress may have taken its toll.",
+        back: "And something in the routine clearly didn't work."
+      }
     },
     {
       id: "travel_course_recon",
       text: "You drove the course yesterday, studying the key sections, noting where attacks might happen, visualizing the finale. That reconnaissance gives you confidence—you won't be surprised by anything today. You know what's coming.",
       triggers: { raceNumber: [5, 6, 7, 8, 9], performanceTier: ["any"] },
-      weight: 0.4
+      weight: 0.4,
+      bridges: {
+        win: "And knowing the course helped you win it.",
+        podium: "The recon proved invaluable.",
+        top10: "The course knowledge gave you an edge.",
+        midpack: "But knowing the course didn't help enough.",
+        back: "But course knowledge isn't everything."
+      }
     },
     {
       id: "travel_overnight_stay",
       text: "You stayed overnight near the race venue to avoid an early morning drive. The hotel wasn't great, the bed was unfamiliar, but you're here fresh and ready. Sometimes the investment in logistics pays off in performance.",
       triggers: { raceNumber: [6, 7, 8], performanceTier: ["any"] },
-      weight: 0.3
+      weight: 0.3,
+      bridges: {
+        win: "And the logistics investment paid off big.",
+        podium: "The overnight stay was worth it.",
+        top10: "Arriving fresh made a difference.",
+        midpack: "But maybe the unfamiliar bed affected you.",
+        back: "But even arriving fresh couldn't save the day."
+      }
     },
     {
       id: "travel_carpool",
       text: "You carpooled with other racers, sharing the drive, the expenses, the nervous energy. The camaraderie made the journey easier, and now you've got built-in support at the race. Small things like this make the racing community special.",
       triggers: { raceNumber: [5, 6, 7, 8], performanceTier: ["any"] },
-      weight: 0.3
+      weight: 0.3,
+      bridges: {
+        win: "And you'll have a great story to share on the drive home.",
+        podium: "The carpool crew will be celebrating on the way back.",
+        top10: "A decent result to discuss on the drive home.",
+        midpack: "At least the drive home will have good company.",
+        back: "The drive home will be quieter than the drive here."
+      }
     },
     {
       id: "travel_forgotten_item",
       text: "You forgot something at home—not critical, but annoying. A favorite piece of kit, spare tubes, your preferred nutrition. You've learned to adapt, to make do, to race with what you have. Flexibility is part of racing.",
       triggers: { raceNumber: [3, 4, 5], performanceTier: ["any"] },
-      weight: 0.2
+      weight: 0.2,
+      bridges: {
+        win: "And it clearly didn't matter.",
+        podium: "The adaptation worked out fine.",
+        top10: "You made do and it was enough.",
+        midpack: "And maybe that forgotten item mattered more than you thought.",
+        back: "And you couldn't help wondering if it made a difference."
+      }
     },
     {
       id: "travel_perfect_prep",
       text: "Everything about today's logistics went perfectly. Arrived early, found easy parking, smooth registration, time to warm up properly. Sometimes racing gods smile on you, and you've got every external factor optimized. Now all that's left is to race.",
       triggers: { raceNumber: [6, 7, 8, 9], performanceTier: ["any"] },
-      weight: 0.3
+      weight: 0.3,
+      bridges: {
+        win: "And the racing gods kept smiling.",
+        podium: "And the race went as smoothly as the prep.",
+        top10: "And you raced up to the occasion.",
+        midpack: "But perfect prep doesn't guarantee perfect results.",
+        back: "But some days, even perfection isn't enough."
+      }
     }
   ],
 
@@ -1752,61 +3171,131 @@ const NARRATIVE_DATABASE = {
       id: "stage_two_fatigue",
       text: "Your legs lied to you this morning. The warm-up felt okay, normal even. Then the stage started and within five kilometers you realized yesterday's effort took more out of you than you thought. The pace feels harder than it should, the accelerations hurt more than normal, and you're working just to stay in contact. This is stage racing—competing on tired legs.",
       triggers: { raceNumber: [14], performanceTier: ["midpack", "back"] },
-      weight: 0.8
+      weight: 0.8,
+      bridges: {
+        win: "But somehow, you found reserves you didn't know existed.",
+        podium: "But you dug deep and found something extra.",
+        top10: "But you managed to hold on through the fatigue.",
+        midpack: "And the tired legs dictated the result.",
+        back: "And the fatigue won out in the end."
+      }
     },
     {
       id: "recovery_failure",
       text: "You did everything right last night—ate well, stretched, elevated your legs, got decent sleep. But somehow it wasn't enough. Your body hasn't recovered from yesterday's effort, and now you're paying for it. Each acceleration feels like it's coming from an empty tank. Stage racing is brutal: race hard, recover as best you can, race hard again. Sometimes recovery just doesn't come.",
       triggers: { raceNumber: [14, 15], performanceTier: ["back", "midpack"] },
-      weight: 0.7
+      weight: 0.7,
+      bridges: {
+        win: "But today, the body finally responded.",
+        podium: "But somehow the legs came around mid-race.",
+        top10: "But you gutted through to a decent result.",
+        midpack: "And the empty tank showed in the result.",
+        back: "And the body simply couldn't deliver."
+      }
     },
     {
       id: "gc_math_desperation",
       text: "You spent the entire stage doing GC math in your head. 'If I finish here, and they finish there, I move up two spots. If I can stay with that group, I only lose 30 seconds.' Stage racing becomes an obsession with numbers, gaps, and positions. But math doesn't help when your legs just don't have the strength to execute the calculations.",
       triggers: { raceNumber: [14, 15], performanceTier: ["midpack", "back"] },
-      weight: 0.6
+      weight: 0.6,
+      bridges: {
+        win: "But today, the legs matched the ambition.",
+        podium: "Today, the numbers worked in your favor.",
+        top10: "Today, you executed the plan well enough.",
+        midpack: "And today, the math remained cruel.",
+        back: "And today, even the calculations offered no hope."
+      }
     },
     {
       id: "watching_gc_slip",
       text: "The group containing the GC contenders rolled away, and you couldn't respond. You tried—attacked out of your chase group, drilled it on the climbs, but the gap just grew. Watching your GC ambitions disappear up the road while you suffer in the second group is a particular kind of painful. The tour isn't over, but your shot at a top GC placing probably is.",
       triggers: { raceNumber: [14, 15], performanceTier: ["midpack", "back"] },
-      weight: 0.8
+      weight: 0.8,
+      bridges: {
+        win: "But today, you were in that front group—and you won it.",
+        podium: "But today, you stayed with the leaders.",
+        top10: "But today, you limited the losses.",
+        midpack: "And today brought more of the same frustration.",
+        back: "And today, the GC slipped even further away."
+      }
     },
     {
       id: "stage_race_learning",
       text: "Every stage is a lesson in pacing, recovery, and race management. Today's lesson was harsh: you can't race every stage like it's your last. The aggressive move that felt smart in the moment cost you energy you needed later. Stage racing punishes enthusiasm and rewards patience. You're learning, but the tuition is expensive.",
       triggers: { raceNumber: [14, 15], performanceTier: ["any"] },
-      weight: 0.6
+      weight: 0.6,
+      bridges: {
+        win: "And today, you applied those lessons perfectly.",
+        podium: "Today, the patience was rewarded.",
+        top10: "Today showed you're learning the art of stage racing.",
+        midpack: "And today offered more expensive lessons.",
+        back: "And today, the tuition bill kept growing."
+      }
     },
     {
       id: "mental_fatigue_tour",
       text: "The physical fatigue is one thing—your legs hurt, your body is tired. But the mental fatigue of stage racing might be harder. Staying focused when you're exhausted, making tactical decisions with a fogged mind, finding motivation to push hard when every fiber of your being wants to soft-pedal. Your mind is as tired as your legs.",
       triggers: { raceNumber: [15], performanceTier: ["any"] },
-      weight: 0.7
+      weight: 0.7,
+      bridges: {
+        win: "But today, you found clarity when it mattered most.",
+        podium: "But today, the mind stayed sharp enough.",
+        top10: "Today, you pushed through the mental fog.",
+        midpack: "And today, the mental fog won.",
+        back: "And today, both mind and body gave out."
+      }
     },
     {
       id: "cumulative_damage",
       text: "It's not one big blow-up that ends your GC hopes—it's the accumulation of small losses. Thirty seconds lost on stage one. Another forty-five seconds today. Suddenly you're two minutes down with one stage left, and barring disaster for those ahead, your GC position is cemented. Stage racing is ruthless in how it accumulates time gaps.",
       triggers: { raceNumber: [14, 15], performanceTier: ["midpack", "back"], gcPosition: [11, 12, 13, 14, 15, 16, 17, 18, 19, 20] },
-      weight: 0.7
+      weight: 0.7,
+      bridges: {
+        win: "But today, you clawed back significant time.",
+        podium: "But today, you stopped the bleeding.",
+        top10: "Today, you at least held your position.",
+        midpack: "And today, more seconds slipped away.",
+        back: "And today, the damage accumulated further."
+      }
     },
     {
       id: "survival_mode_tour",
       text: "You're in survival mode now—forget about GC placing, forget about stage wins. The goal is simple: finish the tour. Get through today, get through tomorrow, make it to the finish line with your dignity intact. It's not the Local Tour you dreamed of, but finishing a three-day stage race is an accomplishment regardless of the result.",
       triggers: { raceNumber: [14, 15], performanceTier: ["back"] },
-      weight: 0.7
+      weight: 0.7,
+      bridges: {
+        win: "But something clicked, and survival turned to triumph.",
+        podium: "But the legs came back, and so did your racing.",
+        top10: "But you found more than just survival today.",
+        midpack: "And today was another day of just getting through.",
+        back: "And today, survival was the best you could manage."
+      }
     },
     {
       id: "legs_not_responding",
       text: "Your mind wanted to go with that attack, but your legs just said no. That's the reality of racing on accumulated fatigue—the communication between brain and muscles breaks down. You see the move, you know you should cover it, you try to respond, and your legs simply don't have the snap. Stage racing exposes limitations you didn't know you had.",
       triggers: { raceNumber: [14, 15], performanceTier: ["midpack", "back"] },
-      weight: 0.6
+      weight: 0.6,
+      bridges: {
+        win: "But today, mind and legs finally worked together.",
+        podium: "But today, the legs answered when called.",
+        top10: "Today, there was just enough snap to stay in contact.",
+        midpack: "And today, the disconnect continued.",
+        back: "And today, the legs refused again."
+      }
     },
     {
       id: "respect_for_stage_racers",
       text: "You have new respect for professional stage racers who do this for three weeks straight. Three days is brutal enough—imagining twenty-one days of racing on tired legs seems impossible. The Local Tour is teaching you what Grand Tour riders endure, and you're only seeing a tiny fraction of it. Stage racing is a different kind of suffering.",
       triggers: { raceNumber: [14, 15], performanceTier: ["any"] },
-      weight: 0.5
+      weight: 0.5,
+      bridges: {
+        win: "And today, you rose above the suffering.",
+        podium: "Today, you proved you can handle this kind of racing.",
+        top10: "Today, you earned your right to be here.",
+        midpack: "And today brought more of that suffering.",
+        back: "And today, you felt every bit of it."
+      }
     }
   ],
 
@@ -1816,61 +3305,131 @@ const NARRATIVE_DATABASE = {
       id: "gc_gaps_checking",
       text: "Every few kilometers you're checking your cycling computer, doing mental math on time gaps. 'They're 45 seconds ahead, I'm 20 seconds behind the next group.' The GC battle happens in seconds, not minutes, and every split matters. You're hyper-aware of who's around you, who's ahead, and what it all means for the overall classification.",
       triggers: { raceNumber: [14, 15], performanceTier: ["podium", "top10"], gcPosition: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] },
-      weight: 0.8
+      weight: 0.8,
+      bridges: {
+        win: "And the math worked in your favor today.",
+        podium: "And today, those calculations paid off.",
+        top10: "Today, you managed the gaps well enough.",
+        midpack: "But today, the math turned against you.",
+        back: "But today, the gaps grew beyond recovery."
+      }
     },
     {
       id: "gc_leader_pressure",
       text: "Wearing the leader's jersey (or being on the virtual podium) changes everything. Suddenly you're marked. Every attack is aimed at you. Every acceleration is a test. You're no longer hunting—you're being hunted, and that's a very different kind of pressure. Defending is harder than attacking. You're learning that now.",
       triggers: { raceNumber: [14, 15], performanceTier: ["any"], gcPosition: [1, 2, 3] },
-      weight: 0.9
+      weight: 0.9,
+      bridges: {
+        win: "And today, you defended brilliantly while taking the stage.",
+        podium: "And today, you handled that pressure well.",
+        top10: "Today, you survived the attacks.",
+        midpack: "But today, the hunters caught you.",
+        back: "But today, the pressure broke you."
+      }
     },
     {
       id: "gc_attacking_move",
       text: "This was your moment to make a move on GC. You attacked hard, trying to distance the riders ahead of you in the classification. For a few glorious kilometers, you dangled off the front, gaining time. But stage racing is cruel—attacks cost energy, and that energy bill comes due later. Whether the gamble pays off depends on whether you can hold the gap to the finish.",
       triggers: { raceNumber: [14, 15], performanceTier: ["podium", "top10", "win"] },
-      weight: 0.8
+      weight: 0.8,
+      bridges: {
+        win: "The gamble paid off spectacularly.",
+        podium: "The attack worked—you gained time.",
+        top10: "The move cost energy, but you held on.",
+        midpack: "But the energy bill came due too soon.",
+        back: "But the gamble backfired completely."
+      }
     },
     {
       id: "gc_covering_attacks",
       text: "You spent the entire stage in defensive mode—covering attacks from riders behind you on GC, marking moves, staying vigilant. It's exhausting to race reactively, always responding rather than initiating. But when you're protecting a GC position, you don't need to win the stage. You just need to not lose time.",
       triggers: { raceNumber: [14, 15], performanceTier: ["any"], gcPosition: [1, 2, 3, 4, 5] },
-      weight: 0.8
+      weight: 0.8,
+      bridges: {
+        win: "And somehow, you still took the stage.",
+        podium: "The defensive work paid off—GC position held.",
+        top10: "Mission accomplished: no time lost.",
+        midpack: "But one attack finally got away.",
+        back: "But you couldn't cover them all."
+      }
     },
     {
       id: "gc_time_bonuses",
       text: "Time bonuses for stage placings suddenly matter enormously. Five seconds for third place doesn't sound like much, but when GC gaps are measured in seconds, those bonuses can move you up or down the classification. You're racing for every second now, calculating whether it's worth the effort to sprint for a top-three stage finish.",
       triggers: { raceNumber: [14, 15], performanceTier: ["podium", "top10"], gcPosition: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] },
-      weight: 0.7
+      weight: 0.7,
+      bridges: {
+        win: "And you grabbed the full bonus—ten seconds banked.",
+        podium: "And you grabbed crucial bonus seconds.",
+        top10: "The bonus sprint didn't quite work out, but you stayed in touch.",
+        midpack: "But the bonus seconds went to others today.",
+        back: "But bonuses were the last thing on your mind today."
+      }
     },
     {
       id: "gc_podium_hope",
       text: "You're in striking distance of a GC podium. Not the win, probably, but a top-three overall is within reach if things go right today. That possibility changes how you race—more aggressive than if you were defending, more calculated than if you had nothing to lose. You're in the dangerous middle ground where mistakes cost dearly.",
       triggers: { raceNumber: [15], performanceTier: ["any"], gcPosition: [4, 5, 6] },
-      weight: 0.9
+      weight: 0.9,
+      bridges: {
+        win: "And things went very right indeed.",
+        podium: "And you made it onto that GC podium.",
+        top10: "The podium stayed just out of reach, but you finished strong.",
+        midpack: "But the podium slipped away.",
+        back: "But the dream crumbled in the finale."
+      }
     },
     {
       id: "gc_gaps_stable",
       text: "The GC gaps have been remarkably stable across the stages. No one has made a decisive move, no one has blown up spectacularly. That means today becomes even more critical—the status quo can't hold forever, and someone needs to make something happen. Will it be you, or will you be responding to someone else's move?",
       triggers: { raceNumber: [15], performanceTier: ["any"], gcPosition: [1, 2, 3, 4, 5] },
-      weight: 0.6
+      weight: 0.6,
+      bridges: {
+        win: "You made it happen—decisively.",
+        podium: "You responded to the moves and came out ahead.",
+        top10: "The status quo mostly held, with you in it.",
+        midpack: "Someone else made the move, and you couldn't follow.",
+        back: "The race exploded, and not in your favor."
+      }
     },
     {
       id: "gc_mathematical_certainty",
       text: "You've done the math a hundred times: the gap to first place is too big to close unless something dramatic happens. You're racing for pride now, for a good final GC placing, for a stage win if the opportunity presents itself. The overall victory is out of reach, but there's still racing to be done and positions to fight for.",
       triggers: { raceNumber: [15], performanceTier: ["any"], gcPosition: [6, 7, 8, 9, 10, 11, 12, 13, 14, 15] },
-      weight: 0.7
+      weight: 0.7,
+      bridges: {
+        win: "And you got that stage win—a perfect consolation.",
+        podium: "And you found something to celebrate anyway.",
+        top10: "You fought for position and finished respectably.",
+        midpack: "The race for pride didn't go as planned.",
+        back: "Even the consolation prizes stayed out of reach."
+      }
     },
     {
       id: "gc_seconds_matter",
       text: "You lost the stage by fifteen seconds but gained five seconds on your GC rival. In the moment, losing the stage stung. But when you check the overall standings and see you've moved up a position, the pain eases. Stage racing is about the long game—sacrificing stage glory for GC position, accepting losses that actually move you forward overall.",
       triggers: { raceNumber: [14, 15], performanceTier: ["top10"], gcPosition: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10] },
-      weight: 0.7
+      weight: 0.7,
+      bridges: {
+        win: "And this time, you took both—stage and GC time.",
+        podium: "The long game continued to pay off.",
+        top10: "The GC implications were mixed, but you're still in it.",
+        midpack: "But this time, the seconds went the wrong way.",
+        back: "But this time, the losses were too big to spin positively."
+      }
     },
     {
       id: "gc_final_shake",
       text: "The queen stage is where the GC will be decided—no more tactical games, no more conserving energy. Today is about going as hard as you can for as long as you can and seeing where you end up when the suffering is over. The accumulated fatigue from previous stages adds another layer of difficulty. This is where tours are won and lost.",
       triggers: { raceNumber: [15], performanceTier: ["any"] },
-      weight: 0.8
+      weight: 0.8,
+      bridges: {
+        win: "And when the suffering ended, you stood on top.",
+        podium: "You suffered well and ended up where you deserved.",
+        top10: "You gave everything and finished with your head high.",
+        midpack: "The suffering was immense, the result less so.",
+        back: "The tour was lost today, but you finished it."
+      }
     }
   ],
 
@@ -1880,49 +3439,105 @@ const NARRATIVE_DATABASE = {
       id: "tt_naked_effort",
       text: "There's something both terrifying and liberating about time trials. No pack to hide in, no tactics to consider, no one to blame but yourself. It's just you and the bike and the clock, and the only question is: how much power can you sustain before your body says no? Your FTP is about to be revealed to everyone watching.",
       triggers: { raceNumber: [4, 10], performanceTier: ["any"] },
-      weight: 0.9
+      weight: 0.9,
+      bridges: {
+        win: "And today, you revealed something impressive.",
+        podium: "Today, the revelation was positive.",
+        top10: "Today, your FTP held up under scrutiny.",
+        midpack: "Today, the clock revealed some hard truths.",
+        back: "Today, the naked effort exposed the gaps."
+      }
     },
     {
       id: "tt_pacing_anxiety",
       text: "The pacing strategy for this time trial has been keeping you awake at night. Start too hard and you'll blow up spectacularly in the final minutes. Too conservative and you'll leave watts on the table. You've practiced the effort dozens of times, but race day always adds variables—adrenaline, wind, that voice in your head screaming to go harder.",
       triggers: { raceNumber: [4, 10], performanceTier: ["any"] },
-      weight: 0.8
+      weight: 0.8,
+      bridges: {
+        win: "And the pacing was perfect—you won.",
+        podium: "The pacing strategy worked out.",
+        top10: "The pacing was solid, if not perfect.",
+        midpack: "But the pacing fell apart somewhere in the middle.",
+        back: "And you either started too hard or not hard enough."
+      }
     },
     {
       id: "tt_suffering_alone",
       text: "The unique suffering of time trials is that you're doing it alone. No one to share the pain with, no one to push you through the bad moments, just you and the mounting fatigue and the clock ticking. When your legs start screaming at the halfway point, there's no pack to hide in. You either push through or you don't.",
       triggers: { raceNumber: [4, 10], performanceTier: ["any"] },
-      weight: 0.7
+      weight: 0.7,
+      bridges: {
+        win: "And you pushed through all the way to victory.",
+        podium: "You pushed through, and it paid off.",
+        top10: "You pushed through the worst of it.",
+        midpack: "And somewhere in that suffering, you found your limit.",
+        back: "Today, pushing through wasn't enough."
+      }
     },
     {
       id: "tt_numbers_game",
       text: "Time trials are a numbers game, and you've been obsessing over them. Your FTP, your power-to-weight ratio, your average speed from training efforts. You know exactly what you're capable of on paper. Now you get to find out if you can deliver those numbers under the pressure of competition, when your heart rate is elevated and your mind is screaming that you're going too hard.",
       triggers: { raceNumber: [4, 10], performanceTier: ["any"] },
-      weight: 0.6
+      weight: 0.6,
+      bridges: {
+        win: "And you delivered numbers you didn't know you had.",
+        podium: "You delivered the numbers when they counted.",
+        top10: "You hit the numbers you expected.",
+        midpack: "But the race-day numbers didn't match the training.",
+        back: "And the gap between paper and reality was wide."
+      }
     },
     {
       id: "tt_mental_battle",
       text: "The mental game in time trials is brutal. Every second feels like an hour when you're at threshold. Your brain keeps suggesting reasons to ease off—'you're going too hard,' 'you'll blow up,' 'this pace isn't sustainable.' You have to override every self-preservation instinct and trust your training. The clock doesn't care about your discomfort.",
       triggers: { raceNumber: [4, 10], performanceTier: ["any"] },
-      weight: 0.7
+      weight: 0.7,
+      bridges: {
+        win: "And you won the mental battle as well as the race.",
+        podium: "You overrode those instincts and got rewarded.",
+        top10: "You kept the brain quiet long enough to compete.",
+        midpack: "And somewhere, the brain won the argument.",
+        back: "And the mental battle was lost along the way."
+      }
     },
     {
       id: "tt_aero_obsession",
       text: "You've been obsessing over aerodynamics—position on the bike, tucking your elbows, keeping your head down. At time trial speeds, aero matters as much as power. Every watt saved through better position is a watt you can put into the pedals. You've practiced your TT position until it's almost comfortable, but 'almost' is the key word.",
       triggers: { raceNumber: [4, 10], performanceTier: ["top10", "podium", "win"] },
-      weight: 0.6
+      weight: 0.6,
+      bridges: {
+        win: "And those aero gains translated to the win.",
+        podium: "The aerodynamic work paid off.",
+        top10: "The position held up and contributed.",
+        midpack: "But position can only do so much.",
+        back: "But aero watts don't replace engine watts."
+      }
     },
     {
       id: "tt_no_hiding",
       text: "In a road race, you can have an off day and still finish anonymously in the pack. In a time trial, there's nowhere to hide. Your result will tell everyone exactly how strong you were today—no excuses about bad positioning, no blaming the pack. Just you versus the clock, and the clock doesn't lie.",
       triggers: { raceNumber: [4, 10], performanceTier: ["any"] },
-      weight: 0.8
+      weight: 0.8,
+      bridges: {
+        win: "And the clock told a story of strength.",
+        podium: "The clock confirmed what you suspected—you're in form.",
+        top10: "The clock showed you belonged.",
+        midpack: "And the clock told an honest, humbling story.",
+        back: "And the clock told everyone exactly where you stand."
+      }
     },
     {
       id: "tt_breakthrough_potential",
       text: "Time trials are where pure fitness gets rewarded. No lucky breaks, no clever tactics—just sustained power output. If you've done the training, if you've built your FTP, if you can hold threshold for the full duration, you'll see it reflected in the result. This is your chance to prove the winter training block was worth it.",
       triggers: { raceNumber: [4, 10], performanceTier: ["podium", "top10", "win"] },
-      weight: 0.7
+      weight: 0.7,
+      bridges: {
+        win: "And the winter work paid off beautifully.",
+        podium: "The training showed in the result.",
+        top10: "The fitness was evident.",
+        midpack: "But fitness alone wasn't enough today.",
+        back: "But the winter training didn't translate to the clock."
+      }
     }
   ],
 
@@ -1932,37 +3547,77 @@ const NARRATIVE_DATABASE = {
       id: "track_first_velodrome",
       text: "The velodrome is intimidating in person. The banking is steeper than it looks in videos, the track surface is unforgiving, and the speed at which riders take the turns seems impossible. You've been practicing, but racing on the track is different from training on it. The elimination format means one mistake and you're done—no second chances, no recovering from a bad position.",
       triggers: { raceNumber: [3], performanceTier: ["any"] },
-      weight: 0.9
+      weight: 0.9,
+      bridges: {
+        win: "And today, you made no mistakes.",
+        podium: "Today, you survived the elimination gauntlet.",
+        top10: "Today, you lasted longer than expected.",
+        midpack: "And today, the track showed you who's boss.",
+        back: "And today, the elimination came early."
+      }
     },
     {
       id: "track_elimination_stress",
       text: "Every lap in an elimination race feels like sudden death. Stay near the front, cover moves, accelerate out of turns, and whatever you do, don't be last across the line. The constant vigilance is exhausting—twenty laps of high-intensity efforts with no time to rest. One lap of inattention and you're watching the rest of the race from the sidelines.",
       triggers: { raceNumber: [3], performanceTier: ["any"] },
-      weight: 0.9
+      weight: 0.9,
+      bridges: {
+        win: "And today, your vigilance was perfect.",
+        podium: "Today, you stayed alert when it mattered.",
+        top10: "Today, you avoided elimination long enough to matter.",
+        midpack: "And today, one lap of inattention cost you.",
+        back: "And today, the sidelines came too soon."
+      }
     },
     {
       id: "track_banking_mastery",
       text: "You're starting to trust the banking—leaning into turns at speeds that would terrify you on the road. The track demands confidence in bike handling. Hesitate and you lose momentum. Brake in the corners and you drift down the banking. The riders who excel here ride with a smoothness that makes it look easy. You're not quite there yet.",
       triggers: { raceNumber: [3], performanceTier: ["top10", "podium", "win"] },
-      weight: 0.6
+      weight: 0.6,
+      bridges: {
+        win: "But today, you were closer than ever.",
+        podium: "Today, the trust paid off.",
+        top10: "Today, you rode with growing confidence."
+      }
     },
     {
       id: "track_sprint_intervals",
       text: "An elimination race is essentially twenty consecutive sprint efforts with no recovery. Your anaerobic capacity is being tested to its limit. Each lap you accelerate hard, hold the pace, then have to do it again fifteen seconds later. By lap ten, your legs are screaming. By lap fifteen, you're racing on willpower and lactic acid.",
       triggers: { raceNumber: [3], performanceTier: ["any"] },
-      weight: 0.8
+      weight: 0.8,
+      bridges: {
+        win: "And today, the willpower outlasted everyone else's.",
+        podium: "Today, you pushed through the pain longer than most.",
+        top10: "Today, you found reserves you didn't know you had.",
+        midpack: "And today, the lactic acid won.",
+        back: "And today, the legs gave out early."
+      }
     },
     {
       id: "track_positioning_paramount",
       text: "On the track, positioning is everything. Get stuck on the outside of a turn and you're done—too much extra distance to make up. Drift to the back of the group and you'll be eliminated. You need to be constantly aware of your position relative to every other rider, every moment of every lap. It's exhausting mentally before it even becomes exhausting physically.",
       triggers: { raceNumber: [3], performanceTier: ["any"] },
-      weight: 0.8
+      weight: 0.8,
+      bridges: {
+        win: "And today, your positioning was flawless.",
+        podium: "Today, you held the right wheel at the right time.",
+        top10: "Today, the awareness kept you alive.",
+        midpack: "And today, one moment of drift cost everything.",
+        back: "And today, the positioning battle was lost early."
+      }
     },
     {
       id: "track_fixed_gear_rhythm",
       text: "Racing on a fixed gear is its own skill—no coasting, no shifting, just pure rhythm and cadence. You can't rest on descents (there are none), you can't shift for attacks, you just have to modulate your power output through leg speed. It's both limiting and freeing. You're learning to love the simplicity of fixed gear racing.",
       triggers: { raceNumber: [3], performanceTier: ["any"] },
-      weight: 0.5
+      weight: 0.5,
+      bridges: {
+        win: "And today, you found the perfect rhythm.",
+        podium: "Today, the simplicity worked in your favor.",
+        top10: "Today, you embraced the fixed-gear demands.",
+        midpack: "And today, the rhythm eluded you.",
+        back: "And today, the simplicity felt limiting."
+      }
     }
   ],
 
@@ -2169,19 +3824,40 @@ const NARRATIVE_DATABASE = {
       id: "confident_swagger",
       text: "You've been carrying yourself differently lately—more swagger, more certainty. The self-doubt that used to creep in before races has been replaced by a calm confidence. You know what you're capable of now, and it shows in how you race.",
       triggers: { minRacesCompleted: 3, personalityMin: { confidence: 70 }, requiresInterview: true },
-      weight: 0.8
+      weight: 0.8,
+      bridges: {
+        win: "And today, that confidence was validated.",
+        podium: "Today, the swagger was earned.",
+        top10: "Today, that certainty paid off.",
+        midpack: "But today, confidence alone wasn't enough.",
+        back: "But today challenged that newfound certainty."
+      }
     },
     {
       id: "confident_predictions",
       text: "Your post-race interviews have been bold lately, predictions stated with conviction rather than hedged with maybes. Some might call it cocky. You call it knowing your own abilities and not being afraid to back yourself.",
       triggers: { minRacesCompleted: 4, personalityMin: { confidence: 75 }, requiresInterview: true },
-      weight: 0.7
+      weight: 0.7,
+      bridges: {
+        win: "And today, the bold prediction came true.",
+        podium: "Today backed up the bold talk.",
+        top10: "Today, you backed yourself well.",
+        midpack: "But today, the predictions didn't materialize.",
+        back: "But today's result will make the next interview harder."
+      }
     },
     {
       id: "confident_mentality",
       text: "There's a mental shift happening. Where you once hoped to compete, you now expect to win. That mindset adjustment is subtle but powerful—it changes how you approach every race, every tactical decision, every moment when the race gets hard.",
       triggers: { performanceTier: ["podium", "win"], personalityMin: { confidence: 70 }, requiresInterview: true },
-      weight: 0.8
+      weight: 0.8,
+      bridges: {
+        win: "And today, you lived up to that expectation.",
+        podium: "Today, that winning mentality showed.",
+        top10: "Today, the mindset served you well.",
+        midpack: "But today, expectation outran reality.",
+        back: "But today tested whether expectations were too high."
+      }
     },
 
     // HUMBLE PERSONALITY
@@ -2189,19 +3865,40 @@ const NARRATIVE_DATABASE = {
       id: "humble_grounded",
       text: "Success hasn't changed you. After each good result, you're quick to credit the competition, to acknowledge the role of luck and timing. It's not false modesty—you genuinely respect how hard this is, how thin the margins are, how much can change in a single race.",
       triggers: { performanceTier: ["podium", "win"], personalityMin: { humility: 70 }, requiresInterview: true },
-      weight: 0.8
+      weight: 0.8,
+      bridges: {
+        win: "And today, everything aligned in your favor.",
+        podium: "Today, the margins fell your way.",
+        top10: "Today, you earned a respectable result.",
+        midpack: "And today showed just how thin those margins can be.",
+        back: "And today reminded you how quickly things can change."
+      }
     },
     {
       id: "humble_learning",
       text: "You're treating every race like a classroom. Win or lose, there's something to learn from the riders around you. After races, you find yourself analyzing what others did well, storing away tactics and strategies for future use. The learning never stops.",
       triggers: { minRacesCompleted: 3, personalityMin: { humility: 65 }, requiresInterview: true },
-      weight: 0.7
+      weight: 0.7,
+      bridges: {
+        win: "And today, all those lessons came together.",
+        podium: "Today, the education showed in the result.",
+        top10: "Today's class had valuable lessons.",
+        midpack: "And today offered plenty to study.",
+        back: "And today's lesson was a hard one."
+      }
     },
     {
       id: "humble_respect",
       text: "The cycling community has noticed your humility. After races, you're the one shaking hands, complimenting strong rides, acknowledging good racing from others. That respect you show? It's being returned, slowly building a reputation as someone people want to race with.",
       triggers: { minRacesCompleted: 5, personalityMin: { humility: 70 }, requiresInterview: true },
-      weight: 0.6
+      weight: 0.6,
+      bridges: {
+        win: "And today, everyone was happy to shake your hand.",
+        podium: "Today, respect was mutual at the finish.",
+        top10: "Today, you raced in a way that earned that respect.",
+        midpack: "And today, that respect sustained you through disappointment.",
+        back: "And today, the community was there to pick you up."
+      }
     },
 
     // AGGRESSIVE PERSONALITY
@@ -2209,19 +3906,40 @@ const NARRATIVE_DATABASE = {
       id: "aggressive_edge",
       text: "Your rivals are starting to recognize a pattern: you don't back down. Where others might play it safe, you attack. Where others might be diplomatic, you speak your mind. Racing isn't just about winning for you—it's about proving something every time you pin on a number.",
       triggers: { minRacesCompleted: 3, personalityMin: { aggression: 70 }, requiresRivalHistory: true, requiresInterview: true },
-      weight: 0.9
+      weight: 0.9,
+      bridges: {
+        win: "And today, you proved everything you set out to prove.",
+        podium: "Today, that aggression was rewarded.",
+        top10: "Today, attacking paid off.",
+        midpack: "But today, the attacks didn't stick.",
+        back: "But today, aggression couldn't overcome the deficit."
+      }
     },
     {
       id: "aggressive_fire",
       text: "There's a competitive fire burning that wasn't there at the start of the season. You're racing angry now—not at anyone specific, but at losing, at being beaten, at anything less than your absolute best. That fire can burn you out or forge you into something dangerous. You're betting on the latter.",
       triggers: { performanceTier: ["any"], personalityMin: { aggression: 75 }, requiresInterview: true },
-      weight: 0.7
+      weight: 0.7,
+      bridges: {
+        win: "And today, that fire forged a victory.",
+        podium: "Today, the fire burned bright.",
+        top10: "Today, that anger found an outlet.",
+        midpack: "But today, the fire wasn't enough.",
+        back: "And today added fuel to that fire."
+      }
     },
     {
       id: "aggressive_reputation",
       text: "Word is getting around: you're a rider who attacks. In the start corrals, you've noticed riders positioning themselves to mark you, to watch for your moves. They're taking you seriously now. That's respect, earned the hard way.",
       triggers: { minRacesCompleted: 6, personalityMin: { aggression: 70 }, requiresInterview: true },
-      weight: 0.6
+      weight: 0.6,
+      bridges: {
+        win: "And today, even the markers couldn't stop you.",
+        podium: "Today, they were right to mark you.",
+        top10: "Today, you made them work to keep you in check.",
+        midpack: "But today, the marking paid off for them.",
+        back: "But today, the reputation didn't translate to results."
+      }
     },
 
     // PROFESSIONAL PERSONALITY
@@ -2229,19 +3947,40 @@ const NARRATIVE_DATABASE = {
       id: "professional_approach",
       text: "You've developed a systematic approach to racing: data analysis, structured training, careful recovery, tactical planning. Nothing left to chance, nothing left unprepared. The romantic notion of racing on pure passion has given way to calculated professionalism.",
       triggers: { minRacesCompleted: 4, personalityMin: { professionalism: 70 }, requiresInterview: true },
-      weight: 0.8
+      weight: 0.8,
+      bridges: {
+        win: "And today, the system delivered a win.",
+        podium: "Today, the professional approach paid off.",
+        top10: "Today, nothing was left to chance.",
+        midpack: "But today, even preparation couldn't guarantee success.",
+        back: "But today, the system broke down somewhere."
+      }
     },
     {
       id: "professional_consistency",
       text: "Consistency over flash, steady progress over dramatic swings. Your results are building a pattern—reliable, professional, predictable in the best way. You're becoming the rider others can count on, the one who shows up prepared and executes the plan.",
       triggers: { minRacesCompleted: 5, personalityMin: { professionalism: 75 }, requiresInterview: true },
-      weight: 0.7
+      weight: 0.7,
+      bridges: {
+        win: "And today, you executed the plan to perfection.",
+        podium: "Today continued the pattern of solid results.",
+        top10: "Today was another reliable performance.",
+        midpack: "But today broke the pattern.",
+        back: "But today's swing was more dramatic than usual."
+      }
     },
     {
       id: "professional_measured",
       text: "Your post-race interviews are composed, analytical, focused on process rather than emotion. You talk about power numbers, pacing strategies, tactical decisions. Some might find it dry. You find it effective. Results speak louder than soundbites.",
       triggers: { performanceTier: ["top10", "podium", "win"], personalityMin: { professionalism: 70 }, requiresInterview: true },
-      weight: 0.6
+      weight: 0.6,
+      bridges: {
+        win: "And today, the results spoke loudest of all.",
+        podium: "Today, the numbers told a good story.",
+        top10: "Today's analysis will be positive.",
+        midpack: "But today's numbers need processing.",
+        back: "And today's data will require honest examination."
+      }
     },
 
     // SHOWMAN PERSONALITY
@@ -2249,19 +3988,40 @@ const NARRATIVE_DATABASE = {
       id: "showman_entertaining",
       text: "Racing is theater, and you've embraced your role as entertainer. Bold moves, memorable quotes, a willingness to make the race exciting even when it costs you a better result. The fans are starting to notice. So are the journalists covering these events.",
       triggers: { minRacesCompleted: 4, personalityMin: { showmanship: 70 }, requiresInterview: true },
-      weight: 0.8
+      weight: 0.8,
+      bridges: {
+        win: "And today, the show ended with a standing ovation.",
+        podium: "Today's performance was memorable.",
+        top10: "Today, you gave them something to talk about.",
+        midpack: "But today, the bold moves didn't pay off.",
+        back: "But today's theater was more tragedy than triumph."
+      }
     },
     {
       id: "showman_dramatic",
       text: "You don't just race—you perform. Every attack is committed, every interview is quotable, every result is part of a larger narrative you're writing. Some riders disappear into the peloton. You make sure people remember your name.",
       triggers: { performanceTier: ["win", "podium"], personalityMin: { showmanship: 75 }, requiresInterview: true },
-      weight: 0.7
+      weight: 0.7,
+      bridges: {
+        win: "And today, they'll definitely remember your name.",
+        podium: "Today added a great chapter to the narrative.",
+        top10: "Today, you didn't disappear.",
+        midpack: "But today's chapter was less dramatic.",
+        back: "But today's performance won't make the highlight reel."
+      }
     },
     {
       id: "showman_flair",
       text: "There's a flair to how you race now—a willingness to try the audacious move, to make the bold statement. It doesn't always work, but when it does, it's spectacular. And even when it doesn't, people are talking about it. That's worth something.",
       triggers: { minRacesCompleted: 5, personalityMin: { showmanship: 65 }, requiresInterview: true },
-      weight: 0.6
+      weight: 0.6,
+      bridges: {
+        win: "Today, it worked—spectacularly.",
+        podium: "Today's flair paid dividends.",
+        top10: "Today, the audacious moves contributed.",
+        midpack: "Today, the bold moves didn't quite connect.",
+        back: "Today, the audacity outran the ability."
+      }
     },
 
     // RESILIENT PERSONALITY
@@ -2269,19 +4029,40 @@ const NARRATIVE_DATABASE = {
       id: "resilient_bounce_back",
       text: "Setbacks don't stick to you anymore. Bad races? Learn and move on. Tough results? Analyze what went wrong and fix it. You've developed a mental resilience that might be more valuable than pure physical ability. Champions aren't made on good days—they're made on how they handle bad ones.",
       triggers: { minRacesCompleted: 4, personalityMin: { resilience: 70 }, requiresInterview: true },
-      weight: 0.9
+      weight: 0.9,
+      bridges: {
+        win: "And today was one of those good days.",
+        podium: "Today, the resilience translated to results.",
+        top10: "Today, resilience served you well.",
+        midpack: "And today, you'll learn and move on.",
+        back: "And today is exactly the kind of day you'll bounce back from."
+      }
     },
     {
       id: "resilient_growth",
       text: "Every challenge has become an opportunity for growth in your mind. Struggles aren't failures—they're data points, lessons, stepping stones to something better. That perspective shift is powerful. It means you're never really losing, only learning.",
       triggers: { performanceTier: ["midpack", "back"], personalityMin: { resilience: 75 }, requiresInterview: true },
-      weight: 0.8
+      weight: 0.8,
+      bridges: {
+        win: "And today, all that learning paid off.",
+        podium: "Today, the growth showed.",
+        top10: "Today was another stepping stone.",
+        midpack: "And today offered more lessons to absorb.",
+        back: "And today was rich with data points for the future."
+      }
     },
     {
       id: "resilient_warrior",
       text: "Your teammates and competitors have noticed: you don't quit. Terrible race? You're back the next week. Get dropped? You chase back. Crash out? You're already planning the comeback. That warrior mentality can't be taught—it has to be forged through adversity. You're forging it now.",
       triggers: { minRacesCompleted: 6, personalityMin: { resilience: 70 }, requiresInterview: true },
-      weight: 0.7
+      weight: 0.7,
+      bridges: {
+        win: "And today, the warrior was victorious.",
+        podium: "Today, that mentality paid off.",
+        top10: "Today, you fought well.",
+        midpack: "And today, you showed that warrior spirit.",
+        back: "And today will only forge you stronger."
+      }
     },
 
     // MIXED PERSONALITY COMBINATIONS
@@ -2289,25 +4070,53 @@ const NARRATIVE_DATABASE = {
       id: "confident_humble_balance",
       text: "You've found an interesting balance: confident in your abilities but humble about your place in the sport. You back yourself without disrespecting the competition. It's a rare combination—the self-belief needed to win mixed with the groundedness that keeps you improving.",
       triggers: { performanceTier: ["podium", "win"], personalityMin: { confidence: 65, humility: 65 }, requiresInterview: true },
-      weight: 0.7
+      weight: 0.7,
+      bridges: {
+        win: "And today, that balance produced a winner.",
+        podium: "Today, both confidence and humility served you.",
+        top10: "Today, that balance helped.",
+        midpack: "And today, humility comes easier than confidence.",
+        back: "And today tests the confidence more than the humility."
+      }
     },
     {
       id: "aggressive_professional",
       text: "Your racing style is interesting: tactically aggressive but methodically professional. You attack with purpose, not recklessness. Every move is calculated, even the bold ones. It's making you dangerous—unpredictable in execution but entirely predictable in intent: you're here to win.",
       triggers: { minRacesCompleted: 5, personalityMin: { aggression: 65, professionalism: 65 }, requiresInterview: true },
-      weight: 0.7
+      weight: 0.7,
+      bridges: {
+        win: "And today, the calculated aggression delivered a win.",
+        podium: "Today, the dangerous combination worked.",
+        top10: "Today, you were dangerous as intended.",
+        midpack: "But today, the calculations didn't add up.",
+        back: "But today, even calculated attacks fell short."
+      }
     },
     {
       id: "humble_resilient",
       text: "There's a quiet strength in how you're approaching this season. Grateful for every opportunity, resilient through every setback. You don't demand attention or make bold claims—you just keep showing up, keep working, keep improving. That steady persistence is building into something formidable.",
       triggers: { minRacesCompleted: 4, personalityMin: { humility: 65, resilience: 65 }, requiresInterview: true },
-      weight: 0.7
+      weight: 0.7,
+      bridges: {
+        win: "And today, the quiet strength roared.",
+        podium: "Today, that persistence paid off.",
+        top10: "Today, you kept showing up and it mattered.",
+        midpack: "And today, you showed up, as always.",
+        back: "And today, you'll absorb and keep building."
+      }
     },
     {
       id: "showman_confident",
       text: "You've got the full package now: the confidence to back up your words and the showmanship to make sure those words are memorable. Pre-race predictions delivered with conviction, post-race interviews full of quotable moments. And the results to justify the swagger. It's working.",
       triggers: { performanceTier: ["win", "podium"], personalityMin: { showmanship: 65, confidence: 65 }, requiresInterview: true },
-      weight: 0.6
+      weight: 0.6,
+      bridges: {
+        win: "And today, it worked perfectly.",
+        podium: "Today justified every bold word.",
+        top10: "Today, the words mostly matched the results.",
+        midpack: "But today, the swagger outran the result.",
+        back: "But today, the words will be harder to deliver."
+      }
     }
   ],
 
@@ -2660,31 +4469,63 @@ const NARRATIVE_DATABASE = {
       id: "contributor_inner_circle",
       text: "As you warm up, a familiar face from the supporter community waves from the barriers. It's a reminder that you're not just racing for yourself—you're part of something bigger, a community that believes in what TPV Career Mode represents. That golden star next to your name isn't just decoration; it's a badge of belonging.",
       triggers: { requiresContributor: true, performanceTier: "any" },
-      weight: 0.7
+      weight: 0.7,
+      bridges: {
+        win: "And today, you gave the community something to celebrate.",
+        podium: "Today, you represented that community well.",
+        top10: "Today, you showed what the community can produce.",
+        midpack: "Today wasn't the result you wanted to share.",
+        back: "But results don't define belonging."
+      }
     },
     {
       id: "contributor_behind_scenes",
       text: "The night before the race, you received a message from the dev team—a thank you for your support and a hint at upcoming features being worked on. Being part of the contributor circle has its perks, including the knowledge that your support directly fuels these innovations. You clip in feeling like an insider.",
       triggers: { requiresContributor: true, raceNumber: [3, 6, 9, 12] },
-      weight: 0.6
+      weight: 0.6,
+      bridges: {
+        win: "And today, you raced with that insider confidence.",
+        podium: "Today, that insider feeling translated to results.",
+        top10: "Today, you raced with purpose.",
+        midpack: "Though today, the results didn't match the feeling.",
+        back: "But the community connection remains, win or lose."
+      }
     },
     {
       id: "contributor_legacy",
       text: "Your contribution to TPV Career Mode isn't just financial—it's a vote of confidence in the virtual cycling community. As you prepare to race, that golden star next to your name reminds you: you're helping build something that will outlast any single race result. Win or lose today, you've already won something bigger.",
       triggers: { requiresContributor: true, performanceTier: ["win", "podium"] },
-      weight: 0.8
+      weight: 0.8,
+      bridges: {
+        win: "And today, you added a race win to that legacy.",
+        podium: "Today, you added a podium to the story."
+      }
     },
     {
       id: "contributor_pioneer",
       text: "You were one of the early believers, one of the riders who saw the potential in TPV Career Mode before it was proven. That pioneering spirit carries over to your racing—you don't just follow the pack, you help shape what's possible. Today's race is another chapter in a story you're helping to write.",
       triggers: { requiresContributor: true, minRacesCompleted: 5 },
-      weight: 0.6
+      weight: 0.6,
+      bridges: {
+        win: "And today, you wrote a winning chapter.",
+        podium: "Today, you added a strong chapter to the story.",
+        top10: "Today, the chapter was competitive.",
+        midpack: "Today's chapter was humbling, but the story continues.",
+        back: "Not every chapter needs to be a triumph."
+      }
     },
     {
       id: "contributor_gratitude",
       text: "Between races, you sometimes forget the contributor badge exists—until you see that star gleaming next to your name in the standings. It's not about recognition; it's about being part of the solution, part of the community that keeps this virtual peloton rolling forward. Every race you complete, every story that unfolds, exists partly because of supporters like you.",
       triggers: { requiresContributor: true },
-      weight: 0.5
+      weight: 0.5,
+      bridges: {
+        win: "And today, your story was one of triumph.",
+        podium: "Today, your story reached the podium.",
+        top10: "Today, your story was competitive.",
+        midpack: "Today's story was a quieter chapter.",
+        back: "Today's story was one of struggle."
+      }
     }
   ],
 
@@ -2696,31 +4537,61 @@ const NARRATIVE_DATABASE = {
       id: "special_singapore_night_atmosphere",
       text: "The Singapore night air wraps around you like a warm blanket as you roll to the start line. Floodlights blaze overhead, turning the Marina Bay street circuit into a theatrical stage. This isn't like any race you've done before—the tropical humidity, the glittering skyline, the exclusive atmosphere of an event you had to earn your way into. The heat is oppressive but somehow electric. Around you, the other riders look equally awed and intimidated by the setting.",
       triggers: { eventNumber: 101, performanceTier: ["any"] },
-      weight: 0.9
+      weight: 0.9,
+      bridges: {
+        win: "And under those lights, you delivered a performance worthy of the stage.",
+        podium: "And under those lights, you rose to the occasion.",
+        top10: "And under those lights, you held your own.",
+        midpack: "But the stage proved bigger than the performance.",
+        back: "But the intimidation won out over the awe."
+      }
     },
     {
       id: "special_singapore_marina_bay",
       text: "Marina Bay's skyline towers behind the start line, a wall of illuminated skyscrapers reflecting off the water. You've seen photos of this place, dreamed about racing here, but nothing prepared you for the reality. The Singapore Criterium is invitation-only, exclusive, prestigious—and somehow you're here, pinning a race number to your jersey under lights bright enough to film a movie. The night racing format adds an edge of unreality to everything.",
       triggers: { eventNumber: 101, performanceTier: ["any"] },
-      weight: 0.8
+      weight: 0.8,
+      bridges: {
+        win: "And the unreality became a dream come true.",
+        podium: "And the dream delivered a podium finish.",
+        top10: "And you proved you belonged in this exclusive field.",
+        midpack: "But the reality of the racing was harder than the dream.",
+        back: "And the exclusive field proved too strong."
+      }
     },
     {
       id: "special_singapore_tropical_heat",
       text: "The tropical heat hits different at night. You'd expected it to cool down after sunset, but Singapore doesn't work that way—the humidity hangs in the air like a physical presence, making every breath feel heavy. Your pre-race warmup left you drenched in sweat before you even started. The riders around you are dealing with the same conditions, dabbing at faces, sipping constantly from bottles. This will be as much a test of heat management as racing ability.",
       triggers: { eventNumber: 101, performanceTier: ["midpack", "back"] },
-      weight: 0.7
+      weight: 0.7,
+      bridges: {
+        midpack: "And the heat management proved more challenging than anticipated.",
+        back: "And the tropical conditions overwhelmed you completely."
+      }
     },
     {
       id: "special_singapore_earned_entry",
       text: "Not everyone gets to race the Singapore Criterium. You had to earn this—prove yourself worthy of an invitation to one of the most exclusive events on the calendar. As you look around at the other competitors, you realize they all went through the same process. This isn't a participation-trophy event. This is where serious riders come to test themselves under extraordinary conditions. The floodlit street circuit awaits.",
       triggers: { eventNumber: 101, performanceTier: ["any"] },
-      weight: 0.7
+      weight: 0.7,
+      bridges: {
+        win: "And you proved yourself worthy in the most decisive way.",
+        podium: "And you proved you earned your place here.",
+        top10: "And you showed the invitation wasn't wasted.",
+        midpack: "But the extraordinary conditions tested you harder than expected.",
+        back: "But the other serious riders were simply faster."
+      }
     },
     {
       id: "special_singapore_urban_circuit",
       text: "The Singapore street circuit is tighter than you expected—technical corners that demand respect, barriers close enough to touch, the constant awareness that one mistake on this unforgiving urban tarmac could end your night early. But that's part of the appeal. Night criteriums reward the bold and punish the careless. As you complete your reconnaissance lap, you're already planning your lines, identifying the corners where you can gain time.",
       triggers: { eventNumber: 101, performanceTier: ["top10", "podium", "win"] },
-      weight: 0.7
+      weight: 0.7,
+      bridges: {
+        win: "And your boldness was rewarded perfectly.",
+        podium: "And your lines through those corners paid off.",
+        top10: "And those planned lines helped you stay competitive."
+      }
     },
     {
       id: "special_singapore_night_victory",
@@ -2738,19 +4609,37 @@ const NARRATIVE_DATABASE = {
       id: "special_singapore_exotic_dream",
       text: "Racing in Singapore felt like stepping into someone else's life. The exotic location, the night format, the prestige of an invitation-only event—none of it seemed real until you were actually there, heart pounding, legs spinning, chasing the rider ahead through pools of floodlight and shadow. Whatever the result, you'll carry this experience with you. Not many people can say they've raced under the Singapore lights.",
       triggers: { eventNumber: 101, performanceTier: ["any"] },
-      weight: 0.6
+      weight: 0.6,
+      bridges: {
+        win: "And now you can say you won under those lights.",
+        podium: "And now you can say you podiumed there.",
+        top10: "And now you have the result to match the experience.",
+        midpack: "The experience matters, even if the result didn't match the dream.",
+        back: "The experience matters, even when the result doesn't."
+      }
     },
     {
       id: "special_singapore_shadow_racing",
       text: "Night racing creates its own rhythm. The floodlights cast sharp shadows that shift as you corner, creating moments of brightness and darkness in rapid succession. Your eyes constantly adjust, your brain processing the unusual visual input while your legs drive the pedals. It's disorienting at first, then exhilarating once you find the flow. The Singapore street circuit under lights is unlike anything else in cycling.",
       triggers: { eventNumber: 101, performanceTier: ["any"] },
-      weight: 0.5
+      weight: 0.5,
+      bridges: {
+        win: "And you found the flow perfectly.",
+        podium: "And you found the flow when it mattered.",
+        top10: "And you adapted to the unique demands.",
+        midpack: "But finding the flow proved harder than expected.",
+        back: "And the disorientation never fully faded."
+      }
     },
     {
       id: "special_singapore_prestige",
       text: "The Singapore Criterium carries a weight that regular races don't. Standing at the start, you're acutely aware of what it took to get here—the qualifying results, the invitation, the journey to this humid metropolis. The prestige of this event isn't manufactured; it's earned by every rider who makes it to the start line. Tonight, under the lights of Marina Bay, you'll find out if you can match that prestige with performance.",
       triggers: { eventNumber: 101, performanceTier: ["podium", "win"] },
-      weight: 0.7
+      weight: 0.7,
+      bridges: {
+        win: "And tonight, you matched prestige with victory.",
+        podium: "And tonight, you matched the prestige with performance."
+      }
     },
 
     // ===== THE LEVELLER (Event 102) =====
@@ -2758,49 +4647,99 @@ const NARRATIVE_DATABASE = {
       id: "special_leveller_proving_ground",
       text: "The Leveller isn't like other races. It doesn't favor the pure climber or the dedicated sprinter—it demands everything. Seven laps of North Lake's rolling terrain, with points scattered across the course, testing your endurance, your explosiveness, and your tactical brain all at once. This is where you find out what kind of rider you really are. No hiding behind a single strength here. The Leveller exposes everything.",
       triggers: { eventNumber: 102, performanceTier: ["any"] },
-      weight: 0.9
+      weight: 0.9,
+      bridges: {
+        win: "And today, you proved you're a complete rider.",
+        podium: "And today, you showed you have it all.",
+        top10: "And today, you proved you're well-rounded.",
+        midpack: "And today exposed where the gaps are.",
+        back: "And today, everything was exposed."
+      }
     },
     {
       id: "special_leveller_rank_calibration",
       text: "They call it The Leveller because it calibrates everyone to their true level. Specialists who dominate in their comfort zone often struggle here, while all-rounders finally get a race that plays to their versatility. As you roll to the start, you're genuinely uncertain how this will go. Your strengths might carry you, or your weaknesses might be ruthlessly exposed. Seven laps from now, you'll know exactly where you stand.",
       triggers: { eventNumber: 102, performanceTier: ["any"] },
-      weight: 0.8
+      weight: 0.8,
+      bridges: {
+        win: "Now you know—you stand at the top.",
+        podium: "Now you know—you stand near the top.",
+        top10: "Now you know exactly where you stand.",
+        midpack: "Now you know where the weaknesses lie.",
+        back: "Now you know exactly what needs work."
+      }
     },
     {
       id: "special_leveller_north_lake",
       text: "North Lake's rolling terrain is familiar territory, but racing it for points changes everything. The climbs that felt manageable on training rides become battlegrounds when there are points on the line. The descents that once offered recovery now demand immediate acceleration into the next effort. Seven laps of this, and you'll have answered some important questions about your riding.",
       triggers: { eventNumber: 102, performanceTier: ["any"] },
-      weight: 0.7
+      weight: 0.7,
+      bridges: {
+        win: "And you answered every question decisively.",
+        podium: "And the answers were mostly positive.",
+        top10: "And you found some good answers.",
+        midpack: "And some answers were harder to hear.",
+        back: "And the answers raised more questions."
+      }
     },
     {
       id: "special_leveller_balanced_test",
       text: "Endurance for the seven laps. Explosiveness for the points sprints. Climbing ability for the rolling terrain. Time trial power to close gaps. The Leveller tests them all, equally and mercilessly. You've spent your training focusing on various aspects of your fitness, and now every bit of that work will be examined. This is the most complete test of cycling ability you've ever faced.",
       triggers: { eventNumber: 102, performanceTier: ["top10", "podium"] },
-      weight: 0.8
+      weight: 0.8,
+      bridges: {
+        podium: "And you passed the test with distinction.",
+        top10: "And your training proved well-rounded."
+      }
     },
     {
       id: "special_leveller_career_jumpstart",
       text: "For developing riders, The Leveller is a golden opportunity. It's open to everyone, free to enter, and the results matter for your ranking calibration. A strong performance here can jumpstart a career, placing you in the right categories with riders at your level. You're not just racing for points today—you're racing to establish your identity in the peloton.",
       triggers: { eventNumber: 102, performanceTier: ["any"] },
-      weight: 0.7
+      weight: 0.7,
+      bridges: {
+        win: "And you established yourself at the very top.",
+        podium: "And you established yourself as a serious contender.",
+        top10: "And you established yourself as competitive.",
+        midpack: "And you established where you currently stand.",
+        back: "And you identified the areas needing work."
+      }
     },
     {
       id: "special_leveller_points_tactical",
       text: "Points racing requires a different mindset. You can't just empty the tank for the finish line—you need to meter your efforts across multiple sprints, making tactical decisions about which points to contest and which to let go. The Leveller's seven-lap format means plenty of opportunities, but also plenty of ways to overcook your effort too early. Smart racing wins here as much as strong legs.",
       triggers: { eventNumber: 102, performanceTier: ["podium", "win"] },
-      weight: 0.7
+      weight: 0.7,
+      bridges: {
+        win: "And you raced smart and strong.",
+        podium: "And your tactical choices paid off."
+      }
     },
     {
       id: "special_leveller_all_rounder_identity",
       text: "Some riders know exactly what they are—pure climbers, dedicated sprinters, time trial specialists. Others are harder to categorize, good at everything but dominant at nothing. The Leveller is designed for the second group. If you've ever wondered whether being an all-rounder is a strength or a weakness, today will provide the answer. Seven laps of multi-faceted racing await.",
       triggers: { eventNumber: 102, performanceTier: ["any"] },
-      weight: 0.6
+      weight: 0.6,
+      bridges: {
+        win: "Today provided the answer: it's a strength.",
+        podium: "Today suggested being well-rounded is indeed a strength.",
+        top10: "Today showed versatility has value.",
+        midpack: "Today's answer was more complicated.",
+        back: "Today suggested you might need to specialize."
+      }
     },
     {
       id: "special_leveller_free_opportunity",
       text: "Unlike some special events that require unlocking, The Leveller is open to all. It's a gift to developing riders—a chance to test yourself against a demanding format without barriers to entry. Free doesn't mean easy, though. The rolling terrain of North Lake and the points race format will extract every watt you can produce. The opportunity is free; earning a good result still costs effort.",
       triggers: { eventNumber: 102, performanceTier: ["any"] },
-      weight: 0.6
+      weight: 0.6,
+      bridges: {
+        win: "And you earned the best result possible.",
+        podium: "And you capitalized on the opportunity.",
+        top10: "And your effort yielded a solid return.",
+        midpack: "And the effort cost was high.",
+        back: "And the format extracted everything you had."
+      }
     },
     {
       id: "special_leveller_complete_rider",
@@ -2820,37 +4759,79 @@ const NARRATIVE_DATABASE = {
       id: "valentine_intro_dedication",
       text: "Valentine's Day. Some riders brought their partners to watch from the sidelines, hearts and flowers in hand. You brought your bike and a race number. Love is temporary—results are forever. Or so you tell yourself as you line up for the Valentine's Invitational, where dedication to cycling trumps dedication to romance.",
       triggers: { eventNumber: 103, performanceTier: ["any"] },
-      weight: 0.9
+      weight: 0.9,
+      bridges: {
+        win: "And today's result will last forever.",
+        podium: "And today's dedication was rewarded.",
+        top10: "And the dedication showed.",
+        midpack: "But today, dedication wasn't enough.",
+        back: "And romance might have been the better choice."
+      }
     },
     {
       id: "valentine_intro_cynical",
       text: "The Valentine's Invitational. Named for the day, not for the sentiment. There's nothing romantic about pushing your body to its limit, nothing sweet about the burn in your legs as you fight for position on rolling hills. But there's something honest about it—pain doesn't lie, and neither do race results. Today, you race.",
       triggers: { eventNumber: 103, performanceTier: ["any"] },
-      weight: 0.8
+      weight: 0.8,
+      bridges: {
+        win: "And the honest truth was sweet indeed.",
+        podium: "And the honest result was worth the pain.",
+        top10: "And the honest effort showed in the results.",
+        midpack: "And the honest truth was harder than expected.",
+        back: "And the pain told an honest, painful story."
+      }
     },
     {
       id: "valentine_couples_racing",
       text: "A few couples are racing together today—partners in life, rivals on the road. You watch them warming up side by side and wonder what that must be like, sharing both the passion for cycling and the passion for each other. Today, though, romance ends at the start line. On the bike, there are no valentines, only competitors.",
       triggers: { eventNumber: 103, performanceTier: ["any"] },
-      weight: 0.7
+      weight: 0.7,
+      bridges: {
+        win: "And you proved to be the best competitor of all.",
+        podium: "And you competed at the sharp end.",
+        top10: "And you held your own among the competitors.",
+        midpack: "And the competition proved tougher than the warmup suggested.",
+        back: "And the competition was fierce."
+      }
     },
     {
       id: "valentine_february_challenge",
       text: "February isn't the easiest month for outdoor racing. The weather can be unpredictable, the training has been tough through winter, and your body is still shaking off the off-season rust. But the Valentine's Invitational doesn't wait for perfect conditions. It demands you show up and race, regardless of the calendar or the elements. Love may be patient, but racing isn't.",
       triggers: { eventNumber: 103, performanceTier: ["any"] },
-      weight: 0.7
+      weight: 0.7,
+      bridges: {
+        win: "And you showed up ready to win.",
+        podium: "And you shook off the rust at the right moment.",
+        top10: "And your winter training showed.",
+        midpack: "And the February rust was evident.",
+        back: "And the off-season rust proved costly."
+      }
     },
     {
       id: "valentine_invitational_prestige",
       text: "The Valentine's Invitational carries a certain prestige. It's not just another race on the calendar—it's a bimonthly special event that attracts riders who choose suffering over sentiment. Being here means you prioritized racing over chocolates and candlelit dinners. The field is full of dedicated cyclists who made the same choice. This is your kind of Valentine's Day.",
       triggers: { eventNumber: 103, performanceTier: ["any"] },
-      weight: 0.8
+      weight: 0.8,
+      bridges: {
+        win: "And it turned out to be the best Valentine's Day ever.",
+        podium: "And your priorities were rewarded.",
+        top10: "And you made the right choice showing up.",
+        midpack: "But today, the dedicated field was simply stronger.",
+        back: "But the field of dedicated cyclists was too strong."
+      }
     },
     {
       id: "valentine_heartbreak_hill",
       text: "They say love hurts, but so do these rolling hills. Each climb tests your resolve, each descent offers brief relief before the next uphill grind. The 351 meters of climbing spread across 37.5 kilometers means constant pressure on your legs and lungs. If your heart isn't racing from romance today, it's definitely racing from the effort. Either way, someone's getting their heart rate up.",
       triggers: { eventNumber: 103, performanceTier: ["any"] },
-      weight: 0.75
+      weight: 0.75,
+      bridges: {
+        win: "And your heart rate paid off perfectly.",
+        podium: "And the effort was rewarded.",
+        top10: "And you conquered the rolling terrain.",
+        midpack: "And the hills proved heartbreaking.",
+        back: "And the climbing broke you."
+      }
     },
     {
       id: "valentine_win_love_found",
@@ -2886,37 +4867,76 @@ const NARRATIVE_DATABASE = {
       id: "valentine_bimonthly_tradition",
       text: "The Valentine's Invitational happens every two months, creating a rhythm to the special event calendar. This recurring opportunity means you'll get another chance, another race, another shot at proving yourself. Like any good relationship, consistency matters. Keep showing up, keep racing, keep chasing those Valentine podiums. The next one is just weeks away.",
       triggers: { eventNumber: 103, performanceTier: ["any"] },
-      weight: 0.6
+      weight: 0.6,
+      bridges: {
+        win: "And today, you didn't need another chance.",
+        podium: "And today you proved yourself.",
+        top10: "And you made this chance count.",
+        midpack: "And you'll be back for another shot.",
+        back: "And the next opportunity can't come soon enough."
+      }
     },
     {
       id: "valentine_career_points_legacy",
       text: "The Valentine's Invitational contributes to career points, not season standings. That makes every result part of your permanent legacy, not just this season's tally. Racing for career points feels more meaningful somehow—like you're building something that lasts beyond a single competitive year. Today's effort becomes part of your lifelong palmares. That's a valentine that doesn't expire.",
       triggers: { eventNumber: 103, performanceTier: ["any"] },
-      weight: 0.7
+      weight: 0.7,
+      bridges: {
+        win: "And you added a major win to that legacy.",
+        podium: "And your legacy grew significantly.",
+        top10: "And you added solid points to your palmares.",
+        midpack: "And every point still counts.",
+        back: "But every race is still part of the story."
+      }
     },
     {
       id: "valentine_multiple_chances",
       text: "With multiple timeslots spread across two days, the Valentine's Invitational offers options. Different race times, different competitors, different pens—all part of the same event. You chose your timeslot, showed up, and raced. Some riders are doing this tomorrow, some already finished yesterday. The shared experience connects you all, even if you never raced the same pen. Community through competition, the cycling way.",
       triggers: { eventNumber: 103, performanceTier: ["any"] },
-      weight: 0.65
+      weight: 0.65,
+      bridges: {
+        win: "And in your pen, you were the best.",
+        podium: "And in your pen, you shone.",
+        top10: "And in your pen, you competed well.",
+        midpack: "And the competition in your pen was tough.",
+        back: "And your pen proved challenging."
+      }
     },
     {
       id: "valentine_anti_romance",
       text: "Nothing says anti-romance like voluntarily suffering through a rolling road race on Valentine's Day. While restaurants overflow with couples and flower shops sell out, you're here, pushing watts, climbing hills, and fighting for position. Some people find this dedication strange. You find it essential. Racing is the relationship that never lets you down—it's always honest about where you stand.",
       triggers: { eventNumber: 103, performanceTier: ["any"] },
-      weight: 0.7
+      weight: 0.7,
+      bridges: {
+        win: "And today, you stood at the very top.",
+        podium: "And today showed you stand near the front.",
+        top10: "And today showed exactly where you stand.",
+        midpack: "And the honest truth was hard to swallow.",
+        back: "And the honesty stung more than usual."
+      }
     },
     {
       id: "valentine_bosberg_attack",
       text: "The Bosberg—1.3 kilometers where legends are made. This is where the Valentine's Invitational truly begins, where the race ignites and attacks fly. Belgian cycling history runs through these cobbles and gradients. To win here, you need to conquer this climb. To attack on the Bosberg is to channel decades of classics racing, to join a lineage of riders who made their move on this iconic ascent.",
       triggers: { eventNumber: 103, performanceTier: ["win", "podium"] },
-      weight: 0.85
+      weight: 0.85,
+      bridges: {
+        win: "And you conquered it decisively.",
+        podium: "And your move on the Bosberg paid off."
+      }
     },
     {
       id: "valentine_bosberg_heritage",
       text: "The Valentine's Invitational traces its path from Ninove toward the Bosberg, paying homage to Flemish classics. This isn't just another climb—it's a piece of cycling heritage. The steep gradients, the rough surface, the knowledge that countless legends have suffered here before you. Racing the Bosberg on Valentine's Day connects you to something bigger than romance: the enduring love affair between cyclists and Belgian hills.",
       triggers: { eventNumber: 103, performanceTier: ["any"] },
-      weight: 0.75
+      weight: 0.75,
+      bridges: {
+        win: "And today, you added your name to that heritage.",
+        podium: "And today, you earned your place in that tradition.",
+        top10: "And today, you honored that heritage.",
+        midpack: "But the Belgian hills showed no love in return.",
+        back: "And the heritage humbled you completely."
+      }
     }
   ]
 };

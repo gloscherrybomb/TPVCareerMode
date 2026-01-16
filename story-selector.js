@@ -40,6 +40,16 @@ const CATEGORY_TONES = {
   specialEvents: EMOTIONAL_TONES.POSITIVE
 };
 
+// Fallback bridges for stories without specific bridges defined
+// Used when transitioning from intro (Part 1) to race recap (Part 2)
+const FALLBACK_BRIDGES = {
+  win: "And today delivered.",
+  podium: "And today, you were in the fight.",
+  top10: "And today, you showed you belonged.",
+  midpack: "But today was a different story.",
+  back: "But today wasn't your day."
+};
+
 // Tone transition penalties (from -> to = penalty score reduction)
 // Higher penalty = more jarring transition to avoid
 const TONE_TRANSITION_PENALTIES = {
@@ -775,8 +785,12 @@ class StorySelector {
         await this.markStoryUsed(riderId, opening.id, context.eventNumber, db);
         // Set initial emotional state
         this.setRiderEmotionalState(riderId, EMOTIONAL_TONES.NEUTRAL);
+        // Return with bridge (use story-specific bridge or fallback)
+        const tier = context.performanceTier || 'midpack';
+        const bridge = (opening.bridges && opening.bridges[tier]) || FALLBACK_BRIDGES[tier];
+        return { text: introParagraph, bridge };
       }
-      return introParagraph;
+      return { text: introParagraph, bridge: FALLBACK_BRIDGES[context.performanceTier || 'midpack'] };
     }
 
     // Special Events (eventNumber >= 100): Use dedicated specialEvents category
@@ -786,8 +800,12 @@ class StorySelector {
         introParagraph = this.applyVariableSubstitution(specialStory.text, context);
         await this.markStoryUsed(riderId, specialStory.id, context.eventNumber, db);
         this.setRiderEmotionalState(riderId, this.getStoryEmotionalTone(specialStory, 'specialEvents'));
+        // Return with bridge (use story-specific bridge or fallback)
+        const tier = context.performanceTier || 'midpack';
+        const bridge = (specialStory.bridges && specialStory.bridges[tier]) || FALLBACK_BRIDGES[tier];
+        return { text: introParagraph.trim(), bridge };
       }
-      return introParagraph.trim();
+      return { text: introParagraph.trim(), bridge: FALLBACK_BRIDGES[context.performanceTier || 'midpack'] };
     }
 
     // Build list of relevant categories with priority bonuses
@@ -857,7 +875,7 @@ class StorySelector {
 
     if (allCandidates.length === 0) {
       console.log(`No story candidates found for rider ${riderId} at event ${context.eventNumber}`);
-      return '';
+      return { text: '', bridge: FALLBACK_BRIDGES[context.performanceTier || 'midpack'] };
     }
 
     // Sort by score (highest first)
@@ -882,7 +900,10 @@ class StorySelector {
     const selectedTone = this.getStoryEmotionalTone(selected.story, selected.category);
     this.setRiderEmotionalState(riderId, selectedTone);
 
-    return introParagraph.trim();
+    // Return with bridge (use story-specific bridge or fallback)
+    const tier = context.performanceTier || 'midpack';
+    const bridge = (selected.story.bridges && selected.story.bridges[tier]) || FALLBACK_BRIDGES[tier];
+    return { text: introParagraph.trim(), bridge };
   }
 
   /**
