@@ -11,7 +11,8 @@
     "fetchedAt": "2026-01-16T12:13:54.033Z",
     "source": "api",
     "manualOverride": true,
-    "overrideReason": "Hash mismatch - approved for processing"
+    "overrideReason": "Hash mismatch - approved for processing",
+    "processedAt": "2026-01-16T12:28:30.241Z"
   },
   "results": [
     {
